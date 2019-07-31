@@ -113,14 +113,14 @@ public interface BitSetUtil{
         return true;
     }
     public static boolean uncheckedcontains(long[] words,int offset,int size,LongUnaryOperator wordFlipper) {
-        int bound=offset+size-1;
-        int wordBound=bound>>6;
+        int bound;
+        int wordBound=(bound=offset+size-1)>>6;
         int wordOffset=offset>>6;
         if((offset&63)!=0) {
             if(wordOffset==wordBound) {
                 return (wordFlipper.applyAsLong(words[wordBound])&(1L<<bound-offset+1)-1<<offset)!=0;
             }
-            if(wordFlipper.applyAsLong(words[wordOffset++])<<offset!=0) {
+            if(wordFlipper.applyAsLong(words[wordOffset++])>>>offset!=0) {
                 return true;
             }
         }

@@ -32,8 +32,6 @@ import omni.util.ToStringUtil.OmniStringBuilderByte;
 import omni.util.TypeUtil;
 public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implements OmniCollection.OfBoolean{
     private static final long serialVersionUID=1L;
-
-
     private static void setRange(long[] words,int offset,int bound,long val) {
       while(offset<bound) {
         words[offset]=val;
@@ -67,7 +65,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
       }
     }
-   
     transient long[] words;
     PackedBooleanArrSeq(){
         super();
@@ -169,7 +166,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         return -1;
     }
-    
     private int uncheckedRemoveIfImpl(int size,BooleanPredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker){
       final long[] words;
       final int wordBound;
@@ -249,8 +245,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
       }
     }
-    
-    
     @Override
     int uncheckedRemoveIfImpl(final int size,final BooleanPredicate filter){
       final long[] words;
@@ -337,74 +331,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         return -1;
     }
     
-    
-   
-    private int uncheckedindexOf(int offset,int size,LongUnaryOperator wordFlipper) {
-      //TODO this almost certainly has bugs
-        final var words=this.words;
-        final var bound=offset+size-1;
-        final var wordBound=bound>>6;
-        int wordOffset=offset>>6;
-        int tail0s;
-        int i;
-        if((offset&=63)!=0) {
-            tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[wordOffset])>>>offset);
-            if(wordOffset==wordBound) {
-                if(tail0s<size) {
-                    return tail0s;
-                }
-                return -1;
-            }else if(tail0s!=64) {
-                return tail0s;
-            }
-            i=++wordOffset;
-        }else {
-            i=wordOffset++;
-        }
-        for(;i<wordBound;++i) {
-            if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[i])))!=64) {
-                return tail0s+64-offset+(i-wordOffset<<6);
-            }
-        }
-        if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[i])))<=(bound&63)) {
-            return tail0s+64-offset+(i-wordOffset<<6);
-        }
-        return -1;
-    }
-    private int uncheckedlastIndexOf(int offset,int size,LongUnaryOperator wordFlipper) {
-        //TODO this almost certainly has bugs
-        final var words=this.words;
-        var bound=offset+--size;
-        var wordBound=bound>>6;
-        final int wordOffset=offset>>6;
-        int lead0s;
-        int i;
-        if((bound&=63)!=63) {
-            lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(words[wordBound])<<-bound);
-            if(wordOffset==wordBound) {
-                if((size-=lead0s)<0) {
-                    return -1;
-                }
-                return size;
-            }else if(lead0s!=64) {
-                return size-lead0s;
-            }
-            i=--wordBound;
-        }else {
-            i=wordBound--;
-        }
-        for(;i>wordOffset;--i) {
-            if((lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(words[i])))!=64) {
-                return 64-lead0s+(i-wordOffset-1<<6)+64-(offset&63);
-            }
-        }
-        if((lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(words[i])))<64-(offset&63)){
-            return 64-lead0s;
-        }
-        return -1;
-    }
-   
-
     private long uncheckedRemoveIndex(final int index,int bound){
         final long[] words;
         int wordOffset;
@@ -1471,16 +1397,39 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public void forEach(BooleanConsumer action){
-            // TODO Auto-generated method stub
+          final int modCount=this.modCount;
+          final var root=this.root;
+          try {
+            final int size;
+            if((size=this.size)!=0) {
+              final int rootOffset;
+              ((UncheckedList)root).uncheckedForEach(rootOffset=this.rootOffset,rootOffset+size,action);
+            }
+          }finally {
+            CheckedCollection.checkModCount(modCount,root.modCount);
+          }
         }
         @Override
         public void forEach(Consumer<? super Boolean> action){
-            // TODO Auto-generated method stub
+          final int modCount=this.modCount;
+          final var root=this.root;
+          try {
+            final int size;
+            if((size=this.size)!=0) {
+              final int rootOffset;
+              ((UncheckedList)root).uncheckedForEach(rootOffset=this.rootOffset,rootOffset+size,action::accept);
+            }
+          }finally {
+            CheckedCollection.checkModCount(modCount,root.modCount);
+          }
         }
         @Override
         public boolean getBoolean(int index){
-            // TODO Auto-generated method stub
-            return false;
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          CheckedCollection.checkLo(index);
+          CheckedCollection.checkReadHi(index,this.size);
+          return ((root.words[(index+=this.rootOffset)>>6]>>index)&1)!=0;
         }
         @Override
         public int hashCode(){
@@ -1495,33 +1444,221 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
           }
         @Override
         public int indexOf(boolean val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,BitSetUtil.getWordFlipper(val));
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(double val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  long bits;
+                  if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(float val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(Float.floatToRawIntBits(val)){
+                    default:
+                      break returnFalse;
+                    case 0:
+                    case Integer.MIN_VALUE:
+                      wordFlipper=BitSetUtil::flip;
+                      break;
+                    case TypeUtil.FLT_TRUE_BITS:
+                      wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(int val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(val){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    wordFlipper=BitSetUtil::flip;
+                    break;
+                  case 1:
+                    wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(long val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val==0L){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(val==1L){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(Object val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                //TODO a pattern-matching switch statement would be great here
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val instanceof Boolean){
+                    wordFlipper=BitSetUtil.getWordFlipper((boolean)val);
+                  }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                    switch(((Number)val).intValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Float){
+                    switch(Float.floatToRawIntBits((float)val)){
+                      default:
+                        break returnFalse;
+                      case 0:
+                      case Integer.MIN_VALUE:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case TypeUtil.FLT_TRUE_BITS:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Double){
+                    final long bits;
+                    if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                      break returnFalse;
+                    }
+                  }else if(val instanceof Long){
+                    final long v;
+                    if((v=(long)val)==0L){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(v==1L){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                     break returnFalse;
+                    }
+                  }else if(val instanceof Character){
+                    switch(((Character)val).charValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else{
+                    break returnFalse;
+                  }
+                  return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public boolean isEmpty(){
@@ -1633,33 +1770,221 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
           }
         @Override
         public int lastIndexOf(boolean val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,BitSetUtil.getWordFlipper(val));
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(double val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  long bits;
+                  if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(float val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(Float.floatToRawIntBits(val)){
+                    default:
+                      break returnFalse;
+                    case 0:
+                    case Integer.MIN_VALUE:
+                      wordFlipper=BitSetUtil::flip;
+                      break;
+                    case TypeUtil.FLT_TRUE_BITS:
+                      wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(int val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(val){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    wordFlipper=BitSetUtil::flip;
+                    break;
+                  case 1:
+                    wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(long val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val==0L){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(val==1L){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(Object val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            final var root=this.root;
+            final int modCount=this.modCount;
+            try
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                //TODO a pattern-matching switch statement would be great here
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val instanceof Boolean){
+                    wordFlipper=BitSetUtil.getWordFlipper((boolean)val);
+                  }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                    switch(((Number)val).intValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Float){
+                    switch(Float.floatToRawIntBits((float)val)){
+                      default:
+                        break returnFalse;
+                      case 0:
+                      case Integer.MIN_VALUE:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case TypeUtil.FLT_TRUE_BITS:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Double){
+                    final long bits;
+                    if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                      break returnFalse;
+                    }
+                  }else if(val instanceof Long){
+                    final long v;
+                    if((v=(long)val)==0L){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(v==1L){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                     break returnFalse;
+                    }
+                  }else if(val instanceof Character){
+                    switch(((Character)val).charValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else{
+                    break returnFalse;
+                  }
+                  return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+            finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+          }//end val check
+          return -1;
         }
         @Override
         public OmniListIterator.OfBoolean listIterator(){
@@ -1764,9 +2089,26 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public boolean set(int index,boolean val){
-            // TODO Auto-generated method stub
-            return false;
-        }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          CheckedCollection.checkLo(index);
+          CheckedCollection.checkReadHi(index,this.size);
+          final long mask;
+          final long word;
+          final long[] words;
+          final int wordIndex;
+          if(((word=(words=root.words)[wordIndex=(index+=rootOffset) >> 6]) & (mask=1L << index)) != 0){
+              if(!val){
+                  words[wordIndex]=word & ~mask;
+              }
+              return true;
+          }else{
+              if(val){
+                  words[wordIndex]=word | mask;
+              }
+              return false;
+          }
+      }
         @Override
         public int size(){
             CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1811,10 +2153,11 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final CheckedList root;
             final T[] dst;
             final int size;
+            final var modCount=this.modCount;
             try {
                 dst=arrConstructor.apply(size=this.size);
             }finally {
-                CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
+                CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
             }
             if(size!=0) {
                 final int rootOffset;
@@ -1982,7 +2325,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 int size;
                 this.size=size=ois.readInt();
                 if(size != 0){
-                    long[] words;
+                    final long[] words;
                     OmniArray.OfLong.readArray(words=new long[(size=size - 1 >> 6) + 1],0,size,ois);
                     this.words=words;
                 }
@@ -1995,19 +2338,18 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     int size;
                     oos.writeInt(size=this.size);
                     if(size != 0){
-                        int rootOffset=this.rootOffset;
+                        final int rootOffset;
                         final int wordBound=(rootOffset=this.rootOffset) + size - 1 >> 6;
                         int wordIndex=rootOffset >> 6;
+                        final var words=this.words;
                         if((rootOffset & 63) == 0){
                             // alligned
                             OmniArray.OfLong.writeArray(words,wordIndex,wordBound,oos);
                         }else{
                             // unalligned
-                            final long[] words;
-                            long word=(words=this.words)[wordIndex];
-                            do{
-                                oos.writeLong(word >>> rootOffset | (word=words[++wordIndex]) << -rootOffset);
-                            }while(wordIndex != wordBound);
+                            long word;
+                            for(word=words[wordIndex];wordIndex!=wordBound;oos.writeLong((word>>>rootOffset)|((word=words[++wordIndex])<<-rootOffset))) {}
+                            oos.writeLong(word>>>rootOffset);
                         }
                     }
                 }finally{
@@ -2016,7 +2358,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
     }
-    
     public static class UncheckedList extends PackedBooleanArrSeq implements BooleanListDefault,Cloneable,RandomAccess{
         private static final long serialVersionUID=1L;
         private static int countRemainingBits(long[] words,int wordBound){
@@ -2045,6 +2386,69 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             for(int i=wordIndex + 1;i <= wordBound;++i){
                 words[i]=0L;
             }
+        }
+        private int uncheckedindexOf(int offset,int size,LongUnaryOperator wordFlipper) {
+            final var words=this.words;
+            final int bound;
+            final var wordBound=(bound=offset+size-1)>>6;
+            int wordOffset=offset>>6;
+            int tail0s;
+            int i;
+            if((offset&=63)!=0) {
+                tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[wordOffset])>>>offset);
+                if(wordOffset==wordBound) {
+                    if(tail0s<size) {
+                        return tail0s;
+                    }
+                    return -1;
+                }else if(tail0s!=64) {
+                    return tail0s;
+                }
+                i=++wordOffset;
+            }else {
+                i=wordOffset++;
+            }
+            for(;i<wordBound;++i) {
+                if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[i])))!=64) {
+                    return tail0s+64-offset+(i-wordOffset<<6);
+                }
+            }
+            if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[i])))<=(bound&63)) {
+                return tail0s+64-offset+(i-wordOffset<<6);
+            }
+            return -1;
+        }
+        private int uncheckedlastIndexOf(int offset,int size,LongUnaryOperator wordFlipper) {
+            //TODO this almost certainly has bugs
+            final var words=this.words;
+            final int bound;
+            var wordBound=(bound=offset+--size)>>6;
+            final int wordOffset=offset>>6;
+            int lead0s;
+            int i;
+            if((bound&63)!=63) {
+                lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(words[wordBound])<<-bound);
+                if(wordOffset==wordBound) {
+                    if((size-=lead0s)<0) {
+                        return -1;
+                    }
+                    return size;
+                }else if(lead0s!=64) {
+                    return size-lead0s;
+                }
+                i=--wordBound;
+            }else {
+                i=wordBound--;
+            }
+            for(;i>wordOffset;--i) {
+                if((lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(words[i])))!=64) {
+                    return 64-lead0s+(i-wordOffset-1<<6)+64-(offset&63);
+                }
+            }
+            if((lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(words[i])))<64-(offset&63)){
+                return 64-lead0s;
+            }
+            return -1;
         }
         public UncheckedList(){
             super();
@@ -3167,9 +3571,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
     }
-    
-    
-    
     public static class UncheckedSubList extends AbstractSeq<Boolean>
             implements
             BooleanSubListDefault,
@@ -3462,15 +3863,23 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public void forEach(BooleanConsumer action){
-            // TODO Auto-generated method stub
+          final int size;
+          if((size=this.size)!=0) {
+            final int rootOffset;
+            root.uncheckedForEach(rootOffset=this.rootOffset,rootOffset+size,action);
+          }
         }
         @Override
         public void forEach(Consumer<? super Boolean> action){
-            // TODO Auto-generated method stub
+          final int size;
+          if((size=this.size)!=0) {
+            final int rootOffset;
+            root.uncheckedForEach(rootOffset=this.rootOffset,rootOffset+size,action::accept);
+          }
         }
         @Override
         public boolean getBoolean(int index){
-            return (root.words[(index+=rootOffset) >> 6] & 1L << index) != 0;
+          return ((root.words[(index+=this.rootOffset)>>6]>>index)&1)!=0;
         }
         @Override
         public int hashCode(){
@@ -3483,33 +3892,185 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public int indexOf(boolean val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                return root.uncheckedindexOf(rootOffset,size,BitSetUtil.getWordFlipper(val));
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(double val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  long bits;
+                  if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return root.uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(float val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(Float.floatToRawIntBits(val)){
+                    default:
+                      break returnFalse;
+                    case 0:
+                    case Integer.MIN_VALUE:
+                      wordFlipper=BitSetUtil::flip;
+                      break;
+                    case TypeUtil.FLT_TRUE_BITS:
+                      wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return root.uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(int val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(val){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    wordFlipper=BitSetUtil::flip;
+                    break;
+                  case 1:
+                    wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return root.uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(long val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val==0L){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(val==1L){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return root.uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int indexOf(Object val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                //TODO a pattern-matching switch statement would be great here
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val instanceof Boolean){
+                    wordFlipper=BitSetUtil.getWordFlipper((boolean)val);
+                  }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                    switch(((Number)val).intValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Float){
+                    switch(Float.floatToRawIntBits((float)val)){
+                      default:
+                        break returnFalse;
+                      case 0:
+                      case Integer.MIN_VALUE:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case TypeUtil.FLT_TRUE_BITS:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Double){
+                    final long bits;
+                    if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                      break returnFalse;
+                    }
+                  }else if(val instanceof Long){
+                    final long v;
+                    if((v=(long)val)==0L){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(v==1L){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                     break returnFalse;
+                    }
+                  }else if(val instanceof Character){
+                    switch(((Character)val).charValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else{
+                    break returnFalse;
+                  }
+                  return root.uncheckedindexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         private static class Itr
         extends AbstractBooleanItr
@@ -3570,33 +4131,185 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         @Override
         public int lastIndexOf(boolean val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                return root.uncheckedlastIndexOf(rootOffset,size,BitSetUtil.getWordFlipper(val));
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(double val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  long bits;
+                  if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(float val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(Float.floatToRawIntBits(val)){
+                    default:
+                      break returnFalse;
+                    case 0:
+                    case Integer.MIN_VALUE:
+                      wordFlipper=BitSetUtil::flip;
+                      break;
+                    case TypeUtil.FLT_TRUE_BITS:
+                      wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(int val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  switch(val){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    wordFlipper=BitSetUtil::flip;
+                    break;
+                  case 1:
+                    wordFlipper=LongUnaryOperator.identity();
+                  }
+                  return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(long val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val==0L){
+                    wordFlipper=BitSetUtil::flip;
+                  }else if(val==1L){
+                    wordFlipper=LongUnaryOperator.identity();
+                  }else{
+                    break returnFalse;
+                  }
+                  return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public int lastIndexOf(Object val){
-            // TODO Auto-generated method stub
-            return 0;
+          {
+            {
+              final int size;
+              if((size=this.size)!=0)
+              {
+                //TODO a pattern-matching switch statement would be great here
+                returnFalse:for(;;){
+                  final LongUnaryOperator wordFlipper;
+                  if(val instanceof Boolean){
+                    wordFlipper=BitSetUtil.getWordFlipper((boolean)val);
+                  }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                    switch(((Number)val).intValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Float){
+                    switch(Float.floatToRawIntBits((float)val)){
+                      default:
+                        break returnFalse;
+                      case 0:
+                      case Integer.MIN_VALUE:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case TypeUtil.FLT_TRUE_BITS:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else if(val instanceof Double){
+                    final long bits;
+                    if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                      break returnFalse;
+                    }
+                  }else if(val instanceof Long){
+                    final long v;
+                    if((v=(long)val)==0L){
+                      wordFlipper=BitSetUtil::flip;
+                    }else if(v==1L){
+                      wordFlipper=LongUnaryOperator.identity();
+                    }else{
+                     break returnFalse;
+                    }
+                  }else if(val instanceof Character){
+                    switch(((Character)val).charValue()){
+                      default:
+                        break returnFalse;
+                      case 0:
+                        wordFlipper=BitSetUtil::flip;
+                        break;
+                      case 1:
+                        wordFlipper=LongUnaryOperator.identity();
+                    }
+                  }else{
+                    break returnFalse;
+                  }
+                  return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                }
+              } //end size check
+            } //end checked sublist try modcount
+          }//end val check
+          return -1;
         }
         @Override
         public OmniListIterator.OfBoolean listIterator(){
@@ -3890,19 +4603,18 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     int size;
                     oos.writeInt(size=this.size);
                     if(size != 0){
-                        int rootOffset=this.rootOffset;
+                        final int rootOffset;
                         final int wordBound=(rootOffset=this.rootOffset) + size - 1 >> 6;
                         int wordIndex=rootOffset >> 6;
+                        final var words=this.words;
                         if((rootOffset & 63) == 0){
                             // alligned
                             OmniArray.OfLong.writeArray(words,wordIndex,wordBound,oos);
                         }else{
                             // unalligned
-                            final long[] words;
-                            long word=(words=this.words)[wordIndex];
-                            do{
-                                oos.writeLong(word >>> rootOffset | (word=words[++wordIndex]) << -rootOffset);
-                            }while(wordIndex != wordBound);
+                            long word;
+                            for(word=words[wordIndex];wordIndex!=wordBound;oos.writeLong((word>>>rootOffset)|((word=words[++wordIndex])<<-rootOffset))) {}
+                            oos.writeLong(word>>>rootOffset);
                         }
                     }
                 }

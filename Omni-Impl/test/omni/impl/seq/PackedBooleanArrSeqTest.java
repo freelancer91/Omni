@@ -33,6 +33,7 @@ import omni.impl.MonitoredSequence;
 import omni.impl.MonitoredStack;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
+import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.impl.seq.PackedBooleanArrSeq.UncheckedList;
 import omni.impl.seq.PackedBooleanArrSeq.UncheckedStack;
@@ -1685,6 +1686,15 @@ public class PackedBooleanArrSeqTest{
   }
   @FunctionalInterface
   private static interface QueryTest<MONITOR extends MonitoredSequence<? extends OmniCollection.OfBoolean>>{
+    default boolean filterParams(SequenceInitParams initParams,int size,double position,IllegalModification illegalMod) {
+      if(position<0) {
+        return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
+      }
+      if(illegalMod.expectedException==null) {
+        return initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63;
+      }
+      return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
+    }
     private void runAllTests(String testName,int structSwitch){
       SequenceInitParams[] initParamArray;
       switch(structSwitch){
@@ -1698,65 +1708,70 @@ public class PackedBooleanArrSeqTest{
         initParamArray=ALL_STRUCT_INIT_PARAMS;
       }
       for(final var initParams:initParamArray){
-          if(initParams.structType==StructType.PackedBooleanArrSubList) {
-              continue;
-          }
+        
         for(final var queryVal:QueryVal.values()){
           if(DataType.BOOLEAN.isValidQueryVal(queryVal)){
             queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
               castTypesToInputTypes.forEach((castType,inputTypes)->{
-                inputTypes.forEach(inputType->{
+                for(var inputType:inputTypes) {
                   final boolean queryCanReturnTrue
-                      =queryVal.queryCanReturnTrue(modification,castType,inputType,DataType.BOOLEAN);
-                  for(final var size:SIZES){
-                    if(size>1 && (castType==QueryCastType.ToBoxed || inputType!=DataType.BOOLEAN)) {
-                        break;
+                  =queryVal.queryCanReturnTrue(modification,castType,inputType,DataType.BOOLEAN);
+              for(final var size:SHORT_SIZES){
+                if(size>1 && (castType==QueryCastType.ToBoxed || inputType!=DataType.BOOLEAN)) {
+                    break;
+                }
+                int prevIndex=-1;
+                for(final var position:POSITIONS){
+                  if(position >= 0){
+                    int index;
+                    if((index=(int)(size*position))==prevIndex||!queryCanReturnTrue){
+                      continue;
                     }
-                      
-                      
-                    for(final var position:POSITIONS){
-                      if(position >= 0){
-                        if(!queryCanReturnTrue){
-                          continue;
-                        }
-                        switch(size){
-                        case 3:
-                          if(position == 0.5d){
-                            break;
-                          }
-                        case 2:
-                          if(position == 1.0d){
-                            break;
-                          }
-                        case 1:
-                          if(position == 0.0d){
-                            break;
-                          }
-                        case 0:
-                          continue;
-                        case 4:
-                          if(position == 0.5d){
-                            continue;
-                          }
-                        default:
-                        }
+                    prevIndex=index;
+                    switch(size){
+                    case 3:
+                      if(position == 0.5d){
+                        break;
                       }
-                      for(final var illegalMod:initParams.structType.validPreMods){
-                        if(illegalMod.minDepth <= initParams.preAllocs.length
-                            && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                          TestExecutorService.submitTest(()->{
-                            if(cmeFilter(illegalMod,inputType,queryVal,modification,castType)){
-                              runTest(initParams,illegalMod,queryVal,modification,castType,inputType,size,position);
-                            }else{
-                              Assertions.assertThrows(illegalMod.expectedException,()->runTest(initParams,illegalMod,
-                                  queryVal,modification,castType,inputType,size,position));
-                            }
-                          });
-                        }
+                    case 2:
+                      if(position == 1.0d){
+                        break;
                       }
+                    case 1:
+                      if(position == 0.0d){
+                        break;
+                      }
+                    case 0:
+                      continue;
+                    case 4:
+                      if(position == 0.5d){
+                        continue;
+                      }
+                    default:
                     }
                   }
-                });
+                  
+                  for(final var illegalMod:initParams.structType.validPreMods){
+                    if(illegalMod.minDepth <= initParams.preAllocs.length
+                        && (initParams.checkedType.checked || illegalMod.expectedException == null)){
+                      
+                      if(filterParams(initParams,size,position,illegalMod)) {
+                        continue;
+                      }
+                      
+                      TestExecutorService.submitTest(()->{
+                        if(cmeFilter(illegalMod,inputType,queryVal,modification,castType)){
+                          runTest(initParams,illegalMod,queryVal,modification,castType,inputType,size,position);
+                        }else{
+                          Assertions.assertThrows(illegalMod.expectedException,()->runTest(initParams,illegalMod,
+                              queryVal,modification,castType,inputType,size,position));
+                        }
+                      });
+                    }
+                  }
+                }
+              }
+            }
               });
             });
           }
@@ -1828,7 +1843,9 @@ public class PackedBooleanArrSeqTest{
   private static final int[] INIT_CAPACITIES=new int[]{0,5,10,15,63,64,65,66,127,128,129,255,256,257,319,320,321};
   private static final int[] SIZES=new int[]{0,1,2,3,4,5,10,20,30,40,50,60,62,63,64,65,66,70,80,90,100,126,127,128,129,
       130,190,191,192,193,194,254,255,256,257,258};
-  private static final int[] SHORT_SIZES=new int[]{0,1,63,64,65,127,128,129,191,192,193,255,256,257};
+  private static final int[] MEDIUM_SIZES=new int[]{0,1,63,64,65,127,128,129,191,192,193,255,256,257};
+  private static final int[] SHORT_SIZES=new int[]{0,1,63,64,65,127,128,129,191,192,193};
+
   private static final SequenceInitParams[] ALL_STRUCT_INIT_PARAMS;
   private static final SequenceInitParams[] LIST_STRUCT_INIT_PARAMS;
     private static final SequenceInitParams[] STACK_STRUCT_INIT_PARAMS;
@@ -2099,8 +2116,18 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_void");
   }
-  @Order(1634136) @Test public void testcontains_val(){
+  @Order(34856976) @Test public void testcontains_val(){
+    //TestExecutorService.setNumWorkers(1);
     final QueryTest<?> test=(monitor,queryVal, inputType, castType,modification, position, seqSize)->{
+//      if(seqSize==64 && position == 0.967741935483871 &&queryVal==QueryVal.MaxBoolean &&monitor.getStructType()==StructType.PackedBooleanArrSubList && monitor.getCheckedType().checked) {
+//        var seq=monitor.getCollection();
+//        if(FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.rootOffset(seq)==1 && FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.root(seq).size==65) {
+//          System.out.println("here");
+//        }
+//        
+//        
+//      }
+      
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
     test.runAllTests("PackedBooleanArrSeqTest.testcontains_val",2);
@@ -2112,8 +2139,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testequals_Object");
   }
-  @Order(-24140) @Test public void testforEach_Consumer(){
-      TestExecutorService.setNumWorkers(1);
+  @Order(13602890) @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2178,7 +2204,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void");
   }
-  @Order(817068) @Test public void testindexOf_val(){
+  @Order(34701996) @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
           int expectedIndex;
@@ -2455,7 +2481,8 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrremove_void");
   }
-  @Order(817068) @Test public void testlastIndexOf_val(){
+  @Order(-817068) @Test public void testlastIndexOf_val(){
+    TestExecutorService.setNumWorkers(1);
     final QueryTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -2463,6 +2490,9 @@ public class PackedBooleanArrSeqTest{
               expectedIndex=(int)Math.round(position * seqSize);
             }else{
               expectedIndex=-1;
+            }
+            if(expectedIndex==-1 && seqSize==1 && monitor.getStructType()==StructType.PackedBooleanArrSubList && monitor.getCheckedType().checked && queryVal==QueryVal.Pos0 && modification==QueryVal.QueryValModification.None && castType==QueryCastType.Unboxed && inputType==DataType.BOOLEAN) {
+              System.out.println("here");
             }
             Assertions.assertEquals(expectedIndex,monitor.verifyLastIndexOf(queryVal,inputType,castType,modification));
         };
@@ -2876,8 +2906,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testput_intval");
   }
-  @Order(-24140) @Test public void testReadAndWrite(){
-      TestExecutorService.setNumWorkers(1);
+  @Order(13602890) @Test public void testReadAndWrite(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -3023,8 +3052,22 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveIf_Predicate");
   }
-  @Tag("testremoveVal_val") @Order(1634136) @Test public void testremoveVal_val(){
-    final QueryTest<?> test=(monitor,queryVal,inputType,castType,modification,position,seqSize)->Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
+  @Tag("testremoveVal_val") @Order(0) @Test public void testremoveVal_val(){
+    QueryTest<?> test=new QueryTest<MonitoredSequence<OmniCollection.OfBoolean>>() {
+      @Override public boolean filterParams(SequenceInitParams initParams,int size,double position,IllegalModification illegalMod) {
+        if(position<0) {
+          return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
+        }
+        if(illegalMod.expectedException==null) {
+          return initParams.totalPreAlloc>63;
+        }
+        return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
+      }
+      @Override public void callAndVerifyResult(MonitoredSequence<OmniCollection.OfBoolean> monitor,QueryVal queryVal,
+          DataType inputType,QueryCastType castType,QueryValModification modification,double position,int seqSize){
+        Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
+      }
+    };
     test.runAllTests("PackedBooleanArrSeqTest.testremoveVal_val",2);
   }
   @Order(13590820) @Test public void testreplaceAll_UnaryOperator(){
@@ -3268,8 +3311,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testsubList_intint");
   }
-  @Order(-24140) @Test public void testtoArray_IntFunction(){
-      TestExecutorService.setNumWorkers(1);
+  @Order(13602890) @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
