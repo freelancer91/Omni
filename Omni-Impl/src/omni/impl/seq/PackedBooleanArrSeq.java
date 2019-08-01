@@ -2789,46 +2789,46 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
         private static void trueComesFirst(long[] words,int bitCount,int offset,int bound) {
-            int wordOffset=offset>>6;
-            int wordBound=bound-1>>6;
+            final int wordOffset;
+            int wordBound;
             final int trueBound;
-            final int trueWordBound=(trueBound=bitCount+offset)-1>>6;
-            long headWord=words[wordOffset]&~(-1L<<offset);
-            long tailWord=words[wordBound]&~(-1L>>>bound);
-            if(trueWordBound==wordBound) {
+            final int trueWordBound;
+            final long headWord=words[wordOffset=offset>>6]&~(-1L<<offset);
+            final long tailWord=words[wordBound=bound-1>>6]&~(-1L>>>-bound);
+            if((trueWordBound=(trueBound=bitCount+offset)-1>>6)==wordBound) {
                 words[wordBound]=tailWord|-1L>>>-trueBound;
                 while(--wordBound>wordOffset) {
                     words[wordBound]=-1L;
                 }
                 
             }else {
-                words[wordBound]=tailWord|-1L>>>-bound;
+                words[wordBound]=tailWord;
                 if(trueWordBound==wordOffset) {
-                    while(--wordBound>wordOffset) {
-                        words[wordBound]=-1L;
-                    }
-                    words[wordOffset]=headWord|-1L<<trueBound;
-                    return;
-                }else {
-                    while(--wordBound>trueWordBound) {
-                        words[wordBound]=-1L;
-                    }
-                    words[wordBound]=-1L>>>-trueBound;
                     while(--wordBound>wordOffset) {
                         words[wordBound]=0L;
                     }
+                    words[wordOffset]=headWord|((-1L>>>-bitCount)<<offset);
+                    return;
+                }else {
+                    while(--wordBound>trueWordBound) {
+                        words[wordBound]=0L;
+                    }
+                    words[wordBound]=-1L>>>-trueBound;
+                    while(--wordBound>wordOffset) {
+                        words[wordBound]=-1L;
+                    }
                 }
             }
-            words[wordOffset]=headWord;
+            words[wordOffset]=headWord|(-1L<<offset);
         }
         private static void falseComesFirst(long[] words,int bitCount,int offset,int bound) {
-            int wordOffset=offset>>6;
-            int wordBound=bound-1>>6;
+            int wordOffset;
+            final int wordBound;
             final int falseBound;
-            final int falseWordBound=(falseBound=bound-bitCount)-1>>6;
-            long headWord=words[wordOffset]&~(-1L<<offset);
-            long tailWord=words[wordBound]&~(-1L>>>bound);
-            if(falseWordBound==wordOffset) {
+            final int falseWordBound;
+            final long headWord=words[wordOffset=offset>>6]&~(-1L<<-offset);
+            final long tailWord=words[wordBound=bound-1>>6]&~(-1L>>>-bound);
+            if((falseWordBound=(falseBound=bound-bitCount)-1>>6)==wordOffset) {
                 words[wordOffset]=headWord|-1L<<falseWordBound;
                 while(++wordOffset<wordBound) {
                     words[wordBound]=-1L;
@@ -3365,11 +3365,11 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         
         private void uncheckedSort(int offset,int size,BooleanComparator sorter) {
-            int wordOffset=offset>>6;
-            int bound=offset+size;
-            int wordBound=bound-1>>6;
+            final int wordOffset;
+            final int bound;
+            int wordBound;
             final var words=this.words;
-            if(wordOffset==wordBound) {
+            if((wordOffset=offset>>6)==(wordBound=(bound=offset+size)-1>>6)) {
                 final long mask,word;
                 final int bitCount;
                 if((bitCount=Long.bitCount((word=words[wordBound])&(mask=-1L>>>-size<<offset)))!=0 && bitCount!=size) {
@@ -3386,7 +3386,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 int i;
                 int bitCount;
                 outer:for(;;) {
-                    if((bitCount=Long.bitCount(words[wordBound]&-1L>>>bound))==0) {
+                    if((bitCount=Long.bitCount(words[wordBound]&-1L>>>-bound))==0) {
                         for(i=wordBound;--i>wordOffset;) {
                             if((bitCount=Long.bitCount(words[--wordBound]))!=0) {
                                 break outer;
@@ -3468,7 +3468,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final long[] words;
             if((bitCount=Long.bitCount((words=this.words)[wordBound=size - 1 >> 6] << -size)) == 0){
                 for(int i=wordBound;--i>=0;) {
-                   if((bitCount=Long.bitCount(words[--wordBound]))!=0) {
+                   if((bitCount=Long.bitCount(words[i]))!=0) {
                        switch(Integer.signum(sorter.compare(false,true))) {
                        case -1:
                            falseComesFirst(words,size-(bitCount+countRemainingBits(words,i)),wordBound);
@@ -3483,7 +3483,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }else if(bitCount == 64 - (-size & 63)){
                 for(int i=wordBound;--i>=0;) {
                     int numTrue;
-                    bitCount+=numTrue=Long.bitCount(words[--wordBound]);
+                    bitCount+=numTrue=Long.bitCount(words[i]);
                     if(numTrue!=64) {
                         switch(Integer.signum(sorter.compare(false,true))) {
                         case -1:
