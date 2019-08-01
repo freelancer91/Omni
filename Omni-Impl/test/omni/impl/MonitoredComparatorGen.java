@@ -183,7 +183,7 @@ public enum MonitoredComparatorGen{
         }
         @SuppressWarnings({"unchecked","rawtypes"})
         @Override
-        void assertReverseSorted(MonitoredList<?> listMonitor){
+        public void assertReverseSorted(MonitoredList<?> listMonitor){
             var uncastItr=listMonitor.getMonitoredIterator().getIterator();
             if(!uncastItr.hasNext()){
                 return;
@@ -264,7 +264,7 @@ public enum MonitoredComparatorGen{
         }
         @SuppressWarnings({"unchecked","rawtypes"})
         @Override
-        void assertSorted(MonitoredList<?> listMonitor){
+        public void assertSorted(MonitoredList<?> listMonitor){
             var uncastItr=listMonitor.getMonitoredIterator().getIterator();
             if(!uncastItr.hasNext()){
                 return;
@@ -594,7 +594,7 @@ public enum MonitoredComparatorGen{
         return null;
     }
     @SuppressWarnings({"unchecked","rawtypes"})
-    void assertReverseSorted(MonitoredList<?> listMonitor){
+    public void assertReverseSorted(MonitoredList<?> listMonitor){
         var uncastItr=listMonitor.getMonitoredIterator().getIterator();
         if(!uncastItr.hasNext()){
             return;
@@ -674,7 +674,7 @@ public enum MonitoredComparatorGen{
         }
     }
     @SuppressWarnings({"unchecked","rawtypes"})
-    void assertSorted(MonitoredList<?> listMonitor){
+    public void assertSorted(MonitoredList<?> listMonitor){
         var uncastItr=listMonitor.getMonitoredIterator().getIterator();
         if(!uncastItr.hasNext()){
             return;

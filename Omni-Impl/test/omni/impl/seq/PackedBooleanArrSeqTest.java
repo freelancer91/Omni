@@ -23,6 +23,7 @@ import omni.impl.FunctionCallType;
 import omni.impl.IllegalModification;
 import omni.impl.IteratorType;
 import omni.impl.MonitoredCollection;
+import omni.impl.MonitoredComparatorGen;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredList;
@@ -2120,7 +2121,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(1724140) @Test public void testclear_void(){
     BasicTest test=new BasicTest() {
-      public int getMaxPostAlloc() {
+      @Override
+    public int getMaxPostAlloc() {
         return Integer.MAX_VALUE;
       }
       @Override public void runTest(MonitoredSequence<?> monitor){
@@ -3001,7 +3003,7 @@ public class PackedBooleanArrSeqTest{
                 }
                 for(final var outputType:DataType.BOOLEAN.validOutputTypes()){
                   if(outputType!=DataType.BOOLEAN) {
-                    if((size>1 || position>0 || initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0)) {
+                    if(size>1 || position>0 || initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0) {
                       break;
                     }
                   }
@@ -3196,123 +3198,100 @@ public class PackedBooleanArrSeqTest{
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("PackedBooleanArrSeqTest.testsize_void");
   }
-  @Order(-888) @Test public void testsort_Comparator(){
-    for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.totalPostAlloc>0) {
-            continue;
-        }
-      for(final var comparatorGen:initParams.structType.validComparatorGens){
-        if(comparatorGen.validWithPrimitive){
-          for(final var size:SHORT_SIZES){
-            if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
-              for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
-                for(final var illegalMod:initParams.structType.validPreMods){
-                  if(illegalMod.minDepth <= initParams.preAllocs.length
-                      && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                    //TestExecutorService.submitTest(()->{
-                      final var monitor=getMonitoredList(initParams,size);
-                      if(illegalMod.expectedException == null){
-                        if(size < 2 || comparatorGen.expectedException == null){
-                          if(initParams.preAllocs.length==2 && initParams.totalPostAlloc==0 && initParams.totalPreAlloc==0 && size==193 && "NoThrowDescending".equals(comparatorGen.toString())) {
-                            System.out.println("here");
+  
+  private static interface SortTest{
+      private void runAllTests(String testName,boolean usesComparator) {
+          for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+              if(initParams.totalPostAlloc>0) {
+                  continue;
+              }
+              for(var comparatorGen:initParams.structType.validComparatorGens) {
+                  if(usesComparator||comparatorGen.validWithNoComparator) {
+                      for(var size:SHORT_SIZES) {
+                          final int periodInc=Math.max(1,size/10);
+                          final int periodBound=size+periodInc;
+                          if(size<2 || comparatorGen.expectedException==null || initParams.checkedType.checked) {
+                              if(size>2 && comparatorGen.expectedException!=null) {
+                                  continue;
+                              }
+                              for(var functionCallType:DataType.BOOLEAN.validFunctionCalls) {
+                                  if(functionCallType.boxed && (!usesComparator || size>2)) {
+                                      continue;
+                                  }
+                                  for(var illegalMod:initParams.structType.validPreMods) {
+                                      if(illegalMod.expectedException!=null && size>0) {
+                                          continue;
+                                      }
+                                      if(initParams.checkedType.checked || illegalMod.expectedException==null) {
+                                          for(int tmpInitVal=0;tmpInitVal<=1;++tmpInitVal) {
+                                              final int initVal=tmpInitVal;
+                                              for(int tmpPeriod=0;tmpPeriod<=periodBound;tmpPeriod+=periodInc) {
+                                                  final int period=tmpPeriod;
+                                                  TestExecutorService.submitTest(()->{
+                                                      final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,initVal,period);
+                                                      final Class<? extends Throwable> expectedException;
+                                                      if(illegalMod.expectedException==null) {
+                                                          if(size<2 || comparatorGen.expectedException==null) {
+                                                              runTest(monitor,comparatorGen,functionCallType);
+                                                              return;
+                                                          }else {
+                                                              expectedException=comparatorGen.expectedException;
+                                                          }
+                                                      }else {
+                                                          monitor.illegalMod(illegalMod);
+                                                          expectedException=illegalMod.expectedException;
+                                                      }
+                                                      Assertions.assertThrows(expectedException,()->runTest(monitor,comparatorGen,functionCallType));
+                                                  });
+                                              }
+                                          }
+                                      }
+                                  }
+                              }
                           }
-                          monitor.verifyStableSort(size,comparatorGen,functionCallType);
-                        }else{
-                          Assertions.assertThrows(comparatorGen.expectedException,
-                              ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
-                        }
-                      }else{
-                        monitor.illegalMod(illegalMod);
-                        Assertions.assertThrows(illegalMod.expectedException,
-                            ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
                       }
-                    //});
                   }
-                }
+                  
               }
-            }
           }
+          TestExecutorService.completeAllTests(testName);
         }
-      }
-    }
-    TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testsort_Comparator");
+      
+      void runTest(MonitoredList<?> monitor,MonitoredComparatorGen comparatorGen,FunctionCallType functionCallType);
   }
-  @Order(-72) @Test public void teststableAscendingSort_void(){
+  
+  @Order(82584) @Test public void testsort_Comparator(){
+    TestExecutorService.setNumWorkers(1);
+    final SortTest test=(monitor,comparatorGen,functionCallType)->{
+        DataType.BOOLEAN.callStableSort(comparatorGen.getMonitoredComparator(monitor),monitor.getCollection(),functionCallType);
+        comparatorGen.assertSorted(monitor);
+        monitor.verifyCollectionState();
+        
+    };
+    test.runAllTests("PackedBooleanArrSeqTest.testsort_Comparator",true);
+  }
+  @Order(17012) @Test public void teststableAscendingSort_void(){
+      TestExecutorService.setNumWorkers(1);
 
-    for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.totalPostAlloc>0) {
-            continue;
-        }
-      for(final var comparatorGen:initParams.structType.validComparatorGens){
-        if(comparatorGen.validWithNoComparator
-            && comparatorGen.validWithPrimitive){
-          for(final var size:SHORT_SIZES){
-            if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
-              for(final var illegalMod:initParams.structType.validPreMods){
-                if(illegalMod.minDepth <= initParams.preAllocs.length
-                    && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                  //TestExecutorService.submitTest(()->{
-                    final var monitor=getMonitoredList(initParams,size);
-                    if(illegalMod.expectedException == null){
-                      if(size < 2 || comparatorGen.expectedException == null){
-                        monitor.verifyAscendingStableSort(size,comparatorGen);
-                      }else{
-                        Assertions.assertThrows(comparatorGen.expectedException,
-                            ()->monitor.verifyAscendingStableSort(size,comparatorGen));
-                      }
-                    }else{
-                      monitor.illegalMod(illegalMod);
-                      Assertions.assertThrows(illegalMod.expectedException,
-                          ()->monitor.verifyAscendingStableSort(size,comparatorGen));
-                    }
-                  //});
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.teststableAscendingSort_void");
+      final SortTest test=(monitor,comparatorGen,functionCallType)->{
+          monitor.getCollection().stableAscendingSort();
+          comparatorGen.assertSorted(monitor);
+          monitor.verifyCollectionState();
+          
+      };
+      test.runAllTests("PackedBooleanArrSeqTest.teststableAscendingSort_void",false);
   }
-  @Order(-72) @Test public void teststableDescendingSort_void(){
+  @Order(17012) @Test public void teststableDescendingSort_void(){
+      TestExecutorService.setNumWorkers(1);
 
-    for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.totalPostAlloc>0) {
-            continue;
-        }
-      for(final var comparatorGen:initParams.structType.validComparatorGens){
-        if(comparatorGen.validWithNoComparator
-            && comparatorGen.validWithPrimitive){
-          for(final var size:SHORT_SIZES){
-            if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
-              for(final var illegalMod:initParams.structType.validPreMods){
-                if(illegalMod.minDepth <= initParams.preAllocs.length
-                    && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                  //TestExecutorService.submitTest(()->{
-                    final var monitor=getMonitoredList(initParams,size);
-                    if(illegalMod.expectedException == null){
-                      if(size < 2 || comparatorGen.expectedException == null){
-                        monitor.verifyDescendingStableSort(size,comparatorGen);
-                      }else{
-                        Assertions.assertThrows(comparatorGen.expectedException,
-                            ()->monitor.verifyDescendingStableSort(size,comparatorGen));
-                      }
-                    }else{
-                      monitor.illegalMod(illegalMod);
-                      Assertions.assertThrows(illegalMod.expectedException,
-                          ()->monitor.verifyDescendingStableSort(size,comparatorGen));
-                    }
-                  //});
-                }
-              }
-            }
-          }
-        }
-      }
+      final SortTest test=(monitor,comparatorGen,functionCallType)->{
+          monitor.getCollection().stableDescendingSort();
+          comparatorGen.assertReverseSorted(monitor);
+          monitor.verifyCollectionState();
+          
+      };
+      test.runAllTests("PackedBooleanArrSeqTest.teststableDescendingSort_void",false);
     }
-    TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.teststableDescendingSort_void");
-  }
   @Tag("testsubList_intint") @Order(217890) @Test public void testsubList_intint(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
