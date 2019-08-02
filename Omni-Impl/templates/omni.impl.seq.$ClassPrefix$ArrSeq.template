@@ -2129,9 +2129,9 @@ public void unstableSort(COMPARATOR sorter)
       $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
       #ELSE
       $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
-      #ENDIF
     }catch(ArrayIndexOutOfBoundsException e){
       throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+      #ENDIF
     }finally{
       CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
@@ -2169,9 +2169,9 @@ public void unstableSort(COMPARATOR sorter)
         $ClassPrefix$SortUtil.uncheckedSort(this.arr,0,size,COMPARE);
         #ELSE
         $ClassPrefix$SortUtil.uncheckedSTABLESort(this.arr,0,size,COMPARE);
-        #ENDIF
       }catch(ArrayIndexOutOfBoundsException e){
         throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        #ENDIF
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;

@@ -5554,6 +5554,9 @@ import omni.util.TestExecutorService;
   @Order(254982) @Test public void testsort_Comparator(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var comparatorGen:initParams.structType.validComparatorGens){
+          if(comparatorGen.throwsContractViolationException && initParams.collectionType==DataType.BOOLEAN) {
+              continue;
+          }
         if(initParams.collectionType == DataType.REF || comparatorGen.validWithPrimitive){
           for(final var size:SIZES){
             if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){

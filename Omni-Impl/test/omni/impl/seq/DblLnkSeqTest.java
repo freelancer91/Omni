@@ -1828,6 +1828,9 @@ public class DblLnkSeqTest{
                 for(final var initParams:initParamArray){
                     if(initParams.totalPreAlloc <= 2 && initParams.totalPostAlloc <= 2){
                         for(final var comparatorGen:initParams.structType.validComparatorGens){
+                            if(comparatorGen.throwsContractViolationException && initParams.collectionType==DataType.BOOLEAN) {
+                                continue;
+                            }
                             if(collectionType == DataType.REF || comparatorGen.validWithPrimitive){
                                 for(final var size:SIZES){
                                     if(size < 2 || comparatorGen.expectedException == null || checkedType.checked

@@ -36,6 +36,19 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 public class OmniArrayTest
 {
+  @Test
+  public void testMaxArraySize(){
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new boolean[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new byte[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new char[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new short[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new int[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new long[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new float[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new double[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new Object[OmniArray.MAX_ARR_SIZE].length);
+  }
+
   private void testGrowBy100PctHelper(int currCapacityBaseLine){
       for(int i=-2;i<=2;++i){
           int currentCapacity=currCapacityBaseLine+i;

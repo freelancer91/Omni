@@ -994,6 +994,7 @@ public class PackedBooleanArrSeqTest{
   int expectedRootOffset;
   int expectedSize;
   int expectedModCount;
+  int trueCount;
   @SuppressWarnings("unchecked") PackedBooleanArrSubListMonitor(PackedBooleanArrListMonitor expectedRoot,int fromIndex,int toIndex){
     this.expectedRoot=expectedRoot;
     expectedParent=null;
@@ -1001,7 +1002,29 @@ public class PackedBooleanArrSeqTest{
     expectedSize=toIndex - fromIndex;
     expectedRootOffset=fromIndex;
     seq=(SUBLIST)expectedRoot.seq.subList(fromIndex,toIndex);
+    trueCount=countTrue();
+    
   }
+  
+  private int countTrue() {
+      if(expectedSize==0) {
+          return 0;
+      }
+      final var words=expectedRoot.expectedWords;
+      int offset=this.expectedRootOffset;
+      int bound=offset+this.expectedSize;
+      int wordOffset=offset>>6;
+      int wordBound=bound-1>>6;
+      if(wordOffset==wordBound) {
+          return Long.bitCount(words[wordBound]&-1L>>>-expectedSize<<offset);
+      }
+      int bitCount=Long.bitCount(words[wordOffset]&-1L<<offset);
+      while(++wordOffset<wordBound) {
+          bitCount+=Long.bitCount(words[wordOffset]);
+      }
+      return bitCount+Long.bitCount(words[wordOffset]&-1L>>>-bound);
+  }
+  
   @SuppressWarnings("unchecked") PackedBooleanArrSubListMonitor(PackedBooleanArrSubListMonitor<SUBLIST,SEQ> expectedParent,int fromIndex,
       int toIndex){
     expectedRoot=expectedParent.expectedRoot;
@@ -1010,9 +1033,11 @@ public class PackedBooleanArrSeqTest{
     expectedSize=toIndex - fromIndex;
     expectedRootOffset=expectedParent.expectedRootOffset + fromIndex;
     seq=(SUBLIST)expectedParent.seq.subList(fromIndex,toIndex);
+    trueCount=countTrue();
   }
   @Override public void copyListContents(){
     expectedRoot.copyListContents();
+    trueCount=countTrue();
   }
   @Override public Object get(int iterationIndex,DataType outputType){
     return expectedRoot.get(iterationIndex + expectedRootOffset,outputType);
@@ -1101,11 +1126,24 @@ public class PackedBooleanArrSeqTest{
   }
   @Override public void updateAddState(int index,Object inputVal,DataType inputType){
     expectedRoot.updateAddState(index + expectedRootOffset,inputVal,inputType);
+    if((boolean)inputVal) {
+        var curr=this;
+        do {
+            ++curr.trueCount;
+        }while((curr=curr.expectedParent)!=null);
+    }
+    
     bubbleUpModifySize(1);
   }
   @Override public void updateClearState(){
       int expectedSize;
       if((expectedSize=this.expectedSize)!=0) {
+          int trueCount=this.trueCount;
+          var curr=this;
+          do {
+              curr.trueCount-=trueCount;
+          }while((curr=curr.expectedParent)!=null);
+          
           bubbleUpModifySize(-expectedSize);
           final var root=this.expectedRoot;
           ++root.expectedModCount;
@@ -1127,8 +1165,12 @@ public class PackedBooleanArrSeqTest{
       }
   }
   @Override public void updateCollectionState(){
+      expectedRoot.updateCollectionState();
     Consumer<PackedBooleanArrSubListMonitor<SUBLIST,SEQ>> subListUpdater
-        =subListMonitor->subListMonitor.expectedSize=((AbstractSeq<?>)subListMonitor.seq).size;
+        =subListMonitor->{
+            subListMonitor.expectedSize=((AbstractSeq<?>)subListMonitor.seq).size;
+            subListMonitor.trueCount=subListMonitor.countTrue();
+        };
     if(expectedRoot.checkedType.checked){
         subListUpdater=subListUpdater.andThen(subListMonitor->subListMonitor.expectedModCount
             =FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.modCount(subListMonitor.seq));
@@ -1138,16 +1180,33 @@ public class PackedBooleanArrSeqTest{
     do{
       subListUpdater.accept(curr);
     }while((curr=curr.expectedParent) != null);
-    expectedRoot.updateCollectionState();
+    
+    
   }
   @Override public void updateRemoveIndexState(int index){
+    int rootTrueCount=expectedRoot.trueCount;
     expectedRoot.updateRemoveIndexState(index + expectedRootOffset);
+    
+    if(rootTrueCount!=expectedRoot.trueCount) {
+        var curr=this;
+        do {
+            --curr.trueCount;
+        }while((curr=curr.expectedParent)!=null);
+    }
+    
     bubbleUpModifySize(-1);
   }
   @Override public void updateRemoveValState(Object inputVal,DataType inputType){
+      int rootTrueCount=expectedRoot.trueCount;
     final int index
         =expectedRoot.findRemoveValIndex(inputVal,inputType,expectedRootOffset,expectedRootOffset + expectedSize);
     expectedRoot.updateRemoveIndexState(index);
+    if(rootTrueCount!=expectedRoot.trueCount) {
+        var curr=this;
+        do {
+            --curr.trueCount;
+        }while((curr=curr.expectedParent)!=null);
+    }
     bubbleUpModifySize(-1);
   }
   @Override public void updateReplaceAllState(MonitoredFunction function){
@@ -1158,7 +1217,13 @@ public class PackedBooleanArrSeqTest{
         ++curr.expectedModCount;
       }while((curr=curr.expectedParent) != null);
     }
+    
     expectedRoot.updateReplaceAllState(function,expectedRootOffset);
+    var curr=this;
+    do {
+       curr.trueCount=curr.countTrue();
+    }while((curr=curr.expectedParent)!=null);
+    
   }
   @Override public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
     expectedRoot.verifyArrayIsCopy(arr,emptyArrayMayBeSame);
@@ -1224,240 +1289,119 @@ public class PackedBooleanArrSeqTest{
     expectedRoot.verifyGetResult(index + expectedRootOffset,result,outputType);
   }
   @Override public void verifyPutResult(int index,Object input,DataType inputType){
+    int trueCount=expectedRoot.trueCount;
     expectedRoot.verifyPutResult(index + expectedRootOffset,input,inputType);
+    if((boolean)input) {
+        if(expectedRoot.trueCount>trueCount) {
+            var curr=this;
+            do {
+                ++curr.trueCount;
+            }while((curr=curr.expectedParent)!=null);
+        }
+    }else {
+        if(expectedRoot.trueCount<trueCount) {
+            var curr=this;
+            do {
+                --curr.trueCount;
+            }while((curr=curr.expectedParent)!=null);
+        }
+    }
   }
  
   @Override public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-      //TODO
-      throw new UnsupportedOperationException();
-//    Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
-//    Assertions.assertNotEquals(result,filter.numRemoved == 0);
-//    final int expectedSize=this.expectedSize;
-//    final int offset=expectedRootOffset;
-//    final int bound=offset + expectedSize;
-//    final var dataType=expectedRoot.dataType;
-//    if(result){
-//      int numRemoved;
-//      if(dataType == DataType.BOOLEAN){
-//        final var expectedArr=(boolean[])expectedRoot.expectedArr;
-//        if(filter.removedVals.contains(Boolean.TRUE)){
-//          if(filter.removedVals.contains(Boolean.FALSE)){
-//            Assertions.assertTrue(filter.retainedVals.isEmpty());
-//            Assertions.assertEquals(0,filter.numRetained);
-//            int i=bound - 1;
-//            final boolean firstVal=expectedArr[i];
-//            while(expectedArr[--i] == firstVal){
-//              // we are expecting this condition to be met before i<offset. Otherwise,
-//              // something is wrong.
-//            }
-//            numRemoved=expectedSize;
-//          }else{
-//            numRemoved=1;
-//            int i=offset;
-//            for(;;++i){
-//              if(expectedArr[i]){
-//                for(int j=i + 1;j < bound;++j){
-//                  if(!expectedArr[j]){
-//                    expectedArr[i++]=false;
-//                  }else{
-//                    ++numRemoved;
-//                  }
-//                }
-//                break;
-//              }
-//            }
-//          }
-//        }else{
-//          numRemoved=1;
-//          int i=offset;
-//          for(;;++i){
-//            if(!expectedArr[i]){
-//              for(int j=i + 1;j < bound;++j){
-//                if(expectedArr[j]){
-//                  expectedArr[i++]=true;
-//                }else{
-//                  ++numRemoved;
-//                }
-//              }
-//              break;
-//            }
-//          }
-//        }
-//      }else{
-//        Assertions.assertEquals(expectedSize,filter.numCalls);
-//        IntBinaryOperator remover;
-//        switch(dataType){
-//        case BYTE:{
-//          final var castArr=(byte[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        case CHAR:{
-//          final var castArr=(char[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        case SHORT:{
-//          final var castArr=(short[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        case INT:{
-//          final var castArr=(int[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        case LONG:{
-//          final var castArr=(long[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        case FLOAT:{
-//          final var castArr=(float[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        case DOUBLE:{
-//          final var castArr=(double[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        case REF:{
-//          final var castArr=(Object[])expectedRoot.expectedArr;
-//          remover=(srcIndex,dstIndex)->{
-//            final var val=castArr[srcIndex];
-//            final boolean removedContains=filter.removedVals.contains(val);
-//            final boolean retainedContains=filter.retainedVals.contains(val);
-//            Assertions.assertNotEquals(removedContains,retainedContains);
-//            if(retainedContains){
-//              castArr[dstIndex++]=val;
-//            }
-//            return dstIndex;
-//          };
-//          break;
-//        }
-//        default:
-//          throw dataType.invalid();
-//        }
-//        int dstOffset=offset;
-//        for(int srcOffset=offset;srcOffset < bound;++srcOffset){
-//          dstOffset=remover.applyAsInt(srcOffset,dstOffset);
-//        }
-//        numRemoved=bound - dstOffset;
-//        Assertions.assertEquals(filter.numRemoved,numRemoved);
-//        Assertions.assertEquals(filter.numRetained,dstOffset - offset);
-//      }
-//      System.arraycopy(expectedRoot.expectedArr,bound,expectedRoot.expectedArr,bound - numRemoved,
-//          expectedRoot.expectedSize - bound);
-//      if(dataType == DataType.REF){
-//        final var expectedArr=(Object[])expectedRoot.expectedArr;
-//        final int rootBound=expectedRoot.expectedSize;
-//        int newRootBound=rootBound - numRemoved;
-//        while(newRootBound != rootBound){
-//          expectedArr[newRootBound]=null;
-//          ++newRootBound;
-//        }
-//      }
-//      bubbleUpModifySize(-numRemoved);
-//      expectedRoot.expectedSize-=numRemoved;
-//      ++expectedRoot.expectedModCount;
-//    }else{
-//      if(dataType == DataType.BOOLEAN){
-//        final var expectedArr=((BooleanArrSeq)expectedRoot.seq).arr;
-//        if(filter.retainedVals.contains(Boolean.TRUE)){
-//          if(filter.retainedVals.contains(Boolean.FALSE)){
-//            int i=expectedRootOffset + expectedSize - 1;
-//            final boolean firstVal=expectedArr[i];
-//            while(expectedArr[--i] == firstVal){
-//              // we are expecting this condition to be met before expectedSize==-1. Otherwise,
-//              // something is wrong.
-//            }
-//          }else{
-//            for(int i=expectedRootOffset + expectedSize;--i >= expectedRootOffset;){
-//              Assertions.assertTrue(expectedArr[i]);
-//            }
-//          }
-//        }else{
-//          if(filter.retainedVals.contains(Boolean.FALSE)){
-//            for(int i=expectedRootOffset + expectedSize;--i >= expectedRootOffset;){
-//              Assertions.assertFalse(expectedArr[i]);
-//            }
-//          }else{
-//            Assertions.assertEquals(0,expectedSize);
-//          }
-//        }
-//      }else{
-//        Assertions.assertEquals(expectedSize,filter.numCalls);
-//        Assertions.assertEquals(expectedSize,filter.numRetained);
-//        final var itr=seq.iterator();
-//        while(itr.hasNext()){
-//          Assertions.assertTrue(filter.retainedVals.contains(itr.next()));
-//        }
-//      }
-//    }
+      int expectedSize=this.expectedSize;
+      if(expectedSize==0) {
+          Assertions.assertFalse(result);
+          Assertions.assertTrue(filter.removedVals.isEmpty());
+      }else {
+          Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
+      }
+      Assertions.assertNotEquals(result,filter.numRemoved == 0);
+      if(result) {
+          int numRemoved;
+          int numTrueRemoved;
+          int trueCount=this.trueCount;
+          if(trueCount==0) {
+            Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+            Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+            Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+            Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
+            Assertions.assertEquals(1,filter.numCalls);
+            Assertions.assertEquals(1,filter.numRemoved);
+            Assertions.assertEquals(0,filter.numRetained);
+            numRemoved=expectedSize;
+            numTrueRemoved=0;
+           
+          }else if(expectedSize==trueCount) {
+            Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+            Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+            Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+            Assertions.assertTrue(filter.removedVals.contains(Boolean.TRUE));
+            Assertions.assertEquals(1,filter.numCalls);
+            Assertions.assertEquals(1,filter.numRemoved);
+            Assertions.assertEquals(0,filter.numRetained);
+            numRemoved=expectedSize;
+            numTrueRemoved=trueCount;
+          }else {
+            Assertions.assertEquals(2,filter.numCalls);
+            if(filter.removedVals.contains(Boolean.TRUE)){
+              Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+              if(filter.removedVals.contains(Boolean.FALSE)){
+                Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                Assertions.assertEquals(2,filter.numRemoved);
+                Assertions.assertEquals(0,filter.numRetained);
+                numRemoved=expectedSize;
+                numTrueRemoved=trueCount;
+              
+                
+              }else{
+                Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                Assertions.assertEquals(1,filter.numRemoved);
+                Assertions.assertEquals(1,filter.numRetained);
+                numRemoved=trueCount;
+                numTrueRemoved=trueCount;
+               
+              }
+            }else{
+              Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+              Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+              Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
+              Assertions.assertEquals(1,filter.numRemoved);
+              Assertions.assertEquals(1,filter.numRetained);
+              numRemoved=expectedSize-trueCount;
+              numTrueRemoved=0;
+            }
+          }
+          ++expectedRoot.expectedModCount;
+          expectedRoot.expectedSize-=numRemoved;
+          expectedRoot.copyListContents();
+          var curr=this;
+          do {
+              ++curr.expectedModCount;
+              curr.expectedSize-=numRemoved;
+              curr.trueCount-=numTrueRemoved;
+          }while((curr=curr.expectedParent)!=null);
+      }else {
+          Assertions.assertEquals(0,filter.numRemoved);
+          Assertions.assertEquals(filter.numCalls,filter.numRetained);
+          if(expectedSize != 0){
+            if(trueCount == 0){
+              Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+              Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+              Assertions.assertEquals(1,filter.numRetained);
+            }else if(trueCount == expectedSize){
+              Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+              Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+              Assertions.assertEquals(1,filter.numRetained);
+            }else{
+              Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+              Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+              Assertions.assertEquals(2,filter.numRetained);
+            }
+          }else{
+            Assertions.assertEquals(0,filter.numRetained);
+          }
+      }
   }
   @Override public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
 
@@ -1745,7 +1689,7 @@ public class PackedBooleanArrSeqTest{
                   final boolean queryCanReturnTrue
                   =queryVal.queryCanReturnTrue(modification,castType,inputType,DataType.BOOLEAN);
               for(final var size:SHORT_SIZES){
-                  if((inputType!=DataType.BOOLEAN || castType!=QueryCastType.Unboxed) && size>1) {
+                  if(size>1 && (!queryCanReturnTrue || inputType!=DataType.BOOLEAN || castType!=QueryCastType.Unboxed)) {
                       break;
                   }
                 int prevIndex=-1;
@@ -1781,10 +1725,9 @@ public class PackedBooleanArrSeqTest{
                     default:
                     }
                   }else {
-                      if(initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0) {
-                          break;
+                      if(initParams.totalPostAlloc>maxPostAlloc) {
+                          continue;
                       }
-                      
                   }
                   
                   for(final var illegalMod:initParams.structType.validPreMods){
@@ -1876,7 +1819,7 @@ public class PackedBooleanArrSeqTest{
   private static final int[] NON_THROWING_REMOVE_AT_POSITIONS=new int[]{-1,0,1,2,3};
   private static final int[] THROWING_REMOVE_AT_POSITIONS=new int[]{-1};
   private static final double[] POSITIONS;
-  private static final int[] INIT_CAPACITIES=new int[]{0,5,10,15,63,64,65,66,127,128,129,255,256,257,319,320,321};
+  private static final int[] INIT_CAPACITIES=new int[] {0,64,128,192,256,320,384};
 //  private static final int[] SIZES=new int[]{0,1,2,3,4,5,10,20,30,40,50,60,62,63,64,65,66,70,80,90,100,126,127,128,129,
 //      130,190,191,192,193,194,254,255,256,257,258};
  // private static final int[] MEDIUM_SIZES=new int[]{0,1,63,64,65,127,128,129,191,192,193,255,256,257};
@@ -1998,19 +1941,7 @@ public class PackedBooleanArrSeqTest{
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
           for(final var inputType:DataType.BOOLEAN.mayBeAddedTo()){
             for(final var functionCallType:inputType.validFunctionCalls){
-              int prevActualInitCap=-1;
               for(final var initCap:INIT_CAPACITIES){
-                  int actualInitCap;
-                  if(initCap<64) {
-                      actualInitCap=0;
-                  }else {
-                      actualInitCap=(initCap-1>>6)+1;
-                  }
-                  if(actualInitCap==prevActualInitCap) {
-                      continue;
-                  }
-                  prevActualInitCap=actualInitCap;
-                  
                   if(illegalMod.expectedException==null) {
                       int prevMax=-1;
                       for(final var position:POSITIONS){
@@ -2081,7 +2012,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testadd_intval");
   }
-  @Order(470152) @Test public void testadd_val(){
+  @Order(193592) @Test public void testadd_val(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2138,8 +2069,9 @@ public class PackedBooleanArrSeqTest{
     test.runAllTests("PackedBooleanArrSeqTest.testclone_void");
   }
   @Order(68) @Test public void testConstructor_int(){
+    final int[] initCapacities=new int[]{0,5,10,15,63,64,65,66,127,128,129,255,256,257,319,320,321};
     for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
-      for(final var initCap:INIT_CAPACITIES){
+      for(final var initCap:initCapacities){
         TestExecutorService.submitTest(()->{
           AbstractPackedBooleanArrSeqMonitor<?> monitor;
           switch(initParams.structType){
@@ -2184,7 +2116,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_void");
   }
-  @Order(8196) @Test public void testcontains_val(){
+  @Order(1851576) @Test public void testcontains_val(){
     final QueryTest<?> test=(monitor,queryVal, inputType, castType,modification, position, seqSize)->{
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
@@ -2265,7 +2197,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void");
   }
-  @Order(5808) @Test public void testindexOf_val(){
+  @Order(1849188) @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
           int expectedIndex;
@@ -2539,7 +2471,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrremove_void");
   }
-  @Order(5808) @Test public void testlastIndexOf_val(){
+  @Order(1849188) @Test public void testlastIndexOf_val(){
     final QueryTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -2621,7 +2553,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testlistIterator_void");
   }
-  @Order(1958910) @Test public void testListItradd_val(){
+  @Order(806610) @Test public void testListItradd_val(){
     for(final var position:POSITIONS){
       if(position >= 0){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -2826,23 +2758,118 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrset_val");
   }
-  @Test public void testMASSIVEtoString(){
-    int seqSize=DataType.BOOLEAN.massiveToStringThreshold + 1;
-    long[] words=new long[(seqSize-1>>6)+1];
-    for(int i=words.length;--i>=0;) {
-      words[i]=-1L;
+  @Order(Integer.MAX_VALUE) @Test public void testMASSIVEtoString(){
+    int seqSize;
+    long[] words;
+    for(int i=(words=new long[((seqSize=DataType.BOOLEAN.massiveToStringThreshold+1)-1>>6)+1]).length;--i>=0;) {
+        words[i]=0xAAAAAAAAAAAAAAAAL;
     }
     var uncheckedStack=new PackedBooleanArrSeq.UncheckedStack(seqSize,words);
     var checkedStack=new PackedBooleanArrSeq.CheckedStack(seqSize,words);
     var uncheckedList=new PackedBooleanArrSeq.UncheckedList(seqSize,words);
     var checkedList=new PackedBooleanArrSeq.CheckedList(seqSize,words);
-    DataType.BOOLEAN.verifyMASSIVEToString(uncheckedStack.toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedStack.testMASSIVEtoString");
-    DataType.BOOLEAN.verifyMASSIVEToString(checkedStack.toString(),seqSize,"PackedBooleanArrSeqTest.CheckedStack.testMASSIVEtoString");
-    DataType.BOOLEAN.verifyMASSIVEToString(uncheckedList.toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedList.testMASSIVEtoString");
-    DataType.BOOLEAN.verifyMASSIVEToString(checkedList.toString(),seqSize,"PackedBooleanArrSeqTest.CheckedList.testMASSIVEtoString");
-    DataType.BOOLEAN.verifyMASSIVEToString(uncheckedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedSubList.testMASSIVEtoString");
-    DataType.BOOLEAN.verifyMASSIVEToString(checkedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.CheckedSubList.testMASSIVEtoString");
+    verifyMASSIVEToStringHelper(uncheckedStack.toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedStack.testMASSIVEtoString",false);
+    verifyMASSIVEToStringHelper(checkedStack.toString(),seqSize,"PackedBooleanArrSeqTest.CheckedStack.testMASSIVEtoString",false);
+    verifyMASSIVEToStringHelper(uncheckedList.toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedStack.testMASSIVEtoString",true);
+    verifyMASSIVEToStringHelper(checkedList.toString(),seqSize,"PackedBooleanArrSeqTest.CheckedStack.testMASSIVEtoString",true);
+    verifyMASSIVEToStringHelper(uncheckedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedStack.testMASSIVEtoString",true);
+    verifyMASSIVEToStringHelper(checkedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.CheckedStack.testMASSIVEtoString",true);
   }
+  private static void verifyMASSIVEToStringHelper(String result,int seqSize,String testName,boolean forward) {
+      
+      int offset;
+      Assertions.assertEquals('[',result.charAt(offset=0));
+      if(forward) {
+          Assertions.assertEquals('f',result.charAt(++offset));
+          Assertions.assertEquals('a',result.charAt(++offset));
+          Assertions.assertEquals('l',result.charAt(++offset));
+          Assertions.assertEquals('s',result.charAt(++offset));
+          Assertions.assertEquals('e',result.charAt(++offset));
+          ++offset;
+          int numBatches=TestExecutorService.getNumWorkers();
+          int batchSize=(seqSize-2)/numBatches * 13;
+          for(int batchCount=0;batchCount<numBatches;++batchCount) {
+              final int batchOffset=offset;
+              final int batchBound=batchCount == numBatches?result.length() - 1:offset + batchSize;
+              TestExecutorService.submitTest(()->{
+                  for(int i=batchOffset;;++i) {
+                    if(i>=batchBound) {
+                        break;
+                    }
+                    Assertions.assertEquals(',',result.charAt(i));
+                    Assertions.assertEquals(' ',result.charAt(++i));
+                    Assertions.assertEquals('t',result.charAt(++i));
+                    Assertions.assertEquals('r',result.charAt(++i));
+                    Assertions.assertEquals('u',result.charAt(++i));
+                    Assertions.assertEquals('e',result.charAt(++i));
+                    if(++i>=batchBound) {
+                        break;
+                    }
+                    Assertions.assertEquals(',',result.charAt(i));
+                    Assertions.assertEquals(' ',result.charAt(++i));
+                    Assertions.assertEquals('f',result.charAt(++i));
+                    Assertions.assertEquals('a',result.charAt(++i));
+                    Assertions.assertEquals('l',result.charAt(++i));
+                    Assertions.assertEquals('s',result.charAt(++i));
+                    Assertions.assertEquals('e',result.charAt(++i));
+                  }
+              });
+          }
+          Assertions.assertEquals(',',result.charAt(offset=result.length()-7));
+          Assertions.assertEquals(' ',result.charAt(++offset));
+          Assertions.assertEquals('t',result.charAt(++offset));
+          Assertions.assertEquals('r',result.charAt(++offset));
+          Assertions.assertEquals('u',result.charAt(++offset));
+      }else {
+          Assertions.assertEquals('t',result.charAt(++offset));
+          Assertions.assertEquals('r',result.charAt(++offset));
+          Assertions.assertEquals('u',result.charAt(++offset));
+          Assertions.assertEquals('e',result.charAt(++offset));
+          ++offset;
+          int numBatches=TestExecutorService.getNumWorkers();
+          int batchSize=(seqSize-2)/numBatches * 13;
+          for(int batchCount=0;batchCount<numBatches;++batchCount) {
+              final int batchOffset=offset;
+              final int batchBound=batchCount == numBatches?result.length() - 1:offset + batchSize;
+              TestExecutorService.submitTest(()->{
+                  for(int i=batchOffset;;++i) {
+                    if(i>=batchBound) {
+                        break;
+                    }
+                    Assertions.assertEquals(',',result.charAt(i));
+                    Assertions.assertEquals(' ',result.charAt(++i));
+                    Assertions.assertEquals('f',result.charAt(++i));
+                    Assertions.assertEquals('a',result.charAt(++i));
+                    Assertions.assertEquals('l',result.charAt(++i));
+                    Assertions.assertEquals('s',result.charAt(++i));
+                    Assertions.assertEquals('e',result.charAt(++i));
+                    if(++i>=batchBound) {
+                        break;
+                    }
+                    Assertions.assertEquals(',',result.charAt(i));
+                    Assertions.assertEquals(' ',result.charAt(++i));
+                    Assertions.assertEquals('t',result.charAt(++i));
+                    Assertions.assertEquals('r',result.charAt(++i));
+                    Assertions.assertEquals('u',result.charAt(++i));
+                    Assertions.assertEquals('e',result.charAt(++i));
+                  }
+              });
+          }
+          Assertions.assertEquals(',',result.charAt(offset=result.length()-8));
+          Assertions.assertEquals(' ',result.charAt(++offset));
+          Assertions.assertEquals('f',result.charAt(++offset));
+          Assertions.assertEquals('a',result.charAt(++offset));
+          Assertions.assertEquals('l',result.charAt(++offset));
+          Assertions.assertEquals('s',result.charAt(++offset));
+      }
+      Assertions.assertEquals('e',result.charAt(++offset));
+      Assertions.assertEquals(']',result.charAt(++offset));
+      
+     
+      TestExecutorService.completeAllTests(testName);
+  
+  }
+  
   @Order(2) @Test public void testpeek_void(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       TestExecutorService.submitTest(()->{
@@ -2896,7 +2923,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testpop_void");
   }
-  @Order(68) @Test public void testpush_val(){
+  @Order(28) @Test public void testpush_val(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       for(final var inputType:DataType.BOOLEAN.mayBeAddedTo()){
         for(final var functionCallType:inputType.validFunctionCalls){
@@ -3057,28 +3084,33 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveAt_int");
   }
-  @Tag("testremoveIf_Predicate") @Order(-51888) @Test public void testremoveIf_Predicate(){
+  @Tag("testremoveIf_Predicate") @Order(28916684) @Test public void testremoveIf_Predicate(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-          //TODO
-            continue;
-        }
       for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
         for(var size:SHORT_SIZES){
+            if((size>65 || initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0) && filterGen.expectedException!=null) {
+                break;
+            }
           if(size == 0 || initParams.checkedType.checked || filterGen.expectedException == null){
             final int initValBound;
             final int periodBound;
             initValBound=size == 0?0:1;
             periodBound=Math.min(Math.max(0,size - 1),65);
             for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
+                if((size>65 || initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0) && functionCallType.boxed) {
+                    continue;
+                }
               for(final var illegalMod:initParams.structType.validPreMods){
+                  if(illegalMod.expectedException!=null && size>65) {
+                      continue;
+                  }
                 if(illegalMod.minDepth <= initParams.preAllocs.length
                     && (initParams.checkedType.checked || illegalMod.expectedException == null)){
                     for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
                       final int initVal=tmpInitVal;
                       for(int tmpPeriod=0;tmpPeriod <= periodBound;++tmpPeriod){
                         final int period=tmpPeriod;
-                          TestExecutorService.submitTest(()->{
+                          TestExecutorService.submitTest(()->{ 
                             final var monitor=SequenceInitialization.Ascending
                                 .initialize(getMonitoredSequence(initParams,size),size,initVal,period);
                             final var filter
@@ -3109,7 +3141,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveIf_Predicate");
   }
-  @Tag("testremoveVal_val") @Order(8196) @Test public void testremoveVal_val(){
+  @Tag("testremoveVal_val") @Order(7884456) @Test public void testremoveVal_val(){
     QueryTest<?> test=new QueryTest<MonitoredSequence<OmniCollection.OfBoolean>>() {
         @Override public int getMaxPostAlloc() {
             return Integer.MAX_VALUE;
@@ -3198,7 +3230,7 @@ public class PackedBooleanArrSeqTest{
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("PackedBooleanArrSeqTest.testsize_void");
   }
-  
+
   private static interface SortTest{
       private void runAllTests(String testName,boolean usesComparator) {
           for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -3211,17 +3243,8 @@ public class PackedBooleanArrSeqTest{
                           final int periodInc=Math.max(1,size/10);
                           final int periodBound=size+periodInc;
                           if(size<2 || comparatorGen.expectedException==null || initParams.checkedType.checked) {
-                              if(size>2 && comparatorGen.expectedException!=null) {
-                                  continue;
-                              }
                               for(var functionCallType:DataType.BOOLEAN.validFunctionCalls) {
-                                  if(functionCallType.boxed && (!usesComparator || size>2)) {
-                                      continue;
-                                  }
                                   for(var illegalMod:initParams.structType.validPreMods) {
-                                      if(illegalMod.expectedException!=null && size>0) {
-                                          continue;
-                                      }
                                       if(initParams.checkedType.checked || illegalMod.expectedException==null) {
                                           for(int tmpInitVal=0;tmpInitVal<=1;++tmpInitVal) {
                                               final int initVal=tmpInitVal;
@@ -3229,19 +3252,17 @@ public class PackedBooleanArrSeqTest{
                                                   final int period=tmpPeriod;
                                                   TestExecutorService.submitTest(()->{
                                                       final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,initVal,period);
-                                                      final Class<? extends Throwable> expectedException;
                                                       if(illegalMod.expectedException==null) {
-                                                          if(size<2 || comparatorGen.expectedException==null) {
+                                                          if(size<2 || comparatorGen.expectedException==null || period+1>=size) {
                                                               runTest(monitor,comparatorGen,functionCallType);
-                                                              return;
-                                                          }else {
-                                                              expectedException=comparatorGen.expectedException;
+                                                          }else {                                                       
+                                                              Assertions.assertThrows(comparatorGen.expectedException,()->runTest(monitor,comparatorGen,functionCallType));
                                                           }
                                                       }else {
                                                           monitor.illegalMod(illegalMod);
-                                                          expectedException=illegalMod.expectedException;
+                                                          Assertions.assertThrows(illegalMod.expectedException,()->runTest(monitor,comparatorGen,functionCallType));
                                                       }
-                                                      Assertions.assertThrows(expectedException,()->runTest(monitor,comparatorGen,functionCallType));
+                                                      
                                                   });
                                               }
                                           }
@@ -3260,7 +3281,7 @@ public class PackedBooleanArrSeqTest{
       void runTest(MonitoredList<?> monitor,MonitoredComparatorGen comparatorGen,FunctionCallType functionCallType);
   }
   
-  @Order(82584) @Test public void testsort_Comparator(){
+  @Order(695224) @Test public void testsort_Comparator(){
     TestExecutorService.setNumWorkers(1);
     final SortTest test=(monitor,comparatorGen,functionCallType)->{
         DataType.BOOLEAN.callStableSort(comparatorGen.getMonitoredComparator(monitor),monitor.getCollection(),functionCallType);
@@ -3270,7 +3291,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testsort_Comparator",true);
   }
-  @Order(17012) @Test public void teststableAscendingSort_void(){
+  @Order(65992) @Test public void teststableAscendingSort_void(){
       TestExecutorService.setNumWorkers(1);
 
       final SortTest test=(monitor,comparatorGen,functionCallType)->{
@@ -3281,7 +3302,7 @@ public class PackedBooleanArrSeqTest{
       };
       test.runAllTests("PackedBooleanArrSeqTest.teststableAscendingSort_void",false);
   }
-  @Order(17012) @Test public void teststableDescendingSort_void(){
+  @Order(65992) @Test public void teststableDescendingSort_void(){
       TestExecutorService.setNumWorkers(1);
 
       final SortTest test=(monitor,comparatorGen,functionCallType)->{

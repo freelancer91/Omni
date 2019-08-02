@@ -4074,8 +4074,6 @@ AbstractSeq<Boolean>
           BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
           try{
             BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
-          }catch(ArrayIndexOutOfBoundsException e){
-            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
           }finally{
             CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
@@ -4170,8 +4168,6 @@ AbstractSeq<Boolean>
           BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
           try{
             BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
-          }catch(ArrayIndexOutOfBoundsException e){
-            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
           }finally{
             CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
@@ -4479,8 +4475,6 @@ AbstractSeq<Boolean>
           int modCount=this.modCount;
           try{
             BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
-          }catch(ArrayIndexOutOfBoundsException e){
-            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
@@ -4552,8 +4546,6 @@ AbstractSeq<Boolean>
           int modCount=this.modCount;
           try{
             BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
-          }catch(ArrayIndexOutOfBoundsException e){
-            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }

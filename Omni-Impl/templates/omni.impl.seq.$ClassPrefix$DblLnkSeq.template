@@ -3933,9 +3933,9 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
         $ClassPrefix$SortUtil.uncheckedSort(tmp,0,size,COMPARE);
       #ELSE
         $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
-      #ENDIF
       }catch(ArrayIndexOutOfBoundsException e){
         throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+      #ENDIF
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       }
@@ -3979,9 +3979,9 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
         $ClassPrefix$SortUtil.uncheckedSort(tmp,0,size,COMPARE);
       #ELSE
         $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
-      #ENDIF
       }catch(ArrayIndexOutOfBoundsException e){
         throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+      #ENDIF
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }

@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import static omni.impl.seq.PackedBooleanArrSeq.UncheckedList.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -382,18 +383,176 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         size=bound;
     }
     public static class CheckedList extends UncheckedList{
-        private int uncheckedRemoveIfImpl(int offset,int size,BooleanPredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker) {
-           final var words=this.words;
-           int wordOffset=offset>>6;
-           int bound=offset+size;
-           int wordBound=bound-1>>6;
-           
-           
-            
-            //TODO
-            return 0;
+        private int multiWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordOffset,int wordBound,ModCountChecker modCountChecker) {
+            final var words=this.words;
+            long word;
+            int i;
+            int bitCount=Long.bitCount((word=words[wordOffset])>>>offset);
+            goToRemoveAll:for(;;) {
+                if(bitCount==0) {
+                    boolean removeFalse=filter.test(false);
+                    for(i=wordOffset;++i<wordBound;) {
+                        if((bitCount=Long.bitCount(words[i]))!=0) {
+                            boolean removeTrue=filter.test(true);
+                            modCountChecker.checkModCount();
+                            if(removeTrue) {
+                                
+                                if(removeFalse) {
+                                    break goToRemoveAll;
+                                }
+                                super.removeAllTrue(words,offset,bitCount+=super.countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
+                                this.size=size-bitCount;
+                                return bitCount;
+                            }else if(removeFalse) {
+                                super.removeAllFalse(words,offset,bitCount=size-(bitCount+super.countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
+                                this.size=size-bitCount;
+                                return bitCount;
+                            }
+                            return 0;
+                        }
+                    }
+                    if((bitCount=Long.bitCount(words[wordBound]<<-bound))==0) {
+                        modCountChecker.checkModCount();
+                        if(removeFalse) {
+                            break goToRemoveAll;
+                        }
+                    }else {
+                        boolean removeTrue=filter.test(true);
+                        modCountChecker.checkModCount();
+                        if(removeTrue) {
+                            if(removeFalse) {
+                                break goToRemoveAll;
+                            }
+                            super.removeAllTrue(words,offset,bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }else if(removeFalse) {
+                            super.removeAllFalse(words,offset,bitCount=size-bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                    }
+                   
+                }else if(bitCount==64-(offset&63)) {
+                    boolean removeTrue=filter.test(true);
+                    for(i=wordOffset;++i<wordBound;) {
+                        int numTrue;
+                        bitCount+=numTrue=Long.bitCount(words[i]);
+                        if(numTrue!=64) {
+                            boolean removeFalse=filter.test(false);
+                            modCountChecker.checkModCount();
+                            if(removeFalse) {
+                                if(removeTrue) {
+                                    break goToRemoveAll;
+                                }
+                                super.removeAllFalse(words,offset,bitCount=size-(bitCount+super.countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
+                                this.size=size-bitCount;
+                                return bitCount;
+                            }else if(removeTrue) {
+                                super.removeAllTrue(words,offset,bitCount+=super.countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
+                                this.size=size-bitCount;
+                                return bitCount;
+                            }
+                            return 0;
+                        }
+                    }
+                    if((bitCount+=Long.bitCount(words[wordBound]<<-bound))==size) {
+                        modCountChecker.checkModCount();
+                        if(removeTrue) {
+                            break goToRemoveAll;
+                        }
+                    }else {
+                        boolean removeFalse=filter.test(false);
+                        modCountChecker.checkModCount();
+                        if(removeFalse) {
+                            if(removeTrue) {
+                                break goToRemoveAll;
+                            }
+                            super.removeAllFalse(words,offset,bitCount=size-bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }else if(removeTrue) {
+                            super.removeAllTrue(words,offset,bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                    }
+                  
+                }else {
+                    i=wordOffset;
+                    boolean removeFalse=filter.test(false);
+                    boolean removeTrue=filter.test(true);
+                    modCountChecker.checkModCount();
+                    if(removeFalse) {
+                        if(removeTrue) {
+                            break goToRemoveAll;
+                        }else {
+                            super.removeAllFalse(words,offset,bitCount=size-(bitCount+super.countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                        
+                    }else {
+                        if(removeTrue) {
+                            super.removeAllTrue(words,offset,bitCount+=super.countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                       
+                    }
+                }
+                return 0;
+            } 
+            super.removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(1L<<offset)-1 | words[wordBound]&~((1L<<bound)-1)>>>size);
+            this.size=bitCount-size;
+            return size;
         }
         
+      
+        
+       
+        private int singleWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordBound,ModCountChecker modCountChecker){
+            final var words=this.words;
+            long word;
+            int bitCount;
+            goToRemoveAll:for(;;) {
+                int numFalse;
+                if((bitCount=Long.bitCount((word=words[wordBound])&-1L>>>-size<<offset))==0) {
+                    boolean removeFalse=filter.test(false);
+                    modCountChecker.checkModCount();
+                    if(removeFalse) {
+                        break goToRemoveAll;
+                    }
+                }else if((numFalse=size-bitCount)==0) {
+                    boolean removeTrue=filter.test(true);
+                    modCountChecker.checkModCount();
+                    if(removeTrue) {
+                       break goToRemoveAll;
+                    }
+                }else {
+                    boolean removeFalse=filter.test(false);
+                    boolean removeTrue=filter.test(true);
+                    modCountChecker.checkModCount();
+                    if(removeFalse) {
+                        if(removeTrue) {
+                            break goToRemoveAll;
+                        }else {
+                            super.removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(1L<<offset)-1 | (1L<<bitCount)-1<<offset | (word&~((1L<<bound)-1))>>>numFalse);
+                            this.size=size-numFalse;
+                            return numFalse;
+                        }
+                    }else if(removeTrue) {
+                        super.removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~(-1L>>>-bound))>>>bitCount);
+                        this.size=size-bitCount;
+                        return bitCount;
+                    }
+                }
+                return 0;
+            }
+            super.removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~((1L<<bound)-1))>>>size);
+            this.size=bitCount-size;
+            return size;
+        }
         private static final long serialVersionUID=1L;
         transient int modCount;
         public CheckedList(){
@@ -523,8 +682,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     final int modCount=this.modCount;
                     try{
                         super.uncheckedSort(size,sorter);
-                    }catch(final ArrayIndexOutOfBoundsException e){
-                        throw new IllegalArgumentException("Comparison method violates its general contract!",e);
                     }finally{
                         CheckedCollection.checkModCount(modCount,this.modCount);
                         this.modCount=modCount + 1;
@@ -543,8 +700,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     final int modCount=this.modCount;
                     try{
                         super.uncheckedSort(size,sorter::compare);
-                    }catch(final ArrayIndexOutOfBoundsException e){
-                        throw new IllegalArgumentException("Comparison method violates its general contract!",e);
                     }finally{
                         CheckedCollection.checkModCount(modCount,this.modCount);
                         this.modCount=modCount + 1;
@@ -2008,22 +2163,26 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         public boolean removeIf(BooleanPredicate filter){
             int modCount=this.modCount;
             final var root=this.root;
-            final int size;
+            int size;
             if((size=this.size)!=0){
               try
               {
-                  //TODO
-//                final long[] words;
-//                final int numRemoved;
-//                int rootOffset;
-//                if((numRemoved=uncheckedRemoveIfImpl(arr=root.words,rootOffset=this.rootOffset,rootOffset+=size,filter,root.new ModCountChecker(modCount)))!=0){
-//                  root.modCount=++modCount;
-//                  this.modCount=modCount;
-//                  for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
-//                  root.size=OmniArray.OfBoolean.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
-//                  this.size=size-numRemoved;
-//                  return true;
-//                }
+                  final int numRemoved,offset,wordOffset,bound,wordBound;
+                  final var modCountChecker=root.new ModCountChecker(modCount);
+                  if((wordOffset=(offset=this.rootOffset)>>6)==(wordBound=(bound=offset+size)-1>>6)) {
+                      numRemoved=root.singleWordRemoveIfImpl(offset,size,filter,bound,wordBound,modCountChecker);
+                  }else {
+                      numRemoved=root.multiWordRemoveIfImpl(offset,size,filter,bound,wordOffset,wordBound,modCountChecker);
+                  }
+                  if(size!=(size-=numRemoved)) {
+                      root.modCount=++modCount;
+                      this.modCount=modCount;
+                      for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+                      this.size=size;
+                      
+                      return true;
+                  }
+                  return false;
               }
               catch(ConcurrentModificationException e){
                 throw e;
@@ -2038,22 +2197,25 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         public boolean removeIf(Predicate<? super Boolean> filter){
             int modCount=this.modCount;
             final var root=this.root;
-            final int size;
+            int size;
             if((size=this.size)!=0){
               try
               {
-                  //TODO
-//                final long[] words;
-//                final int numRemoved;
-//                int rootOffset;
-//                if((numRemoved=uncheckedRemoveIfImpl(arr=root.words,rootOffset=this.rootOffset,rootOffset+=size,filter::test,root.new ModCountChecker(modCount)))!=0){
-//                  root.modCount=++modCount;
-//                  this.modCount=modCount;
-//                  for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
-//                  root.size=OmniArray.OfBoolean.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
-//                  this.size=size-numRemoved;
-//                  return true;
-//                }
+                  final int numRemoved,offset,wordOffset,bound,wordBound;
+                  final var modCountChecker=root.new ModCountChecker(modCount);
+                  if((wordOffset=(offset=this.rootOffset)>>6)==(wordBound=(bound=offset+size)-1>>6)) {
+                      numRemoved=root.singleWordRemoveIfImpl(offset,size,filter::test,bound,wordBound,modCountChecker);
+                  }else {
+                      numRemoved=root.multiWordRemoveIfImpl(offset,size,filter::test,bound,wordOffset,wordBound,modCountChecker);
+                  }
+                  if(size!=(size-=numRemoved)) {
+                      root.modCount=++modCount;
+                      this.modCount=modCount;
+                      for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+                      this.size=size;
+                      return true;
+                  }
+                  return false;
               }
               catch(ConcurrentModificationException e){
                 throw e;
@@ -2268,8 +2430,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                   }else {
                       ((UncheckedList)root). multiWordSort(offset,wordOffset,bound,wordBound,sorter);
                   }
-              }catch(ArrayIndexOutOfBoundsException e){
-                throw new IllegalArgumentException("Comparison method violates its general contract!",e);
               }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
                 root.modCount=++modCount;
@@ -2304,8 +2464,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                   }else {
                       ((UncheckedList)root). multiWordSort(offset,wordOffset,bound,wordBound,sorter::compare);
                   }
-              }catch(ArrayIndexOutOfBoundsException e){
-                throw new IllegalArgumentException("Comparison method violates its general contract!",e);
               }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
                 root.modCount=++modCount;
@@ -2550,9 +2708,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int tail0s;
             goToRemoveIndex:for(;;){
                 if((offset&=63) != 0){
-                    tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(word=words[wordOffset]) >>> offset);
+                    tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(word=words[wordOffset]) & -1L<<offset);
                     if(wordOffset == wordBound){
-                        if(tail0s < size){
+                        if(tail0s <=(bound&63)){
                             break goToRemoveIndex;
                         }
                         return false;
@@ -2815,170 +2973,148 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         private static final long serialVersionUID=1L;
         
         private static void removeAllTrue(long[] words,int offset,int numRemoved,int bound,int rootBound) {
-            
-            int wordOffset=offset>>6;
-            int wordBound=bound-1>>6;
-            int falseBound=bound-numRemoved;
-            int falseWordBound=falseBound-1>>6;
-            long word;
-            if(falseWordBound==wordOffset) {
-                
-                words[wordOffset]=words[wordOffset]&(1L<<offset)-1|(word=words[wordBound])<<falseBound;
+            //TODO bugtest
+            int wordOffset;
+            final int wordBound=bound-1>>6;
+            final int falseWordBound;
+            if((falseWordBound=(bound-=numRemoved)-1>>6)==(wordOffset=offset>>6)) {
+                final long word;
+                words[wordOffset]=words[wordOffset]&(1L<<offset)-1|(word=words[wordBound])<<bound;
                 removeIfShiftDown(rootBound,numRemoved,wordOffset+1,wordBound,words,word);
-                
             }else {
                 words[wordOffset]=words[wordOffset]&(1L<<offset)-1;
-                while(++wordOffset<falseWordBound) {
-                    words[wordOffset]=0L;
-                }
-                removeIfShiftDown(rootBound,numRemoved,wordOffset,wordBound,words,words[wordBound]>>>numRemoved);
+                setRange(words,wordOffset+1,falseWordBound,0L);
+                removeIfShiftDown(rootBound,numRemoved,falseWordBound,wordBound,words,words[wordBound]>>>numRemoved);
             }
         }
         private static void removeAllFalse(long[] words,int offset,int numRemoved,int bound,int rootBound) {
-            
-//            int wordOffset=offset>>6;
-//            int wordBound=(bound-1)>>6;
-//            int falseBound=bound-numRemoved;
-//            int falseWordBound=(falseBound-1)>>6;
-//            long word;
-//            if(falseWordBound==wordOffset) {
-//                
-//                words[wordOffset]=((words[wordOffset])&((1L<<offset)-1))|((word=words[wordBound])<<falseBound);
-//                removeIfShiftDown(rootBound,numRemoved,wordOffset+1,wordBound,words,word);
-//                
-//            }else {
-//                words[wordOffset]=(words[wordOffset]&((1L<<offset)-1));
-//                while(++wordOffset<falseWordBound) {
-//                    words[wordOffset]=0L;
-//                }
-//                removeIfShiftDown(rootBound,numRemoved,wordOffset,wordBound,words,words[wordBound]>>>numRemoved);
-//            }
-            //TODO
-        }
-        
-        private int uncheckedRemoveIfImpl(int offset,int size,BooleanPredicate filter) {
-           
+            //TODO bugtest
             int wordOffset=offset>>6;
-            int bound=offset+size;
             int wordBound=bound-1>>6;
-            
-            if(wordOffset==wordBound) {
-                return singleWordRemoveIfImpl(offset,size,filter,bound,wordBound);
+            int numRetained=(bound-=numRemoved)-offset;
+            int trueWordBound=bound-1>>6;
+            if(trueWordBound==wordOffset) {
+                final long word;
+                words[wordOffset]=words[wordOffset]&(1L<<offset)-1|(1L<<numRetained)-1|(word=words[wordBound])<<bound;
+                removeIfShiftDown(rootBound,numRemoved,wordOffset+1,wordBound,words,word);
             }else {
-                final var words=this.words;
-                long word;
-                int i;
-                int bitCount=Long.bitCount((word=words[wordOffset])>>>offset);
-                goToRemoveAll:for(;;) {
-                    if(bitCount==0) {
-                        boolean removeFalse=filter.test(false);
-                        for(i=wordOffset;++i<wordBound;) {
-                            if((bitCount=Long.bitCount(words[i]))!=0) {
-                                if(filter.test(true)) {
-                                    if(removeFalse) {
-                                        break goToRemoveAll;
-                                    }
-                                    removeAllTrue(words,offset,bitCount+=countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
-                                    this.size=size-bitCount;
-                                    return bitCount;
-                                }else if(removeFalse) {
-                                    removeAllFalse(words,offset,bitCount=size-(bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
-                                    this.size=size-bitCount;
-                                    return bitCount;
-                                }
-                                return 0;
-                            }
-                        }
-                        if((bitCount=Long.bitCount(words[wordBound]<<-bound))==0) {
-                            if(removeFalse) {
-                                break goToRemoveAll;
-                            }
-                        }else {
+                words[wordOffset]=words[wordOffset]&(1L<<offset)-1|-1L<<offset;
+                setRange(words,wordOffset+1,trueWordBound,-1L);
+                removeIfShiftDown(rootBound,numRemoved,trueWordBound,wordBound,words,words[wordBound]>>>numRemoved|(1L<<bound)-1);
+            }
+        }
+        private int multiWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordOffset,int wordBound) {
+            final var words=this.words;
+            long word;
+            int i;
+            int bitCount=Long.bitCount((word=words[wordOffset])>>>offset);
+            goToRemoveAll:for(;;) {
+                if(bitCount==0) {
+                    boolean removeFalse=filter.test(false);
+                    for(i=wordOffset;++i<wordBound;) {
+                        if((bitCount=Long.bitCount(words[i]))!=0) {
                             if(filter.test(true)) {
                                 if(removeFalse) {
                                     break goToRemoveAll;
                                 }
-                                removeAllTrue(words,offset,bitCount,bound,size=this.size);
+                                removeAllTrue(words,offset,bitCount+=countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
                                 this.size=size-bitCount;
                                 return bitCount;
                             }else if(removeFalse) {
-                                removeAllFalse(words,offset,bitCount=size-bitCount,bound,size=this.size);
-                                this.size=size-bitCount;
-                                return bitCount;
-                            }
-                        }
-                       
-                    }else if(bitCount==64-(offset&63)) {
-                        boolean removeTrue=filter.test(true);
-                        for(i=wordOffset;++i<wordBound;) {
-                            int numTrue;
-                            bitCount+=numTrue=Long.bitCount(words[i]);
-                            if(numTrue!=64) {
-                                if(filter.test(false)) {
-                                    if(removeTrue) {
-                                        break goToRemoveAll;
-                                    }
-                                    removeAllFalse(words,offset,bitCount=size-(bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
-                                    this.size=size-bitCount;
-                                    return bitCount;
-                                }else if(removeTrue) {
-                                    removeAllTrue(words,offset,bitCount+=countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
-                                    this.size=size-bitCount;
-                                    return bitCount;
-                                }
-                                return 0;
-                            }
-                        }
-                        if((bitCount+=Long.bitCount(words[wordBound]<<-bound))==size) {
-                            if(removeTrue) {
-                                break goToRemoveAll;
-                            }
-                        }else {
-                            if(filter.test(false)) {
-                                if(removeTrue) {
-                                    break goToRemoveAll;
-                                }
-                                removeAllFalse(words,offset,bitCount=size-bitCount,bound,size=this.size);
-                                this.size=size-bitCount;
-                                return bitCount;
-                            }else if(removeTrue) {
-                                removeAllTrue(words,offset,bitCount,bound,size=this.size);
-                                this.size=size-bitCount;
-                                return bitCount;
-                            }
-                        }
-                      
-                    }else {
-                        i=wordOffset;
-                        if(filter.test(false)) {
-                            if(filter.test(true)) {
-                                break goToRemoveAll;
-                            }else {
                                 removeAllFalse(words,offset,bitCount=size-(bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
                                 this.size=size-bitCount;
                                 return bitCount;
                             }
-                            
-                        }else {
-                            if(filter.test(true)) {
+                            return 0;
+                        }
+                    }
+                    if((bitCount=Long.bitCount(words[wordBound]<<-bound))==0) {
+                        if(removeFalse) {
+                            break goToRemoveAll;
+                        }
+                    }else {
+                        if(filter.test(true)) {
+                            if(removeFalse) {
+                                break goToRemoveAll;
+                            }
+                            removeAllTrue(words,offset,bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }else if(removeFalse) {
+                            removeAllFalse(words,offset,bitCount=size-bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                    }
+                   
+                }else if(bitCount==64-(offset&63)) {
+                    boolean removeTrue=filter.test(true);
+                    for(i=wordOffset;++i<wordBound;) {
+                        int numTrue;
+                        bitCount+=numTrue=Long.bitCount(words[i]);
+                        if(numTrue!=64) {
+                            if(filter.test(false)) {
+                                if(removeTrue) {
+                                    break goToRemoveAll;
+                                }
+                                removeAllFalse(words,offset,bitCount=size-(bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
+                                this.size=size-bitCount;
+                                return bitCount;
+                            }else if(removeTrue) {
                                 removeAllTrue(words,offset,bitCount+=countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
                                 this.size=size-bitCount;
                                 return bitCount;
                             }
-                           
+                            return 0;
                         }
                     }
-                    return 0;
+                    if((bitCount+=Long.bitCount(words[wordBound]<<-bound))==size) {
+                        if(removeTrue) {
+                            break goToRemoveAll;
+                        }
+                    }else {
+                        if(filter.test(false)) {
+                            if(removeTrue) {
+                                break goToRemoveAll;
+                            }
+                            removeAllFalse(words,offset,bitCount=size-bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }else if(removeTrue) {
+                            removeAllTrue(words,offset,bitCount,bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                    }
+                  
+                }else {
+                    i=wordOffset;
+                    if(filter.test(false)) {
+                        if(filter.test(true)) {
+                            break goToRemoveAll;
+                        }else {
+                            removeAllFalse(words,offset,bitCount=size-(bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound)),bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                        
+                    }else {
+                        if(filter.test(true)) {
+                            removeAllTrue(words,offset,bitCount+=countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),bound,size=this.size);
+                            this.size=size-bitCount;
+                            return bitCount;
+                        }
+                       
+                    }
                 }
-               
-                removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(1L<<offset)-1 | words[wordBound]&~((1L<<bound)-1)>>>size);
-                this.size=bitCount-size;
-                return size;
-                
-                
-            }
-            
+                return 0;
+            } 
+            removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(1L<<offset)-1 | words[wordBound]&~((1L<<bound)-1)>>>size);
+            this.size=bitCount-size;
+            return size;
         }
+        
+      
         
        
         private int singleWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordBound){
@@ -3001,22 +3137,19 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         if(filter.test(true)) {
                             break goToRemoveAll;
                         }else {
-                            word = word&(1L<<offset)-1 | (1L<<bitCount)-1<<offset | (word&~((1L<<bound)-1))>>>numFalse;
-                            removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word);
+                            removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(1L<<offset)-1 | (1L<<bitCount)-1<<offset | (word&~((1L<<bound)-1))>>>numFalse);
                             this.size=size-numFalse;
                             return numFalse;
                         }
                     }else if(filter.test(true)) {
-                        word = word&(1L<<offset)-1 | (word&~((1L<<bound)-1))>>>bitCount;
-                        removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word);
+                        removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~(-1L>>>-bound))>>>bitCount);
                         this.size=size-bitCount;
                         return bitCount;
                     }
                 }
                 return 0;
             }
-            word=word&(1L<<offset)-1 | (word&~((1L<<bound)-1))>>>size;
-            removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word);
+            removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~((1L<<bound)-1))>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -3054,7 +3187,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     }
                     int numTrue;
                     bitCount+=numTrue=Long.bitCount(words[wordBound]&-1L>>>-bound);
-                    if(numTrue==(bound&63)) {
+                    if(numTrue==64-(-bound&63)) {
                         return;
                     }
                 }else {
@@ -3082,12 +3215,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             switch(Integer.signum(sorter.compare(false,true))) {
             case -1:
-                falseComesFirst(words,bitCount+countRemainingBits(words,wordOffset+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),offset,bound);
+                falseComesFirst(words,bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),offset,bound);
             case 0:
                 //already sorted
                 break;
             default:
-                trueComesFirst(words,bitCount+countRemainingBits(words,wordOffset+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),offset,bound);
+                trueComesFirst(words,bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),offset,bound);
             }
         }
 
@@ -3109,12 +3242,8 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         private static void falseComesFirst(long[] words,int falseCount,int wordBound){
             int wordIndex;
             words[wordIndex=falseCount >> 6]=-1L << falseCount;
-            for(int i=0;i < wordIndex;++i){
-                words[i]=0;
-            }
-            for(int i=wordIndex + 1;i <= wordBound;++i){
-                words[i]=-1L;
-            }
+            setRange(words,0,wordIndex,0);
+            setRange(words,wordIndex+1,wordBound+1,-1L);
         }
         private void uncheckedStableDescendingSort(int offset,int size) {
             final var words=this.words;
@@ -3166,26 +3295,17 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final long tailWord=words[wordBound=bound-1>>6]&~(-1L>>>-bound);
             if((trueWordBound=(trueBound=bitCount+offset)-1>>6)==wordBound) {
                 words[wordBound]=tailWord|-1L>>>-trueBound;
-                while(--wordBound>wordOffset) {
-                    words[wordBound]=-1L;
-                }
-                
+                setRange(words,wordOffset+1,wordBound,-1L);
             }else {
                 words[wordBound]=tailWord;
                 if(trueWordBound==wordOffset) {
-                    while(--wordBound>wordOffset) {
-                        words[wordBound]=0L;
-                    }
+                    setRange(words,wordOffset+1,wordBound,0L);
                     words[wordOffset]=headWord|-1L>>>-bitCount<<offset;
                     return;
                 }else {
-                    while(--wordBound>trueWordBound) {
-                        words[wordBound]=0L;
-                    }
-                    words[wordBound]=-1L>>>-trueBound;
-                    while(--wordBound>wordOffset) {
-                        words[wordBound]=-1L;
-                    }
+                    setRange(words,trueWordBound+1,wordBound,0L);
+                    words[trueWordBound]=-1L>>>-trueBound;
+                    setRange(words,wordOffset+1,trueWordBound,-1L);
                 }
             }
             words[wordOffset]=headWord|-1L<<offset;
@@ -3199,25 +3319,17 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final long tailWord=words[wordBound=bound-1>>6]&~(-1L>>>-bound);
             if((falseWordBound=(falseBound=bound-bitCount)-1>>6)==wordOffset) {
                 words[wordOffset]=headWord|~(-1L>>>-falseBound);
-                while(++wordOffset<wordBound) {
-                    words[wordOffset]=-1L;
-                }
+                setRange(words,wordOffset+1,wordBound,-1L);
             }else {
                 words[wordOffset]=headWord;
                 if(falseWordBound==wordBound) {
-                    while(++wordOffset<wordBound) {
-                        words[wordOffset]=0L;
-                    }
+                    setRange(words,wordOffset+1,wordBound,0L);
                     words[wordBound]=tailWord|-1L>>>-bitCount<<falseBound;
                     return;
                 }else {
-                    while(++wordOffset<falseWordBound) {
-                        words[wordOffset]=0L;
-                    }
-                    words[wordOffset]=-1L<<falseBound;
-                    while(++wordOffset<wordBound) {
-                        words[wordOffset]=-1L;
-                    }
+                    setRange(words,wordOffset+1,falseWordBound,0L);
+                    words[falseWordBound]=-1L<<falseBound;
+                    setRange(words,falseWordBound+1,wordBound,-1L);
                 }
             }
             words[wordBound]=tailWord|-1L>>>-bound;
@@ -3267,12 +3379,8 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         private static void trueComesFirst(long[] words,int trueCount,int wordBound){
             int wordIndex;
             words[wordIndex=trueCount >> 6]=(1L << trueCount) - 1;
-            for(int i=0;i < wordIndex;++i){
-                words[i]=-1L;
-            }
-            for(int i=wordIndex + 1;i <= wordBound;++i){
-                words[i]=0L;
-            }
+            setRange(words,0,wordIndex,-1L);
+            setRange(words,wordIndex+1,wordBound+1,0L);
         }
         private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,boolean[] dst){
             for(int dstOffset=0;;){
@@ -5199,28 +5307,44 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public boolean removeIf(BooleanPredicate filter){
-            final int size;
+            int size;
             if((size=this.size)!=0){
               {
-//                final boolean[] arr;
-//                final int numRemoved;
-//                int rootOffset;
-//                final UncheckedList root;
-//                if((numRemoved=uncheckedRemoveIfImpl(arr=(root=this.root).arr,rootOffset=this.rootOffset,rootOffset+=size,filter))!=0){
-//                  for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
-//                  root.size=OmniArray.OfBoolean.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
-//                  this.size=size-numRemoved;
-//                  return true;
-//                }
+                  final int numRemoved,offset,wordOffset,bound,wordBound;
+                  if((wordOffset=(offset=this.rootOffset)>>6)==(wordBound=(bound=offset+size)-1>>6)) {
+                      numRemoved=root.singleWordRemoveIfImpl(offset,size,filter,bound,wordBound);
+                  }else {
+                      numRemoved=root.multiWordRemoveIfImpl(offset,size,filter,bound,wordOffset,wordBound);
+                  }
+                  if(size!=(size-=numRemoved)) {
+                      for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+                      this.size=size;
+                      return true;
+                  }
               }
             }
             return false;
           }
         @Override
         public boolean removeIf(Predicate<? super Boolean> filter){
-            // TODO Auto-generated method stub
+            int size;
+            if((size=this.size)!=0){
+              {
+                  final int numRemoved,offset,wordOffset,bound,wordBound;
+                  if((wordOffset=(offset=this.rootOffset)>>6)==(wordBound=(bound=offset+size)-1>>6)) {
+                      numRemoved=root.singleWordRemoveIfImpl(offset,size,filter::test,bound,wordBound);
+                  }else {
+                      numRemoved=root.multiWordRemoveIfImpl(offset,size,filter::test,bound,wordOffset,wordBound);
+                  }
+                  if(size!=(size-=numRemoved)) {
+                      for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+                      this.size=size;
+                      return true;
+                  }
+              }
+            }
             return false;
-        }
+          }
         @Override
         public boolean removeVal(boolean val){
             {
@@ -5580,9 +5704,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int tail0s;
             goToRemoveIndex:for(;;){
                 if((offset&=63) != 0){
-                    tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(word=words[wordOffset]) >>> offset);
+                    tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(word=words[wordOffset]) & -1L<<offset);
                     if(wordOffset == wordBound){
-                        if(tail0s < size){
+                        if(tail0s <=(bound&63)){
                             break goToRemoveIndex;
                         }
                         return false;

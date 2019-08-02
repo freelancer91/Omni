@@ -91,7 +91,9 @@ public class TestExecutorService {
             totalCompletedTasks.incrementAndGet();
         }
     }
-
+    public static void suspend() {
+        System.out.println("here");
+    }
 
 
     public static void completeAllTests() {
