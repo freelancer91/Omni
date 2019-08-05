@@ -17,18 +17,17 @@ public interface BitSetUtil{
       return packedIndex<<6;
     }
     public static int getPackedCapacity(int nonPackedCapacity) {
-      return (convertToPackedIndex(nonPackedCapacity-1))+1;
+      return convertToPackedIndex(nonPackedCapacity-1)+1;
     }
     
     public static boolean getFromPackedArr(long[] words,int nonPackedIndex) {
-      return ((words[convertToPackedIndex(nonPackedIndex)]>>>nonPackedIndex)&1)!=0;
+      return (words[convertToPackedIndex(nonPackedIndex)]>>>nonPackedIndex&1)!=0;
     }
     public static void arraycopyaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
       //TODO bugtest
-      ArrCopy.uncheckedCopy(src,srcOffset>>=6,dst,dstOffset>>=6,length>>=6);
+      ArrCopy.semicheckedCopy(src,srcOffset>>6,dst,dstOffset>>6,length>>6);
       if((length&63)!=0) {
-        //length is not aligned
-        (dst)[dstOffset+=length] = (dst[dstOffset]&(-1L<<length)) | ((src)[srcOffset+length]&(-1L>>>length));
+        dst[dstOffset=dstOffset+length>>6]=dst[dstOffset]&-1L<<length | src[srcOffset+length>>6]&-1L>>>-length;
       }
     }
     public static void arraycopysrcaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
@@ -36,47 +35,149 @@ public interface BitSetUtil{
 
       int srcWordOffset,dstWordOffset;
       long srcWord;
-      (dst)[dstWordOffset=dstOffset>>6]=(dst[dstOffset]&(-1L>>>-dstOffset))|((srcWord=(src)[srcWordOffset=srcOffset>>6])<<dstOffset);
       int dstBound;
-      for(final var dstWordBound=(dstBound=dstOffset+length)>>6;++dstWordOffset<dstWordBound;) {
-        dst[dstWordOffset]=(srcWord>>>-dstOffset)|((srcWord=src[++srcWordOffset])<<dstOffset);
+      int dstWordBound;
+      final long srcEndMask=-1L>>>-length;
+      if((dstWordOffset=dstOffset>>6)==(dstWordBound=(dstBound=dstOffset+length-1)>>6)) {
+          dst[dstWordOffset]=dst[dstWordOffset]&~(srcEndMask<<dstOffset) | (src[srcOffset>>6]&srcEndMask)<<dstOffset;
+      }else {
+          dst[dstWordOffset=dstOffset>>6]=dst[dstWordOffset]&-1L>>>-dstOffset|(srcWord=src[srcWordOffset=srcOffset>>6])<<dstOffset;
+          while(++dstWordOffset<dstWordBound) {
+            dst[dstWordOffset]=srcWord>>>-dstOffset|(srcWord=src[++srcWordOffset])<<dstOffset;
+          }
+          final long dstEndMask=-1L<<dstBound-1;
+          if(++srcWordOffset==srcOffset+length-1>>6) {
+              dst[dstWordOffset]=srcWord>>>-dstOffset|dst[dstWordOffset]&dstEndMask| (src[srcWordOffset]&srcEndMask)<<dstOffset;
+
+          }else {
+              dst[dstWordOffset]=(srcWord&srcEndMask)>>>-dstOffset|dst[dstWordOffset]&dstEndMask;
+          }
+          
       }
-      dst[dstWordOffset]=(srcWord>>>-dstOffset)|(dst[dstWordOffset]&(-1L<<(dstBound-1)));
+
     }
     public static void arraycopydstaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
-      //TODO bugtest
-
-      int srcWordOffset,dstWordOffset;
+      int srcWordOffset=srcOffset>>6,dstWordOffset=dstOffset>>6;
       long srcWord;
-      (dst)[dstWordOffset=dstOffset>>6]=(((src)[srcWordOffset=srcOffset>>6])>>>srcOffset)|((srcWord=src[++srcWordOffset])<<-srcOffset);
-      for(final var dstWordBound=(dstOffset+length)>>6;++dstWordOffset<=dstWordBound;) {
-        dst[dstWordOffset]=(srcWord>>>srcOffset)|((srcWord=src[++srcWordOffset])<<-srcOffset);
+      if(length<=64) {
+          srcWord=src[srcWordOffset]>>>srcOffset;
+          if(srcWordOffset!=srcOffset+length-1>>6) {
+              srcWord|=src[srcWordOffset+1]<<-srcOffset;
+          }
+          final long endMask;
+          dst[dstWordOffset]=dst[dstWordOffset]&~(endMask=-1L>>>-length)|srcWord&endMask;
+      }else {
+          dst[dstWordOffset]=src[srcWordOffset]>>>srcOffset | (srcWord=src[++srcWordOffset])<<-srcOffset;
+          final int dstWordBound=dstOffset+length-1>>6;
+          while(++dstWordOffset<dstWordBound) {
+              dst[dstWordOffset]=srcWord>>>srcOffset|(srcWord=src[++srcWordOffset])<<-srcOffset;
+          }
+          srcWord>>>=srcOffset;
+          if(srcWordOffset!=srcOffset+length-1>>6) {
+              srcWord|=src[srcWordOffset+1]<<-srcOffset;
+          }
+          final long endMask;
+          dst[dstWordOffset]=dst[dstWordOffset]&~(endMask=-1L>>>-length)|srcWord&endMask;
       }
+      
     }
     public static void arraycopyunaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
+        int srcWordOffset;
+        int srcWordBound;
+        int dstWordOffset=dstOffset>>6;
+        int dstBound;
+        int dstWordBound=(dstBound=dstOffset+length)-1>>6;
+        long mask;
+        if((srcWordOffset=srcOffset>>6)==(srcWordBound=srcOffset+length-1>>6)) {
+            long srcWord=src[srcWordOffset];
+            long dstWord;
+            if(dstWordOffset==dstWordBound) {
+                dstWord=dst[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset);
+                if((dstOffset&63)<(srcOffset&63)) {
+                    dst[dstWordOffset]=srcWord>>>srcOffset-dstOffset&mask | dstWord;
+                }else {
+                    dst[dstWordOffset]=srcWord<<dstOffset-srcOffset&mask | dstWord;
+                }
+            }else {
+                int shift;
+                dstWord=dst[dstWordOffset]&(mask=-1L>>>-dstOffset);
+                if((dstOffset&63)<(srcOffset&63)) {
+                    dst[dstWordOffset]=srcWord>>>(shift=srcOffset-dstOffset)&~mask | dstWord;
+                    dst[++dstWordOffset]=srcWord<<-shift&~(mask=-1L<<dstBound) | dst[dstWordOffset]&mask;
+                }else {
+                    dst[dstWordOffset]=srcWord<<(shift=dstOffset-srcOffset)&~mask | dstWord;
+                    dst[++dstWordOffset]=srcWord>>>-shift&~(mask=-1L<<dstBound)|dst[dstWordOffset]&mask;
+                }
+            }
+        }else {
+            if(dstWordOffset==dstWordBound) {
+                int shift;
+                final long dstWord=dst[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset);
+                if((dstOffset&63)<(srcOffset&63)) {
+                    dst[dstWordOffset]=dstWord | (src[srcWordOffset]>>>(shift=srcOffset-dstOffset)|src[srcWordOffset+1]<<-shift)&mask;
+                }else {
+                    dst[dstWordOffset]=dstWord | (src[srcWordOffset]<<(shift=dstOffset-srcOffset)|src[srcWordOffset+1]>>>-shift)&mask;
+                }
+            }else {
+                long srcWord=src[srcWordOffset];
+                int shift;
+                switch(Integer.signum(shift=(dstOffset&63)-(srcOffset&63))) {
+                case 0:{
+                    dst[dstWordOffset]=dst[dstWordOffset]&(mask=-1L>>>-dstOffset)|srcWord&~mask;
+                    ArrCopy.semicheckedCopy(src,srcWordOffset+1,dst,++dstWordOffset,dstWordBound-dstWordOffset);
+                    dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) | src[srcWordBound]&mask;
+                    break;
+                }
+                case 1:{
+                    dst[dstWordOffset]=dst[dstWordOffset]&(mask=-1L>>>-dstOffset) | srcWord<<shift&~mask;
+                    while(++dstWordOffset<dstWordBound) {
+                        dst[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
+                    }
+                    dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordBound]<<shift)&mask;
+                    break;
+                }
+                default:{
+                    //TODO
+                  dst[dstWordOffset]=dst[dstWordOffset]&(mask=-1L>>>-dstOffset) | (srcWord>>>-shift|(srcWord=src[++srcWordOffset])<<shift)&~mask ;
+                  if((dstBound&63)==0) {
+                      while(++dstWordOffset<=dstWordBound) {
+                          dst[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
+                      }
+                  }else {
+                      while(++dstWordOffset<dstWordBound) {
+                          dst[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
+                      }
+                      if(++srcWordOffset==srcWordBound) {
+                          dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordOffset]<<-shift)&mask;
+                      }else {
+                          dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) |srcWord>>>-shift&mask;
+                      }
+                      
+                  }
+                 
+                 
+                 
+
+//                    dst[dstWordOffset]=dst[dstWordOffset]&(mask=-1L>>>-dstOffset) | (srcWord>>>-shift|(srcWord=src[++srcWordOffset])<<shift)&~mask ;
+//                    while(srcWordOffset<srcWordBound) {
+//                        dst[++dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
+//                    }
+//                    if(++dstWordOffset==dstWordBound) {
+//                        dst[dstWordOffset]=dst[dstWordOffset]&~(mask=-1L>>>-dstBound) | srcWord>>>-shift&mask;
+//                    }
+                }
+                }
+                
+            } 
+        }
+        
       //TODO bugtest
-      int srcWordOffset=srcOffset>>6;
-      int dstWordOffset=dstOffset>>6;
-      int dstBound;
-      final int shift,dstWordBound=(dstBound=dstOffset+length)>>6;
-      long srcWord;
-      if((dstOffset&=63)<(srcOffset&=63)) {
-        dst[dstWordOffset]=dst[dstWordOffset]&(-1L<<dstOffset)|((srcWord=src[srcWordOffset]))>>>(shift=srcOffset-dstOffset);
-        while(++dstWordOffset<dstWordBound) {
-          dst[dstWordOffset]=(srcWord<<-shift) | ((srcWord=src[++srcWordOffset])>>>shift);
-        }
-        dst[dstWordOffset]=(srcWord<<-shift) | (dst[dstWordOffset]&(-1L<<(dstBound-1)));
-      }else {
-        dst[dstWordOffset]=dst[dstWordOffset]&(-1L<<dstOffset)|((srcWord=src[srcWordOffset]))<<(shift=dstOffset-srcOffset);
-        while(++dstWordOffset<dstWordBound) {
-          dst[dstWordOffset]=(srcWord>>>-shift) | ((srcWord=src[++srcWordOffset])<<shift);
-        }
-        dst[dstWordOffset]=(srcWord>>>-shift) | (dst[dstWordOffset]&(-1L<<(dstBound-1)));
-      }
     }
     public static void arraycopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
       //TODO bugtest
-
+      if(length==0) {
+          return;
+      }
       if((srcOffset&63)==0) {
         if((dstOffset&63)==0) {
           arraycopyaligned(src,srcOffset,dst,dstOffset,length);
@@ -102,7 +203,7 @@ public interface BitSetUtil{
       }else {
         words[packedIndex]=word&~mask;
       }
-      return ((word>>nonPackedIndex)&1)!=0;
+      return (word>>nonPackedIndex&1)!=0;
     }
     
     
@@ -110,9 +211,9 @@ public interface BitSetUtil{
       final var packedIndex=convertToPackedIndex(nonPackedIndex);
       final var mask=1L<<nonPackedIndex;
       if(val) {
-        words[packedIndex]|=(mask);
+        words[packedIndex]|=mask;
       }else {
-        words[packedIndex]&=~(mask);
+        words[packedIndex]&=~mask;
       }
     }
   
