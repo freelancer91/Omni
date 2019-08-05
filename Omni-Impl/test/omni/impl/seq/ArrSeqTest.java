@@ -5551,7 +5551,7 @@ import omni.util.TestExecutorService;
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("ArrSeqTest.testsize_void");
   }
-  @Order(254982) @Test public void testsort_Comparator(){
+  @Order(266462) @Test public void testsort_Comparator(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var comparatorGen:initParams.structType.validComparatorGens){
           if(comparatorGen.throwsContractViolationException && initParams.collectionType==DataType.BOOLEAN) {
@@ -5853,7 +5853,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testunstableDescendingSort_void");
   }
-  @Order(124698) @Test public void testunstableSort_Comparator(){
+  @Order(133146) @Test public void testunstableSort_Comparator(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       if(initParams.collectionType != DataType.BOOLEAN){
         for(final var comparatorGen:initParams.structType.validComparatorGens){

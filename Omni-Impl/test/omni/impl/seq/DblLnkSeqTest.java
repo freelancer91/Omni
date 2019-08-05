@@ -1820,7 +1820,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testsize_void");
     }
-    @Order(43912)
+    @Order(46360)
     @Test
     public void testsort_Comparator(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -2054,7 +2054,7 @@ public class DblLnkSeqTest{
         final NonComparatorSortTest test=MonitoredList::verifyDescendingUnstableSort;
         test.runUnstableTests("DblLnkSeqTest.testunstableDescendingSort_void");
     }
-    @Order(289381)
+    @Order(308085)
     @Test
     public void testunstableSort_Comparator(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{

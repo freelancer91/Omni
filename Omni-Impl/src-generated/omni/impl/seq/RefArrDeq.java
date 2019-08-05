@@ -1,9 +1,6 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
-import omni.api.OmniDeque;
 import omni.util.ArrCopy;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -11,10 +8,13 @@ import java.util.function.IntFunction;
 import java.util.ConcurrentModificationException;
 import omni.util.OmniPred;
 import java.util.Objects;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
+import omni.api.OmniDeque;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.io.Externalizable;
 import java.util.RandomAccess;
 public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable,RandomAccess{
   private static final long serialVersionUID=1L;
@@ -40,9 +40,9 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
   }
   RefArrDeq(int head,Object[] arr,int tail){
     super();
-    this.arr=arr;
     this.head=head;
     this.tail=tail;
+    this.arr=arr;
   }
   @Override public int size(){
     int tail;
@@ -1456,7 +1456,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return false;
   }
-  private boolean uncheckedcontainsNonNull(int tail
+  private
+  boolean uncheckedcontainsNonNull(int tail
   ,Object nonNull
   ){
     final var arr=this.arr;
@@ -1466,7 +1467,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return OmniArray.OfRef.uncheckedcontainsNonNull(arr,head,tail,nonNull);
   }
-  private boolean uncheckedcontainsNull(int tail
+  private
+  boolean uncheckedcontainsNull(int tail
   ){
     final var arr=this.arr;
     final int head;
@@ -1475,7 +1477,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return OmniArray.OfRef.uncheckedcontainsNull(arr,head,tail );
   }
-  private boolean uncheckedcontains (int tail
+  private
+  boolean uncheckedcontains (int tail
   ,Predicate<Object> pred
   ){
     final var arr=this.arr;
@@ -1485,7 +1488,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return OmniArray.OfRef.uncheckedcontains (arr,head,tail,pred);
   }
-  private int uncheckedsearchNonNull(int tail
+  private
+  int uncheckedsearchNonNull(int tail
   ,Object nonNull
   ){
     final var arr=this.arr;
@@ -1518,7 +1522,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
     }
   }
-  private int uncheckedsearchNull(int tail
+  private
+  int uncheckedsearchNull(int tail
   ){
     final var arr=this.arr;
     int head,prefix;
@@ -1550,7 +1555,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
     }
   }
-  private int uncheckedsearch (int tail
+  private
+  int uncheckedsearch (int tail
   ,Predicate<Object> pred
   ){
     final var arr=this.arr;
@@ -1644,7 +1650,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return new RefArrDeq<E>();
   }
-  private String uncheckedToString(int tail){
+  private
+  String uncheckedToString(int tail){
     final var arr=this.arr;
     final var builder=new StringBuilder("[");
     int head;
@@ -1664,7 +1671,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
     }
   }
-  private int uncheckedHashCode(int tail){
+  private
+  int uncheckedHashCode(int tail){
     final Object[] arr;
     int head;
     int hash=31+Objects.hashCode((arr=this.arr)[head=this.head]);

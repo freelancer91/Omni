@@ -1830,20 +1830,6 @@ public class PackedBooleanArrSeqTest{
     private static final SequenceInitParams[] STACK_STRUCT_INIT_PARAMS;
   private static final SequenceInitParams[] ROOT_STRUCT_INIT_PARAMS;
   static{
-//      TreeSet<Double> positionSet=new TreeSet<>();
-//    //final DoubleStream.Builder positionBuilder=DoubleStream.builder();
-//    //positionBuilder.add(-1);
-//    //positionBuilder.add(0);
-//      positionSet.add(-1.0);
-//      positionSet.add(0.0);
-//    final var denominators=new double[]{62,63,64,65,66,126,127,128,129,130,190,191,192,193,194,254,255,256,257,258};
-//    for(final var denominator:denominators){
-//      for(int numerator=1;numerator < denominator;++numerator){
-//          positionSet.add(numerator / denominator);
-//      }
-//    }
-//    positionSet.add(1.0);
-//    POSITIONS=positionSet.stream().mapToDouble(boxed->boxed.doubleValue()).toArray();
     POSITIONS=new double[] {-1,0.0,0.25,0.5,0.75,1.0};
     
     final Stream.Builder<SequenceInitParams> allStructBuilder=Stream.builder();
@@ -1862,18 +1848,18 @@ public class PackedBooleanArrSeqTest{
       rootStructBuilder.accept(arrListParams);
       rootStructBuilder.accept(arrStackParams);
     }
-    final int[] buffers=new int[] {0,1,2,62,63,64,65,66};
+    final int[] buffers=new int[] {0,1,2,3,4,60,61,62,63,64,65,66,67,68,124,125,126,127,128,129,130,131,132};
     for(var pre0:buffers) {
-        if(pre0>64) {
-            continue;
-        }
         for(var pre1:buffers) {
-            if(pre1>64) {
+            if(pre1>0) {
                 continue;
             }
             final var preAllocs=new int[] {pre0,pre1};
             for(var post0:buffers) {
                 for(var post1:buffers) {
+                  if(post1>0) {
+                    continue;
+                  }
                     final var postAllocs=new int[] {post0,post1};
                     for(var checkedType:CheckedType.values()) {
                         final var subListParams=new SequenceInitParams(StructType.PackedBooleanArrSubList,DataType.BOOLEAN,checkedType,preAllocs,postAllocs);
@@ -1934,7 +1920,7 @@ public class PackedBooleanArrSeqTest{
       int initCapacity){
     return new PackedBooleanArrStackMonitor(initParams,initCapacity);
   }
-  @Order(354914) @Test public void testadd_intval(){
+  @Order(81564) @Test public void testadd_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2012,7 +1998,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testadd_intval");
   }
-  @Order(193592) @Test public void testadd_val(){
+  @Order(44492) @Test public void testadd_val(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2050,7 +2036,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testadd_val");
   }
-  @Order(1724140) @Test public void testclear_void(){
+  @Order(163240) @Test public void testclear_void(){
     BasicTest test=new BasicTest() {
       @Override
     public int getMaxPostAlloc() {
@@ -2064,7 +2050,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testclear_void");
   }
-  @Order(27676) @Test public void testclone_void(){
+  @Order(7392) @Test public void testclone_void(){
     final BasicTest test=MonitoredSequence::verifyClone;
     test.runAllTests("PackedBooleanArrSeqTest.testclone_void");
   }
@@ -2116,7 +2102,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_void");
   }
-  @Order(1851576) @Test public void testcontains_val(){
+  @Order(712716) @Test public void testcontains_val(){
     final QueryTest<?> test=(monitor,queryVal, inputType, castType,modification, position, seqSize)->{
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
@@ -2132,7 +2118,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testequals_Object");
   }
-  @Order(649740) @Test public void testforEach_Consumer(){
+  @Order(171990) @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2149,7 +2135,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testforEach_Consumer",true);
   }
-  @Order(1606) @Test public void testget_int(){
+  @Order(1034) @Test public void testget_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2186,7 +2172,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testget_int");
   }
-  @Order(3256) @Test public void testhashCode_void(){
+  @Order(2112) @Test public void testhashCode_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection.OfBoolean seq){
         seq.hashCode();
@@ -2197,7 +2183,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void");
   }
-  @Order(1849188) @Test public void testindexOf_val(){
+  @Order(710328) @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
           int expectedIndex;
@@ -2211,11 +2197,11 @@ public class PackedBooleanArrSeqTest{
         };
     test.runAllTests("PackedBooleanArrSeqTest.testindexOf_val",0);
   }
-  @Order(27676) @Test public void testisEmpty_void(){
+  @Order(7392) @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
     test.runAllTests("PackedBooleanArrSeqTest.testisEmpty_void");
   }
-  @Order(1628) @Test public void testiterator_void(){
+  @Order(1056) @Test public void testiterator_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       if(initParams.totalPostAlloc>0) {
           continue;
@@ -2244,7 +2230,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testiterator_void");
   }
-  @Order(7200) @Test public void testItrclone_void(){
+  @Order(4704) @Test public void testItrclone_void(){
     for(final var size:SHORT_SIZES){
       int prevIndex=-1;
       for(final var position:POSITIONS){
@@ -2269,7 +2255,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrclone_void");
   }
-  @Order(288462) @Test public void testItrforEachRemaining_Consumer(){
+  @Order(185658) @Test public void testItrforEachRemaining_Consumer(){
     for(final int size:SHORT_SIZES){
       int prevNumToIterate=-1;
       for(final var position:POSITIONS){
@@ -2317,7 +2303,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrforEachRemaining_Consumer");
   }
-  @Order(1650) @Test public void testItrhasNext_void(){
+  @Order(1078) @Test public void testItrhasNext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2337,7 +2323,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrhasNext_void");
   }
-  @Order(122580) @Test public void testItrnext_void(){
+  @Order(79056) @Test public void testItrnext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2383,7 +2369,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrnext_void");
   }
-  @Order(3053756) @Test public void testItrremove_void(){
+  @Order(701881) @Test public void testItrremove_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
@@ -2471,7 +2457,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrremove_void");
   }
-  @Order(1849188) @Test public void testlastIndexOf_val(){
+  @Order(710328) @Test public void testlastIndexOf_val(){
     final QueryTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -2484,7 +2470,7 @@ public class PackedBooleanArrSeqTest{
         };
     test.runAllTests("PackedBooleanArrSeqTest.testlastIndexOf_val",0);
   }
-  @Order(1569) @Test public void testlistIterator_int(){
+  @Order(1010) @Test public void testlistIterator_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2525,7 +2511,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testlistIterator_int");
   }
-  @Order(1606) @Test public void testlistIterator_void(){
+  @Order(1034) @Test public void testlistIterator_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2553,7 +2539,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testlistIterator_void");
   }
-  @Order(806610) @Test public void testListItradd_val(){
+  @Order(185360) @Test public void testListItradd_val(){
     for(final var position:POSITIONS){
       if(position >= 0){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -2604,7 +2590,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItradd_val");
   }
-  @Order(814) @Test public void testListItrhasPrevious_void(){
+  @Order(528) @Test public void testListItrhasPrevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2621,7 +2607,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrhasPrevious_void");
   }
-  @Order(814) @Test public void testListItrnextIndex_void(){
+  @Order(528) @Test public void testListItrnextIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2638,7 +2624,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrnextIndex_void");
   }
-  @Order(53955) @Test public void testListItrprevious_void(){
+  @Order(34650) @Test public void testListItrprevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2683,7 +2669,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrprevious_void");
   }
-  @Order(814) @Test public void testListItrpreviousIndex_void(){
+  @Order(528) @Test public void testListItrpreviousIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2700,7 +2686,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrpreviousIndex_void");
   }
-  @Order(75416) @Test public void testListItrset_val(){
+  @Order(48532) @Test public void testListItrset_val(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2770,10 +2756,10 @@ public class PackedBooleanArrSeqTest{
     var checkedList=new PackedBooleanArrSeq.CheckedList(seqSize,words);
     verifyMASSIVEToStringHelper(uncheckedStack.toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedStack.testMASSIVEtoString",false);
     verifyMASSIVEToStringHelper(checkedStack.toString(),seqSize,"PackedBooleanArrSeqTest.CheckedStack.testMASSIVEtoString",false);
-    verifyMASSIVEToStringHelper(uncheckedList.toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedStack.testMASSIVEtoString",true);
-    verifyMASSIVEToStringHelper(checkedList.toString(),seqSize,"PackedBooleanArrSeqTest.CheckedStack.testMASSIVEtoString",true);
-    verifyMASSIVEToStringHelper(uncheckedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedStack.testMASSIVEtoString",true);
-    verifyMASSIVEToStringHelper(checkedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.CheckedStack.testMASSIVEtoString",true);
+    verifyMASSIVEToStringHelper(uncheckedList.toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedList.testMASSIVEtoString",true);
+    verifyMASSIVEToStringHelper(checkedList.toString(),seqSize,"PackedBooleanArrSeqTest.CheckedList.testMASSIVEtoString",true);
+    verifyMASSIVEToStringHelper(uncheckedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.UncheckedSubList.testMASSIVEtoString",true);
+    verifyMASSIVEToStringHelper(checkedList.subList(0,seqSize).toString(),seqSize,"PackedBooleanArrSeqTest.CheckedSubList.testMASSIVEtoString",true);
   }
   private static void verifyMASSIVEToStringHelper(String result,int seqSize,String testName,boolean forward) {
       
@@ -2940,7 +2926,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testpush_val");
   }
-  @Order(1606) @Test public void testput_intval(){
+  @Order(1034) @Test public void testput_intval(){
 
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
@@ -2985,7 +2971,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testput_intval");
   }
-  @Order(649740) @Test public void testReadAndWrite(){
+  @Order(171990) @Test public void testReadAndWrite(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -3000,7 +2986,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testReadAndWrite",true);
   }
-  @Order(230574) @Test public void testremoveAt_int(){
+  @Order(53074) @Test public void testremoveAt_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -3084,7 +3070,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveAt_int");
   }
-  @Tag("testremoveIf_Predicate") @Order(28916684) @Test public void testremoveIf_Predicate(){
+  @Tag("testremoveIf_Predicate") @Order(6679484) @Test public void testremoveIf_Predicate(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
         for(var size:SHORT_SIZES){
@@ -3141,7 +3127,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveIf_Predicate");
   }
-  @Tag("testremoveVal_val") @Order(7884456) @Test public void testremoveVal_val(){
+  @Tag("testremoveVal_val") @Order(1813956) @Test public void testremoveVal_val(){
     QueryTest<?> test=new QueryTest<MonitoredSequence<OmniCollection.OfBoolean>>() {
         @Override public int getMaxPostAlloc() {
             return Integer.MAX_VALUE;
@@ -3153,7 +3139,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testremoveVal_val",2);
   }
-  @Order(646170) @Test public void testreplaceAll_UnaryOperator(){
+  @Order(170520) @Test public void testreplaceAll_UnaryOperator(){
     final MonitoredFunctionTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,functionGen,functionCallType,illegalMod)->{
           if(illegalMod.expectedException == null){
@@ -3186,7 +3172,7 @@ public class PackedBooleanArrSeqTest{
         };
     test.runAllTests("PackedBooleanArrSeqTest.testsearch",1);
   }
-  @Order(1606) @Test public void testset_intval(){
+  @Order(1034) @Test public void testset_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3226,7 +3212,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testset_intval");
   }
-  @Order(27676) @Test public void testsize_void(){
+  @Order(7392) @Test public void testsize_void(){
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("PackedBooleanArrSeqTest.testsize_void");
   }
@@ -3281,8 +3267,7 @@ public class PackedBooleanArrSeqTest{
       void runTest(MonitoredList<?> monitor,MonitoredComparatorGen comparatorGen,FunctionCallType functionCallType);
   }
   
-  @Order(695224) @Test public void testsort_Comparator(){
-    TestExecutorService.setNumWorkers(1);
+  @Order(488320) @Test public void testsort_Comparator(){
     final SortTest test=(monitor,comparatorGen,functionCallType)->{
         DataType.BOOLEAN.callStableSort(comparatorGen.getMonitoredComparator(monitor),monitor.getCollection(),functionCallType);
         comparatorGen.assertSorted(monitor);
@@ -3291,8 +3276,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testsort_Comparator",true);
   }
-  @Order(65992) @Test public void teststableAscendingSort_void(){
-      TestExecutorService.setNumWorkers(1);
+  @Order(42488) @Test public void teststableAscendingSort_void(){
 
       final SortTest test=(monitor,comparatorGen,functionCallType)->{
           monitor.getCollection().stableAscendingSort();
@@ -3302,8 +3286,7 @@ public class PackedBooleanArrSeqTest{
       };
       test.runAllTests("PackedBooleanArrSeqTest.teststableAscendingSort_void",false);
   }
-  @Order(65992) @Test public void teststableDescendingSort_void(){
-      TestExecutorService.setNumWorkers(1);
+  @Order(42488) @Test public void teststableDescendingSort_void(){
 
       final SortTest test=(monitor,comparatorGen,functionCallType)->{
           monitor.getCollection().stableDescendingSort();
@@ -3313,7 +3296,7 @@ public class PackedBooleanArrSeqTest{
       };
       test.runAllTests("PackedBooleanArrSeqTest.teststableDescendingSort_void",false);
     }
-  @Tag("testsubList_intint") @Order(217890) @Test public void testsubList_intint(){
+  @Tag("testsubList_intint") @Order(140072) @Test public void testsubList_intint(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3365,7 +3348,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testsubList_intint");
   }
-  @Order(649740) @Test public void testtoArray_IntFunction(){
+  @Order(171990) @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -3380,7 +3363,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testtoArray_IntFunction",true);
   }
-  @Order(180412) @Test public void testtoArray_ObjectArray(){
+  @Order(117024) @Test public void testtoArray_ObjectArray(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3408,7 +3391,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testtoArray_ObjectArray");
   }
-  @Order(1628) @Test public void testtoArray_void(){
+  @Order(1056) @Test public void testtoArray_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3437,7 +3420,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testtoArray_void");
   }
-  @Order(3256) @Test public void testtoString_void(){
+  @Order(2112) @Test public void testtoString_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection.OfBoolean seq){
         seq.toString();

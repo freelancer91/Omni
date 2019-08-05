@@ -229,7 +229,7 @@ AbstractBooleanArrSeq
         val==arr[index]
         )
         {
-          OmniArray.OfBoolean.removeIndexAndPullDown(arr,index,size);
+          arr[index]=!val;
           this.size=size;
           return true;
         }else if(index==0){
@@ -2088,7 +2088,7 @@ AbstractBooleanArrSeq
         )
         {
           ++this.modCount;
-          OmniArray.OfBoolean.removeIndexAndPullDown(arr,index,size);
+          arr[index]=!val;
           this.size=size;
           return true;
         }else if(index==0){

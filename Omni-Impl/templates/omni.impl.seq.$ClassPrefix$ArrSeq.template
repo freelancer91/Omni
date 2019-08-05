@@ -3655,7 +3655,11 @@ val==VAL
 #IFSWITCH STRUCTNAME==CheckedStack
       ++this.modCount;
 #ENDIF
+#IF OfBoolean
+      arr[index]=!val;
+#ELSE
       OmniArray.Of$ClassPrefix$.removeIndexAndPullDown(arr,index,size);
+#ENDIF
       this.size=size;
       return true;
     }else if(index==0){

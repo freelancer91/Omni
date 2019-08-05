@@ -10,6 +10,112 @@ import java.util.function.LongUnaryOperator;
  */
 public interface BitSetUtil{
 
+    public static int convertToPackedIndex(int nonPackedIndex) {
+      return nonPackedIndex>>6;
+    }
+    public static int convertToNonPackedIndex(int packedIndex) {
+      return packedIndex<<6;
+    }
+    public static int getPackedCapacity(int nonPackedCapacity) {
+      return (convertToPackedIndex(nonPackedCapacity-1))+1;
+    }
+    
+    public static boolean getFromPackedArr(long[] words,int nonPackedIndex) {
+      return ((words[convertToPackedIndex(nonPackedIndex)]>>>nonPackedIndex)&1)!=0;
+    }
+    public static void arraycopyaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
+      //TODO bugtest
+      ArrCopy.uncheckedCopy(src,srcOffset>>=6,dst,dstOffset>>=6,length>>=6);
+      if((length&63)!=0) {
+        //length is not aligned
+        (dst)[dstOffset+=length] = (dst[dstOffset]&(-1L<<length)) | ((src)[srcOffset+length]&(-1L>>>length));
+      }
+    }
+    public static void arraycopysrcaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
+      //TODO bugtest
+
+      int srcWordOffset,dstWordOffset;
+      long srcWord;
+      (dst)[dstWordOffset=dstOffset>>6]=(dst[dstOffset]&(-1L>>>-dstOffset))|((srcWord=(src)[srcWordOffset=srcOffset>>6])<<dstOffset);
+      int dstBound;
+      for(final var dstWordBound=(dstBound=dstOffset+length)>>6;++dstWordOffset<dstWordBound;) {
+        dst[dstWordOffset]=(srcWord>>>-dstOffset)|((srcWord=src[++srcWordOffset])<<dstOffset);
+      }
+      dst[dstWordOffset]=(srcWord>>>-dstOffset)|(dst[dstWordOffset]&(-1L<<(dstBound-1)));
+    }
+    public static void arraycopydstaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
+      //TODO bugtest
+
+      int srcWordOffset,dstWordOffset;
+      long srcWord;
+      (dst)[dstWordOffset=dstOffset>>6]=(((src)[srcWordOffset=srcOffset>>6])>>>srcOffset)|((srcWord=src[++srcWordOffset])<<-srcOffset);
+      for(final var dstWordBound=(dstOffset+length)>>6;++dstWordOffset<=dstWordBound;) {
+        dst[dstWordOffset]=(srcWord>>>srcOffset)|((srcWord=src[++srcWordOffset])<<-srcOffset);
+      }
+    }
+    public static void arraycopyunaligned(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
+      //TODO bugtest
+      int srcWordOffset=srcOffset>>6;
+      int dstWordOffset=dstOffset>>6;
+      int dstBound;
+      final int shift,dstWordBound=(dstBound=dstOffset+length)>>6;
+      long srcWord;
+      if((dstOffset&=63)<(srcOffset&=63)) {
+        dst[dstWordOffset]=dst[dstWordOffset]&(-1L<<dstOffset)|((srcWord=src[srcWordOffset]))>>>(shift=srcOffset-dstOffset);
+        while(++dstWordOffset<dstWordBound) {
+          dst[dstWordOffset]=(srcWord<<-shift) | ((srcWord=src[++srcWordOffset])>>>shift);
+        }
+        dst[dstWordOffset]=(srcWord<<-shift) | (dst[dstWordOffset]&(-1L<<(dstBound-1)));
+      }else {
+        dst[dstWordOffset]=dst[dstWordOffset]&(-1L<<dstOffset)|((srcWord=src[srcWordOffset]))<<(shift=dstOffset-srcOffset);
+        while(++dstWordOffset<dstWordBound) {
+          dst[dstWordOffset]=(srcWord>>>-shift) | ((srcWord=src[++srcWordOffset])<<shift);
+        }
+        dst[dstWordOffset]=(srcWord>>>-shift) | (dst[dstWordOffset]&(-1L<<(dstBound-1)));
+      }
+    }
+    public static void arraycopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
+      //TODO bugtest
+
+      if((srcOffset&63)==0) {
+        if((dstOffset&63)==0) {
+          arraycopyaligned(src,srcOffset,dst,dstOffset,length);
+        }else {
+          arraycopysrcaligned(src,srcOffset,dst,dstOffset,length);
+        }
+      }else {
+        if((dstOffset&63)==0) {
+          arraycopydstaligned(src,srcOffset,dst,dstOffset,length);
+        }else {
+          arraycopyunaligned(src,srcOffset,dst,dstOffset,length);
+        }
+      }
+    }
+    
+    
+    public static boolean getAndSwap(long[] words,int nonPackedIndex,boolean val) {
+      final int packedIndex;
+      final var mask=1L<<nonPackedIndex;
+      final var word=words[packedIndex=convertToPackedIndex(nonPackedIndex)];
+      if(val) {
+        words[packedIndex]=word|mask;
+      }else {
+        words[packedIndex]=word&~mask;
+      }
+      return ((word>>nonPackedIndex)&1)!=0;
+    }
+    
+    
+    public static void storeInPackedArr(long[] words,int nonPackedIndex,boolean val) {
+      final var packedIndex=convertToPackedIndex(nonPackedIndex);
+      final var mask=1L<<nonPackedIndex;
+      if(val) {
+        words[packedIndex]|=(mask);
+      }else {
+        words[packedIndex]&=~(mask);
+      }
+    }
+  
     public static long flip(long word) {
         return ~word;
     }

@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import static omni.impl.seq.PackedBooleanArrSeq.UncheckedList.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -2680,13 +2679,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 final byte[] buffer;
                 final var rootOffset=this.rootOffset;
                 if(size <= OmniArray.MAX_ARR_SIZE / 7){
-                    (buffer=new byte[size * 7])[size=((UncheckedList)root).uncheckedToString(rootOffset,
+                    (buffer=new byte[size * 7])[size=UncheckedList.uncheckedToString(root.words,rootOffset,
                             rootOffset + size,buffer)]=(byte)']';
                     buffer[0]=(byte)'[';
                     return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
                 }else{
                     final ToStringUtil.OmniStringBuilderByte builder;
-                    ((UncheckedList)root).uncheckedToString(rootOffset,rootOffset + size,
+                    UncheckedList.uncheckedToString(root.words,rootOffset,rootOffset + size,
                             builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
                     builder.uncheckedAppendChar((byte)']');
                     (buffer=builder.buffer)[0]=(byte)'[';
@@ -3239,6 +3238,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
             }
         }
+        
         private static void falseComesFirst(long[] words,int falseCount,int wordBound){
             int wordIndex;
             words[wordIndex=falseCount >> 6]=-1L << falseCount;
@@ -3382,7 +3382,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             setRange(words,0,wordIndex,-1L);
             setRange(words,wordIndex+1,wordBound+1,0L);
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,boolean[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,boolean[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3394,7 +3394,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,Boolean[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,Boolean[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3406,7 +3406,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,byte[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,byte[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3418,7 +3418,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,char[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,char[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3430,7 +3430,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,double[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,double[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3442,7 +3442,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,float[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,float[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3454,7 +3454,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,int[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,int[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3466,7 +3466,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,long[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,long[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3478,7 +3478,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,Object[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,Object[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3490,7 +3490,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((srcOffset & 63) != 0);
             }
         }
-        private static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,short[] dst){
+        static void uncheckedCopyInto(long[] words,int srcOffset,int srcBound,short[] dst){
             for(int dstOffset=0;;){
                 final var word=words[srcOffset >> 6];
                 do{
@@ -3716,11 +3716,11 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         int uncheckedToString(int size,byte[] buffer){
-            return uncheckedToString(0,size,buffer);
+            return uncheckedToString(words,0,size,buffer);
         }
         @Override
         void uncheckedToString(int size,OmniStringBuilderByte builder){
-            uncheckedToString(0,size,builder);
+            uncheckedToString(words,0,size,builder);
         }
         private void uncheckedForEach(int offset,int bound,BooleanConsumer action){
             for(final var words=this.words;;){
@@ -3912,8 +3912,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 trueComesFirst(words,bitCount,wordBound);
             }
         }
-        private int uncheckedToString(int offset,int bound,byte[] buffer){
-            final var words=this.words;
+        static int uncheckedToString(long[] words,int offset,int bound,byte[] buffer){
             for(int bufferOffset=1;;){
                 final var word=words[offset >> 6];
                 do{
@@ -3927,8 +3926,8 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((offset & 63) != 0);
             }
         }
-        private void uncheckedToString(int offset,int bound,OmniStringBuilderByte builder){
-            for(final var words=this.words;;){
+        static void uncheckedToString(long[] words,int offset,int bound,OmniStringBuilderByte builder){
+            for(;;){
                 final var word=words[offset >> 6];
                 do{
                     builder.uncheckedAppendBoolean((word >> offset & 1) != 0);
@@ -4430,31 +4429,38 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         boolean uncheckedremoveVal(int size,boolean val){
-            final var words=this.words;
-            final int bound;
-            final var wordBound=(bound=size - 1) >> 6;
-            int lead0s;
-            final LongUnaryOperator wordFlipper;
-            long word;
-            if((lead0s=Long.numberOfLeadingZeros(
-                    (wordFlipper=BitSetUtil.getWordFlipper(val)).applyAsLong(word=words[wordBound]) << -size)) == 64){
+          final long[] words;
+          final int bound;
+          final int wordBound;
+          int lead0s;
+          long word=(words=this.words)[wordBound=(bound=size - 1) >> 6];
+          if(val) {
+            if((lead0s=Long.numberOfLeadingZeros(word << -size)) == 64){
                 for(int wordOffset=wordBound - 1;wordOffset >= 0;--wordOffset){
-                    if((lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(word=words[wordOffset]))) != 64){
-                        words[wordOffset]=BitSetUtil.partialWordShiftDown(word,-lead0s - 1)
-                                | (word=words[++wordOffset]) << 63;
-                        while(wordOffset != wordBound){
-                            words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << 63;
-                        }
-                        words[wordBound]=word >>> 1;
-                        this.size=bound;
-                        return true;
+                    if((lead0s=Long.numberOfLeadingZeros((word=words[wordOffset]))) != 64){
+                      words[wordOffset]=word-(1L<<(63-lead0s));
+                      this.size=bound;
+                      return true;
                     }
                 }
                 return false;
             }
-            words[wordBound]=BitSetUtil.partialWordShiftDown(word,bound - lead0s);
-            this.size=bound;
-            return true;
+            words[wordBound]=word-(1L<<(size-lead0s-1));
+          }else {
+            if((lead0s=Long.numberOfLeadingZeros((~word) << -size)) == 64){
+              for(int wordOffset=wordBound - 1;wordOffset >= 0;--wordOffset){
+                  if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset]))) != 64){
+                    words[wordOffset]=word+(1L<<(63-lead0s));
+                    this.size=bound;
+                    return true;
+                  }
+              }
+              return false;
+            }
+            words[wordBound]=word+(1L<<(size-lead0s-1));
+          }
+          this.size=bound;
+          return true;
         }
         @Override
         int uncheckedToString(int size,byte[] buffer){
@@ -5678,13 +5684,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 final byte[] buffer;
                 final var rootOffset=this.rootOffset;
                 if(size <= OmniArray.MAX_ARR_SIZE / 7){
-                    (buffer=new byte[size * 7])[size=root.uncheckedToString(rootOffset,rootOffset + size,
+                    (buffer=new byte[size * 7])[size=UncheckedList.uncheckedToString(root.words,rootOffset,rootOffset + size,
                             buffer)]=(byte)']';
                     buffer[0]=(byte)'[';
                     return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
                 }else{
                     final ToStringUtil.OmniStringBuilderByte builder;
-                    root.uncheckedToString(rootOffset,rootOffset + size,
+                    UncheckedList.uncheckedToString(root.words,rootOffset,rootOffset + size,
                             builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
                     builder.uncheckedAppendChar((byte)']');
                     (buffer=builder.buffer)[0]=(byte)'[';

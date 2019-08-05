@@ -1,9 +1,6 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
-import omni.api.OmniDeque;
 import omni.util.ArrCopy;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -12,22 +9,16 @@ import omni.util.TypeUtil;
 import omni.function.BooleanPredicate;
 import omni.function.BooleanConsumer;
 import omni.util.ToStringUtil;
-import omni.impl.AbstractBooleanItr;
 import java.util.ConcurrentModificationException;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
-import java.util.RandomAccess;
-public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneable,RandomAccess{
+public class BooleanArrDeq extends AbstractBooleanArrDeq{
   private static final long serialVersionUID=1L;
   transient boolean[] arr;
-  transient int head;
-  transient int tail;
   public BooleanArrDeq(){
     super();
     this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
-    this.tail=-1;
   }
   public BooleanArrDeq(int initialCapacity){
     super();
@@ -39,13 +30,10 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
     case 0:
     }
-    this.tail=-1;
   }
   BooleanArrDeq(int head,boolean[] arr,int tail){
-    super();
+    super(head,tail);
     this.arr=arr;
-    this.head=head;
-    this.tail=tail;
   }
   @Override public int size(){
     int tail;
@@ -56,29 +44,6 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     }
     return tail;
   }
-  @Override public boolean isEmpty(){
-    return this.tail==-1;
-  }
-  @Override public void forEach(BooleanConsumer action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      uncheckedForEach(tail,action);
-    }
-  }
-  @Override public boolean removeIf(BooleanPredicate filter){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      if(tail<(head=this.head)){
-        return fragmentedRemoveIf(head,tail,filter);
-      }
-      return nonfragmentedRemoveIf(head,tail,filter);
-    }
-    return false;
-  }
-  @Override public void clear(){
-    this.tail=-1;
-  }
   void uncheckedForEach(final int tail,BooleanConsumer action){
     final var arr=this.arr;
     int head;
@@ -88,686 +53,11 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     }
     OmniArray.OfBoolean.ascendingForEach(arr,head,tail,action);
   }
-  @Override public boolean add(boolean val){
-    addLast(val);
-    return true;
-  }
-  @Override public void addFirst(boolean val){
-    push(val);
-  }
-  @Override public boolean offerFirst(boolean val){
-    push(val);
-    return true;
-  }
-  @Override public boolean offerLast(boolean val){
-    addLast(val);
-    return true;
-  }
   @Override public boolean booleanElement(){
     return (boolean)arr[head];
   }
   @Override public boolean getLastBoolean(){
     return (boolean)arr[tail];
-  }
-  @Override public boolean offer(boolean val){
-    addLast(val);
-    return true;
-  }
-  @Override public boolean contains(boolean val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        return uncheckedcontains(tail,(val));
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(int val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(val){
-          default:
-            break returnFalse;
-          case 0:
-            v=false;
-            break;
-          case 1:
-            v=true;
-          }
-          return uncheckedcontains(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(long val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          if(val==0L){
-            v=false;
-          }else if(val==1L){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedcontains(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(float val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(Float.floatToRawIntBits(val)){
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return uncheckedcontains(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(double val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
-            v=false;
-          }else if(bits==TypeUtil.DBL_TRUE_BITS){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedcontains(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(Object val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        //todo: a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return uncheckedcontains(tail,b);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(boolean val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        return uncheckedremoveVal(tail,(val));
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(int val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(val){
-          default:
-            break returnFalse;
-          case 0:
-            v=false;
-            break;
-          case 1:
-            v=true;
-          }
-          return uncheckedremoveVal(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(long val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          if(val==0L){
-            v=false;
-          }else if(val==1L){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedremoveVal(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(float val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(Float.floatToRawIntBits(val)){
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return uncheckedremoveVal(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(double val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
-            v=false;
-          }else if(bits==TypeUtil.DBL_TRUE_BITS){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedremoveVal(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean remove(Object val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        //todo: a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return uncheckedremoveVal(tail,b);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(boolean val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        return uncheckedremoveLastOccurrence(tail,(val));
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(int val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(val){
-          default:
-            break returnFalse;
-          case 0:
-            v=false;
-            break;
-          case 1:
-            v=true;
-          }
-          return uncheckedremoveLastOccurrence(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(long val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          if(val==0L){
-            v=false;
-          }else if(val==1L){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedremoveLastOccurrence(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(float val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(Float.floatToRawIntBits(val)){
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return uncheckedremoveLastOccurrence(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(double val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
-            v=false;
-          }else if(bits==TypeUtil.DBL_TRUE_BITS){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedremoveLastOccurrence(tail,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(Object val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        //todo: a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return uncheckedremoveLastOccurrence(tail,b);
-        }
-      }
-    }
-    return false;
-  }
-  @Override public int search(boolean val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        return uncheckedsearch(tail,(val));
-      }
-    }
-    return -1;
-  }
-  @Override public int search(int val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(val){
-          default:
-            break returnFalse;
-          case 0:
-            v=false;
-            break;
-          case 1:
-            v=true;
-          }
-          return uncheckedsearch(tail,v);
-        }
-      }
-    }
-    return -1;
-  }
-  @Override public int search(long val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          if(val==0L){
-            v=false;
-          }else if(val==1L){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedsearch(tail,v);
-        }
-      }
-    }
-    return -1;
-  }
-  @Override public int search(float val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          switch(Float.floatToRawIntBits(val)){
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return uncheckedsearch(tail,v);
-        }
-      }
-    }
-    return -1;
-  }
-  @Override public int search(double val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        returnFalse:for(;;){
-          final boolean v;
-          long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
-            v=false;
-          }else if(bits==TypeUtil.DBL_TRUE_BITS){
-            v=true;
-          }else{
-            break returnFalse;
-          }
-          return uncheckedsearch(tail,v);
-        }
-      }
-    }
-    return -1;
-  }
-  @Override public int search(Object val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        //todo: a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return uncheckedsearch(tail,b);
-        }
-      }
-    }
-    return -1;
   }
   @Override public boolean[] toBooleanArray(){
     int tail;
@@ -1349,61 +639,6 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     }
     return dst;
   }
-  @Override public Boolean getFirst(){
-    return booleanElement();
-  }
-  @Override public Boolean peekFirst(){
-    return peek();
-  }
-  @Override public Boolean pollFirst(){
-    return poll();
-  }
-  @Override public Boolean removeFirst(){
-    return popBoolean();
-  }
-  @Override public Boolean remove(){
-    return popBoolean();
-  }
-  @Override public boolean removeFirstOccurrence(Object val){
-    return remove(val);
-  }
-  @Override public Boolean pop(){
-    return popBoolean();
-  }
-  @Override public Boolean removeLast(){
-    return removeLastBoolean();
-  }
-  @Override public void push(Boolean val){
-    push((boolean)val);
-  }
-  @Override public boolean offer(Boolean val){
-    addLast((boolean)val);
-    return true;
-  }
-  @Override public Boolean element(){
-    return booleanElement();
-  }
-  @Override public Boolean getLast(){
-    return getLastBoolean();
-  }
-  @Override public void addFirst(Boolean val){
-    push((boolean)val);
-  }
-  @Override public void addLast(Boolean val){
-    addLast((boolean)val);
-  }
-  @Override public boolean add(Boolean val){
-    addLast((boolean)val);
-    return true;
-  }
-  @Override public boolean offerFirst(Boolean val){
-    push((boolean)val);
-    return true;
-  }
-  @Override public boolean offerLast(Boolean val){
-    addLast((boolean)val);
-    return true;
-  }
   boolean uncheckedremoveVal(int tail
   ,boolean val
   ){
@@ -1414,30 +649,18 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         final int bound;
         for(index=head,bound=arr.length-1;;++index){
           if(val==(arr[index])){
-            int headDist,tailDist;
-            if((headDist=index-head)<=((tailDist=bound-index)+tail)){
-              ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-              this.head=(head>bound)?0:head;
+            if(++head>bound){
+              this.head=0;
             }else{
-              ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-              arr[bound]=arr[0];
-              ArrCopy.semicheckedSelfCopy(arr,0,1,tail);
-              this.tail=(--tail==-1)?bound:tail;
+              arr[index]=!val;
+              this.head=head;
             }
             return true;
           }else if(index==bound){
             for(index=0;;++index){
               if(val==(arr[index])){
-                int headDist,tailDist;
-                if((headDist=bound-head)+index+1<(tailDist=tail-index)){
-                  ArrCopy.semicheckedCopy(arr,0,arr,1,index);
-                  arr[0]=arr[bound];
-                  ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                  this.head=(head>bound)?0:head;
-                }else{
-                  ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                  this.tail=(--tail==-1)?bound:tail;
-                }
+                arr[index]=!val;
+                this.head=(++head>bound)?0:head;
                 return true;
               }else if(index==tail){
                 break;
@@ -1449,17 +672,11 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       }else{
         for(index=head;;++index){
           if(val==(arr[index])){
-            int headDist,tailDist;
-            if((tailDist=tail-index)<=(headDist=index-head)){
-              if(headDist==0){
-                this.tail=-1;
-              }else{
-                ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                this.tail=tail-1;
-              }
+            if(head==tail){
+              this.tail=-1;
             }else{
-              ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-              this.head=head;
+              arr[index]=!val;
+              this.head=head+1;
             }
             return true;
           }else if(index==tail){
@@ -1480,30 +697,18 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         final int bound;
         for(bound=arr.length-1,index=tail;;--index){
           if(val==(arr[index])){
-            int headDist,tailDist;
-            if((headDist=bound-head)+index+1<(tailDist=tail-index)){
-              ArrCopy.semicheckedCopy(arr,0,arr,1,index);
-              arr[0]=arr[bound];
-              ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-              this.head=(head>bound)?0:head;
+            if(--tail==-1){
+              this.tail=bound;
             }else{
-              ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-              this.tail=(--tail==-1)?bound:tail;
+              arr[index]=!val;
+              this.tail=tail;
             }
             return true;
           }else if(index==0){
             for(index=bound;;--index){
               if(val==(arr[index])){
-                int headDist,tailDist;
-                if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
-                  ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                  this.head=(head>bound)?0:head;
-                }else{
-                  ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                  arr[bound]=arr[0];
-                  ArrCopy.semicheckedSelfCopy(arr,0,1,tail);
-                  this.tail=(--tail==-1)?bound:tail;
-                }
+                arr[index]=!val;
+                this.tail=(--tail==-1)?bound:tail;
                 return true;
               }else if(index==head){
                 break;
@@ -1515,17 +720,11 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       }else{
         for(index=tail;;--index){
           if(val==(arr[index])){
-            int headDist,tailDist;
-            if((tailDist=tail-index)<=(headDist=index-head)){
-              if(headDist==0){
-                this.tail=-1;
-              }else{
-                ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                this.tail=tail-1;
-              }
+            if(head==tail){
+               this.tail=-1;
             }else{
-              ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-              this.head=head;
+               arr[index]=!val;
+               this.tail=tail-1;
             }
             return true;
           }else if(index==head){
@@ -1536,7 +735,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     }
     return false;
   }
-  private boolean uncheckedcontains (int tail
+  boolean uncheckedcontains (int tail
   ,boolean val
   ){
     final var arr=this.arr;
@@ -1546,7 +745,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     }
     return OmniArray.OfBoolean.uncheckedcontains (arr,head,tail,val);
   }
-  private int uncheckedsearch (int tail
+  int uncheckedsearch (int tail
   ,boolean val
   ){
     final var arr=this.arr;
@@ -1578,37 +777,6 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         return -1;
       }
     }
-  }
-  @Override public void forEach(Consumer<? super Boolean> action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      uncheckedForEach(tail,action::accept);
-    }
-  }
-  @Override public boolean removeIf(Predicate<? super Boolean> filter){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      if(tail<(head=this.head)){
-        return fragmentedRemoveIf(head,tail,filter::test);
-      }
-      return nonfragmentedRemoveIf(head,tail,filter::test);
-    }
-    return false;
-  }
-  @Override public String toString(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedToString(tail);
-    }
-    return "[]";
-  }
-  @Override public int hashCode(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedHashCode(tail);
-    }
-    return 1;
   }
   @Override public boolean popBoolean(){
     final boolean[] arr;
@@ -1653,7 +821,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     }
     return new BooleanArrDeq();
   }
-  private String uncheckedToString(int tail){
+  String uncheckedToString(int tail){
     final var arr=this.arr;
     final byte[] buffer;
     int size,head,bufferOffset=1;
@@ -1705,7 +873,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       }
     }
   }
-  private int uncheckedHashCode(int tail){
+  int uncheckedHashCode(int tail){
     final boolean[] arr;
     int head;
     int hash=31+Boolean.hashCode((arr=this.arr)[head=this.head]);
@@ -1831,33 +999,6 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         break;
       default:
         this.tail=tail-1;
-    }
-  }
-  private static abstract class AbstractDeqItr
-    extends AbstractBooleanItr
-  {
-    transient int cursor;
-    AbstractDeqItr(AbstractDeqItr itr){
-      this.cursor=itr.cursor;
-    }
-    AbstractDeqItr(int cursor){
-      this.cursor=cursor;
-    }
-    @Override public boolean hasNext(){
-      return this.cursor!=-1;
-    }
-    abstract void uncheckedForEachRemaining(int cursor,BooleanConsumer action);
-    @Override public void forEachRemaining(BooleanConsumer action){
-      int cursor;
-      if((cursor=this.cursor)!=-1){
-        uncheckedForEachRemaining(cursor,action);
-      }
-    }
-    @Override public void forEachRemaining(Consumer<? super Boolean> action){
-      int cursor;
-      if((cursor=this.cursor)!=-1){
-        uncheckedForEachRemaining(cursor,action::accept);
-      }
     }
   }
   private static int pullUp(boolean[] arr,int head,int headDist){
@@ -3090,31 +2231,19 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
           for(index=head,bound=arr.length-1;;++index){
             if(val==(arr[index])){
               this.modCount=modCount+1;
-              int headDist,tailDist;
-              if((headDist=index-head)<=((tailDist=bound-index)+tail)){
-                ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                this.head=(head>bound)?0:head;
+              if(++head>bound){
+                this.head=0;
               }else{
-                ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                arr[bound]=arr[0];
-                ArrCopy.semicheckedSelfCopy(arr,0,1,tail);
-                this.tail=(--tail==-1)?bound:tail;
+                arr[index]=!val;
+                this.head=head;
               }
               return true;
             }else if(index==bound){
               for(index=0;;++index){
                 if(val==(arr[index])){
                   this.modCount=modCount+1;
-                  int headDist,tailDist;
-                  if((headDist=bound-head)+index+1<(tailDist=tail-index)){
-                    ArrCopy.semicheckedCopy(arr,0,arr,1,index);
-                    arr[0]=arr[bound];
-                    ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                    this.head=(head>bound)?0:head;
-                  }else{
-                    ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                    this.tail=(--tail==-1)?bound:tail;
-                  }
+                  arr[index]=!val;
+                  this.head=(++head>bound)?0:head;
                   return true;
                 }else if(index==tail){
                   break;
@@ -3127,17 +2256,11 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
           for(index=head;;++index){
             if(val==(arr[index])){
               this.modCount=modCount+1;
-              int headDist,tailDist;
-              if((tailDist=tail-index)<=(headDist=index-head)){
-                if(headDist==0){
-                  this.tail=-1;
-                }else{
-                  ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                  this.tail=tail-1;
-                }
+              if(head==tail){
+                this.tail=-1;
               }else{
-                ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                this.head=head;
+                arr[index]=!val;
+                this.head=head+1;
               }
               return true;
             }else if(index==tail){
@@ -3160,31 +2283,19 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
           for(bound=arr.length-1,index=tail;;--index){
             if(val==(arr[index])){
               this.modCount=modCount+1;
-              int headDist,tailDist;
-              if((headDist=bound-head)+index+1<(tailDist=tail-index)){
-                ArrCopy.semicheckedCopy(arr,0,arr,1,index);
-                arr[0]=arr[bound];
-                ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                this.head=(head>bound)?0:head;
+              if(--tail==-1){
+                this.tail=bound;
               }else{
-                ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                this.tail=(--tail==-1)?bound:tail;
+                arr[index]=!val;
+                this.tail=tail;
               }
               return true;
             }else if(index==0){
               for(index=bound;;--index){
                 if(val==(arr[index])){
                   this.modCount=modCount+1;
-                  int headDist,tailDist;
-                  if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
-                    ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                    this.head=(head>bound)?0:head;
-                  }else{
-                    ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                    arr[bound]=arr[0];
-                    ArrCopy.semicheckedSelfCopy(arr,0,1,tail);
-                    this.tail=(--tail==-1)?bound:tail;
-                  }
+                  arr[index]=!val;
+                  this.tail=(--tail==-1)?bound:tail;
                   return true;
                 }else if(index==head){
                   break;
@@ -3197,17 +2308,11 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
           for(index=tail;;--index){
             if(val==(arr[index])){
               this.modCount=modCount+1;
-              int headDist,tailDist;
-              if((tailDist=tail-index)<=(headDist=index-head)){
-                if(headDist==0){
-                  this.tail=-1;
-                }else{
-                  ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailDist);
-                  this.tail=tail-1;
-                }
+              if(head==tail){
+                 this.tail=-1;
               }else{
-                ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-                this.head=head;
+                 arr[index]=!val;
+                 this.tail=tail-1;
               }
               return true;
             }else if(index==head){

@@ -1,8 +1,5 @@
 package omni.impl.seq;
-import java.io.Externalizable;
-import java.io.IOException;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Random;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
@@ -20,16 +17,13 @@ import omni.impl.DataType;
 import omni.impl.FunctionCallType;
 import omni.impl.IteratorType;
 import omni.impl.MonitoredCollection;
-import omni.impl.MonitoredDeque;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredObjectGen;
-import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredRemoveIfPredicateGen;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
-import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
@@ -45,7 +39,7 @@ import omni.util.TestExecutorService;
                 for(int tmpNumToRotate=0;tmpNumToRotate <= 10;++tmpNumToRotate){
                   final int numToRotate=tmpNumToRotate;
                   TestExecutorService.submitTest(()->{
-                    final var monitor=new ArrDeqMonitor(checkedType,collectionType,initCap);
+                    final var monitor=new ArrDeqMonitor<>(checkedType,collectionType,initCap);
                     if(numToRotate != 0){
                       monitor.add(0);
                       monitor.rotate(numToRotate);
@@ -62,43 +56,14 @@ import omni.util.TestExecutorService;
       }
       TestExecutorService.completeAllTests(testName);
     }
-    void callMethod(ArrDeqMonitor monitor,Object inputVal,DataType inputType,FunctionCallType functionCallType);
+    void callMethod(ArrDeqMonitor<?> monitor,Object inputVal,DataType inputType,FunctionCallType functionCallType);
   }
-  private static class ArrDeqMonitor implements MonitoredDeque<OmniDeque<?>>{
-    
-    private abstract class AbstractItrMonitor
-        implements MonitoredCollection.MonitoredIterator<OmniIterator<?>,OmniDeque<?>>{
-      final OmniIterator<?> itr;
-      int expectedCursor;
-      int expectedLastRet;
-      int expectedItrModCount;
-      int numLeft;
+  private static class ArrDeqMonitor<E> extends AbstractArrDeqMonitor<OmniDeque<E>,E>{
+    private abstract class AbstractItrMonitor extends AbstractArrDeqMonitor<OmniDeque<E>,E>.AbstractItrMonitor{
       AbstractItrMonitor(OmniIterator<?> itr,int expectedCursor,int numLeft){
-        this.itr=itr;
-        this.expectedCursor=expectedCursor;
-        expectedLastRet=-1;
-        expectedItrModCount=expectedModCount;
-        this.numLeft=numLeft;
+        super(itr,expectedCursor,numLeft);
       }
-      @Override public OmniIterator<?> getIterator(){
-        return itr;
-      }
-      @Override public MonitoredCollection<OmniDeque<?>> getMonitoredCollection(){
-        return ArrDeqMonitor.this;
-      }
-      @Override public int getNumLeft(){
-        return numLeft;
-      }
-      @Override public boolean hasNext(){
-        return numLeft > 0;
-      }
-      @Override public boolean nextWasJustCalled(){
-        return expectedLastRet != -1;
-      }
-      @Override public void verifyNextResult(DataType outputType,Object result){
-        verifyGetResult(expectedCursor,result,outputType);
-      }
-      private IntConsumer getForEachRemainingVerifier(MonitoredFunction function){
+      IntConsumer getForEachRemainingVerifier(MonitoredFunction function){
         final var functionItr=function.iterator();
         switch(dataType){
         case BOOLEAN:{
@@ -142,14 +107,7 @@ import omni.util.TestExecutorService;
         }
       }
     }
-    
-    
-    
     private class AscendingItrMonitor extends AbstractItrMonitor{
-        
-        
-        
-        
       AscendingItrMonitor(){
         super(seq.iterator(),expectedTail != -1?expectedHead:-1,expectedSize);
       }
@@ -871,221 +829,13 @@ import omni.util.TestExecutorService;
         }
       }
     }
-    final CheckedType checkedType;
-    final DataType dataType;
-    final OmniDeque<?> seq;
-    Object expectedArr;
-    int expectedHead;
-    int expectedTail;
-    int expectedSize;
-    int expectedModCount;
-    int expectedCapacity;
     ArrDeqMonitor(CheckedType checkedType,DataType dataType){
-      this.checkedType=checkedType;
-      this.dataType=dataType;
-      final var checked=checkedType.checked;
-      switch(dataType){
-      case BOOLEAN:
-        if(checked){
-          seq=new BooleanArrDeq.Checked();
-        }else{
-          seq=new BooleanArrDeq();
-        }
-        break;
-      case BYTE:
-        if(checked){
-          seq=new ByteArrDeq.Checked();
-        }else{
-          seq=new ByteArrDeq();
-        }
-        break;
-      case CHAR:
-        if(checked){
-          seq=new CharArrDeq.Checked();
-        }else{
-          seq=new CharArrDeq();
-        }
-        break;
-      case DOUBLE:
-        if(checked){
-          seq=new DoubleArrDeq.Checked();
-        }else{
-          seq=new DoubleArrDeq();
-        }
-        break;
-      case FLOAT:
-        if(checked){
-          seq=new FloatArrDeq.Checked();
-        }else{
-          seq=new FloatArrDeq();
-        }
-        break;
-      case INT:
-        if(checked){
-          seq=new IntArrDeq.Checked();
-        }else{
-          seq=new IntArrDeq();
-        }
-        break;
-      case LONG:
-        if(checked){
-          seq=new LongArrDeq.Checked();
-        }else{
-          seq=new LongArrDeq();
-        }
-        break;
-      case REF:
-        if(checked){
-          seq=new RefArrDeq.Checked<>();
-        }else{
-          seq=new RefArrDeq<>();
-        }
-        break;
-      case SHORT:
-        if(checked){
-          seq=new ShortArrDeq.Checked();
-        }else{
-          seq=new ShortArrDeq();
-        }
-        break;
-      default:
-        throw dataType.invalid();
-      }
+      super(checkedType,dataType);
       updateCollectionState();
     }
     ArrDeqMonitor(CheckedType checkedType,DataType dataType,int initCap){
-      this.checkedType=checkedType;
-      this.dataType=dataType;
-      final var checked=checkedType.checked;
-      switch(dataType){
-      case BOOLEAN:
-        if(checked){
-          seq=new BooleanArrDeq.Checked(initCap);
-        }else{
-          seq=new BooleanArrDeq(initCap);
-        }
-        break;
-      case BYTE:
-        if(checked){
-          seq=new ByteArrDeq.Checked(initCap);
-        }else{
-          seq=new ByteArrDeq(initCap);
-        }
-        break;
-      case CHAR:
-        if(checked){
-          seq=new CharArrDeq.Checked(initCap);
-        }else{
-          seq=new CharArrDeq(initCap);
-        }
-        break;
-      case DOUBLE:
-        if(checked){
-          seq=new DoubleArrDeq.Checked(initCap);
-        }else{
-          seq=new DoubleArrDeq(initCap);
-        }
-        break;
-      case FLOAT:
-        if(checked){
-          seq=new FloatArrDeq.Checked(initCap);
-        }else{
-          seq=new FloatArrDeq(initCap);
-        }
-        break;
-      case INT:
-        if(checked){
-          seq=new IntArrDeq.Checked(initCap);
-        }else{
-          seq=new IntArrDeq(initCap);
-        }
-        break;
-      case LONG:
-        if(checked){
-          seq=new LongArrDeq.Checked(initCap);
-        }else{
-          seq=new LongArrDeq(initCap);
-        }
-        break;
-      case REF:
-        if(checked){
-          seq=new RefArrDeq.Checked<>(initCap);
-        }else{
-          seq=new RefArrDeq<>(initCap);
-        }
-        break;
-      case SHORT:
-        if(checked){
-          seq=new ShortArrDeq.Checked(initCap);
-        }else{
-          seq=new ShortArrDeq(initCap);
-        }
-        break;
-      default:
-        throw dataType.invalid();
-      }
+      super(checkedType,dataType,initCap);
       updateCollectionState();
-    }
-    @SuppressWarnings("unchecked") @Override public boolean add(int val){
-      Object inputVal;
-      switch(dataType){
-      case BOOLEAN:{
-        boolean v;
-        ((BooleanArrDeq)seq).addLast(v=(val & 1) != 0);
-        inputVal=v;
-        break;
-      }
-      case BYTE:{
-        byte v;
-        ((ByteArrDeq)seq).addLast(v=(byte)val);
-        inputVal=v;
-        break;
-      }
-      case CHAR:{
-        char v;
-        ((CharArrDeq)seq).addLast(v=(char)val);
-        inputVal=v;
-        break;
-      }
-      case SHORT:{
-        short v;
-        ((ShortArrDeq)seq).addLast(v=(short)val);
-        inputVal=v;
-        break;
-      }
-      case INT:{
-        int v;
-        ((IntArrDeq)seq).addLast(v=val);
-        inputVal=v;
-        break;
-      }
-      case LONG:{
-        long v;
-        ((LongArrDeq)seq).addLast(v=val);
-        inputVal=v;
-        break;
-      }
-      case FLOAT:{
-        float v;
-        ((FloatArrDeq)seq).addLast(v=val);
-        inputVal=v;
-        break;
-      }
-      case DOUBLE:{
-        double v;
-        ((DoubleArrDeq)seq).addLast(v=val);
-        inputVal=v;
-        break;
-      }
-      case REF:{
-        ((RefArrDeq<Object>)seq).addLast(inputVal=val);
-        break;
-      }
-      default:
-        throw dataType.invalid();
-      }
-      updateAddState(inputVal,dataType);
-      return true;
     }
     @Override public Object get(int iterationIndex,DataType outputType){
       iterationIndex+=expectedHead;
@@ -1094,39 +844,11 @@ import omni.util.TestExecutorService;
       }
       return outputType.convertVal(dataType.getFromArray(iterationIndex,expectedArr));
     }
-    @Override public CheckedType getCheckedType(){
-      return checkedType;
-    }
-    @Override public OmniDeque<?> getCollection(){
-      return seq;
-    }
-    @Override public DataType getDataType(){
-      return dataType;
-    }
-    @Override public MonitoredIterator<?,OmniDeque<?>> getMonitoredDescendingIterator(){
+    @Override public MonitoredIterator<?,OmniDeque<E>> getMonitoredDescendingIterator(){
       return new DescendingItrMonitor();
     }
-    @Override public MonitoredIterator<? extends OmniIterator<?>,OmniDeque<?>> getMonitoredIterator(){
+    @Override public MonitoredIterator<? extends OmniIterator<?>,OmniDeque<E>> getMonitoredIterator(){
       return new AscendingItrMonitor();
-    }
-    @Override public MonitoredIterator<? extends OmniIterator<?>,OmniDeque<?>> getMonitoredIterator(int index,
-        IteratorType itrType){
-      final var itrMonitor=getMonitoredIterator(itrType);
-      while(--index >= 0 && itrMonitor.hasNext()){
-        itrMonitor.iterateForward();
-      }
-      return itrMonitor;
-    }
-    @Override public MonitoredIterator<? extends OmniIterator<?>,OmniDeque<?>>
-        getMonitoredIterator(IteratorType itrType){
-      switch(itrType){
-      case AscendingItr:
-        return getMonitoredIterator();
-      case DescendingItr:
-        return getMonitoredDescendingIterator();
-      default:
-        throw itrType.invalid();
-      }
     }
     @Override public StructType getStructType(){
       return StructType.ArrDeq;
@@ -1165,14 +887,152 @@ import omni.util.TestExecutorService;
       }
       ++expectedModCount;
     }
-    @Override public void modParent(){
-      throw new UnsupportedOperationException();
-    }
-    @Override public void modRoot(){
-      throw new UnsupportedOperationException();
-    }
-    @Override public int size(){
-      return expectedSize;
+    @Override public void rotate(int numToRotate){
+      if(expectedSize <= 0){ return; }
+      assert expectedHead == 0;
+      assert expectedTail == expectedSize - 1;
+      numToRotate%=expectedCapacity;
+      if(numToRotate <= 0){ return; }
+      Object actualArr;
+      Object tmp=null;
+      final int newHead=-numToRotate + expectedCapacity;
+      int newTail=newHead + expectedSize - 1;
+      if(newTail >= expectedCapacity){
+        newTail-=expectedCapacity;
+      }
+      final int overflow=Math.min(numToRotate - (expectedCapacity - expectedSize),expectedSize - numToRotate);
+      switch(dataType){
+      case BOOLEAN:{
+        final var seq=(BooleanArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new boolean[overflow];
+        }
+        break;
+      }
+      case BYTE:{
+        final var seq=(ByteArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new byte[overflow];
+        }
+        break;
+      }
+      case CHAR:{
+        final var seq=(CharArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new char[overflow];
+        }
+        break;
+      }
+      case DOUBLE:{
+        final var seq=(DoubleArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new double[overflow];
+        }
+        break;
+      }
+      case FLOAT:{
+        final var seq=(FloatArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new float[overflow];
+        }
+        break;
+      }
+      case INT:{
+        final var seq=(IntArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new int[overflow];
+        }
+        break;
+      }
+      case LONG:{
+        final var seq=(LongArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new long[overflow];
+        }
+        break;
+      }
+      case REF:{
+        final var seq=(RefArrDeq<?>)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new Object[overflow];
+        }
+        break;
+      }
+      case SHORT:{
+        final var seq=(ShortArrDeq)this.seq;
+        actualArr=seq.arr;
+        seq.head=newHead;
+        seq.tail=newTail;
+        if(overflow > 0){
+          tmp=new short[overflow];
+        }
+        break;
+      }
+      default:
+        throw dataType.invalid();
+      }
+      if(tmp != null){
+        if(expectedSize - numToRotate > overflow){
+          System.arraycopy(actualArr,expectedSize - overflow,tmp,0,overflow);
+          System.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
+          int tmpLength;
+          System.arraycopy(actualArr,numToRotate,actualArr,0,tmpLength=expectedSize - numToRotate - overflow);
+          System.arraycopy(tmp,0,actualArr,tmpLength,overflow);
+        }else{
+          System.arraycopy(actualArr,expectedSize - overflow,tmp,0,overflow);
+          System.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
+          System.arraycopy(tmp,0,actualArr,0,overflow);
+        }
+      }else{
+        if(numToRotate >= expectedSize){
+          System.arraycopy(actualArr,0,actualArr,newHead,expectedSize);
+        }else{
+          System.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
+          System.arraycopy(actualArr,numToRotate,actualArr,0,expectedSize - numToRotate);
+        }
+      }
+      expectedHead=newHead;
+      expectedTail=newTail;
+      if(dataType == DataType.REF){
+        final Object[] castActual=(Object[])actualArr;
+        if(newTail < newHead){
+          for(int i=newTail + 1;i < newHead;++i){
+            castActual[i]=null;
+          }
+        }else{
+          for(int i=0;i < newHead;++i){
+            castActual[i]=null;
+          }
+          for(int i=expectedCapacity - 1;i > newTail;--i){
+            castActual[i]=null;
+          }
+        }
+      }
+      System.arraycopy(actualArr,0,expectedArr,0,expectedCapacity);
     }
     @Override public void updateAddFirstState(Object inputVal,DataType inputType){
       if(expectedSize == 0){
@@ -1250,27 +1110,6 @@ import omni.util.TestExecutorService;
       }
       ++expectedModCount;
       ++expectedSize;
-    }
-    @Override public void updateClearState(){
-      if(expectedSize != 0){
-        if(dataType == DataType.REF){
-          final var expectedArr=(Object[])this.expectedArr;
-          int tail,head;
-          if((tail=expectedTail) < (head=expectedHead)){
-            final int bound=expectedCapacity;
-            do{
-              expectedArr[head]=null;
-            }while(++head != bound);
-            head=0;
-          }
-          do{
-            expectedArr[head]=null;
-          }while(++head <= tail);
-        }
-        expectedTail=-1;
-        expectedSize=0;
-        ++expectedModCount;
-      }
     }
     @Override public void updateCollectionState(){
       Object actualArr;
@@ -1416,18 +1255,6 @@ import omni.util.TestExecutorService;
         System.arraycopy(actualArr,expectedHead,expectedArr,expectedHead,expectedSize=expectedTail + 1 - expectedHead);
       }
     }
-    @Override public void updateRemoveFirstState(){
-      if(dataType == DataType.REF){
-        ((Object[])expectedArr)[expectedHead]=null;
-      }
-      if(expectedHead == expectedTail){
-        expectedTail=-1;
-      }else if(++expectedHead == expectedCapacity){
-        expectedHead=0;
-      }
-      --expectedSize;
-      ++expectedModCount;
-    }
     @Override public void updateRemoveLastOccurrenceState(Object inputVal,DataType inputType){
       final int head=expectedHead;
       int tail=expectedTail;
@@ -1505,18 +1332,6 @@ import omni.util.TestExecutorService;
         }
       }
     }
-    @Override public void updateRemoveLastState(){
-      if(dataType == DataType.REF){
-        ((Object[])expectedArr)[expectedTail]=null;
-      }
-      if(expectedHead == expectedTail){
-        expectedTail=-1;
-      }else if(--expectedTail == -1){
-        expectedTail=expectedCapacity - 1;
-      }
-      --expectedSize;
-      ++expectedModCount;
-    }
     @Override public void updateRemoveValState(Object inputVal,DataType inputType){
       final int head=expectedHead;
       int tail=expectedTail;
@@ -1593,12 +1408,6 @@ import omni.util.TestExecutorService;
           }
         }
       }
-    }
-    @Override public boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType){
-      Assertions.assertTrue(inputType.callAdd(inputVal,seq,functionCallType));
-      updateAddState(inputVal,inputType);
-      verifyCollectionState();
-      return true;
     }
     @Override public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
       Object expectedArr;
@@ -2046,440 +1855,7 @@ import omni.util.TestExecutorService;
         }
       }
     }
-    @Override public void verifyGetFirstResult(Object result,DataType outputType){
-      verifyGetResult(expectedHead,result,outputType);
-    }
-    @Override public void verifyGetLastResult(Object result,DataType outputType){
-      verifyGetResult(expectedTail,result,outputType);
-    }
-    @Override public void verifyHashCode(int hashCode){
-      int expectedHash=1;
-      switch(dataType){
-      case BOOLEAN:{
-        final var itr=(OmniIterator.OfBoolean)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Boolean.hashCode(itr.nextBoolean());
-        }
-        break;
-      }
-      case BYTE:{
-        final var itr=(OmniIterator.OfByte)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Byte.hashCode(itr.nextByte());
-        }
-        break;
-      }
-      case CHAR:{
-        final var itr=(OmniIterator.OfChar)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Character.hashCode(itr.nextChar());
-        }
-        break;
-      }
-      case DOUBLE:{
-        final var itr=(OmniIterator.OfDouble)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Double.hashCode(itr.nextDouble());
-        }
-        break;
-      }
-      case FLOAT:{
-        final var itr=(OmniIterator.OfFloat)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Float.hashCode(itr.nextFloat());
-        }
-        break;
-      }
-      case INT:{
-        final var itr=(OmniIterator.OfInt)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Integer.hashCode(itr.nextInt());
-        }
-        break;
-      }
-      case LONG:{
-        final var itr=(OmniIterator.OfLong)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Long.hashCode(itr.nextLong());
-        }
-        break;
-      }
-      case REF:{
-        final var itr=(OmniIterator.OfRef<?>)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Objects.hashCode(itr.next());
-        }
-        break;
-      }
-      case SHORT:{
-        final var itr=(OmniIterator.OfShort)seq.iterator();
-        while(itr.hasNext()){
-          expectedHash=expectedHash * 31 + Short.hashCode(itr.nextShort());
-        }
-        break;
-      }
-      default:
-        throw dataType.invalid();
-      }
-      Assertions.assertEquals(expectedHash,hashCode);
-    }
-    @Override public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-      Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
-      Assertions.assertNotEquals(result,filter.numRemoved == 0);
-      if(expectedTail == -1){
-        Assertions.assertFalse(result);
-        Assertions.assertTrue(filter.retainedVals.isEmpty());
-        Assertions.assertEquals(0,filter.numRetained);
-        Assertions.assertEquals(0,filter.numCalls);
-      }else{
-        if(dataType == DataType.BOOLEAN){
-          if(expectedTail < expectedHead){
-            verifyBooleanFragmentedRemoveIf(result,filter);
-          }else{
-            verifyBooleanNonfragmentedRemoveIf(result,filter);
-          }
-        }else{
-          verifyNonBooleanRemoveIf(result,filter);
-        }
-      }
-    }
-    @Override public boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
-        QueryValModification modification){
-      final Object inputVal=queryVal.getInputVal(inputType,modification);
-      final boolean result=queryCastType.callremoveVal(seq,inputVal,inputType);
-      if(result){
-        updateRemoveValState(inputVal,inputType);
-      }
-      verifyCollectionState();
-      return result;
-    }
-    @Override public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
-      ((Externalizable)seq).writeExternal(oos);
-    }
-    public Object removeFirst(){
-      Object result=seq.pop();
-      if(dataType==DataType.REF) {
-        ((Object[])expectedArr)[expectedHead]=null;
-      }
-      if(expectedHead == expectedTail){
-        expectedTail=-1;
-      }else if(++expectedHead == expectedCapacity){
-        expectedHead=0;
-      }
-      --expectedSize;
-      ++expectedModCount;
-      return result;
-    }
-    private void removeLast(){
-      switch(dataType){
-      case BOOLEAN:
-        ((BooleanArrDeq)seq).removeLastBoolean();
-        break;
-      case BYTE:
-        ((ByteArrDeq)seq).removeLastByte();
-        break;
-      case CHAR:
-        ((CharArrDeq)seq).removeLastChar();
-        break;
-      case DOUBLE:
-        ((DoubleArrDeq)seq).removeLastDouble();
-        break;
-      case FLOAT:
-        ((FloatArrDeq)seq).removeLastFloat();
-        break;
-      case INT:
-        ((IntArrDeq)seq).removeLastInt();
-        break;
-      case LONG:
-        ((LongArrDeq)seq).removeLastLong();
-        break;
-      case REF:
-        ((RefArrDeq<?>)seq).removeLast();
-        ((Object[])expectedArr)[expectedTail]=null;
-        break;
-      case SHORT:
-        ((ShortArrDeq)seq).removeLastShort();
-        break;
-      default:
-        throw dataType.invalid();
-      }
-      if(expectedHead == expectedTail){
-        expectedTail=-1;
-      }else if(--expectedTail == -1){
-        expectedTail=expectedCapacity - 1;
-      }
-      --expectedSize;
-      ++expectedModCount;
-    }
-    private void rotate(int numToRotate){
-      if(expectedSize <= 0){ return; }
-      assert expectedHead == 0;
-      assert expectedTail == expectedSize - 1;
-      numToRotate%=expectedCapacity;
-      if(numToRotate <= 0){ return; }
-      Object actualArr;
-      Object tmp=null;
-      final int newHead=-numToRotate + expectedCapacity;
-      int newTail=newHead + expectedSize - 1;
-      if(newTail >= expectedCapacity){
-        newTail-=expectedCapacity;
-      }
-      final int overflow=Math.min(numToRotate - (expectedCapacity - expectedSize),expectedSize - numToRotate);
-      switch(dataType){
-      case BOOLEAN:{
-        final var seq=(BooleanArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new boolean[overflow];
-        }
-        break;
-      }
-      case BYTE:{
-        final var seq=(ByteArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new byte[overflow];
-        }
-        break;
-      }
-      case CHAR:{
-        final var seq=(CharArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new char[overflow];
-        }
-        break;
-      }
-      case DOUBLE:{
-        final var seq=(DoubleArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new double[overflow];
-        }
-        break;
-      }
-      case FLOAT:{
-        final var seq=(FloatArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new float[overflow];
-        }
-        break;
-      }
-      case INT:{
-        final var seq=(IntArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new int[overflow];
-        }
-        break;
-      }
-      case LONG:{
-        final var seq=(LongArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new long[overflow];
-        }
-        break;
-      }
-      case REF:{
-        final var seq=(RefArrDeq<?>)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new Object[overflow];
-        }
-        break;
-      }
-      case SHORT:{
-        final var seq=(ShortArrDeq)this.seq;
-        actualArr=seq.arr;
-        seq.head=newHead;
-        seq.tail=newTail;
-        if(overflow > 0){
-          tmp=new short[overflow];
-        }
-        break;
-      }
-      default:
-        throw dataType.invalid();
-      }
-      if(tmp != null){
-        if(expectedSize - numToRotate > overflow){
-          System.arraycopy(actualArr,expectedSize - overflow,tmp,0,overflow);
-          System.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
-          int tmpLength;
-          System.arraycopy(actualArr,numToRotate,actualArr,0,tmpLength=expectedSize - numToRotate - overflow);
-          System.arraycopy(tmp,0,actualArr,tmpLength,overflow);
-        }else{
-          System.arraycopy(actualArr,expectedSize - overflow,tmp,0,overflow);
-          System.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
-          System.arraycopy(tmp,0,actualArr,0,overflow);
-        }
-      }else{
-        if(numToRotate >= expectedSize){
-          System.arraycopy(actualArr,0,actualArr,newHead,expectedSize);
-        }else{
-          System.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
-          System.arraycopy(actualArr,numToRotate,actualArr,0,expectedSize - numToRotate);
-        }
-      }
-      expectedHead=newHead;
-      expectedTail=newTail;
-      if(dataType == DataType.REF){
-        final Object[] castActual=(Object[])actualArr;
-        if(newTail < newHead){
-          for(int i=newTail + 1;i < newHead;++i){
-            castActual[i]=null;
-          }
-        }else{
-          for(int i=0;i < newHead;++i){
-            castActual[i]=null;
-          }
-          for(int i=expectedCapacity - 1;i > newTail;--i){
-            castActual[i]=null;
-          }
-        }
-      }
-      System.arraycopy(actualArr,0,expectedArr,0,expectedCapacity);
-    }
-    private void verifyBooleanFragmentedRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-      final int head=expectedHead;
-      final int tail=expectedTail;
-      final int expectedCapacity=this.expectedCapacity;
-      final var expectedArr=(boolean[])this.expectedArr;
-      int trueCount=0;
-      int size;
-      for(int i=tail;;--i){
-        if(expectedArr[i]){
-          ++trueCount;
-        }
-        if(i == 0){
-          for(i=(size=expectedCapacity) - 1;;--i){
-            if(expectedArr[i]){
-              ++trueCount;
-            }
-            if(i == head){
-              break;
-            }
-          }
-          size+=tail + 1 - head;
-          break;
-        }
-      }
-      verifyBooleanRemoveIfHelper(result,filter,expectedArr,trueCount,size);
-    }
-    private void verifyBooleanNonfragmentedRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-      final int head=expectedHead;
-      final int tail=expectedTail;
-      final var expectedArr=(boolean[])this.expectedArr;
-      int trueCount=0;
-      for(int i=head;;++i){
-        if(expectedArr[i]){
-          ++trueCount;
-        }
-        if(i == tail){
-          break;
-        }
-      }
-      verifyBooleanRemoveIfHelper(result,filter,expectedArr,trueCount,tail - head + 1);
-    }
-    private void verifyBooleanRemoveIfHelper(boolean result,MonitoredRemoveIfPredicate filter,
-        final boolean[] expectedArr,int trueCount,int size){
-      if(trueCount == size){
-        Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
-        Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
-        Assertions.assertEquals(1,filter.numCalls);
-        if(filter.removedVals.contains(Boolean.TRUE)){
-          Assertions.assertTrue(result);
-          expectedTail=-1;
-          expectedSize=0;
-          ++expectedModCount;
-        }else{
-          Assertions.assertFalse(result);
-        }
-      }else if(trueCount == 0){
-        Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
-        Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-        Assertions.assertEquals(1,filter.numCalls);
-        if(filter.removedVals.contains(Boolean.FALSE)){
-          Assertions.assertTrue(result);
-          expectedTail=-1;
-          expectedSize=0;
-          ++expectedModCount;
-        }else{
-          Assertions.assertFalse(result);
-        }
-      }else{
-        Assertions.assertEquals(2,filter.numCalls);
-        if(filter.removedVals.contains(Boolean.TRUE)){
-          Assertions.assertTrue(result);
-          ++expectedModCount;
-          if(filter.removedVals.contains(Boolean.FALSE)){
-            expectedTail=-1;
-            expectedSize=0;
-            Assertions.assertTrue(filter.retainedVals.isEmpty());
-            Assertions.assertEquals(0,filter.numRetained);
-            Assertions.assertEquals(2,filter.numRemoved);
-          }else{
-            for(int i=size-=trueCount + 1;;--i){
-              expectedArr[i]=false;
-              if(i == 0){
-                break;
-              }
-            }
-            expectedHead=0;
-            expectedTail=size;
-            expectedSize=size + 1;
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
-            Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-            Assertions.assertEquals(1,filter.numRetained);
-            Assertions.assertEquals(1,filter.numRemoved);
-          }
-        }else{
-          if(filter.removedVals.contains(Boolean.FALSE)){
-            Assertions.assertTrue(result);
-            ++expectedModCount;
-            for(int i=--trueCount;;--i){
-              expectedArr[i]=true;
-              if(i == 0){
-                break;
-              }
-            }
-            expectedHead=0;
-            expectedTail=trueCount;
-            expectedSize=trueCount + 1;
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
-            Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
-            Assertions.assertEquals(1,filter.numRetained);
-            Assertions.assertEquals(1,filter.numRemoved);
-          }else{
-            Assertions.assertFalse(result);
-            Assertions.assertEquals(2,filter.numRetained);
-            Assertions.assertEquals(0,filter.numRemoved);
-            Assertions.assertTrue(filter.removedVals.isEmpty());
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
-          }
-        }
-      }
-    }
-    public void verifyGetResult(int expectedCursor,Object output,DataType outputType){
+    @Override public void verifyGetResult(int expectedCursor,Object output,DataType outputType){
       switch(outputType){
       case BOOLEAN:
         Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor],(boolean)output);
@@ -2675,6 +2051,147 @@ import omni.util.TestExecutorService;
       }
       }
     }
+    @Override public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+      Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
+      Assertions.assertNotEquals(result,filter.numRemoved == 0);
+      if(expectedTail == -1){
+        Assertions.assertFalse(result);
+        Assertions.assertTrue(filter.retainedVals.isEmpty());
+        Assertions.assertEquals(0,filter.numRetained);
+        Assertions.assertEquals(0,filter.numCalls);
+      }else{
+        if(dataType == DataType.BOOLEAN){
+          if(expectedTail < expectedHead){
+            verifyBooleanFragmentedRemoveIf(result,filter);
+          }else{
+            verifyBooleanNonfragmentedRemoveIf(result,filter);
+          }
+        }else{
+          verifyNonBooleanRemoveIf(result,filter);
+        }
+      }
+    }
+    private void verifyBooleanFragmentedRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+      final int head=expectedHead;
+      final int tail=expectedTail;
+      final int expectedCapacity=this.expectedCapacity;
+      final var expectedArr=(boolean[])this.expectedArr;
+      int trueCount=0;
+      int size;
+      for(int i=tail;;--i){
+        if(expectedArr[i]){
+          ++trueCount;
+        }
+        if(i == 0){
+          for(i=(size=expectedCapacity) - 1;;--i){
+            if(expectedArr[i]){
+              ++trueCount;
+            }
+            if(i == head){
+              break;
+            }
+          }
+          size+=tail + 1 - head;
+          break;
+        }
+      }
+      verifyBooleanRemoveIfHelper(result,filter,expectedArr,trueCount,size);
+    }
+    private void verifyBooleanNonfragmentedRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+      final int head=expectedHead;
+      final int tail=expectedTail;
+      final var expectedArr=(boolean[])this.expectedArr;
+      int trueCount=0;
+      for(int i=head;;++i){
+        if(expectedArr[i]){
+          ++trueCount;
+        }
+        if(i == tail){
+          break;
+        }
+      }
+      verifyBooleanRemoveIfHelper(result,filter,expectedArr,trueCount,tail - head + 1);
+    }
+    private void verifyBooleanRemoveIfHelper(boolean result,MonitoredRemoveIfPredicate filter,
+        final boolean[] expectedArr,int trueCount,int size){
+      if(trueCount == size){
+        Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+        Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+        Assertions.assertEquals(1,filter.numCalls);
+        if(filter.removedVals.contains(Boolean.TRUE)){
+          Assertions.assertTrue(result);
+          expectedTail=-1;
+          expectedSize=0;
+          ++expectedModCount;
+        }else{
+          Assertions.assertFalse(result);
+        }
+      }else if(trueCount == 0){
+        Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+        Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+        Assertions.assertEquals(1,filter.numCalls);
+        if(filter.removedVals.contains(Boolean.FALSE)){
+          Assertions.assertTrue(result);
+          expectedTail=-1;
+          expectedSize=0;
+          ++expectedModCount;
+        }else{
+          Assertions.assertFalse(result);
+        }
+      }else{
+        Assertions.assertEquals(2,filter.numCalls);
+        if(filter.removedVals.contains(Boolean.TRUE)){
+          Assertions.assertTrue(result);
+          ++expectedModCount;
+          if(filter.removedVals.contains(Boolean.FALSE)){
+            expectedTail=-1;
+            expectedSize=0;
+            Assertions.assertTrue(filter.retainedVals.isEmpty());
+            Assertions.assertEquals(0,filter.numRetained);
+            Assertions.assertEquals(2,filter.numRemoved);
+          }else{
+            for(int i=size-=trueCount + 1;;--i){
+              expectedArr[i]=false;
+              if(i == 0){
+                break;
+              }
+            }
+            expectedHead=0;
+            expectedTail=size;
+            expectedSize=size + 1;
+            Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+            Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+            Assertions.assertEquals(1,filter.numRetained);
+            Assertions.assertEquals(1,filter.numRemoved);
+          }
+        }else{
+          if(filter.removedVals.contains(Boolean.FALSE)){
+            Assertions.assertTrue(result);
+            ++expectedModCount;
+            for(int i=--trueCount;;--i){
+              expectedArr[i]=true;
+              if(i == 0){
+                break;
+              }
+            }
+            expectedHead=0;
+            expectedTail=trueCount;
+            expectedSize=trueCount + 1;
+            Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+            Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+            Assertions.assertEquals(1,filter.numRetained);
+            Assertions.assertEquals(1,filter.numRemoved);
+          }else{
+            Assertions.assertFalse(result);
+            Assertions.assertEquals(2,filter.numRetained);
+            Assertions.assertEquals(0,filter.numRemoved);
+            Assertions.assertTrue(filter.removedVals.isEmpty());
+            Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+            Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+          }
+        }
+      }
+    }
     private void verifyNonBooleanRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
       if(result){
         for(final var removedVal:filter.removedVals){
@@ -2689,9 +2206,127 @@ import omni.util.TestExecutorService;
       }
       updateCollectionState();
     }
-
-    @Override public void updateRemoveIndexState(int index){
-      throw new UnsupportedOperationException();
+    @SuppressWarnings("unchecked") @Override OmniDeque<E> initDeq(){
+      final var checked=checkedType.checked;
+      switch(dataType){
+      case BOOLEAN:
+        if(checked){
+          return (OmniDeque<E>)new BooleanArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new BooleanArrDeq();
+        }
+      case BYTE:
+        if(checked){
+          return (OmniDeque<E>)new ByteArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new ByteArrDeq();
+        }
+      case CHAR:
+        if(checked){
+          return (OmniDeque<E>)new CharArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new CharArrDeq();
+        }
+      case DOUBLE:
+        if(checked){
+          return (OmniDeque<E>)new DoubleArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new DoubleArrDeq();
+        }
+      case FLOAT:
+        if(checked){
+          return (OmniDeque<E>)new FloatArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new FloatArrDeq();
+        }
+      case INT:
+        if(checked){
+          return (OmniDeque<E>)new IntArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new IntArrDeq();
+        }
+      case LONG:
+        if(checked){
+          return (OmniDeque<E>)new LongArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new LongArrDeq();
+        }
+      case REF:
+        if(checked){
+          return new RefArrDeq.Checked<>();
+        }else{
+          return new RefArrDeq<>();
+        }
+      case SHORT:
+        if(checked){
+          return (OmniDeque<E>)new ShortArrDeq.Checked();
+        }else{
+          return (OmniDeque<E>)new ShortArrDeq();
+        }
+      default:
+        throw dataType.invalid();
+      }
+    }
+    @SuppressWarnings("unchecked") @Override OmniDeque<E> initDeq(int initCap){
+      final var checked=checkedType.checked;
+      switch(dataType){
+      case BOOLEAN:
+        if(checked){
+          return (OmniDeque<E>)new BooleanArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new BooleanArrDeq(initCap);
+        }
+      case BYTE:
+        if(checked){
+          return (OmniDeque<E>)new ByteArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new ByteArrDeq(initCap);
+        }
+      case CHAR:
+        if(checked){
+          return (OmniDeque<E>)new CharArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new CharArrDeq(initCap);
+        }
+      case DOUBLE:
+        if(checked){
+          return (OmniDeque<E>)new DoubleArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new DoubleArrDeq(initCap);
+        }
+      case FLOAT:
+        if(checked){
+          return (OmniDeque<E>)new FloatArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new FloatArrDeq(initCap);
+        }
+      case INT:
+        if(checked){
+          return (OmniDeque<E>)new IntArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new IntArrDeq(initCap);
+        }
+      case LONG:
+        if(checked){
+          return (OmniDeque<E>)new LongArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new LongArrDeq(initCap);
+        }
+      case REF:
+        if(checked){
+          return new RefArrDeq.Checked<>(initCap);
+        }else{
+          return new RefArrDeq<>(initCap);
+        }
+      case SHORT:
+        if(checked){
+          return (OmniDeque<E>)new ShortArrDeq.Checked(initCap);
+        }else{
+          return (OmniDeque<E>)new ShortArrDeq(initCap);
+        }
+      default:
+        throw dataType.invalid();
+      }
     }
   }
   private static interface BasicTest{
@@ -2708,7 +2343,7 @@ import omni.util.TestExecutorService;
                 final int numToRotate=tmpNumToRotate;
                 TestExecutorService.submitTest(()->{
                   final var monitor=SequenceInitialization.Ascending
-                      .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,0);
+                      .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
                   monitor.rotate(numToRotate);
                   runTest(monitor);
                 });
@@ -2719,7 +2354,7 @@ import omni.util.TestExecutorService;
       }
       TestExecutorService.completeAllTests(testName);
     }
-    void runTest(ArrDeqMonitor monitor);
+    void runTest(ArrDeqMonitor<?> monitor);
   }
   private static interface GetTest{
     private void runAllTests(String testName,boolean throwsOnEmpty){
@@ -2732,7 +2367,7 @@ import omni.util.TestExecutorService;
                 final int numToRotate=tmpNumToRotate;
                 TestExecutorService.submitTest(()->{
                   final var monitor=SequenceInitialization.Ascending
-                      .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),100,0);
+                      .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),100,0);
                   if(numToRotate > 0){
                     monitor.rotate(numToRotate);
                   }
@@ -2754,7 +2389,7 @@ import omni.util.TestExecutorService;
       }
       TestExecutorService.completeAllTests(testName);
     }
-    void processNext(ArrDeqMonitor monitor,DataType outputType);
+    void processNext(ArrDeqMonitor<?> monitor,DataType outputType);
   }
   private static interface MonitoredFunctionTest{
     private void runAllTests(String testName,long maxRand){
@@ -2778,7 +2413,7 @@ import omni.util.TestExecutorService;
                           final int initVal=tmpInitVal;
                           TestExecutorService.submitTest(()->{
                             final var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,initVal);
+                                .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,initVal);
                             if(size > 0 && numToRotate > 0){
                               monitor.rotate(numToRotate);
                             }
@@ -2796,7 +2431,7 @@ import omni.util.TestExecutorService;
       }
       TestExecutorService.completeAllTests(testName);
     }
-    void runTest(ArrDeqMonitor monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
+    void runTest(ArrDeqMonitor<?> monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
         long randSeed);
   }
   private static interface QueryTest{
@@ -2822,7 +2457,7 @@ import omni.util.TestExecutorService;
                               if(size != 0 && monitoredObjectGen.expectedException != null && checkedType.checked){
                                 TestExecutorService.submitTest(()->{
                                   Assertions.assertThrows(monitoredObjectGen.expectedException,
-                                      ()->runTest(new ArrDeqMonitor(checkedType,collectionType,initCap),queryVal,
+                                      ()->runTest(new ArrDeqMonitor<>(checkedType,collectionType,initCap),queryVal,
                                           modification,castType,inputType,size,monitoredObjectGen,size == 0?-1:0,
                                           numToRotate));
                                 });
@@ -2857,7 +2492,7 @@ import omni.util.TestExecutorService;
                                 }
                               }
                               TestExecutorService.submitTest(()->{
-                                runTest(new ArrDeqMonitor(checkedType,collectionType,initCap),queryVal,modification,
+                                runTest(new ArrDeqMonitor<>(checkedType,collectionType,initCap),queryVal,modification,
                                     castType,inputType,size,null,position,numToRotate);
                               });
                             }
@@ -2874,7 +2509,7 @@ import omni.util.TestExecutorService;
       }
       TestExecutorService.completeAllTests(testName);
     }
-    @SuppressWarnings("unchecked") private void runTest(ArrDeqMonitor monitor,QueryVal queryVal,
+    @SuppressWarnings("unchecked") private void runTest(ArrDeqMonitor<?> monitor,QueryVal queryVal,
         QueryVal.QueryValModification modification,QueryCastType castType,DataType inputType,int size,
         MonitoredObjectGen monitoredObjectGen,double position,int numToRotate){
       if(position < 0){
@@ -2947,7 +2582,7 @@ import omni.util.TestExecutorService;
       monitor.rotate(numToRotate);
       callAndVerifyResult(monitor,queryVal,modification,castType,inputType,size,monitoredObjectGen,position);
     }
-    void callAndVerifyResult(ArrDeqMonitor monitor,QueryVal queryVal,QueryVal.QueryValModification modification,
+    void callAndVerifyResult(ArrDeqMonitor<?> monitor,QueryVal queryVal,QueryVal.QueryValModification modification,
         QueryCastType castType,DataType inputType,int size,MonitoredObjectGen monitoredObjectGen,double position);
   }
   private static interface ToStringAndHashCodeTest{
@@ -2968,7 +2603,7 @@ import omni.util.TestExecutorService;
                       TestExecutorService.submitTest(()->{
                         if(size == 0 || objGen.expectedException == null){
                           final var monitor=SequenceInitialization.Ascending
-                              .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,0);
+                              .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
                           if(size > 0 && numToRotate > 0){
                             monitor.rotate(numToRotate);
                           }
@@ -2976,7 +2611,7 @@ import omni.util.TestExecutorService;
                         }else{
                           final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
                           final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
-                              new ArrDeqMonitor(checkedType,collectionType,initCap),size,0,objGen,throwSwitch);
+                              new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0,objGen,throwSwitch);
                           if(size > 0 && numToRotate > 0){
                             monitor.rotate(numToRotate);
                           }
@@ -2997,7 +2632,7 @@ import omni.util.TestExecutorService;
                     final int initVal=tmpInitVal;
                     TestExecutorService.submitTest(()->{
                       final var monitor=SequenceInitialization.Ascending
-                          .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,initVal);
+                          .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,initVal);
                       if(size > 0 && numToRotate > 0){
                         monitor.rotate(numToRotate);
                       }
@@ -3013,10 +2648,14 @@ import omni.util.TestExecutorService;
       TestExecutorService.completeAllTests(testName);
     }
     void callRaw(OmniDeque<?> seq);
-    void callVerify(ArrDeqMonitor monitor);
+    void callVerify(ArrDeqMonitor<?> monitor);
   }
   private static final int[] REMOVE_IF_SIZES=new int[66 + 8 * 5 + 2];
   private static final int[] SHORT_SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10};
+  private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.10,0.90};
+  private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
+  private static final double[] POSITIONS=new double[]{-1,0,0.25,0.5,0.75,1.0};
+  private static final int[] SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,60,70,80,90,100};
   static{
     for(int i=0;i < 67;++i){
       REMOVE_IF_SIZES[i]=i;
@@ -3029,10 +2668,6 @@ import omni.util.TestExecutorService;
     }
     REMOVE_IF_SIZES[REMOVE_IF_SIZES.length - 1]=16384;
   }
-  private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.10,0.90};
-  private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
-  private static final double[] POSITIONS=new double[]{-1,0,0.25,0.5,0.75,1.0};
-  private static final int[] SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,60,70,80,90,100};
   @Order(6072) @Test public void testadd_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyAdd(inputVal,inputType,functionCallType));
@@ -3054,19 +2689,13 @@ import omni.util.TestExecutorService;
     final BasicTest test=ArrDeqMonitor::verifyClone;
     test.runAllTests("ArrDeqTest.testclone_void");
   }
-  @Order(31428)
-  @Test
-  public void testequals_Object(){
-      final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
-      test.runAllTests("ArrDeqTest.testequals_Object");
-  }
   @Order(72) @Test public void testConstructor_int(){
     for(final var checkedType:CheckedType.values()){
       for(final var collectionType:DataType.values()){
         for(int tmpInitCap=0;tmpInitCap <= 15;tmpInitCap+=5){
           final int initCap=tmpInitCap;
           TestExecutorService.submitTest(()->{
-            new ArrDeqMonitor(checkedType,collectionType,initCap).verifyCollectionState();
+            new ArrDeqMonitor<>(checkedType,collectionType,initCap).verifyCollectionState();
           });
         }
       }
@@ -3077,7 +2706,7 @@ import omni.util.TestExecutorService;
     for(final var checkedType:CheckedType.values()){
       for(final var collectionType:DataType.values()){
         TestExecutorService.submitTest(()->{
-          new ArrDeqMonitor(checkedType,collectionType).verifyCollectionState();
+          new ArrDeqMonitor<>(checkedType,collectionType).verifyCollectionState();
         });
       }
     }
@@ -3108,6 +2737,10 @@ import omni.util.TestExecutorService;
       }
     };
     test.runAllTests("ArrDeqTest.testelement_void",true);
+  }
+  @Order(31428) @Test public void testequals_Object(){
+      final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
+      test.runAllTests("ArrDeqTest.testequals_Object");
   }
   @Order(3971795) @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
@@ -3143,7 +2776,7 @@ import omni.util.TestExecutorService;
       @Override public void callRaw(OmniDeque<?> seq){
         seq.hashCode();
       }
-      @Override public void callVerify(ArrDeqMonitor monitor){
+      @Override public void callVerify(ArrDeqMonitor<?> monitor){
         monitor.verifyHashCode();
       }
     };
@@ -3202,7 +2835,7 @@ import omni.util.TestExecutorService;
                                 final int initCap=tmpInitCap;
                                 TestExecutorService.submitTest(()->{
                                   final var seqMonitor=SequenceInitialization.Ascending
-                                      .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,0);
+                                      .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
                                   seqMonitor.rotate(numToRotate);
                                   final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,itrType);
                                   itrMonitor.illegalMod(illegalMod);
@@ -3263,7 +2896,7 @@ import omni.util.TestExecutorService;
                       if(illegalMod.expectedException == null){
                         TestExecutorService.submitTest(()->{
                           final var seqMonitor=SequenceInitialization.Ascending
-                              .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,0);
+                              .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
                           seqMonitor.rotate(numToRotate);
                           final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
                           while(itrMonitor.hasNext()){
@@ -3278,7 +2911,7 @@ import omni.util.TestExecutorService;
                           if(position >= 0){
                             TestExecutorService.submitTest(()->{
                               final var seqMonitor=SequenceInitialization.Ascending
-                                  .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,0);
+                                  .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
                               if(size > 0 && numToRotate > 0){
                                 seqMonitor.rotate(numToRotate);
                               }
@@ -3344,7 +2977,7 @@ import omni.util.TestExecutorService;
                             }
                             TestExecutorService.submitTest(()->{
                               final var seqMonitor=SequenceInitialization.Ascending
-                                  .initialize(new ArrDeqMonitor(checkedType,collectionType,initCap),size,0);
+                                  .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
                               seqMonitor.rotate(numToRotate);
                               final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,itrType);
                               removeScenario.initialize(itrMonitor);
@@ -3385,7 +3018,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testItrremove_void");
   }
-  @Test public void testMASSIVEtoString(){
+  @Order(Integer.MAX_VALUE) @Test public void testMASSIVEtoString(){
     for(final var collectionType:DataType.values()){
       int seqSize;
       if((seqSize=collectionType.massiveToStringThreshold + 1) == 0){
@@ -3617,7 +3250,7 @@ import omni.util.TestExecutorService;
                           final int period=tmpPeriod;
                           TestExecutorService.submitTest(()->{
                             final var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrDeqMonitor(checkedType,collectionType,size),size,initVal,period);
+                                .initialize(new ArrDeqMonitor<>(checkedType,collectionType,size),size,initVal,period);
                             monitor.rotate(numToRotate);
                             final var filter
                                 =filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,new Random(randSeed));
@@ -3719,7 +3352,7 @@ import omni.util.TestExecutorService;
       @Override public void callRaw(OmniDeque<?> seq){
         seq.toString();
       }
-      @Override public void callVerify(ArrDeqMonitor monitor){
+      @Override public void callVerify(ArrDeqMonitor<?> monitor){
         monitor.verifyToString();
       }
     };

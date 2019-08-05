@@ -344,6 +344,38 @@ public enum MonitoredComparatorGen{
 
         }
     },
+    NoThrowUnsorted(true,ComparatorType.Unsorted,null,false,0,false){
+      @Override
+      public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
+          return new MonitoredComparator(){
+              @Override
+              protected int impl(double val1,double val2){
+                  return 0;
+              }
+              @Override
+              protected int impl(long val1,long val2){
+                  return 0;
+              }
+              @Override
+              protected int impl(Object val1,Object val2){
+                  return 0;
+              }
+          };
+      }
+      public void assertReverseSorted(MonitoredList<?> listMonitor){
+          if(listMonitor.size() > 1){
+              listMonitor.incrementModCount();
+              listMonitor.copyListContents();
+          }
+      }
+      public void assertSorted(MonitoredList<?> listMonitor){
+          if(listMonitor.size() > 1){
+              listMonitor.incrementModCount();
+              listMonitor.copyListContents();
+          }
+
+      }
+    },
     NullComparator(true,ComparatorType.NaturalOrder,null,true,0,false){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
@@ -590,7 +622,7 @@ public enum MonitoredComparatorGen{
         this.throwsContractViolationException=throwsContractViolationException;
     }
     public enum ComparatorType{
-        Ascending,Descending,NaturalOrder,ImmediatelyThrows;
+        Ascending,Descending,NaturalOrder,ImmediatelyThrows,Unsorted;
     }
     public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
         return null;

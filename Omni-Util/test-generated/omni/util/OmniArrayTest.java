@@ -1,40 +1,52 @@
 package omni.util;
+import java.util.function.DoublePredicate;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
+import java.util.function.Predicate;
+import java.util.Random;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import omni.function.CharPredicate;
+import omni.function.FloatPredicate;
+import omni.function.ShortPredicate;
+import omni.function.BooleanPredicate;
+import omni.function.ByteUnaryOperator;
+import omni.function.CharUnaryOperator;
+import omni.function.ShortUnaryOperator;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongUnaryOperator;
+import omni.function.FloatUnaryOperator;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.UnaryOperator;
+import java.util.Objects;
+import java.util.Arrays;
+import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
+import java.util.function.Consumer;
+import omni.function.CharConsumer;
+import omni.function.FloatConsumer;
+import omni.function.ShortConsumer;
+import omni.function.ByteConsumer;
+import omni.function.BooleanConsumer;
+import java.util.ArrayDeque;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Random;
-import java.util.function.Consumer;
-import java.util.function.DoubleConsumer;
-import java.util.function.DoublePredicate;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.IntConsumer;
-import java.util.function.IntPredicate;
-import java.util.function.IntUnaryOperator;
-import java.util.function.LongConsumer;
-import java.util.function.LongPredicate;
-import java.util.function.LongUnaryOperator;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import omni.function.BooleanConsumer;
-import omni.function.BooleanPredicate;
-import omni.function.ByteConsumer;
-import omni.function.ByteUnaryOperator;
-import omni.function.CharConsumer;
-import omni.function.CharPredicate;
-import omni.function.CharUnaryOperator;
-import omni.function.FloatConsumer;
-import omni.function.FloatPredicate;
-import omni.function.FloatUnaryOperator;
-import omni.function.ShortConsumer;
-import omni.function.ShortPredicate;
-import omni.function.ShortUnaryOperator;
 public class OmniArrayTest
 {
+  @Test
+  public void testMaxArraySize(){
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new boolean[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new byte[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new char[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new short[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new int[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new long[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new float[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new double[OmniArray.MAX_ARR_SIZE].length);
+    Assertions.assertEquals(OmniArray.MAX_ARR_SIZE,new Object[OmniArray.MAX_ARR_SIZE].length);
+  }
   private void testGrowBy100PctHelper(int currCapacityBaseLine){
       for(int i=-2;i<=2;++i){
           int currentCapacity=currCapacityBaseLine+i;
@@ -241,7 +253,7 @@ public class OmniArrayTest
       return (short)deque.remove();
     }
     @Override public int readUnsignedByte(){
-      return 0xff&(byte)deque.remove();
+      return ((0xff)&(int)(byte)deque.remove());
     }
     @Override public Object readObject(){
       return deque.remove();
@@ -419,8 +431,8 @@ public class OmniArrayTest
   public void testGetIndexPredicateChar()
   {
     var inputPred=new CharIndexPredicate();
-    char testVal=(char)1;
-    OmniArray.OfChar.getIndexPredicate(inputPred,(char)3,(char)2,testVal).test(2);
+    char testVal=(char)(1);
+    OmniArray.OfChar.getIndexPredicate(inputPred,(char)(3),(char)(2),testVal).test(2);
     Assertions.assertTrue(inputPred.captured==testVal);
   }
   private static class CharIndexPredicate implements CharPredicate
@@ -437,8 +449,8 @@ public class OmniArrayTest
   public void testGetIndexPredicateShort()
   {
     var inputPred=new ShortIndexPredicate();
-    short testVal=(short)1;
-    OmniArray.OfShort.getIndexPredicate(inputPred,(short)3,(short)2,testVal).test(2);
+    short testVal=(short)(1);
+    OmniArray.OfShort.getIndexPredicate(inputPred,(short)(3),(short)(2),testVal).test(2);
     Assertions.assertTrue(inputPred.captured==testVal);
   }
   private static class ShortIndexPredicate implements ShortPredicate
@@ -455,8 +467,8 @@ public class OmniArrayTest
   public void testGetIndexPredicateInt()
   {
     var inputPred=new IntIndexPredicate();
-    int testVal=1;
-    OmniArray.OfInt.getIndexPredicate(inputPred,3,2,testVal).test(2);
+    int testVal=(int)(1);
+    OmniArray.OfInt.getIndexPredicate(inputPred,(int)(3),(int)(2),testVal).test(2);
     Assertions.assertTrue(inputPred.captured==testVal);
   }
   private static class IntIndexPredicate implements IntPredicate
@@ -473,8 +485,8 @@ public class OmniArrayTest
   public void testGetIndexPredicateLong()
   {
     var inputPred=new LongIndexPredicate();
-    long testVal=1;
-    OmniArray.OfLong.getIndexPredicate(inputPred,3,2,testVal).test(2);
+    long testVal=(long)(1);
+    OmniArray.OfLong.getIndexPredicate(inputPred,(long)(3),(long)(2),testVal).test(2);
     Assertions.assertTrue(inputPred.captured==testVal);
   }
   private static class LongIndexPredicate implements LongPredicate
@@ -491,8 +503,8 @@ public class OmniArrayTest
   public void testGetIndexPredicateFloat()
   {
     var inputPred=new FloatIndexPredicate();
-    float testVal=1;
-    OmniArray.OfFloat.getIndexPredicate(inputPred,3,2,testVal).test(2);
+    float testVal=(float)(1);
+    OmniArray.OfFloat.getIndexPredicate(inputPred,(float)(3),(float)(2),testVal).test(2);
     Assertions.assertTrue(inputPred.captured==testVal);
   }
   private static class FloatIndexPredicate implements FloatPredicate
@@ -509,8 +521,8 @@ public class OmniArrayTest
   public void testGetIndexPredicateDouble()
   {
     var inputPred=new DoubleIndexPredicate();
-    double testVal=1;
-    OmniArray.OfDouble.getIndexPredicate(inputPred,3,2,testVal).test(2);
+    double testVal=(double)(1);
+    OmniArray.OfDouble.getIndexPredicate(inputPred,(double)(3),(double)(2),testVal).test(2);
     Assertions.assertTrue(inputPred.captured==testVal);
   }
   private static class DoubleIndexPredicate implements DoublePredicate
@@ -528,8 +540,8 @@ public class OmniArrayTest
   public void testGetIndexPredicateRef()
   {
     var inputPred=new RefIndexPredicate();
-    Double testVal=new Double(1);
-    OmniArray.OfRef.getIndexPredicate(inputPred,new Double(3),new Double(2),testVal).test(2);
+    Double testVal=(Double)new Double(1);
+    OmniArray.OfRef.getIndexPredicate(inputPred,(Double)new Double(3),(Double)new Double(2),testVal).test(2);
     Assertions.assertTrue(inputPred.captured==testVal);
   }
   private static class RefIndexPredicate implements Predicate<Double>
@@ -1182,7 +1194,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+Boolean.hashCode(arr[i]);
+      expectedHash=expectedHash*31+(
+        Boolean.hashCode(arr[i])
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
     OmniArray.OfBoolean.uncheckedReplaceAll(arr,0,arr.length,val->!val);
@@ -1190,7 +1204,7 @@ public class OmniArrayTest
     expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+Boolean.hashCode(arr[i]);
+      expectedHash=expectedHash*31+(Boolean.hashCode(arr[i]));
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1212,7 +1226,7 @@ public class OmniArrayTest
     expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
     {
-      expectedHash=expectedHash*31+Boolean.hashCode(arr[i]);
+      expectedHash=expectedHash*31+(Boolean.hashCode(arr[i]));
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1225,7 +1239,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+arr[i];
+      expectedHash=expectedHash*31+(
+        arr[i]
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1252,7 +1268,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+arr[i];
+      expectedHash=expectedHash*31+(
+        arr[i]
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1279,7 +1297,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+arr[i];
+      expectedHash=expectedHash*31+(
+        arr[i]
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1306,7 +1326,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+arr[i];
+      expectedHash=expectedHash*31+(
+        arr[i]
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1333,7 +1355,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+Long.hashCode(arr[i]);
+      expectedHash=expectedHash*31+(
+        Long.hashCode(arr[i])
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1360,7 +1384,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+Float.hashCode(arr[i]);
+      expectedHash=expectedHash*31+(
+        Float.hashCode(arr[i])
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1387,7 +1413,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+Double.hashCode(arr[i]);
+      expectedHash=expectedHash*31+(
+        Double.hashCode(arr[i])
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1414,7 +1442,9 @@ public class OmniArrayTest
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
     {
-      expectedHash=expectedHash*31+Objects.hashCode(arr[i]);
+      expectedHash=expectedHash*31+(
+        Objects.hashCode(arr[i])
+      );
     }
     Assertions.assertEquals(hash,expectedHash);
   }
@@ -1441,11 +1471,10 @@ public class OmniArrayTest
     var forwardCopier=new BooleanConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(boolean val)
+      public void accept(boolean val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfBoolean.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1459,11 +1488,10 @@ public class OmniArrayTest
     var reverseCopier=new BooleanConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(boolean val)
+      public void accept(boolean val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfBoolean.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1477,11 +1505,10 @@ public class OmniArrayTest
     var forwardCopier=new ByteConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(byte val)
+      public void accept(byte val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfByte.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1495,11 +1522,10 @@ public class OmniArrayTest
     var reverseCopier=new ByteConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(byte val)
+      public void accept(byte val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfByte.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1513,11 +1539,10 @@ public class OmniArrayTest
     var forwardCopier=new CharConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(char val)
+      public void accept(char val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfChar.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1531,11 +1556,10 @@ public class OmniArrayTest
     var reverseCopier=new CharConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(char val)
+      public void accept(char val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfChar.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1549,11 +1573,10 @@ public class OmniArrayTest
     var forwardCopier=new ShortConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(short val)
+      public void accept(short val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfShort.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1567,11 +1590,10 @@ public class OmniArrayTest
     var reverseCopier=new ShortConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(short val)
+      public void accept(short val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfShort.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1585,11 +1607,10 @@ public class OmniArrayTest
     var forwardCopier=new IntConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(int val)
+      public void accept(int val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfInt.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1603,11 +1624,10 @@ public class OmniArrayTest
     var reverseCopier=new IntConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(int val)
+      public void accept(int val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfInt.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1621,11 +1641,10 @@ public class OmniArrayTest
     var forwardCopier=new LongConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(long val)
+      public void accept(long val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfLong.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1639,11 +1658,10 @@ public class OmniArrayTest
     var reverseCopier=new LongConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(long val)
+      public void accept(long val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfLong.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1657,11 +1675,10 @@ public class OmniArrayTest
     var forwardCopier=new FloatConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(float val)
+      public void accept(float val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfFloat.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1675,11 +1692,10 @@ public class OmniArrayTest
     var reverseCopier=new FloatConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(float val)
+      public void accept(float val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfFloat.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1693,11 +1709,10 @@ public class OmniArrayTest
     var forwardCopier=new DoubleConsumer()
     {
       int currIndex=0;
-      @Override
-    public void accept(double val)
+      public void accept(double val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfDouble.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1711,11 +1726,10 @@ public class OmniArrayTest
     var reverseCopier=new DoubleConsumer()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(double val)
+      public void accept(double val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfDouble.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1729,11 +1743,10 @@ public class OmniArrayTest
     var forwardCopier=new Consumer<Integer>()
     {
       int currIndex=0;
-      @Override
-    public void accept(Integer val)
+      public void accept(Integer val)
       {
         copy[currIndex++]=val;
-      }
+      };
     };
     OmniArray.OfRef.ascendingForEach(arr,0,arr.length-1,forwardCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1747,11 +1760,10 @@ public class OmniArrayTest
     var reverseCopier=new Consumer<Integer>()
     {
       int currIndex=arr.length;
-      @Override
-    public void accept(Integer val)
+      public void accept(Integer val)
       {
         copy[--currIndex]=val;
-      }
+      };
     };
     OmniArray.OfRef.descendingForEach(arr,0,arr.length-1,reverseCopier);
     EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
@@ -1833,7 +1845,7 @@ public class OmniArrayTest
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     IntUnaryOperator manipulator=val->
     {
-      return val*val;
+      return (int)(val*val);
     };
     OmniArray.OfInt.uncheckedReplaceAll(arr,0,arr.length,manipulator);
     for(int i=0;i<arr.length;++i)
@@ -1850,7 +1862,7 @@ public class OmniArrayTest
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     LongUnaryOperator manipulator=val->
     {
-      return val*val;
+      return (long)(val*val);
     };
     OmniArray.OfLong.uncheckedReplaceAll(arr,0,arr.length,manipulator);
     for(int i=0;i<arr.length;++i)
@@ -1867,7 +1879,7 @@ public class OmniArrayTest
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     FloatUnaryOperator manipulator=val->
     {
-      return val*val;
+      return (float)(val*val);
     };
     OmniArray.OfFloat.uncheckedReplaceAll(arr,0,arr.length,manipulator);
     for(int i=0;i<arr.length;++i)
@@ -1884,7 +1896,7 @@ public class OmniArrayTest
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     DoubleUnaryOperator manipulator=val->
     {
-      return val*val;
+      return (double)(val*val);
     };
     OmniArray.OfDouble.uncheckedReplaceAll(arr,0,arr.length,manipulator);
     for(int i=0;i<arr.length;++i)
@@ -1901,7 +1913,7 @@ public class OmniArrayTest
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     UnaryOperator<Integer> manipulator=val->
     {
-      int i=val;
+      int i=(int)val;
       return (Integer)(i*i);
     };
     OmniArray.OfRef.uncheckedReplaceAll(arr,0,arr.length,manipulator);

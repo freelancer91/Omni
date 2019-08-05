@@ -1,10 +1,7 @@
 package omni.impl.seq;
 import omni.util.HashUtil;
 import omni.util.OmniArray;
-import omni.api.OmniDeque;
 import omni.util.ArrCopy;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -15,10 +12,13 @@ import omni.function.FloatConsumer;
 import omni.util.ToStringUtil;
 import omni.impl.AbstractFloatItr;
 import java.util.ConcurrentModificationException;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
+import omni.api.OmniDeque;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.io.Externalizable;
 import java.util.RandomAccess;
 public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,RandomAccess{
   private static final long serialVersionUID=1L;
@@ -44,9 +44,9 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
   }
   FloatArrDeq(int head,float[] arr,int tail){
     super();
-    this.arr=arr;
     this.head=head;
     this.tail=tail;
+    this.arr=arr;
   }
   @Override public int size(){
     int tail;
@@ -1459,7 +1459,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     return false;
   }
-  private boolean uncheckedcontainsBits(int tail
+  private
+  boolean uncheckedcontainsBits(int tail
   ,int bits
   ){
     final var arr=this.arr;
@@ -1469,7 +1470,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     return OmniArray.OfFloat.uncheckedcontainsBits(arr,head,tail,bits);
   }
-  private boolean uncheckedcontains0(int tail
+  private
+  boolean uncheckedcontains0(int tail
   ){
     final var arr=this.arr;
     final int head;
@@ -1478,7 +1480,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     return OmniArray.OfFloat.uncheckedcontains0(arr,head,tail );
   }
-  private boolean uncheckedcontainsNaN(int tail
+  private
+  boolean uncheckedcontainsNaN(int tail
   ){
     final var arr=this.arr;
     final int head;
@@ -1487,7 +1490,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     return OmniArray.OfFloat.uncheckedcontainsNaN(arr,head,tail );
   }
-  private int uncheckedsearchBits(int tail
+  private
+  int uncheckedsearchBits(int tail
   ,int bits
   ){
     final var arr=this.arr;
@@ -1520,7 +1524,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
       }
     }
   }
-  private int uncheckedsearch0(int tail
+  private
+  int uncheckedsearch0(int tail
   ){
     final var arr=this.arr;
     int head,prefix;
@@ -1552,7 +1557,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
       }
     }
   }
-  private int uncheckedsearchNaN(int tail
+  private
+  int uncheckedsearchNaN(int tail
   ){
     final var arr=this.arr;
     int head,prefix;
@@ -1658,7 +1664,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     return new FloatArrDeq();
   }
-  private String uncheckedToString(int tail){
+  private
+  String uncheckedToString(int tail){
     final var arr=this.arr;
     final byte[] buffer;
     int size,head,bufferOffset=1;
@@ -1710,7 +1717,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
       }
     }
   }
-  private int uncheckedHashCode(int tail){
+  private
+  int uncheckedHashCode(int tail){
     final float[] arr;
     int head;
     int hash=31+HashUtil.hashFloat((arr=this.arr)[head=this.head]);

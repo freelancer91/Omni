@@ -8,14 +8,14 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
+
 #IF OfDouble,OfFloat
 import omni.util.HashUtil;
 #ENDIF
 import omni.util.OmniArray;
-import omni.api.OmniDeque;
+
 import omni.util.ArrCopy;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
+
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -33,7 +33,7 @@ import omni.function.$TypeNameModifier$Consumer;
 #IFNOT OfDouble,OfChar,OfRef
 import omni.util.ToStringUtil;
 #ENDIF
-#IFNOT OfRef
+#IFNOT OfRef,OfBoolean
 import omni.impl.Abstract$TypeNameModifier$Itr;
 #ENDIF
 import java.util.ConcurrentModificationException;
@@ -41,20 +41,33 @@ import java.util.ConcurrentModificationException;
 import omni.util.OmniPred;
 import java.util.Objects;
 #ENDIF
-import java.io.Externalizable;
+
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
+#IF OfBoolean
+public class $ClassPrefix$ArrDeq$<E>$ extends AbstractBooleanArrDeq{
+#ELSE
+import omni.api.OmniDeque;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.io.Externalizable;
 import java.util.RandomAccess;
 public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,Externalizable,Cloneable,RandomAccess{
+#ENDIF
   private static final long serialVersionUID=1L;
   transient $ArrayType$[] arr;
+#IFNOT OfBoolean
   transient int head;
   transient int tail;
+#ENDIF 
+
   public $ClassPrefix$ArrDeq(){
     super();
     this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+#IFNOT OfBoolean
     this.tail=-1;
+#ENDIF
   }
   public $ClassPrefix$ArrDeq(int initialCapacity){
     super();
@@ -66,13 +79,19 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
     case 0:
     }
+#IFNOT OfBoolean
     this.tail=-1;
+#ENDIF
   }
   $ClassPrefix$ArrDeq(int head,$ArrayType$[] arr,int tail){
+#IF OfBoolean
+    super(head,tail);
+#ELSE
     super();
-    this.arr=arr;
     this.head=head;
     this.tail=tail;
+#ENDIF  
+    this.arr=arr;
   }
   @Override public int size(){
     int tail;
@@ -83,6 +102,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     return tail;
   }
+#IFNOT OfBoolean
   @Override public boolean isEmpty(){
     return this.tail==-1;
   }
@@ -104,7 +124,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     return false;
   }
   @Override public void clear(){
-#IF OfRef
+  #IF OfRef
     int tail;
     if((tail=this.tail)!=-1){
       final var arr=this.arr;
@@ -116,10 +136,11 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
       this.tail=-1;
     }
-#ELSE
+  #ELSE
     this.tail=-1;
-#ENDIF
+  #ENDIF
   }
+#ENDIF
   void uncheckedForEach(final int tail,$TypeNameModifier$Consumer$<? super E>$ action){
     final var arr=this.arr;
     int head;
@@ -129,22 +150,23 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     OmniArray.Of$ClassPrefix$.ascendingForEach(arr,head,tail,action);
   }
+#IFNOT OfBoolean
   @Override public boolean add($exposedType$ val){
     addLast(val);
     return true;
   }
-#IF OfInt,OfLong
+  #IF OfInt,OfLong
   @Override public boolean add(char val){
     addLast(($exposedType$)val);
     return true;
   }
-#ENDIF
-#IF OfInt,OfLong,OfShort
+  #ENDIF
+  #IF OfInt,OfLong,OfShort
   @Override public boolean add(byte val){
     addLast(($exposedType$)val);
     return true;
   }
-#ENDIF
+  #ENDIF
   @Override public void addFirst($exposedType$ val){
     push(val);
   }
@@ -156,6 +178,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     addLast(val);
     return true;
   }
+#ENDIF
   #MACRO SuppressUnchecked()
   @Override public $exposedType$ $elementMethod$(){
     return ($exposedType$)arr[head];
@@ -164,14 +187,17 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   @Override public $exposedType$ getLast$TypeNameModifier$(){
     return ($exposedType$)arr[tail];
   }
+#IFNOT OfBoolean
   @Override public boolean offer($exposedType$ val){
     addLast(val);
     return true;
   }
+
   #MACRO QueryMethods<contains>()
   #MACRO QueryMethods<removeVal>()
   #MACRO QueryMethods<removeLastOccurrence>()
   #MACRO QueryMethods<search>()
+#ENDIF
   #MACRO OutputMethods<false>(ToArrayImpl)
   #MACRO OutputMethods<false>(PeekImpl)
   #MACRO OutputMethods<false>(PollImpl)
@@ -240,6 +266,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     #ENDIF
   #ENDIF
 #ENDIF
+#IFNOT OfBoolean
   @Override public $BoxedType$ getFirst(){
     return $elementMethod$();
   }
@@ -258,6 +285,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   @Override public boolean removeFirstOccurrence(Object val){
     return remove(val);
   }
+#ENDIF
 #IF OfRef
   #MACRO UncheckedRemoveVal<false,NonNull>(nonNull.equals)
   #MACRO UncheckedRemoveVal<false,Null>(null==)
@@ -272,6 +300,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   #MACRO UncheckedSearch<Null>(null==)
   #MACRO UncheckedSearch< >(pred.test)
 #ELSE
+  #IFNOT OfBoolean
   @Override public $BoxedType$ pop(){
     return pop$TypeNameModifier$();
   }
@@ -309,6 +338,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     addLast(($exposedType$)val);
     return true;
   }
+  #ENDIF
   #IF OfFloat,OfDouble
   #MACRO UncheckedRemoveVal<false,Bits>(bits==$convertToBits$)
   #MACRO UncheckedRemoveVal<false,0>(0==)
@@ -328,6 +358,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   #MACRO UncheckedContains< >(\,val)
   #MACRO UncheckedSearch< >(val==)
   #ENDIF
+  #IFNOT OfBoolean
   @Override public void forEach(Consumer<? super $BoxedType$> action){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -345,7 +376,9 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     return false;
   }
+  #ENDIF
 #ENDIF
+#IFNOT OfBoolean
   @Override public String toString(){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -360,6 +393,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     return 1;
   }
+#ENDIF
   #MACRO SuppressUnchecked()
   @Override public $exposedType$ pop$TypeNameModifier$(){
     final $ArrayType$[] arr;
@@ -411,7 +445,10 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     return new $ClassPrefix$ArrDeq$<E>$();
   }
-  private String uncheckedToString(int tail){
+#IFNOT OfBoolean
+  private
+#ENDIF
+  String uncheckedToString(int tail){
     final var arr=this.arr;
 #IF OfDouble,OfRef
     final var builder=new StringBuilder("[");
@@ -548,7 +585,10 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
 #ENDIF
   }
-  private int uncheckedHashCode(int tail){
+#IFNOT OfBoolean
+  private
+#ENDIF
+  int uncheckedHashCode(int tail){
     final $ArrayType$[] arr;
     int head;
     int hash=31+$hashCodeMethod$((arr=this.arr)[head=this.head]);
@@ -690,6 +730,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     arr[tail]=null;
 #ENDIF
   }
+#IFNOT OfBoolean
   private static abstract class AbstractDeqItr$<E>$
 #IF OfRef
     implements OmniIterator.Of$ClassPrefix$$<E>$
@@ -726,6 +767,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
 #ENDIF 
   }
+#ENDIF
   private static int pullUp($ArrayType$[] arr,int head,int headDist){
 #IF OfRef
     final int tmp;
@@ -3880,6 +3922,14 @@ boolean uncheckedremoveValSUFFIX(int tail
   #ENDIF
           this.modCount=modCount+1;
 #ENDIF
+#IF OfBoolean
+          if(++head>bound){
+            this.head=0;
+          }else{
+            arr[index]=!val;
+            this.head=head;
+          }
+#ELSE
           int headDist,tailDist;
           if((headDist=index-head)<=((tailDist=bound-index)+tail)){
   #IF OfRef
@@ -3899,6 +3949,7 @@ boolean uncheckedremoveValSUFFIX(int tail
   #ENDIF
             this.tail=(--tail==-1)?bound:tail;
           }
+#ENDIF
           return true;
         }else if(index==bound){
           for(index=0;;++index){
@@ -3909,6 +3960,10 @@ boolean uncheckedremoveValSUFFIX(int tail
   #ENDIF
               this.modCount=modCount+1;
 #ENDIF
+#IF OfBoolean
+              arr[index]=!val;
+              this.head=(++head>bound)?0:head;
+#ELSE
               int headDist,tailDist;
               if((headDist=bound-head)+index+1<(tailDist=tail-index)){
                 ArrCopy.semicheckedCopy(arr,0,arr,1,index);
@@ -3928,6 +3983,7 @@ boolean uncheckedremoveValSUFFIX(int tail
   #ENDIF
                 this.tail=(--tail==-1)?bound:tail;
               }
+#ENDIF
               return true;
             }else if(index==tail){
               break;
@@ -3945,6 +4001,15 @@ boolean uncheckedremoveValSUFFIX(int tail
   #ENDIF
           this.modCount=modCount+1;
 #ENDIF
+#IF OfBoolean
+          
+          if(head==tail){
+            this.tail=-1;
+          }else{
+            arr[index]=!val;
+            this.head=head+1;
+          }
+#ELSE
           int headDist,tailDist;
           if((tailDist=tail-index)<=(headDist=index-head)){
             if(headDist==0){
@@ -3966,6 +4031,7 @@ boolean uncheckedremoveValSUFFIX(int tail
             this.head=head;
     #ENDIF
           }
+#ENDIF
           return true;
         }else if(index==tail){
           break;
@@ -4014,6 +4080,14 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
   #ENDIF
           this.modCount=modCount+1;
 #ENDIF
+#IF OfBoolean
+          if(--tail==-1){
+            this.tail=bound;
+          }else{
+            arr[index]=!val;
+            this.tail=tail;
+          }
+#ELSE
           int headDist,tailDist;
           if((headDist=bound-head)+index+1<(tailDist=tail-index)){
             ArrCopy.semicheckedCopy(arr,0,arr,1,index);
@@ -4033,6 +4107,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
   #ENDIF
             this.tail=(--tail==-1)?bound:tail;
           }
+#ENDIF
           return true;
         }else if(index==0){
           for(index=bound;;--index){
@@ -4043,6 +4118,10 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
   #ENDIF
               this.modCount=modCount+1;
 #ENDIF
+#IF OfBoolean
+              arr[index]=!val;
+              this.tail=(--tail==-1)?bound:tail;
+#ELSE
               int headDist,tailDist;
               if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
   #IF OfRef
@@ -4062,6 +4141,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
   #ENDIF
                 this.tail=(--tail==-1)?bound:tail;
               }
+#ENDIF
               return true;
             }else if(index==head){
               break;
@@ -4079,6 +4159,14 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
   #ENDIF
           this.modCount=modCount+1;
 #ENDIF
+#IF OfBoolean
+          if(head==tail){
+             this.tail=-1;
+          }else{
+             arr[index]=!val;
+             this.tail=tail-1;
+          }
+#ELSE
           int headDist,tailDist;
           if((tailDist=tail-index)<=(headDist=index-head)){
             if(headDist==0){
@@ -4100,6 +4188,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
             this.head=head;
     #ENDIF
           }
+#ENDIF
           return true;
         }else if(index==head){
           break;
@@ -4121,7 +4210,10 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
 }
 #ENDDEF
 #MACRODEF UncheckedContains<SUFFIX>(PARAM)
-private boolean uncheckedcontainsSUFFIX(int tail
+#IFNOT OfBoolean
+private
+#ENDIF
+boolean uncheckedcontainsSUFFIX(int tail
 #MACRO UncheckedQueryParam()
 ){
   final var arr=this.arr;
@@ -4133,7 +4225,10 @@ private boolean uncheckedcontainsSUFFIX(int tail
 }
 #ENDDEF
 #MACRODEF UncheckedSearch<SUFFIX>(TEST)
-private int uncheckedsearchSUFFIX(int tail
+#IFNOT OfBoolean
+private
+#ENDIF
+int uncheckedsearchSUFFIX(int tail
 #MACRO UncheckedQueryParam()
 ){
   final var arr=this.arr;

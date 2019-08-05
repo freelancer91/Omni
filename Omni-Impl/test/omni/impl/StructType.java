@@ -42,7 +42,7 @@ public enum StructType{
             return EnumSet.noneOf(MonitoredComparatorGen.class);
         case "ArrList":
         case "DblLnkList":
-            return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,
+            return EnumSet.of(MonitoredComparatorGen.NoThrowUnsorted,MonitoredComparatorGen.ModCollectionAscending,
                     MonitoredComparatorGen.ModCollectionDescending,MonitoredComparatorGen.ModCollectionThrowAIOB,
                     MonitoredComparatorGen.ModCollectionThrowIOB,MonitoredComparatorGen.NoThrowAscending,
                     MonitoredComparatorGen.NoThrowDescending,MonitoredComparatorGen.NullComparator,
@@ -55,12 +55,12 @@ public enum StructType{
         case "DblLnkSubList":
             return EnumSet.allOf(MonitoredComparatorGen.class);
         case "PackedBooleanArrList":
-            return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,
+            return EnumSet.of(MonitoredComparatorGen.NoThrowUnsorted,MonitoredComparatorGen.ModCollectionAscending,
                     MonitoredComparatorGen.ModCollectionDescending,
                     MonitoredComparatorGen.ModCollectionThrowIOB,MonitoredComparatorGen.NoThrowAscending,
                     MonitoredComparatorGen.NoThrowDescending,MonitoredComparatorGen.NullComparator,MonitoredComparatorGen.ThrowIOB);
         case "PackedBooleanArrSubList":
-            return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,MonitoredComparatorGen.ModCollectionDescending,MonitoredComparatorGen.ModCollectionThrowIOB,MonitoredComparatorGen.ModParentAscending,MonitoredComparatorGen.ModParentDescending,MonitoredComparatorGen.ModParentThrowIOB,MonitoredComparatorGen.ModRootAscending,MonitoredComparatorGen.ModRootDescending,MonitoredComparatorGen.ModRootThrowIOB,MonitoredComparatorGen.NoThrowAscending,MonitoredComparatorGen.NoThrowDescending,MonitoredComparatorGen.NullComparator,MonitoredComparatorGen.ThrowIOB);
+            return EnumSet.of(MonitoredComparatorGen.NoThrowUnsorted,MonitoredComparatorGen.ModCollectionAscending,MonitoredComparatorGen.ModCollectionDescending,MonitoredComparatorGen.ModCollectionThrowIOB,MonitoredComparatorGen.ModParentAscending,MonitoredComparatorGen.ModParentDescending,MonitoredComparatorGen.ModParentThrowIOB,MonitoredComparatorGen.ModRootAscending,MonitoredComparatorGen.ModRootDescending,MonitoredComparatorGen.ModRootThrowIOB,MonitoredComparatorGen.NoThrowAscending,MonitoredComparatorGen.NoThrowDescending,MonitoredComparatorGen.NullComparator,MonitoredComparatorGen.ThrowIOB);
         }
         throw structType.invalid();
     }

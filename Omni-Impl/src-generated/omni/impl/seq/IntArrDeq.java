@@ -1,9 +1,6 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
-import omni.api.OmniDeque;
 import omni.util.ArrCopy;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -14,10 +11,13 @@ import java.util.function.IntConsumer;
 import omni.util.ToStringUtil;
 import omni.impl.AbstractIntItr;
 import java.util.ConcurrentModificationException;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
+import omni.api.OmniDeque;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.io.Externalizable;
 import java.util.RandomAccess;
 public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,RandomAccess{
   private static final long serialVersionUID=1L;
@@ -43,9 +43,9 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
   }
   IntArrDeq(int head,int[] arr,int tail){
     super();
-    this.arr=arr;
     this.head=head;
     this.tail=tail;
+    this.arr=arr;
   }
   @Override public int size(){
     int tail;
@@ -1084,7 +1084,8 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     }
     return false;
   }
-  private boolean uncheckedcontains (int tail
+  private
+  boolean uncheckedcontains (int tail
   ,int val
   ){
     final var arr=this.arr;
@@ -1094,7 +1095,8 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     }
     return OmniArray.OfInt.uncheckedcontains (arr,head,tail,val);
   }
-  private int uncheckedsearch (int tail
+  private
+  int uncheckedsearch (int tail
   ,int val
   ){
     final var arr=this.arr;
@@ -1201,7 +1203,8 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     }
     return new IntArrDeq();
   }
-  private String uncheckedToString(int tail){
+  private
+  String uncheckedToString(int tail){
     final var arr=this.arr;
     final byte[] buffer;
     int size,head,bufferOffset=1;
@@ -1253,7 +1256,8 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
       }
     }
   }
-  private int uncheckedHashCode(int tail){
+  private
+  int uncheckedHashCode(int tail){
     final int[] arr;
     int head;
     int hash=31+((arr=this.arr)[head=this.head]);

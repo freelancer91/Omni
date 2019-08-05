@@ -1,10 +1,7 @@
 package omni.impl.seq;
 import omni.util.HashUtil;
 import omni.util.OmniArray;
-import omni.api.OmniDeque;
 import omni.util.ArrCopy;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -14,10 +11,13 @@ import java.util.function.DoublePredicate;
 import java.util.function.DoubleConsumer;
 import omni.impl.AbstractDoubleItr;
 import java.util.ConcurrentModificationException;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
+import omni.api.OmniDeque;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.io.Externalizable;
 import java.util.RandomAccess;
 public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable,RandomAccess{
   private static final long serialVersionUID=1L;
@@ -43,9 +43,9 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
   }
   DoubleArrDeq(int head,double[] arr,int tail){
     super();
-    this.arr=arr;
     this.head=head;
     this.tail=tail;
+    this.arr=arr;
   }
   @Override public int size(){
     int tail;
@@ -1225,7 +1225,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return false;
   }
-  private boolean uncheckedcontainsBits(int tail
+  private
+  boolean uncheckedcontainsBits(int tail
   ,long bits
   ){
     final var arr=this.arr;
@@ -1235,7 +1236,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return OmniArray.OfDouble.uncheckedcontainsBits(arr,head,tail,bits);
   }
-  private boolean uncheckedcontains0(int tail
+  private
+  boolean uncheckedcontains0(int tail
   ){
     final var arr=this.arr;
     final int head;
@@ -1244,7 +1246,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return OmniArray.OfDouble.uncheckedcontains0(arr,head,tail );
   }
-  private boolean uncheckedcontainsNaN(int tail
+  private
+  boolean uncheckedcontainsNaN(int tail
   ){
     final var arr=this.arr;
     final int head;
@@ -1253,7 +1256,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return OmniArray.OfDouble.uncheckedcontainsNaN(arr,head,tail );
   }
-  private int uncheckedsearchBits(int tail
+  private
+  int uncheckedsearchBits(int tail
   ,long bits
   ){
     final var arr=this.arr;
@@ -1286,7 +1290,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
       }
     }
   }
-  private int uncheckedsearch0(int tail
+  private
+  int uncheckedsearch0(int tail
   ){
     final var arr=this.arr;
     int head,prefix;
@@ -1318,7 +1323,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
       }
     }
   }
-  private int uncheckedsearchNaN(int tail
+  private
+  int uncheckedsearchNaN(int tail
   ){
     final var arr=this.arr;
     int head,prefix;
@@ -1424,7 +1430,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return new DoubleArrDeq();
   }
-  private String uncheckedToString(int tail){
+  private
+  String uncheckedToString(int tail){
     final var arr=this.arr;
     final var builder=new StringBuilder("[");
     int head;
@@ -1444,7 +1451,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
       }
     }
   }
-  private int uncheckedHashCode(int tail){
+  private
+  int uncheckedHashCode(int tail){
     final double[] arr;
     int head;
     int hash=31+HashUtil.hashDouble((arr=this.arr)[head=this.head]);

@@ -657,6 +657,84 @@ static interface CLASSPREFIXSnglLnkSeq{
   }
 }
 #IFSWITCH CLASSPREFIX==Boolean
+static interface PackedCLASSPREFIXArrDeq{
+  public static int head(Object obj){
+    return ((omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)obj).head;
+  }
+  public static int tail(Object obj){
+    return ((omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)obj).tail;
+  }
+  public static long[] words(Object obj){
+    return ((omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)obj).words;
+  }
+  public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+    ((Externalizable)obj).writeExternal(oos);
+  }
+  static interface Checked extends PackedCLASSPREFIXArrDeq{
+    public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)obj).tail;
+    }
+    public static long[] words(Object obj){
+      return ((omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)obj).words;
+    }
+    public static int modCount(Object obj){
+      return ((omni.impl.seq.PackedCLASSPREFIXArrDeq.CheckedTYPEPARAMETER)obj).modCount;
+    }
+    public static AscendingItr{
+      static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+      static final Field modCountField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+      
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+      static int cursor(Object obj){
+        return ((omni.impl.seq.AbstractCLASSPREFIXArrDeq.AbstractDeqItr)obj).cursor;
+      }
+      static int lastRet(Object obj){
+        return getIntField(lastRetField,obj);
+      }
+      static int modCount(Object obj){
+        return getIntField(modCountField,obj);
+      }
+      static omni.impl.seq.PackedCLASSPREFIXArrDeq.CheckedTYPEPARAMETER root(Object obj){
+        return (omni.impl.seq.PackedCLASSPREFIXArrDeq.CheckedTYPEPARAMETER)getValue(rootField,obj);
+      }
+    }
+    public static DescendingItr extends AscendingItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrDeq"+DOLLARSIGN+"DescendingItr","root");
+      static int cursor(Object obj){
+        return ((omni.impl.seq.AbstractCLASSPREFIXArrDeq.AbstractDeqItr)obj).cursor;
+      }
+      static omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER root(Object obj){
+        return (omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)getValue(rootField,obj);
+      }
+    }
+  
+    
+  }
+  public static AscendingItr{
+    static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrDeq"+DOLLARSIGN+"AscendingItr","root");
+    static int cursor(Object obj){
+      return ((omni.impl.seq.AbstractCLASSPREFIXArrDeq.AbstractDeqItr)obj).cursor;
+    }
+    static omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER root(Object obj){
+      return (omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)getValue(rootField,obj);
+    }
+  }
+  public static DescendingItr extends AscendingItr{
+    static int cursor(Object obj){
+      return ((omni.impl.seq.AbstractCLASSPREFIXArrDeq.AbstractDeqItr)obj).cursor;
+    }
+    static omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER root(Object obj){
+      return (omni.impl.seq.PackedCLASSPREFIXArrDeqTYPEPARAMETER)getValue(rootField,obj);
+    }
+  }
+  
+}
 static interface PackedCLASSPREFIXArrSeq{
   public static int size(Object obj){
     return ((omni.impl.seq.PackedCLASSPREFIXArrSeqTYPEPARAMETER)obj).size;
