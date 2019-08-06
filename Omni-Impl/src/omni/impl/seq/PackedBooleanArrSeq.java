@@ -1322,10 +1322,10 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         if((size & 63) == 0){
                             ArrCopy.uncheckedSelfCopy(words,size >> 6,offset >> 6,(tailLength - 1 >> 6) + 1);
                         }else{
-                            BitSetUtil.srcUnallignedPullDown(words,offset >> 6,size,rootBound - 1 >> 6);
+                            BitSetUtil.srcUnalignedPullDown(words,offset >> 6,size,rootBound - 1 >> 6);
                         }
                     }else{
-                        BitSetUtil.dstUnallignedPullDown(words,offset,size,rootBound - 1 >> 6);
+                        BitSetUtil.dstUnalignedPullDown(words,offset,size,rootBound - 1 >> 6);
                     }
                 }
             }
@@ -4607,10 +4607,10 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         if((size & 63) == 0){
                             ArrCopy.uncheckedSelfCopy(words,size >> 6,offset >> 6,(tailLength - 1 >> 6) + 1);
                         }else{
-                            BitSetUtil.srcUnallignedPullDown(words,offset >> 6,size,rootBound - 1 >> 6);
+                            BitSetUtil.srcUnalignedPullDown(words,offset >> 6,size,rootBound - 1 >> 6);
                         }
                     }else{
-                        BitSetUtil.dstUnallignedPullDown(words,offset,size,rootBound - 1 >> 6);
+                        BitSetUtil.dstUnalignedPullDown(words,offset,size,rootBound - 1 >> 6);
                     }
                 }
             }

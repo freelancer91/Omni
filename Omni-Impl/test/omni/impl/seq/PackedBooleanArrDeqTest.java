@@ -1,8 +1,8 @@
 package omni.impl.seq;
 
 import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
 import org.junit.jupiter.api.Assertions;
-import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
@@ -10,8 +10,8 @@ import omni.impl.IteratorType;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.StructType;
-import omni.util.OmniArray;
 import omni.util.BitSetUtil;
+import omni.util.OmniArray;
 
 public class PackedBooleanArrDeqTest{
   private static class PackedBooleanArrDeqMonitor extends AbstractArrDeqMonitor<PackedBooleanArrDeq,Boolean>{
@@ -19,7 +19,8 @@ public class PackedBooleanArrDeqTest{
       AbstractItrMonitor(OmniIterator<?> itr,int expectedCursor,int numLeft){
         super(itr,expectedCursor,numLeft);
       }
-      IntConsumer getForEachRemainingVerifier(MonitoredFunction function){
+      @Override
+    IntConsumer getForEachRemainingVerifier(MonitoredFunction function){
         final var functionItr=function.iterator();
 
         final var expectedArr=(long[])PackedBooleanArrDeqMonitor.this.expectedArr;
@@ -78,16 +79,15 @@ public class PackedBooleanArrDeqTest{
             final int arrBound=expectedCapacity - 1;
             int head=expectedHead;
             final int headDist=arrBound - head;
-            final var arr=expectedArr;
+            final var arr=(long[])expectedArr;
             if(tail < headDist){
-              BitSetUtil.arraycopy(arr,0,arr,arrBound,1);
-              BitSetUtil.arraycopy(arr,1,arr,0,tail);
-              System.arraycopy(arr,1,arr,0,tail);
+              BitSetUtil.uncheckedCopy(arr,0,arr,arrBound,1);
+              BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
+              BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
               expectedTail=tail == 0?arrBound:tail - 1;
               expectedCursor=arrBound;
             }else{
-              int tmp;
-              BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+              BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
               expectedHead=headDist == 0?0:head;
             }
             break;
@@ -141,7 +141,7 @@ public class PackedBooleanArrDeqTest{
         int tail=expectedTail;
         final int lastRet=expectedLastRet;
         final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        final var arr=(long[])expectedArr;
         int headDist=expectedLastRet - head;
         if(headDist >= 0){
           final int tailDist=arrBound - lastRet;
@@ -153,13 +153,13 @@ public class PackedBooleanArrDeqTest{
                 expectedHead=head + 1;
               }
             }else{
-              BitSetUtil.arraycopy(expectedArr,tail=head,arr,++head,headDist);
+              BitSetUtil.uncheckedCopy(arr,tail=head,arr,++head,headDist);
               expectedHead=head;
             }
           }else{
-            BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-            BitSetUtil.arraycopy(arr,0,arr,arrBound,1);
-            BitSetUtil.arraycopy(arr,1,arr,0,tail);
+            BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
+            BitSetUtil.uncheckedCopy(arr,0,arr,arrBound,1);
+            BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
             if(tail == 0){
               expectedTail=arrBound;
             }else{
@@ -178,15 +178,14 @@ public class PackedBooleanArrDeqTest{
                 expectedTail=tail - 1;
               }
             }else{
-              BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
+              BitSetUtil.uncheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
               expectedTail=tail - 1;
               expectedCursor=lastRet;
             }
           }else{
-            BitSetUtil.arraycopy(arr,0,arr,1,lastRet);
-            BitSetUtil.arraycopy(arr,arrBound,arr,0,1);
-            int tmp;
-            BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+            BitSetUtil.semicheckedCopy(arr,0,arr,1,lastRet);
+            BitSetUtil.uncheckedCopy(arr,arrBound,arr,0,1);
+            BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
             expectedHead=headDist == 0?0:head;
           }
         }
@@ -197,13 +196,12 @@ public class PackedBooleanArrDeqTest{
         final int lastRet=expectedLastRet;
         final int headDist=lastRet - head;
         final int tailDist=tail - lastRet;
-        final var arr=expectedArr;
+        final var arr=(long[])expectedArr;
         if(headDist <= tailDist){
-          int tmp;
-          BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+          BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
           expectedHead=head;
         }else{
-          BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
+          BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
           if(expectedCursor != -1){
             expectedCursor=lastRet;
           }
@@ -215,18 +213,17 @@ public class PackedBooleanArrDeqTest{
         final int tail=expectedTail;
         final int lastRet=expectedLastRet;
         final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        final var arr=(long[])expectedArr;
         int headDist=expectedLastRet - head;
         if(headDist >= 0){
           final int tailDist=arrBound - lastRet;
           if(headDist <= tailDist + tail + 1){
-            int tmp;
-            BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+            BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
             expectedHead=head;
           }else{
-            BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-            BitSetUtil.arraycopy(arr,0,arr,arrBound,1);
-            BitSetUtil.arraycopy(arr,1,arr,0,tail);
+            BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
+            BitSetUtil.uncheckedCopy(arr,0,arr,arrBound,1);
+            BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
             expectedTail=tail == 0?arrBound:tail - 1;
             expectedCursor=lastRet;
           }
@@ -234,14 +231,13 @@ public class PackedBooleanArrDeqTest{
           final int tailDist=tail - lastRet;
           headDist=arrBound - head;
           if(tailDist <= headDist + lastRet + 1){
-            BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
+            BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
             expectedTail=tail - 1;
             expectedCursor=lastRet;
           }else{
-            BitSetUtil.arraycopy(arr,0,arr,1,lastRet);
-            BitSetUtil.arraycopy(arr,arrBound,arr,0,1);
-            int tmp;
-            BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+            BitSetUtil.semicheckedCopy(arr,0,arr,1,lastRet);
+            BitSetUtil.uncheckedCopy(arr,arrBound,arr,0,1);
+            BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
             expectedHead=headDist == 0?0:head;
           }
         }
@@ -343,7 +339,7 @@ public class PackedBooleanArrDeqTest{
         int head=expectedHead;
         int tail=expectedTail;
         final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        final var arr=(long[])expectedArr;
         final int lastRet=expectedLastRet;
         int headDist=expectedLastRet - head;
         if(headDist >= 0){
@@ -356,14 +352,14 @@ public class PackedBooleanArrDeqTest{
                 expectedHead=head + 1;
               }
             }else{
-              BitSetUtil.arraycopy(arr,tail=head,arr,++head,headDist);
+              BitSetUtil.uncheckedCopy(arr,tail=head,arr,++head,headDist);
               expectedHead=head;
               expectedCursor=lastRet;
             }
           }else{
-            BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-            BitSetUtil.arraycopy(arr,0,arr,arrBound,1);
-            BitSetUtil.arraycopy(arr,1,arr,0,tail);
+            BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
+            BitSetUtil.uncheckedCopy(arr,0,arr,arrBound,1);
+            BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
             expectedTail=tail == 0?arrBound:tail - 1;
           }
         }else{
@@ -377,14 +373,13 @@ public class PackedBooleanArrDeqTest{
                 expectedTail=tail - 1;
               }
             }else{
-              BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
+              BitSetUtil.uncheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
               expectedTail=tail - 1;
             }
           }else{
-            BitSetUtil.arraycopy(arr,0,arr,1,lastRet);
-            BitSetUtil.arraycopy(arr,arrBound,arr,0,1);
-            int tmp;
-            BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+            BitSetUtil.semicheckedCopy(arr,0,arr,1,lastRet);
+            BitSetUtil.uncheckedCopy(arr,arrBound,arr,0,1);
+            BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
             expectedHead=headDist == 0?0:head;
             expectedCursor=lastRet;
           }
@@ -393,16 +388,15 @@ public class PackedBooleanArrDeqTest{
       private void nonfragmentedRemove(){
         final int tail=expectedTail;
         int head=expectedHead;
-        final var arr=expectedArr;
+        final var arr=(long[])expectedArr;
         final int lastRet=expectedLastRet;
         final int headDist=lastRet - head;
         final int tailDist=tail - lastRet;
         if(tailDist <= headDist){
-          BitSetUtil.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
+          BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
           expectedTail=tail - 1;
         }else{
-          int tmp;
-          BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+          BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
           expectedHead=head;
           if(expectedCursor != -1){
             expectedCursor=lastRet;
@@ -413,16 +407,15 @@ public class PackedBooleanArrDeqTest{
         int head=expectedHead;
         int tail=expectedTail;
         final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        final var arr=(long[])expectedArr;
         int cursor=expectedCursor;
         if(arrBound == cursor){
           if(tail <= (cursor=arrBound - head) + 1){
-            BitSetUtil.arraycopy(arr,1,arr,0,tail);
+            BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
             expectedTail=tail == 0?arrBound:tail - 1;
           }else{
-            BitSetUtil.arraycopy(arr,arrBound,arr,0,1);
-            int tmp;
-            BitSetUtil.arraycopy(arr,tmp=head,arr,++head,cursor);
+            BitSetUtil.uncheckedCopy(arr,arrBound,arr,0,1);
+            BitSetUtil.semicheckedCopy(arr,head,arr,++head,cursor);
             expectedHead=cursor == 0?0:head;
             expectedCursor=0;
           }
@@ -431,26 +424,25 @@ public class PackedBooleanArrDeqTest{
           if(headDist > 0){
             final int tailDist=arrBound - cursor;
             if(headDist <= tailDist + tail + 1){
-              BitSetUtil.arraycopy(arr,tail=head,arr,++head,headDist);
+              BitSetUtil.uncheckedCopy(arr,tail=head,arr,++head,headDist);
               expectedHead=head;
               expectedCursor=cursor;
             }else{
-              BitSetUtil.arraycopy(arr,cursor + 1,arr,cursor,tailDist);
-              BitSetUtil.arraycopy(arr,0,arr,arrBound,1);
-              BitSetUtil.arraycopy(arr,1,arr,0,tail);
+              BitSetUtil.semicheckedCopy(arr,cursor + 1,arr,cursor,tailDist);
+              BitSetUtil.uncheckedCopy(arr,0,arr,arrBound,1);
+              BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
               expectedTail=tail == 0?arrBound:tail - 1;
             }
           }else{
             final int tailDist=tail - cursor;
             headDist=arrBound - head;
             if(tailDist <= headDist + cursor + 1){
-              BitSetUtil.arraycopy(arr,cursor + 1,arr,cursor,tailDist);
+              BitSetUtil.semicheckedCopy(arr,cursor + 1,arr,cursor,tailDist);
               expectedTail=tail - 1;
             }else{
-              BitSetUtil.arraycopy(arr,0,arr,1,cursor);
-              BitSetUtil.arraycopy(arr,arrBound,arr,0,1);
-              int tmp;
-              BitSetUtil.arraycopy(arr,tmp=head,arr,++head,headDist);
+              BitSetUtil.semicheckedCopy(arr,0,arr,1,cursor);
+              BitSetUtil.uncheckedCopy(arr,arrBound,arr,0,1);
+              BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
               expectedHead=headDist == 0?0:head;
               expectedCursor=cursor;
             }
@@ -492,45 +484,378 @@ public class PackedBooleanArrDeqTest{
     }
     
     @Override public void updateAddFirstState(Object inputVal,DataType inputType){
-      //TODO
-      throw new UnsupportedOperationException();
-    }
+        if(expectedSize == 0){
+            if(expectedCapacity == 0){
+              expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=64)];
+            }
+            expectedHead=expectedCapacity - 1;
+            expectedTail=expectedCapacity - 1;
+            BitSetUtil.storeInPackedArr((long[])expectedArr,expectedCapacity - 1,(boolean)inputVal);
+          }else{
+            int head;
+            int tail;
+            if((tail=expectedTail) == (head=expectedHead - 1)){
+              long[] newArr;
+              int newCap,size;
+              expectedTail=(newCap=OmniArray.growBy50Pct(head + (size=expectedCapacity))) - 1;
+              expectedCapacity=newCap;
+              newArr=new long[BitSetUtil.getPackedCapacity(newCap)];
+              BitSetUtil.semicheckedCopy((long[])expectedArr,0,newArr,newCap-=++tail,tail);
+              BitSetUtil.semicheckedCopy((long[])expectedArr,head + 1,newArr,head=newCap - (size-=tail),size);
+              expectedArr=newArr;
+              --head;
+            }else if(head == -1 && tail == (head=expectedCapacity - 1)){
+              int newCap;
+              expectedTail=(newCap=OmniArray.growBy50Pct(++tail)) - 1;
+              expectedCapacity=newCap;
+              BitSetUtil.semicheckedCopy((long[])expectedArr,0,(long[])(expectedArr=new long[BitSetUtil.getPackedCapacity(newCap)]),head=newCap - tail,tail);
+              --head;
+            }
+            BitSetUtil.storeInPackedArr((long[])expectedArr,head,(boolean)inputVal);
+            dataType.convertValAndStoreInArray(head,expectedArr,inputVal,inputType);
+            expectedHead=head;
+          }
+          ++expectedModCount;
+          ++expectedSize;
+        }
 
     @Override public void updateAddState(Object inputVal,DataType inputType){
-      //TODO
-      throw new UnsupportedOperationException();
-    }
+        if(expectedSize == 0){
+            if(expectedCapacity == 0){
+
+                expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=64)];
+            }
+            expectedHead=0;
+            expectedTail=0;
+            BitSetUtil.storeInPackedArr((long[])expectedArr,0,(boolean)inputVal);
+          }else{
+            int head;
+            int tail;
+            if((tail=expectedTail + 1) == (head=expectedHead)){
+              expectedHead=0;
+              tail=expectedCapacity;
+              final long[] newArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=OmniArray.growBy50Pct(tail))];
+              BitSetUtil.storeInPackedArr(newArr,tail,(boolean)inputVal);
+              expectedTail=tail;
+              BitSetUtil.semicheckedCopy((long[])expectedArr,head,newArr,0,tail-=head);
+              BitSetUtil.semicheckedCopy((long[])expectedArr,0,newArr,tail,head);
+              expectedArr=newArr;
+            }else{
+              if(tail == expectedCapacity){
+                if(head == 0){
+                 BitSetUtil.semicheckedCopy((long[])expectedArr,0,(long[])(expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=OmniArray.growBy50Pct(tail))]),0,tail);
+                }else{
+                  tail=0;
+                }
+              }
+              BitSetUtil.storeInPackedArr((long[])expectedArr,tail,(boolean)inputVal);
+              expectedTail=tail;
+            }
+          }
+          ++expectedModCount;
+          ++expectedSize;
+        }
 
     @Override public void updateCollectionState(){
-      //TODO
-      throw new UnsupportedOperationException();
+        long[] actualArr;
+        int actualCapacity;
+        final var checked=checkedType.checked;
+        final var cast=seq;
+        expectedHead=cast.head;
+        expectedTail=cast.tail;
+        actualArr=cast.words;
+        actualCapacity=cast.words == null?0:cast.words.length<<6;
+        if(checked){
+          expectedModCount=((PackedBooleanArrDeq.Checked)cast).modCount;
+        }
+        if(actualArr == null){
+            expectedArr=actualArr;
+            expectedCapacity=0;
+            expectedSize=0;
+          }else if(expectedCapacity != actualCapacity){
+            expectedCapacity=actualCapacity;
+            expectedArr=new long[BitSetUtil.getPackedCapacity(actualCapacity)];
+            if(expectedTail == -1){
+              expectedSize=0;
+            }else if(expectedTail < expectedHead){
+              BitSetUtil.uncheckedCopy(actualArr,expectedHead,(long[])expectedArr,expectedHead,actualCapacity - expectedHead);
+              BitSetUtil.uncheckedCopy(actualArr,0,(long[])expectedArr,0,expectedTail + 1);
+              expectedSize=actualCapacity - expectedHead + expectedTail + 1;
+            }else{
+              BitSetUtil.semicheckedCopy(actualArr,expectedHead,(long[])expectedArr,expectedHead,
+                  expectedSize=expectedTail + 1 - expectedHead);
+             
+            }
+          }else if(expectedTail == -1){
+            expectedSize=0;
+          }else if(expectedTail < expectedHead){
+            BitSetUtil.uncheckedCopy(actualArr,expectedHead,(long[])expectedArr,expectedHead,actualCapacity - expectedHead);
+            BitSetUtil.uncheckedCopy(actualArr,0,(long[])expectedArr,0,expectedTail + 1);
+            expectedSize=actualCapacity - expectedHead + expectedTail + 1;
+          }else{
+              BitSetUtil.semicheckedCopy(actualArr,expectedHead,(long[])expectedArr,expectedHead,expectedSize=expectedTail + 1 - expectedHead);
+          }
     }
-
+    private static IntPredicate getArrayIndexSearcher(long[] arr,Object inputVal,DataType inputType) {
+        long inputCast;
+        switch(inputType){
+        case BOOLEAN:
+            inputCast=(boolean)inputVal?1L:0L;
+          break;
+        case BYTE:
+          inputCast=(byte)inputVal;
+          break;
+        case CHAR:
+            inputCast=(char)inputVal;
+          break;
+        case SHORT:
+            inputCast=(short)inputVal;
+          break;
+        case INT:
+            inputCast=(int)inputVal;
+          break;
+        case LONG:
+            inputCast=(long)inputVal;
+          break;
+        case FLOAT:
+            inputCast=(long)(float)inputVal;
+          break;
+        case DOUBLE:
+            inputCast=(long)(double)inputVal;
+          break;
+        default:
+          throw inputType.invalid();
+        }
+        return index->(arr[index>>6]>>>index&1)==inputCast;
+    }
     @Override public void updateRemoveLastOccurrenceState(Object inputVal,DataType inputType){
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException();
-    }
+        final int head=expectedHead;
+        int tail=expectedTail;
+        final IntPredicate indexSearcher=getArrayIndexSearcher((long[])expectedArr,inputVal,inputType);
+        ++expectedModCount;
+        --expectedSize;
+        if(tail < head){
+          int index,bound;
+          for(index=tail,bound=expectedCapacity - 1;index >= 0;--index){
+            if(indexSearcher.test(index)){
+              int headDist,tailDist;
+              if((headDist=bound - head) + index + 1 < (tailDist=tail - index)){
+                BitSetUtil.semicheckedCopy((long[])expectedArr,0,(long[])expectedArr,1,index);
+                BitSetUtil.uncheckedCopy((long[])expectedArr,bound,(long[])expectedArr,0,1);
+                BitSetUtil.semicheckedCopy((long[])expectedArr,head,(long[])expectedArr,tail=head + 1,headDist);
+     
+                expectedHead=tail > bound?0:tail;
+              }else{
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,index + 1,(long[])expectedArr,index,tailDist);
+ 
+                expectedTail=--tail == -1?bound:tail;
+              }
+              return;
+            }
+          }
+          for(index=bound;;--index){
+            if(indexSearcher.test(index)){
+              int headDist,tailDist;
+              if((headDist=index - head) <= (tailDist=bound - index) + tail + 1){
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,head,(long[])expectedArr,tail=head + 1,headDist);
+
+                expectedHead=tail > bound?0:tail;
+              }else{
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,index + 1,(long[])expectedArr,index,tailDist);
+                  BitSetUtil.uncheckedCopy((long[])expectedArr,0,(long[])expectedArr,bound,1);
+                BitSetUtil.semicheckedCopy((long[])expectedArr,1,(long[])expectedArr,0,tail);
+   
+                expectedTail=--tail == -1?bound:tail;
+              }
+              return;
+            }
+          }
+        }else{
+          int index;
+          for(index=tail;;--index){
+            if(indexSearcher.test(index)){
+              int headDist,tailDist;
+              if((tailDist=tail - index) <= (headDist=index - head)){
+                if(headDist == 0){
+                  expectedTail=-1;
+                }else{
+                    BitSetUtil.semicheckedCopy((long[])expectedArr,index + 1,(long[])expectedArr,index,tailDist);
+                  expectedTail=tail - 1;
+                }
+              }else{
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,head,(long[])expectedArr,tail=head + 1,headDist);
+                expectedHead=tail;
+              }
+              return;
+            }
+          }
+        }
+      }
 
     @Override public void updateRemoveValState(Object inputVal,DataType inputType){
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException();
-
-    }
+        final int head=expectedHead;
+        int tail=expectedTail;
+        final IntPredicate indexSearcher=getArrayIndexSearcher((long[])expectedArr,inputVal,inputType);
+        ++expectedModCount;
+        --expectedSize;
+        if(tail < head){
+          int index,bound;
+          for(index=head,bound=expectedCapacity - 1;index <= bound;++index){
+            if(indexSearcher.test(index)){
+              int headDist,tailDist;
+              if((headDist=index - head) <= (tailDist=bound - index) + tail){
+                BitSetUtil.semicheckedCopy((long[])expectedArr,head,(long[])expectedArr,tail=head + 1,headDist);
+                expectedHead=tail > bound?0:tail;
+              }else{
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,index + 1,(long[])expectedArr,index,tailDist);
+                  BitSetUtil.uncheckedCopy((long[])expectedArr,0,(long[])expectedArr,bound,1);
+                BitSetUtil.semicheckedCopy((long[])expectedArr,1,(long[])expectedArr,0,tail);
+                expectedTail=--tail == -1?bound:tail;
+              }
+              return;
+            }
+          }
+          for(index=0;;++index){
+            if(indexSearcher.test(index)){
+              int headDist,tailDist;
+              if((headDist=bound - head) + index + 1 < (tailDist=tail - index)){
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,0,(long[])expectedArr,1,index);
+                  BitSetUtil.uncheckedCopy((long[])expectedArr,bound,(long[])expectedArr,0,1);
+                BitSetUtil.semicheckedCopy((long[])expectedArr,head,(long[])expectedArr,tail=head + 1,headDist);
+                expectedHead=tail > bound?0:tail;
+              }else{
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,index + 1,(long[])expectedArr,index,tailDist);
+                expectedTail=--tail == -1?bound:tail;
+              }
+              return;
+            }
+          }
+        }else{
+          int index;
+          for(index=head;;++index){
+            if(indexSearcher.test(index)){
+              int headDist,tailDist;
+              if((tailDist=tail - index) <= (headDist=index - head)){
+                if(headDist == 0){
+                  expectedTail=-1;
+                }else{
+                    BitSetUtil.semicheckedCopy((long[])expectedArr,index + 1,(long[])expectedArr,index,tailDist);
+                  expectedTail=tail - 1;
+                }
+              }else{
+                  BitSetUtil.semicheckedCopy((long[])expectedArr,head,(long[])expectedArr,tail=head + 1,headDist);
+                expectedHead=tail;
+              }
+              return;
+            }
+          }
+        }
+      }
 
     @Override public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
-      //TODO
-      throw new UnsupportedOperationException();
+      
+      if(!(arr instanceof long[])) {
+          return;
+      }
+      long[] expectedArr=seq.words;
+      Assertions.assertNotSame(expectedArr,arr);
     }
 
     @Override public void verifyClone(Object clone){
-      //TODO
-      throw new UnsupportedOperationException();
-    }
+        final var checked=checkedType.checked;
+        int cloneHead;
+        int cloneTail;
+        int cloneCapacity;
+        int thisHead;
+        int thisTail;
+        long[] cloneArr;
+        CloneVerifier cloneVerifier;
+
+          final var cloneCast=(PackedBooleanArrDeq)clone;
+          final var thisCast=seq;
+          thisHead=thisCast.head;
+          thisTail=thisCast.tail;
+          cloneHead=cloneCast.head;
+          cloneTail=cloneCast.tail;
+          final var cloneCastArr=cloneCast.words;
+          cloneCapacity=cloneCastArr == null?0:cloneCastArr.length<<6;
+          cloneArr=cloneCastArr;
+          Assertions.assertEquals(checked,cloneCast instanceof PackedBooleanArrDeq.Checked);
+          if(checked){
+            Assertions.assertEquals(0,((PackedBooleanArrDeq.Checked)cloneCast).modCount);
+          }
+          final var thisArr=(long[])expectedArr;
+          cloneVerifier=(thisIndex,cloneIndex)->Assertions.assertEquals(BitSetUtil.getFromPackedArr(thisArr,thisIndex),BitSetUtil.getFromPackedArr(cloneArr,cloneIndex));
+       
+        Assertions.assertNotSame(clone,seq);
+        if(expectedSize == 0){
+          Assertions.assertEquals(-1,cloneTail);
+          Assertions.assertEquals(0,cloneHead);
+          Assertions.assertNull(cloneArr);
+        }else{
+          Assertions.assertNotSame(cloneArr,expectedArr);
+          Assertions.assertEquals(expectedSize,cloneTail + 1 - cloneHead);
+          Assertions.assertEquals(expectedSize,cloneCapacity);
+          int cloneIndex=0;
+          if(thisTail < thisHead){
+            final int bound=expectedCapacity;
+            for(int thisIndex=thisHead;thisIndex < bound;++thisIndex,++cloneIndex){
+              cloneVerifier.verifyIndices(thisIndex,cloneIndex);
+            }
+            for(int thisIndex=0;thisIndex <= thisTail;++thisIndex,++cloneIndex){
+              cloneVerifier.verifyIndices(thisIndex,cloneIndex);
+            }
+          }else{
+            for(int thisIndex=thisHead;thisIndex <= thisTail;++thisIndex,++cloneIndex){
+              cloneVerifier.verifyIndices(thisIndex,cloneIndex);
+            }
+          }
+        }
+      }
 
     @Override public void verifyCollectionState(){
-      //TODO
-      throw new UnsupportedOperationException();
-    }
+        int actualHead;
+        int actualTail;
+        int actualCapacity;
+        Object actualArr;
+        final var checked=checkedType.checked;
+        IntConsumer indexVerifier;
+
+          final var castSeq=seq;
+          actualHead=castSeq.head;
+          actualTail=castSeq.tail;
+          final var castActualArr=castSeq.words;
+          actualArr=castActualArr;
+          actualCapacity=castActualArr == null?0:castActualArr.length<<6;
+          if(checked){
+            Assertions.assertEquals(expectedModCount,((PackedBooleanArrDeq.Checked)castSeq).modCount);
+          }
+          final var expectedArr=(long[])this.expectedArr;
+          indexVerifier=index->Assertions.assertEquals(BitSetUtil.getFromPackedArr(expectedArr,index),BitSetUtil.getFromPackedArr(castActualArr,index));
+        
+        Assertions.assertEquals(expectedHead,actualHead);
+        Assertions.assertEquals(expectedTail,actualTail);
+        Assertions.assertEquals(expectedCapacity,actualCapacity);
+        Assertions.assertTrue(actualCapacity > 0 || actualArr == null);
+        if(actualTail == -1){
+          Assertions.assertEquals(0,expectedSize);
+        }else{
+          if(actualTail < actualHead){
+            Assertions.assertEquals(expectedSize,actualTail + 1 + actualCapacity - actualHead);
+            for(int i=actualHead;i < actualCapacity;++i){
+              indexVerifier.accept(i);
+            }
+            for(int i=0;i <= actualTail;++i){
+              indexVerifier.accept(i);
+            }
+          }else{
+            Assertions.assertEquals(expectedSize,actualTail + 1 - actualHead);
+            for(int i=actualHead;i <= actualTail;++i){
+              indexVerifier.accept(i);
+            }
+          }
+        }
+      }
 
     @Override public void verifyGetResult(int index,Object result,DataType outputType){
       //TODO
@@ -562,15 +887,15 @@ public class PackedBooleanArrDeqTest{
       assert expectedTail == expectedSize - 1;
       numToRotate%=expectedCapacity;
       if(numToRotate <= 0){ return; }
-      Object actualArr;
-      Object tmp=null;
+      long[] actualArr;
+      long[] tmp=null;
       final int newHead=-numToRotate + expectedCapacity;
       int newTail=newHead + expectedSize - 1;
       if(newTail >= expectedCapacity){
         newTail-=expectedCapacity;
       }
       final int overflow=Math.min(numToRotate - (expectedCapacity - expectedSize),expectedSize - numToRotate);
-      final var seq=(PackedBooleanArrDeq)this.seq;
+      final var seq=this.seq;
       actualArr=seq.words;
       seq.head=newHead;
       seq.tail=newTail;
@@ -579,27 +904,27 @@ public class PackedBooleanArrDeqTest{
       }
       if(tmp != null){
         if(expectedSize - numToRotate > overflow){
-          BitSetUtil.arraycopy(actualArr,expectedSize - overflow,tmp,0,overflow);
-          BitSetUtil.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
+          BitSetUtil.uncheckedCopy(actualArr,expectedSize - overflow,tmp,0,overflow);
+          BitSetUtil.uncheckedCopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
           int tmpLength;
-          BitSetUtil.arraycopy(actualArr,numToRotate,actualArr,0,tmpLength=expectedSize - numToRotate - overflow);
-          BitSetUtil.arraycopy(tmp,0,actualArr,tmpLength,overflow);
+          BitSetUtil.semicheckedCopy(actualArr,numToRotate,actualArr,0,tmpLength=expectedSize - numToRotate - overflow);
+          BitSetUtil.uncheckedCopy(tmp,0,actualArr,tmpLength,overflow);
         }else{
-          BitSetUtil.arraycopy(actualArr,expectedSize - overflow,tmp,0,overflow);
-          BitSetUtil.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
-          BitSetUtil.arraycopy(tmp,0,actualArr,0,overflow);
+          BitSetUtil.uncheckedCopy(actualArr,expectedSize - overflow,tmp,0,overflow);
+          BitSetUtil.uncheckedCopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
+          BitSetUtil.uncheckedCopy(tmp,0,actualArr,0,overflow);
         }
       }else{
         if(numToRotate >= expectedSize){
-          BitSetUtil.arraycopy(actualArr,0,actualArr,newHead,expectedSize);
+          BitSetUtil.semicheckedCopy(actualArr,0,actualArr,newHead,expectedSize);
         }else{
-          BitSetUtil.arraycopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
-          BitSetUtil.arraycopy(actualArr,numToRotate,actualArr,0,expectedSize - numToRotate);
+          BitSetUtil.uncheckedCopy(actualArr,0,actualArr,expectedCapacity - numToRotate,numToRotate);
+          BitSetUtil.semicheckedCopy(actualArr,numToRotate,actualArr,0,expectedSize - numToRotate);
         }
       }
       expectedHead=newHead;
       expectedTail=newTail;
-      BitSetUtil.arraycopy(actualArr,0,expectedArr,0,expectedCapacity);
+      BitSetUtil.uncheckedCopy(actualArr,0,(long[])expectedArr,0,expectedCapacity);
     }
     
     

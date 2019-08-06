@@ -1155,10 +1155,10 @@ public class PackedBooleanArrSeqTest{
                   if((expectedSize&63)==0) {
                      ArrCopy.uncheckedSelfCopy(words,expectedSize>>6,offset>>6,(tailLength-1>>6)+1);
                   }else {
-                      BitSetUtil.srcUnallignedPullDown(words,offset>>6,expectedSize,rootBound-1>>6);
+                      BitSetUtil.srcUnalignedPullDown(words,offset>>6,expectedSize,rootBound-1>>6);
                   }
               }else {
-                  BitSetUtil.dstUnallignedPullDown(words,offset,expectedSize,rootBound-1>>6);
+                  BitSetUtil.dstUnalignedPullDown(words,offset,expectedSize,rootBound-1>>6);
               }
           }
           ((AbstractPackedBooleanArrSeqMonitor<?>)root).updateTrueCount();

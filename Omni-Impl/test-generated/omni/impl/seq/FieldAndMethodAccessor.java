@@ -1380,6 +1380,91 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  static interface PackedBooleanArrDeq{
+    public static int head(Object obj){
+      return ((omni.impl.seq.PackedBooleanArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.PackedBooleanArrDeq)obj).tail;
+    }
+    public static long[] words(Object obj){
+      return ((omni.impl.seq.PackedBooleanArrDeq)obj).words;
+    }
+    public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    static interface AbstractDeqItr{
+      static int cursor(Object obj){
+          return ((omni.impl.seq.AbstractBooleanArrDeq.AbstractDeqItr)obj).cursor;
+      }
+    }
+    static interface Checked extends PackedBooleanArrDeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrDeq)obj).tail;
+      }
+      public static long[] words(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrDeq)obj).words;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrDeq.Checked)obj).modCount;
+      }
+      public interface AscendingItr extends AbstractDeqItr{
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static int cursor(Object obj){
+          return ((omni.impl.seq.AbstractBooleanArrDeq.AbstractDeqItr)obj).cursor;
+        }
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        static omni.impl.seq.PackedBooleanArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.PackedBooleanArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      public interface DescendingItr extends AscendingItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrDeq"+DOLLARSIGN+"DescendingItr","root");
+        static int cursor(Object obj){
+          return ((omni.impl.seq.AbstractBooleanArrDeq.AbstractDeqItr)obj).cursor;
+        }
+        static omni.impl.seq.PackedBooleanArrDeq root(Object obj){
+          return (omni.impl.seq.PackedBooleanArrDeq)getValue(rootField,obj);
+        }
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+      }
+    }
+    public interface AscendingItr  extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      static int cursor(Object obj){
+        return ((omni.impl.seq.AbstractBooleanArrDeq.AbstractDeqItr)obj).cursor;
+      }
+      static omni.impl.seq.PackedBooleanArrDeq root(Object obj){
+        return (omni.impl.seq.PackedBooleanArrDeq)getValue(rootField,obj);
+      }
+    }
+    public interface DescendingItr extends AscendingItr{
+      static int cursor(Object obj){
+        return ((omni.impl.seq.AbstractBooleanArrDeq.AbstractDeqItr)obj).cursor;
+      }
+      static omni.impl.seq.PackedBooleanArrDeq root(Object obj){
+        return (omni.impl.seq.PackedBooleanArrDeq)getValue(rootField,obj);
+      }
+    }
+  }
   static interface PackedBooleanArrSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.PackedBooleanArrSeq)obj).size;
