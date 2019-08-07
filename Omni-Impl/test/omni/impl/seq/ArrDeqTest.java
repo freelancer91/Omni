@@ -2780,7 +2780,7 @@ import omni.util.TestExecutorService;
         monitor.verifyHashCode();
       }
     };
-    test.runAllTests("ArrDeqTst.testhashCode_void");
+    test.runAllTests("ArrDeqTest.testhashCode_void");
   }
   @Order(31428) @Test public void testisEmpty_void(){
     final BasicTest test=ArrDeqMonitor::verifyIsEmpty;

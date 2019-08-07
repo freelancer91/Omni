@@ -710,7 +710,6 @@ static interface PackedCLASSPREFIXArrDeq{
       }
     }
     public interface DescendingItr extends AscendingItr{
-      static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrDeq"+DOLLARSIGN+"DescendingItr","root");
       static int cursor(Object obj){
         return ((omni.impl.seq.AbstractCLASSPREFIXArrDeq.AbstractDeqItr)obj).cursor;
       }

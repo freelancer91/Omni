@@ -1432,7 +1432,6 @@ final class FieldAndMethodAccessor{
         }
       }
       public interface DescendingItr extends AscendingItr{
-        static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrDeq"+DOLLARSIGN+"DescendingItr","root");
         static int cursor(Object obj){
           return ((omni.impl.seq.AbstractBooleanArrDeq.AbstractDeqItr)obj).cursor;
         }
