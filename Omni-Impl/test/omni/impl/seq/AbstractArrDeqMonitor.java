@@ -75,6 +75,7 @@ public abstract class AbstractArrDeqMonitor<DEQ extends OmniDeque<E>,E> implemen
     this.checkedType=checkedType;
     this.dataType=dataType;
     this.seq=initDeq(capacity);
+    
   }
   @SuppressWarnings("unchecked") @Override public boolean add(int val){
     Object inputVal;

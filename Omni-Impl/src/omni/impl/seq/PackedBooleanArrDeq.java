@@ -25,7 +25,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
   public PackedBooleanArrDeq(int initialCapacity){
     super();
     if(initialCapacity>=64) {
-      this.words=new long[((initialCapacity-1)>>6)+1];
+      this.words=new long[(initialCapacity-1>>6)+1];
     }
   }
   PackedBooleanArrDeq(int head,long[] words,int tail){
@@ -36,19 +36,20 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     int tail;
     if((tail=this.tail+1)!=0){
       if((tail-=this.head)<=0){
-        tail+=(words.length<<6);
+        tail+=words.length<<6;
       }
     }
     return tail;
   }
-  void uncheckedForEach(final int tail,BooleanConsumer action){
+  @Override
+void uncheckedForEach(final int tail,BooleanConsumer action){
     final var words=this.words;
     int head;
     int wordOffset=(head=this.head)>>6;
     if(tail<(head=this.head)) {
       int wordsBound=words.length;
       for(long word=words[wordOffset];;) {
-        action.accept(((word>>>head)&1)!=0);
+        action.accept((word>>>head&1)!=0);
         if((++head&63)==0) {
           if(++wordOffset==wordsBound) {
             head=0;
@@ -62,7 +63,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       wordOffset=head>>6;
     }
     for(long word=words[wordOffset];;) {
-      action.accept(((word>>>head)&1)!=0);
+      action.accept((word>>>head&1)!=0);
       if(head==tail) {
         return;
       }
@@ -73,11 +74,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
   }
   @Override public boolean booleanElement(){
     int head;
-    return ((words[(head=this.head)>>6]>>head)&1)!=0;
+    return (words[(head=this.head)>>6]>>head&1)!=0;
   }
   @Override public boolean getLastBoolean(){
     int tail;
-    return ((words[(tail=this.tail)>>6]>>tail)&1)!=0;
+    return (words[(tail=this.tail)>>6]>>tail&1)!=0;
   }
   @Override public boolean equals(Object obj){
     //TODO
@@ -108,18 +109,20 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             ArrCopy.uncheckedCopy(words,newTailWordBound=tail>>6,newWords=new long[head=OmniArray.growBy50Pct(oldCap=words.length)],head-(oldCap-=newTailWordBound),oldCap);
             ArrCopy.uncheckedCopy(words,0,newWords,0,newTailWordBound);
             if(val) {
-              newWords[newTailWordBound]|=(1L<<tail);
+              newWords[newTailWordBound]|=1L<<tail;
             }else {
               newWords[newTailWordBound]&=~(1L<<tail);
             }
           }
           this.words=newWords;
         }else {
-          if((newTailWordBound=tail>>6)==(words.length)) {
+          if((newTailWordBound=tail>>6)==words.length) {
             if(head==0) {
               ArrCopy.uncheckedCopy(words,0,newWords=new long[OmniArray.growBy50Pct(newTailWordBound)],0,newTailWordBound);
               this.words=newWords;
-              newWords[newTailWordBound]=val?1L:0L;
+              if(val) {
+                  newWords[newTailWordBound]=1L;
+              }
               this.tail=tail;
             }else {
               if(val) {
@@ -131,7 +134,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             }
           }else {
             if(val) {
-              words[newTailWordBound]|=(1L<<tail);
+              words[newTailWordBound]|=1L<<tail;
             }else {
               words[newTailWordBound]&=~(1L<<tail);
             }
@@ -156,12 +159,12 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }else {
       this.tail=tail-1;
     }
-    return ((ret>>>tail)&1)!=0;
+    return (ret>>>tail&1)!=0;
   }
   @Override public Boolean peekLast(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return ((this.words[tail>>6]>>>tail)&1)!=0;
+      return (this.words[tail>>6]>>>tail&1)!=0;
     }
     return null;
   }
@@ -177,14 +180,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return ((ret>>>tail)&1)!=0;
+      return (ret>>>tail&1)!=0;
     }
     return null;
   }
   @Override public boolean peekLastBoolean(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return ((this.words[tail>>6]>>>tail)&1)!=0;
+      return (this.words[tail>>6]>>>tail&1)!=0;
     }
     return false;
   }
@@ -200,14 +203,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return ((ret>>>tail)&1)!=0;
+      return (ret>>>tail&1)!=0;
     }
     return false;
   }
   @Override public double peekLastDouble(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return ((this.words[tail>>6]>>>tail)&1);
+      return this.words[tail>>6]>>>tail&1;
     }
     return Double.NaN;
   }
@@ -223,14 +226,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return ((ret>>>tail)&1);
+      return ret>>>tail&1;
     }
     return Double.NaN;
   }
   @Override public float peekLastFloat(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return ((this.words[tail>>6]>>>tail)&1);
+      return this.words[tail>>6]>>>tail&1;
     }
     return Float.NaN;
   }
@@ -246,14 +249,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return ((ret>>>tail)&1);
+      return ret>>>tail&1;
     }
     return Float.NaN;
   }
   @Override public long peekLastLong(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return ((this.words[tail>>6]>>>tail)&1);
+      return this.words[tail>>6]>>>tail&1;
     }
     return Long.MIN_VALUE;
   }
@@ -269,14 +272,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return ((ret>>>tail)&1);
+      return ret>>>tail&1;
     }
     return Long.MIN_VALUE;
   }
   @Override public int peekLastInt(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return (int)((this.words[tail>>6]>>>tail)&1);
+      return (int)(this.words[tail>>6]>>>tail&1);
     }
     return Integer.MIN_VALUE;
   }
@@ -292,14 +295,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return (int)((ret>>>tail)&1);
+      return (int)(ret>>>tail&1);
     }
     return Integer.MIN_VALUE;
   }
   @Override public short peekLastShort(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return (short)((this.words[tail>>6]>>>tail)&1);
+      return (short)(this.words[tail>>6]>>>tail&1);
     }
     return Short.MIN_VALUE;
   }
@@ -315,14 +318,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return (short)((ret>>>tail)&1);
+      return (short)(ret>>>tail&1);
     }
     return Short.MIN_VALUE;
   }
   @Override public byte peekLastByte(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return (byte)((this.words[tail>>6]>>>tail)&1);
+      return (byte)(this.words[tail>>6]>>>tail&1);
     }
     return Byte.MIN_VALUE;
   }
@@ -338,14 +341,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return (byte)((ret>>>tail)&1);
+      return (byte)(ret>>>tail&1);
     }
     return Byte.MIN_VALUE;
   }
   @Override public char peekLastChar(){
     final int tail;
     if((tail=this.tail)!=-1) {
-      return (char)((this.words[tail>>6]>>>tail)&1);
+      return (char)(this.words[tail>>6]>>>tail&1);
     }
     return Character.MIN_VALUE;
   }
@@ -361,7 +364,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.tail=tail-1;
       }
-      return (char)((ret>>>tail)&1);
+      return (char)(ret>>>tail&1);
     }
     return Character.MIN_VALUE;
   }
@@ -376,11 +379,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final T[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=arrConstructor.apply(size+((wordsBound=words.length)<<6));
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=(T)(Boolean)(((word>>>head)&1)!=0);
+          dst[dstOffset++]=(T)(Boolean)((word>>>head&1)!=0);
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -394,7 +397,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=arrConstructor.apply(size);
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=(T)(Boolean)(((word>>>head)&1)!=0);
+        dst[dstOffset]=(T)(Boolean)((word>>>head&1)!=0);
         if(++head==tail) {
          return dst;
         }
@@ -412,11 +415,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final var words=this.words;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=OmniArray.uncheckedArrResize(size+((wordsBound=words.length)<<6),dst);
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=(T)(Boolean)(((word>>>head)&1)!=0);
+          dst[dstOffset++]=(T)(Boolean)((word>>>head&1)!=0);
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -430,7 +433,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=OmniArray.uncheckedArrResize(size,dst);
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=(T)(Boolean)(((word>>>head)&1)!=0);
+        dst[dstOffset]=(T)(Boolean)((word>>>head&1)!=0);
         if(++head==tail) {
          return dst;
         }
@@ -465,7 +468,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final long[] words;
       int cursor;
       final PackedBooleanArrDeq root;
-      final var ret=(((words=(root=this.root).words)[(cursor=this.cursor)>>6]>>>cursor)&1)!=0;
+      final var ret=((words=(root=this.root).words)[(cursor=this.cursor)>>6]>>>cursor&1)!=0;
       if(cursor==root.tail){
         cursor=-1;
       }else if(++cursor==words.length<<6){
@@ -502,7 +505,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final PackedBooleanArrDeq root;
       final var words=(root=this.root).words;
       this.cursor=(cursor=this.cursor)==root.head?-1:cursor==0?(words.length<<6)-1:cursor-1;
-      return (((words[cursor>>6])>>>cursor)&1)!=0;
+      return (words[cursor>>6]>>>cursor&1)!=0;
     }
     @Override public void remove(){
       //TODO
@@ -520,11 +523,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final Boolean[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new Boolean[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=((word>>>head)&1)!=0;
+          dst[dstOffset++]=(word>>>head&1)!=0;
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -538,7 +541,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new Boolean[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=((word>>>head)&1)!=0;
+        dst[dstOffset]=(word>>>head&1)!=0;
         if(++head==tail) {
          return dst;
         }
@@ -557,11 +560,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final boolean[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new boolean[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=((word>>>head)&1)!=0;
+          dst[dstOffset++]=(word>>>head&1)!=0;
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -575,7 +578,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new boolean[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=((word>>>head)&1)!=0;
+        dst[dstOffset]=(word>>>head&1)!=0;
         if(++head==tail) {
          return dst;
         }
@@ -594,11 +597,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final double[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new double[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=((word>>>head)&1);
+          dst[dstOffset++]=word>>>head&1;
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -612,7 +615,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new double[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=((word>>>head)&1);
+        dst[dstOffset]=word>>>head&1;
         if(++head==tail) {
          return dst;
         }
@@ -631,11 +634,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final float[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new float[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=((word>>>head)&1);
+          dst[dstOffset++]=word>>>head&1;
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -649,7 +652,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new float[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=((word>>>head)&1);
+        dst[dstOffset]=word>>>head&1;
         if(++head==tail) {
          return dst;
         }
@@ -668,11 +671,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final long[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new long[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=((word>>>head)&1);
+          dst[dstOffset++]=word>>>head&1;
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -686,7 +689,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new long[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=((word>>>head)&1);
+        dst[dstOffset]=word>>>head&1;
         if(++head==tail) {
          return dst;
         }
@@ -705,11 +708,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final int[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new int[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=(int)((word>>>head)&1);
+          dst[dstOffset++]=(int)(word>>>head&1);
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -723,7 +726,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new int[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=(int)((word>>>head)&1);
+        dst[dstOffset]=(int)(word>>>head&1);
         if(++head==tail) {
          return dst;
         }
@@ -742,11 +745,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final short[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new short[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=(short)((word>>>head)&1);
+          dst[dstOffset++]=(short)(word>>>head&1);
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -760,7 +763,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new short[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=(short)((word>>>head)&1);
+        dst[dstOffset]=(short)(word>>>head&1);
         if(++head==tail) {
          return dst;
         }
@@ -779,11 +782,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final byte[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new byte[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=(byte)((word>>>head)&1);
+          dst[dstOffset++]=(byte)(word>>>head&1);
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -797,7 +800,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new byte[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=(byte)((word>>>head)&1);
+        dst[dstOffset]=(byte)(word>>>head&1);
         if(++head==tail) {
          return dst;
         }
@@ -816,11 +819,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final char[] dst;
       int size,head;
       int wordOffset=(head=this.head)>>6;
-      if((size=(++tail)-head)<=0){
+      if((size=++tail-head)<=0){
         int wordsBound;
         dst=new char[size+((wordsBound=words.length)<<6)];
         for(long word=words[wordOffset];;) {
-          dst[dstOffset++]=(char)((word>>>head)&1);
+          dst[dstOffset++]=(char)(word>>>head&1);
           if((++head&63)==0) {
             if(++wordOffset==wordsBound) {
               head=0;
@@ -834,7 +837,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         dst=new char[size];
       }
       for(long word=words[wordOffset];;++dstOffset) {
-        dst[dstOffset]=(char)((word>>>head)&1);
+        dst[dstOffset]=(char)(word>>>head&1);
         if(++head==tail) {
          return dst;
         }
@@ -848,7 +851,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
   @Override public boolean peekBoolean(){
     if(this.tail!=-1) {
       final int head;
-      return ((this.words[(head=this.head)>>6]>>>head)&1)!=0;
+      return (this.words[(head=this.head)>>6]>>>head&1)!=0;
     }
     return false;
   }
@@ -865,14 +868,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return ((ret>>>head)&1)!=0;
+      return (ret>>>head&1)!=0;
     }
     return false;
   }
   @Override public byte peekByte(){
     if(this.tail!=-1) {
       final int head;
-      return (byte)((this.words[(head=this.head)>>6]>>>head)&1);
+      return (byte)(this.words[(head=this.head)>>6]>>>head&1);
     }
     return Byte.MIN_VALUE;
   }
@@ -889,14 +892,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return (byte)((ret>>>head)&1);
+      return (byte)(ret>>>head&1);
     }
     return Byte.MIN_VALUE;
   }
   @Override public short peekShort(){
     if(this.tail!=-1) {
       final int head;
-      return (short)((this.words[(head=this.head)>>6]>>>head)&1);
+      return (short)(this.words[(head=this.head)>>6]>>>head&1);
     }
     return Short.MIN_VALUE;
   }
@@ -913,14 +916,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return (short)((ret>>>head)&1);
+      return (short)(ret>>>head&1);
     }
     return Short.MIN_VALUE;
   }
   @Override public int peekInt(){
     if(this.tail!=-1) {
       final int head;
-      return (int)((this.words[(head=this.head)>>6]>>>head)&1);
+      return (int)(this.words[(head=this.head)>>6]>>>head&1);
     }
     return Integer.MIN_VALUE;
   }
@@ -937,14 +940,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return (int)((ret>>>head)&1);
+      return (int)(ret>>>head&1);
     }
     return Integer.MIN_VALUE;
   }
   @Override public long peekLong(){
     if(this.tail!=-1) {
       final int head;
-      return ((this.words[(head=this.head)>>6]>>>head)&1);
+      return this.words[(head=this.head)>>6]>>>head&1;
     }
     return Long.MIN_VALUE;
   }
@@ -961,14 +964,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return ((ret>>>head)&1);
+      return ret>>>head&1;
     }
     return Long.MIN_VALUE;
   }
   @Override public float peekFloat(){
     if(this.tail!=-1) {
       final int head;
-      return (float)((this.words[(head=this.head)>>6]>>>head)&1);
+      return this.words[(head=this.head)>>6]>>>head&1;
     }
     return Float.NaN;
   }
@@ -985,14 +988,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return ((ret>>>head)&1);
+      return ret>>>head&1;
     }
     return Float.NaN;
   }
   @Override public double peekDouble(){
     if(this.tail!=-1) {
       final int head;
-      return (double)((this.words[(head=this.head)>>6]>>>head)&1);
+      return this.words[(head=this.head)>>6]>>>head&1;
     }
     return Double.NaN;
   }
@@ -1009,14 +1012,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return ((ret>>>head)&1);
+      return ret>>>head&1;
     }
     return Double.NaN;
   }
   @Override public Boolean peek(){
     if(this.tail!=-1) {
       final int head;
-      return ((this.words[(head=this.head)>>6]>>>head)&1)!=0;
+      return (this.words[(head=this.head)>>6]>>>head&1)!=0;
     }
     return null;
   }
@@ -1033,14 +1036,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return ((ret>>>head)&1)!=0;
+      return (ret>>>head&1)!=0;
     }
     return null;
   }
   @Override public char peekChar(){
     if(this.tail!=-1) {
       final int head;
-      return (char)((this.words[(head=this.head)>>6]>>>head)&1);
+      return (char)(this.words[(head=this.head)>>6]>>>head&1);
     }
     return Character.MIN_VALUE;
   }
@@ -1057,7 +1060,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         this.head=head+1;
       }
-      return (char)((ret>>>head)&1);
+      return (char)(ret>>>head&1);
     }
     return Character.MIN_VALUE;
   }
@@ -1090,25 +1093,28 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             this.words=newWords;
           }
         }else if(head==-1 && tail==(head=((oldCap=words.length)<<6)-1)) {
-          this.tail=((newCap=OmniArray.growBy50Pct(oldCap))>>6)-1;
-          newWords=new long[newCap];
-          ArrCopy.uncheckedCopy(words,0,newWords,head=newCap-oldCap,oldCap);
-          this.head=((--head)<<6)+63;
+          this.tail=((newCap=OmniArray.growBy50Pct(oldCap))<<6)-1;
+          ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],head=newCap-oldCap,oldCap);
+          this.head=(--head<<6)+63;
+          if(val) {
+              newWords[head]=-1L;
+          }
           newWords[head]=val?-1L:0L;
           this.words=newWords;
           return;
         }else {
           newWords=words;
+          this.head=head;
         }
         if(val) {
-          newWords[head>>6]|=(1L<<head);
+          newWords[head>>6]|=1L<<head;
         }else {
           newWords[head>>6]&=~(1L<<head);
         }
       }
     }else {
-      this.head=0;
-      this.tail=0;
+      this.head=63;
+      this.tail=63;
       this.words=new long[] {val?-1L:0L};
     }
   }
@@ -1123,7 +1129,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }else {
       this.head=head+1;
     }
-    return ((ret>>>head)&1)!=0;
+    return (ret>>>head&1)!=0;
   }
   @Override public void writeExternal(ObjectOutput out) throws IOException{
     //TODO
@@ -1149,7 +1155,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     final var wordFlipper=BitSetUtil.getWordFlipper(val);
     final var words=this.words;
     int head;
-    final int headWordOffset,tailWordOffset=(tail>>6);
+    final int headWordOffset,tailWordOffset=tail>>6;
     if(tail<(head=this.head)) {
       for(int i=tailWordOffset;--i>=0;) {
         if(wordFlipper.applyAsLong(words[i])!=0) {
@@ -1163,7 +1169,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }
       }
       if(headWordOffset==tailWordOffset) {
-        return (wordFlipper.applyAsLong(words[headWordOffset])&(((1L<<(tail+1))-1)|(-1L<<head)))!=0;
+        return (wordFlipper.applyAsLong(words[headWordOffset])&((1L<<tail+1)-1|-1L<<head))!=0;
       }
       
     }else {
@@ -1174,10 +1180,10 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }
       }
       if(headWordOffset==tailWordOffset) {
-        return ((wordFlipper.applyAsLong(words[headWordOffset])) & ((-1L>>>-(tail-head+1))<<head))!=0;
+        return (wordFlipper.applyAsLong(words[headWordOffset]) & -1L>>>-(tail-head+1)<<head)!=0;
       }
     }
-    return wordFlipper.applyAsLong(words[tailWordOffset])<<(-tail-1)!=0 || wordFlipper.applyAsLong(words[headWordOffset]>>>head)!=0;
+    return wordFlipper.applyAsLong(words[tailWordOffset])<<-tail-1!=0 || wordFlipper.applyAsLong(words[headWordOffset]>>>head)!=0;
   }
   @Override boolean uncheckedremoveVal(int tail,boolean val){
     int head;
@@ -1194,7 +1200,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     final var words=this.words;
     if((headWordOffset=head>>6)==(tailWordOffset=tail>>6)){
       if(val) {
-        if((tail0s=Long.numberOfTrailingZeros((word=words[tailWordOffset])>>>head))<=(tail-head)) {
+        if((tail0s=Long.numberOfTrailingZeros((word=words[tailWordOffset])>>>head))<=tail-head) {
           if(head==tail) {
             this.tail=-1;
           }else {
@@ -1204,7 +1210,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           return true;
         }
       }else {
-        if((tail0s=Long.numberOfTrailingZeros((~((word=words[tailWordOffset])))>>>head))<=(tail-head)) {
+        if((tail0s=Long.numberOfTrailingZeros(~(word=words[tailWordOffset])>>>head))<=tail-head) {
           if(head==tail) {
             this.tail=-1;
           }else {
@@ -1219,36 +1225,36 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       if(val) {
         if((tail0s=Long.numberOfTrailingZeros((word=words[headWordOffset])>>>head))!=64) {
           this.head=head+1;
-          words[headWordOffset]=word-(1L<<(head+tail0s));
+          words[headWordOffset]=word-(1L<<head+tail0s);
           return true;
         }
         for(int i=headWordOffset+1;i<tailWordOffset;++i) {
           if((tail0s=Long.numberOfTrailingZeros(word=words[i]))!=64) {
             this.head=head+1;
-            words[i]=word-(1L<<(tail0s));
+            words[i]=word-(1L<<tail0s);
             return true;
           }
         }
-        if((tail0s=Long.numberOfTrailingZeros((word=words[tailWordOffset])))<((tail&63))){
-          words[tailWordOffset]=word-(1L<<(tail0s));
+        if((tail0s=Long.numberOfTrailingZeros(word=words[tailWordOffset]))<(tail&63)){
+          words[tailWordOffset]=word-(1L<<tail0s);
           this.head=head+1;
           return true;
         }
       }else {
-        if((tail0s=Long.numberOfTrailingZeros((~((word=words[headWordOffset])))>>>head))!=64) {
+        if((tail0s=Long.numberOfTrailingZeros(~(word=words[headWordOffset])>>>head))!=64) {
           this.head=head+1;
-          words[headWordOffset]=word+(1L<<(head+tail0s));
+          words[headWordOffset]=word+(1L<<head+tail0s);
           return true;
         }
         for(int i=headWordOffset+1;i<tailWordOffset;++i) {
-          if((tail0s=Long.numberOfTrailingZeros((~(word=words[i]))))!=64) {
+          if((tail0s=Long.numberOfTrailingZeros(~(word=words[i])))!=64) {
             this.head=head+1;
-            words[i]=word+(1L<<(tail0s));
+            words[i]=word+(1L<<tail0s);
             return true;
           }
         }
-        if((tail0s=Long.numberOfTrailingZeros((~((word=words[tailWordOffset])))))<((tail&63))){
-          words[tailWordOffset]=word+(1L<<(tail0s));
+        if((tail0s=Long.numberOfTrailingZeros(~(word=words[tailWordOffset])))<(tail&63)){
+          words[tailWordOffset]=word+(1L<<tail0s);
           this.head=head+1;
           return true;
         }
@@ -1268,7 +1274,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         if(head==(wordBound<<6)-1) {
           this.head=0;
         }else {
-          words[wordOffset]=word-(1L<<(head+tail0s));
+          words[wordOffset]=word-(1L<<head+tail0s);
           this.head=head+1;
         }
         return true;
@@ -1288,17 +1294,17 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           return true;
         }
       }
-      if((tail0s=Long.numberOfTrailingZeros((word=words[wordOffset])))<((tail&63))){
-        words[wordOffset]=word-(1L<<(tail0s));
+      if((tail0s=Long.numberOfTrailingZeros(word=words[wordOffset]))<(tail&63)){
+        words[wordOffset]=word-(1L<<tail0s);
         this.head=head+1;
         return true;
       }
     }else {
-      if((tail0s=Long.numberOfTrailingZeros((~(word=words[wordOffset]))>>>head))!=64) {
+      if((tail0s=Long.numberOfTrailingZeros(~(word=words[wordOffset])>>>head))!=64) {
         if(head==(wordBound<<6)-1) {
           this.head=0;
         }else {
-          words[wordOffset]=word+(1L<<(head+tail0s));
+          words[wordOffset]=word+(1L<<head+tail0s);
           this.head=head+1;
         }
         return true;
@@ -1318,8 +1324,8 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           return true;
         }
       }
-      if((tail0s=Long.numberOfTrailingZeros((~((word=words[wordOffset])))))<((tail&63))){
-        words[wordOffset]=word+(1L<<(tail0s));
+      if((tail0s=Long.numberOfTrailingZeros(~(word=words[wordOffset])))<(tail&63)){
+        words[wordOffset]=word+(1L<<tail0s);
         this.head=head+1;
         return true;
       }
@@ -1344,14 +1350,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         if(tail==0) {
           this.tail=(wordBound<<6)-1;
         }else {
-          words[wordOffset]=word-(Long.MIN_VALUE>>>(lead0s-tail));
+          words[wordOffset]=word-(Long.MIN_VALUE>>>lead0s-tail);
           this.tail=tail-1;
         }
         return true;
       }
       for(int i=wordOffset-1;i>=0;--i) {
         if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
-          words[i]=word-(Long.MIN_VALUE>>>(lead0s));
+          words[i]=word-(Long.MIN_VALUE>>>lead0s);
           this.tail=tail-1;
           return true;
         }
@@ -1359,43 +1365,43 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       wordOffset=head>>6;
       for(int i=wordBound-1;i>wordOffset;--i) {
         if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
-          words[i]=word-(Long.MIN_VALUE>>>(lead0s));
+          words[i]=word-(Long.MIN_VALUE>>>lead0s);
           this.tail=tail-1;
           return true;
         }
       }
-      if((lead0s=Long.numberOfLeadingZeros((word=words[wordOffset])))<((-head&63))){
-        words[wordOffset]=word-(Long.MIN_VALUE>>>(lead0s));
+      if((lead0s=Long.numberOfLeadingZeros(word=words[wordOffset]))<(-head&63)){
+        words[wordOffset]=word-(Long.MIN_VALUE>>>lead0s);
         this.tail=tail-1;
         return true;
       }
     }else {
-      if((lead0s=Long.numberOfLeadingZeros((~((word=words[wordOffset])))<<-tail))!=64) {
+      if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset])<<-tail))!=64) {
         if(tail==0) {
           this.tail=(wordBound<<6)-1;
         }else {
-          words[wordOffset]=word+(Long.MIN_VALUE>>>(lead0s-tail));
+          words[wordOffset]=word+(Long.MIN_VALUE>>>lead0s-tail);
           this.tail=tail-1;
         }
         return true;
       }
       for(int i=wordOffset-1;i>=0;--i) {
-        if((lead0s=Long.numberOfLeadingZeros((~(word=words[i]))))!=64) {
-          words[i]=word+(Long.MIN_VALUE>>>(lead0s));
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
+          words[i]=word+(Long.MIN_VALUE>>>lead0s);
           this.tail=tail-1;
           return true;
         }
       }
       wordOffset=head>>6;
       for(int i=wordBound-1;i>wordOffset;--i) {
-        if((lead0s=Long.numberOfLeadingZeros((~(word=words[i]))))!=64) {
-          words[i]=word+(Long.MIN_VALUE>>>(lead0s));
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
+          words[i]=word+(Long.MIN_VALUE>>>lead0s);
           this.tail=tail-1;
           return true;
         }
       }
-      if((lead0s=Long.numberOfLeadingZeros((~((word=words[wordOffset])))))<((-head&63))){
-        words[wordOffset]=word+(Long.MIN_VALUE>>>(lead0s));
+      if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset])))<(-head&63)){
+        words[wordOffset]=word+(Long.MIN_VALUE>>>lead0s);
         this.tail=tail-1;
         return true;
       }
@@ -1410,22 +1416,22 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     final var words=this.words;
     if((headWordOffset=head>>6)==(tailWordOffset=tail>>6)){
       if(val) {
-        if((lead0s=Long.numberOfLeadingZeros((word=words[tailWordOffset])<<-tail))<=(tail-head)) {
+        if((lead0s=Long.numberOfLeadingZeros((word=words[tailWordOffset])<<-tail))<=tail-head) {
           if(head==tail) {
             this.tail=-1;
           }else {
             this.tail=tail-1;
-            words[tailWordOffset]=word-(Long.MIN_VALUE>>>(lead0s-tail));
+            words[tailWordOffset]=word-(Long.MIN_VALUE>>>lead0s-tail);
           }
           return true;
         }
       }else {
-        if((lead0s=Long.numberOfLeadingZeros((~((word=words[tailWordOffset])))<<-tail))<=(tail-head)) {
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[tailWordOffset])<<-tail))<=tail-head) {
           if(head==tail) {
             this.tail=-1;
           }else {
             this.tail=tail-1;
-            words[tailWordOffset]=word+(Long.MIN_VALUE>>>(lead0s-tail));
+            words[tailWordOffset]=word+(Long.MIN_VALUE>>>lead0s-tail);
           }
           return true;
         }
@@ -1434,36 +1440,36 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       if(val) {
         if((lead0s=Long.numberOfLeadingZeros((word=words[tailWordOffset])<<-tail))!=64) {
           this.tail=tail-1;
-          words[tailWordOffset]=word-(Long.MIN_VALUE>>>(lead0s-tail));
+          words[tailWordOffset]=word-(Long.MIN_VALUE>>>lead0s-tail);
           return true;
         }
         for(int i=tailWordOffset-1;i>headWordOffset;--tail) {
           if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
             this.tail=tail-1;
-            words[i]=word-(Long.MIN_VALUE>>>(lead0s));
+            words[i]=word-(Long.MIN_VALUE>>>lead0s);
             return true;
           }
         }
-        if((lead0s=Long.numberOfLeadingZeros((word=words[headWordOffset])))<((-head&63))){
-          words[headWordOffset]=word-(Long.MIN_VALUE>>>(lead0s));
+        if((lead0s=Long.numberOfLeadingZeros(word=words[headWordOffset]))<(-head&63)){
+          words[headWordOffset]=word-(Long.MIN_VALUE>>>lead0s);
           this.tail=tail-1;
           return true;
         }
       }else {
-        if((lead0s=Long.numberOfLeadingZeros((~((word=words[tailWordOffset])))<<-tail))!=64) {
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[tailWordOffset])<<-tail))!=64) {
           this.tail=tail-1;
-          words[tailWordOffset]=word+(Long.MIN_VALUE>>>(lead0s-tail));
+          words[tailWordOffset]=word+(Long.MIN_VALUE>>>lead0s-tail);
           return true;
         }
         for(int i=tailWordOffset-1;i>headWordOffset;--tail) {
-          if((lead0s=Long.numberOfLeadingZeros((~(word=words[i]))))!=64) {
+          if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
             this.tail=tail-1;
-            words[i]=word+(Long.MIN_VALUE>>>(lead0s));
+            words[i]=word+(Long.MIN_VALUE>>>lead0s);
             return true;
           }
         }
-        if((lead0s=Long.numberOfLeadingZeros((~((word=words[headWordOffset])))))<((-head&63))){
-          words[headWordOffset]=word+(Long.MIN_VALUE>>>(lead0s));
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[headWordOffset])))<(-head&63)){
+          words[headWordOffset]=word+(Long.MIN_VALUE>>>lead0s);
           this.tail=tail-1;
           return true;
         }
@@ -1478,7 +1484,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     int headWordOffset,tail0s;
     final LongUnaryOperator wordFlipper;
     if((tail0s=Long.numberOfTrailingZeros((wordFlipper=BitSetUtil.getWordFlipper(val)).applyAsLong((words=this.words)[headWordOffset=(head=this.head)>>6])>>>head))!=64) {
-      if(tail<head ||tail0s<(tail-head+1)) {
+      if(tail<head ||tail0s<tail-head+1) {
         return tail0s+1;
       }
       return -1;
@@ -1488,26 +1494,26 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       final var wordBound=words.length;
       for(int i=++headWordOffset;i<wordBound;++i) {
         if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[i])))!=64) {
-          return (64-(head&63))+((i-headWordOffset)<<6)+tail0s+1;
+          return 64-(head&63)+(i-headWordOffset<<6)+tail0s+1;
         }
       }
       tailWordOffset=tail>>6;
       for(int i=0;i<tailWordOffset;++i) {
         if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[i])))!=64) {
-          return (64-(head&63))+((wordBound-headWordOffset+i)<<6)+tail0s+1;
+          return 64-(head&63)+(wordBound-headWordOffset+i<<6)+tail0s+1;
         }
       }
       if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[tailWordOffset])))<=(tail&63)) {
-        return (64-(head&63))+((wordBound-headWordOffset+tailWordOffset-1)<<6)+tail0s+1;
+        return 64-(head&63)+(wordBound-headWordOffset+tailWordOffset-1<<6)+tail0s+1;
       }
     }else if(headWordOffset!=(tailWordOffset=tail>>6)) {
       for(int i=++headWordOffset;i<tailWordOffset;++i) {
         if((tail0s=Long.numberOfTrailingZeros(words[i]))!=64) {
-          return (64-(head&63))+((i-headWordOffset)<<6)+tail0s+1;
+          return 64-(head&63)+(i-headWordOffset<<6)+tail0s+1;
         }
       }
       if((tail0s=Long.numberOfTrailingZeros(words[tailWordOffset]))<=(tail&63)) {
-        return (64-(head&63))+((tailWordOffset-1-headWordOffset)<<6)+tail0s+1;
+        return 64-(head&63)+(tailWordOffset-1-headWordOffset<<6)+tail0s+1;
       }
     }
     return -1;
@@ -1515,18 +1521,18 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
   @Override String uncheckedToString(int tail){
     final byte[] buffer;
     int size,head,bufferOffset=1;
-    if((size=(++tail-(head=this.head)))<=0) {
+    if((size=++tail-(head=this.head))<=0) {
       final long[] words;
       int wordBound,wordOffset=head>>6;
-      if((size+=((wordBound=(words=this.words).length)<<6))<=(OmniArray.MAX_ARR_SIZE/7)){
+      if((size+=(wordBound=(words=this.words).length)<<6)<=OmniArray.MAX_ARR_SIZE/7){
         (buffer=new byte[size*7])[0]=(byte)'[';
         for(long word=words[wordOffset];;++bufferOffset){
-          buffer[bufferOffset=ToStringUtil.getStringBoolean(((word>>>head)&1)!=0,buffer,bufferOffset)]=(byte)',';
+          buffer[bufferOffset=ToStringUtil.getStringBoolean((word>>>head&1)!=0,buffer,bufferOffset)]=(byte)',';
           buffer[++bufferOffset]=(byte)' ';
-          if(((++head)&63)==0){
+          if((++head&63)==0){
             if(++wordOffset==wordBound) {
               for(word=words[head=wordOffset=0];;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' '){
-                bufferOffset=ToStringUtil.getStringBoolean(((word>>>head)&1)!=0,buffer,++bufferOffset);
+                bufferOffset=ToStringUtil.getStringBoolean((word>>>head&1)!=0,buffer,++bufferOffset);
                 if(++head==tail){
                   buffer[bufferOffset]=(byte)']';
                   return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
@@ -1542,12 +1548,12 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }else {
         final ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]);
         for(long word=words[wordOffset];;){
-          builder.uncheckedAppendBoolean(((word>>>head)&1)!=0);
+          builder.uncheckedAppendBoolean((word>>>head&1)!=0);
           builder.uncheckedAppendCommaAndSpace();
-          if(((++head)&63)==0){
+          if((++head&63)==0){
             if(++wordOffset==wordBound) {
               for(word=words[head=wordOffset=0];;builder.uncheckedAppendCommaAndSpace()){
-                builder.uncheckedAppendBoolean(((word>>>head)&1)!=0);
+                builder.uncheckedAppendBoolean((word>>>head&1)!=0);
                 if(++head==tail){
                   builder.uncheckedAppendChar((byte)']');
                   (buffer=builder.buffer)[0]=(byte)'[';
@@ -1582,7 +1588,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     int hash=((word=(words=this.words)[wordOffset=(head=this.head) >> 6]) >> head & 1) != 0?31 + 1231:31 + 1237;
     if(tail<head) {
       for(int wordBound=words.length;;) {
-        if(((++head)&63)==0) {
+        if((++head&63)==0) {
           if(++wordOffset==wordBound) {
             hash=hash * 31 + (((word=words[head=wordOffset=0]) & 1) != 0?1231:1237);
             break;
@@ -1593,7 +1599,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       }
     }
     for(;;) {
-      if((++head)==tail) {
+      if(++head==tail) {
         return hash;
       }
       if((head&63)==0) {
@@ -1663,7 +1669,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         int cursor;
         if((cursor=this.cursor)!=-1){
           final long[] words;
-          final var ret=(((words=root.words)[cursor>>6]>>>cursor)&1)!=0;
+          final var ret=((words=root.words)[cursor>>6]>>>cursor&1)!=0;
           this.lastRet=cursor;
           if(cursor==root.tail){
             cursor=-1;
@@ -1700,7 +1706,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         int cursor;
         if((cursor=this.cursor)!=-1){
           final long[] words;
-          final var ret=(((words=root.words)[cursor>>6]>>>cursor)&1)!=0;
+          final var ret=((words=root.words)[cursor>>6]>>>cursor&1)!=0;
           this.lastRet=cursor;
           if(cursor==root.head){
             cursor=-1;
@@ -1738,7 +1744,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return ((ret>>>tail)&1)!=0;
+        return (ret>>>tail&1)!=0;
       }
       throw new NoSuchElementException();
     }
@@ -1756,7 +1762,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return ((ret>>>head)&1)!=0;
+        return (ret>>>head&1)!=0;
       }
       throw new NoSuchElementException();
     }
@@ -1793,14 +1799,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     @Override public boolean booleanElement(){
       if(tail!=-1){
         int head;
-        return ((words[(head=this.head)>>6]>>head)&1)!=0;
+        return (words[(head=this.head)>>6]>>head&1)!=0;
       }
       throw new NoSuchElementException();
     }
     @Override public boolean getLastBoolean(){
       final int tail;
       if((tail=this.tail)!=-1){
-        return ((words[(tail)>>6]>>tail)&1)!=0;
+        return (words[tail>>6]>>tail&1)!=0;
       }
       throw new NoSuchElementException();
     }
@@ -1828,7 +1834,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return ((ret>>>head)&1)!=0;
+        return (ret>>>head&1)!=0;
       }
       return false;
     }
@@ -1845,7 +1851,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return ((ret>>>tail)&1)!=0;
+        return (ret>>>tail&1)!=0;
       }
       return false;
     }
@@ -1863,7 +1869,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return ((ret>>>head)&1)!=0;
+        return (ret>>>head&1)!=0;
       }
       return null;
     }
@@ -1880,7 +1886,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return ((ret>>>tail)&1)!=0;
+        return (ret>>>tail&1)!=0;
       }
       return null;
     }
@@ -1898,7 +1904,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return ((ret>>>head)&1);
+        return ret>>>head&1;
       }
       return Double.NaN;
     }
@@ -1915,7 +1921,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return ((ret>>>tail)&1);
+        return ret>>>tail&1;
       }
       return Double.NaN;
     }
@@ -1933,7 +1939,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return ((ret>>>head)&1);
+        return ret>>>head&1;
       }
       return Float.NaN;
     }
@@ -1950,7 +1956,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return ((ret>>>tail)&1);
+        return ret>>>tail&1;
       }
       return Float.NaN;
     }
@@ -1968,7 +1974,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return ((ret>>>head)&1);
+        return ret>>>head&1;
       }
       return Long.MIN_VALUE;
     }
@@ -1985,7 +1991,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return ((ret>>>tail)&1);
+        return ret>>>tail&1;
       }
       return Long.MIN_VALUE;
     }
@@ -2003,7 +2009,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return (int)((ret>>>head)&1);
+        return (int)(ret>>>head&1);
       }
       return Integer.MIN_VALUE;
     }
@@ -2020,7 +2026,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return (int)((ret>>>tail)&1);
+        return (int)(ret>>>tail&1);
       }
       return Integer.MIN_VALUE;
     }
@@ -2038,7 +2044,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return (short)((ret>>>head)&1);
+        return (short)(ret>>>head&1);
       }
       return Short.MIN_VALUE;
     }
@@ -2055,7 +2061,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return (short)((ret>>>tail)&1);
+        return (short)(ret>>>tail&1);
       }
       return Short.MIN_VALUE;
     }
@@ -2073,7 +2079,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return (byte)((ret>>>head)&1);
+        return (byte)(ret>>>head&1);
       }
       return Byte.MIN_VALUE;
     }
@@ -2090,7 +2096,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return (byte)((ret>>>tail)&1);
+        return (byte)(ret>>>tail&1);
       }
       return Byte.MIN_VALUE;
     }
@@ -2108,7 +2114,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.head=head+1;
         }
-        return (char)((ret>>>head)&1);
+        return (char)(ret>>>head&1);
       }
       return Character.MIN_VALUE;
     }
@@ -2125,7 +2131,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }else {
           this.tail=tail-1;
         }
-        return (char)((ret>>>tail)&1);
+        return (char)(ret>>>tail&1);
       }
       return Character.MIN_VALUE;
     }

@@ -5,8 +5,10 @@ import java.util.Random;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import omni.api.OmniCollection;
+import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
@@ -19,10 +21,12 @@ import omni.impl.MonitoredRemoveIfPredicateGen;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.StructType;
+import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 
+@TestMethodOrder(OrderAnnotation.class) 
 public class PackedBooleanArrDeqTest{
   private static final int[] SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,60,70,80,90,100};
   private static final int[] SHORT_SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10};
@@ -469,10 +473,12 @@ public class PackedBooleanArrDeqTest{
     }
     PackedBooleanArrDeqMonitor(CheckedType checkedType){
       super(checkedType,DataType.BOOLEAN);
+      updateCollectionState();
     }
 
     PackedBooleanArrDeqMonitor(CheckedType checkedType,int capacity){
       super(checkedType,DataType.BOOLEAN,capacity);
+      updateCollectionState();
     }
 
     @Override public Object get(int iterationIndex,DataType outputType){
@@ -501,75 +507,173 @@ public class PackedBooleanArrDeqTest{
     }
     
     @Override public void updateAddFirstState(Object inputVal,DataType inputType){
-        if(expectedSize == 0){
-            if(expectedCapacity == 0){
-              expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=64)];
-            }
-            expectedHead=expectedCapacity - 1;
-            expectedTail=expectedCapacity - 1;
-            BitSetUtil.storeInPackedArr((long[])expectedArr,expectedCapacity - 1,(boolean)inputVal);
-          }else{
-            int head;
+        ++expectedSize;
+        ++expectedModCount;
+        long[] words=(long[])this.expectedArr;
+        if(expectedCapacity!=0) {
             int tail;
-            if((tail=expectedTail) == (head=expectedHead - 1)){
-              long[] newArr;
-              int newCap,size;
-              expectedTail=(newCap=OmniArray.growBy50Pct(head + (size=expectedCapacity))) - 1;
-              expectedCapacity=newCap;
-              newArr=new long[BitSetUtil.getPackedCapacity(newCap)];
-              BitSetUtil.semicheckedCopy((long[])expectedArr,0,newArr,newCap-=++tail,tail);
-              BitSetUtil.semicheckedCopy((long[])expectedArr,head + 1,newArr,head=newCap - (size-=tail),size);
-              expectedArr=newArr;
-              --head;
-            }else if(head == -1 && tail == (head=expectedCapacity - 1)){
-              int newCap;
-              expectedTail=(newCap=OmniArray.growBy50Pct(++tail)) - 1;
-              expectedCapacity=newCap;
-              BitSetUtil.semicheckedCopy((long[])expectedArr,0,(long[])(expectedArr=new long[BitSetUtil.getPackedCapacity(newCap)]),head=newCap - tail,tail);
-              --head;
+            if((tail=this.expectedTail)==-1) {
+              words[(tail=words.length)-1]=(boolean)inputVal?-1:0L;
+              this.expectedHead=tail=(tail<<6)-1;
+              this.expectedTail=tail;
+            }else {
+              int head;
+              final long[] newWords;
+              int oldCap,newCap;
+              if((head=this.expectedHead-1)==tail) {
+                if((tail&63)==63) {
+                  (newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)])[(head=newCap-oldCap)-1]=(boolean)inputVal?-1L:0L;
+                  this.expectedHead=(head<<6)-1;
+                  this.expectedTail=(newCap<<6)-1;
+                  ArrCopy.uncheckedCopy(words,tail=(tail>>6)+1,newWords,head,oldCap-=tail);
+                  ArrCopy.uncheckedCopy(words,0,newWords,head+oldCap,tail);
+                  this.expectedArr=newWords;
+                  return;
+                }else {
+                  newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)];
+                  expectedCapacity=newWords.length<<6;
+                  ArrCopy.uncheckedCopy(words,0,newWords,0,tail=(tail>>6)+1);
+                  ArrCopy.uncheckedCopy(words,tail,newWords,newCap-(tail=oldCap-tail),tail);
+                  this.expectedHead=head=(newCap<<6)-((oldCap<<6)-head);
+                  this.expectedArr=newWords;
+                }
+              }else if(head==-1 && tail==(head=((oldCap=words.length)<<6)-1)) {
+                this.expectedTail=((newCap=OmniArray.growBy50Pct(oldCap))<<6)-1;
+                ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],head=newCap-oldCap,oldCap);
+                expectedCapacity=newWords.length<<6;
+                this.expectedHead=(--head<<6)+63;
+                if((boolean)inputVal) {
+                    newWords[head]=-1L;
+                }
+                newWords[head]=(boolean)inputVal?-1L:0L;
+                this.expectedArr=newWords;
+                return;
+              }else {
+                newWords=words;
+                this.expectedHead=head;
+              }
+              if((boolean)inputVal) {
+                newWords[head>>6]|=1L<<head;
+              }else {
+                newWords[head>>6]&=~(1L<<head);
+              }
             }
-            BitSetUtil.storeInPackedArr((long[])expectedArr,head,(boolean)inputVal);
-            expectedHead=head;
-          }
-          ++expectedModCount;
-          ++expectedSize;
+          }else {
+            this.expectedHead=63;
+            this.expectedTail=63;
+            this.expectedArr=new long[] {(boolean)inputVal?-1L:0L};
+            this.expectedCapacity=64;
         }
+        
+        
+    }
+
 
     @Override public void updateAddState(Object inputVal,DataType inputType){
-        if(expectedSize == 0){
-            if(expectedCapacity == 0){
-
-                expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=64)];
-            }
-            expectedHead=0;
-            expectedTail=0;
-            BitSetUtil.storeInPackedArr((long[])expectedArr,0,(boolean)inputVal);
-          }else{
+        ++expectedSize;
+        ++expectedModCount;
+        final long[] words=(long[])this.expectedArr;
+        if(expectedCapacity!=0) {
+          int tail;
+          if((tail=this.expectedTail)==-1) {
+            words[0]=(boolean)inputVal?1L:0L;
+            this.expectedHead=0;
+            this.expectedTail=0;
+          }else {
             int head;
-            int tail;
-            if((tail=expectedTail + 1) == (head=expectedHead)){
-              expectedHead=0;
-              tail=expectedCapacity;
-              final long[] newArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=OmniArray.growBy50Pct(tail))];
-              BitSetUtil.storeInPackedArr(newArr,tail,(boolean)inputVal);
-              expectedTail=tail;
-              BitSetUtil.semicheckedCopy((long[])expectedArr,head,newArr,0,tail-=head);
-              BitSetUtil.semicheckedCopy((long[])expectedArr,0,newArr,tail,head);
-              expectedArr=newArr;
-            }else{
-              if(tail == expectedCapacity){
-                if(head == 0){
-                 BitSetUtil.semicheckedCopy((long[])expectedArr,0,(long[])(expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=OmniArray.growBy50Pct(tail))]),0,tail);
-                }else{
-                  tail=0;
+            final long[] newWords;
+            int newTailWordBound;
+            if(++tail==(head=this.expectedHead)) {
+              if((tail&63)==0) {
+                this.expectedHead=0;
+                (newWords=new long[OmniArray.growBy50Pct(tail=words.length)])[tail]=(boolean)inputVal?1L:0L;
+                this.expectedCapacity=newWords.length<<6;
+                this.expectedTail=tail<<6;
+                ArrCopy.uncheckedCopy(words,head>>=6,newWords,0,tail-=head);
+                ArrCopy.uncheckedCopy(words,0,newWords,tail,head);
+              }else {
+                this.expectedTail=tail;
+                int oldCap;
+                ArrCopy.uncheckedCopy(words,newTailWordBound=tail>>6,newWords=new long[head=OmniArray.growBy50Pct(oldCap=words.length)],head-(oldCap-=newTailWordBound),oldCap);
+                ArrCopy.uncheckedCopy(words,0,newWords,0,newTailWordBound);
+                this.expectedCapacity=newWords.length<<6;
+                if((boolean)inputVal) {
+                  newWords[newTailWordBound]|=1L<<tail;
+                }else {
+                  newWords[newTailWordBound]&=~(1L<<tail);
                 }
               }
-              BitSetUtil.storeInPackedArr((long[])expectedArr,tail,(boolean)inputVal);
-              expectedTail=tail;
+              this.expectedArr=newWords;
+            }else {
+              if((newTailWordBound=tail>>6)==words.length) {
+                if(head==0) {
+                  ArrCopy.uncheckedCopy(words,0,newWords=new long[OmniArray.growBy50Pct(newTailWordBound)],0,newTailWordBound);
+                  this.expectedCapacity=newWords.length<<6;
+                  this.expectedArr=newWords;
+                  if((boolean)inputVal) {
+                      newWords[newTailWordBound]=1L;
+                  }
+                  this.expectedTail=tail;
+                }else {
+                  if((boolean)inputVal) {
+                    words[0]|=1L;
+                  }else {
+                    words[0]&=-2L;
+                  }
+                  this.expectedTail=0;
+                }
+              }else {
+                if((boolean)inputVal) {
+                  words[newTailWordBound]|=1L<<tail;
+                }else {
+                  words[newTailWordBound]&=~(1L<<tail);
+                }
+                this.expectedTail=tail;
+              }
             }
           }
-          ++expectedModCount;
-          ++expectedSize;
+        }else {
+          this.expectedHead=0;
+          this.expectedTail=0;
+          this.expectedArr=new long[] {(boolean)inputVal?1L:0L};
+          this.expectedCapacity=64;
+        }
+      
+        
+//        if(expectedSize == 0){
+//            if(expectedCapacity == 0){
+//
+//                expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=64)];
+//            }
+//            expectedHead=0;
+//            expectedTail=0;
+//            BitSetUtil.storeInPackedArr((long[])expectedArr,0,(boolean)inputVal);
+//          }else{
+//            int head;
+//            int tail;
+//            if((tail=expectedTail + 1) == (head=expectedHead)){
+//              expectedHead=0;
+//              tail=expectedCapacity;
+//              final long[] newArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=OmniArray.growBy50Pct(tail))];
+//              BitSetUtil.storeInPackedArr(newArr,tail,(boolean)inputVal);
+//              expectedTail=tail;
+//              BitSetUtil.semicheckedCopy((long[])expectedArr,head,newArr,0,tail-=head);
+//              BitSetUtil.semicheckedCopy((long[])expectedArr,0,newArr,tail,head);
+//              expectedArr=newArr;
+//            }else{
+//              if(tail == expectedCapacity){
+//                if(head == 0){
+//                 BitSetUtil.semicheckedCopy((long[])expectedArr,0,(long[])(expectedArr=new long[BitSetUtil.getPackedCapacity(expectedCapacity=OmniArray.growBy50Pct(tail))]),0,tail);
+//                }else{
+//                  tail=0;
+//                }
+//              }
+//              BitSetUtil.storeInPackedArr((long[])expectedArr,tail,(boolean)inputVal);
+//              expectedTail=tail;
+//            }
+//          }
+//          ++expectedModCount;
+//          ++expectedSize;
         }
 
     @Override public void updateCollectionState(){
@@ -1322,10 +1426,10 @@ public class PackedBooleanArrDeqTest{
         QueryVal.QueryValModification modification,QueryCastType castType,DataType inputType,int size,double position,int numToRotate){
       if(position < 0){
 
-          queryVal.initDoesNotContain((OmniCollection.OfBoolean)monitor.getCollection(),size,0,modification);
+          queryVal.initDoesNotContain(monitor.getCollection(),size,0,modification);
        
       }else{
-          queryVal.initContains((OmniCollection.OfBoolean)monitor.getCollection(),size,0,position,modification);
+          queryVal.initContains(monitor.getCollection(),size,0,position,modification);
         
       }
       monitor.updateCollectionState();
@@ -1366,6 +1470,7 @@ public class PackedBooleanArrDeqTest{
     void callRaw(PackedBooleanArrDeq seq);
     void callVerify(PackedBooleanArrDeqMonitor monitor);
   }
+  @Order(176)
   @Test public void testadd_val(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1373,30 +1478,31 @@ public class PackedBooleanArrDeqTest{
         .assertTrue(monitor.verifyAdd(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testadd_val");
   }
+  @Order(176)
   @Test public void testaddFirst_val(){
-    TestExecutorService.setNumWorkers(1);
-
     final AddTest test=PackedBooleanArrDeqMonitor::verifyAddFirst;
     test.runAllTests("PackedBooleanArrDeqTest.testaddFirst_val");
   }
+  @Order(176)
   @Test public void testaddLast_val(){
     TestExecutorService.setNumWorkers(1);
 
     final AddTest test=PackedBooleanArrDeqMonitor::verifyAddLast;
     test.runAllTests("PackedBooleanArrDeqTest.testaddLast_val");
   }
+  @Order(3492)
   @Test public void testclear_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyClear;
     test.runAllTests("PackedBooleanArrDeqTest.testclear_void");
   }
+  @Order(3492)
   @Test public void testclone_void(){
     TestExecutorService.setNumWorkers(1);
 
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyClone;
     test.runAllTests("PackedBooleanArrDeqTest.testclone_void");
   }
-  @Test public void testConstructor_int(){
-    TestExecutorService.setNumWorkers(1);
+  @Order(8) @Test public void testConstructor_int(){
     for(final var checkedType:CheckedType.values()){
         for(int tmpInitCap=0;tmpInitCap <= 15;tmpInitCap+=5){
           final int initCap=tmpInitCap;
@@ -1408,9 +1514,8 @@ public class PackedBooleanArrDeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testConstructor_int");
   }
+  @Order(2)
   @Test public void testConstructor_void(){
-    TestExecutorService.setNumWorkers(1);
-
     for(final var checkedType:CheckedType.values()){
       TestExecutorService.submitTest(()->{
         new PackedBooleanArrDeqMonitor(checkedType).verifyCollectionState();
@@ -1418,23 +1523,22 @@ public class PackedBooleanArrDeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testConstructor_void");
   }
+  @Order(231288)
   @Test public void testcontains_val(){
-    TestExecutorService.setNumWorkers(1);
-
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,position)->{
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
     test.runAllTests("PackedBooleanArrDeqTest.testcontains_val");
   }
+  @Order(3492)
   @Test public void testdescendingIterator_void(){
-    TestExecutorService.setNumWorkers(1);
-
     final BasicTest test=monitor->{
       monitor.getMonitoredDescendingIterator().verifyIteratorState();
       monitor.verifyCollectionState();
     };
     test.runAllTests("PackedBooleanArrDeqTest.testdescendingIterator_void");
   }
+  @Order(4356)
   @Test public void testelement_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyElement(outputType);
@@ -1444,10 +1548,12 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testelement_void",true);
   }
+  @Order(3492)
   @Test public void testequals_Object(){
     final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
     test.runAllTests("PackedBooleanArrDeqTest.testequals_Object");
-}
+  }
+  @Order(795620)
   @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -1459,6 +1565,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testforEach_Consumer",100);
   }
+  @Order(4356)
   @Test public void testgetFirst_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyGetFirst(outputType);
@@ -1468,6 +1575,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testgetFirst_void",true);
   }
+  @Order(4356)
   @Test public void testgetLast_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyGetLast(outputType);
@@ -1477,6 +1585,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testgetLast_void",true);
   }
+  @Order(5164)
   @Test public void testhashCode_void(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1490,10 +1599,12 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testhashCode_void");
   }
+  @Order(3492)
   @Test public void testisEmpty_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyIsEmpty;
     test.runAllTests("PackedBooleanArrDeqTest.testisEmpty_void");
   }
+  @Order(3492)
   @Test public void testiterator_void(){
     final BasicTest test=monitor->{
       monitor.getMonitoredIterator().verifyIteratorState();
@@ -1501,8 +1612,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testiterator_void");
   }
-  @Test public void testItrclone_void(){
-    TestExecutorService.setNumWorkers(1);
+  @Order(3492) @Test public void testItrclone_void(){
     final BasicTest test=monitor->{
       final int size=monitor.size();
       for(final var itrType:StructType.PackedBooleanArrDeq.validItrTypes){
@@ -1515,6 +1625,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testItrclone_void");
   }
+  @Order(1502124)
   @Test public void testItrforEachRemaining_Consumer(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1577,9 +1688,8 @@ public class PackedBooleanArrDeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testItrforEachRemaining_Consumer");
   }
+  @Order(3492)
   @Test public void testItrhasNext_void(){
-    TestExecutorService.setNumWorkers(1);
-
     final BasicTest test=monitor->{
       for(final var itrType:StructType.PackedBooleanArrDeq.validItrTypes){
         final var itrMonitor=monitor.getMonitoredIterator(itrType);
@@ -1590,9 +1700,8 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testItrhasNext_void");
   }
+  @Order(162846)
   @Test public void testItrnext_void(){
-    TestExecutorService.setNumWorkers(1);
-
     for(final var size:SIZES){
       final int interval=Math.max(1,size / 10);
       final int rotateBound=size / 2 + interval;
@@ -1648,6 +1757,7 @@ public class PackedBooleanArrDeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testItrnext_void");
   }
+  @Order(61318)
   @Test public void testItrremove_void(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1732,35 +1842,75 @@ public class PackedBooleanArrDeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testItrremove_void");
   }
+  private static void verifyMASSIVEToStringHelper(String result,int seqSize,String testName) {
+      int offset;
+      Assertions.assertEquals('[',result.charAt(offset=0));
+      Assertions.assertEquals('f',result.charAt(++offset));
+      Assertions.assertEquals('a',result.charAt(++offset));
+      Assertions.assertEquals('l',result.charAt(++offset));
+      Assertions.assertEquals('s',result.charAt(++offset));
+      Assertions.assertEquals('e',result.charAt(++offset));
+      ++offset;
+      int numBatches=TestExecutorService.getNumWorkers();
+      int batchSize=(seqSize-2)/numBatches * 13;
+      for(int batchCount=0;batchCount<numBatches;++batchCount) {
+          final int batchOffset=offset;
+          final int batchBound=batchCount == numBatches?result.length() - 1:offset + batchSize;
+          TestExecutorService.submitTest(()->{
+              for(int i=batchOffset;;++i) {
+                if(i>=batchBound) {
+                    break;
+                }
+                Assertions.assertEquals(',',result.charAt(i));
+                Assertions.assertEquals(' ',result.charAt(++i));
+                Assertions.assertEquals('t',result.charAt(++i));
+                Assertions.assertEquals('r',result.charAt(++i));
+                Assertions.assertEquals('u',result.charAt(++i));
+                Assertions.assertEquals('e',result.charAt(++i));
+                if(++i>=batchBound) {
+                    break;
+                }
+                Assertions.assertEquals(',',result.charAt(i));
+                Assertions.assertEquals(' ',result.charAt(++i));
+                Assertions.assertEquals('f',result.charAt(++i));
+                Assertions.assertEquals('a',result.charAt(++i));
+                Assertions.assertEquals('l',result.charAt(++i));
+                Assertions.assertEquals('s',result.charAt(++i));
+                Assertions.assertEquals('e',result.charAt(++i));
+              }
+          });
+      }
+      Assertions.assertEquals(',',result.charAt(offset=result.length()-7));
+      Assertions.assertEquals(' ',result.charAt(++offset));
+      Assertions.assertEquals('t',result.charAt(++offset));
+      Assertions.assertEquals('r',result.charAt(++offset));
+      Assertions.assertEquals('u',result.charAt(++offset));
+      Assertions.assertEquals('e',result.charAt(++offset));
+      Assertions.assertEquals(']',result.charAt(++offset));
+      TestExecutorService.completeAllTests(testName);
+  }
   @Test public void testMASSIVEtoString(){
-    //TODO
-//      int seqSize;
-//      if((seqSize=DataType.BOOLEAN.massiveToStringThreshold + 1) == 0){
-//        continue;
-//      }
-//      OmniDeque<?> checkedNonFragmented;
-//      OmniDeque<?> uncheckedNonFragmented;
-//      OmniDeque<?> checkedFragmented;
-//      OmniDeque<?> uncheckedFragmented;
-//        long[] arr;
-//        checkedNonFragmented=new PackedBooleanArrDeq.Checked(0,arr=new long[seqSize],seqSize - 1);
-//        uncheckedNonFragmented=new PackedBooleanArrDeq(0,arr,seqSize - 1);
-//        checkedFragmented=new PackedBooleanArrDeq.Checked((seqSize >> 1) + 1,arr,seqSize >> 1);
-//        uncheckedFragmented=new PackedBooleanArrDeq((seqSize >> 1) + 1,arr,seqSize >> 1);
-//        for(int i=0;i < seqSize;++i){
-//          arr[i]=true;
-//        }
-//      
-//        DataType.BOOLEAN.verifyMASSIVEToString(checkedNonFragmented.toString(),seqSize,
-//          "Packed"+DataType.BOOLEAN.classPrefix + "ArrDeqTest.Checked.NonFragmented.testMassiveToString");
-//        DataType.BOOLEAN.verifyMASSIVEToString(uncheckedNonFragmented.toString(),seqSize,
-//          "Packed"+DataType.BOOLEAN.classPrefix + "ArrDeqTest.NonFragmented.testMassiveToString");
-//        DataType.BOOLEAN.verifyMASSIVEToString(checkedFragmented.toString(),seqSize,
-//          "Packed"+DataType.BOOLEAN.classPrefix + "ArrDeqTest.Checked.Fragmented.testMassiveToString");
-//        DataType.BOOLEAN.verifyMASSIVEToString(uncheckedFragmented.toString(),seqSize,
-//          "Packed"+DataType.BOOLEAN.classPrefix + "ArrDeqTest.Fragmented.testMassiveToString");
+      int seqSize;
+      long[] words;
+      for(int i=(words=new long[((seqSize=DataType.BOOLEAN.massiveToStringThreshold+1)-1>>6)+1]).length;--i>=0;) {
+          words[i]=0xAAAAAAAAAAAAAAAAL;
+      }
+      PackedBooleanArrDeq deq=new PackedBooleanArrDeq(0,words,seqSize-1);
+      verifyMASSIVEToStringHelper(deq.toString(),seqSize,"PackedBooleanArrDeqTest.testMASSIVEtoString nonfragmented");
+      //TODO test checked
+      deq.tail=seqSize/2+1;
+      deq.head=deq.head+1;
+      verifyMASSIVEToStringHelper(deq.toString(),seqSize,"PackedBooleanArrDeqTest.testMASSIVEtoString fragmented");
+      deq=new PackedBooleanArrDeq.Checked(0,words,seqSize-1);
+      verifyMASSIVEToStringHelper(deq.toString(),seqSize,"PackedBooleanArrDeqTest.Checked.testMASSIVEtoString nonfragmented");
+      //TODO test checked
+      deq.tail=seqSize/2+1;
+      deq.head=deq.head+1;
+      verifyMASSIVEToStringHelper(deq.toString(),seqSize,"PackedBooleanArrDeqTest.Checked.testMASSIVEtoString fragmented");
+      
     
   }
+  @Order(176)
   @Test public void testoffer_val(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1768,13 +1918,13 @@ public class PackedBooleanArrDeqTest{
         .assertTrue(monitor.verifyOffer(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testoffer_val");
   }
+  @Order(176)
   @Test public void testofferFirst_val(){
-    TestExecutorService.setNumWorkers(1);
-
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOfferFirst(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testofferFirst_val");
   }
+  @Order(176)
   @Test public void testofferLast_val(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1782,6 +1932,7 @@ public class PackedBooleanArrDeqTest{
         .assertTrue(monitor.verifyOfferLast(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testofferLast_val");
   }
+  @Order(4356)
   @Test public void testpeek_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeek(outputType);
@@ -1791,7 +1942,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testpeek_void",false);
   }
-  @Test public void testpeekFirst_void(){
+  @Order(4356) @Test public void testpeekFirst_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeekFirst(outputType);
       if(!monitor.isEmpty()){
@@ -1800,6 +1951,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testpeekFirst_void",false);
   }
+  @Order(4356)
   @Test public void testpeekLast_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeekLast(outputType);
@@ -1809,28 +1961,31 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testpeekLast_void",false);
   }
+  @Order(4356)
   @Test public void testpoll_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPoll;
     test.runAllTests("PackedBooleanArrDeqTest.testpoll_void",false);
   }
+  @Order(4356)
   @Test public void testpollFirst_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPollFirst;
     test.runAllTests("PackedBooleanArrDeqTest.testpollFirst_void",false);
   }
+  @Order(4356)
   @Test public void testpollLast_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPollLast;
     test.runAllTests("PackedBooleanArrDeqTest.testpollLast_void",false);
   }
+  @Order(4356)
   @Test public void testpop_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPop;
     test.runAllTests("PackedBooleanArrDeqTest.testpop_void",true);
   }
-  @Test public void testpush_val(){
-    TestExecutorService.setNumWorkers(1);
-
+  @Order(176) @Test public void testpush_val(){
     final AddTest test=PackedBooleanArrDeqMonitor::verifyPush;
     test.runAllTests("PackedBooleanArrDeqTest.testpush_val");
   }
+  @Order(25820)
   @Test public void testReadAndWrite(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1843,14 +1998,17 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testReadAndWrite",0);
   }
+  @Order(4356)
   @Test public void testremove_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemove;
     test.runAllTests("PackedBooleanArrDeqTest.testremove_void",true);
   }
+  @Order(4356)
   @Test public void testremoveFirst_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemoveFirst;
     test.runAllTests("PackedBooleanArrDeqTest.testremoveFirst_void",true);
   }
+  @Order(231288)
   @Test public void testremoveFirstOccurrence_val(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1861,6 +2019,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveFirstOccurrence_val");
   }
+  @Order(1118080)
   @Test public void testremoveIf_Predicate(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1946,10 +2105,12 @@ public class PackedBooleanArrDeqTest{
     
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testremoveIf_Predicate");
   }
+  @Order(4356)
   @Test public void testremoveLast_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemoveLast;
     test.runAllTests("PackedBooleanArrDeqTest.testremoveLast_void",true);
   }
+  @Order(231288)
   @Test public void testremoveLastOccurrence_val(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1960,6 +2121,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveLastOccurrence_val");
   }
+  @Order(231288)
   @Test public void testremoveVal_val(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1968,6 +2130,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveVal_val");
   }
+  @Order(231288)
   @Test public void testsearch_val(){
     TestExecutorService.setNumWorkers(1);
 
@@ -1982,10 +2145,12 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testsearch_val");
   }
+  @Order(3492)
   @Test public void testsize_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifySize;
     test.runAllTests("PackedBooleanArrDeqTest.testsize_void");
   }
+  @Order(25820)
   @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
@@ -1996,6 +2161,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testtoArray_IntFunction",0);
   }
+  @Order(3492)
   @Test public void testtoArray_ObjectArray(){
     final BasicTest test=(monitor)->{
       final int size=monitor.size();
@@ -2006,6 +2172,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testtoArray_ObjectArray");
   }
+  @Order(3492)
   @Test public void testtoArray_void(){
     final BasicTest test=(monitor)->{
       for(final var outputType:monitor.dataType.validOutputTypes()){
@@ -2014,6 +2181,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testtoArray_void");
   }
+  @Order(5164)
   @Test public void testtoString_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(PackedBooleanArrDeq seq){
@@ -2023,7 +2191,7 @@ public class PackedBooleanArrDeqTest{
         monitor.verifyToString();
       }
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testhashCode_void");
+    test.runAllTests("PackedBooleanArrDeqTest.testtoString_void");
   }
   @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
     int numTestsRemaining;
