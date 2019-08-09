@@ -84,6 +84,64 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
     //TODO
     return false;
   }
+  @Override public void push(boolean val){
+    final long[] words;
+    if((words=this.words)!=null) {
+      int tail;
+      if((tail=this.tail)==-1) {
+        words[(tail=words.length)-1]=val?-1L:0L;
+        this.head=tail=(tail<<6)-1;
+        this.tail=tail;
+      }else {
+        int head;
+        final long[] newWords;
+        int newTailWordBound;
+        int oldCap,newCap;
+        if(tail==(head=this.head-1)) {
+          newCap=OmniArray.growBy50Pct(oldCap=words.length);
+          if((tail&63)==0) {
+            (newWords=new long[newCap])[(head=newCap-oldCap)-1]=val?-1L:0L;
+            this.head=(head<<6)-1;
+            this.tail=(newCap<<6)-1;
+            ArrCopy.uncheckedCopy(words,tail=(tail>>6)+1,newWords,head,oldCap-=tail);
+            ArrCopy.uncheckedCopy(words,0,newWords,head+oldCap,tail);
+          }else {
+            ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],0,(newTailWordBound=(tail>>6))+1);
+            this.head=head=(newCap<<6)-((oldCap<<6)-(tail+1))-1;
+            ArrCopy.semicheckedCopy(words,newTailWordBound+1,newWords,oldCap=(tail=head>>6)+1,newCap-oldCap);
+            if(val) {
+              newWords[tail]=words[newTailWordBound]|(1L<<head);
+            }else {
+              newWords[tail]=words[newTailWordBound]&(~(1L<<head));
+            }
+          }
+          this.words=newWords;
+          return;
+        }else if(head==-1 && tail==(head=((oldCap=words.length)<<6)-1)) {
+          this.tail=((newCap=OmniArray.growBy50Pct(oldCap))<<6)-1;
+          ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],head=newCap-oldCap,oldCap);
+          this.head=(--head<<6)+63;
+          if(val) {
+              newWords[head]=-1L;
+          }
+          this.words=newWords;
+          return;
+        }else {
+          newWords=words;
+          this.head=head;
+        }
+        if(val) {
+          newWords[head>>6]|=1L<<head;
+        }else {
+          newWords[head>>6]&=~(1L<<head);
+        }
+      }
+    }else {
+      this.head=63;
+      this.tail=63;
+      this.words=new long[] {val?-1L:0L};
+    }
+  }
   @Override public void addLast(boolean val){
     final long[] words;
     if((words=this.words)!=null) {
@@ -105,14 +163,15 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
             ArrCopy.uncheckedCopy(words,0,newWords,tail,head);
           }else {
             this.tail=tail;
-            int oldCap;
-            ArrCopy.uncheckedCopy(words,newTailWordBound=tail>>6,newWords=new long[head=OmniArray.growBy50Pct(oldCap=words.length)],head-(oldCap-=newTailWordBound),oldCap);
-            ArrCopy.uncheckedCopy(words,0,newWords,0,newTailWordBound);
+            int oldCap,newCap;
+            ArrCopy.semicheckedCopy(words,0,newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)],0,(newTailWordBound=tail>>6));
             if(val) {
-              newWords[newTailWordBound]|=1L<<tail;
+              newWords[newTailWordBound]=words[newTailWordBound]|(1L<<tail);
             }else {
-              newWords[newTailWordBound]&=~(1L<<tail);
+              newWords[newTailWordBound]=words[newTailWordBound]&(~(1L<<tail));
             }
+            this.head=head=(newCap<<6)-((oldCap<<6)-tail);
+            ArrCopy.uncheckedCopy(words,newTailWordBound,newWords,head>>=6,newCap-head);
           }
           this.words=newWords;
         }else {
@@ -1064,60 +1123,7 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
     }
     return Character.MIN_VALUE;
   }
-  @Override public void push(boolean val){
-    final long[] words;
-    if((words=this.words)!=null) {
-      int tail;
-      if((tail=this.tail)==-1) {
-        words[(tail=words.length)-1]=val?-1:0L;
-        this.head=tail=(tail<<6)-1;
-        this.tail=tail;
-      }else {
-        int head;
-        final long[] newWords;
-        int oldCap,newCap;
-        if((head=this.head-1)==tail) {
-          if((tail&63)==63) {
-            (newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)])[(head=newCap-oldCap)-1]=val?-1L:0L;
-            this.head=(head<<6)-1;
-            this.tail=(newCap<<6)-1;
-            ArrCopy.uncheckedCopy(words,tail=(tail>>6)+1,newWords,head,oldCap-=tail);
-            ArrCopy.uncheckedCopy(words,0,newWords,head+oldCap,tail);
-            this.words=newWords;
-            return;
-          }else {
-            newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)];
-            ArrCopy.uncheckedCopy(words,0,newWords,0,tail=(tail>>6)+1);
-            ArrCopy.uncheckedCopy(words,tail,newWords,newCap-(tail=oldCap-tail),tail);
-            this.head=head=(newCap<<6)-((oldCap<<6)-head);
-            this.words=newWords;
-          }
-        }else if(head==-1 && tail==(head=((oldCap=words.length)<<6)-1)) {
-          this.tail=((newCap=OmniArray.growBy50Pct(oldCap))<<6)-1;
-          ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],head=newCap-oldCap,oldCap);
-          this.head=(--head<<6)+63;
-          if(val) {
-              newWords[head]=-1L;
-          }
-          newWords[head]=val?-1L:0L;
-          this.words=newWords;
-          return;
-        }else {
-          newWords=words;
-          this.head=head;
-        }
-        if(val) {
-          newWords[head>>6]|=1L<<head;
-        }else {
-          newWords[head>>6]&=~(1L<<head);
-        }
-      }
-    }else {
-      this.head=63;
-      this.tail=63;
-      this.words=new long[] {val?-1L:0L};
-    }
-  }
+  
   @Override public boolean popBoolean(){
     final long[] words;
     final int head;

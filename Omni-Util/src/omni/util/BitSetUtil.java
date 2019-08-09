@@ -83,6 +83,8 @@ public interface BitSetUtil{
           dst[dstWordOffset]=dst[dstWordOffset]&~(endMask=-1L>>>-length)|srcWord&endMask;
       }
     }
+
+    
     public static void uncheckedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
         int srcWordOffset;
         int srcWordBound;

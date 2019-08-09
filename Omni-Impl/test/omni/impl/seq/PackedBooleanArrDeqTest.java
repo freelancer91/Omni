@@ -507,65 +507,69 @@ public class PackedBooleanArrDeqTest{
     }
     
     @Override public void updateAddFirstState(Object inputVal,DataType inputType){
-        ++expectedSize;
-        ++expectedModCount;
-        long[] words=(long[])this.expectedArr;
-        if(expectedCapacity!=0) {
-            int tail;
-            if((tail=this.expectedTail)==-1) {
-              words[(tail=words.length)-1]=(boolean)inputVal?-1:0L;
-              this.expectedHead=tail=(tail<<6)-1;
-              this.expectedTail=tail;
+      ++expectedSize;
+      ++expectedModCount;
+      final var val=(boolean)inputVal;
+      final var words=(long[])expectedArr;
+      if(expectedCapacity!=0) {
+        int tail;
+        if((tail=this.expectedTail)==-1) {
+          words[(tail=words.length)-1]=val?-1L:0L;
+          this.expectedHead=tail=(tail<<6)-1;
+          this.expectedTail=tail;
+        }else {
+          int head;
+          final long[] newWords;
+          int newTailWordBound;
+          int oldCap,newCap;
+          if(tail==(head=this.expectedHead-1)) {
+            newCap=OmniArray.growBy50Pct(oldCap=words.length);
+            if((tail&63)==0) {
+              (newWords=new long[newCap])[(head=newCap-oldCap)-1]=val?-1L:0L;
+              this.expectedHead=(head<<6)-1;
+              this.expectedTail=(newCap<<6)-1;
+              ArrCopy.uncheckedCopy(words,tail=(tail>>6)+1,newWords,head,oldCap-=tail);
+              ArrCopy.uncheckedCopy(words,0,newWords,head+oldCap,tail);
             }else {
-              int head;
-              final long[] newWords;
-              int oldCap,newCap;
-              if((head=this.expectedHead-1)==tail) {
-                if((tail&63)==63) {
-                  (newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)])[(head=newCap-oldCap)-1]=(boolean)inputVal?-1L:0L;
-                  this.expectedHead=(head<<6)-1;
-                  this.expectedTail=(newCap<<6)-1;
-                  ArrCopy.uncheckedCopy(words,tail=(tail>>6)+1,newWords,head,oldCap-=tail);
-                  ArrCopy.uncheckedCopy(words,0,newWords,head+oldCap,tail);
-                  this.expectedArr=newWords;
-                  return;
-                }else {
-                  newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)];
-                  expectedCapacity=newWords.length<<6;
-                  ArrCopy.uncheckedCopy(words,0,newWords,0,tail=(tail>>6)+1);
-                  ArrCopy.uncheckedCopy(words,tail,newWords,newCap-(tail=oldCap-tail),tail);
-                  this.expectedHead=head=(newCap<<6)-((oldCap<<6)-head);
-                  this.expectedArr=newWords;
-                }
-              }else if(head==-1 && tail==(head=((oldCap=words.length)<<6)-1)) {
-                this.expectedTail=((newCap=OmniArray.growBy50Pct(oldCap))<<6)-1;
-                ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],head=newCap-oldCap,oldCap);
-                expectedCapacity=newWords.length<<6;
-                this.expectedHead=(--head<<6)+63;
-                if((boolean)inputVal) {
-                    newWords[head]=-1L;
-                }
-                newWords[head]=(boolean)inputVal?-1L:0L;
-                this.expectedArr=newWords;
-                return;
+              ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],0,(newTailWordBound=(tail>>6))+1);
+              this.expectedHead=head=(newCap<<6)-((oldCap<<6)-tail+1)-1;
+              ArrCopy.semicheckedCopy(words,newTailWordBound+1,newWords,oldCap=(tail=head>>6)+1,newCap-oldCap);
+              if(val) {
+                newWords[tail]=words[newTailWordBound]|(1L<<head);
               }else {
-                newWords=words;
-                this.expectedHead=head;
-              }
-              if((boolean)inputVal) {
-                newWords[head>>6]|=1L<<head;
-              }else {
-                newWords[head>>6]&=~(1L<<head);
+                newWords[tail]=words[newTailWordBound]&(~(1L<<head));
               }
             }
+            this.expectedArr=newWords;
+            this.expectedCapacity=newWords.length<<6;
+            return;
+          }else if(head==-1 && tail==(head=((oldCap=words.length)<<6)-1)) {
+            this.expectedTail=((newCap=OmniArray.growBy50Pct(oldCap))<<6)-1;
+            ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],head=newCap-oldCap,oldCap);
+            this.expectedHead=(--head<<6)+63;
+            if(val) {
+                newWords[head]=-1L;
+            }
+            this.expectedArr=newWords;
+            this.expectedCapacity=newWords.length<<6;
+
+            return;
           }else {
-            this.expectedHead=63;
-            this.expectedTail=63;
-            this.expectedArr=new long[] {(boolean)inputVal?-1L:0L};
-            this.expectedCapacity=64;
+            newWords=words;
+            this.expectedHead=head;
+          }
+          if(val) {
+            newWords[head>>6]|=1L<<head;
+          }else {
+            newWords[head>>6]&=~(1L<<head);
+          }
         }
-        
-        
+      }else {
+        this.expectedHead=63;
+        this.expectedTail=63;
+        this.expectedArr=new long[] {val?-1L:0L};
+        this.expectedCapacity=64;
+      }
     }
 
 
@@ -587,22 +591,22 @@ public class PackedBooleanArrDeqTest{
               if((tail&63)==0) {
                 this.expectedHead=0;
                 (newWords=new long[OmniArray.growBy50Pct(tail=words.length)])[tail]=(boolean)inputVal?1L:0L;
-                this.expectedCapacity=newWords.length<<6;
                 this.expectedTail=tail<<6;
                 ArrCopy.uncheckedCopy(words,head>>=6,newWords,0,tail-=head);
                 ArrCopy.uncheckedCopy(words,0,newWords,tail,head);
               }else {
                 this.expectedTail=tail;
-                int oldCap;
-                ArrCopy.uncheckedCopy(words,newTailWordBound=tail>>6,newWords=new long[head=OmniArray.growBy50Pct(oldCap=words.length)],head-(oldCap-=newTailWordBound),oldCap);
-                ArrCopy.uncheckedCopy(words,0,newWords,0,newTailWordBound);
-                this.expectedCapacity=newWords.length<<6;
+                int oldCap,newCap;
+                ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)],0,(newTailWordBound=tail>>6));
                 if((boolean)inputVal) {
-                  newWords[newTailWordBound]|=1L<<tail;
+                  newWords[newTailWordBound]=words[newTailWordBound]|(1L<<tail);
                 }else {
-                  newWords[newTailWordBound]&=~(1L<<tail);
+                  newWords[newTailWordBound]=words[newTailWordBound]&(~(1L<<tail));
                 }
+                this.expectedHead=head=(newCap<<6)-((oldCap<<6)-tail);
+                ArrCopy.uncheckedCopy(words,newTailWordBound,newWords,head>>=6,newCap-head);
               }
+              this.expectedCapacity=newWords.length<<6;
               this.expectedArr=newWords;
             }else {
               if((newTailWordBound=tail>>6)==words.length) {
@@ -1236,20 +1240,23 @@ public class PackedBooleanArrDeqTest{
     private void runAllTests(String testName){
       for(final var checkedType:CheckedType.values()){
         for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
-          for(int tmpInitCap=0;tmpInitCap <= 15;tmpInitCap+=5){
+          for(int tmpInitCap=0;tmpInitCap <= 512;tmpInitCap+=64){
             final int initCap=tmpInitCap;
-            for(int tmpNumToRotate=0;tmpNumToRotate <= 10;++tmpNumToRotate){
+            for(int tmpNumToRotate=0,rotateBound=Math.max(32,tmpInitCap/2);tmpNumToRotate <= rotateBound;++tmpNumToRotate){
               final int numToRotate=tmpNumToRotate;
-              TestExecutorService.submitTest(()->{
+             // TestExecutorService.submitTest(()->{
                 final var monitor=new PackedBooleanArrDeqMonitor(checkedType,initCap);
                 if(numToRotate != 0){
                   monitor.add(0);
                   monitor.rotate(numToRotate);
                 }
-                for(int i=0;i < 100;++i){
+                for(int i=0;i < 512;++i){
+                  if(numToRotate==2 && initCap==0 && i==63 && functionCallType.boxed && checkedType.checked) {
+                    TestExecutorService.suspend();
+                  }
                   callMethod(monitor,DataType.BOOLEAN.convertValUnchecked(i),DataType.BOOLEAN,functionCallType);
                 }
-              });
+             // });
             }
           }
         }
@@ -1982,6 +1989,8 @@ public class PackedBooleanArrDeqTest{
     test.runAllTests("PackedBooleanArrDeqTest.testpop_void",true);
   }
   @Order(176) @Test public void testpush_val(){
+    TestExecutorService.setNumWorkers(1);
+
     final AddTest test=PackedBooleanArrDeqMonitor::verifyPush;
     test.runAllTests("PackedBooleanArrDeqTest.testpush_val");
   }
