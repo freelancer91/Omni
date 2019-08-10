@@ -195,7 +195,7 @@ public interface BitSetUtil{
     public static String prettyPrintWord(long word) {
         var byteArr=new byte[64];
         for(int i=0;;) {
-            byteArr[i]=(byte)(48+(word>>>i&1));
+            byteArr[63-i]=(byte)(48+(word>>>i&1));
             if(++i==64) {
                 return new String(byteArr,ToStringUtil.IOS8859CharSet);
             }

@@ -303,7 +303,7 @@ public class BitSetUtilTest{
             TestExecutorService.submitTest(()->{
               String result=BitSetUtil.prettyPrintWord(word);
               for(int j=0;j<64;++j) {
-                  Assertions.assertEquals((char)((word>>>j&1)+48),result.charAt(j));
+                  Assertions.assertEquals((char)((word>>>j&1)+48),result.charAt(63-j));
               }              
             });
         }

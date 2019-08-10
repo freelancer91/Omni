@@ -103,16 +103,16 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
             (newWords=new long[newCap])[(head=newCap-oldCap)-1]=val?-1L:0L;
             this.head=(head<<6)-1;
             this.tail=(newCap<<6)-1;
-            ArrCopy.uncheckedCopy(words,tail=(tail>>6)+1,newWords,head,oldCap-=tail);
+            ArrCopy.semicheckedCopy(words,tail=(tail>>6)+1,newWords,head,oldCap-=tail);
             ArrCopy.uncheckedCopy(words,0,newWords,head+oldCap,tail);
           }else {
-            ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],0,(newTailWordBound=(tail>>6))+1);
+            ArrCopy.uncheckedCopy(words,0,newWords=new long[newCap],0,(newTailWordBound=tail>>6)+1);
             this.head=head=(newCap<<6)-((oldCap<<6)-(tail+1))-1;
             ArrCopy.semicheckedCopy(words,newTailWordBound+1,newWords,oldCap=(tail=head>>6)+1,newCap-oldCap);
             if(val) {
-              newWords[tail]=words[newTailWordBound]|(1L<<head);
+              newWords[tail]=words[newTailWordBound]|1L<<head;
             }else {
-              newWords[tail]=words[newTailWordBound]&(~(1L<<head));
+              newWords[tail]=words[newTailWordBound]&~(1L<<head);
             }
           }
           this.words=newWords;
@@ -164,11 +164,11 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
           }else {
             this.tail=tail;
             int oldCap,newCap;
-            ArrCopy.semicheckedCopy(words,0,newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)],0,(newTailWordBound=tail>>6));
+            ArrCopy.semicheckedCopy(words,0,newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)],0,newTailWordBound=tail>>6);
             if(val) {
-              newWords[newTailWordBound]=words[newTailWordBound]|(1L<<tail);
+              newWords[newTailWordBound]=words[newTailWordBound]|1L<<tail;
             }else {
-              newWords[newTailWordBound]=words[newTailWordBound]&(~(1L<<tail));
+              newWords[newTailWordBound]=words[newTailWordBound]&~(1L<<tail);
             }
             this.head=head=(newCap<<6)-((oldCap<<6)-tail);
             ArrCopy.uncheckedCopy(words,newTailWordBound,newWords,head>>=6,newCap-head);
@@ -1146,8 +1146,56 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
     throw new UnsupportedOperationException();
   }
   @Override public Object clone(){
-    //TODO
-    throw new UnsupportedOperationException();
+      int tail;
+      if((tail=this.tail)!=-1) {
+          final var words=this.words;
+          final long[] dst;
+          int size;
+          int head;
+          final PackedBooleanArrDeq clone;
+          if((size=tail-(head=this.head))<0) {
+              int oldCap;
+              if((size+=oldCap=words.length<<6)<64) {
+                  long mask;
+                  (dst=new long[1])[0]=words[0]&~(mask=-1L<<tail+1)|words[oldCap-1>>6]&mask;
+                  clone=new PackedBooleanArrDeq(head&63,dst,tail);
+              }else {
+                  int cloneHead;
+                  clone=new PackedBooleanArrDeq(cloneHead=(size=size+64&-64)-(oldCap-=head),dst=new long[size>>6],tail);
+                  if((size=tail>>6)==(cloneHead>>=6)) {
+                      if(size==0) {
+                          dst[0]=words[0]&-1L>>>-tail-1|words[tail=head>>6]&-1L<<head;
+                          ArrCopy.uncheckedCopy(words,tail+1,dst,cloneHead+1,oldCap>>6);
+                      }else {
+                          ArrCopy.uncheckedCopy(words,0,dst,0,size);
+                          long mask;
+                          dst[size]=words[size]&(mask=-1L>>>-tail-1)|words[tail=head>>6]&~mask;
+                          ArrCopy.semicheckedCopy(words,tail+1,dst,cloneHead+1,oldCap>>6);
+                      }
+                  }else {
+                      ArrCopy.uncheckedCopy(words,0,dst,0,size+1);
+                      ArrCopy.uncheckedCopy(words,head>>6,dst,cloneHead,(oldCap-1>>6)+1);
+                  }
+              }
+          }else {
+              final int cloneCap;
+              clone=new PackedBooleanArrDeq(0,dst=new long[cloneCap=(size>>6)+1],size);
+              if((head&63)==0) {
+                  ArrCopy.uncheckedCopy(words,head>>6,dst,0,cloneCap);
+              }else {
+                long srcWord;
+                int srcOffset;
+                for(srcWord=words[srcOffset=head>>6]>>>head,tail>>=6,size=0;srcOffset<tail;++size,srcWord>>>=head) {
+                    dst[size]=srcWord | (srcWord=words[++srcOffset])<<-head;
+                }
+                if(size<cloneCap) {
+                    dst[size]=srcWord;
+                }
+              }
+          }
+          return clone;
+      }
+      return new PackedBooleanArrDeq();
   }
   @Override boolean fragmentedRemoveIf(int head,int tail,BooleanPredicate filter){
     //TODO
@@ -1605,10 +1653,10 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
       }
     }
     for(;;) {
-      if(++head==tail) {
+      if(head==tail) {
         return hash;
       }
-      if((head&63)==0) {
+      if((++head&63)==0) {
         word=words[++wordOffset];
       }
       hash=hash * 31 + ((word >> head & 1) != 0?1231:1237);
@@ -1734,8 +1782,56 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
       }
     }
     @Override public Object clone(){
-      //TODO
-      throw new UnsupportedOperationException();
+        int tail;
+        if((tail=this.tail)!=-1) {
+            final var words=this.words;
+            final long[] dst;
+            int size;
+            int head;
+            final Checked clone;
+            if((size=tail-(head=this.head))<0) {
+                int oldCap;
+                if((size+=oldCap=words.length<<6)<64) {
+                    long mask;
+                    (dst=new long[1])[0]=words[0]&~(mask=-1L<<tail+1)|words[oldCap-1>>6]&mask;
+                    clone=new Checked(head&63,dst,tail);
+                }else {
+                    int cloneHead;
+                    clone=new Checked(cloneHead=(size=size+64&-64)-(oldCap-=head),dst=new long[size>>6],tail);
+                    if((size=tail>>6)==(cloneHead>>=6)) {
+                        if(size==0) {
+                            dst[0]=words[0]&-1L>>>-tail-1|words[tail=head>>6]&-1L<<head;
+                            ArrCopy.uncheckedCopy(words,tail+1,dst,cloneHead+1,oldCap>>6);
+                        }else {
+                            ArrCopy.uncheckedCopy(words,0,dst,0,size);
+                            long mask;
+                            dst[size]=words[size]&(mask=-1L>>>-tail-1)|words[tail=head>>6]&~mask;
+                            ArrCopy.semicheckedCopy(words,tail+1,dst,cloneHead+1,oldCap>>6);
+                        }
+                    }else {
+                        ArrCopy.uncheckedCopy(words,0,dst,0,size+1);
+                        ArrCopy.uncheckedCopy(words,head>>6,dst,cloneHead,(oldCap-1>>6)+1);
+                    }
+                }
+            }else {
+                final int cloneCap;
+                clone=new Checked(0,dst=new long[cloneCap=(size>>6)+1],size);
+                if((head&63)==0) {
+                    ArrCopy.uncheckedCopy(words,head>>6,dst,0,cloneCap);
+                }else {
+                  long srcWord;
+                  int srcOffset;
+                  for(srcWord=words[srcOffset=head>>6]>>>head,tail>>=6,size=0;srcOffset<tail;++size,srcWord>>>=head) {
+                      dst[size]=srcWord | (srcWord=words[++srcOffset])<<-head;
+                  }
+                  if(size<cloneCap) {
+                      dst[size]=srcWord;
+                  }
+                }
+            }
+            return clone;
+        }
+        return new Checked();
     }
     @Override public boolean removeLastBoolean(){
       int tail;
