@@ -55,6 +55,11 @@ public class PackedBooleanArrSeqTest{
     long[] expectedWords;
     int expectedModCount;
     int trueCount;
+    @Override
+    public void repairModCount() {
+        //nothing to do
+    }
+    
     private void updateTrueCount() {
       int bitCount=0;
       if(expectedSize!=0) {
@@ -1098,6 +1103,18 @@ public class PackedBooleanArrSeqTest{
       ++curr.expectedModCount;
     }while((curr=curr.expectedParent) != null);
     ++expectedRoot.expectedModCount;
+  }
+  @Override
+public void repairModCount() {
+      if(expectedRoot.checkedType.checked) {
+          int rootModCount=expectedRoot.expectedModCount;
+          var curr=this;
+          do{
+            FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.modCountField,curr.seq,rootModCount);
+            curr.expectedModCount=rootModCount;
+          }while((curr=curr.expectedParent) != null);
+      }
+     
   }
   @Override public void modCollection(){
     var curr=this;

@@ -73,6 +73,13 @@ final class FieldAndMethodAccessor{
       throw new RuntimeException(e);
     }
   }
+  static void setIntValue(Field field,Object obj,int val){
+    try{
+      field.setInt(obj,val);
+    }catch(IllegalArgumentException | IllegalAccessException e){
+      throw new RuntimeException(e);
+    }
+  }
   static int incrementIntValue(Field field,Object obj){
     try{
       int v;

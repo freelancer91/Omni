@@ -30,21 +30,38 @@ import omni.util.TestExecutorService;
 
 @TestMethodOrder(OrderAnnotation.class) 
 public class PackedBooleanArrDeqTest{
-  private static final int[] SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,60,70,80,90,100};
+  //private static final int[] SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,60,70,80,90,100};
   private static final int[] SHORT_SIZES;
+  private static final int[] SIZES;
   
   static {
-    IntStream.Builder builder=IntStream.builder();
-    builder.accept(0);
-    builder.accept(1);
-    builder.accept(2);
-    for(int i=1;i<20;++i) {
-      int baseSize=i*64;
-      for(int j=-2;j<=2;++j) {
-        builder.accept(baseSize+j);
+      {
+          IntStream.Builder builder=IntStream.builder();
+          builder.accept(0);
+          builder.accept(1);
+          builder.accept(2);
+          for(int i=1;i<5;++i) {
+            int baseSize=i*64;
+            for(int j=-2;j<=2;++j) {
+              builder.accept(baseSize+j);
+            }
+          }
+          SHORT_SIZES=builder.build().toArray();
+        }
+      {
+        IntStream.Builder builder=IntStream.builder();
+        builder.accept(0);
+        builder.accept(1);
+        builder.accept(2);
+        builder.accept(3);
+        for(int i=1;i<20;++i) {
+          int baseSize=i*64;
+          for(int j=-3;j<=3;++j) {
+            builder.accept(baseSize+j);
+          }
+        }
+        SIZES=builder.build().toArray();
       }
-    }
-    SHORT_SIZES=builder.build().toArray();
   }
   
   //private static final int[] SHORT_SIZES=new int[]{0,1,63,64,65,127,128,129,191,192,193};
@@ -1361,7 +1378,7 @@ public class PackedBooleanArrDeqTest{
                   for(int tmpInitVal=0;tmpInitVal<=initValBound;++tmpInitVal) {
                       final int initVal=tmpInitVal;
                       for(var checkedType:CheckedType.values()) {
-                          //TestExecutorService.submitTest(()->{
+                          TestExecutorService.submitTest(()->{
                               final var monitor=SequenceInitialization.Ascending.initialize(new PackedBooleanArrDeqMonitor(checkedType,initCap),size,initVal);
                               for(int i=0;i<rotateBound;++i) {
                                   monitor.rotate(1);
@@ -1370,16 +1387,13 @@ public class PackedBooleanArrDeqTest{
                                           for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
                                               final long randSeedBound=monitor.expectedSize > 1 && functionGen.randomized && !functionCallType.boxed?randMax:0;
                                               for(long randSeed=0;randSeed<=randSeedBound;++randSeed) {
-                                                if(size==66 && initCap==64 && i==126 && functionGen==MonitoredFunctionGen.NoThrow && testName=="PackedBooleanArrDeqTest.testReadAndWrite") {
-                                                  TestExecutorService.suspend();
-                                                }
                                                 runTest(monitor,functionGen,functionCallType,randSeed);
                                               }
                                           }
                                       }
                                   }
                               }
-                          //});
+                          });
                       }
                   }
               }
@@ -1440,7 +1454,7 @@ public class PackedBooleanArrDeqTest{
                   final boolean queryCanReturnTrue
                       =queryVal.queryCanReturnTrue(modification,castType,inputType,DataType.BOOLEAN);
                   for(final var checkedType:CheckedType.values()){
-                    for(final var size:SHORT_SIZES){
+                    for(final var size:SIZES){
                       for(int tmpInitCap=0,initCapBound=size+64&-64;tmpInitCap <= initCapBound;tmpInitCap+=64){
 
                         final int initCap=tmpInitCap;
@@ -1557,15 +1571,15 @@ public class PackedBooleanArrDeqTest{
     final AddTest test=PackedBooleanArrDeqMonitor::verifyAddLast;
     test.runAllTests("PackedBooleanArrDeqTest.testaddLast_val");
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testclear_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyClear;
-    test.runAllTests("PackedBooleanArrDeqTest.testclear_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testclear_void",SIZES);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testclone_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyClone;
-    test.runAllTests("PackedBooleanArrDeqTest.testclone_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testclone_void",SIZES);
   }
   @Order(130) @Test public void testConstructor_int(){
     for(final var checkedType:CheckedType.values()){
@@ -1598,13 +1612,13 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testcontains_val");
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testdescendingIterator_void(){
     final BasicTest test=monitor->{
       monitor.getMonitoredDescendingIterator().verifyIteratorState();
       monitor.verifyCollectionState();
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testdescendingIterator_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testdescendingIterator_void",SIZES);
   }
   @Order(50688)
   @Test public void testelement_void(){
@@ -1616,12 +1630,12 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testelement_void",true);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testequals_Object(){
     final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
-    test.runAllTests("PackedBooleanArrDeqTest.testequals_Object",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testequals_Object",SIZES);
   }
-  @Order(144)
+  @Order(348)
   @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -1653,25 +1667,25 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testgetLast_void",true);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testhashCode_void(){
     BasicTest test=PackedBooleanArrDeqMonitor::verifyHashCode;
-    test.runAllTests("PackedBooleanArrDeqTest.testhashCode_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testhashCode_void",SIZES);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testisEmpty_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyIsEmpty;
-    test.runAllTests("PackedBooleanArrDeqTest.testisEmpty_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testisEmpty_void",SIZES);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testiterator_void(){
     final BasicTest test=monitor->{
       monitor.getMonitoredIterator().verifyIteratorState();
       monitor.verifyCollectionState();
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testiterator_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testiterator_void",SIZES);
   }
-  @Order(144) @Test public void testItrclone_void(){
+  @Order(6184) @Test public void testItrclone_void(){
     final BasicTest test=monitor->{
       final int size=monitor.size();
       for(final var itrType:StructType.PackedBooleanArrDeq.validItrTypes){
@@ -1682,14 +1696,12 @@ public class PackedBooleanArrDeqTest{
         }
       }
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testItrclone_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testItrclone_void",SIZES);
   }
   
  
-  @Disabled
-  @Order(144)
+  @Order(348)
   @Test public void testItrforEachRemaining_Consumer(){
-    TestExecutorService.setNumWorkers(1);
     BasicTest test=(monitor)->{
         int prevNumToIterate=-1;
         for(final var position:POSITIONS){
@@ -1729,68 +1741,8 @@ public class PackedBooleanArrDeqTest{
         }
     };
     test.runAllTests("PackedBooleanArrDeqTest.testItrforEachRemaining_Consumer",SHORT_SIZES);
-   
-    for(final var size:SHORT_SIZES){
-      final int interval=Math.max(1,size / 10);
-      final int rotateBound=size / 2 + interval;
-      final int initCapBound=size + interval;
-      int prevNumToIterate=-1;
-      for(final var position:POSITIONS){
-        int numToIterate;
-        if(position >= 0 && (numToIterate=(int)(position * size)) != prevNumToIterate){
-          prevNumToIterate=numToIterate;
-          final int numLeft=size - numToIterate;
-            for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
-              for(final var itrType:StructType.PackedBooleanArrDeq.validItrTypes){
-                for(final var illegalMod:itrType.validPreMods){
-                  for(final var checkedType:CheckedType.values()){
-                    if(illegalMod.expectedException == null || checkedType.checked){
-                      for(final var functionGen:itrType.validMonitoredFunctionGens){
-                        if(checkedType.checked || size == 0 || functionGen.expectedException == null){
-                          final long randSeedBound=!functionCallType.boxed && numLeft > 1 && functionGen.randomized
-                              && illegalMod.expectedException == null?100:0;
-                          for(var tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                            final long randSeed=tmpRandSeed;
-                            for(var tmpNumToRotate=0;tmpNumToRotate <= rotateBound;tmpNumToRotate+=interval){
-                              final int numToRotate=tmpNumToRotate;
-                              
-                              for(int tmpInitCap=0;tmpInitCap <= initCapBound;tmpInitCap+=interval){
-                                final int initCap=tmpInitCap;
-                                TestExecutorService.submitTest(()->{
-                                  final var seqMonitor=SequenceInitialization.Ascending
-                                      .initialize(new PackedBooleanArrDeqMonitor(checkedType,initCap),size,0);
-                                  seqMonitor.rotate(numToRotate);
-                                  final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,itrType);
-                                  itrMonitor.illegalMod(illegalMod);
-                                  if(illegalMod.expectedException == null || numLeft == 0){
-                                    if(functionGen.expectedException == null || numLeft == 0){
-                                      itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed);
-                                    }else{
-                                      Assertions.assertThrows(functionGen.expectedException,
-                                          ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed));
-                                    }
-                                  }else{
-                                    Assertions.assertThrows(illegalMod.expectedException,
-                                        ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed));
-                                  }
-                                });
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          
-        }
-      }
-    }
-    TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testItrforEachRemaining_Consumer");
   }
-  @Order(144)
+  @Order(348)
   @Test public void testItrhasNext_void(){
     final BasicTest test=monitor->{
       for(final var itrType:StructType.PackedBooleanArrDeq.validItrTypes){
@@ -1802,7 +1754,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testItrhasNext_void",SHORT_SIZES);
   }
-  @Order(144)
+  @Order(348)
   @Test public void testItrnext_void(){
       BasicTest test=monitor->{
           for(var itrType:StructType.PackedBooleanArrDeq.validItrTypes) {
@@ -2060,7 +2012,7 @@ public class PackedBooleanArrDeqTest{
     final AddTest test=PackedBooleanArrDeqMonitor::verifyPush;
     test.runAllTests("PackedBooleanArrDeqTest.testpush_val");
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testReadAndWrite(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
@@ -2069,7 +2021,7 @@ public class PackedBooleanArrDeqTest{
         Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
       }
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testReadAndWrite",0,SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testReadAndWrite",0,SIZES);
   }
   @Order(50688)
   @Test public void testremove_void(){
@@ -2102,7 +2054,7 @@ public class PackedBooleanArrDeqTest{
         for(final var filterGen:StructType.PackedBooleanArrDeq.validMonitoredRemoveIfPredicateGens){
           if(filterGen.expectedException == null || checkedType.checked){
             for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
-              for(final var size:SHORT_SIZES){
+              for(final var size:SIZES){
                 int periodBound;
                 int initValBound;
                 int periodInc;
@@ -2223,12 +2175,12 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testsearch_val");
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testsize_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifySize;
-    test.runAllTests("PackedBooleanArrDeqTest.testsize_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testsize_void",SIZES);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
@@ -2237,9 +2189,9 @@ public class PackedBooleanArrDeqTest{
         Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
       }
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testtoArray_IntFunction",0,SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testtoArray_IntFunction",0,SIZES);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testtoArray_ObjectArray(){
     final BasicTest test=(monitor)->{
       final int size=monitor.size();
@@ -2248,21 +2200,21 @@ public class PackedBooleanArrDeqTest{
         monitor.verifyToArray(new Object[paramArrLength]);
       }
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testtoArray_ObjectArray",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testtoArray_ObjectArray",SIZES);
   }
-  @Order(144)
+  @Order(6184)
   @Test public void testtoArray_void(){
     final BasicTest test=(monitor)->{
       for(final var outputType:monitor.dataType.validOutputTypes()){
         outputType.verifyToArray(monitor);
       }
     };
-    test.runAllTests("PackedBooleanArrDeqTest.testtoArray_void",SHORT_SIZES);
+    test.runAllTests("PackedBooleanArrDeqTest.testtoArray_void",SIZES);
   }
-  @Order(5164)
+  @Order(6184)
   @Test public void testtoString_void(){
       BasicTest test=PackedBooleanArrDeqMonitor::verifyToString;
-      test.runAllTests("PackedBooleanArrDeqTest.testtoString_void",SHORT_SIZES);
+      test.runAllTests("PackedBooleanArrDeqTest.testtoString_void",SIZES);
   }
   @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
     int numTestsRemaining;

@@ -7,6 +7,10 @@ import omni.api.OmniSet;
 import omni.impl.QueryVal.QueryValModification;
 public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection<SET>{
     @Override
+    default void repairModCount() {
+        //nothing to do
+    }
+    @Override
     @SuppressWarnings("unchecked") default boolean add(int val) {
         SET collection=getCollection();
         DataType dataType=getDataType();

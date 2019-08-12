@@ -34,6 +34,10 @@ abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Externalizab
     updateCollectionState();
   }
   @Override
+public void repairModCount() {
+      //nothing to do
+  }
+  @Override
   public Object get(int iterationIndex,DataType outputType) {
       switch(dataType) {
       case BOOLEAN:

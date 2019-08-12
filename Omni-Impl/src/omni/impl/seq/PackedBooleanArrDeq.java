@@ -10,7 +10,6 @@ import omni.api.OmniIterator;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.impl.CheckedCollection;
-import omni.impl.seq.BooleanArrDeq.Checked;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
 import omni.util.OmniArray;
@@ -507,7 +506,26 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     return dst;
   }
 
-  
+  private void eraseTail() {
+      int tail;
+      switch(Integer.signum((tail=this.tail)-this.head)){
+        case -1:
+          this.tail=tail==0?(words.length<<6)-1:tail-1;
+          return;
+        case 0:
+          this.tail=-1;
+          break;
+        default:
+          this.tail=tail-1;
+      }
+  }
+  private static long fragmentedPullUpFinalWord(int dist,long word,int head) {
+      if(dist==0) {
+          return word<<1&-1L<<head|word&-1L>>>-head;
+      }else {
+          return word<<1;
+      }
+  }
   private static class AscendingItr extends AbstractDeqItr
   {
     transient final PackedBooleanArrDeq root;
@@ -539,14 +557,146 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       this.cursor=cursor;
       return ret;
     }
-    
+    private void eraseAtSplit(){
+        final PackedBooleanArrDeq root;
+        final long[] words;
+        final int head,tail,headDist,tailOffset,headOffset;
+        int arrBound;
+        long word;
+        if((tailOffset=(tail=(root=this.root).tail)>>6)<(headDist=(arrBound=(words=root.words).length-1)-(headOffset=(head=root.head)>>6))) {
+            //it's more efficient to pull the tail down
+            this.cursor=arrBound=(arrBound<<6)+63;
+            if(tail==0) {
+                root.tail=arrBound;
+            }else {
+                root.tail=tail-1;
+            }
+            words[arrBound]=words[arrBound]&Long.MAX_VALUE | (word=words[arrBound=0])<<-1;
+            while(arrBound!=tailOffset) {
+                words[arrBound]=word>>>1| (word=words[++arrBound])<<-1;
+            }
+            if(headOffset==tailOffset) {
+                words[arrBound]=word>>>1&(1L<<tail)-1 | words[arrBound]&-1L<<head;
+            }else {
+                words[arrBound]=word>>>1;
+            }
+        }else {
+            //it's more efficient to pull the head up
+            word=words[arrBound];
+            if(headDist==0) {
+                if(head==(arrBound<<6)+63) {
+                    root.head=0;
+                }else {
+                    root.head=head+1;
+                }
+            }else {
+                root.head=head+1;   
+                do {
+                    words[arrBound]=word<<1|(word=words[--arrBound])>>>-1;
+                }while(arrBound!=headOffset);
+            }
+            if(headOffset==tailOffset) {
+                words[arrBound]=word<<1&-1L<<head|word&-1L>>>-head;
+            }else {
+                words[arrBound]=word<<1;
+            }
+        }
+      }
+    private void fragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root) {
+        final long[] words=root.words;
+        int headOffset=head>>6;
+        int tailOffset=tail>>6;
+        int arrBound=words.length-1;
+        int lastRetOffset=lastRet>>6;
+        int headDist=lastRet-head;
+        if(headDist>=0) {
+            //in the head run
+            int headWordDist=lastRetOffset-headOffset;
+            int tailWordDist=arrBound-lastRetOffset;
+            if(tailWordDist+tailOffset+1<headWordDist) {
+                //TODO pull down tail
+                
+                
+            }else {
+                //TODO pull up head
+               
+                
+            }
+        }else {
+            //in the tail run
+            int tailWordDist=tailOffset-lastRetOffset;
+            int headWordDist=arrBound-headOffset;
+            if(tailWordDist<=headWordDist+lastRetOffset+1) {
+                //TODO pull down tail
+            }else {
+                //TODO pull up head
+            }
+        }
+    }
+    private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
+        //TODO
+        final long[] words=root.words;
+        int headOffset=head>>6;
+        int tailOffset=tail>>6;
+        int lastRetOffset=lastRet>>6;
+//        int headDist,tailDist;
+//        if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+//          root.head=pullUp(root.arr,head,headDist);
+//        }else{
+//          ArrCopy.uncheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+//          root.tail=tail-1;
+//          this.cursor=lastRet;
+//        }
+      }
     @Override public void remove(){
-      //TODO
-      throw new UnsupportedOperationException();
+        int cursor;
+        switch(cursor=this.cursor) {
+        case -1:
+            root.eraseTail();
+            break;
+        case 0:
+            eraseAtSplit();
+            break;
+        default:
+            final int head,tail;
+            final PackedBooleanArrDeq root;
+            if((tail=(root=this.root).tail)<(head=root.head)){
+                fragmentedAscendingRemove(head,cursor-1,tail,root);
+            }else {
+                nonfragmentedAscendingRemove(head,cursor-1,tail,root);
+            }
+        }
+        
+        
+        
     }
     @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
-      //TODO
-      throw new UnsupportedOperationException();
+      final PackedBooleanArrDeq root;
+      final int tail;
+      final long[] words;
+      var word=(words=(root=this.root).words)[cursor>>6];
+      if(cursor>(tail=root.tail)) {
+          for(int wordBound=words.length<<6;;) {
+              action.accept((word>>>cursor&1L)!=0);
+              if((++cursor&63)==0) {
+                  if(cursor==wordBound) {
+                      word=words[cursor=0];
+                      break;
+                  }
+                  word=words[cursor>>6];
+              }
+          }
+      }
+      for(;;) {
+          action.accept((word>>>cursor&1L)!=0);
+          if(cursor==tail) {
+              break;
+          }
+          if((++cursor&63)==0) {
+              word=words[cursor>>6];
+          }
+      }
+      this.cursor=-1;
     }
   }
   private static class DescendingItr extends AscendingItr{
@@ -560,9 +710,34 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       return new DescendingItr(this);
     }
     @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
-      //TODO
-      throw new UnsupportedOperationException();
-    }
+        final PackedBooleanArrDeq root;
+        final int head;
+        final long[] words;
+        long word=(words=(root=this.root).words)[cursor>>6];
+        if(cursor<(head=root.head)){
+            for(;;) {
+                action.accept((word>>>cursor&1L)!=0);
+                if((--cursor&63)==63) {
+                    if(cursor==-1) {
+                        word=words[(cursor=words.length)-1];
+                        cursor=(cursor<<6)-1;
+                        break;
+                    }
+                    word=words[cursor>>6];
+                }
+            }
+        }
+        for(;;) {
+            action.accept((word>>>cursor&1L)!=0);
+            if(cursor==head) {
+                break;
+            }
+            if((--cursor&63)==63) {
+                word=words[cursor>>6];
+            }
+        }
+        this.cursor=-1;
+      }
     @Override public boolean nextBoolean(){
       int cursor;
       final PackedBooleanArrDeq root;
@@ -1151,30 +1326,28 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       int size,head;
       if((size=tail-(head=this.head))<0) {
         int wordLength;
-        out.writeInt((size+=((wordLength=words.length)<<6)));
-        int headAlignment;
-        if((headAlignment=head&63)==0) {
-          OmniArray.OfLong.writeArray(words,head>>6,(wordLength-1),out);
+        out.writeInt(size+=(wordLength=words.length)<<6);
+        if((head&63)==0) {
+          OmniArray.OfLong.writeArray(words,head>>6,wordLength-1,out);
           BitSetUtil.writeWordsSrcAligned(words,0,tail,out);
         }else {
-          if(size<64) {
-            BitSetUtil.writeFinalWord((words[head>>6]>>>head)|((words[tail>>6]<<-head)),size,out);
-          }else {
-            var word=words[size=head>>6];
-            for(int wordBound=(wordLength-1);size!=wordBound;) {
-              out.writeLong((word>>>head)|((word=words[++size])<<-head));
-            }
-            if((wordLength=tail+(64-headAlignment))<64) {
-              BitSetUtil.writeFinalWord((word>>>head)|(words[0]<<-head),wordLength,out);
-            }else {
-              for(size=-1,wordLength=tail>>6;;) {
-                out.writeLong((word>>>head)|((word=words[++size])<<-head));
-                if(size==wordLength) {
-                  break;
-                }
+          int headOffset;
+          var word=words[headOffset=head>>6];
+          int numLeftInHead;
+          for(numLeftInHead=size-tail;numLeftInHead>=64;numLeftInHead-=64) {
+              out.writeLong(word>>>head|(word=words[++headOffset])<<-head);
+          }
+          for(size=tail+numLeftInHead,headOffset=-1;size>=64;size-=64) {
+              out.writeLong(word>>>head|(word=words[++headOffset])<<-head);
+          }
+          if(headOffset==tail>>6) {
+              if(headOffset==wordLength-1) {
+                  BitSetUtil.writeFinalWord(word>>>head|word<<-head,size,out);
+              }else {
+                  BitSetUtil.writeFinalWord(word>>>head,size,out);
               }
-              BitSetUtil.writeFinalWord(word>>>head,tail-headAlignment,out);
-            }
+          }else {
+              BitSetUtil.writeFinalWord(word>>>head|words[headOffset+1]<<-head,size,out);
           }
         }
       }else {
@@ -1182,7 +1355,16 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         if((head&63)==0) {
           BitSetUtil.writeWordsSrcAligned(words,head,tail,out);
         }else {
-          BitSetUtil.writeWordsSrcUnaligned(words,head,tail,out);
+          int headOffset;
+          var word=words[headOffset=head>>6];
+          for(;size>=64;size-=64) {
+              out.writeLong(word>>>head|(word=words[++headOffset])<<-head);
+          }
+          if(headOffset==tail>>6) {
+              BitSetUtil.writeFinalWord(word>>>head,size,out);
+          }else {
+              BitSetUtil.writeFinalWord(word>>>head|words[headOffset+1]<<-head,size,out);
+          }
         }
       }
     }
@@ -1793,9 +1975,40 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         throw new UnsupportedOperationException();
       }
       @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
+          final int modCount=this.modCount;
+          final Checked root;
+          final int tail=(root=this.root).tail;
+          try{
+              final long[] words;
+              int cursor;
+              var word=(words=root.words)[(cursor=expectedCursor)>>6];
+              if(cursor>tail) {
+                  for(int wordBound=words.length<<6;;) {
+                      action.accept((word>>>cursor&1L)!=0);
+                      if((++cursor&63)==0) {
+                          if(cursor==wordBound) {
+                              word=words[cursor=0];
+                              break;
+                          }
+                          word=words[cursor>>6];
+                      }
+                  }
+              }
+              for(;;) {
+                  action.accept((word>>>cursor&1L)!=0);
+                  if(cursor==tail) {
+                      break;
+                  }
+                  if((++cursor&63)==0) {
+                      word=words[cursor>>6];
+                  }
+              }
+          }finally{
+            CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
+          }
+          this.lastRet=tail;
+          this.cursor=-1;
+        }
     }
     private static class DescendingItr extends AscendingItr{
       private DescendingItr(DescendingItr itr){
@@ -1831,9 +2044,41 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         throw new UnsupportedOperationException();
       }
       @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
+          int modCount=this.modCount;
+          final Checked root;
+          final int head=(root=this.root).head;
+          try{
+              final long[] words;
+              int cursor;
+              long word=(words=root.words)[(cursor=expectedCursor)>>6];
+              if(cursor<head){
+                  for(;;) {
+                      action.accept((word>>>cursor&1L)!=0);
+                      if((--cursor&63)==63) {
+                          if(cursor==-1) {
+                              word=words[(cursor=words.length)-1];
+                              cursor=(cursor<<6)-1;
+                              break;
+                          }
+                          word=words[cursor>>6];
+                      }
+                  }
+              }
+              for(;;) {
+                  action.accept((word>>>cursor&1L)!=0);
+                  if(cursor==head) {
+                      break;
+                  }
+                  if((--cursor&63)==63) {
+                      word=words[cursor>>6];
+                  }
+              }
+          }finally{
+            CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
+          }
+          this.lastRet=head;
+          this.cursor=-1;
+        }
     }
     @Override public Object clone(){
         int tail;

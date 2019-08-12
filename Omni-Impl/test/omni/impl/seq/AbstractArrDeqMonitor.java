@@ -29,6 +29,11 @@ public abstract class AbstractArrDeqMonitor<DEQ extends OmniDeque<E>,E> implemen
   int expectedModCount;
   int expectedCapacity;
   Object expectedArr;
+  @Override
+public void repairModCount() {
+      //nothing to do
+  }
+  
   abstract class AbstractItrMonitor
     implements MonitoredCollection.MonitoredIterator<OmniIterator<?>,DEQ>{
     final OmniIterator<?> itr;

@@ -36,7 +36,6 @@ public class BooleanSetImplTest{
         final CheckedType checkedType;
         final BooleanSetImpl set;
         int expectedState;
-
         BooleanSetImplMonitor(CheckedType checkedType){
             this.checkedType=checkedType;
             this.expectedState=0;

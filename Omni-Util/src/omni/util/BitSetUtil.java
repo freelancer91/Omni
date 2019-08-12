@@ -3,7 +3,6 @@ package omni.util;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.function.LongUnaryOperator;
 
 /**
@@ -233,15 +232,15 @@ public interface BitSetUtil{
     }
     @Deprecated
     public static void writeWordsFragmentedAligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException{
-      OmniArray.OfLong.writeArray(words,head>>6,(words.length-1)>>6,dataOutput);
+      OmniArray.OfLong.writeArray(words,head>>6,words.length-1>>6,dataOutput);
       writeWordsSrcAligned(words,0,tail,dataOutput);
     }
     public static void writeWordsFragmentedUnaligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException{
       int wordOffset;
       var word=words[wordOffset=head>>6];
-      for(int wordBound=(words.length-1)>>6;wordOffset!=wordBound;dataOutput.writeLong((word>>>head)|((word=words[++wordOffset])<<-head))) {}
+      for(int wordBound=words.length-1>>6;wordOffset!=wordBound;dataOutput.writeLong(word>>>head|(word=words[++wordOffset])<<-head)) {}
       wordOffset=0;
-      for(int wordBound=tail>>6;wordOffset!=wordBound;dataOutput.writeLong((word>>>head)|((word=words[wordOffset++])<<-head))) {}
+      for(int wordBound=tail>>6;wordOffset!=wordBound;dataOutput.writeLong(word>>>head|(word=words[wordOffset++])<<-head)) {}
       writeFinalWord(word>>>head,tail-(head&63),dataOutput);
     }
     
@@ -249,7 +248,9 @@ public interface BitSetUtil{
     public static void writeWordsSrcUnaligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException {
       int wordOffset;
       var word=words[wordOffset=head>>6];
-      for(int wordBound=(tail>>6);wordOffset!=wordBound;dataOutput.writeLong(word>>>head|((word=words[++wordOffset])<<-head))) {}
+      for(int wordBound=tail>>6;wordOffset!=wordBound;) {
+          dataOutput.writeLong(word>>>head|(word=words[++wordOffset])<<-head);
+      }
       writeFinalWord(word>>>head,tail-(head&63),dataOutput);
     }
     
@@ -269,15 +270,15 @@ public interface BitSetUtil{
       case 7:
         return dataInput.readLong();
       case 6:
-        return (((long)dataInput.readUnsignedByte())<<48)|(((long)dataInput.readUnsignedShort())<<32)|((long)dataInput.readInt());
+        return (long)dataInput.readUnsignedByte()<<48|(long)dataInput.readUnsignedShort()<<32|dataInput.readInt();
       case 5:
-        return (((long)dataInput.readUnsignedShort())<<32)|((long)dataInput.readInt());
+        return (long)dataInput.readUnsignedShort()<<32|dataInput.readInt();
       case 4:
-        return (((long)dataInput.readInt())) | (((long)dataInput.readUnsignedByte())<<32);
+        return dataInput.readInt() | (long)dataInput.readUnsignedByte()<<32;
       case 3:
         return dataInput.readInt();
       case 2:
-        return (((long)dataInput.readUnsignedByte())<<16) | ((long)dataInput.readUnsignedShort());
+        return (long)dataInput.readUnsignedByte()<<16 | dataInput.readUnsignedShort();
       case 1:
         return dataInput.readUnsignedShort();
       default:

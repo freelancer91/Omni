@@ -31,6 +31,8 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     default Object get(int iterationIndex) {
         return get(iterationIndex,getDataType());
     }
+    void repairModCount();
+    
     MonitoredIterator<? extends OmniIterator<?>,COL> getMonitoredIterator(IteratorType itrType);
     CheckedType getCheckedType();
     COL getCollection();

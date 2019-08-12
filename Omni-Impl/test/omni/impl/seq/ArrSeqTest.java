@@ -607,6 +607,9 @@ import omni.util.TestExecutorService;
       extends AbstractArrSeqMonitor<SEQ> implements MonitoredList<SEQ>{
     public static class ArrSubListMonitor<SUBLIST extends AbstractSeq<E>&OmniList<E>,
         SEQ extends AbstractSeq<E>&OmniList<E>&Externalizable,E> implements MonitoredList<SUBLIST>{
+        
+      
+        
       private abstract class AbstractItrMonitor<ITR extends OmniIterator<?>> implements MonitoredIterator<ITR,SUBLIST>{
         final ITR itr;
         int expectedCursor;
@@ -1165,6 +1168,88 @@ import omni.util.TestExecutorService;
         }while((curr=curr.expectedParent) != null);
         expectedRoot.modCollection();
       }
+      @Override
+    public void repairModCount() {
+          if(expectedRoot.checkedType.checked) {
+              int rootModCount=expectedRoot.expectedModCount;
+              Consumer<ArrSubListMonitor<SUBLIST,SEQ,E>> modCountRepairer;
+              switch(expectedRoot.dataType) {
+              case BOOLEAN:{
+                  modCountRepairer=monitor->{
+                    FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                    monitor.expectedModCount=rootModCount;
+                  };
+                  break;
+              }
+              case BYTE:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.ByteArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              case CHAR:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.CharArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              case SHORT:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.ShortArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              case INT:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.IntArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              case LONG:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.LongArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              case FLOAT:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              case DOUBLE:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.DoubleArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              case REF:{
+                  modCountRepairer=monitor->{
+                      FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.RefArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                      monitor.expectedModCount=rootModCount;
+                    };
+                    break;
+                }
+              default:
+                  throw expectedRoot.dataType.invalid();
+              }
+              var curr=this;
+              do {
+                  modCountRepairer.accept(curr);
+              }while((curr=curr.expectedParent)!=null);
+          }
+          
+          
+      }
+      
+      
       @Override public void modParent(){
         final var modifier=getModCountModifier();
         var curr=this;
@@ -1176,6 +1261,8 @@ import omni.util.TestExecutorService;
       @Override public void modRoot(){
         expectedRoot.modCollection();
       }
+      
+      
       @Override public Object removeFirst(){
         final var removed=seq.remove(0);
         updateRemoveIndexState(0);
@@ -3819,6 +3906,7 @@ import omni.util.TestExecutorService;
     void runTest(MONITOR monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
         IllegalModification illegalMod,long randSeed);
   }
+  
   private static interface QueryTest<MONITOR extends MonitoredSequence<? extends AbstractSeq<?>>>{
     private void runAllTests(String testName,int structSwitch){
       SequenceInitParams[] initParamArray;
@@ -4505,22 +4593,46 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testequals_Object");
   }
-  @Order(7103280) @Test public void testforEach_Consumer(){
-    final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
-      if(illegalMod.expectedException == null){
-        if(functionGen.expectedException == null || monitor.isEmpty()){
-          monitor.verifyForEach(functionGen,functionCallType,randSeed);
-        }else{
-          Assertions.assertThrows(functionGen.expectedException,
-              ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
-        }
-      }else{
-        monitor.illegalMod(illegalMod);
-        Assertions.assertThrows(illegalMod.expectedException,
-            ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
+  @Order(5724) @Test public void testforEach_Consumer(){
+      for(var size:SIZES) {
+          for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+              final int initValBound=initParams.collectionType == DataType.BOOLEAN && size != 0?1:0;
+              for(int tmpInitVal=0;tmpInitVal<=initValBound;++tmpInitVal) {
+                  final int initVal=tmpInitVal;
+                  TestExecutorService.submitTest(()->{
+                      final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredSequence(initParams,size),size,initVal) ;
+                      for(final var functionGen:initParams.structType.validMonitoredFunctionGens){
+                          if((functionGen.expectedException==null || size>0) && (initParams.checkedType.checked || functionGen.expectedException == null)){
+                              for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                                  for(final var illegalMod:initParams.structType.validPreMods){
+                                      if(illegalMod.minDepth <= initParams.preAllocs.length&& (initParams.checkedType.checked || illegalMod.expectedException == null)){
+                                          final long randSeedBound=size > 1 && functionGen.randomized && !functionCallType.boxed&& illegalMod.expectedException == null?100:0;
+                                          for(long randSeed=0;randSeed <= randSeedBound;++randSeed){
+                                              if(illegalMod.expectedException==null) {
+                                                  if(functionGen.expectedException==null) {
+                                                      seqMonitor.verifyForEach(functionGen,functionCallType,randSeed);
+                                                  }else {
+                                                      final long finalRandSeed=randSeed;
+                                                      Assertions.assertThrows(functionGen.expectedException, ()->seqMonitor.verifyForEach(functionGen,functionCallType,finalRandSeed));
+                                                      seqMonitor.repairModCount();
+                                                  }
+                                              }else {
+                                                  seqMonitor.illegalMod(illegalMod);
+                                                  final long finalRandSeed=randSeed;
+                                                  Assertions.assertThrows(illegalMod.expectedException, ()->seqMonitor.verifyForEach(functionGen,functionCallType,finalRandSeed));
+                                                  seqMonitor.repairModCount();
+                                              }
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  });
+              }
+          }
       }
-    };
-    test.runAllTests("ArrSeqTest.testforEach_Consumer",100,true);
+      TestExecutorService.completeAllTests("ArrSeqTest.testforEach_Consumer");
   }
   @Order(1188) @Test public void testget_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -4584,6 +4696,8 @@ import omni.util.TestExecutorService;
         };
     test.runAllTests("ArrSeqTest.testindexOf_val",0);
   }
+ 
+  
   @Order(39168) @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
     test.runAllTests("ArrSeqTest.testisEmpty_void");
@@ -4636,69 +4750,67 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrclone_void");
   }
-  @Order(8401566) @Test public void testItrforEachRemaining_Consumer(){
-    for(final int size:SIZES){
-      int prevNumToIterate=-1;
-      for(final var position:POSITIONS){
-        int numToIterate;
-        if(position >= 0 && (numToIterate=(int)(position * size)) != prevNumToIterate){
-          prevNumToIterate=numToIterate;
-          final int numLeft=size - numToIterate;
-          for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-            for(final var functionCallType:initParams.collectionType.validFunctionCalls){
-              for(final var itrType:initParams.structType.validItrTypes){
-                for(final var illegalMod:itrType.validPreMods){
-                  if(illegalMod.expectedException == null || initParams.checkedType.checked){
-                    for(final var functionGen:itrType.validMonitoredFunctionGens){
-                      if(initParams.checkedType.checked || size == 0 || functionGen.expectedException == null){
-                        final long randSeedBound=!functionCallType.boxed && numLeft > 1 && functionGen.randomized
-                            && illegalMod.expectedException == null?100:0;
-                        for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                          final long randSeed=tmpRandSeed;
-                          TestExecutorService.submitTest(()->{
-                            final var seqMonitor=SequenceInitialization.Ascending
-                                .initialize(getMonitoredSequence(initParams,size),size,0);
-                            final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,itrType);
-                            itrMonitor.illegalMod(illegalMod);
-                            if(illegalMod.expectedException == null || numLeft == 0){
-                              if(functionGen.expectedException == null || numLeft == 0){
-                                itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed);
-                              }else{
-                                Assertions.assertThrows(functionGen.expectedException,
-                                    ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed));
+  @Order(5184) @Test public void testItrforEachRemaining_Consumer(){
+      for(final int size:SIZES) {
+          for(var initParams:ALL_STRUCT_INIT_PARAMS) {
+              TestExecutorService.submitTest(()->{
+                  final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredSequence(initParams,size),size,0);
+                  int prevNumToIterate=-1;
+                  for(var position:POSITIONS) {
+                      int numToIterate;
+                      if(position >= 0 && (numToIterate=(int)(position * size)) != prevNumToIterate){
+                          prevNumToIterate=numToIterate;
+                          final int numLeft=size - numToIterate;
+                          for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                              for(final var itrType:initParams.structType.validItrTypes){
+                                  for(final var illegalMod:itrType.validPreMods){
+                                      if((illegalMod.expectedException==null || numLeft>0) && (illegalMod.expectedException == null || initParams.checkedType.checked)){
+                                          for(final var functionGen:itrType.validMonitoredFunctionGens){
+                                              if((functionGen.expectedException==null || numLeft>0) && (initParams.checkedType.checked || size == 0 || functionGen.expectedException == null)){
+                                                  final long randSeedBound=!functionCallType.boxed && numLeft > 1 && functionGen.randomized&& illegalMod.expectedException == null?100:0;
+                                                  for(long randSeed=0;randSeed <= randSeedBound;++randSeed){
+                                                      final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,itrType);
+                                                      if(illegalMod.expectedException==null ) {
+                                                          if(functionGen.expectedException==null) {
+                                                              itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed);
+                                                          }else {
+                                                              final long finalRandSeed=randSeed;
+                                                              Assertions.assertThrows(functionGen.expectedException,()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,finalRandSeed));
+                                                              seqMonitor.repairModCount();
+                                                          }
+                                                      }else {
+                                                          itrMonitor.illegalMod(illegalMod);
+                                                          final long finalRandSeed=randSeed;
+                                                          Assertions.assertThrows(illegalMod.expectedException,()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,finalRandSeed));
+                                                          seqMonitor.repairModCount();
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      }
+                                  }
                               }
-                            }else{
-                              Assertions.assertThrows(illegalMod.expectedException,
-                                  ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed));
-                            }
-                          });
-                        }
+                          }
                       }
-                    }
                   }
-                }
-              }
-            }
+              });
           }
-        }
       }
-    }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrforEachRemaining_Consumer");
   }
   @Order(1260) @Test public void testItrhasNext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-      for(final var itrType:initParams.structType.validItrTypes){
         for(final int size:SHORT_SIZES){
-          TestExecutorService.submitTest(()->{
-            final var seqMonitor
-                =SequenceInitialization.Ascending.initialize(getMonitoredSequence(initParams,size),size,0);
-            final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
-            while(itrMonitor.verifyHasNext()){
-              itrMonitor.iterateForward();
-            }
-          });
+            TestExecutorService.submitTest(()->{
+                final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredSequence(initParams,size),size,0);
+                for(final var itrType:initParams.structType.validItrTypes){
+                    final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
+                    while(itrMonitor.verifyHasNext()){
+                      itrMonitor.iterateForward();
+                    }
+                }
+            });
         }
-      }
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrhasNext_void");
   }

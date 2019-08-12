@@ -4601,6 +4601,9 @@ public class DblLnkSeqTest{
         private static class SubListMonitor<SUBLIST extends AbstractSeq<E>&OmniList<E>,LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
                 implements
                 MonitoredList<SUBLIST>{
+            
+            
+            
           @Override
         public Object removeFirst() {
             var removed=seq.remove(0);
@@ -4616,6 +4619,88 @@ public class DblLnkSeqTest{
             Object expectedTail;
             int expectedSize;
             int expectedModCount;
+            
+            @Override
+            public void repairModCount() {
+                  if(expectedRoot.checkedType.checked) {
+                      int rootModCount=expectedRoot.expectedModCount;
+                      Consumer<SubListMonitor<SUBLIST,LSTDEQ,E>> modCountRepairer;
+                      switch(expectedRoot.dataType) {
+                      case BOOLEAN:{
+                          modCountRepairer=monitor->{
+                            FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                            monitor.expectedModCount=rootModCount;
+                          };
+                          break;
+                      }
+                      case BYTE:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.ByteArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      case CHAR:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.CharArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      case SHORT:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.ShortArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      case INT:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.IntArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      case LONG:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.LongArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      case FLOAT:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      case DOUBLE:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.DoubleArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      case REF:{
+                          modCountRepairer=monitor->{
+                              FieldAndMethodAccessor.setIntValue(FieldAndMethodAccessor.RefArrSeq.CheckedSubList.modCountField,monitor.seq,rootModCount);
+                              monitor.expectedModCount=rootModCount;
+                            };
+                            break;
+                        }
+                      default:
+                          throw expectedRoot.dataType.invalid();
+                      }
+                      var curr=this;
+                      do {
+                          modCountRepairer.accept(curr);
+                      }while((curr=curr.expectedParent)!=null);
+                  }
+                  
+                  
+              }
+            
             @SuppressWarnings("unchecked")
             SubListMonitor(DblLnkSeqMonitor<LSTDEQ,E> expectedRoot,int fromIndex,int toIndex){
                 this.expectedRoot=expectedRoot;
