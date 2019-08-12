@@ -4,7 +4,9 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,23 @@ import omni.util.TestExecutorService;
 @TestMethodOrder(OrderAnnotation.class) 
 public class PackedBooleanArrDeqTest{
   private static final int[] SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,60,70,80,90,100};
-  private static final int[] SHORT_SIZES=new int[]{0,1,63,64,65,127,128,129,191,192,193};
+  private static final int[] SHORT_SIZES;
+  
+  static {
+    IntStream.Builder builder=IntStream.builder();
+    builder.accept(0);
+    builder.accept(1);
+    builder.accept(2);
+    for(int i=1;i<20;++i) {
+      int baseSize=i*64;
+      for(int j=-2;j<=2;++j) {
+        builder.accept(baseSize+j);
+      }
+    }
+    SHORT_SIZES=builder.build().toArray();
+  }
+  
+  //private static final int[] SHORT_SIZES=new int[]{0,1,63,64,65,127,128,129,191,192,193};
   private static final double[] POSITIONS=new double[]{-1,0,0.25,0.5,0.75,1.0};
   private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
   private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.10,0.90};
@@ -1343,7 +1361,7 @@ public class PackedBooleanArrDeqTest{
                   for(int tmpInitVal=0;tmpInitVal<=initValBound;++tmpInitVal) {
                       final int initVal=tmpInitVal;
                       for(var checkedType:CheckedType.values()) {
-                          TestExecutorService.submitTest(()->{
+                          //TestExecutorService.submitTest(()->{
                               final var monitor=SequenceInitialization.Ascending.initialize(new PackedBooleanArrDeqMonitor(checkedType,initCap),size,initVal);
                               for(int i=0;i<rotateBound;++i) {
                                   monitor.rotate(1);
@@ -1352,13 +1370,16 @@ public class PackedBooleanArrDeqTest{
                                           for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
                                               final long randSeedBound=monitor.expectedSize > 1 && functionGen.randomized && !functionCallType.boxed?randMax:0;
                                               for(long randSeed=0;randSeed<=randSeedBound;++randSeed) {
-                                                  runTest(monitor,functionGen,functionCallType,randSeed);
+                                                if(size==66 && initCap==64 && i==126 && functionGen==MonitoredFunctionGen.NoThrow && testName=="PackedBooleanArrDeqTest.testReadAndWrite") {
+                                                  TestExecutorService.suspend();
+                                                }
+                                                runTest(monitor,functionGen,functionCallType,randSeed);
                                               }
                                           }
                                       }
                                   }
                               }
-                          });
+                          //});
                       }
                   }
               }
@@ -1567,6 +1588,7 @@ public class PackedBooleanArrDeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testConstructor_void");
   }
+  @Disabled
   @Order(6164256)
   @Test public void testcontains_val(){
       TestExecutorService.setNumWorkers(1);
@@ -1664,7 +1686,7 @@ public class PackedBooleanArrDeqTest{
   }
   
  
-  
+  @Disabled
   @Order(144)
   @Test public void testItrforEachRemaining_Consumer(){
     TestExecutorService.setNumWorkers(1);
@@ -1812,6 +1834,7 @@ public class PackedBooleanArrDeqTest{
       };
       test.runAllTests("PackedBooleanArrDeqTest.testItrnext_void",SHORT_SIZES);
   }
+  @Disabled
   @Order(61318)
   @Test public void testItrremove_void(){
     TestExecutorService.setNumWorkers(1);
@@ -1944,6 +1967,7 @@ public class PackedBooleanArrDeqTest{
       Assertions.assertEquals(']',result.charAt(++offset));
       TestExecutorService.completeAllTests(testName);
   }
+  @Disabled
   @Test public void testMASSIVEtoString(){
       int seqSize;
       long[] words;
@@ -2038,7 +2062,6 @@ public class PackedBooleanArrDeqTest{
   }
   @Order(144)
   @Test public void testReadAndWrite(){
-    TestExecutorService.setNumWorkers(1);
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
         Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
@@ -2058,6 +2081,7 @@ public class PackedBooleanArrDeqTest{
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemoveFirst;
     test.runAllTests("PackedBooleanArrDeqTest.testremoveFirst_void",true);
   }
+  @Disabled
   @Order(6164256)
   @Test public void testremoveFirstOccurrence_val(){
     TestExecutorService.setNumWorkers(1);
@@ -2069,6 +2093,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveFirstOccurrence_val");
   }
+  @Disabled
   @Order(925690)
   @Test public void testremoveIf_Predicate(){
     TestExecutorService.setNumWorkers(1);
@@ -2160,6 +2185,7 @@ public class PackedBooleanArrDeqTest{
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemoveLast;
     test.runAllTests("PackedBooleanArrDeqTest.testremoveLast_void",true);
   }
+  @Disabled
   @Order(6164256)
   @Test public void testremoveLastOccurrence_val(){
     TestExecutorService.setNumWorkers(1);
@@ -2171,6 +2197,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveLastOccurrence_val");
   }
+  @Disabled
   @Order(6164256)
   @Test public void testremoveVal_val(){
     TestExecutorService.setNumWorkers(1);
@@ -2180,6 +2207,7 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveVal_val");
   }
+  @Disabled
   @Order(6164256)
   @Test public void testsearch_val(){
     TestExecutorService.setNumWorkers(1);

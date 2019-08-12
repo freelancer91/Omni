@@ -297,14 +297,13 @@ public interface OfCLASSPREFIX
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
 #ENDIF
-
 #IFNOTSWITCH CLASSPREFIX==Byte
 #IFSWITCH CLASSPREFIX==Ref
   public static void writeArray(PRIMITIVETYPE[] arr,int begin,int end,ObjectOutput out) throws IOException{
 #ELSE
   public static void writeArray(PRIMITIVETYPE[] arr,int begin,int end,DataOutput out) throws IOException{
 #ENDIF
-  #IFSWITCH CLASSPREFIX==Boolean
+  #IFSWITCH CLASSPREFIX==Boolean 
     for(int word=TypeUtil.castToByte(arr[begin]),marker=1;;){
       if(begin==end){
         out.writeByte(word);

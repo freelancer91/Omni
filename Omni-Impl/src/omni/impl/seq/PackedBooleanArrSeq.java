@@ -101,9 +101,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         int size;
         this.size=size=in.readInt();
         if(size != 0){
-            long[] words;
-            OmniArray.OfLong.readArray(words=new long[(size=size - 1 >> 6) + 1],0,size,in);
-            this.words=words;
+          final long[] words;
+          BitSetUtil.readWords(words=new long[((--size) >> 6) + 1],size,in);
+          this.words=words;
         }
     }
     @Override
@@ -111,7 +111,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         int size;
         out.writeInt(size=this.size);
         if(size != 0){
-            OmniArray.OfLong.writeArray(words,0,size - 1 >> 6,out);
+          BitSetUtil.writeWordsSrcAligned(words,0,size-1,out);
         }
     }
     @Override
@@ -2935,7 +2935,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 this.size=size=ois.readInt();
                 if(size != 0){
                     final long[] words;
-                    OmniArray.OfLong.readArray(words=new long[(size=size - 1 >> 6) + 1],0,size,ois);
+                    BitSetUtil.readWords(words=new long[((--size) >> 6) + 1],size,ois);
                     this.words=words;
                 }
             }
@@ -2947,20 +2947,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     int size;
                     oos.writeInt(size=this.size);
                     if(size != 0){
-                        final int rootOffset;
-                        final int wordBound=(rootOffset=this.rootOffset) + size - 1 >> 6;
-                        int wordIndex=rootOffset >> 6;
-                        final var words=this.words;
-                        if((rootOffset & 63) == 0){
-                            // alligned
-                            OmniArray.OfLong.writeArray(words,wordIndex,wordBound,oos);
-                        }else{
-                            // unalligned
-                            long word;
-                            for(word=words[wordIndex];wordIndex != wordBound;oos
-                                    .writeLong(word >>> rootOffset | (word=words[++wordIndex]) << -rootOffset)){}
-                            oos.writeLong(word >>> rootOffset);
-                        }
+                      int rootOffset;
+                      if(((rootOffset=this.rootOffset)&63)==0) {
+                        BitSetUtil.writeWordsSrcAligned(words,rootOffset,rootOffset+size-1,oos);
+                      }else {
+                        BitSetUtil.writeWordsSrcUnaligned(words,rootOffset,rootOffset+size-1,oos);
+                      }
                     }
                 }finally{
                     modCountChecker.checkModCount();
@@ -5905,9 +5897,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 int size;
                 this.size=size=ois.readInt();
                 if(size != 0){
-                    long[] words;
-                    OmniArray.OfLong.readArray(words=new long[(size=size - 1 >> 6) + 1],0,size,ois);
-                    this.words=words;
+                  final long[] words;
+                  BitSetUtil.readWords(words=new long[((--size) >> 6) + 1],size,ois);
+                  this.words=words;
                 }
             }
             private Object readResolve(){
@@ -5915,24 +5907,16 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             private void writeObject(ObjectOutputStream oos) throws IOException{
                 {
-                    int size;
-                    oos.writeInt(size=this.size);
-                    if(size != 0){
-                        final int rootOffset;
-                        final int wordBound=(rootOffset=this.rootOffset) + size - 1 >> 6;
-                        int wordIndex=rootOffset >> 6;
-                        final var words=this.words;
-                        if((rootOffset & 63) == 0){
-                            // alligned
-                            OmniArray.OfLong.writeArray(words,wordIndex,wordBound,oos);
-                        }else{
-                            // unalligned
-                            long word;
-                            for(word=words[wordIndex];wordIndex != wordBound;oos
-                                    .writeLong(word >>> rootOffset | (word=words[++wordIndex]) << -rootOffset)){}
-                            oos.writeLong(word >>> rootOffset);
-                        }
+                  int size;
+                  oos.writeInt(size=this.size);
+                  if(size != 0){
+                    int rootOffset;
+                    if(((rootOffset=this.rootOffset)&63)==0) {
+                      BitSetUtil.writeWordsSrcAligned(words,rootOffset,rootOffset+size-1,oos);
+                    }else {
+                      BitSetUtil.writeWordsSrcUnaligned(words,rootOffset,rootOffset+size-1,oos);
                     }
+                  }
                 }
             }
         }

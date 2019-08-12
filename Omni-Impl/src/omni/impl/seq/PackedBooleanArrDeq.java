@@ -10,6 +10,7 @@ import omni.api.OmniIterator;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.impl.CheckedCollection;
+import omni.impl.seq.BooleanArrDeq.Checked;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
 import omni.util.OmniArray;
@@ -42,7 +43,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     return tail;
   }
   @Override
-void uncheckedForEach(final int tail,BooleanConsumer action){
+  void uncheckedForEach(final int tail,BooleanConsumer action){
     final var words=this.words;
     int head;
     int wordOffset=(head=this.head)>>6;
@@ -505,6 +506,8 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
     }
     return dst;
   }
+
+  
   private static class AscendingItr extends AbstractDeqItr
   {
     transient final PackedBooleanArrDeq root;
@@ -536,6 +539,7 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
       this.cursor=cursor;
       return ret;
     }
+    
     @Override public void remove(){
       //TODO
       throw new UnsupportedOperationException();
@@ -566,6 +570,7 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
       this.cursor=(cursor=this.cursor)==root.head?-1:cursor==0?(words.length<<6)-1:cursor-1;
       return (words[cursor>>6]>>>cursor&1)!=0;
     }
+    
     @Override public void remove(){
       //TODO
       throw new UnsupportedOperationException();
@@ -1138,12 +1143,59 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
     return (ret>>>head&1)!=0;
   }
   @Override public void writeExternal(ObjectOutput out) throws IOException{
-    //TODO
-    throw new UnsupportedOperationException();
+    int tail;
+    if((tail=this.tail)==-1) {
+      out.writeInt(-1);
+    }else{
+      final var words=this.words;
+      int size,head;
+      if((size=tail-(head=this.head))<0) {
+        int wordLength;
+        out.writeInt((size+=((wordLength=words.length)<<6)));
+        int headAlignment;
+        if((headAlignment=head&63)==0) {
+          OmniArray.OfLong.writeArray(words,head>>6,(wordLength-1),out);
+          BitSetUtil.writeWordsSrcAligned(words,0,tail,out);
+        }else {
+          if(size<64) {
+            BitSetUtil.writeFinalWord((words[head>>6]>>>head)|((words[tail>>6]<<-head)),size,out);
+          }else {
+            var word=words[size=head>>6];
+            for(int wordBound=(wordLength-1);size!=wordBound;) {
+              out.writeLong((word>>>head)|((word=words[++size])<<-head));
+            }
+            if((wordLength=tail+(64-headAlignment))<64) {
+              BitSetUtil.writeFinalWord((word>>>head)|(words[0]<<-head),wordLength,out);
+            }else {
+              for(size=-1,wordLength=tail>>6;;) {
+                out.writeLong((word>>>head)|((word=words[++size])<<-head));
+                if(size==wordLength) {
+                  break;
+                }
+              }
+              BitSetUtil.writeFinalWord(word>>>head,tail-headAlignment,out);
+            }
+          }
+        }
+      }else {
+        out.writeInt(size);
+        if((head&63)==0) {
+          BitSetUtil.writeWordsSrcAligned(words,head,tail,out);
+        }else {
+          BitSetUtil.writeWordsSrcUnaligned(words,head,tail,out);
+        }
+      }
+    }
   }
   @Override public void readExternal(ObjectInput in) throws IOException,ClassNotFoundException{
-    //TODO
-    throw new UnsupportedOperationException();
+    int tail;
+    this.tail=tail=in.readInt();
+    if(tail!=-1) {
+      final long[] words;
+      BitSetUtil.readWords(words=new long[(tail>>6)+1],tail,in);
+      this.words=words;
+      this.head=0;
+    }
   }
   @Override public Object clone(){
       int tail;
@@ -1735,6 +1787,7 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
         }
         throw new NoSuchElementException();
       }
+
       @Override public void remove(){
         //TODO
         throw new UnsupportedOperationException();
@@ -1772,6 +1825,7 @@ void uncheckedForEach(final int tail,BooleanConsumer action){
         }
         throw new NoSuchElementException();
       } 
+
       @Override public void remove(){
         //TODO
         throw new UnsupportedOperationException();

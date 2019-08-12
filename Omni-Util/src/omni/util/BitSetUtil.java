@@ -1,5 +1,9 @@
 package omni.util;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.function.LongUnaryOperator;
 
 /**
@@ -22,6 +26,77 @@ public interface BitSetUtil{
     
     public static boolean getFromPackedArr(long[] words,int nonPackedIndex) {
       return (words[convertToPackedIndex(nonPackedIndex)]>>>nonPackedIndex&1)!=0;
+    }
+    public static void uncheckedAlignedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
+      //TODO
+    }
+    public static void uncheckedSrcAlignedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
+      //TODO
+    }
+    public static void uncheckedDstAlignedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
+      //TODO
+    }
+    public static void uncheckedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
+      int srcWordOffset;
+      int srcWordBound;
+      int dstWordOffset=dstOffset>>6;
+      int dstBound;
+      int dstWordBound=(dstBound=dstOffset+length)-1>>6;
+      long mask;
+      int shift;
+      if((srcWordOffset=srcOffset>>6)==(srcWordBound=srcOffset+length-1>>6)) {
+          long srcWord=src[srcWordOffset];
+          long dstWord;
+          if(dstWordOffset==dstWordBound) {
+              dstWord=src[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset);
+              if((shift=(dstOffset&63)-(srcOffset&63))<0) {
+                src[dstWordOffset]=srcWord>>>-shift&mask | dstWord;
+              }else {
+                src[dstWordOffset]=srcWord<<shift&mask | dstWord;
+              }
+          }else {
+            src[dstWordOffset]=srcWord<<(shift=dstOffset-srcOffset)&(mask=-1L<<dstOffset) | src[dstWordOffset]&~mask;
+            src[++dstWordOffset]=srcWord>>>-shift&~(mask=-1L<<dstBound)|src[dstWordOffset]&mask;
+          }
+      }else {
+          if(dstWordOffset==dstWordBound) {
+            src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset) | (src[srcWordOffset]>>>(shift=srcOffset-dstOffset)|src[srcWordOffset+1]<<-shift)&mask;
+          }else {
+              long srcWord=src[srcWordOffset];
+              switch(Integer.signum(shift=(dstOffset&63)-(srcOffset&63))) {
+              case 0:{
+                src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L<<dstOffset)|srcWord&mask;
+                  ArrCopy.semicheckedSelfCopy(src,++dstWordOffset,srcWordOffset+1,dstWordBound-dstWordOffset);
+                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) | src[srcWordBound]&mask;
+                  break;
+              }
+              case 1:{
+                src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L<<dstOffset) | srcWord<<shift&mask;
+                  while(++dstWordOffset<dstWordBound) {
+                    src[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
+                  }
+                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordBound]<<shift)&mask;
+                  break;
+              }
+              default:{
+                src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L<<dstOffset) | (srcWord>>>-shift|(srcWord=src[++srcWordOffset])<<shift)&mask ;
+                while(++dstWordOffset<dstWordBound) {
+                  src[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
+                }
+                if(srcWordOffset<srcWordBound) {
+                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordBound]<<shift)&mask;
+                }else {
+                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) |srcWord>>>-shift&mask;
+                }
+              }
+              }
+          } 
+      }
+  }
+    public static void semicheckedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
+      if(length!=0) {
+        uncheckedSelfCopy(src,dstOffset,srcOffset,length);
+      }
     }
     public static void uncheckedAlignedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
       ArrCopy.semicheckedCopy(src,srcOffset>>6,dst,dstOffset>>6,length>>6);
@@ -147,7 +222,95 @@ public interface BitSetUtil{
             uncheckedCopy(src,srcOffset,dst,dstOffset,length);
         }
     }
+    public static void writeWordsSrcAligned(long[] words,int begin,int end,DataOutput dataOutput) throws IOException {
+      for(int wordOffset=begin>>6,wordBound=end>>6;;++wordOffset) {
+        if(wordOffset==wordBound) {
+          writeFinalWord(words[wordOffset],end,dataOutput);
+          return;
+        }
+        dataOutput.writeLong(words[wordOffset]);
+      }
+    }
+    @Deprecated
+    public static void writeWordsFragmentedAligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException{
+      OmniArray.OfLong.writeArray(words,head>>6,(words.length-1)>>6,dataOutput);
+      writeWordsSrcAligned(words,0,tail,dataOutput);
+    }
+    public static void writeWordsFragmentedUnaligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException{
+      int wordOffset;
+      var word=words[wordOffset=head>>6];
+      for(int wordBound=(words.length-1)>>6;wordOffset!=wordBound;dataOutput.writeLong((word>>>head)|((word=words[++wordOffset])<<-head))) {}
+      wordOffset=0;
+      for(int wordBound=tail>>6;wordOffset!=wordBound;dataOutput.writeLong((word>>>head)|((word=words[wordOffset++])<<-head))) {}
+      writeFinalWord(word>>>head,tail-(head&63),dataOutput);
+    }
     
+    
+    public static void writeWordsSrcUnaligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException {
+      int wordOffset;
+      var word=words[wordOffset=head>>6];
+      for(int wordBound=(tail>>6);wordOffset!=wordBound;dataOutput.writeLong(word>>>head|((word=words[++wordOffset])<<-head))) {}
+      writeFinalWord(word>>>head,tail-(head&63),dataOutput);
+    }
+    
+    public static void readWords(long[] words,int end,DataInput dataInput) throws IOException{
+      for(int wordOffset=0,wordBound=end>>6;;++wordOffset) {
+        if(wordOffset==wordBound) {
+          words[wordOffset]=readFinalWord(end,dataInput);
+          return;
+        }
+        words[wordOffset]=dataInput.readLong();
+      }
+    }
+    
+    
+    public static long readFinalWord(int end,DataInput dataInput) throws IOException{
+      switch((end&63)>>3) {
+      case 7:
+        return dataInput.readLong();
+      case 6:
+        return (((long)dataInput.readUnsignedByte())<<48)|(((long)dataInput.readUnsignedShort())<<32)|((long)dataInput.readInt());
+      case 5:
+        return (((long)dataInput.readUnsignedShort())<<32)|((long)dataInput.readInt());
+      case 4:
+        return (((long)dataInput.readInt())) | (((long)dataInput.readUnsignedByte())<<32);
+      case 3:
+        return dataInput.readInt();
+      case 2:
+        return (((long)dataInput.readUnsignedByte())<<16) | ((long)dataInput.readUnsignedShort());
+      case 1:
+        return dataInput.readUnsignedShort();
+      default:
+        return dataInput.readUnsignedByte();
+      }
+    }
+    public static void writeFinalWord(long word,int end,DataOutput dataOutput) throws IOException {
+      switch((end&63)>>3) {
+      case 7:
+        dataOutput.writeLong(word);
+        return;
+      case 6:
+        dataOutput.writeByte((int)(word>>>48));
+      case 5:
+        dataOutput.writeShort((int)(word>>>32));
+        dataOutput.writeInt((int)word);
+        return;
+      case 4:
+        dataOutput.writeInt((int)word);
+        dataOutput.writeByte((int)(word>>>32));
+        return;
+      case 3:
+        dataOutput.writeInt((int)word);
+        return;
+      case 2:
+        dataOutput.writeByte((int)(word>>>16));
+      case 1:
+        dataOutput.writeShort((int)word);
+        return;
+      default:
+        dataOutput.writeByte((int)word);
+      }
+    }
     
     
     
