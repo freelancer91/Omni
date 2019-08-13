@@ -10,8 +10,10 @@ import omni.api.OmniIterator;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.impl.CheckedCollection;
+import omni.impl.seq.BooleanArrDeq.Checked;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
+import omni.util.NotYetImplementedException;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
 
@@ -505,7 +507,19 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }
     return dst;
   }
-
+  private void eraseHead(){
+    int head;
+    switch(Integer.signum(this.tail-(head=this.head))){
+      case -1:
+        this.head=head==(words.length<<6)-1?0:head+1;
+        return;
+      case 0:
+        this.tail=-1;
+        break;
+      default:
+        this.head=head+1;
+    }
+  }
   private void eraseTail() {
       int tail;
       switch(Integer.signum((tail=this.tail)-this.head)){
@@ -519,13 +533,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           this.tail=tail-1;
       }
   }
-  private static long fragmentedPullUpFinalWord(int dist,long word,int head) {
-      if(dist==0) {
-          return word<<1&-1L<<head|word&-1L>>>-head;
-      }else {
-          return word<<1;
-      }
-  }
+
   private static class AscendingItr extends AbstractDeqItr
   {
     transient final PackedBooleanArrDeq root;
@@ -615,12 +623,10 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             int tailWordDist=arrBound-lastRetOffset;
             if(tailWordDist+tailOffset+1<headWordDist) {
                 //TODO pull down tail
-                
-                
+                throw new NotYetImplementedException();
             }else {
                 //TODO pull up head
-               
-                
+                throw new NotYetImplementedException();
             }
         }else {
             //in the tail run
@@ -628,8 +634,10 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             int headWordDist=arrBound-headOffset;
             if(tailWordDist<=headWordDist+lastRetOffset+1) {
                 //TODO pull down tail
+                throw new NotYetImplementedException();
             }else {
                 //TODO pull up head
+                throw new NotYetImplementedException();
             }
         }
     }
@@ -639,6 +647,8 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         int headOffset=head>>6;
         int tailOffset=tail>>6;
         int lastRetOffset=lastRet>>6;
+        throw new NotYetImplementedException();
+
 //        int headDist,tailDist;
 //        if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
 //          root.head=pullUp(root.arr,head,headDist);
@@ -745,10 +755,27 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       this.cursor=(cursor=this.cursor)==root.head?-1:cursor==0?(words.length<<6)-1:cursor-1;
       return (words[cursor>>6]>>>cursor&1)!=0;
     }
-    
-    @Override public void remove(){
+    private void fragmentedDescendingRemove(int head,int cursor,int tail,PackedBooleanArrDeq root){
       //TODO
-      throw new UnsupportedOperationException();
+      throw new NotYetImplementedException();
+    }
+    private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
+      //TODO
+      throw new NotYetImplementedException();
+    }
+    @Override public void remove(){
+      int cursor;
+      if((cursor=this.cursor)==-1){
+        root.eraseHead();
+      }else{
+        PackedBooleanArrDeq root;
+        int head,tail;
+        if((tail=(root=this.root).tail)<(head=root.head)){
+          fragmentedDescendingRemove(head,cursor,tail,root);
+        }else{
+          nonfragmentedDescendingRemove(head,cursor+1,tail,root);
+        }
+      }
     }
   } 
   @Override public OmniIterator.OfBoolean iterator(){
@@ -1969,10 +1996,37 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }
         throw new NoSuchElementException();
       }
-
-      @Override public void remove(){
+      private void fragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
         //TODO
-        throw new UnsupportedOperationException();
+        throw new NotYetImplementedException();
+      }
+      private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
+        //TODO
+        throw new NotYetImplementedException();
+      }
+      @Override public void remove(){
+        int lastRet;
+        if((lastRet=this.lastRet)!=-1){
+          int modCount;
+          final Checked root;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          final int head,tail;
+          switch(Integer.signum((tail=root.tail)-(head=root.head))){
+            case -1:
+              fragmentedAscendingRemove(head,lastRet,tail,root);
+              break;
+            case 0:
+              root.tail=-1;
+              break;
+            default:
+              nonfragmentedAscendingRemove(head,lastRet,tail,root);
+          }
+          this.lastRet=-1;
+          return;
+        }
+        throw new IllegalStateException();
       }
       @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
           final int modCount=this.modCount;
@@ -2038,10 +2092,37 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }
         throw new NoSuchElementException();
       } 
-
-      @Override public void remove(){
+      private void fragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
         //TODO
-        throw new UnsupportedOperationException();
+        throw new NotYetImplementedException();
+      }
+      private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
+        //TODO
+        throw new NotYetImplementedException();
+      }
+      @Override public void remove(){
+        int lastRet;
+        if((lastRet=this.lastRet)!=-1){
+          int modCount;
+          final Checked root;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          final int head,tail;
+          switch(Integer.signum((tail=root.tail)-(head=root.head))){
+            case -1:
+              fragmentedDescendingRemove(head,lastRet,tail,root);
+              break;
+            case 0:
+              root.tail=-1;
+              break;
+            default:
+              nonfragmentedDescendingRemove(head,lastRet,tail,root);
+          }
+          this.lastRet=-1;
+          return;
+        }
+        throw new IllegalStateException();
       }
       @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
           int modCount=this.modCount;
