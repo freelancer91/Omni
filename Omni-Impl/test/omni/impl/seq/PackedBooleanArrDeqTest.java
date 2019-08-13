@@ -2,6 +2,7 @@ package omni.impl.seq;
 
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
@@ -15,8 +16,6 @@ import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
-import omni.impl.IllegalModification;
-import omni.impl.IteratorRemoveScenario;
 import omni.impl.IteratorType;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
@@ -74,6 +73,9 @@ public class PackedBooleanArrDeqTest{
 
 
   private static class PackedBooleanArrDeqMonitor extends AbstractArrDeqMonitor<PackedBooleanArrDeq,Boolean>{
+      
+    int trueCount;
+      
     private abstract class AbstractItrMonitor extends AbstractArrDeqMonitor<PackedBooleanArrDeq,Boolean>.AbstractItrMonitor{
       AbstractItrMonitor(OmniIterator<?> itr,int expectedCursor,int numLeft){
         super(itr,expectedCursor,numLeft);
@@ -87,7 +89,8 @@ public class PackedBooleanArrDeqTest{
        
       }
       
-      public void verifyRemove(){
+      @Override
+    public void verifyRemove(){
         //TODO remove
         try{
             getIterator().remove();
@@ -107,6 +110,7 @@ public class PackedBooleanArrDeqTest{
         getMonitoredCollection().verifyCollectionState();
     }
     }
+    
     private class AscendingItrMonitor extends AbstractItrMonitor{
       AscendingItrMonitor(){
         super(seq.iterator(),expectedTail != -1?expectedHead:-1,expectedSize);
@@ -123,79 +127,239 @@ public class PackedBooleanArrDeqTest{
           expectedCursor=0;
         }
       }
+      private void uncheckedEraseTail() {
+          int tail=expectedTail;
+          int head=expectedHead;
+          switch(Integer.signum(tail-head)) {
+          case -1:
+              if(tail==0) {
+                  expectedTail=expectedCapacity-1;
+              }else {
+                  expectedTail=tail-1;
+              }
+              break;
+          case 0:
+              expectedTail=-1;
+              break;
+          default:
+              expectedTail=tail-1;
+          }
+      }
+      private void uncheckedEraseAtSplit() {
+          var words=(long[])expectedArr;
+          int head=expectedHead;
+          int tail=expectedTail;
+          int headOffset=head>>6;
+          int tailOffset=tail>>6;
+          int arrBound=expectedCapacity-1>>6;
+          int headDist=arrBound-headOffset;
+          if(tailOffset<headDist) {
+              expectedCursor=expectedCapacity-1;
+              if(tail==0) {
+                  expectedTail=expectedCursor;
+              }else {
+                  expectedTail=tail-1;
+              }
+              int wordOffset=0;
+              long word=words[wordOffset];
+              words[arrBound]=words[arrBound]&Long.MAX_VALUE | word<<-1;
+              while(wordOffset!=tailOffset) {
+                  words[wordOffset]=word>>>1| (word=words[++wordOffset])<<-1;
+              }
+              if(headOffset==tailOffset) {
+                  words[wordOffset]=word>>>1&(1L<<tail)-1 | words[wordOffset]&-1L<<head;
+              }else {
+                  words[wordOffset]=word>>>1;
+              }
+          }else {
+              int wordOffset=arrBound;
+              long word=words[wordOffset];
+              if(headDist==0) {
+                  if(head==expectedCapacity-1) {
+                      expectedHead=0;
+                  }else {
+                      expectedHead=head+1;
+                  }
+              }else {
+                  expectedHead=head+1;
+                  do {
+                      words[wordOffset]=word<<1|(word=words[--wordOffset])>>>-1;
+                  }while(wordOffset!=headOffset);
+              }
+              if(headOffset==tailOffset) {
+                  words[wordOffset]=word<<1&-1L<<head|word&-1L>>>-head;
+              }else {
+                  words[wordOffset]=word<<1;
+              }
+          }
+      }
+      private void uncheckedFragmentedRemove() {
+          int head=expectedHead;
+          int tail=expectedTail;
+          int lastRet=expectedCursor-1;
+          final long[] words;
+          final int headOffset=head>>6;
+          final int tailOffset=tail>>6;
+          final int arrBound=(words=(long[])expectedArr).length-1;
+          int lastRetOffset;
+          long mask,word=words[lastRetOffset=lastRet>>6];
+          final int headDist;
+          if((headDist=lastRet-head)>=0) {
+              //the index to remove is in the head run
+              final int headWordDist;
+              final int tailWordDist;
+              if(( tailWordDist=arrBound-lastRetOffset)+tailOffset+1<(headWordDist=lastRetOffset-headOffset)) {
+                  //pull the tail down
+                  expectedCursor=lastRet;
+                  if(tail==0) {
+                      expectedTail=(arrBound<<6)+63;
+                  }else {
+                      expectedTail=tail-1;
+                  }
+                  word=word&(mask=(1L<<lastRet)-1)|word>>>1&~mask;
+                  if(tailWordDist==0) {
+                      words[lastRetOffset]=word | (word=words[lastRetOffset=0])<<-1;
+                  }else {
+                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                      while(lastRetOffset!=arrBound) {
+                          words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                      }
+                      words[lastRetOffset]=word>>>1| (word=words[lastRetOffset=0])<<-1;
+                  }
+                  while(lastRetOffset!=tailOffset) {
+                      words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                  }
+                  words[lastRetOffset]=(word&(mask=(1L<<tail)-1))>>>1 | word&~mask;
+              }else {
+                  //pull up the head
+                  expectedHead=head+1;
+                  if(headWordDist==0) {
+                      words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
+                  }else {
+                      words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
+                      while(lastRetOffset!=headOffset) {
+                          words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
+                      }
+                      if(headOffset==tailOffset) {
+                          words[lastRetOffset]=word<<1&(mask=-1L<<head) | word&~mask;
+                      }else {
+                          words[lastRetOffset]=word<<1;
+                      }
+                  }
+              }
+          }else {
+              //the index to remove is in the tail run
+              final int tailWordDist;
+              if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset+1) {
+                //pull down the tail
+                 expectedTail=tail-1;
+                 expectedCursor=lastRet;
+                 if(tailWordDist==0) {
+                     words[lastRetOffset]=word>>>1&(mask=(1L<<tail-lastRet)-1<<lastRet) | word&~mask;
+                 }else {
+                     words[lastRetOffset]=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask | (word=words[++lastRetOffset])<<-1;
+                     while(lastRetOffset!=tailOffset) {
+                         words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                     }
+                     if(headOffset==tailOffset) {
+                         words[lastRetOffset]=word>>>1&(mask=(1L<<tail)-1) | word&~mask;
+                     }else {
+                         words[lastRetOffset]=word>>>1;
+                     }
+                 }
+              }else {
+                  //pull up the head
+                  if(head==(arrBound<<6)+63) {
+                      expectedHead=0;
+                  }else {
+                      expectedHead=head+1;
+                  }
+                  word=word<<1&(mask=(1L<<lastRet)-1)|word&~mask;
+                  if(lastRetOffset==0) {
+                      words[0]=word|(word=words[lastRetOffset=arrBound])>>>-1;
+                  }else {
+                      words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
+                      while(lastRetOffset!=0) {
+                          words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
+                      }
+                      words[0]=word<<1|(word=words[lastRetOffset=arrBound])>>>-1;
+                  }
+                  while(lastRetOffset!=headOffset) {
+                      words[lastRetOffset]=word<<1|(word=words[--lastRetOffset])>>>-1;
+                  }
+                  words[lastRetOffset]=word&(mask=1L<<head-1) | word<<1&~mask;
+              }
+          }
+      }
+      private void uncheckedNonfragmentedRemove() {
+          final int tail=expectedTail;
+          final int head=expectedHead;
+          final int lastRet=expectedCursor-1;
+          final long[] words;
+          final int headOffset,tailOffset;
+          int lastRetOffset;
+          long mask,word=(words=(long[])expectedArr)[lastRetOffset=lastRet>>6];
+          if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset) {
+              expectedHead=head+1;
+              word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
+              for(;lastRetOffset!=headOffset;word<<=1) {
+                  words[lastRetOffset]=word | (word=words[--lastRetOffset])>>>-1;
+              }
+          }else {
+              expectedCursor=lastRet;
+              expectedTail=tail-1;
+              word=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask;
+              for(;lastRetOffset!=tailOffset;word>>>=1) {
+                  words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+              }
+          }
+          words[lastRetOffset]=word;
+        }
+      private void checkedFragmentedRemove() {
+          //TODO
+          throw new UnsupportedOperationException();
+      }
+      private void checkedNonfragmentedRemove() {
+          //TODO
+          throw new UnsupportedOperationException();
+      }
       @Override public void updateItrRemoveState(){
+        if(BitSetUtil.getFromPackedArr((long[])expectedArr,expectedLastRet)) {
+            --trueCount;
+        }
+          
         ++expectedItrModCount;
         ++expectedModCount;
         if(checkedType.checked){
-          throw new UnsupportedOperationException();
-        }else{
-          final int cursor=expectedCursor;
-          final int tail=expectedTail;
-          switch(cursor){
-          case -1:
-            switch(Integer.signum(tail - expectedHead)){
+            int head=expectedHead;
+            int tail=expectedTail;
+            switch(Integer.signum(tail-head)) {
             case -1:
-              expectedTail=tail == 0?expectedCapacity - 1:tail - 1;
-              break;
+                checkedFragmentedRemove();
+                break;
             case 0:
-              expectedTail=-1;
-              break;
+                expectedTail=-1;
+                break;
             default:
-              expectedTail=tail - 1;
+                checkedNonfragmentedRemove();
             }
-            break;
+        }else{
+          int cursor=this.expectedCursor;
+          switch(cursor) {
+          case -1:
+              uncheckedEraseTail();
+              break;
           case 0:
-          {
-            final long[] words;
-            final int head,headDist,tailOffset,headOffset;
-            int arrBound;
-            long word;
-            if((tailOffset=(tail)>>6)<(headDist=(arrBound=(words=(long[])expectedArr).length-1)-(headOffset=(head=expectedHead)>>6))) {
-                //it's more efficient to pull the tail down
-                this.expectedCursor=arrBound=(arrBound<<6)+63;
-                if(tail==0) {
-                    expectedTail=arrBound;
-                }else {
-                  expectedTail=tail-1;
-                }
-                words[arrBound]=words[arrBound]&Long.MAX_VALUE | (word=words[arrBound=0])<<-1;
-                while(arrBound!=tailOffset) {
-                    words[arrBound]=word>>>1| (word=words[++arrBound])<<-1;
-                }
-                if(headOffset==tailOffset) {
-                    words[arrBound]=word>>>1&(1L<<tail)-1 | words[arrBound]&-1L<<head;
-                }else {
-                    words[arrBound]=word>>>1;
-                }
-            }else {
-                //it's more efficient to pull the head up
-                word=words[arrBound];
-                if(headDist==0) {
-                    if(head==(arrBound<<6)+63) {
-                        expectedHead=0;
-                    }else {
-                        expectedHead=head+1;
-                    }
-                }else {
-                  expectedHead=head+1;   
-                    do {
-                        words[arrBound]=word<<1|(word=words[--arrBound])>>>-1;
-                    }while(arrBound!=headOffset);
-                }
-                if(headOffset==tailOffset) {
-                    words[arrBound]=word<<1&-1L<<head|word&-1L>>>-head;
-                }else {
-                    words[arrBound]=word<<1;
-                }
-            }
-          }
-            break;
+              uncheckedEraseAtSplit();
+              break;
           default:
-            if(tail < expectedHead){
-              uncheckedFragmentedRemove();
-            }else{
-              nonfragmentedRemove();
-            }
+              int head=expectedHead;
+              int tail=expectedTail;
+              if(tail<head) {
+                  uncheckedFragmentedRemove();
+              }else {
+                  uncheckedNonfragmentedRemove();
+              }
           }
         }
         expectedLastRet=-1;
@@ -235,66 +399,6 @@ public class PackedBooleanArrDeqTest{
           Assertions.assertTrue(function.isEmpty());
         }
       }
-      private void checkedFragmentedRemove(){
-        int head=expectedHead;
-        int tail=expectedTail;
-        final int lastRet=expectedLastRet;
-        final int arrBound=expectedCapacity - 1;
-        final var arr=(long[])expectedArr;
-        int headDist=expectedLastRet - head;
-        if(headDist >= 0){
-          final int tailDist=arrBound - lastRet;
-          if(headDist <= tailDist + tail + 1){
-            if(headDist == 0){
-              if(tailDist == 0){
-                expectedHead=0;
-              }else{
-                expectedHead=head + 1;
-              }
-            }else{
-              BitSetUtil.uncheckedCopy((long[])expectedArr,tail=head,arr,++head,headDist);
-              expectedHead=head;
-            }
-          }else{
-            BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
-            BitSetUtil.uncheckedCopy(arr,0,arr,arrBound,1);
-            BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
-            if(tail == 0){
-              expectedTail=arrBound;
-            }else{
-              expectedTail=tail - 1;
-            }
-            expectedCursor=lastRet;
-          }
-        }else{
-          final int tailDist=tail - lastRet;
-          headDist=arrBound - head;
-          if(tailDist <= headDist + lastRet + 1){
-            if(tailDist == 0){
-              if(lastRet == 0){
-                expectedTail=arrBound;
-              }else{
-                expectedTail=tail - 1;
-              }
-            }else{
-              BitSetUtil.uncheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
-              expectedTail=tail - 1;
-              expectedCursor=lastRet;
-            }
-          }else{
-            BitSetUtil.semicheckedCopy(arr,0,arr,1,lastRet);
-            BitSetUtil.uncheckedCopy(arr,arrBound,arr,0,1);
-            BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
-            expectedHead=headDist == 0?0:head;
-          }
-        }
-      }
-      private void nonfragmentedRemove(){
-        throw new UnsupportedOperationException();
-        }
-      private void uncheckedFragmentedRemove(){
-        throw new UnsupportedOperationException();
-      }
     }
    
     private class DescendingItrMonitor extends AbstractItrMonitor{
@@ -313,30 +417,144 @@ public class PackedBooleanArrDeqTest{
           expectedCursor=expectedCapacity - 1;
         }
       }
+      private void uncheckedFragmentedRemove() {
+          final long[] words=(long[])expectedArr;
+          int head=expectedHead;
+          int tail=expectedTail;
+          int cursor=expectedCursor;
+          int headOffset=head>>6;
+          int tailOffset=tail>>6;
+          int arrBound=words.length-1;
+          if(cursor==(arrBound<<6)+63) {
+              long word=words[0];
+              //remove index 0
+              int headWordDist=arrBound-headOffset;
+              long mask;
+              if(tailOffset<=headWordDist+1) {
+                  //pull the tail down
+                  expectedTail=tail==0?cursor:tail-1;
+                  for(cursor=0;cursor!=tailOffset;) {
+                      words[cursor]=word>>>1|(word=words[++cursor])<<-1;
+                  }
+                  words[tailOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
+              }else {
+                  expectedHead=head==cursor?0:head+1;
+                  expectedCursor=0;
+                  words[0]=word&-2L|(word=words[arrBound])>>>-1;
+                  while(arrBound!=headOffset) {
+                      words[arrBound]=word<<1 | (word=words[--arrBound]>>>-1);
+                  }
+                  words[headOffset]=headOffset==tailOffset?word&(mask=(1L<<head)-1) | word<<1&~mask:word<<1;
+              }
+          }else {
+              int headDist;
+              int lastRetOffset=++cursor>>6;
+              long word=words[lastRetOffset];
+              if((headDist=cursor-head)>0) {
+                  //removing from head run
+                  int headWordDist=lastRetOffset-headOffset;
+                  int tailWordDist=arrBound-lastRetOffset;
+                  if(headWordDist<=tailWordDist+tailOffset+1) {
+                      //pull the head up
+                      expectedHead=head+1;
+                      expectedCursor=cursor;
+                      long mask;
+                      if(headWordDist==0) {
+                          words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
+                      }else {
+                          //TODO
+                          throw new UnsupportedOperationException();
+                      }
+                      
+                      
+//                      if(tailWordDist==0) {
+//                          words[lastRetOffset]=word>>>1&(mask=(1L<<tail-lastRet)-1<<lastRet) | word&~mask;
+//                      }else {
+//                          words[lastRetOffset]=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask | (word=words[++lastRetOffset])<<-1;
+//                          while(lastRetOffset!=tailOffset) {
+//                              words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+//                          }
+//                          words[lastRetOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
+//                      }
+                  }else {
+                      //TODO pull tail down
+                      throw new UnsupportedOperationException();
+                  }
+              }else {
+                  //removing from tail run
+                  int tailWordDist=tailOffset-lastRetOffset;
+                  int headWordDist=arrBound-headOffset;
+                  if(tailWordDist<=headWordDist+lastRetOffset+1) {
+                      //TODO pull the tail down
+                      throw new UnsupportedOperationException();
+                  }else {
+                      //TODO pull the head up
+                      throw new UnsupportedOperationException();
+                  }
+              }
+          }
+        }
+      private void uncheckedNonfragmentedRemove() {
+          //TODO
+          throw new UnsupportedOperationException();
+      }
+      private void checkedFragmentedRemove() {
+          //TODO
+          throw new UnsupportedOperationException();
+      }
+      private void checkedNonfragmentedRemove() {
+          //TODO
+          throw new UnsupportedOperationException();
+      }
+      private void uncheckedEraseHead() {
+          int tail=expectedTail;
+          int head=expectedHead;
+          switch(Integer.signum(tail-head)) {
+          case -1:
+              if(head==expectedCapacity-1) {
+                  expectedHead=0;
+              }else {
+                  expectedHead=head+1;
+              }
+              break;
+          case 0:
+              expectedTail=-1;
+              break;
+          default:
+              expectedHead=head+1;
+          }
+      }
       @Override public void updateItrRemoveState(){
+          if(BitSetUtil.getFromPackedArr((long[])expectedArr,expectedLastRet)) {
+              --trueCount;
+          }
         ++expectedItrModCount;
         ++expectedModCount;
         if(checkedType.checked){
-          throw new UnsupportedOperationException();
-        }else{
-          if(expectedCursor == -1){
-            int head;
-            switch(Integer.signum(expectedTail - (head=expectedHead))){
+            int head=expectedHead;
+            int tail=expectedTail;
+            switch(Integer.signum(tail-head)) {
             case -1:
-              expectedHead=head == expectedCapacity - 1?0:head + 1;
-              break;
+                checkedFragmentedRemove();
+                break;
             case 0:
-              expectedTail=-1;
-              break;
+                expectedTail=-1;
+                break;
             default:
-              expectedHead=head + 1;
+                checkedNonfragmentedRemove();
             }
-          }else{
-            if(expectedTail < expectedHead){
-              uncheckedFragmentedRemove();
-            }else{
-              nonfragmentedRemove();
-            }
+        }else{
+          int cursor=this.expectedCursor;
+          if(cursor==-1) {
+              uncheckedEraseHead();
+          }else {
+              int head=expectedHead;
+              int tail=expectedTail;
+              if(tail<head) {
+                  uncheckedFragmentedRemove();
+              }else {
+                  uncheckedNonfragmentedRemove();
+              }
           }
         }
         expectedLastRet=-1;
@@ -375,62 +593,6 @@ public class PackedBooleanArrDeqTest{
         }else{
           Assertions.assertTrue(function.isEmpty());
         }
-      }
-      private void checkedFragmentedRemove(){
-        int head=expectedHead;
-        int tail=expectedTail;
-        final int arrBound=expectedCapacity - 1;
-        final var arr=(long[])expectedArr;
-        final int lastRet=expectedLastRet;
-        int headDist=expectedLastRet - head;
-        if(headDist >= 0){
-          final int tailDist=arrBound - lastRet;
-          if(headDist <= tailDist + tail + 1){
-            if(headDist == 0){
-              if(tailDist == 0){
-                expectedHead=0;
-              }else{
-                expectedHead=head + 1;
-              }
-            }else{
-              BitSetUtil.uncheckedCopy(arr,tail=head,arr,++head,headDist);
-              expectedHead=head;
-              expectedCursor=lastRet;
-            }
-          }else{
-            BitSetUtil.semicheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
-            BitSetUtil.uncheckedCopy(arr,0,arr,arrBound,1);
-            BitSetUtil.semicheckedCopy(arr,1,arr,0,tail);
-            expectedTail=tail == 0?arrBound:tail - 1;
-          }
-        }else{
-          final int tailDist=tail - lastRet;
-          headDist=arrBound - head;
-          if(tailDist <= headDist + lastRet + 1){
-            if(tailDist == 0){
-              if(lastRet == 0){
-                expectedTail=arrBound;
-              }else{
-                expectedTail=tail - 1;
-              }
-            }else{
-              BitSetUtil.uncheckedCopy(arr,lastRet + 1,arr,lastRet,tailDist);
-              expectedTail=tail - 1;
-            }
-          }else{
-            BitSetUtil.semicheckedCopy(arr,0,arr,1,lastRet);
-            BitSetUtil.uncheckedCopy(arr,arrBound,arr,0,1);
-            BitSetUtil.semicheckedCopy(arr,head,arr,++head,headDist);
-            expectedHead=headDist == 0?0:head;
-            expectedCursor=lastRet;
-          }
-        }
-      }
-      private void nonfragmentedRemove(){
-        throw new UnsupportedOperationException();
-        }
-      private void uncheckedFragmentedRemove(){
-        throw new UnsupportedOperationException();
       }
     }
     PackedBooleanArrDeqMonitor(CheckedType checkedType){
@@ -472,6 +634,9 @@ public class PackedBooleanArrDeqTest{
       ++expectedSize;
       ++expectedModCount;
       final var val=(boolean)inputVal;
+      if(val) {
+          ++trueCount;
+      }
       final var words=(long[])expectedArr;
       if(expectedCapacity!=0) {
         int tail;
@@ -479,6 +644,7 @@ public class PackedBooleanArrDeqTest{
           words[(tail=words.length)-1]=val?-1L:0L;
           this.expectedHead=tail=(tail<<6)-1;
           this.expectedTail=tail;
+         
         }else {
           int head;
           final long[] newWords;
@@ -538,10 +704,14 @@ public class PackedBooleanArrDeqTest{
         ++expectedSize;
         ++expectedModCount;
         final long[] words=(long[])this.expectedArr;
+        final boolean val=(boolean)inputVal;
+        if(val) {
+            ++trueCount;
+        }
         if(expectedCapacity!=0) {
           int tail;
           if((tail=this.expectedTail)==-1) {
-            words[0]=(boolean)inputVal?1L:0L;
+            words[0]=val?1L:0L;
             this.expectedHead=0;
             this.expectedTail=0;
           }else {
@@ -551,7 +721,7 @@ public class PackedBooleanArrDeqTest{
             if(++tail==(head=this.expectedHead)) {
               if((tail&63)==0) {
                 this.expectedHead=0;
-                (newWords=new long[OmniArray.growBy50Pct(tail=words.length)])[tail]=(boolean)inputVal?1L:0L;
+                (newWords=new long[OmniArray.growBy50Pct(tail=words.length)])[tail]=val?1L:0L;
                 this.expectedTail=tail<<6;
                 ArrCopy.uncheckedCopy(words,head>>=6,newWords,0,tail-=head);
                 ArrCopy.uncheckedCopy(words,0,newWords,tail,head);
@@ -559,7 +729,7 @@ public class PackedBooleanArrDeqTest{
                 this.expectedTail=tail;
                 int oldCap,newCap;
                 ArrCopy.semicheckedCopy(words,0,newWords=new long[newCap=OmniArray.growBy50Pct(oldCap=words.length)],0,newTailWordBound=tail>>6);
-                if((boolean)inputVal) {
+                if(val) {
                   newWords[newTailWordBound]=words[newTailWordBound]|1L<<tail;
                 }else {
                   newWords[newTailWordBound]=words[newTailWordBound]&~(1L<<tail);
@@ -575,12 +745,12 @@ public class PackedBooleanArrDeqTest{
                   ArrCopy.uncheckedCopy(words,0,newWords=new long[OmniArray.growBy50Pct(newTailWordBound)],0,newTailWordBound);
                   this.expectedCapacity=newWords.length<<6;
                   this.expectedArr=newWords;
-                  if((boolean)inputVal) {
+                  if(val) {
                       newWords[newTailWordBound]=1L;
                   }
                   this.expectedTail=tail;
                 }else {
-                  if((boolean)inputVal) {
+                  if(val) {
                     words[0]|=1L;
                   }else {
                     words[0]&=-2L;
@@ -588,7 +758,7 @@ public class PackedBooleanArrDeqTest{
                   this.expectedTail=0;
                 }
               }else {
-                if((boolean)inputVal) {
+                if(val) {
                   words[newTailWordBound]|=1L<<tail;
                 }else {
                   words[newTailWordBound]&=~(1L<<tail);
@@ -641,6 +811,41 @@ public class PackedBooleanArrDeqTest{
 //          ++expectedSize;
         }
 
+    private int getTrueCount() {
+        if(expectedSize==0) {
+            return 0;
+        }
+        int head=expectedHead;
+        int tail=expectedTail;
+        int headOffset=head>>6;
+        int tailOffset=tail>>6;
+        long[] words=(long[])expectedArr;
+        int arrBound=words.length-1;
+        int count;
+        if(tail<head) {
+            count=Long.bitCount(words[headOffset]>>>head);
+            while(headOffset!=arrBound) {
+                count+=Long.bitCount(words[++headOffset]);
+            }
+            count+=Long.bitCount(words[tailOffset]<<-tail-1);
+            while(tailOffset!=0) {
+                count+=Long.bitCount(words[--tailOffset]);
+            }
+        }else {
+            if(headOffset==tailOffset) {
+                count=Long.bitCount(words[headOffset]&(1L<<expectedSize)-1<<head);
+            }else {
+                count=Long.bitCount(words[headOffset]>>>head);
+                while(++headOffset!=tailOffset) {
+                    count+=Long.bitCount(words[headOffset]);
+                }
+                count+=Long.bitCount(words[headOffset]<<-tail-1);
+            }
+        }
+        return count;
+    }
+    
+    
     @Override public void updateCollectionState(){
         long[] actualArr;
         int actualCapacity;
@@ -680,8 +885,10 @@ public class PackedBooleanArrDeqTest{
           }else{
               BitSetUtil.semicheckedCopy(actualArr,expectedHead,(long[])expectedArr,expectedHead,expectedSize=expectedTail + 1 - expectedHead);
           }
+        this.trueCount=getTrueCount();
     }
-    private static IntPredicate getArrayIndexSearcher(long[] arr,Object inputVal,DataType inputType) {
+    
+    private static long getInputVal(Object inputVal,DataType inputType) {
         long inputCast;
         switch(inputType){
         case BOOLEAN:
@@ -711,12 +918,21 @@ public class PackedBooleanArrDeqTest{
         default:
           throw inputType.invalid();
         }
+        return inputCast;
+    }
+    private static IntPredicate getArrayIndexSearcher(long[] arr,long inputCast) {
+       
         return index->(arr[index>>6]>>>index&1)==inputCast;
     }
     @Override public void updateRemoveLastOccurrenceState(Object inputVal,DataType inputType){
+        
         final int head=expectedHead;
         int tail=expectedTail;
-        final IntPredicate indexSearcher=getArrayIndexSearcher((long[])expectedArr,inputVal,inputType);
+        long inputCast=getInputVal(inputVal,inputType);
+        final IntPredicate indexSearcher=getArrayIndexSearcher((long[])expectedArr,inputCast);
+        if(inputCast!=0) {
+            --trueCount;
+        }
         ++expectedModCount;
         --expectedSize;
         if(tail < head){
@@ -780,7 +996,11 @@ public class PackedBooleanArrDeqTest{
     @Override public void updateRemoveValState(Object inputVal,DataType inputType){
         final int head=expectedHead;
         int tail=expectedTail;
-        final IntPredicate indexSearcher=getArrayIndexSearcher((long[])expectedArr,inputVal,inputType);
+        long inputCast=getInputVal(inputVal,inputType);
+        final IntPredicate indexSearcher=getArrayIndexSearcher((long[])expectedArr,inputCast);
+        if(inputCast!=0) {
+            --trueCount;
+        }
         ++expectedModCount;
         --expectedSize;
         if(tail < head){
@@ -917,6 +1137,7 @@ public class PackedBooleanArrDeqTest{
             }
           }
         }
+        Assertions.assertEquals(trueCount,getTrueCount());
       }
 
     @Override public void verifyGetResult(int expectedCursor,Object output,DataType outputType){
@@ -977,140 +1198,101 @@ public class PackedBooleanArrDeqTest{
       Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
       Assertions.assertNotEquals(result,filter.numRemoved == 0);
       if(expectedTail == -1){
+          
         Assertions.assertFalse(result);
         Assertions.assertTrue(filter.retainedVals.isEmpty());
         Assertions.assertEquals(0,filter.numRetained);
         Assertions.assertEquals(0,filter.numCalls);
       }else{
-          if(expectedTail < expectedHead){
-            verifyBooleanFragmentedRemoveIf(result,filter);
-          }else{
-            verifyBooleanNonfragmentedRemoveIf(result,filter);
-          }
-
-      }
-    }
-    private void verifyBooleanFragmentedRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-      final int head=expectedHead;
-      final int tail=expectedTail;
-      final int expectedCapacity=this.expectedCapacity;
-      final var expectedArr=(long[])this.expectedArr;
-      int trueCount=0;
-      int size;
-      for(int i=tail;;--i){
-        if(BitSetUtil.getFromPackedArr(expectedArr,i)){
-          ++trueCount;
-        }
-        if(i == 0){
-          for(i=(size=expectedCapacity) - 1;;--i){
-            if(BitSetUtil.getFromPackedArr(expectedArr,i)){
-              ++trueCount;
-            }
-            if(i == head){
-              break;
-            }
-          }
-          size+=tail + 1 - head;
-          break;
-        }
-      }
-      verifyBooleanRemoveIfHelper(result,filter,expectedArr,trueCount,size);
-    }
-    private void verifyBooleanNonfragmentedRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-      final int head=expectedHead;
-      final int tail=expectedTail;
-      final var expectedArr=(long[])this.expectedArr;
-      int trueCount=0;
-      for(int i=head;;++i){
-        if(BitSetUtil.getFromPackedArr(expectedArr,i)){
-          ++trueCount;
-        }
-        if(i == tail){
-          break;
-        }
-      }
-      verifyBooleanRemoveIfHelper(result,filter,expectedArr,trueCount,tail - head + 1);
-    }
-    private void verifyBooleanRemoveIfHelper(boolean result,MonitoredRemoveIfPredicate filter,
-        final long[] expectedArr,int trueCount,int size){
-      if(trueCount == size){
-        Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
-        Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
-        Assertions.assertEquals(1,filter.numCalls);
-        if(filter.removedVals.contains(Boolean.TRUE)){
-          Assertions.assertTrue(result);
-          expectedTail=-1;
-          expectedSize=0;
-          ++expectedModCount;
-        }else{
-          Assertions.assertFalse(result);
-        }
-      }else if(trueCount == 0){
-        Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
-        Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-        Assertions.assertEquals(1,filter.numCalls);
-        if(filter.removedVals.contains(Boolean.FALSE)){
-          Assertions.assertTrue(result);
-          expectedTail=-1;
-          expectedSize=0;
-          ++expectedModCount;
-        }else{
-          Assertions.assertFalse(result);
-        }
-      }else{
-        Assertions.assertEquals(2,filter.numCalls);
-        if(filter.removedVals.contains(Boolean.TRUE)){
-          Assertions.assertTrue(result);
-          ++expectedModCount;
-          if(filter.removedVals.contains(Boolean.FALSE)){
-            expectedTail=-1;
-            expectedSize=0;
-            Assertions.assertTrue(filter.retainedVals.isEmpty());
-            Assertions.assertEquals(0,filter.numRetained);
-            Assertions.assertEquals(2,filter.numRemoved);
-          }else{
-            for(int i=size-=trueCount + 1;;--i){
-              BitSetUtil.storeInPackedArr(expectedArr,i,false);
-              if(i == 0){
-                break;
-              }
-            }
-            expectedHead=0;
-            expectedTail=size;
-            expectedSize=size + 1;
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
-            Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-            Assertions.assertEquals(1,filter.numRetained);
-            Assertions.assertEquals(1,filter.numRemoved);
-          }
-        }else{
-          if(filter.removedVals.contains(Boolean.FALSE)){
-            Assertions.assertTrue(result);
-            ++expectedModCount;
-            for(int i=--trueCount;;--i){
-              BitSetUtil.storeInPackedArr(expectedArr,i,true);
-              if(i == 0){
-                break;
-              }
-            }
-            expectedHead=0;
-            expectedTail=trueCount;
-            expectedSize=trueCount + 1;
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+          int trueCount=this.trueCount;
+          if(trueCount == expectedSize){
+            Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
             Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
-            Assertions.assertEquals(1,filter.numRetained);
-            Assertions.assertEquals(1,filter.numRemoved);
+            Assertions.assertEquals(1,filter.numCalls);
+            if(filter.removedVals.contains(Boolean.TRUE)){
+              Assertions.assertTrue(result);
+              expectedTail=-1;
+              expectedSize=0;
+              ++expectedModCount;
+              this.trueCount=0;
+            }else{
+              Assertions.assertFalse(result);
+            }
+          }else if(trueCount == 0){
+            Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+            Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+            Assertions.assertEquals(1,filter.numCalls);
+            if(filter.removedVals.contains(Boolean.FALSE)){
+              Assertions.assertTrue(result);
+              expectedTail=-1;
+              expectedSize=0;
+              ++expectedModCount;
+            }else{
+              Assertions.assertFalse(result);
+            }
           }else{
-            Assertions.assertFalse(result);
-            Assertions.assertEquals(2,filter.numRetained);
-            Assertions.assertEquals(0,filter.numRemoved);
-            Assertions.assertTrue(filter.removedVals.isEmpty());
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
-            Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+            Assertions.assertEquals(2,filter.numCalls);
+            if(filter.removedVals.contains(Boolean.TRUE)){
+              Assertions.assertTrue(result);
+              ++expectedModCount;
+              if(filter.removedVals.contains(Boolean.FALSE)){
+                expectedTail=-1;
+                expectedSize=0;
+                Assertions.assertTrue(filter.retainedVals.isEmpty());
+                Assertions.assertEquals(0,filter.numRetained);
+                Assertions.assertEquals(2,filter.numRemoved);
+               
+              }else{
+                int size=expectedSize;
+                long[] expectedArr=(long[])this.expectedArr;
+                for(int i=size-=trueCount + 1;;--i){
+                  BitSetUtil.storeInPackedArr(expectedArr,i,false);
+                  if(i == 0){
+                    break;
+                  }
+                }
+                expectedHead=0;
+                expectedTail=size;
+                expectedSize=size + 1;
+                Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                Assertions.assertEquals(1,filter.numRetained);
+                Assertions.assertEquals(1,filter.numRemoved);
+              }
+              this.trueCount=0;
+            }else{
+              if(filter.removedVals.contains(Boolean.FALSE)){
+                Assertions.assertTrue(result);
+                ++expectedModCount;
+                long[] expectedArr=(long[])this.expectedArr;
+                for(int i=--trueCount;;--i){
+                  BitSetUtil.storeInPackedArr(expectedArr,i,true);
+                  if(i == 0){
+                    break;
+                  }
+                }
+                expectedHead=0;
+                expectedTail=trueCount;
+                expectedSize=trueCount + 1;
+                Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                Assertions.assertEquals(1,filter.numRetained);
+                Assertions.assertEquals(1,filter.numRemoved);
+              }else{
+                Assertions.assertFalse(result);
+                Assertions.assertEquals(2,filter.numRetained);
+                Assertions.assertEquals(0,filter.numRemoved);
+                Assertions.assertTrue(filter.removedVals.isEmpty());
+                Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+              }
+            }
           }
-        }
+        
       }
     }
+
+
     @Override PackedBooleanArrDeq initDeq(){
       if(checkedType.checked) {
         return new PackedBooleanArrDeq.Checked();
@@ -1332,47 +1514,7 @@ public class PackedBooleanArrDeqTest{
       
   }
   
-//  private static interface MonitoredFunctionTest{
-//    private void runAllTests(String testName,long maxRand){
-//      for(final var checkedType:CheckedType.values()){
-//        for(final var size:SIZES){
-//          final int initValBound=size != 0?1:0;
-//          for(int tmpInitCap=0,initCapBound=size+64&-64;tmpInitCap <= initCapBound;tmpInitCap+=64){
-//            final int initCap=tmpInitCap;
-//            final int rotateBound=getExpectedFinalCapacity(initCapBound,size)-1;
-//            for(int tmpNumToRotate=0;tmpNumToRotate <= rotateBound;++tmpNumToRotate){
-//              final int numToRotate=tmpNumToRotate;
-//              for(final var functionGen:StructType.ArrDeq.validMonitoredFunctionGens){
-//                if(functionGen.expectedException == null || checkedType.checked){
-//                  for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
-//                    final long randSeedBound=size > 1 && functionGen.randomized && !functionCallType.boxed?maxRand:0;
-//                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-//                      final long randSeed=tmpRandSeed;
-//                      for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-//                        final int initVal=tmpInitVal;
-//                        TestExecutorService.submitTest(()->{
-//                          final var monitor=SequenceInitialization.Ascending
-//                              .initialize(new PackedBooleanArrDeqMonitor(checkedType,initCap),size,initVal);
-//                          if(size > 0 && numToRotate > 0){
-//                            monitor.rotate(numToRotate);
-//                          }
-//                          runTest(monitor,functionGen,functionCallType,randSeed);
-//                        });
-//                      }
-//                    }
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-//        
-//      }
-//      TestExecutorService.completeAllTests(testName);
-//    }
-//    void runTest(PackedBooleanArrDeqMonitor monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
-//        long randSeed);
-//  }
+
   private static interface QueryTest{
     private void runAllTests(String testName){
         for(final var queryVal:QueryVal.values()){
@@ -1453,37 +1595,7 @@ public class PackedBooleanArrDeqTest{
     void callAndVerifyResult(PackedBooleanArrDeqMonitor monitor,QueryVal queryVal,QueryVal.QueryValModification modification,
         QueryCastType castType,DataType inputType,int size,double position);
   }
-//  private static interface ToStringAndHashCodeTest{
-//    private void runAllTests(String testName){
-//      for(final var size:SHORT_SIZES){
-//        final int interval=Math.max(1,size / 10);
-//        for(int tmpInitCap=0,initCapBound=size+64&-64;tmpInitCap <= initCapBound;tmpInitCap+=64){
-//          final int initCap=tmpInitCap;
-//          final int rotateBound=getExpectedFinalCapacity(initCap,size)-1;
-//
-//          for(int tmpNumToRotate=0;tmpNumToRotate <= rotateBound;tmpNumToRotate+=interval){
-//            final int numToRotate=tmpNumToRotate;
-//            final int initValBound=size > 0?1:0;
-//            for(final var checkedType:CheckedType.values()){
-//              for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-//                final int initVal=tmpInitVal;
-//                TestExecutorService.submitTest(()->{
-//                  final var monitor=SequenceInitialization.Ascending
-//                      .initialize(new PackedBooleanArrDeqMonitor(checkedType,initCap),size,initVal);
-//                  if(size > 0 && numToRotate > 0){
-//                    monitor.rotate(numToRotate);
-//                  }
-//                  callVerify(monitor);
-//                });
-//              }
-//            }
-//          }
-//        }
-//      }
-//      TestExecutorService.completeAllTests(testName);
-//    }
-//    void callVerify(PackedBooleanArrDeqMonitor monitor);
-//  }
+
   @Order(11520)
   @Test public void testadd_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
@@ -1631,6 +1743,7 @@ public class PackedBooleanArrDeqTest{
  
   @Order(348)
   @Test public void testItrforEachRemaining_Consumer(){
+    TestExecutorService.setNumWorkers(1);
     BasicTest test=(monitor)->{
         int prevNumToIterate=-1;
         for(final var position:POSITIONS){
@@ -1715,8 +1828,12 @@ public class PackedBooleanArrDeqTest{
       };
       test.runAllTests("PackedBooleanArrDeqTest.testItrnext_void",SHORT_SIZES);
   }
+  @Disabled
   @Order(-537958)
   @Test public void testItrremove_void(){
+      //TODO remove
+      AtomicInteger totalNumTests=new AtomicInteger(0);
+      AtomicInteger totalNumPassed=new AtomicInteger(0);
     TestExecutorService.setNumWorkers(1);
     for(final var size:SIZES){
       final int initCapBound=size+64&-64;
@@ -1756,6 +1873,8 @@ public class PackedBooleanArrDeqTest{
                               throw removeScenario.invalid();
                             }
                             TestExecutorService.submitTest(()->{
+                                totalNumTests.incrementAndGet();
+                                
                               final var thisSize=size;
                               final var thisPosition=position;
                               final var thisInitCap=initCap;
@@ -1777,9 +1896,9 @@ public class PackedBooleanArrDeqTest{
                               itrMonitor.illegalMod(illegalMod);
                               if(removeScenario.expectedException == null){
                                 if(illegalMod.expectedException == null){
-                                  if(thisSize==3 && thisPosition==.75 && thisInitCap==0 && thisNumToRotate==62 && !thisCheckedType.checked && thisItrType==IteratorType.AscendingItr && thisIllegalMod==IllegalModification.NoMod && thisRemoveScenario==IteratorRemoveScenario.PostNext) {
-                                    TestExecutorService.suspend();
-                                  }
+//                                  if(thisSize==258 && thisPosition==.75 && thisInitCap==256 && thisNumToRotate==319 && !thisCheckedType.checked && thisItrType==IteratorType.DescendingItr && thisIllegalMod==IllegalModification.NoMod && thisRemoveScenario==IteratorRemoveScenario.PostNext) {
+//                                    TestExecutorService.suspend();
+//                                  }
                                   try {
                                   itrMonitor.verifyRemove();
                                   switch(removeScenario){
@@ -1796,6 +1915,7 @@ public class PackedBooleanArrDeqTest{
                                   }
                                   }catch(NotYetImplementedException e) {
                                     //TODO do nothing
+                                    return;
                                   }
                                 }else{
                                   Assertions.assertThrows(illegalMod.expectedException,()->itrMonitor.verifyRemove());
@@ -1803,6 +1923,7 @@ public class PackedBooleanArrDeqTest{
                               }else{
                                 Assertions.assertThrows(removeScenario.expectedException,()->itrMonitor.verifyRemove());
                               }
+                              totalNumPassed.incrementAndGet();
                             });
                           }
                         }
@@ -1817,6 +1938,13 @@ public class PackedBooleanArrDeqTest{
       }
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testItrremove_void");
+    final int totalNumTestsInt=totalNumTests.get();
+    final int totalNumPassedInt=totalNumPassed.get();
+    System.out.println("Total num tests  = "+totalNumTestsInt);
+    System.out.println("Total num passed = "+totalNumPassedInt);
+    double percent=100.0 * totalNumPassedInt / totalNumTestsInt;
+    System.out.println("Percent passed   = "+percent+"%");
+    NotYetImplementedException.reportCounts();
   }
   private static void verifyMASSIVEToStringHelper(String result,int seqSize,String testName) {
       int offset;
