@@ -356,6 +356,11 @@ public interface BitSetUtil{
         }
     }
     
+    /**
+     * left = high bits
+     * @param word
+     * @return
+     */
     public static String prettyPrintWord(long word) {
         var byteArr=new byte[64];
         for(int i=0;;) {

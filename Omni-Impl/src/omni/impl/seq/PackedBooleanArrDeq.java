@@ -619,13 +619,15 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                 while(lastRetOffset!=tailOffset) {
                     words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
                 }
-                words[lastRetOffset]=(word&(mask=(1L<<tail)-1))>>>1 | word&~mask;
+                words[lastRetOffset]=((word>>>1)&(mask=(-1L>>>(-tail-1)))) | word&~mask;
             }else {
                 //pull up the head
-                root.head=head+1;
+                
                 if(headWordDist==0) {
+                  root.head=++head;
                     words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
                 }else {
+                  root.head=head+1;
                     words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
                     while(lastRetOffset!=headOffset) {
                         words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
@@ -652,7 +654,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             }else {
                 //pull up the head
                 root.head=head==(arrBound<<6)+63?0:head+1;
-                word=word<<1&(mask=(1L<<lastRet)-1)|word&~mask;
+                word=((word<<1)&(mask=-1L>>>(-lastRet-1)))|(word&~mask);
                 if(lastRetOffset==0) {
                     words[0]=word|(word=words[lastRetOffset=arrBound])>>>-1;
                 }else {
@@ -665,7 +667,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                 while(lastRetOffset!=headOffset) {
                     words[lastRetOffset]=word<<1|(word=words[--lastRetOffset])>>>-1;
                 }
-                words[lastRetOffset]=word&(mask=1L<<head-1) | word<<1&~mask;
+                words[lastRetOffset]=word&(mask=(1L<<head)-1) | word<<1&~mask;
             }
         }
     }
@@ -822,7 +824,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               int tailWordDist=arrBound-lastRetOffset;
               if(headWordDist<=tailWordDist+tailOffset+1) {
                   //pull the head up
-                  root.head=head+1;
+                  root.head=++head;
                   this.cursor=cursor;
                   long mask;
                   if(headWordDist==0) {
