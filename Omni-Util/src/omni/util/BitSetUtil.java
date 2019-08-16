@@ -26,6 +26,9 @@ public interface BitSetUtil{
     public static boolean getFromPackedArr(long[] words,int nonPackedIndex) {
       return (words[convertToPackedIndex(nonPackedIndex)]>>>nonPackedIndex&1)!=0;
     }
+
+    
+    
     public static void uncheckedAlignedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
       //TODO
     }
@@ -116,12 +119,14 @@ public interface BitSetUtil{
       if((dstWordOffset=dstOffset>>6)==(dstWordBound=(dstBound=dstOffset+length-1)>>6)) {
           dst[dstWordOffset]=dst[dstWordOffset]&~(srcEndMask<<dstOffset) | (src[srcOffset>>6]&srcEndMask)<<dstOffset;
       }else {
-          dst[dstWordOffset=dstOffset>>6]=dst[dstWordOffset]&-1L>>>-dstOffset|(srcWord=src[srcWordOffset=srcOffset>>6])<<dstOffset;
+          dst[dstWordOffset]=dst[dstWordOffset]&-1L>>>-dstOffset|(srcWord=src[srcWordOffset=srcOffset>>6])<<dstOffset;
           while(++dstWordOffset<dstWordBound) {
             dst[dstWordOffset]=srcWord>>>-dstOffset|(srcWord=src[++srcWordOffset])<<dstOffset;
           }
           final long dstEndMask=-1L<<dstBound-1;
+        //TODO this is potentially bugged
           if(++srcWordOffset==srcOffset+length-1>>6) {
+              
               dst[dstWordOffset]=srcWord>>>-dstOffset|dst[dstWordOffset]&dstEndMask| (src[srcWordOffset]&srcEndMask)<<dstOffset;
 
           }else {

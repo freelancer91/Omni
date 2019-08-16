@@ -506,381 +506,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }
     return dst;
   }
-  private void eraseHead(){
-    int head;
-    switch(Integer.signum(this.tail-(head=this.head))){
-      case -1:
-        this.head=head==(words.length<<6)-1?0:head+1;
-        return;
-      case 0:
-        this.tail=-1;
-        break;
-      default:
-        this.head=head+1;
-    }
-  }
-  private void eraseTail() {
-      int tail;
-      switch(Integer.signum((tail=this.tail)-this.head)){
-        case -1:
-          this.tail=tail==0?(words.length<<6)-1:tail-1;
-          return;
-        case 0:
-          this.tail=-1;
-          break;
-        default:
-          this.tail=tail-1;
-      }
-  }
 
-  private static class AscendingItr extends AbstractDeqItr
-  {
-    transient final PackedBooleanArrDeq root;
-    private AscendingItr(AscendingItr itr){
-      super(itr);
-      this.root=itr.root;
-    }
-    private AscendingItr(PackedBooleanArrDeq root){
-      super(root.tail!=-1?root.head:-1);
-      this.root=root;
-    }
-    private AscendingItr(PackedBooleanArrDeq root,int cursor){
-      super(cursor);
-      this.root=root;
-    }
-    @Override public Object clone(){
-      return new AscendingItr(this);
-    }
-    @Override public boolean nextBoolean(){
-      final long[] words;
-      int cursor;
-      final PackedBooleanArrDeq root;
-      final var ret=((words=(root=this.root).words)[(cursor=this.cursor)>>6]>>>cursor&1)!=0;
-      if(cursor==root.tail){
-        cursor=-1;
-      }else if(++cursor==words.length<<6){
-        cursor=0;
-      }
-      this.cursor=cursor;
-      return ret;
-    }
-    private void eraseAtSplit(){
-        final PackedBooleanArrDeq root;
-        final long[] words;
-        final int head,tail,tailOffset,headOffset;
-        int arrBound,headDist;
-        long word;
-        if((tailOffset=(tail=(root=this.root).tail)>>6)<(headDist=(arrBound=(words=root.words).length-1)-(headOffset=(head=root.head)>>6))) {
-            //it's more efficient to pull the tail down
-            this.cursor=headDist=(arrBound<<6)+63;
-            root.tail=tail==0?headDist:tail-1;
-            words[arrBound]=words[arrBound]&Long.MAX_VALUE | (word=words[arrBound=0])<<-1;
-            while(arrBound!=tailOffset) {
-                words[arrBound]=word>>>1| (word=words[++arrBound])<<-1;
-            }
-            words[arrBound]=headOffset==tailOffset?word>>>1&(1L<<tail)-1 | words[arrBound]&-1L<<head:word>>>1;
-        }else {
-            //it's more efficient to pull the head up
-            word=words[arrBound];
-            if(headDist==0) {
-                root.head=head==(arrBound<<6)+63?0:head+1;
-            }else {
-                root.head=head+1;   
-                do {
-                    words[arrBound]=word<<1|(word=words[--arrBound])>>>-1;
-                }while(arrBound!=headOffset);
-            }
-            words[arrBound]=headOffset==tailOffset?word<<1&-1L<<head|word&-1L>>>-head:word<<1;
-        }
-      }
-    private void fragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root) {
-        final long[] words;
-        final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1,headDist;
-        int lastRetOffset;
-        long mask,word=words[lastRetOffset=lastRet>>6];
-        if((headDist=lastRet-head)>=0) {
-            //the index to remove is in the head run
-            final int headWordDist;
-            final int tailWordDist;
-            if(( tailWordDist=arrBound-lastRetOffset)+tailOffset+1<(headWordDist=lastRetOffset-headOffset)) {
-                //pull the tail down
-                this.cursor=lastRet;
-                root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                word=word&(mask=(1L<<lastRet)-1)|word>>>1&~mask;
-                if(tailWordDist==0) {
-                    words[lastRetOffset]=word | (word=words[lastRetOffset=0])<<-1;
-                }else {
-                    words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
-                    while(lastRetOffset!=arrBound) {
-                        words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
-                    }
-                    words[lastRetOffset]=word>>>1| (word=words[lastRetOffset=0])<<-1;
-                }
-                while(lastRetOffset!=tailOffset) {
-                    words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
-                }
-                words[lastRetOffset]=((word>>>1)&(mask=(-1L>>>(-tail-1)))) | word&~mask;
-            }else {
-                //pull up the head
-                
-                if(headWordDist==0) {
-                  root.head=++head;
-                    words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
-                }else {
-                  root.head=head+1;
-                    words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
-                    while(lastRetOffset!=headOffset) {
-                        words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
-                    }
-                    words[lastRetOffset]=headOffset==tailOffset?word<<1&(mask=-1L<<head) | word&~mask:word<<1;
-                }
-            }
-        }else {
-            //the index to remove is in the tail run
-            final int tailWordDist;
-            if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset+1) {
-              //pull down the tail
-               root.tail=tail-1;
-               this.cursor=lastRet;
-               if(tailWordDist==0) {
-                   words[lastRetOffset]=word>>>1&(mask=(1L<<tail-lastRet)-1<<lastRet) | word&~mask;
-               }else {
-                   words[lastRetOffset]=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask | (word=words[++lastRetOffset])<<-1;
-                   while(lastRetOffset!=tailOffset) {
-                       words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
-                   }
-                   words[lastRetOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
-               }
-            }else {
-                //pull up the head
-                root.head=head==(arrBound<<6)+63?0:head+1;
-                word=((word<<1)&(mask=-1L>>>(-lastRet-1)))|(word&~mask);
-                if(lastRetOffset==0) {
-                    words[0]=word|(word=words[lastRetOffset=arrBound])>>>-1;
-                }else {
-                    words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
-                    while(lastRetOffset!=0) {
-                        words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
-                    }
-                    words[0]=word<<1|(word=words[lastRetOffset=arrBound])>>>-1;
-                }
-                while(lastRetOffset!=headOffset) {
-                    words[lastRetOffset]=word<<1|(word=words[--lastRetOffset])>>>-1;
-                }
-                words[lastRetOffset]=word&(mask=(1L<<head)-1) | word<<1&~mask;
-            }
-        }
-    }
-    private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
-        final long[] words;
-        final int headOffset,tailOffset;
-        int lastRetOffset;
-        long mask,word=(words=root.words)[lastRetOffset=lastRet>>6];
-        if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset) {
-            root.head=head+1;
-            word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
-            for(;lastRetOffset!=headOffset;word<<=1) {
-                words[lastRetOffset]=word | (word=words[--lastRetOffset])>>>-1;
-            }
-        }else {
-            this.cursor=lastRet;
-            root.tail=tail-1;
-            word=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask;
-            for(;lastRetOffset!=tailOffset;word>>>=1) {
-                words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
-            }
-        }
-        words[lastRetOffset]=word;
-      }
-    @Override public void remove(){
-        int cursor;
-        switch(cursor=this.cursor) {
-        case -1:
-            root.eraseTail();
-            break;
-        case 0:
-            eraseAtSplit();
-            break;
-        default:
-            final int head,tail;
-            final PackedBooleanArrDeq root;
-            if((tail=(root=this.root).tail)<(head=root.head)){
-                fragmentedAscendingRemove(head,cursor-1,tail,root);
-            }else {
-                nonfragmentedAscendingRemove(head,cursor-1,tail,root);
-            }
-        }
-        
-        
-        
-    }
-    @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
-      final PackedBooleanArrDeq root;
-      final int tail;
-      final long[] words;
-      var word=(words=(root=this.root).words)[cursor>>6];
-      if(cursor>(tail=root.tail)) {
-          for(int wordBound=words.length<<6;;) {
-              action.accept((word>>>cursor&1L)!=0);
-              if((++cursor&63)==0) {
-                  if(cursor==wordBound) {
-                      word=words[cursor=0];
-                      break;
-                  }
-                  word=words[cursor>>6];
-              }
-          }
-      }
-      for(;;) {
-          action.accept((word>>>cursor&1L)!=0);
-          if(cursor==tail) {
-              break;
-          }
-          if((++cursor&63)==0) {
-              word=words[cursor>>6];
-          }
-      }
-      this.cursor=-1;
-    }
-  }
-  private static class DescendingItr extends AscendingItr{
-    private DescendingItr(DescendingItr itr){
-      super(itr);
-    }
-    private DescendingItr(PackedBooleanArrDeq root){
-      super(root,root.tail);
-    }
-    @Override public Object clone(){
-      return new DescendingItr(this);
-    }
-    @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
-        final PackedBooleanArrDeq root;
-        final int head;
-        final long[] words;
-        long word=(words=(root=this.root).words)[cursor>>6];
-        if(cursor<(head=root.head)){
-            for(;;) {
-                action.accept((word>>>cursor&1L)!=0);
-                if((--cursor&63)==63) {
-                    if(cursor==-1) {
-                        word=words[(cursor=words.length)-1];
-                        cursor=(cursor<<6)-1;
-                        break;
-                    }
-                    word=words[cursor>>6];
-                }
-            }
-        }
-        for(;;) {
-            action.accept((word>>>cursor&1L)!=0);
-            if(cursor==head) {
-                break;
-            }
-            if((--cursor&63)==63) {
-                word=words[cursor>>6];
-            }
-        }
-        this.cursor=-1;
-      }
-    @Override public boolean nextBoolean(){
-      int cursor;
-      final PackedBooleanArrDeq root;
-      final var words=(root=this.root).words;
-      this.cursor=(cursor=this.cursor)==root.head?-1:cursor==0?(words.length<<6)-1:cursor-1;
-      return (words[cursor>>6]>>>cursor&1)!=0;
-    }
-    private void fragmentedDescendingRemove(int head,int cursor,int tail,PackedBooleanArrDeq root){
-      final long[] words=root.words;
-      int headOffset=head>>6;
-      int tailOffset=tail>>6;
-      int arrBound=words.length-1;
-      if(cursor==(arrBound<<6)+63) {
-          long word=words[0];
-          //remove index 0
-          long mask;
-          if(tailOffset<=arrBound-headOffset+1) {
-              //pull the tail down
-              root.tail=tail==0?cursor:tail-1;
-              for(cursor=0;cursor!=tailOffset;) {
-                  words[cursor]=word>>>1|(word=words[++cursor])<<-1;
-              }
-              words[tailOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
-          }else {
-              root.head=head==cursor?0:head+1;
-              this.cursor=0;
-              words[0]=word&-2L|(word=words[arrBound])>>>-1;
-              while(arrBound!=headOffset) {
-                  words[arrBound]=word<<1 | (word=words[--arrBound]>>>-1);
-              }
-              words[headOffset]=headOffset==tailOffset?word&(mask=(1L<<head)-1) | word<<1&~mask:word<<1;
-          }
-      }else {
-          int headDist;
-          int lastRetOffset=++cursor>>6;
-          long word=words[lastRetOffset];
-          if((headDist=cursor-head)>0) {
-              //removing from head run
-              int headWordDist=lastRetOffset-headOffset;
-              int tailWordDist=arrBound-lastRetOffset;
-              if(headWordDist<=tailWordDist+tailOffset+1) {
-                  //pull the head up
-                  root.head=++head;
-                  this.cursor=cursor;
-                  long mask;
-                  if(headWordDist==0) {
-                      words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
-                  }else {
-                      //TODO
-                      throw new NotYetImplementedException(502);
-                  }
-                  
-                  
-//                  if(tailWordDist==0) {
-//                      words[lastRetOffset]=word>>>1&(mask=(1L<<tail-lastRet)-1<<lastRet) | word&~mask;
-//                  }else {
-//                      words[lastRetOffset]=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask | (word=words[++lastRetOffset])<<-1;
-//                      while(lastRetOffset!=tailOffset) {
-//                          words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
-//                      }
-//                      words[lastRetOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
-//                  }
-              }else {
-                  //TODO pull tail down
-                  throw new NotYetImplementedException(503);
-              }
-          }else {
-              //removing from tail run
-              int tailWordDist=tailOffset-lastRetOffset;
-              int headWordDist=arrBound-headOffset;
-              if(tailWordDist<=headWordDist+lastRetOffset+1) {
-                  //TODO pull the tail down
-                  throw new NotYetImplementedException(504);
-              }else {
-                  //TODO pull the head up
-                  throw new NotYetImplementedException(505);
-              }
-          }
-      }
-    }
-    private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
-      //TODO
-      throw new NotYetImplementedException(600);
-    }
-    @Override public void remove(){
-      int cursor;
-      if((cursor=this.cursor)==-1){
-        root.eraseHead();
-      }else{
-        PackedBooleanArrDeq root;
-        int head,tail;
-        if((tail=(root=this.root).tail)<(head=root.head)){
-          fragmentedDescendingRemove(head,cursor,tail,root);
-        }else{
-          nonfragmentedDescendingRemove(head,cursor+1,tail,root);
-        }
-      }
-    }
-  } 
   @Override public OmniIterator.OfBoolean iterator(){
     return new AscendingItr(this);
   }
@@ -1433,7 +1059,6 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }
     return Character.MIN_VALUE;
   }
-  
   @Override public boolean popBoolean(){
     final long[] words;
     final int head;
@@ -2026,7 +1651,745 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       hash=hash * 31 + ((word >> head & 1) != 0?1231:1237);
     }
   }
-  public static class Checked extends PackedBooleanArrDeq{
+  private void eraseHead(){
+      int head;
+      switch(Integer.signum(this.tail-(head=this.head))){
+        case -1:
+          this.head=head==(words.length<<6)-1?0:head+1;
+          return;
+        case 0:
+          this.tail=-1;
+          break;
+        default:
+          this.head=head+1;
+      }
+    }
+    private void eraseTail() {
+        int tail;
+        switch(Integer.signum((tail=this.tail)-this.head)){
+          case -1:
+            this.tail=tail==0?(words.length<<6)-1:tail-1;
+            return;
+          case 0:
+            this.tail=-1;
+            break;
+          default:
+            this.tail=tail-1;
+        }
+    }
+
+
+    private static class DescendingItr extends AscendingItr{
+      private DescendingItr(DescendingItr itr){
+        super(itr);
+      }
+      private DescendingItr(PackedBooleanArrDeq root){
+        super(root,root.tail);
+      }
+      @Override public Object clone(){
+        return new DescendingItr(this);
+      }
+      @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
+          final PackedBooleanArrDeq root;
+          final int head;
+          final long[] words;
+          long word=(words=(root=this.root).words)[cursor>>6];
+          if(cursor<(head=root.head)){
+              for(;;) {
+                  action.accept((word>>>cursor&1L)!=0);
+                  if((--cursor&63)==63) {
+                      if(cursor==-1) {
+                          word=words[(cursor=words.length)-1];
+                          cursor=(cursor<<6)-1;
+                          break;
+                      }
+                      word=words[cursor>>6];
+                  }
+              }
+          }
+          for(;;) {
+              action.accept((word>>>cursor&1L)!=0);
+              if(cursor==head) {
+                  break;
+              }
+              if((--cursor&63)==63) {
+                  word=words[cursor>>6];
+              }
+          }
+          this.cursor=-1;
+        }
+      @Override public boolean nextBoolean(){
+        int cursor;
+        final PackedBooleanArrDeq root;
+        final var words=(root=this.root).words;
+        this.cursor=(cursor=this.cursor)==root.head?-1:cursor==0?(words.length<<6)-1:cursor-1;
+        return (words[cursor>>6]>>>cursor&1)!=0;
+      }
+      private void fragmentedDescendingRemove(int head,int cursor,int tail,PackedBooleanArrDeq root){
+          //TODO optimize and clean up
+        final long[] words=root.words;
+        int headOffset=head>>6;
+        int tailOffset=tail>>6;
+        int arrBound=words.length-1;
+        long mask;
+        if(cursor==(arrBound<<6)+63) {
+            long word=words[0];
+            //remove index 0
+            if(tailOffset<=arrBound-headOffset+1) {
+                //pull the tail down
+                root.tail=tail==0?cursor:tail-1;
+                for(cursor=0;cursor!=tailOffset;) {
+                    words[cursor]=word>>>1|(word=words[++cursor])<<-1;
+                }
+                words[tailOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
+            }else {
+                root.head=head==cursor?0:head+1;
+                this.cursor=0;
+                words[0]=word&-2L|(word=words[arrBound])>>>-1;
+                while(arrBound!=headOffset) {
+                    words[arrBound]=word<<1 | (word=words[--arrBound])>>>-1;
+                }
+                words[headOffset]=headOffset==tailOffset?word&(mask=(1L<<head)-1) | word<<1&~mask:word<<1;
+            }
+        }else {
+            int headDist;
+            int lastRetOffset=++cursor>>6;
+            long word=words[lastRetOffset];
+            if((headDist=cursor-head)>0) {
+                //removing from head run
+                int headWordDist=lastRetOffset-headOffset;
+                int tailWordDist=arrBound-lastRetOffset;
+                if(headWordDist<=tailWordDist+tailOffset+1) {
+                    //pull the head up
+                    this.cursor=cursor;
+                    
+                    if(headWordDist==0) {
+                      root.head=++head;
+                      words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
+                    }else {
+                      root.head=head+1;
+                      words[lastRetOffset]=word<<1&(mask=-1L>>>-cursor-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
+                      while(lastRetOffset!=headOffset) {
+                        words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
+                      }
+                      words[lastRetOffset]=headOffset==tailOffset?word<<1&(mask=-1L<<head) | word&~mask:word<<1;
+                    }
+                }else {
+                    root.tail=tail==0?(arrBound<<6)+63:tail-1;
+                    word=word&(mask=(1L<<cursor)-1)|word>>>1&~mask;
+                    if(tailWordDist==0) {
+                        words[lastRetOffset]=word | (word=words[lastRetOffset=0])<<-1;
+                    }else {
+                        words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                        while(lastRetOffset!=arrBound) {
+                            words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                        }
+                        words[lastRetOffset]=word>>>1| (word=words[lastRetOffset=0])<<-1;
+                    }
+                    while(lastRetOffset!=tailOffset) {
+                        words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                    }
+                    words[lastRetOffset]=word>>>1&(mask=-1L>>>-tail-1) | word&~mask;
+                }
+            }else {
+                //removing from tail run
+                int tailWordDist=tailOffset-lastRetOffset;
+                int headWordDist=arrBound-headOffset;
+                if(tailWordDist<=headWordDist+lastRetOffset+1) {
+                    root.tail=tail-1;
+                    
+                    if(tailWordDist==0) {
+                        words[lastRetOffset]=word>>>1&(mask=(1L<<tail-cursor)-1<<cursor) | word&~mask;
+                    }else {
+                        words[lastRetOffset]=word&(mask=(1L<<cursor)-1) | word>>>1&~mask | (word=words[++lastRetOffset])<<-1;
+                        while(lastRetOffset!=tailOffset) {
+                            words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                        }
+                        words[lastRetOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
+                    }
+                }else {
+                    this.cursor=cursor;
+                    root.head=head==(arrBound<<6)+63?0:head+1;
+                    word=word<<1&(mask=-1L>>>-cursor-1)|word&~mask;
+                    if(lastRetOffset==0) {
+                        words[0]=word|(word=words[lastRetOffset=arrBound])>>>-1;
+                    }else {
+                        words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
+                        while(lastRetOffset!=0) {
+                            words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
+                        }
+                        words[0]=word<<1|(word=words[lastRetOffset=arrBound])>>>-1;
+                    }
+                    while(lastRetOffset!=headOffset) {
+                        words[lastRetOffset]=word<<1|(word=words[--lastRetOffset])>>>-1;
+                    }
+                    words[lastRetOffset]=word&(mask=(1L<<head)-1) | word<<1&~mask;
+                }
+            }
+        }
+      }
+      private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
+          //TODO optimize and clean up
+          final long[] words;
+          final int headOffset,tailOffset;
+          int lastRetOffset;
+          long mask,word=(words=root.words)[lastRetOffset=lastRet>>6];
+          if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset) {
+              this.cursor=lastRet;
+              root.head=head+1;
+              word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
+              for(;lastRetOffset!=headOffset;word<<=1) {
+                  words[lastRetOffset]=word | (word=words[--lastRetOffset])>>>-1;
+              }
+          }else {
+              
+              root.tail=tail-1;
+              word=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask;
+              for(;lastRetOffset!=tailOffset;word>>>=1) {
+                  words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+              }
+          }
+          words[lastRetOffset]=word;
+        }
+      @Override public void remove(){
+        int cursor;
+        if((cursor=this.cursor)==-1){
+          root.eraseHead();
+        }else{
+          final PackedBooleanArrDeq root;
+          int head,tail;
+          if((tail=(root=this.root).tail)<(head=root.head)){
+            fragmentedDescendingRemove(head,cursor,tail,root);
+          }else{
+            nonfragmentedDescendingRemove(head,cursor+1,tail,root);
+          }
+        }
+      }
+    } 
+    private static class AscendingItr extends AbstractDeqItr
+    {
+      transient final PackedBooleanArrDeq root;
+      private AscendingItr(AscendingItr itr){
+        super(itr);
+        this.root=itr.root;
+      }
+      private AscendingItr(PackedBooleanArrDeq root){
+        super(root.tail!=-1?root.head:-1);
+        this.root=root;
+      }
+      private AscendingItr(PackedBooleanArrDeq root,int cursor){
+        super(cursor);
+        this.root=root;
+      }
+      @Override public Object clone(){
+        return new AscendingItr(this);
+      }
+      @Override public boolean nextBoolean(){
+        final long[] words;
+        int cursor;
+        final PackedBooleanArrDeq root;
+        final var ret=((words=(root=this.root).words)[(cursor=this.cursor)>>6]>>>cursor&1)!=0;
+        if(cursor==root.tail){
+          cursor=-1;
+        }else if(++cursor==words.length<<6){
+          cursor=0;
+        }
+        this.cursor=cursor;
+        return ret;
+      }
+      @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
+          final PackedBooleanArrDeq root;
+          final int tail;
+          final long[] words;
+          var word=(words=(root=this.root).words)[cursor>>6];
+          if(cursor>(tail=root.tail)) {
+              for(int wordBound=words.length<<6;;) {
+                  action.accept((word>>>cursor&1L)!=0);
+                  if((++cursor&63)==0) {
+                      if(cursor==wordBound) {
+                          word=words[cursor=0];
+                          break;
+                      }
+                      word=words[cursor>>6];
+                  }
+              }
+          }
+          for(;;) {
+              action.accept((word>>>cursor&1L)!=0);
+              if(cursor==tail) {
+                  break;
+              }
+              if((++cursor&63)==0) {
+                  word=words[cursor>>6];
+              }
+          }
+          this.cursor=-1;
+        }
+      @Override public void remove(){
+          int cursor;
+          switch(cursor=this.cursor) {
+          case -1:
+              root.eraseTail();
+              break;
+          case 0:
+              eraseAtSplit();
+              break;
+          default:
+              final int head,tail;
+              final PackedBooleanArrDeq root;
+              if((tail=(root=this.root).tail)<(head=root.head)){
+                  fragmentedAscendingRemove(head,cursor-1,tail,root);
+              }else {
+                  nonfragmentedAscendingRemove(head,cursor-1,tail,root);
+              }
+          }
+      }
+      private void eraseAtSplit(){
+          final PackedBooleanArrDeq root;
+          final long[] words;
+          final int head,tail,tailOffset,headOffset;
+          int arrBound,headDist;
+          long word;
+          if((tailOffset=(tail=(root=this.root).tail)>>6)<(headDist=(arrBound=(words=root.words).length-1)-(headOffset=(head=root.head)>>6))) {
+              //it's more efficient to pull the tail down
+              this.cursor=headDist=(arrBound<<6)+63;
+              root.tail=tail==0?headDist:tail-1;
+              words[arrBound]=words[arrBound]&Long.MAX_VALUE | (word=words[arrBound=0])<<-1;
+              while(arrBound!=tailOffset) {
+                  words[arrBound]=word>>>1| (word=words[++arrBound])<<-1;
+              }
+              words[arrBound]=headOffset==tailOffset?word>>>1&(1L<<tail)-1 | words[arrBound]&-1L<<head:word>>>1;
+          }else {
+              //it's more efficient to pull the head up
+              word=words[arrBound];
+              if(headDist==0) {
+                  root.head=head==(arrBound<<6)+63?0:head+1;
+              }else {
+                  root.head=head+1;   
+                  do {
+                      words[arrBound]=word<<1|(word=words[--arrBound])>>>-1;
+                  }while(arrBound!=headOffset);
+              }
+              words[arrBound]=headOffset==tailOffset?word<<1&-1L<<head|word&-1L>>>-head:word<<1;
+          }
+        }
+      private void fragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root) {
+          //TODO optimize and clean up
+          final long[] words;
+          final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1,headDist;
+          int lastRetOffset;
+          long mask,word=words[lastRetOffset=lastRet>>6];
+          if((headDist=lastRet-head)>=0) {
+              //the index to remove is in the head run
+              final int headWordDist;
+              final int tailWordDist;
+              if((tailWordDist=arrBound-lastRetOffset)+tailOffset+1<(headWordDist=lastRetOffset-headOffset)) {
+                  //pull the tail down
+                  this.cursor=lastRet;
+                  root.tail=tail==0?(arrBound<<6)+63:tail-1;
+                  word=word&(mask=(1L<<lastRet)-1)|word>>>1&~mask;
+                  if(tailWordDist==0) {
+                      words[lastRetOffset]=word | (word=words[lastRetOffset=0])<<-1;
+                  }else {
+                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                      while(lastRetOffset!=arrBound) {
+                          words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                      }
+                      words[lastRetOffset]=word>>>1| (word=words[lastRetOffset=0])<<-1;
+                  }
+                  while(lastRetOffset!=tailOffset) {
+                      words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                  }
+                  words[lastRetOffset]=word>>>1&(mask=-1L>>>-tail-1) | word&~mask;
+              }else {
+                  //pull up the head
+                  if(headWordDist==0) {
+                      root.head=++head;
+                      words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
+                  }else {
+                      root.head=head+1;
+                      words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
+                      while(lastRetOffset!=headOffset) {
+                          words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
+                      }
+                      words[lastRetOffset]=headOffset==tailOffset?word<<1&(mask=-1L<<head) | word&~mask:word<<1;
+                  }
+              }
+          }else {
+              //the index to remove is in the tail run
+              final int tailWordDist;
+              if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset+1) {
+                //pull down the tail
+                 root.tail=tail-1;
+                 this.cursor=lastRet;
+                 if(tailWordDist==0) {
+                     words[lastRetOffset]=word>>>1&(mask=(1L<<tail-lastRet)-1<<lastRet) | word&~mask;
+                 }else {
+                     words[lastRetOffset]=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask | (word=words[++lastRetOffset])<<-1;
+                     while(lastRetOffset!=tailOffset) {
+                         words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                     }
+                     words[lastRetOffset]=headOffset==tailOffset?word>>>1&(mask=(1L<<tail)-1) | word&~mask:word>>>1;
+                 }
+              }else {
+                  //pull up the head
+                  root.head=head==(arrBound<<6)+63?0:head+1;
+                  word=word<<1&(mask=-1L>>>-lastRet-1)|word&~mask;
+                  if(lastRetOffset==0) {
+                      words[0]=word|(word=words[lastRetOffset=arrBound])>>>-1;
+                  }else {
+                      words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
+                      while(lastRetOffset!=0) {
+                          words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
+                      }
+                      words[0]=word<<1|(word=words[lastRetOffset=arrBound])>>>-1;
+                  }
+                  while(lastRetOffset!=headOffset) {
+                      words[lastRetOffset]=word<<1|(word=words[--lastRetOffset])>>>-1;
+                  }
+                  words[lastRetOffset]=word&(mask=(1L<<head)-1) | word<<1&~mask;
+              }
+          }
+      }
+      private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
+          //TODO optimize and clean up
+          final long[] words;
+          final int headOffset,tailOffset;
+          int lastRetOffset;
+          long mask,word=(words=root.words)[lastRetOffset=lastRet>>6];
+          if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset) {
+              root.head=head+1;
+              word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
+              for(;lastRetOffset!=headOffset;word<<=1) {
+                  words[lastRetOffset]=word | (word=words[--lastRetOffset])>>>-1;
+              }
+          }else {
+              this.cursor=lastRet;
+              root.tail=tail-1;
+              word=word&(mask=(1L<<lastRet)-1) | word>>>1&~mask;
+              for(;lastRetOffset!=tailOffset;word>>>=1) {
+                  words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+              }
+          }
+          words[lastRetOffset]=word;
+        }
+     
+     
+    }
+    public static class Checked extends PackedBooleanArrDeq{
+      private static class AscendingItr extends AbstractDeqItr{
+          transient int modCount;
+          transient int lastRet;
+          transient final Checked root;
+          private AscendingItr(AscendingItr itr){
+            super(itr);
+            this.modCount=itr.modCount;
+            this.lastRet=itr.lastRet;
+            this.root=itr.root;
+          }
+          private AscendingItr(Checked root){
+            super(root.tail==-1?-1:root.head);
+            this.root=root;
+            this.modCount=root.modCount;
+            this.lastRet=-1;
+          }
+          private AscendingItr(Checked root,int cursor){
+            super(cursor);
+            this.root=root;
+            this.modCount=root.modCount;
+            this.lastRet=-1;
+          }
+          @Override public Object clone(){
+            return new AscendingItr(this);
+          }
+          @Override public boolean nextBoolean(){
+            final Checked root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            int cursor;
+            if((cursor=this.cursor)!=-1){
+              final long[] words;
+              final var ret=((words=root.words)[cursor>>6]>>>cursor&1)!=0;
+              this.lastRet=cursor;
+              if(cursor==root.tail){
+                cursor=-1;
+              }else if(++cursor==words.length<<6){
+                cursor=0;
+              }
+              this.cursor=cursor;
+              return ret;
+            }
+            throw new NoSuchElementException();
+          }
+          private void fragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
+            final long[] words=root.words;
+            int headOffset=head>>6;
+            int tailOffset=tail>>6;
+            int arrBound=words.length;
+            int lastRetOffset=lastRet>>6;
+            int headDist;
+            if((headDist=lastRet-head)>=0) {
+                //removing from the head run
+                int headWordDist;
+                int tailWordDist;
+                if((headWordDist=lastRetOffset-headOffset) <= (tailWordDist=arrBound-lastRetOffset)+tailOffset) {
+                    //pull the head up
+                    if(++head==arrBound<<6) {
+                        root.head=0;
+                    }else {
+                        root.head=head;
+                        long word=words[lastRetOffset];
+                        long mask;
+                        if(headWordDist==0) {
+                            words[headOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
+                        }else {
+                            words[lastRetOffset]=word<<1&(mask=(1L<<lastRet+1)-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
+                            while(lastRetOffset!=headOffset) {
+                                words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
+                            }
+                            words[lastRetOffset]=headOffset==tailOffset?word&(mask=-1L>>>-tail-1)|word<<1&~mask:word<<1;
+                        }
+                        
+                        
+                        
+                    }
+                }else {
+                    //pull the tail down
+                    throw new NotYetImplementedException(25);
+                    //TODO
+                }
+            }else {
+                //removing from the tail run
+                int headWordDist;
+                int tailWordDist;
+                if((tailWordDist=tailOffset-lastRetOffset)<=(headWordDist=arrBound-headOffset)+lastRetOffset) {
+                    //pull the tail down
+                    throw new NotYetImplementedException(50);
+                    //TODO
+                }else {
+                    //pull the head up
+                    throw new NotYetImplementedException(75);
+                    //TODO
+                }
+            }
+          }
+          private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
+            final long[] words=root.words;
+            int headOffset=head>>6;
+            int tailOffset=tail>>6;
+            int lastRetOffset=lastRet>>6;
+            int headDist=lastRetOffset-head;
+            int tailDist=tailOffset-lastRetOffset;
+            if(headDist<=tailDist) {
+                //pull the head up
+                //TODO
+                throw new NotYetImplementedException(100);
+            }else {
+                //pull the tail down
+                //TODO
+                throw new NotYetImplementedException(150);
+            }
+          }
+          @Override public void remove(){
+            int lastRet;
+            if((lastRet=this.lastRet)!=-1){
+              int modCount;
+              final Checked root;
+              CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+              root.modCount=++modCount;
+              this.modCount=modCount;
+              final int head,tail;
+              switch(Integer.signum((tail=root.tail)-(head=root.head))){
+                case -1:
+                  fragmentedAscendingRemove(head,lastRet,tail,root);
+                  break;
+                case 0:
+                  root.tail=-1;
+                  break;
+                default:
+                  nonfragmentedAscendingRemove(head,lastRet,tail,root);
+              }
+              this.lastRet=-1;
+              return;
+            }
+            throw new IllegalStateException();
+          }
+          @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
+              final int modCount=this.modCount;
+              final Checked root;
+              final int tail=(root=this.root).tail;
+              try{
+                  final long[] words;
+                  int cursor;
+                  var word=(words=root.words)[(cursor=expectedCursor)>>6];
+                  if(cursor>tail) {
+                      for(int wordBound=words.length<<6;;) {
+                          action.accept((word>>>cursor&1L)!=0);
+                          if((++cursor&63)==0) {
+                              if(cursor==wordBound) {
+                                  word=words[cursor=0];
+                                  break;
+                              }
+                              word=words[cursor>>6];
+                          }
+                      }
+                  }
+                  for(;;) {
+                      action.accept((word>>>cursor&1L)!=0);
+                      if(cursor==tail) {
+                          break;
+                      }
+                      if((++cursor&63)==0) {
+                          word=words[cursor>>6];
+                      }
+                  }
+              }finally{
+                CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
+              }
+              this.lastRet=tail;
+              this.cursor=-1;
+            }
+        }
+        private static class DescendingItr extends AscendingItr{
+          private void fragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
+              final long[] words=root.words;
+              int headOffset=head>>6;
+              int tailOffset=tail>>6;
+              int arrBound=words.length;
+              int lastRetOffset=lastRet>>6;
+              int headDist;
+              if((headDist=lastRet-head)>=0) {
+                  //removing from the head run
+                  int headWordDist;
+                  int tailWordDist;
+                  if((headWordDist=lastRetOffset-headOffset) <= (tailWordDist=arrBound-lastRetOffset)+tailOffset) {
+                      //pull the head up
+                      throw new NotYetImplementedException(200);
+                      //TODO
+                  }else {
+                      //pull the tail down
+                      throw new NotYetImplementedException(225);
+                      //TODO
+                  }
+              }else {
+                  //removing from the tail run
+                  int headWordDist;
+                  int tailWordDist;
+                  if((tailWordDist=tailOffset-lastRetOffset)<=(headWordDist=arrBound-headOffset)+lastRetOffset) {
+                      //pull the tail down
+                      throw new NotYetImplementedException(250);
+                      //TODO
+                  }else {
+                      //pull the head up
+                      throw new NotYetImplementedException(275);
+                      //TODO
+                  }
+              }
+            }
+          private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
+              final long[] words=root.words;
+              int headOffset=head>>6;
+              int tailOffset=tail>>6;
+              int lastRetOffset=lastRet>>6;
+              int headDist=lastRetOffset-head;
+              int tailDist=tailOffset-lastRetOffset;
+              if(headDist<=tailDist) {
+                  //pull the head up
+                  //TODO
+                  throw new NotYetImplementedException(300);
+              }else {
+                  //pull the tail down
+                  //TODO
+                  throw new NotYetImplementedException(350);
+              }
+            }
+          @Override public void remove(){
+              int lastRet;
+              if((lastRet=this.lastRet)!=-1){
+                int modCount;
+                final Checked root;
+                CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+                root.modCount=++modCount;
+                this.modCount=modCount;
+                final int head,tail;
+                switch(Integer.signum((tail=root.tail)-(head=root.head))){
+                  case -1:
+                    fragmentedDescendingRemove(head,lastRet,tail,root);
+                    break;
+                  case 0:
+                    root.tail=-1;
+                    break;
+                  default:
+                    nonfragmentedDescendingRemove(head,lastRet,tail,root);
+                }
+                this.lastRet=-1;
+                return;
+              }
+              throw new IllegalStateException();
+            }
+          private DescendingItr(DescendingItr itr){
+            super(itr);
+          }
+          private DescendingItr(Checked root){
+            super(root,root.tail);
+          }
+          @Override public Object clone(){
+            return new DescendingItr(this);
+          }
+          @Override public boolean nextBoolean(){
+            final Checked root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            int cursor;
+            if((cursor=this.cursor)!=-1){
+              final long[] words;
+              final var ret=((words=root.words)[cursor>>6]>>>cursor&1)!=0;
+              this.lastRet=cursor;
+              if(cursor==root.head){
+                cursor=-1;
+              }else if(--cursor==-1){
+                cursor=(words.length<<6)-1;
+              }
+              this.cursor=cursor;
+              return ret;
+            }
+            throw new NoSuchElementException();
+          } 
+          @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
+              int modCount=this.modCount;
+              final Checked root;
+              final int head=(root=this.root).head;
+              try{
+                  final long[] words;
+                  int cursor;
+                  long word=(words=root.words)[(cursor=expectedCursor)>>6];
+                  if(cursor<head){
+                      for(;;) {
+                          action.accept((word>>>cursor&1L)!=0);
+                          if((--cursor&63)==63) {
+                              if(cursor==-1) {
+                                  word=words[(cursor=words.length)-1];
+                                  cursor=(cursor<<6)-1;
+                                  break;
+                              }
+                              word=words[cursor>>6];
+                          }
+                      }
+                  }
+                  for(;;) {
+                      action.accept((word>>>cursor&1L)!=0);
+                      if(cursor==head) {
+                          break;
+                      }
+                      if((--cursor&63)==63) {
+                          word=words[cursor>>6];
+                      }
+                  }
+              }finally{
+                CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
+              }
+              this.lastRet=head;
+              this.cursor=-1;
+            }
+        }
     private static final long serialVersionUID=1L;
     transient int modCount;
     public Checked(){
@@ -2056,214 +2419,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     @Override public OmniIterator.OfBoolean descendingIterator(){
       return new DescendingItr(this);
     }
-    private static class AscendingItr extends AbstractDeqItr{
-      transient int modCount;
-      transient int lastRet;
-      transient final Checked root;
-      private AscendingItr(AscendingItr itr){
-        super(itr);
-        this.modCount=itr.modCount;
-        this.lastRet=itr.lastRet;
-        this.root=itr.root;
-      }
-      private AscendingItr(Checked root){
-        super(root.tail==-1?-1:root.head);
-        this.root=root;
-        this.modCount=root.modCount;
-        this.lastRet=-1;
-      }
-      private AscendingItr(Checked root,int cursor){
-        super(cursor);
-        this.root=root;
-        this.modCount=root.modCount;
-        this.lastRet=-1;
-      }
-      @Override public Object clone(){
-        return new AscendingItr(this);
-      }
-      @Override public boolean nextBoolean(){
-        final Checked root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        int cursor;
-        if((cursor=this.cursor)!=-1){
-          final long[] words;
-          final var ret=((words=root.words)[cursor>>6]>>>cursor&1)!=0;
-          this.lastRet=cursor;
-          if(cursor==root.tail){
-            cursor=-1;
-          }else if(++cursor==words.length<<6){
-            cursor=0;
-          }
-          this.cursor=cursor;
-          return ret;
-        }
-        throw new NoSuchElementException();
-      }
-      private void fragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
-        //TODO
-        throw new NotYetImplementedException(700);
-      }
-      private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
-        //TODO
-        throw new NotYetImplementedException(800);
-      }
-      @Override public void remove(){
-        int lastRet;
-        if((lastRet=this.lastRet)!=-1){
-          int modCount;
-          final Checked root;
-          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          this.modCount=modCount;
-          final int head,tail;
-          switch(Integer.signum((tail=root.tail)-(head=root.head))){
-            case -1:
-              fragmentedAscendingRemove(head,lastRet,tail,root);
-              break;
-            case 0:
-              root.tail=-1;
-              break;
-            default:
-              nonfragmentedAscendingRemove(head,lastRet,tail,root);
-          }
-          this.lastRet=-1;
-          return;
-        }
-        throw new IllegalStateException();
-      }
-      @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
-          final int modCount=this.modCount;
-          final Checked root;
-          final int tail=(root=this.root).tail;
-          try{
-              final long[] words;
-              int cursor;
-              var word=(words=root.words)[(cursor=expectedCursor)>>6];
-              if(cursor>tail) {
-                  for(int wordBound=words.length<<6;;) {
-                      action.accept((word>>>cursor&1L)!=0);
-                      if((++cursor&63)==0) {
-                          if(cursor==wordBound) {
-                              word=words[cursor=0];
-                              break;
-                          }
-                          word=words[cursor>>6];
-                      }
-                  }
-              }
-              for(;;) {
-                  action.accept((word>>>cursor&1L)!=0);
-                  if(cursor==tail) {
-                      break;
-                  }
-                  if((++cursor&63)==0) {
-                      word=words[cursor>>6];
-                  }
-              }
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
-          }
-          this.lastRet=tail;
-          this.cursor=-1;
-        }
-    }
-    private static class DescendingItr extends AscendingItr{
-      private DescendingItr(DescendingItr itr){
-        super(itr);
-      }
-      private DescendingItr(Checked root){
-        super(root,root.tail);
-      }
-      @Override public Object clone(){
-        return new DescendingItr(this);
-      }
-      @Override public boolean nextBoolean(){
-        final Checked root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        int cursor;
-        if((cursor=this.cursor)!=-1){
-          final long[] words;
-          final var ret=((words=root.words)[cursor>>6]>>>cursor&1)!=0;
-          this.lastRet=cursor;
-          if(cursor==root.head){
-            cursor=-1;
-          }else if(--cursor==-1){
-            cursor=(words.length<<6)-1;
-          }
-          this.cursor=cursor;
-          return ret;
-        }
-        throw new NoSuchElementException();
-      } 
-      private void fragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
-        //TODO
-        throw new NotYetImplementedException(900);
-      }
-      private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
-        //TODO
-        throw new NotYetImplementedException(1000);
-      }
-      @Override public void remove(){
-        int lastRet;
-        if((lastRet=this.lastRet)!=-1){
-          int modCount;
-          final Checked root;
-          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          this.modCount=modCount;
-          final int head,tail;
-          switch(Integer.signum((tail=root.tail)-(head=root.head))){
-            case -1:
-              fragmentedDescendingRemove(head,lastRet,tail,root);
-              break;
-            case 0:
-              root.tail=-1;
-              break;
-            default:
-              nonfragmentedDescendingRemove(head,lastRet,tail,root);
-          }
-          this.lastRet=-1;
-          return;
-        }
-        throw new IllegalStateException();
-      }
-      @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
-          int modCount=this.modCount;
-          final Checked root;
-          final int head=(root=this.root).head;
-          try{
-              final long[] words;
-              int cursor;
-              long word=(words=root.words)[(cursor=expectedCursor)>>6];
-              if(cursor<head){
-                  for(;;) {
-                      action.accept((word>>>cursor&1L)!=0);
-                      if((--cursor&63)==63) {
-                          if(cursor==-1) {
-                              word=words[(cursor=words.length)-1];
-                              cursor=(cursor<<6)-1;
-                              break;
-                          }
-                          word=words[cursor>>6];
-                      }
-                  }
-              }
-              for(;;) {
-                  action.accept((word>>>cursor&1L)!=0);
-                  if(cursor==head) {
-                      break;
-                  }
-                  if((--cursor&63)==63) {
-                      word=words[cursor>>6];
-                  }
-              }
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
-          }
-          this.lastRet=head;
-          this.cursor=-1;
-        }
-    }
+    
     @Override public Object clone(){
         int tail;
         if((tail=this.tail)!=-1) {
