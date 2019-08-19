@@ -375,7 +375,19 @@ public interface BitSetUtil{
             }
         }
     }
-  
+    
+    /**
+     * @param index The index you intend to remove
+     * @return A mask  that should be applied to 
+     */
+    public static long getPullUpMask(int index)
+    {
+      return -1L>>>(-index-1);
+    }
+    public static long getPullDownMask(int index)
+    {
+      return (1L<<index)-1;
+    }
    
     
     public static void srcUnalignedPullDown(long[] words,int dstWordOffset,int srcOffset,int srcWordBound) {

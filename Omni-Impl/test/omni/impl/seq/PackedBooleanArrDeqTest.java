@@ -16,6 +16,7 @@ import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
+import omni.impl.IllegalModification;
 import omni.impl.IteratorType;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
@@ -334,7 +335,7 @@ public class PackedBooleanArrDeqTest{
                       if(headWordDist==0) {
                           words[headOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
                       }else {
-                          words[lastRetOffset]=word<<1&(mask=(1L<<lastRet+1)-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
+                          words[lastRetOffset]=word<<1&(mask=-1L>>>(-lastRet-1)) | word&~mask | (word=words[--lastRetOffset])>>>-1;
                           while(lastRetOffset!=headOffset) {
                               words[lastRetOffset]=word<<1 | (word=words[--lastRetOffset])>>>-1;
                           }
@@ -342,9 +343,25 @@ public class PackedBooleanArrDeqTest{
                       }
                   }
               }else {
-                  //pull the tail down
-                  throw new UnsupportedOperationException();
-                  //TODO
+                //pull the tail down
+                expectedCursor=lastRet;
+                expectedTail=tail==0?(arrBound<<6)+63:tail-1;
+                long word;
+                long mask;
+                word=(word=words[lastRetOffset])&(mask=(1L<<lastRet)-1)|word>>>1&~mask;
+                if(tailWordDist==0) {
+                    words[lastRetOffset]=word | (word=words[lastRetOffset=0])<<-1;
+                }else {
+                    words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                    while(lastRetOffset!=arrBound) {
+                        words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                    }
+                    words[lastRetOffset]=word>>>1| (word=words[lastRetOffset=0])<<-1;
+                }
+                while(lastRetOffset!=tailOffset) {
+                    words[lastRetOffset]=word>>>1 | (word=words[++lastRetOffset])<<-1;
+                }
+                words[lastRetOffset]=word>>>1&(mask=-1L>>>-tail-1) | word&~mask;
               }
           }else {
               //removing from the tail run
@@ -2095,7 +2112,7 @@ public class PackedBooleanArrDeqTest{
                               final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,itrType);
                               
                               try {
-                              removeScenario.initialize(itrMonitor);
+                                removeScenario.initialize(itrMonitor);
                               }catch(NotYetImplementedException e) {
                                 //TODO
                                 return;
@@ -2106,15 +2123,15 @@ public class PackedBooleanArrDeqTest{
                                 if(illegalMod.expectedException == null){
                                   
                                   try {
-                                      if(thisSize==125&& thisPosition==0.75 && thisInitCap==64 && thisNumToRotate==4 && thisCheckedType.checked && thisItrType==IteratorType.AscendingItr) {
-                                          TestExecutorService.suspend();
-                                      }
+                                     
                                   itrMonitor.verifyRemove();
                                   switch(removeScenario){
                                   case PostNext:{
                                     while(itrMonitor.hasNext()){
                                       itrMonitor.iterateForward();
-                                      
+//                                      if(seqMonitor.expectedSize==96 && thisSize==125&& thisPosition==0.75 && thisInitCap==64 && thisNumToRotate==6 && thisCheckedType.checked && thisItrType==IteratorType.AscendingItr && thisIllegalMod==IllegalModification.NoMod) {
+//                                        TestExecutorService.suspend();
+//                                      }
                                       itrMonitor.verifyRemove();
                                     }
                                     Assertions.assertEquals(numToIterate < 2,seqMonitor.isEmpty());
