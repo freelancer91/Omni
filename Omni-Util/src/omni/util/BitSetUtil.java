@@ -269,6 +269,19 @@ public interface BitSetUtil{
       }
     }
     
+    public static long pullDownLoop(long[] words,long word,int begin,int end){
+        while(begin!=end){
+            words[begin]=word>>>1|(word=words[++begin])<<-1;
+        }
+        return word;
+    }
+    public static long pullUpLoop(long[] words,long word,int begin,int end){
+        while(end!=begin){
+            words[end]=word<<1|(word=words[--end])>>>-1;
+        }
+        return word;
+    }
+    
     
     public static long readFinalWord(int end,DataInput dataInput) throws IOException{
       switch((end&63)>>3) {
@@ -380,14 +393,18 @@ public interface BitSetUtil{
      * @param index The index you intend to remove
      * @return A mask  that should be applied to 
      */
+    @Deprecated
     public static long getPullUpMask(int index)
     {
-      return -1L>>>(-index-1);
+      return -1L>>>-index-1;
     }
+    @Deprecated
     public static long getPullDownMask(int index)
     {
       return (1L<<index)-1;
     }
+    
+    
    
     
     public static void srcUnalignedPullDown(long[] words,int dstWordOffset,int srcOffset,int srcWordBound) {
