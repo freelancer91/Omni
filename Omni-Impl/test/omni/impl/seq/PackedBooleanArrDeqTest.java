@@ -2,7 +2,6 @@ package omni.impl.seq;
 
 import java.util.NoSuchElementException;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
@@ -27,7 +26,6 @@ import omni.impl.QueryVal;
 import omni.impl.StructType;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
-import omni.util.NotYetImplementedException;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 
@@ -98,26 +96,7 @@ public class PackedBooleanArrDeqTest{
        
       }
       
-      @Override
-    public void verifyRemove(){
-        //TODO remove
-        try{
-            getIterator().remove();
-            updateItrRemoveState();
-        }catch(NotYetImplementedException e) {
-          throw e;
-        }catch(Error e) {
-          verifyIteratorState();
-          getMonitoredCollection().verifyCollectionState();
-          throw e;
-        }catch(RuntimeException e) {
-          verifyIteratorState();
-          getMonitoredCollection().verifyCollectionState();
-          throw e;
-        }
-        verifyIteratorState();
-        getMonitoredCollection().verifyCollectionState();
-    }
+ 
     }
     
     private class AscendingItrMonitor extends AbstractItrMonitor{
@@ -164,8 +143,7 @@ public class PackedBooleanArrDeqTest{
               expectedCursor=headDist=(arrBound<<6)+63;
               expectedTail=tail==0?headDist:tail-1;
               words[arrBound]=words[arrBound]&Long.MAX_VALUE | (word=words[0])<<-1;
-              word=BitSetUtil.pullDownLoop(words,word,0,tailOffset);
-              words[tailOffset]=headOffset==tailOffset? word&(mask=-1L<<head)|word>>>1&~mask:word>>>1;
+              words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))&(mask=-1L<<tail)|word>>>1&~mask;
           }else {
               //it's more efficient to pull the head up
               word=words[arrBound];
@@ -177,54 +155,28 @@ public class PackedBooleanArrDeqTest{
                       words[arrBound]=word<<1|(word=words[--arrBound])>>>-1;
                   }while(arrBound!=headOffset);
               }
-              words[arrBound]=headOffset==tailOffset?word<<1&(mask=-1L<<head)|word&~mask:word<<1;
+              words[arrBound]=word<<1&(mask=-1L<<head)|word&~mask;
           }
         }
       private void uncheckedFragmentedRemove() {
           //TODO optimize and clean up
-          int head=expectedHead;
-          int tail=expectedTail;
           final long[] words;
-          final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=(long[])expectedArr).length-1,headDist;
-          int lastRet=expectedCursor-1;
+          int head,tail,lastRet;
+          final int headOffset=(head=expectedHead)>>6,tailOffset=(tail=expectedTail)>>6,arrBound=(words=(long[])expectedArr).length-1;
           int lastRetOffset;
-          long mask,word=words[lastRetOffset=lastRet>>6];
-          if((headDist=lastRet-head)>=0) {
-              //the index to remove is in the head run
-              final int headWordDist;
-              final int tailWordDist;
-              if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset){
-                  //pull up the head
-                  if(headWordDist==0) {
-                      expectedHead=++head;
-                      words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
-                  }else {
-                      expectedHead=head+1;
-                      words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
-                      words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
-                  }
-              }else {
-                  //pull the tail down
-                  expectedCursor=lastRet;
-                  expectedTail=tail==0?(arrBound<<6)+63:tail-1;
-                  word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
-                  if(tailWordDist==0) {
-                      words[lastRetOffset]=word | (word=words[0])<<-1;
-                  }else {
-                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
-                      words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
-                  }
-                  words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
-              }
-          }else {
+          long mask,word=words[lastRetOffset=(lastRet=expectedCursor-1)>>6];
+          switch(Integer.signum(lastRet-head))
+          {
+          case -1:
+          {
               //the index to remove is in the tail run
               final int tailWordDist;
-              if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset+1) {
+              if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset) {
                 //pull down the tail
-                  expectedTail=tail-1;
+                 expectedTail=tail-1;
                  expectedCursor=lastRet;
                  if(tailWordDist==0) {
-                     words[lastRetOffset]=word>>>1&(mask=(1L<<tail-lastRet)-1<<lastRet) | word&~mask;
+                     words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet&-1L>>>-tail) | word&~mask;
                  }else {
                      words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet)|word&~mask | (word=words[++lastRetOffset])<<-1;
                      words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
@@ -241,6 +193,43 @@ public class PackedBooleanArrDeqTest{
                   }
                   words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
               }
+              break;
+          }
+          case 0:
+          {
+              //removing the head
+              expectedHead=head+1;
+              break;
+          }
+          default:
+          {
+              //removing from the head run
+              final int headWordDist;
+              final int tailWordDist;
+              if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset){
+                  //pull up the head
+                  expectedHead=head+1;
+                  if(headWordDist==0) {
+                      words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-lastRet-1) | word&~mask;
+                  }else {
+                      words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
+                      words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
+                  }
+              }else {
+                  //pull the tail down
+  
+                  expectedCursor=lastRet;
+                  expectedTail=tail==0?(arrBound<<6)+63:tail-1;
+                  word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+                  if(tailWordDist==0) {
+                      words[lastRetOffset]=word | (word=words[0])<<-1;
+                  }else {
+                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                      words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
+                  }
+                  words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
+              }
+          }
           }
       }
       private void uncheckedNonfragmentedRemove() {
@@ -288,52 +277,88 @@ public class PackedBooleanArrDeqTest{
           final int arrBound=words.length-1;
           int headDist=lastRet-head;
           long mask,word=words[lastRetOffset];
-          if(headDist>=0)
+          switch(Integer.signum(headDist))
           {
+          case -1:
+          {
+            //removing from tail run
+              int headWordDist=arrBound-headOffset;
+              int tailWordDist=tailOffset-lastRetOffset;
+              if(tailWordDist<=headWordDist+lastRetOffset)
+              {
+                 //pull down the tail
+                  if(tail==0)
+                  {
+                      expectedTail=(arrBound<<6)+63;
+                  }
+                  else
+                  {
+                      expectedTail=tail-1;
+                      expectedCursor=lastRet;
+                      if(tailWordDist==0) {
+                          words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet&-1L>>>-tail) | word&~mask;
+                      }else {
+                          words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet)|word&~mask | (word=words[++lastRetOffset])<<-1;
+                          words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
+                      }
+                  }
+               }
+              else
+              {
+                  //pull up the head
+                  expectedHead=head==(arrBound<<6)+63?0:head+1;
+                  word=word<<1&(mask=-1L>>>-lastRet-1)|word&~mask;
+                  if(lastRetOffset==0) {
+                      words[0]=word|(word=words[arrBound])>>>-1;
+                  }else {
+                      words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
+                      words[0]=BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1|(word=words[arrBound])>>>-1;
+                  }
+                  words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
+              }
+              break;
+          }
+          case 0:
+          {
+              //removing from the head
+              expectedHead=head==(arrBound<<6)+63?0:head+1;
+          }
+              break;
+          default:
               //removing from head run
-              int headWordDist=lastRetOffset-headOffset+1;
-              int tailWordDist=arrBound+lastRetOffset;
+              int headWordDist=lastRetOffset-headOffset;
+              int tailWordDist=arrBound-lastRetOffset;
               if(headWordDist<=tailWordDist+tailOffset)
               {
                   //pull up the head
+                  expectedHead=head+1;
                   if(headWordDist==0) {
-                      expectedHead=++head;
-                      words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
+                      words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-lastRet-1) | word&~mask;
                   }else {
-                      expectedHead=head+1;
                       words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
                       words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
                   }
               }
               else
               {
-                  //TODO pull the tail down
-                  throw new NotYetImplementedException(0);
-              }
-          }
-          else
-          {
-              //removing from tail run
-              int headWordDist=arrBound-headOffset;
-              int tailWordDist=tailOffset-lastRetOffset;
-              if(tailWordDist<=headWordDist+lastRetOffset)
-              {
-                  //pull down the tail
-                  expectedTail=tail-1;
+                  //pull the tail down
                   expectedCursor=lastRet;
-                  if(tailWordDist==0) {
-                      words[lastRetOffset]=word>>>1&(mask=(1L<<tail-lastRet)-1<<lastRet) | word&~mask;
-                  }else {
-                      words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet)|word&~mask | (word=words[++lastRetOffset])<<-1;
-                      words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
+                  expectedTail=tail==0?(arrBound<<6)+63:tail-1;
+                  word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+                  if(tailWordDist==0)
+                  {
+                      words[lastRetOffset]=word | (word=words[0])<<-1;
                   }
-               }
-              else
-              {
-                  //TODO pull the head up
-                  throw new NotYetImplementedException(50);
+                  else
+                  {
+                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                      words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
+                  }
+                  words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
               }
           }
+          
+         
           
       }
       private void checkedNonfragmentedRemove() {
@@ -463,22 +488,20 @@ public class PackedBooleanArrDeqTest{
       private void uncheckedFragmentedRemove() {
           //TODO optimize and clean up
         final long[] words;
-        int head=expectedHead;
-        int tail=expectedTail;
-        int cursor=expectedCursor;
-        
-        final int headOffset=head>>6;
-        final int tailOffset=tail>>6;
+        int head,tail;
+        final int headOffset=(head=expectedHead)>>6;
+        final int tailOffset=(tail=expectedTail)>>6;
         final int arrBound;
         long mask,word;
-        if(cursor==((arrBound=(words=(long[])expectedArr).length-1)<<6)+63) {
+        int cursor;
+        if((cursor=expectedCursor)==((arrBound=(words=(long[])expectedArr).length-1)<<6)+63) {
             //remove index 0
             if(tailOffset<=arrBound-headOffset+1) {
                 //pull the tail down
                 if(tail==0){
                   expectedTail=cursor;
                 }else{
-                    expectedTail=tail-1;
+                  expectedTail=tail-1;
                   words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,words[0],0,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
                 }
             }else {
@@ -493,21 +516,20 @@ public class PackedBooleanArrDeqTest{
                 }
             }
         }else {
-            final int headDist;
             int lastRetOffset;
             word=words[lastRetOffset=++cursor>>6];
-            if((headDist=cursor-head)>0) {
-                //removing from head run
+            if(cursor-head>0)
+            {
+              //removing from head run
                 final int headWordDist;
                 final int tailWordDist;
                 if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset+1) {
                     //pull the head up
                     expectedCursor=cursor;
+                    expectedHead=head+1;
                     if(headWordDist==0) {
-                        expectedHead=++head;
-                      words[lastRetOffset]=word<<1&(mask=(1L<<headDist)-1<<head) | word&~mask;
+                      words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-cursor-1) | word&~mask;
                     }else {
-                        expectedHead=head+1;
                       words[lastRetOffset]=word<<1&(mask=-1L>>>-cursor-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
                       words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
                     }
@@ -523,14 +545,16 @@ public class PackedBooleanArrDeqTest{
                     }
                     words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
                 }
-            }else {
+            }
+            else
+            {
                 //removing from tail run
                 final int tailWordDist;
                 if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset+1) {
                     //pull the tail down
                     expectedTail=tail-1;
                     if(tailWordDist==0) {
-                        words[lastRetOffset]=word>>>1&(mask=(1L<<tail-cursor)-1<<cursor) | word&~mask;
+                        words[lastRetOffset]=word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
                     }else {
                         words[lastRetOffset]=word>>>1&(mask=-1L<<cursor) | word&~mask | (word=words[++lastRetOffset])<<-1;
                         words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail)|word>>>1&~mask;
@@ -577,43 +601,92 @@ public class PackedBooleanArrDeqTest{
           words[lastRetOffset]=word;
         }
       private void checkedFragmentedRemove() {
-          final long[] words=(long[])expectedArr;
-          int head=expectedHead;
-          int tail=expectedTail;
-          int lastRet=expectedLastRet;
-          int headOffset=head>>6;
-          int tailOffset=tail>>6;
-          int arrBound=words.length;
-          int lastRetOffset=lastRet>>6;
-          int headDist;
-          if((headDist=lastRet-head)>=0) {
-              //removing from the head run
-              int headWordDist;
-              int tailWordDist;
-              if((headWordDist=lastRetOffset-headOffset) <= (tailWordDist=arrBound-lastRetOffset)+tailOffset) {
-                  //pull the head up
-                  throw new UnsupportedOperationException();
-                  //TODO
-              }else {
-                  //pull the tail down
-                  throw new UnsupportedOperationException();
-                  //TODO
+          //TODO optimize and clean up
+          final long[] words;
+          int head,tail;
+          final int headOffset=(head=expectedHead)>>6,tailOffset=(tail=expectedTail)>>6,arrBound=(words=(long[])expectedArr).length-1;
+          int lastRetOffset;
+          int lastRet;
+          long mask,word=words[lastRetOffset=(lastRet=expectedLastRet)>>6];
+          switch(Integer.signum(lastRet-head))
+          {
+          case -1:
+          {
+            //removing from tail run
+              final int tailWordDist;
+              if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset)
+              {
+                 //pull down the tail
+                  if(tail==0)
+                  {
+                      expectedTail=(arrBound<<6)+63;
+                  }
+                  else
+                  {
+                      expectedTail=tail-1;
+                      if(tailWordDist==0) {
+                          words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet&-1L>>>-tail) | word&~mask;
+                      }else {
+                          words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet)|word&~mask | (word=words[++lastRetOffset])<<-1;
+                          words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
+                      }
+                  }
+               }
+              else
+              {
+                  //pull up the head
+                  expectedCursor=lastRet;
+                  expectedHead=head==(arrBound<<6)+63?0:head+1;
+                  word=word<<1&(mask=-1L>>>-lastRet-1)|word&~mask;
+                  if(lastRetOffset==0) {
+                      words[0]=word|(word=words[arrBound])>>>-1;
+                  }else {
+                      words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
+                      words[0]=BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1|(word=words[arrBound])>>>-1;
+                  }
+                  words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
               }
-          }else {
-              //removing from the tail run
-              int headWordDist;
-              int tailWordDist;
-              if((tailWordDist=tailOffset-lastRetOffset)<=(headWordDist=arrBound-headOffset)+lastRetOffset) {
+              break;
+          }
+          case 0:
+          {
+              //removing from the head
+              expectedHead=head==(arrBound<<6)+63?0:head+1;
+          }
+              break;
+          default:
+              //removing from head run
+              final int headWordDist,tailWordDist;
+              if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset)
+              {
+                  expectedCursor=lastRet;
+                  expectedHead=head+1;
+                  //pull up the head
+                  if(headWordDist==0) {
+                      words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-lastRet-1) | word&~mask;
+                  }else {
+                      words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
+                      words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
+                  }
+              }
+              else
+              {
                   //pull the tail down
-                  throw new UnsupportedOperationException();
-                  //TODO
-              }else {
-                  //pull the head up
-                  throw new UnsupportedOperationException();
-                  //TODO
+                  expectedTail=tail==0?(arrBound<<6)+63:tail-1;
+                  word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+                  if(tailWordDist==0)
+                  {
+                      words[lastRetOffset]=word | (word=words[0])<<-1;
+                  }
+                  else
+                  {
+                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                      words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
+                  }
+                  words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
               }
           }
-        }
+      }
       private void checkedNonfragmentedRemove() {
           //TODO optimize and clean up
           final long[] words;
@@ -2014,10 +2087,20 @@ public class PackedBooleanArrDeqTest{
   @Tag("testItrremove_void")
   @Order(-537958)
   @Test public void testItrremove_void(){
-      //TODO remove
-      AtomicInteger totalNumTests=new AtomicInteger(0);
-      AtomicInteger totalNumPassed=new AtomicInteger(0);
-    //TestExecutorService.setNumWorkers(1);
+//    IntStream.Builder sizeBuilder=IntStream.builder();
+//    sizeBuilder.accept(0);
+//    sizeBuilder.accept(1);
+//    sizeBuilder.accept(2);
+//    sizeBuilder.accept(3);
+//    for(int i=1;i<=20;++i) {
+//        int baseSize=i*64;
+//        for(int j=-3;j<=3;++j) {
+//            sizeBuilder.accept(baseSize+j);
+//        }
+//    }
+//    int[] sizes=sizeBuilder.build().toArray();
+    //double[] positions=new double[] {1.0,0.99,0.98,0.97,0.96,0.95,0.94,0.93,0.92,0.91,0.90,0.75,0.50,0.25,0.0};//{0.0,0.25,0.5,0.75,0.8,0.85,0.9,0.95,0.96,0.97,0.98,0.99,1.0};
+
     for(final var size:SIZES){
       final int initCapBound=size+64&-64;
       int prevNumToIterate=-1;
@@ -2056,37 +2139,16 @@ public class PackedBooleanArrDeqTest{
                               throw removeScenario.invalid();
                             }
                             TestExecutorService.submitTest(()->{
-                                totalNumTests.incrementAndGet();
-                                
-                              final var thisSize=size;
-                              final var thisPosition=position;
-                              final var thisInitCap=initCap;
-                              final var thisNumToRotate=numToRotate;
-                              final var thisCheckedType=checkedType;
-                              final var thisItrType=itrType;
-                              final var thisIllegalMod=illegalMod;
-                              final var thisRemoveScenario=removeScenario;
                               final var seqMonitor=SequenceInitialization.Ascending
                                   .initialize(new PackedBooleanArrDeqMonitor(checkedType,initCap),size,0);
                               seqMonitor.rotate(numToRotate);
                               final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,itrType);
                               
-                              try {
                                 removeScenario.initialize(itrMonitor);
-                              }catch(NotYetImplementedException e) {
-                                //TODO
-                                return;
-                              }
                               itrMonitor.illegalMod(illegalMod);
 
                               if(removeScenario.expectedException == null){
                                 if(illegalMod.expectedException == null){
-                                  
-                                  try {
-                                  if(thisSize==66 && thisPosition==0.25 && thisInitCap==64 && thisNumToRotate==63 && thisCheckedType.checked && thisItrType==IteratorType.AscendingItr && thisIllegalMod.expectedException==null && thisRemoveScenario.expectedException==null)
-                                  {
-                                      TestExecutorService.suspend();
-                                  }
                                   itrMonitor.verifyRemove();
                                   switch(removeScenario){
                                   case PostNext:{
@@ -2101,18 +2163,13 @@ public class PackedBooleanArrDeqTest{
                                   default:
                                     throw removeScenario.invalid();
                                   }
-                                  }catch(NotYetImplementedException e) {
-                                    //TODO do nothing
-                                    return;
-                                  }
                                 }else{
                                   Assertions.assertThrows(illegalMod.expectedException,()->itrMonitor.verifyRemove());
                                 }
                               }else{
-
+                               
                                 Assertions.assertThrows(removeScenario.expectedException,()->itrMonitor.verifyRemove());
                               }
-                              totalNumPassed.incrementAndGet();
                             });
                           }
                         }
@@ -2127,13 +2184,6 @@ public class PackedBooleanArrDeqTest{
       }
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testItrremove_void");
-    final int totalNumTestsInt=totalNumTests.get();
-    final int totalNumPassedInt=totalNumPassed.get();
-    System.out.println("Total num tests  = "+totalNumTestsInt);
-    System.out.println("Total num passed = "+totalNumPassedInt);
-    double percent=100.0 * totalNumPassedInt / totalNumTestsInt;
-    System.out.println("Percent passed   = "+percent+"%");
-    NotYetImplementedException.reportCounts();
   }
   private static void verifyMASSIVEToStringHelper(String result,int seqSize,String testName) {
       int offset;

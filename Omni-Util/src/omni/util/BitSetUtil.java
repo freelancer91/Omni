@@ -268,6 +268,28 @@ public interface BitSetUtil{
         words[wordOffset]=dataInput.readLong();
       }
     }
+    public static long maskedShiftUp(long word,int head,int cursor)
+    {
+        final long mask;
+        return word<<1&(mask=-1L<<head&-1L>>>-cursor-1) | word&~mask;
+    }
+    
+    public static long maskedShiftUp(long word,int head)
+    {
+        final long mask;
+        return word<<1&(mask=-1L<<head)&word&~mask;
+    }
+    public static long maskedShiftDown(long word,int tail,int cursor)
+    {
+        final long mask;
+        return word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
+    }
+    public static long maskedShiftDown(long word,int tail)
+    {
+        final long mask;
+        return word&(mask=-1L<<tail) | word>>>1&~mask;
+    }
+    
     
     public static long pullDownLoop(long[] words,long word,int begin,int end){
         while(begin!=end){
