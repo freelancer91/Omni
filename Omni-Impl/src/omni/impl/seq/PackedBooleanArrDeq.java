@@ -41,6 +41,24 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }
     return tail;
   }
+  private void removeIndex0PullDown(long[] words,int tail,int cursor,int tailOffset) {
+    if(tail==0){
+      this.tail=cursor;
+    }else{
+      this.tail=tail-1;
+      words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,words[0],0,tailOffset),tail);
+    }
+  }
+  private void removeIndex0PullUp(long[] words,int head,int cursor,int headOffset,int arrBound) {
+    long word;
+    words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(words[0]&-2L,word=words[arrBound]);
+    if(head==cursor){
+        this.head=0;
+    }else{
+        this.head=head+1;
+        words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
+    }
+  }
   @Override
   void uncheckedForEach(final int tail,BooleanConsumer action){
     final var words=this.words;
@@ -1727,37 +1745,30 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
       private void fragmentedDescendingRemove(int head,int cursor,int tail,PackedBooleanArrDeq root){
           //TODO optimize and clean up
         final long[] words;
-        final int headOffset=head>>6,tailOffset=tail>>6,arrBound;
-        long word;
-        if(cursor==((arrBound=(words=root.words).length-1)<<6)+63) {
+        final int arrBound;
+       
+        int tailDist;
+        int capacityBound;
+        if((tailDist=(capacityBound=((arrBound=(words=root.words).length-1)<<6)+63)-cursor)==0) {
             //remove index 0
-            if(tailOffset<=arrBound-headOffset+1) {
+            final int headOffset,tailOffset;
+            if((tailOffset=tail>>6)<=arrBound-(headOffset=head>>6)+1) {
                 //pull the tail down
-                if(tail==0){
-                  root.tail=cursor;
-                }else{
-                  root.tail=tail-1;
-                  words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,words[0],0,tailOffset),tail);
-                }
+                root.removeIndex0PullDown(words,tail,cursor,tailOffset);
             }else {
                 //pull the head up
                 this.cursor=0;
-                words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(words[0]&-2L,word=words[arrBound]);
-                if(head==cursor){
-                    root.head=0;
-                }else{
-                    root.head=head+1;
-                    words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
-                }
+                root.removeIndex0PullUp(words,head,cursor,headOffset,arrBound);
             }
         }else {
+            final int headOffset=head>>6,tailOffset=tail>>6;
             int lastRetOffset;
-            word=words[lastRetOffset=++cursor>>6];
+            long word=words[lastRetOffset=++cursor>>6];
             if(cursor-head>0)
             {
               //removing from head run
                 final int headWordDist,tailWordDist;
-                if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset+1) {
+                if((headWordDist=lastRetOffset-(headOffset))<=(tailWordDist=arrBound-lastRetOffset)+(tailOffset)+1) {
                     //pull the head up
                     this.cursor=cursor;
                     root.head=head+1;
@@ -1784,7 +1795,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             {
                 //removing from tail run
                 final int tailWordDist;
-                if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset+1) {
+                if((tailWordDist=(tailOffset)-lastRetOffset)<=arrBound-(headOffset)+lastRetOffset+1) {
                     //pull the tail down
                     root.tail=tail-1;
                     if(tailWordDist==0) {

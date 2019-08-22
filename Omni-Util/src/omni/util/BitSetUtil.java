@@ -302,18 +302,7 @@ public interface BitSetUtil{
         return currWord | prevWord>>>-1;
     }
     
-//    public static long maskedShiftDown(long word,int tail,int cursor)
-//    {
-//        final long mask;
-//        return word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
-//    }
-//    public static long maskedShiftDown(long word,int tail)
-//    {
-//        final long mask;
-//        return word&(mask=-1L<<tail) | word>>>1&~mask;
-//    }
-//    
-    
+
     public static long pullDownLoop(long[] words,long word,int begin,int end){
         while(begin!=end){
             words[begin]=combineWordWithTrailingBitOfNext(word>>>1,word=words[++begin]);
@@ -433,24 +422,7 @@ public interface BitSetUtil{
             }
         }
     }
-    
-    /**
-     * @param index The index you intend to remove
-     * @return A mask  that should be applied to 
-     */
-    @Deprecated
-    public static long getPullUpMask(int index)
-    {
-      return -1L>>>-index-1;
-    }
-    @Deprecated
-    public static long getPullDownMask(int index)
-    {
-      return (1L<<index)-1;
-    }
-    
-    
-   
+
     
     public static void srcUnalignedPullDown(long[] words,int dstWordOffset,int srcOffset,int srcWordBound) {
         int srcWordOffset;
