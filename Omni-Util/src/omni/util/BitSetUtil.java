@@ -268,11 +268,7 @@ public interface BitSetUtil{
         words[wordOffset]=dataInput.readLong();
       }
     }
-    public static long shiftUpMiddleBits(long word,int head,int cursor)
-    {
-        final long mask;
-        return word<<1&(mask=-1L<<head&-1L>>>-cursor-1) | word&~mask;
-    }
+    
     
     public static long shiftUpLeadingBits(long word,int head)
     {
@@ -295,6 +291,20 @@ public interface BitSetUtil{
         final long mask;
         return word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
     }
+    public static long shiftDownEdgeBits(long word,int cursor,int tail) {
+        final long mask;
+        return word&(mask=-1L<<tail & -1L>>>-cursor) | word>>>1&~mask;
+    }
+    public static long shiftUpMiddleBits(long word,int head,int cursor)
+    {
+        final long mask;
+        return word<<1&(mask=-1L<<head&-1L>>>-cursor-1) | word&~mask;
+    }
+    public static long shiftUpEdgeBits(long word,int cursor,int head) {
+        final long mask;
+        return word&(mask=-1L<<cursor+1&-1L>>>-head) | word<<1&~mask;
+    }
+    
     public static long combineWordWithTrailingBitOfNext(long currWord,long nextWord) {
         return currWord | nextWord<<-1;
     }

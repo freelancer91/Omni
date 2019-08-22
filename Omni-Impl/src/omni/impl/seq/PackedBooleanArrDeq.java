@@ -41,23 +41,35 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }
     return tail;
   }
-  private void removeIndex0PullDown(long[] words,int tail,int cursor,int tailOffset) {
+  private void removeIndex0PullDown(long[] words,int tail,int cursor) {
     if(tail==0){
       this.tail=cursor;
     }else{
       this.tail=tail-1;
-      words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,words[0],0,tailOffset),tail);
+      final int tailOffset;
+      words[tailOffset=tail>>6]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,words[0],0,tailOffset),tail);
     }
   }
-  private void removeIndex0PullUp(long[] words,int head,int cursor,int headOffset,int arrBound) {
-    long word;
-    words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(words[0]&-2L,word=words[arrBound]);
-    if(head==cursor){
-        this.head=0;
-    }else{
-        this.head=head+1;
-        words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
-    }
+  private void removeIndex0PullUp(long[] words,int head,int cursor,int arrBound) {
+      if(arrBound==0){
+        final long word=words[0];
+        if(head==cursor){
+            this.head=0;
+        }else {
+            this.head=head+1;
+        }
+        words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpLeadingBits(word&-2L,head),word);
+      }else{
+        long word;
+        words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(words[0]&-2L,word=words[arrBound]);
+        if(head==cursor){
+            this.head=0;
+        }else{
+            this.head=head+1;
+            final int headOffset;
+            words[headOffset=head>>6]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
+        }
+      }
   }
   @Override
   void uncheckedForEach(final int tail,BooleanConsumer action){
@@ -1295,7 +1307,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             return true;
           }
         }
-        if((tail0s=Long.numberOfTrailingZeros(word=words[tailWordOffset]))<(tail&63)){
+        if((tail0s=Long.numberOfTrailingZeros(word=words[tailWordOffset]))<=(tail&63)){
           words[tailWordOffset]=word-(1L<<tail0s);
           this.head=head+1;
           return true;
@@ -1313,7 +1325,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             return true;
           }
         }
-        if((tail0s=Long.numberOfTrailingZeros(~(word=words[tailWordOffset])))<(tail&63)){
+        if((tail0s=Long.numberOfTrailingZeros(~(word=words[tailWordOffset])))<=(tail&63)){
           words[tailWordOffset]=word+(1L<<tail0s);
           this.head=head+1;
           return true;
@@ -1324,73 +1336,72 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     return false;
   }
   private boolean fragmentedremoveVal(int head,int tail,boolean val){
-    int tail0s;
-    final var words=this.words;
-    long word;
-    int wordBound=words.length;
-    int wordOffset=head>>6;
-    if(val) {
-      if((tail0s=Long.numberOfTrailingZeros((word=words[wordOffset])>>>head))!=64) {
-        if(head==(wordBound<<6)-1) {
-          this.head=0;
+    final long[] words;
+    final int wordBound=(words=this.words).length;
+    goToShiftHead:for(;;) {
+        int tail0s;
+        long word;
+        int wordOffset=head>>6;
+        if(val) {
+          if((tail0s=Long.numberOfTrailingZeros((word=words[wordOffset])>>>head))!=64) {
+            if(head==(wordBound<<6)-1) {
+              this.head=0;
+            }else {
+              words[wordOffset]=word-(1L<<head+tail0s);
+              this.head=head+1;
+            }
+            return true;
+          }
+          for(int i=wordOffset+1;i<wordBound;++i) {
+            if((tail0s=Long.numberOfTrailingZeros(word=words[i]))!=64) {
+              words[i]=word-(1L<<tail0s);
+              break goToShiftHead;
+            }
+          }
+          wordOffset=tail>>6;
+          for(int i=0;i<wordOffset;++i) {
+            if((tail0s=Long.numberOfTrailingZeros(word=words[i]))!=64) {
+              words[i]=word-(1L<<tail0s);
+              break goToShiftHead;
+            }
+          }
+          if((tail0s=Long.numberOfTrailingZeros(word=words[wordOffset]))<=(tail&63)){
+            words[wordOffset]=word-(1L<<tail0s);
+            break goToShiftHead;
+          }
         }else {
-          words[wordOffset]=word-(1L<<head+tail0s);
-          this.head=head+1;
+          if((tail0s=Long.numberOfTrailingZeros(~(word=words[wordOffset])>>>head))!=64) {
+            if(head==(wordBound<<6)-1) {
+              this.head=0;
+            }else {
+              words[wordOffset]=word+(1L<<head+tail0s);
+              this.head=head+1;
+            }
+            return true;
+          }
+          for(int i=wordOffset+1;i<wordBound;++i) {
+            if((tail0s=Long.numberOfTrailingZeros(~(word=words[i])))!=64) {
+              words[i]=word+(1L<<tail0s);
+              break goToShiftHead;
+            }
+          }
+          wordOffset=tail>>6;
+          for(int i=0;i<wordOffset;++i) {
+            if((tail0s=Long.numberOfTrailingZeros(~(word=words[i])))!=64) {
+              words[i]=word+(1L<<tail0s);
+              break goToShiftHead;
+            }
+          }
+          if((tail0s=Long.numberOfTrailingZeros(~(word=words[wordOffset])))<=(tail&63)){
+            words[wordOffset]=word+(1L<<tail0s);
+            break goToShiftHead;
+          }
         }
-        return true;
-      }
-      for(int i=wordOffset+1;i<wordBound;++i) {
-        if((tail0s=Long.numberOfTrailingZeros(word=words[i]))!=64) {
-          words[i]=word-(1L<<tail0s);
-          this.head=head+1;
-          return true;
-        }
-      }
-      wordOffset=tail>>6;
-      for(int i=0;i<wordOffset;++i) {
-        if((tail0s=Long.numberOfTrailingZeros(word=words[i]))!=64) {
-          words[i]=word-(1L<<tail0s);
-          this.head=head+1;
-          return true;
-        }
-      }
-      if((tail0s=Long.numberOfTrailingZeros(word=words[wordOffset]))<(tail&63)){
-        words[wordOffset]=word-(1L<<tail0s);
-        this.head=head+1;
-        return true;
-      }
-    }else {
-      if((tail0s=Long.numberOfTrailingZeros(~(word=words[wordOffset])>>>head))!=64) {
-        if(head==(wordBound<<6)-1) {
-          this.head=0;
-        }else {
-          words[wordOffset]=word+(1L<<head+tail0s);
-          this.head=head+1;
-        }
-        return true;
-      }
-      for(int i=wordOffset+1;i<wordBound;++i) {
-        if((tail0s=Long.numberOfTrailingZeros(~(word=words[i])))!=64) {
-          words[i]=word+(1L<<tail0s);
-          this.head=head+1;
-          return true;
-        }
-      }
-      wordOffset=tail>>6;
-      for(int i=0;i<wordOffset;++i) {
-        if((tail0s=Long.numberOfTrailingZeros(~(word=words[i])))!=64) {
-          words[i]=word+(1L<<tail0s);
-          this.head=head+1;
-          return true;
-        }
-      }
-      if((tail0s=Long.numberOfTrailingZeros(~(word=words[wordOffset])))<(tail&63)){
-        words[wordOffset]=word+(1L<<tail0s);
-        this.head=head+1;
-        return true;
-      }
+        return false;
     }
-    return false;
+    this.head=++head==wordBound<<6?0:head;
+    return true;
+    
   }
   @Override boolean uncheckedremoveLastOccurrence(int tail,boolean val){
     int head;
@@ -1400,73 +1411,77 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     return nonfragmentedremoveLastOccurrence(head,tail,val);
   }
   private boolean fragmentedremoveLastOccurrence(int head,int tail,boolean val) {
-    int lead0s;
-    final var words=this.words;
-    long word;
-    int wordBound=words.length;
-    int wordOffset=tail>>6;
-    if(val) {
-      if((lead0s=Long.numberOfLeadingZeros((word=words[wordOffset])<<-tail))!=64) {
-        if(tail==0) {
-          this.tail=(wordBound<<6)-1;
+    final long[] words;
+    final int wordBound=(words=this.words).length;
+    goToShiftTail:for(;;) {
+        int lead0s;
+        long word;
+        int wordOffset=tail>>6;
+        if(val) {
+          if((lead0s=Long.numberOfLeadingZeros((word=words[wordOffset])<<-tail-1))!=64) {
+            if(tail==0) {
+              this.tail=(wordBound<<6)-1;
+            }else {
+              words[wordOffset]=word-(1L<<tail-lead0s);
+              this.tail=tail-1;
+            }
+            return true;
+          }
+          for(int i=wordOffset-1;i>=0;--i) {
+            if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
+              words[i]=word-(1L<<-lead0s-1);
+              break goToShiftTail;
+            }
+          }
+          wordOffset=head>>6;
+          for(int i=wordBound-1;i>wordOffset;--i) {
+            if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
+              words[i]=word-(1L<<-lead0s-1);
+              break goToShiftTail;
+
+            }
+          }
+          if((lead0s=Long.numberOfLeadingZeros(word=words[wordOffset]))<=(-head-1&63)){
+            words[wordOffset]=word-(1L<<-lead0s-1);
+            break goToShiftTail;
+
+          }
         }else {
-          words[wordOffset]=word-(Long.MIN_VALUE>>>lead0s-tail);
-          this.tail=tail-1;
+          if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset])<<-tail-1))!=64) {
+            if(tail==0) {
+              this.tail=(wordBound<<6)-1;
+            }else {
+              words[wordOffset]=word+(1L<<tail-lead0s);
+              this.tail=tail-1;
+            }
+            return true;
+          }
+          for(int i=wordOffset-1;i>=0;--i) {
+            if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
+              words[i]=word+(1L<<-lead0s-1);
+              break goToShiftTail;
+
+            }
+          }
+          wordOffset=head>>6;
+          for(int i=wordBound-1;i>wordOffset;--i) {
+            if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
+              words[i]=word+(1L<<-lead0s-1);
+              break goToShiftTail;
+
+            }
+          }
+          if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset])))<=(-head-1&63)){
+            words[wordOffset]=word+(1L<<-lead0s-1);
+            break goToShiftTail;
+
+          }
         }
-        return true;
-      }
-      for(int i=wordOffset-1;i>=0;--i) {
-        if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
-          words[i]=word-(Long.MIN_VALUE>>>lead0s);
-          this.tail=tail-1;
-          return true;
-        }
-      }
-      wordOffset=head>>6;
-      for(int i=wordBound-1;i>wordOffset;--i) {
-        if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
-          words[i]=word-(Long.MIN_VALUE>>>lead0s);
-          this.tail=tail-1;
-          return true;
-        }
-      }
-      if((lead0s=Long.numberOfLeadingZeros(word=words[wordOffset]))<(-head&63)){
-        words[wordOffset]=word-(Long.MIN_VALUE>>>lead0s);
-        this.tail=tail-1;
-        return true;
-      }
-    }else {
-      if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset])<<-tail))!=64) {
-        if(tail==0) {
-          this.tail=(wordBound<<6)-1;
-        }else {
-          words[wordOffset]=word+(Long.MIN_VALUE>>>lead0s-tail);
-          this.tail=tail-1;
-        }
-        return true;
-      }
-      for(int i=wordOffset-1;i>=0;--i) {
-        if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
-          words[i]=word+(Long.MIN_VALUE>>>lead0s);
-          this.tail=tail-1;
-          return true;
-        }
-      }
-      wordOffset=head>>6;
-      for(int i=wordBound-1;i>wordOffset;--i) {
-        if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
-          words[i]=word+(Long.MIN_VALUE>>>lead0s);
-          this.tail=tail-1;
-          return true;
-        }
-      }
-      if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset])))<(-head&63)){
-        words[wordOffset]=word+(Long.MIN_VALUE>>>lead0s);
-        this.tail=tail-1;
-        return true;
-      }
+        return false;
     }
-    return false;
+    this.tail=tail==0?(wordBound<<6)-1:tail-1;
+    return true;
+    
   }
   private boolean nonfragmentedremoveLastOccurrence(int head,int tail,boolean val) {
     int headWordOffset;
@@ -1476,60 +1491,60 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     final var words=this.words;
     if((headWordOffset=head>>6)==(tailWordOffset=tail>>6)){
       if(val) {
-        if((lead0s=Long.numberOfLeadingZeros((word=words[tailWordOffset])<<-tail))<=tail-head) {
+        if((lead0s=Long.numberOfLeadingZeros((word=words[tailWordOffset])<<-tail-1))<=tail-head) {
           if(head==tail) {
             this.tail=-1;
           }else {
             this.tail=tail-1;
-            words[tailWordOffset]=word-(Long.MIN_VALUE>>>lead0s-tail);
+            words[tailWordOffset]=word-(1L<<tail-lead0s);
           }
           return true;
         }
       }else {
-        if((lead0s=Long.numberOfLeadingZeros(~(word=words[tailWordOffset])<<-tail))<=tail-head) {
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[tailWordOffset])<<-tail-1))<=tail-head) {
           if(head==tail) {
             this.tail=-1;
           }else {
             this.tail=tail-1;
-            words[tailWordOffset]=word+(Long.MIN_VALUE>>>lead0s-tail);
+            words[tailWordOffset]=word+(1L<<tail-lead0s);
           }
           return true;
         }
       }
     }else {
       if(val) {
-        if((lead0s=Long.numberOfLeadingZeros((word=words[tailWordOffset])<<-tail))!=64) {
+        if((lead0s=Long.numberOfLeadingZeros((word=words[tailWordOffset])<<-tail-1))!=64) {
           this.tail=tail-1;
-          words[tailWordOffset]=word-(Long.MIN_VALUE>>>lead0s-tail);
+          words[tailWordOffset]=word-(1L<<tail-lead0s);
           return true;
         }
-        for(int i=tailWordOffset-1;i>headWordOffset;--tail) {
+        for(int i=tailWordOffset-1;i>headWordOffset;--i) {
           if((lead0s=Long.numberOfLeadingZeros(word=words[i]))!=64) {
             this.tail=tail-1;
-            words[i]=word-(Long.MIN_VALUE>>>lead0s);
+            words[i]=word-(1L<<-lead0s-1);
             return true;
           }
         }
-        if((lead0s=Long.numberOfLeadingZeros(word=words[headWordOffset]))<(-head&63)){
-          words[headWordOffset]=word-(Long.MIN_VALUE>>>lead0s);
+        if((lead0s=Long.numberOfLeadingZeros(word=words[headWordOffset]))<=(-head-1&63)){
+          words[headWordOffset]=word-(1L<<-lead0s-1);
           this.tail=tail-1;
           return true;
         }
       }else {
-        if((lead0s=Long.numberOfLeadingZeros(~(word=words[tailWordOffset])<<-tail))!=64) {
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[tailWordOffset])<<-tail-1))!=64) {
           this.tail=tail-1;
-          words[tailWordOffset]=word+(Long.MIN_VALUE>>>lead0s-tail);
+          words[tailWordOffset]=word+(1L<<tail-lead0s);
           return true;
         }
-        for(int i=tailWordOffset-1;i>headWordOffset;--tail) {
+        for(int i=tailWordOffset-1;i>headWordOffset;--i) {
           if((lead0s=Long.numberOfLeadingZeros(~(word=words[i])))!=64) {
             this.tail=tail-1;
-            words[i]=word+(Long.MIN_VALUE>>>lead0s);
+            words[i]=word+(1L<<-lead0s-1);
             return true;
           }
         }
-        if((lead0s=Long.numberOfLeadingZeros(~(word=words[headWordOffset])))<(-head&63)){
-          words[headWordOffset]=word+(Long.MIN_VALUE>>>lead0s);
+        if((lead0s=Long.numberOfLeadingZeros(~(word=words[headWordOffset])))<=(-head-1&63)){
+          words[headWordOffset]=word+(1L<<-lead0s-1);
           this.tail=tail-1;
           return true;
         }
@@ -1695,7 +1710,60 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }
     }
 
+    private static void headRunPullUp(long[] words,int lastRet,int head) {
+        final int headOffset;
+        int lastRetOffset;
+        if((headOffset=head>>6)==(lastRetOffset=lastRet>>6)) {
+            words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(words[lastRetOffset],head,lastRet);
+        }else {
+            final long word;
+            words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(words[lastRetOffset],lastRet),word=words[--lastRetOffset]);
+            words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
+        }
+    }
+    private static void headRunPullDown(long[] words,int lastRet,int tail,int arrBound){
+        if(arrBound==0) {
+            final long word;
+            words[0]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownEdgeBits(word=words[0],lastRet,tail),word);
+        }else {
+            int lastRetOffset;
+            long word=BitSetUtil.shiftDownLeadingBits(words[lastRetOffset=lastRet>>6],lastRet);
+            if(arrBound==lastRetOffset) {
+                words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
+            }else {
+                words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
+            }
+            words[lastRetOffset=tail>>6]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,lastRetOffset),tail);
+        }
 
+    }
+    private static void tailRunPullDown(long[] words,int lastRet,int tail) {
+        int tailOffset,lastRetOffset;
+        if((tailOffset=tail>>6)==(lastRetOffset=lastRet>>6)) {
+            words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(words[lastRetOffset],lastRet,tail);
+        }else {
+            final long word;
+            words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(words[lastRetOffset],lastRet),word=words[++lastRetOffset]);
+            words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
+        }
+    }
+    private static void tailRunPullUp(long[] words,int lastRet,int head,int arrBound) {
+        if(arrBound==0) {
+            final long word;
+            words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpEdgeBits(word=words[0],lastRet,head),word);
+        }else {
+            int lastRetOffset;
+            long word=BitSetUtil.shiftUpTrailingBits(words[lastRetOffset=lastRet>>6],lastRet);
+            if(lastRetOffset==0) {
+                words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
+            }else {
+                words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
+            }
+            words[lastRetOffset=head>>6]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,lastRetOffset,arrBound),head);
+        }
+    }
     private static class DescendingItr extends AscendingItr{
       private DescendingItr(DescendingItr itr){
         super(itr);
@@ -1743,85 +1811,48 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return (words[cursor>>6]>>>cursor&1)!=0;
       }
       private void fragmentedDescendingRemove(int head,int cursor,int tail,PackedBooleanArrDeq root){
-          //TODO optimize and clean up
         final long[] words;
-        final int arrBound;
-       
-        int tailDist;
-        int capacityBound;
-        if((tailDist=(capacityBound=((arrBound=(words=root.words).length-1)<<6)+63)-cursor)==0) {
+        final int arrBound,arrBoundDist,capacityBound;
+        if((arrBoundDist=(capacityBound=((arrBound=(words=root.words).length-1)<<6)+63)-cursor)==0) {
             //remove index 0
-            final int headOffset,tailOffset;
-            if((tailOffset=tail>>6)<=arrBound-(headOffset=head>>6)+1) {
+            if(tail<=capacityBound-head+1) {
                 //pull the tail down
-                root.removeIndex0PullDown(words,tail,cursor,tailOffset);
+                root.removeIndex0PullDown(words,tail,cursor);
             }else {
                 //pull the head up
                 this.cursor=0;
-                root.removeIndex0PullUp(words,head,cursor,headOffset,arrBound);
+                root.removeIndex0PullUp(words,head,cursor,arrBound);
             }
         }else {
-            final int headOffset=head>>6,tailOffset=tail>>6;
-            int lastRetOffset;
-            long word=words[lastRetOffset=++cursor>>6];
-            if(cursor-head>0)
-            {
-              //removing from head run
-                final int headWordDist,tailWordDist;
-                if((headWordDist=lastRetOffset-(headOffset))<=(tailWordDist=arrBound-lastRetOffset)+(tailOffset)+1) {
+            final int headDist;
+            if((headDist=++cursor-head)>0){
+                //removing from head run
+                if(headDist<=arrBoundDist+tail){
                     //pull the head up
                     this.cursor=cursor;
                     root.head=head+1;
-                    if(headWordDist==0) {
-                      words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,cursor);
-                    }else {
-                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,cursor),word=words[--lastRetOffset]);
-                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
-                    }
-                }else {
+                    headRunPullUp(words,cursor,head);
+                }else{
                     //pull the tail down
-                    root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                    word=BitSetUtil.shiftDownLeadingBits(word,cursor);
-                    if(tailWordDist==0) {
-                        words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
-                    }else {
-                        words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
-                        words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
-                    }
-                    words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
+                    root.tail=tail==0?capacityBound:tail-1;
+                    headRunPullDown(words,cursor,tail,arrBound);
                 }
-            }
-            else
-            {
-                //removing from tail run
-                final int tailWordDist;
-                if((tailWordDist=(tailOffset)-lastRetOffset)<=arrBound-(headOffset)+lastRetOffset+1) {
+            }else{
+                //removing from the tail run
+                if(tail-cursor<=capacityBound+headDist+1) {
                     //pull the tail down
                     root.tail=tail-1;
-                    if(tailWordDist==0) {
-                        words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,cursor,tail);
-                    }else {
-                        words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,cursor),word=words[++lastRetOffset]);
-                        words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
-                    }
+                    tailRunPullDown(words,cursor,tail);
                 }else {
                     //pull the head up
                     this.cursor=cursor;
-                    root.head=head==(arrBound<<6)+63?0:head+1;
-                    word=BitSetUtil.shiftUpTrailingBits(word,cursor);
-                    if(lastRetOffset==0) {
-                        words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
-                    }else {
-                        words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
-                        words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
-                    }
-                    words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
+                    root.head=head==capacityBound?0:head+1;
+                    tailRunPullUp(words,cursor,head,arrBound);
                 }
             }
         }
       }
       private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
-          //TODO optimize and clean up
           final long[] words;
           final int headOffset,tailOffset;
           int lastRetOffset;
@@ -1962,39 +1993,11 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           }
         }
       private void fragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root) {
-          //TODO optimize and clean up
-          final long[] words;
-          final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1;
-          int lastRetOffset;
-          long word=words[lastRetOffset=lastRet>>6];
           switch(Integer.signum(lastRet-head))
           {
           case -1:
           {
-              //the index to remove is in the tail run
-              final int tailWordDist;
-              if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset) {
-                //pull down the tail
-                 root.tail=tail-1;
-                 this.cursor=lastRet;
-                 if(tailWordDist==0) {
-                     words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
-                 }else {
-                     words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
-                     words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
-                 }
-              }else {
-                  //pull up the head
-                  root.head=head==(arrBound<<6)+63?0:head+1;
-                  word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
-                  if(lastRetOffset==0) {
-                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
-                  }else {
-                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
-                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
-                  }
-                  words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
-              }
+              removeFromTailRun(head,lastRet,tail,root);
               break;
           }
           case 0:
@@ -2005,35 +2008,71 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           }
           default:
           {
-              //removing from the head run
-              final int headWordDist,tailWordDist;
-              if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset){
-                  //pull up the head
-                  root.head=head+1;
-                  if(headWordDist==0) {
-                      words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
-                  }else {
-                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
-                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
-                  }
-              }else {
-                  //pull the tail down
-                  this.cursor=lastRet;
-                  root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                  word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
-                  if(tailWordDist==0) {
-                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
-                  }else {
-                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
-                      words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
-                  }
-                  words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
-              }
+              removeFromHeadRun(head,lastRet,tail,root);
           }
           }
       }
+    private void removeFromHeadRun(int head,int lastRet,int tail,PackedBooleanArrDeq root){
+        final long[] words;
+          final int headOffset,tailOffset,arrBound;
+          int lastRetOffset;
+          long word=(words=root.words)[lastRetOffset=lastRet>>6];
+          //removing from the head run
+          final int headWordDist,tailWordDist;
+          if((headWordDist=lastRetOffset-(headOffset=head>>6))<=(tailWordDist=(arrBound=words.length-1)-lastRetOffset)+(tailOffset=tail>>6)){
+              //pull up the head
+              root.head=head+1;
+              if(headWordDist==0) {
+                  words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
+              }else {
+                  words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
+                  words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
+              }
+          }else {
+              //pull the tail down
+              this.cursor=lastRet;
+              root.tail=tail==0?(arrBound<<6)+63:tail-1;
+              word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
+              if(tailWordDist==0) {
+                  words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
+              }else {
+                  words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                  words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
+              }
+              words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
+          }
+    }
+    private void removeFromTailRun(int head,int lastRet,int tail,PackedBooleanArrDeq root){
+        final long[] words;
+          final int headOffset,tailOffset,arrBound;
+          int lastRetOffset;
+          long word=(words=root.words)[lastRetOffset=lastRet>>6];
+          //the index to remove is in the tail run
+          final int tailWordDist;
+          if((tailWordDist=(tailOffset=tail>>6)-lastRetOffset)<=(arrBound=words.length-1)-(headOffset=head>>6)+lastRetOffset) {
+            //pull down the tail
+             root.tail=tail-1;
+             this.cursor=lastRet;
+             if(tailWordDist==0) {
+                 words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
+             }else {
+                 words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
+                 words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
+             }
+          }else {
+              //pull up the head
+              root.head=head==(arrBound<<6)+63?0:head+1;
+              word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
+              if(lastRetOffset==0) {
+                  words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
+              }else {
+                  words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                  words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
+              }
+              words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
+          }
+    }
       private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root){
-          //TODO optimize and clean up
         final long[] words;
         final int headOffset,tailOffset;
         int lastRetOffset;
@@ -2101,96 +2140,80 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
             }
             throw new NoSuchElementException();
           }
-          private void fragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
-              //TODO optimize and clean up
-              final long[] words;
-              final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1;
+          
+        void removeFromHeadRun(int head,int lastRet,int tail,Checked root){
+            final long[] words;
+              final int headOffset,tailOffset,arrBound,headWordDist,tailWordDist;
               int lastRetOffset;
-              long word=words[lastRetOffset=lastRet>>6];
-              switch(Integer.signum(lastRet-head))
+              long word=(words=root.words)[lastRetOffset=lastRet>>6];
+              if((headWordDist=lastRetOffset-(headOffset=head>>6))<=(tailWordDist=(arrBound=words.length-1)-lastRetOffset)+(tailOffset=tail>>6))
               {
-              case -1:
-              {
-                //removing from tail run
-                  final int tailWordDist;
-                  if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset)
-                  {
-                     //pull down the tail
-                      if(tail==0)
-                      {
-                          root.tail=(arrBound<<6)+63;
-                      }
-                      else
-                      {
-                          root.tail=tail-1;
-                          this.cursor=lastRet;
-                          if(tailWordDist==0) {
-                              words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
-                          }else {
-                              words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
-                              words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
-                          }
-                      }
-                   }
-                  else
-                  {
-                      //pull up the head
-                      root.head=head==(arrBound<<6)+63?0:head+1;
-                      word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
-                      if(lastRetOffset==0) {
-                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
-                      }else {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
-                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
-                      }
-                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
+                  //pull up the head
+                  root.head=head+1;
+                  if(headWordDist==0) {
+                      words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
+                  }else {
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
+                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
                   }
-                  break;
               }
-              case 0:
+              else
               {
-                  //removing from the head
-                  root.head=head==(arrBound<<6)+63?0:head+1;
-              }
-                  break;
-              default:
-                  //removing from head run
-                  final int headWordDist,tailWordDist;
-                  if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset)
+                  //pull the tail down
+                  this.cursor=lastRet;
+                  root.tail=tail==0?(arrBound<<6)+63:tail-1;
+                  word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
+                  if(tailWordDist==0)
                   {
-                      //pull up the head
-                      root.head=head+1;
-                      if(headWordDist==0) {
-                          words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
-                      }else {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
-                          words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
-                      }
+                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
                   }
                   else
                   {
-                      //pull the tail down
+                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                      words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
+                  }
+                  words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
+              }
+        }
+        void removeFromTailRun(int head,int lastRet,int tail,Checked root){
+              final long[] words;
+              final int headOffset,tailOffset,arrBound,tailWordDist;
+              int lastRetOffset;
+              long word=(words=root.words)[lastRetOffset=lastRet>>6];
+              if((tailWordDist=(tailOffset=tail>>6)-lastRetOffset)<=(arrBound=words.length-1)-(headOffset=head>>6)+lastRetOffset)
+              {
+                 //pull down the tail
+                  if(tail==0)
+                  {
+                      root.tail=(arrBound<<6)+63;
+                  }
+                  else
+                  {
+                      root.tail=tail-1;
                       this.cursor=lastRet;
-                      root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                      word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
-                      if(tailWordDist==0)
-                      {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
+                      if(tailWordDist==0) {
+                          words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
+                      }else {
+                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
+                          words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
                       }
-                      else
-                      {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
-                          words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
-                      }
-                      words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
                   }
+               }
+              else
+              {
+                  //pull up the head
+                  root.head=head==(arrBound<<6)+63?0:head+1;
+                  word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
+                  if(lastRetOffset==0) {
+                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
+                  }else {
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
+                  }
+                  words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
               }
-              
-             
-              
-          }
-          private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,Checked root) {
-              //TODO optimize and clean up
+        }
+           void nonfragmentedRemove(int head,int lastRet,int tail,Checked root) {
               final long[] words;
               final int headOffset, tailOffset;
               int lastRetOffset;
@@ -2213,30 +2236,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               }
               words[lastRetOffset]=word;
           }
-          @Override public void remove(){
-            int lastRet;
-            if((lastRet=this.lastRet)!=-1){
-              int modCount;
-              final Checked root;
-              CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              this.modCount=modCount;
-              final int head,tail;
-              switch(Integer.signum((tail=root.tail)-(head=root.head))){
-                case -1:
-                  fragmentedAscendingRemove(head,lastRet,tail,root);
-                  break;
-                case 0:
-                  root.tail=-1;
-                  break;
-                default:
-                  nonfragmentedAscendingRemove(head,lastRet,tail,root);
-              }
-              this.lastRet=-1;
-              return;
-            }
-            throw new IllegalStateException();
-          }
+          
           @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
               final int modCount=this.modCount;
               final Checked root;
@@ -2272,95 +2272,134 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               this.lastRet=tail;
               this.cursor=-1;
             }
-        }
-        private static class DescendingItr extends AscendingItr{
-          private void fragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
-              //TODO optimize and clean up
-              final long[] words;
-              final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1;
-              int lastRetOffset;
-              long word=words[lastRetOffset=lastRet>>6];
+          private void fragmentedRemove(int head,int lastRet,int tail,Checked root) {
               switch(Integer.signum(lastRet-head))
               {
               case -1:
               {
-                //removing from tail run
-                  final int tailWordDist;
-                  if((tailWordDist=tailOffset-lastRetOffset)<=arrBound-headOffset+lastRetOffset)
-                  {
-                     //pull down the tail
-                      if(tail==0)
-                      {
-                          root.tail=(arrBound<<6)+63;
-                      }
-                      else
-                      {
-                          root.tail=tail-1;
-                          if(tailWordDist==0) {
-                              words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
-                          }else {
-                              words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
-                              words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
-                          }
-                      }
-                   }
-                  else
-                  {
-                      //pull up the head
-                      this.cursor=lastRet;
-                      root.head=head==(arrBound<<6)+63?0:head+1;
-                      word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
-                      if(lastRetOffset==0) {
-                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
-                      }else {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
-                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
-                      }
-                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
-                  }
+                  removeFromTailRun(head,lastRet,tail,root);
                   break;
               }
               case 0:
               {
                   //removing from the head
-                  root.head=head==(arrBound<<6)+63?0:head+1;
+                  root.head=++head==root.words.length<<6?0:head;
               }
                   break;
               default:
-                  //removing from head run
-                  final int headWordDist,tailWordDist;
-                  if((headWordDist=lastRetOffset-headOffset)<=(tailWordDist=arrBound-lastRetOffset)+tailOffset)
+              {
+                  removeFromHeadRun(head,lastRet,tail,root);
+              }
+              }
+              
+             
+              
+          }
+          @Override public void remove(){
+              int lastRet;
+              if((lastRet=this.lastRet)!=-1){
+                int modCount;
+                final Checked root;
+                CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+                root.modCount=++modCount;
+                this.modCount=modCount;
+                final int head,tail;
+                switch(Integer.signum((tail=root.tail)-(head=root.head))){
+                  case -1:
+                    fragmentedRemove(head,lastRet,tail,root);
+                    break;
+                  case 0:
+                    root.tail=-1;
+                    break;
+                  default:
+                    nonfragmentedRemove(head,lastRet,tail,root);
+                }
+                this.lastRet=-1;
+                return;
+              }
+              throw new IllegalStateException();
+            }
+        }
+        private static class DescendingItr extends AscendingItr{
+            
+         @Override
+        void removeFromHeadRun(int head,int lastRet,int tail,Checked root){
+            final long[] words;
+              final int headOffset,tailOffset,arrBound,headWordDist,tailWordDist;
+              int lastRetOffset;
+              long word=(words=root.words)[lastRetOffset=lastRet>>6];
+              if((headWordDist=lastRetOffset-(headOffset=head>>6))<=(tailWordDist=(arrBound=words.length-1)-lastRetOffset)+(tailOffset=tail>>6))
+              {
+                  //pull up the head
+                  this.cursor=lastRet;
+                  root.head=head+1;
+                  if(headWordDist==0) {
+                      words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
+                  }else {
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
+                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
+                  }
+              }
+              else
+              {
+                  //pull the tail down
+                  root.tail=tail==0?(arrBound<<6)+63:tail-1;
+                  word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
+                  if(tailWordDist==0)
                   {
-                      this.cursor=lastRet;
-                      //pull up the head
-                      root.head=head+1;
-                      if(headWordDist==0) {
-                          words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
-                      }else {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
-                          words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
-                      }
+                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
                   }
                   else
                   {
-                      //pull the tail down
-                      root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                      word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
-                      if(tailWordDist==0)
-                      {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
-                      }
-                      else
-                      {
-                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
-                          words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
-                      }
-                      words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
+                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                      words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
                   }
+                  words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
               }
-          }
-          private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,Checked root){
-              //TODO optimize and clean up
+        }
+         @Override
+        void removeFromTailRun(int head,int lastRet,int tail,Checked root){
+            
+             
+            final long[] words;
+            final int headOffset,tailOffset,arrBound,tailWordDist;
+              int lastRetOffset;
+              long word=(words=root.words)[lastRetOffset=lastRet>>6];
+              if((tailWordDist=(tailOffset=tail>>6)-lastRetOffset)<=(arrBound=words.length-1)-(headOffset=head>>6)+lastRetOffset)
+              {
+                 //pull down the tail
+                  if(tail==0)
+                  {
+                      root.tail=(arrBound<<6)+63;
+                  }
+                  else
+                  {
+                      root.tail=tail-1;
+                      if(tailWordDist==0) {
+                          words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
+                      }else {
+                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
+                          words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
+                      }
+                  }
+               }
+              else
+              {
+                  //pull up the head
+                  this.cursor=lastRet;
+                  root.head=head==(arrBound<<6)+63?0:head+1;
+                  word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
+                  if(lastRetOffset==0) {
+                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
+                  }else {
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
+                  }
+                  words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
+              }
+        }
+         @Override
+        void nonfragmentedRemove(int head,int lastRet,int tail,Checked root){
               final long[] words;
               final int headOffset,tailOffset;
               int lastRetOffset;
@@ -2382,30 +2421,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               }
               words[lastRetOffset]=word;
             }
-          @Override public void remove(){
-              int lastRet;
-              if((lastRet=this.lastRet)!=-1){
-                int modCount;
-                final Checked root;
-                CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-                root.modCount=++modCount;
-                this.modCount=modCount;
-                final int head,tail;
-                switch(Integer.signum((tail=root.tail)-(head=root.head))){
-                  case -1:
-                    fragmentedDescendingRemove(head,lastRet,tail,root);
-                    break;
-                  case 0:
-                    root.tail=-1;
-                    break;
-                  default:
-                    nonfragmentedDescendingRemove(head,lastRet,tail,root);
-                }
-                this.lastRet=-1;
-                return;
-              }
-              throw new IllegalStateException();
-            }
+          
           private DescendingItr(DescendingItr itr){
             super(itr);
           }

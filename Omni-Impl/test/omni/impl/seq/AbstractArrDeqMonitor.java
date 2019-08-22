@@ -34,25 +34,27 @@ public void repairModCount() {
       //nothing to do
   }
   
-  abstract class AbstractItrMonitor
+  abstract static class AbstractItrMonitor<MONITOR extends AbstractArrDeqMonitor<DEQ,E>,DEQ extends OmniDeque<E>,E>
     implements MonitoredCollection.MonitoredIterator<OmniIterator<?>,DEQ>{
+    final MONITOR root;
     final OmniIterator<?> itr;
     int expectedCursor;
     int expectedLastRet;
     int expectedItrModCount;
     int numLeft;
-    AbstractItrMonitor(OmniIterator<?> itr,int expectedCursor,int numLeft){
+    AbstractItrMonitor(MONITOR root,OmniIterator<?> itr,int expectedCursor,int numLeft){
+      this.root=root;
       this.itr=itr;
       this.expectedCursor=expectedCursor;
       expectedLastRet=-1;
-      expectedItrModCount=expectedModCount;
+      expectedItrModCount=root.expectedModCount;
       this.numLeft=numLeft;
     }
     @Override public OmniIterator<?> getIterator(){
       return itr;
     }
     @Override public MonitoredCollection<DEQ> getMonitoredCollection(){
-      return AbstractArrDeqMonitor.this;
+      return root;
     }
     @Override public int getNumLeft(){
       return numLeft;
@@ -64,7 +66,7 @@ public void repairModCount() {
       return expectedLastRet != -1;
     }
     @Override public void verifyNextResult(DataType outputType,Object result){
-      verifyGetResult(expectedCursor,result,outputType);
+      root.verifyGetResult(expectedCursor,result,outputType);
     }
     abstract IntConsumer getForEachRemainingVerifier(MonitoredFunction function);
     

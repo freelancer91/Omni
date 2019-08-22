@@ -59,57 +59,58 @@ import omni.util.TestExecutorService;
     void callMethod(ArrDeqMonitor<?> monitor,Object inputVal,DataType inputType,FunctionCallType functionCallType);
   }
   private static class ArrDeqMonitor<E> extends AbstractArrDeqMonitor<OmniDeque<E>,E>{
-    private abstract class AbstractItrMonitor extends AbstractArrDeqMonitor<OmniDeque<E>,E>.AbstractItrMonitor{
-      AbstractItrMonitor(OmniIterator<?> itr,int expectedCursor,int numLeft){
-        super(itr,expectedCursor,numLeft);
+    private abstract static class AbstractItrMonitor<E> extends AbstractArrDeqMonitor.AbstractItrMonitor<ArrDeqMonitor<E>,OmniDeque<E>,E>{
+      AbstractItrMonitor(ArrDeqMonitor<E> root,OmniIterator<?> itr,int expectedCursor,int numLeft){
+        super(root,itr,expectedCursor,numLeft);
       }
-      IntConsumer getForEachRemainingVerifier(MonitoredFunction function){
+      @Override
+    IntConsumer getForEachRemainingVerifier(MonitoredFunction function){
         final var functionItr=function.iterator();
-        switch(dataType){
+        switch(root.dataType){
         case BOOLEAN:{
-          final var expectedArr=(boolean[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(boolean[])root.expectedArr;
           return index->Assertions.assertEquals((boolean)functionItr.next(),expectedArr[index]);
         }
         case BYTE:{
-          final var expectedArr=(byte[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(byte[])root.expectedArr;
           return index->Assertions.assertEquals((byte)functionItr.next(),expectedArr[index]);
         }
         case CHAR:{
-          final var expectedArr=(char[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(char[])root.expectedArr;
           return index->Assertions.assertEquals((char)functionItr.next(),expectedArr[index]);
         }
         case SHORT:{
-          final var expectedArr=(short[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(short[])root.expectedArr;
           return index->Assertions.assertEquals((short)functionItr.next(),expectedArr[index]);
         }
         case INT:{
-          final var expectedArr=(int[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(int[])root.expectedArr;
           return index->Assertions.assertEquals((int)functionItr.next(),expectedArr[index]);
         }
         case LONG:{
-          final var expectedArr=(long[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(long[])root.expectedArr;
           return index->Assertions.assertEquals((long)functionItr.next(),expectedArr[index]);
         }
         case FLOAT:{
-          final var expectedArr=(float[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(float[])root.expectedArr;
           return index->Assertions.assertEquals((float)functionItr.next(),expectedArr[index]);
         }
         case DOUBLE:{
-          final var expectedArr=(double[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(double[])root.expectedArr;
           return index->Assertions.assertEquals((double)functionItr.next(),expectedArr[index]);
         }
         case REF:{
-          final var expectedArr=(Object[])ArrDeqMonitor.this.expectedArr;
+          final var expectedArr=(Object[])root.expectedArr;
           return index->Assertions.assertSame(functionItr.next(),expectedArr[index]);
         }
         default:
-          throw dataType.invalid();
+          throw root.dataType.invalid();
         }
       }
     }
-    private class AscendingItrMonitor extends AbstractItrMonitor{
-      AscendingItrMonitor(){
-        super(seq.iterator(),expectedTail != -1?expectedHead:-1,expectedSize);
+    private static class AscendingItrMonitor<E> extends AbstractItrMonitor<E>{
+      AscendingItrMonitor(ArrDeqMonitor<E> root){
+        super(root,root.seq.iterator(),root.expectedTail != -1?root.expectedHead:-1,root.expectedSize);
       }
       @Override public IteratorType getIteratorType(){
         return IteratorType.AscendingItr;
@@ -117,25 +118,25 @@ import omni.util.TestExecutorService;
       @Override public void updateItrNextState(){
         expectedLastRet=expectedCursor;
         --numLeft;
-        if(expectedCursor == expectedTail){
+        if(expectedCursor == root.expectedTail){
           expectedCursor=-1;
-        }else if(++expectedCursor == expectedCapacity){
+        }else if(++expectedCursor == root.expectedCapacity){
           expectedCursor=0;
         }
       }
       @Override public void updateItrRemoveState(){
         ++expectedItrModCount;
-        ++expectedModCount;
-        if(checkedType.checked){
-          final int tail=expectedTail;
-          switch(Integer.signum(tail - expectedHead)){
+        ++root.expectedModCount;
+        if(root.checkedType.checked){
+          final int tail=root.expectedTail;
+          switch(Integer.signum(tail - root.expectedHead)){
           case -1:
             checkedFragmentedRemove();
             break;
           case 0:
-            expectedTail=-1;
-            if(dataType == DataType.REF){
-              ((Object[])expectedArr)[tail]=null;
+            root.expectedTail=-1;
+            if(root.dataType == DataType.REF){
+              ((Object[])root.expectedArr)[tail]=null;
             }
             break;
           default:
@@ -143,47 +144,47 @@ import omni.util.TestExecutorService;
           }
         }else{
           final int cursor=expectedCursor;
-          final int tail=expectedTail;
+          final int tail=root.expectedTail;
           switch(cursor){
           case -1:
-            switch(Integer.signum(tail - expectedHead)){
+            switch(Integer.signum(tail - root.expectedHead)){
             case -1:
-              expectedTail=tail == 0?expectedCapacity - 1:tail - 1;
+                root.expectedTail=tail == 0?root.expectedCapacity - 1:tail - 1;
               break;
             case 0:
-              expectedTail=-1;
+                root.expectedTail=-1;
               break;
             default:
-              expectedTail=tail - 1;
+                root.expectedTail=tail - 1;
             }
-            if(dataType == DataType.REF){
-              ((Object[])expectedArr)[tail]=null;
+            if(root.dataType == DataType.REF){
+              ((Object[])root.expectedArr)[tail]=null;
             }
             break;
           case 0:
-            final int arrBound=expectedCapacity - 1;
-            int head=expectedHead;
+            final int arrBound=root.expectedCapacity - 1;
+            int head=root.expectedHead;
             final int headDist=arrBound - head;
-            final var arr=expectedArr;
+            final var arr=root.expectedArr;
             if(tail < headDist){
               System.arraycopy(arr,0,arr,arrBound,1);
               System.arraycopy(arr,1,arr,0,tail);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tail]=null;
+              if(root.dataType == DataType.REF){
+                ((Object[])root.expectedArr)[tail]=null;
               }
-              expectedTail=tail == 0?arrBound:tail - 1;
+              root.expectedTail=tail == 0?arrBound:tail - 1;
               expectedCursor=arrBound;
             }else{
               int tmp;
               System.arraycopy(arr,tmp=head,arr,++head,headDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tmp]=null;
+              if(root.dataType == DataType.REF){
+                ((Object[])root.expectedArr)[tmp]=null;
               }
-              expectedHead=headDist == 0?0:head;
+              root.expectedHead=headDist == 0?0:head;
             }
             break;
           default:
-            if(tail < expectedHead){
+            if(tail < root.expectedHead){
               uncheckedFragmentedRemove();
             }else{
               nonfragmentedRemove();
@@ -191,135 +192,135 @@ import omni.util.TestExecutorService;
           }
         }
         expectedLastRet=-1;
-        --expectedSize;
+        --root.expectedSize;
       }
       @Override public void verifyCloneHelper(Object clone){
-        final var checked=checkedType.checked;
-        switch(dataType){
+        final var checked=root.checkedType.checked;
+        switch(root.dataType){
         case BOOLEAN:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.BooleanArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.BooleanArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.BooleanArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.BooleanArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.BooleanArrDeq.AscendingItr.root(itr));
           }
           break;
         case BYTE:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.ByteArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ByteArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.ByteArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.ByteArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ByteArrDeq.AscendingItr.root(itr));
           }
           break;
         case CHAR:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.CharArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.CharArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.CharArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.CharArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.CharArrDeq.AscendingItr.root(itr));
           }
           break;
         case SHORT:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.ShortArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ShortArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.ShortArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.ShortArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ShortArrDeq.AscendingItr.root(itr));
           }
           break;
         case INT:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.IntArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.IntArrDeq.AscendingItr.root(itr));
           }
           break;
         case LONG:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.LongArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.LongArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.LongArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.LongArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.LongArrDeq.AscendingItr.root(itr));
           }
           break;
         case FLOAT:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.FloatArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.FloatArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.FloatArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.FloatArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.FloatArrDeq.AscendingItr.root(itr));
           }
           break;
         case DOUBLE:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.DoubleArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.DoubleArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.DoubleArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.DoubleArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.DoubleArrDeq.AscendingItr.root(itr));
           }
           break;
         case REF:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.RefArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrDeq.Checked.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.RefArrDeq.Checked.AscendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.RefArrDeq.Checked.AscendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,FieldAndMethodAccessor.RefArrDeq.Checked.AscendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrDeq.AscendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.RefArrDeq.AscendingItr.root(itr));
           }
           break;
         default:
-          throw dataType.invalid();
+          throw root.dataType.invalid();
         }
       }
       @Override public void verifyForEachRemaining(MonitoredFunction function){
         if(expectedCursor != -1){
           final IntConsumer verifier=super.getForEachRemainingVerifier(function);
           int i=expectedCursor;
-          if(i > expectedTail){
-            for(;i < expectedCapacity;++i){
+          if(i > root.expectedTail){
+            for(;i < root.expectedCapacity;++i){
               verifier.accept(i);
             }
             i=0;
           }
-          for(;i <= expectedTail;++i){
+          for(;i <= root.expectedTail;++i){
             verifier.accept(i);
           }
-          expectedLastRet=expectedTail;
+          expectedLastRet=root.expectedTail;
           expectedCursor=-1;
           Assertions.assertEquals(function.size(),numLeft);
           numLeft=0;
@@ -328,42 +329,42 @@ import omni.util.TestExecutorService;
         }
       }
       private void checkedFragmentedRemove(){
-        int head=expectedHead;
-        int tail=expectedTail;
+        int head=root.expectedHead;
+        int tail=root.expectedTail;
         final int lastRet=expectedLastRet;
-        final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        final int arrBound=root.expectedCapacity - 1;
+        final var arr=root.expectedArr;
         int headDist=expectedLastRet - head;
         if(headDist >= 0){
           final int tailDist=arrBound - lastRet;
           if(headDist <= tailDist + tail + 1){
             if(headDist == 0){
               if(tailDist == 0){
-                expectedHead=0;
+                  root.expectedHead=0;
               }else{
-                expectedHead=head + 1;
+                  root.expectedHead=head + 1;
               }
-              if(dataType == DataType.REF){
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[head]=null;
               }
             }else{
-              System.arraycopy(expectedArr,tail=head,arr,++head,headDist);
-              if(dataType == DataType.REF){
+              System.arraycopy(root.expectedArr,tail=head,arr,++head,headDist);
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[tail]=null;
               }
-              expectedHead=head;
+              root.expectedHead=head;
             }
           }else{
             System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
             System.arraycopy(arr,0,arr,arrBound,1);
             System.arraycopy(arr,1,arr,0,tail);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tail]=null;
             }
             if(tail == 0){
-              expectedTail=arrBound;
+                root.expectedTail=arrBound;
             }else{
-              expectedTail=tail - 1;
+                root.expectedTail=tail - 1;
             }
             expectedCursor=lastRet;
           }
@@ -373,16 +374,16 @@ import omni.util.TestExecutorService;
           if(tailDist <= headDist + lastRet + 1){
             if(tailDist == 0){
               if(lastRet == 0){
-                expectedTail=arrBound;
+                  root.expectedTail=arrBound;
               }else{
-                expectedTail=tail - 1;
+                  root.expectedTail=tail - 1;
               }
             }else{
               System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-              expectedTail=tail - 1;
+              root.expectedTail=tail - 1;
               expectedCursor=lastRet;
             }
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tail]=null;
             }
           }else{
@@ -390,62 +391,62 @@ import omni.util.TestExecutorService;
             System.arraycopy(arr,arrBound,arr,0,1);
             int tmp;
             System.arraycopy(arr,tmp=head,arr,++head,headDist);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tmp]=null;
             }
-            expectedHead=headDist == 0?0:head;
+            root.expectedHead=headDist == 0?0:head;
           }
         }
       }
       private void nonfragmentedRemove(){
-        int head=expectedHead;
-        final int tail=expectedTail;
+        int head=root.expectedHead;
+        final int tail=root.expectedTail;
         final int lastRet=expectedLastRet;
         final int headDist=lastRet - head;
         final int tailDist=tail - lastRet;
-        final var arr=expectedArr;
+        final var arr=root.expectedArr;
         if(headDist <= tailDist){
           int tmp;
           System.arraycopy(arr,tmp=head,arr,++head,headDist);
-          if(dataType == DataType.REF){
+          if(root.dataType == DataType.REF){
             ((Object[])arr)[tmp]=null;
           }
-          expectedHead=head;
+          root.expectedHead=head;
         }else{
           System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-          if(dataType == DataType.REF){
+          if(root.dataType == DataType.REF){
             ((Object[])arr)[tail]=null;
           }
           if(expectedCursor != -1){
             expectedCursor=lastRet;
           }
-          expectedTail=tail - 1;
+          root.expectedTail=tail - 1;
         }
       }
       private void uncheckedFragmentedRemove(){
-        int head=expectedHead;
-        final int tail=expectedTail;
+        int head=root.expectedHead;
+        final int tail=root.expectedTail;
         final int lastRet=expectedLastRet;
-        final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        final int arrBound=root.expectedCapacity - 1;
+        final var arr=root.expectedArr;
         int headDist=expectedLastRet - head;
         if(headDist >= 0){
           final int tailDist=arrBound - lastRet;
           if(headDist <= tailDist + tail + 1){
             int tmp;
             System.arraycopy(arr,tmp=head,arr,++head,headDist);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tmp]=null;
             }
-            expectedHead=head;
+            root.expectedHead=head;
           }else{
             System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
             System.arraycopy(arr,0,arr,arrBound,1);
             System.arraycopy(arr,1,arr,0,tail);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tail]=null;
             }
-            expectedTail=tail == 0?arrBound:tail - 1;
+            root.expectedTail=tail == 0?arrBound:tail - 1;
             expectedCursor=lastRet;
           }
         }else{
@@ -453,20 +454,20 @@ import omni.util.TestExecutorService;
           headDist=arrBound - head;
           if(tailDist <= headDist + lastRet + 1){
             System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tail]=null;
             }
-            expectedTail=tail - 1;
+            root.expectedTail=tail - 1;
             expectedCursor=lastRet;
           }else{
             System.arraycopy(arr,0,arr,1,lastRet);
             System.arraycopy(arr,arrBound,arr,0,1);
             int tmp;
             System.arraycopy(arr,tmp=head,arr,++head,headDist);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tmp]=null;
             }
-            expectedHead=headDist == 0?0:head;
+            root.expectedHead=headDist == 0?0:head;
           }
         }
       }
@@ -474,9 +475,9 @@ import omni.util.TestExecutorService;
     private static interface CloneVerifier{
       void verifyIndices(int thisIndex,int cloneIndex);
     }
-    private class DescendingItrMonitor extends AbstractItrMonitor{
-      DescendingItrMonitor(){
-        super(seq.descendingIterator(),expectedTail,expectedSize);
+    private static class DescendingItrMonitor<E> extends AbstractItrMonitor<E>{
+      DescendingItrMonitor(ArrDeqMonitor<E> root){
+        super(root,root.seq.descendingIterator(),root.expectedTail,root.expectedSize);
       }
       @Override public IteratorType getIteratorType(){
         return IteratorType.DescendingItr;
@@ -484,25 +485,25 @@ import omni.util.TestExecutorService;
       @Override public void updateItrNextState(){
         expectedLastRet=expectedCursor;
         --numLeft;
-        if(expectedCursor == expectedHead){
+        if(expectedCursor == root.expectedHead){
           expectedCursor=-1;
         }else if(--expectedCursor == -1){
-          expectedCursor=expectedCapacity - 1;
+          expectedCursor=root.expectedCapacity - 1;
         }
       }
       @Override public void updateItrRemoveState(){
         ++expectedItrModCount;
-        ++expectedModCount;
-        if(checkedType.checked){
-          final int tail=expectedTail;
-          switch(Integer.signum(tail - expectedHead)){
+        ++root.expectedModCount;
+        if(root.checkedType.checked){
+          final int tail=root.expectedTail;
+          switch(Integer.signum(tail - root.expectedHead)){
           case -1:
             checkedFragmentedRemove();
             break;
           case 0:
-            expectedTail=-1;
-            if(dataType == DataType.REF){
-              ((Object[])expectedArr)[tail]=null;
+              root.expectedTail=-1;
+            if(root.dataType == DataType.REF){
+              ((Object[])root.expectedArr)[tail]=null;
             }
             break;
           default:
@@ -511,21 +512,21 @@ import omni.util.TestExecutorService;
         }else{
           if(expectedCursor == -1){
             int head;
-            switch(Integer.signum(expectedTail - (head=expectedHead))){
+            switch(Integer.signum(root.expectedTail - (head=root.expectedHead))){
             case -1:
-              expectedHead=head == expectedCapacity - 1?0:head + 1;
+                root.expectedHead=head == root.expectedCapacity - 1?0:head + 1;
               break;
             case 0:
-              expectedTail=-1;
+                root.expectedTail=-1;
               break;
             default:
-              expectedHead=head + 1;
+                root.expectedHead=head + 1;
             }
-            if(dataType == DataType.REF){
-              ((Object[])expectedArr)[head]=null;
+            if(root.dataType == DataType.REF){
+              ((Object[])root.expectedArr)[head]=null;
             }
           }else{
-            if(expectedTail < expectedHead){
+            if(root.expectedTail < root.expectedHead){
               uncheckedFragmentedRemove();
             }else{
               nonfragmentedRemove();
@@ -533,137 +534,137 @@ import omni.util.TestExecutorService;
           }
         }
         expectedLastRet=-1;
-        --expectedSize;
+        --root.expectedSize;
       }
       @Override public void verifyCloneHelper(Object clone){
-        final var checked=checkedType.checked;
-        switch(dataType){
+        final var checked=root.checkedType.checked;
+        switch(root.dataType){
         case BOOLEAN:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.BooleanArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.BooleanArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.BooleanArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.BooleanArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.BooleanArrDeq.DescendingItr.root(itr));
           }
           break;
         case BYTE:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.ByteArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ByteArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.ByteArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.ByteArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ByteArrDeq.DescendingItr.root(itr));
           }
           break;
         case CHAR:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.CharArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.CharArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.CharArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.CharArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.CharArrDeq.DescendingItr.root(itr));
           }
           break;
         case SHORT:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.ShortArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ShortArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.ShortArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.ShortArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.ShortArrDeq.DescendingItr.root(itr));
           }
           break;
         case INT:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.IntArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.IntArrDeq.DescendingItr.root(itr));
           }
           break;
         case LONG:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.LongArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.LongArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.LongArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.LongArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.LongArrDeq.DescendingItr.root(itr));
           }
           break;
         case FLOAT:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.FloatArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.FloatArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.FloatArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.FloatArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.FloatArrDeq.DescendingItr.root(itr));
           }
           break;
         case DOUBLE:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.DoubleArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.DoubleArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.DoubleArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.DoubleArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.DoubleArrDeq.DescendingItr.root(itr));
           }
           break;
         case REF:
           Assertions.assertEquals(expectedCursor,FieldAndMethodAccessor.RefArrDeq.AbstractDeqItr.cursor(itr));
           if(checked){
-            Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrDeq.Checked.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.RefArrDeq.Checked.DescendingItr.root(itr));
             Assertions.assertEquals(expectedItrModCount,
                 FieldAndMethodAccessor.RefArrDeq.Checked.DescendingItr.modCount(itr));
             Assertions.assertEquals(expectedLastRet,
                 FieldAndMethodAccessor.RefArrDeq.Checked.DescendingItr.lastRet(itr));
           }else{
-            Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrDeq.DescendingItr.root(itr));
+            Assertions.assertSame(root.seq,FieldAndMethodAccessor.RefArrDeq.DescendingItr.root(itr));
           }
           break;
         default:
-          throw dataType.invalid();
+          throw root.dataType.invalid();
         }
       }
       @Override public void verifyForEachRemaining(MonitoredFunction function){
         if(expectedCursor != -1){
           final IntConsumer verifier=super.getForEachRemainingVerifier(function);
           int i=expectedCursor;
-          if(i < expectedHead){
+          if(i < root.expectedHead){
             for(;i >= 0;--i){
               verifier.accept(i);
             }
-            i=expectedCapacity - 1;
+            i=root.expectedCapacity - 1;
           }
-          for(;i >= expectedHead;--i){
+          for(;i >= root.expectedHead;--i){
             verifier.accept(i);
           }
-          expectedLastRet=expectedHead;
+          expectedLastRet=root.expectedHead;
           expectedCursor=-1;
           Assertions.assertEquals(function.size(),numLeft);
           numLeft=0;
@@ -672,10 +673,10 @@ import omni.util.TestExecutorService;
         }
       }
       private void checkedFragmentedRemove(){
-        int head=expectedHead;
-        int tail=expectedTail;
-        final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        int head=root.expectedHead;
+        int tail=root.expectedTail;
+        final int arrBound=root.expectedCapacity - 1;
+        final var arr=root.expectedArr;
         final int lastRet=expectedLastRet;
         int headDist=expectedLastRet - head;
         if(headDist >= 0){
@@ -683,29 +684,29 @@ import omni.util.TestExecutorService;
           if(headDist <= tailDist + tail + 1){
             if(headDist == 0){
               if(tailDist == 0){
-                expectedHead=0;
+                  root.expectedHead=0;
               }else{
-                expectedHead=head + 1;
+                  root.expectedHead=head + 1;
               }
-              if(dataType == DataType.REF){
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[head]=null;
               }
             }else{
               System.arraycopy(arr,tail=head,arr,++head,headDist);
-              if(dataType == DataType.REF){
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[tail]=null;
               }
-              expectedHead=head;
+              root.expectedHead=head;
               expectedCursor=lastRet;
             }
           }else{
             System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
             System.arraycopy(arr,0,arr,arrBound,1);
             System.arraycopy(arr,1,arr,0,tail);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tail]=null;
             }
-            expectedTail=tail == 0?arrBound:tail - 1;
+            root.expectedTail=tail == 0?arrBound:tail - 1;
           }
         }else{
           final int tailDist=tail - lastRet;
@@ -713,15 +714,15 @@ import omni.util.TestExecutorService;
           if(tailDist <= headDist + lastRet + 1){
             if(tailDist == 0){
               if(lastRet == 0){
-                expectedTail=arrBound;
+                  root.expectedTail=arrBound;
               }else{
-                expectedTail=tail - 1;
+                  root.expectedTail=tail - 1;
               }
             }else{
               System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-              expectedTail=tail - 1;
+              root.expectedTail=tail - 1;
             }
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tail]=null;
             }
           }else{
@@ -729,60 +730,60 @@ import omni.util.TestExecutorService;
             System.arraycopy(arr,arrBound,arr,0,1);
             int tmp;
             System.arraycopy(arr,tmp=head,arr,++head,headDist);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tmp]=null;
             }
-            expectedHead=headDist == 0?0:head;
+            root.expectedHead=headDist == 0?0:head;
             expectedCursor=lastRet;
           }
         }
       }
       private void nonfragmentedRemove(){
-        final int tail=expectedTail;
-        int head=expectedHead;
-        final var arr=expectedArr;
+        final int tail=root.expectedTail;
+        int head=root.expectedHead;
+        final var arr=root.expectedArr;
         final int lastRet=expectedLastRet;
         final int headDist=lastRet - head;
         final int tailDist=tail - lastRet;
         if(tailDist <= headDist){
           System.arraycopy(arr,lastRet + 1,arr,lastRet,tailDist);
-          if(dataType == DataType.REF){
+          if(root.dataType == DataType.REF){
             ((Object[])arr)[tail]=null;
           }
-          expectedTail=tail - 1;
+          root.expectedTail=tail - 1;
         }else{
           int tmp;
           System.arraycopy(arr,tmp=head,arr,++head,headDist);
-          if(dataType == DataType.REF){
+          if(root.dataType == DataType.REF){
             ((Object[])arr)[tmp]=null;
           }
-          expectedHead=head;
+          root.expectedHead=head;
           if(expectedCursor != -1){
             expectedCursor=lastRet;
           }
         }
       }
       private void uncheckedFragmentedRemove(){
-        int head=expectedHead;
-        int tail=expectedTail;
-        final int arrBound=expectedCapacity - 1;
-        final var arr=expectedArr;
+        int head=root.expectedHead;
+        int tail=root.expectedTail;
+        final int arrBound=root.expectedCapacity - 1;
+        final var arr=root.expectedArr;
         int cursor=expectedCursor;
         if(arrBound == cursor){
           if(tail <= (cursor=arrBound - head) + 1){
             System.arraycopy(arr,1,arr,0,tail);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tail]=null;
             }
-            expectedTail=tail == 0?arrBound:tail - 1;
+            root.expectedTail=tail == 0?arrBound:tail - 1;
           }else{
             System.arraycopy(arr,arrBound,arr,0,1);
             int tmp;
             System.arraycopy(arr,tmp=head,arr,++head,cursor);
-            if(dataType == DataType.REF){
+            if(root.dataType == DataType.REF){
               ((Object[])arr)[tmp]=null;
             }
-            expectedHead=cursor == 0?0:head;
+            root.expectedHead=cursor == 0?0:head;
             expectedCursor=0;
           }
         }else{
@@ -791,38 +792,38 @@ import omni.util.TestExecutorService;
             final int tailDist=arrBound - cursor;
             if(headDist <= tailDist + tail + 1){
               System.arraycopy(arr,tail=head,arr,++head,headDist);
-              if(dataType == DataType.REF){
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[tail]=null;
               }
-              expectedHead=head;
+              root.expectedHead=head;
               expectedCursor=cursor;
             }else{
               System.arraycopy(arr,cursor + 1,arr,cursor,tailDist);
               System.arraycopy(arr,0,arr,arrBound,1);
               System.arraycopy(arr,1,arr,0,tail);
-              if(dataType == DataType.REF){
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[tail]=null;
               }
-              expectedTail=tail == 0?arrBound:tail - 1;
+              root.expectedTail=tail == 0?arrBound:tail - 1;
             }
           }else{
             final int tailDist=tail - cursor;
             headDist=arrBound - head;
             if(tailDist <= headDist + cursor + 1){
               System.arraycopy(arr,cursor + 1,arr,cursor,tailDist);
-              if(dataType == DataType.REF){
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[tail]=null;
               }
-              expectedTail=tail - 1;
+              root.expectedTail=tail - 1;
             }else{
               System.arraycopy(arr,0,arr,1,cursor);
               System.arraycopy(arr,arrBound,arr,0,1);
               int tmp;
               System.arraycopy(arr,tmp=head,arr,++head,headDist);
-              if(dataType == DataType.REF){
+              if(root.dataType == DataType.REF){
                 ((Object[])arr)[tmp]=null;
               }
-              expectedHead=headDist == 0?0:head;
+              root.expectedHead=headDist == 0?0:head;
               expectedCursor=cursor;
             }
           }
@@ -845,10 +846,10 @@ import omni.util.TestExecutorService;
       return outputType.convertVal(dataType.getFromArray(iterationIndex,expectedArr));
     }
     @Override public MonitoredIterator<?,OmniDeque<E>> getMonitoredDescendingIterator(){
-      return new DescendingItrMonitor();
+      return new DescendingItrMonitor<>(this);
     }
     @Override public MonitoredIterator<? extends OmniIterator<?>,OmniDeque<E>> getMonitoredIterator(){
-      return new AscendingItrMonitor();
+      return new AscendingItrMonitor<>(this);
     }
     @Override public StructType getStructType(){
       return StructType.ArrDeq;
