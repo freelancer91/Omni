@@ -268,38 +268,61 @@ public interface BitSetUtil{
         words[wordOffset]=dataInput.readLong();
       }
     }
-    public static long maskedShiftUp(long word,int head,int cursor)
+    public static long shiftUpMiddleBits(long word,int head,int cursor)
     {
         final long mask;
         return word<<1&(mask=-1L<<head&-1L>>>-cursor-1) | word&~mask;
     }
     
-    public static long maskedShiftUp(long word,int head)
+    public static long shiftUpLeadingBits(long word,int head)
     {
         final long mask;
-        return word<<1&(mask=-1L<<head)&word&~mask;
+        return word<<1&(mask=-1L<<head)|word&~mask;
     }
-    public static long maskedShiftDown(long word,int tail,int cursor)
-    {
+    public static long shiftUpTrailingBits(long word,int cursor) {
         final long mask;
-        return word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
+        return word<<1&(mask=-1L>>>-cursor-1) | word&~mask;
     }
-    public static long maskedShiftDown(long word,int tail)
-    {
+    public static long shiftDownTrailingBits(long word,int tail) {
         final long mask;
         return word&(mask=-1L<<tail) | word>>>1&~mask;
     }
+    public static long shiftDownLeadingBits(long word,int cursor) {
+        final long mask;
+        return word>>>1&(mask=-1L<<cursor)|word&~mask;
+    }
+    public static long shiftDownMiddleBits(long word,int cursor,int tail) {
+        final long mask;
+        return word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
+    }
+    public static long combineWordWithTrailingBitOfNext(long currWord,long nextWord) {
+        return currWord | nextWord<<-1;
+    }
+    public static long combineWordWithLeadingBitOfPrev(long currWord,long prevWord) {
+        return currWord | prevWord>>>-1;
+    }
     
+//    public static long maskedShiftDown(long word,int tail,int cursor)
+//    {
+//        final long mask;
+//        return word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
+//    }
+//    public static long maskedShiftDown(long word,int tail)
+//    {
+//        final long mask;
+//        return word&(mask=-1L<<tail) | word>>>1&~mask;
+//    }
+//    
     
     public static long pullDownLoop(long[] words,long word,int begin,int end){
         while(begin!=end){
-            words[begin]=word>>>1|(word=words[++begin])<<-1;
+            words[begin]=combineWordWithTrailingBitOfNext(word>>>1,word=words[++begin]);
         }
         return word;
     }
     public static long pullUpLoop(long[] words,long word,int begin,int end){
         while(end!=begin){
-            words[end]=word<<1|(word=words[--end])>>>-1;
+            words[end]=combineWordWithLeadingBitOfPrev(word<<1,word=words[--end]);
         }
         return word;
     }

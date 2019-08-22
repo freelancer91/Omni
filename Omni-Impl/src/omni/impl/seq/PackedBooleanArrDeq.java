@@ -1728,7 +1728,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           //TODO optimize and clean up
         final long[] words;
         final int headOffset=head>>6,tailOffset=tail>>6,arrBound;
-        long mask,word;
+        long word;
         if(cursor==((arrBound=(words=root.words).length-1)<<6)+63) {
             //remove index 0
             if(tailOffset<=arrBound-headOffset+1) {
@@ -1737,17 +1737,17 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                   root.tail=cursor;
                 }else{
                   root.tail=tail-1;
-                  words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,words[0],0,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
+                  words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,words[0],0,tailOffset),tail);
                 }
             }else {
                 //pull the head up
                 this.cursor=0;
-                words[0]=words[0]&-2L|(word=words[arrBound])>>>-1;
+                words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(words[0]&-2L,word=words[arrBound]);
                 if(head==cursor){
                     root.head=0;
                 }else{
                     root.head=head+1;
-                    words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
+                    words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
                 }
             }
         }else {
@@ -1762,22 +1762,22 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                     this.cursor=cursor;
                     root.head=head+1;
                     if(headWordDist==0) {
-                      words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-cursor-1) | word&~mask;
+                      words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,cursor);
                     }else {
-                      words[lastRetOffset]=word<<1&(mask=-1L>>>-cursor-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
-                      words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,cursor),word=words[--lastRetOffset]);
+                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
                     }
                 }else {
                     //pull the tail down
                     root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                    word=word>>>1&(mask=-1L<<cursor)|word&~mask;
+                    word=BitSetUtil.shiftDownLeadingBits(word,cursor);
                     if(tailWordDist==0) {
-                        words[lastRetOffset]=word | (word=words[0])<<-1;
+                        words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
                     }else {
-                        words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
-                        words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
+                        words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                        words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
                     }
-                    words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
+                    words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
                 }
             }
             else
@@ -1788,23 +1788,23 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                     //pull the tail down
                     root.tail=tail-1;
                     if(tailWordDist==0) {
-                        words[lastRetOffset]=word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
+                        words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,cursor,tail);
                     }else {
-                        words[lastRetOffset]=word>>>1&(mask=-1L<<cursor) | word&~mask | (word=words[++lastRetOffset])<<-1;
-                        words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail)|word>>>1&~mask;
+                        words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,cursor),word=words[++lastRetOffset]);
+                        words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
                     }
                 }else {
                     //pull the head up
                     this.cursor=cursor;
                     root.head=head==(arrBound<<6)+63?0:head+1;
-                    word=word<<1&(mask=-1L>>>-cursor-1)|word&~mask;
+                    word=BitSetUtil.shiftUpTrailingBits(word,cursor);
                     if(lastRetOffset==0) {
-                        words[0]=word|(word=words[arrBound])>>>-1;
+                        words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
                     }else {
-                        words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
-                        words[0]=BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1|(word=words[arrBound])>>>-1;
+                        words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                        words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
                     }
-                    words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
+                    words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
                 }
             }
         }
@@ -1814,19 +1814,19 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           final long[] words;
           final int headOffset,tailOffset;
           int lastRetOffset;
-          long mask,word=(words=root.words)[lastRetOffset=lastRet>>6];
+          long word=(words=root.words)[lastRetOffset=lastRet>>6];
           if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset) {
               this.cursor=lastRet;
               root.head=head+1;
-              word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
+              word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
               for(;lastRetOffset!=headOffset;word<<=1) {
-                  words[lastRetOffset]=word | (word=words[--lastRetOffset])>>>-1;
+                  words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
               }
           }else {
               root.tail=tail-1;
-              word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+              word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
               for(;lastRetOffset!=tailOffset;word>>>=1) {
-                  words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                  words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
               }
           }
           words[lastRetOffset]=word;
@@ -1929,13 +1929,13 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           final long[] words;
           final int head,tail,tailOffset,headOffset;
           int arrBound,headDist;
-          long word,mask;
+          long word;
           if((tailOffset=(tail=(root=this.root).tail)>>6)<(headDist=(arrBound=(words=root.words).length-1)-(headOffset=(head=root.head)>>6))) {
               //it's more efficient to pull the tail down
               this.cursor=headDist=(arrBound<<6)+63;
               root.tail=tail==0?headDist:tail-1;
-              words[arrBound]=words[arrBound]&Long.MAX_VALUE | (word=words[0])<<-1;
-              words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))&(mask=-1L<<tail)|word>>>1&~mask;
+              words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(words[arrBound]&Long.MAX_VALUE,word=words[0]);
+              words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
           }else {
               //it's more efficient to pull the head up
               word=words[arrBound];
@@ -1944,10 +1944,10 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               }else {
                   root.head=head+1;   
                   do {
-                      words[arrBound]=word<<1|(word=words[--arrBound])>>>-1;
+                      words[arrBound]=BitSetUtil.combineWordWithLeadingBitOfPrev(word<<1,word=words[--arrBound]);
                   }while(arrBound!=headOffset);
               }
-              words[arrBound]=word<<1&(mask=-1L<<head)|word&~mask;
+              words[arrBound]=BitSetUtil.shiftUpLeadingBits(word,head);
           }
         }
       private void fragmentedAscendingRemove(int head,int lastRet,int tail,PackedBooleanArrDeq root) {
@@ -1955,7 +1955,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
           final long[] words;
           final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1;
           int lastRetOffset;
-          long mask,word=words[lastRetOffset=lastRet>>6];
+          long word=words[lastRetOffset=lastRet>>6];
           switch(Integer.signum(lastRet-head))
           {
           case -1:
@@ -1967,22 +1967,22 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                  root.tail=tail-1;
                  this.cursor=lastRet;
                  if(tailWordDist==0) {
-                     words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet&-1L>>>-tail) | word&~mask;
+                     words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
                  }else {
-                     words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet)|word&~mask | (word=words[++lastRetOffset])<<-1;
-                     words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
+                     words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
+                     words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
                  }
               }else {
                   //pull up the head
                   root.head=head==(arrBound<<6)+63?0:head+1;
-                  word=word<<1&(mask=-1L>>>-lastRet-1)|word&~mask;
+                  word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
                   if(lastRetOffset==0) {
-                      words[0]=word|(word=words[arrBound])>>>-1;
+                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
                   }else {
-                      words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
-                      words[0]=BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1|(word=words[arrBound])>>>-1;
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                      words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
                   }
-                  words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
+                  words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
               }
               break;
           }
@@ -2000,23 +2000,23 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                   //pull up the head
                   root.head=head+1;
                   if(headWordDist==0) {
-                      words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-lastRet-1) | word&~mask;
+                      words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
                   }else {
-                      words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
-                      words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
+                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
                   }
               }else {
                   //pull the tail down
                   this.cursor=lastRet;
                   root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                  word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+                  word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
                   if(tailWordDist==0) {
-                      words[lastRetOffset]=word | (word=words[0])<<-1;
+                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
                   }else {
-                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
-                      words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
+                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                      words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
                   }
-                  words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
+                  words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
               }
           }
           }
@@ -2026,20 +2026,20 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         final long[] words;
         final int headOffset,tailOffset;
         int lastRetOffset;
-        long word=(words=root.words)[lastRetOffset=lastRet>>6],mask;
+        long word=(words=root.words)[lastRetOffset=lastRet>>6];
         if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset){
           root.head=head+1;
-          word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
+          word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
           while(lastRetOffset!=headOffset) {
-            words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
+            words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
             word<<=1;
           }
         }else{
           this.cursor=lastRet;
           root.tail=tail-1;
-          word=word>>>1&(mask=-1L<<lastRet)|word&~mask;
+          word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
           while(lastRetOffset!=tailOffset){
-            words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+            words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
             word>>>=1;
           }
         }
@@ -2095,7 +2095,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               final long[] words;
               final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1;
               int lastRetOffset;
-              long mask,word=words[lastRetOffset=lastRet>>6];
+              long word=words[lastRetOffset=lastRet>>6];
               switch(Integer.signum(lastRet-head))
               {
               case -1:
@@ -2114,10 +2114,10 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                           root.tail=tail-1;
                           this.cursor=lastRet;
                           if(tailWordDist==0) {
-                              words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet&-1L>>>-tail) | word&~mask;
+                              words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
                           }else {
-                              words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet)|word&~mask | (word=words[++lastRetOffset])<<-1;
-                              words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
+                              words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
+                              words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
                           }
                       }
                    }
@@ -2125,14 +2125,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                   {
                       //pull up the head
                       root.head=head==(arrBound<<6)+63?0:head+1;
-                      word=word<<1&(mask=-1L>>>-lastRet-1)|word&~mask;
+                      word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
                       if(lastRetOffset==0) {
-                          words[0]=word|(word=words[arrBound])>>>-1;
+                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
                       }else {
-                          words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
-                          words[0]=BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1|(word=words[arrBound])>>>-1;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
                       }
-                      words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
+                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
                   }
                   break;
               }
@@ -2150,10 +2150,10 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                       //pull up the head
                       root.head=head+1;
                       if(headWordDist==0) {
-                          words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-lastRet-1) | word&~mask;
+                          words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
                       }else {
-                          words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
-                          words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
+                          words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
                       }
                   }
                   else
@@ -2161,17 +2161,17 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                       //pull the tail down
                       this.cursor=lastRet;
                       root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                      word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+                      word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
                       if(tailWordDist==0)
                       {
-                          words[lastRetOffset]=word | (word=words[0])<<-1;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
                       }
                       else
                       {
-                          words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
-                          words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                          words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
                       }
-                      words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
+                      words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
                   }
               }
               
@@ -2183,20 +2183,20 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               final long[] words;
               final int headOffset, tailOffset;
               int lastRetOffset;
-              long word=(words=root.words)[lastRetOffset=lastRet>>6],mask;
+              long word=(words=root.words)[lastRetOffset=lastRet>>6];
               if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset){
                 root.head=head+1;
-                word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
+                word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
                 while(lastRetOffset!=headOffset) {
-                  words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
+                  words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
                   word<<=1;
                 }
               }else{
                 this.cursor=lastRet;
                 root.tail=tail-1;
-                word=word>>>1&(mask=-1L<<lastRet)|word&~mask;
+                word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
                 while(lastRetOffset!=tailOffset){
-                  words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                  words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
                   word>>>=1;
                 }
               }
@@ -2268,7 +2268,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               final long[] words;
               final int headOffset=head>>6,tailOffset=tail>>6,arrBound=(words=root.words).length-1;
               int lastRetOffset;
-              long mask,word=words[lastRetOffset=lastRet>>6];
+              long word=words[lastRetOffset=lastRet>>6];
               switch(Integer.signum(lastRet-head))
               {
               case -1:
@@ -2286,10 +2286,10 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                       {
                           root.tail=tail-1;
                           if(tailWordDist==0) {
-                              words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet&-1L>>>-tail) | word&~mask;
+                              words[lastRetOffset]=BitSetUtil.shiftDownMiddleBits(word,lastRet,tail);
                           }else {
-                              words[lastRetOffset]=word>>>1&(mask=-1L<<lastRet)|word&~mask | (word=words[++lastRetOffset])<<-1;
-                              words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset))&(mask=-1L<<tail) | word>>>1&~mask;
+                              words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,lastRet),word=words[++lastRetOffset]);
+                              words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,lastRetOffset,tailOffset),tail);
                           }
                       }
                    }
@@ -2298,14 +2298,14 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                       //pull up the head
                       this.cursor=lastRet;
                       root.head=head==(arrBound<<6)+63?0:head+1;
-                      word=word<<1&(mask=-1L>>>-lastRet-1)|word&~mask;
+                      word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
                       if(lastRetOffset==0) {
-                          words[0]=word|(word=words[arrBound])>>>-1;
+                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[arrBound]);
                       }else {
-                          words[lastRetOffset]=word|(word=words[--lastRetOffset])>>>-1;
-                          words[0]=BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1|(word=words[arrBound])>>>-1;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
+                          words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.pullUpLoop(words,word,0,lastRetOffset)<<1,word=words[arrBound]);
                       }
-                      words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,arrBound))<<1&(mask=-1L<<head) | word&~mask;
+                      words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,arrBound),head);
                   }
                   break;
               }
@@ -2324,27 +2324,27 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                       //pull up the head
                       root.head=head+1;
                       if(headWordDist==0) {
-                          words[lastRetOffset]=word<<1&(mask=-1L<<head&-1L>>>-lastRet-1) | word&~mask;
+                          words[lastRetOffset]=BitSetUtil.shiftUpMiddleBits(word,head,lastRet);
                       }else {
-                          words[lastRetOffset]=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask | (word=words[--lastRetOffset])>>>-1;
-                          words[headOffset]=(word=BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset))<<1&(mask=-1L<<head) | word&~mask;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpTrailingBits(word,lastRet),word=words[--lastRetOffset]);
+                          words[headOffset]=BitSetUtil.shiftUpLeadingBits(BitSetUtil.pullUpLoop(words,word,headOffset,lastRetOffset),head);
                       }
                   }
                   else
                   {
                       //pull the tail down
                       root.tail=tail==0?(arrBound<<6)+63:tail-1;
-                      word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+                      word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
                       if(tailWordDist==0)
                       {
-                          words[lastRetOffset]=word | (word=words[0])<<-1;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[0]);
                       }
                       else
                       {
-                          words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
-                          words[arrBound]=BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1| (word=words[0])<<-1;
+                          words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
+                          words[arrBound]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.pullDownLoop(words,word,lastRetOffset,arrBound)>>>1,word=words[0]);
                       }
-                      words[tailOffset]=(word=BitSetUtil.pullDownLoop(words,word,0,tailOffset))>>>1&(mask=-1L>>>-tail-1) | word&~mask;
+                      words[tailOffset]=BitSetUtil.shiftDownTrailingBits(BitSetUtil.pullDownLoop(words,word,0,tailOffset),tail);
                   }
               }
           }
@@ -2353,20 +2353,20 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
               final long[] words;
               final int headOffset,tailOffset;
               int lastRetOffset;
-              long mask,word=(words=root.words)[lastRetOffset=lastRet>>6];
+              long word=(words=root.words)[lastRetOffset=lastRet>>6];
               if(lastRetOffset-(headOffset=head>>6)<=(tailOffset=tail>>6)-lastRetOffset) {
                   this.cursor=lastRet;
                   root.head=head+1;
-                  word=word<<1&(mask=-1L>>>-lastRet-1) | word&~mask;
+                  word=BitSetUtil.shiftUpTrailingBits(word,lastRet);
                   for(;lastRetOffset!=headOffset;word<<=1) {
-                      words[lastRetOffset]=word | (word=words[--lastRetOffset])>>>-1;
+                      words[lastRetOffset]=BitSetUtil.combineWordWithLeadingBitOfPrev(word,word=words[--lastRetOffset]);
                   }
               }else {
                   
                   root.tail=tail-1;
-                  word=word>>>1&(mask=-1L<<lastRet) | word&~mask;
+                  word=BitSetUtil.shiftDownLeadingBits(word,lastRet);
                   for(;lastRetOffset!=tailOffset;word>>>=1) {
-                      words[lastRetOffset]=word | (word=words[++lastRetOffset])<<-1;
+                      words[lastRetOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++lastRetOffset]);
                   }
               }
               words[lastRetOffset]=word;
