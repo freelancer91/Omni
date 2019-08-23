@@ -80,6 +80,10 @@ public class PackedBooleanArrDeqTest{
   private static class PackedBooleanArrDeqMonitor extends AbstractArrDeqMonitor<PackedBooleanArrDeq,Boolean>{
       
     int trueCount;
+    
+    
+   
+    
       
     private abstract static class AbstractItrMonitor extends AbstractArrDeqMonitor.AbstractItrMonitor<PackedBooleanArrDeqMonitor,PackedBooleanArrDeq,Boolean>{
       AbstractItrMonitor(PackedBooleanArrDeqMonitor root,OmniIterator<?> itr,int expectedCursor,int numLeft){
@@ -1899,18 +1903,6 @@ public class PackedBooleanArrDeqTest{
                               }
                             }
                             TestExecutorService.submitTest(()->{
-//                              final var thisCheckedType=checkedType;
-//                              final var thisInitCap=initCap;
-//                              final var thisQueryVal=queryVal;
-//                              final var thisModification=modification;
-//                              final var thisCastType=castType;
-//                              final var thisInputType=inputType;
-//                              final var thisSize=size;
-//                              final var thisPosition=position;
-//                              final var thisNumToRotate=numToRotate;
-//                              if(thisSize==65 && thisNumToRotate==0 && thisInitCap==64 && thisPosition==0.0 && thisQueryVal==QueryVal.Pos0 && thisCastType==QueryCastType.Unboxed && thisInputType==DataType.BOOLEAN && thisCheckedType.checked && thisModification==QueryVal.QueryValModification.None) {
-//                                  TestExecutorService.suspend();
-//                              }
                               runTest(new PackedBooleanArrDeqMonitor(checkedType,initCap),queryVal,modification,
                                   castType,inputType,size,position,numToRotate);
                             });
@@ -2431,16 +2423,14 @@ public class PackedBooleanArrDeqTest{
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveFirstOccurrence_val");
   }
-  @Disabled
-  @Order(925690)
+  @Tag("testremoveIf_Predicate")
+  @Order(4369698)
   @Test public void testremoveIf_Predicate(){
-    TestExecutorService.setNumWorkers(1);
-    //TODO
       for(final var checkedType:CheckedType.values()){
         for(final var filterGen:StructType.PackedBooleanArrDeq.validMonitoredRemoveIfPredicateGens){
           if(filterGen.expectedException == null || checkedType.checked){
             for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
-              for(final var size:SIZES){
+              for(final var size:SHORT_SIZES){
                 int periodBound;
                 int initValBound;
                 int periodInc;
@@ -2449,22 +2439,19 @@ public class PackedBooleanArrDeqTest{
                   periodOffset=0;
                   periodBound=size;
                   initValBound=1;
-                  periodInc=Math.max(1,size / 10);
+                  periodInc=1;
                 }else{
                   periodOffset=0;
-                  periodBound=Math.max(1,size / 128);
+                  periodBound=size;
                   initValBound=0;
-                  periodInc=Math.max(1,size / 256);
+                  periodInc=1;
                 }
                 final int rotateInc=Math.max(1,size / 4);
                 if(functionCallType == FunctionCallType.Boxed && size > 2){
                   continue;
                 }
-                if((filterGen.expectedException != null
-                    || filterGen.predicateGenCallType != MonitoredRemoveIfPredicateGen.PredicateGenCallType.Randomized
-                        && !checkedType.checked)
-                    && size > 126){
-                  continue;
+                if(filterGen.expectedException!=null && size>126) {
+                    continue;
                 }
                 double[] thresholdArr;
                 long randSeedBound;
@@ -2493,14 +2480,18 @@ public class PackedBooleanArrDeqTest{
                         for(var tmpPeriod=periodOffset;tmpPeriod <= periodBound;tmpPeriod+=periodInc){
                           final int period=tmpPeriod;
                           TestExecutorService.submitTest(()->{
+                           
+                              
                             final var monitor=SequenceInitialization.Ascending
                                 .initialize(new PackedBooleanArrDeqMonitor(checkedType,size),size,initVal,period);
                             monitor.rotate(numToRotate);
                             final var filter
                                 =filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,new Random(randSeed));
+      
                             if(filterGen.expectedException == null || size == 0){
                               monitor.verifyRemoveIf(filter,functionCallType);
                             }else{
+
                               Assertions.assertThrows(filterGen.expectedException,
                                   ()->monitor.verifyRemoveIf(filter,functionCallType));
                             }
@@ -2517,6 +2508,8 @@ public class PackedBooleanArrDeqTest{
       }
     
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testremoveIf_Predicate");
+   
+    
   }
   @Order(50688)
   @Test public void testremoveLast_void(){

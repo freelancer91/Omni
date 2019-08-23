@@ -155,7 +155,7 @@ public enum StructType{
         case "ArrDeq":
         case "DblLnkList":
         case "PackedBooleanArrDeq":
-            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveFirst,MonitoredRemoveIfPredicateGen.RemoveLast,MonitoredRemoveIfPredicateGen.RemoveFirstAndLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirst,MonitoredRemoveIfPredicateGen.RemoveAllButLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirstAndLast,MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
+            return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,
                     MonitoredRemoveIfPredicateGen.RemoveFalse,MonitoredRemoveIfPredicateGen.RemoveTrue,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveAll,
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection);
