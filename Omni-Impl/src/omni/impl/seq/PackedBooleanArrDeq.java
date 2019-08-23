@@ -1255,7 +1255,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return (wordFlipper.applyAsLong(words[headWordOffset]) & -1L>>>-(tail-head+1)<<head)!=0;
       }
     }
-    return wordFlipper.applyAsLong(words[tailWordOffset])<<-tail-1!=0 || wordFlipper.applyAsLong(words[headWordOffset]>>>head)!=0;
+    return wordFlipper.applyAsLong(words[tailWordOffset])<<-tail-1!=0 || wordFlipper.applyAsLong(words[headWordOffset])>>>head!=0;
   }
   @Override boolean uncheckedremoveVal(int tail,boolean val){
     int head;
@@ -1579,16 +1579,16 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }
       }
       if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[tailWordOffset])))<=(tail&63)) {
-        return 64-(head&63)+(wordBound-headWordOffset+tailWordOffset-1<<6)+tail0s+1;
+        return 64-(head&63)+(wordBound-headWordOffset+tailWordOffset<<6)+tail0s+1;
       }
     }else if(headWordOffset!=(tailWordOffset=tail>>6)) {
       for(int i=++headWordOffset;i<tailWordOffset;++i) {
-        if((tail0s=Long.numberOfTrailingZeros(words[i]))!=64) {
+        if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[i])))!=64) {
           return 64-(head&63)+(i-headWordOffset<<6)+tail0s+1;
         }
       }
-      if((tail0s=Long.numberOfTrailingZeros(words[tailWordOffset]))<=(tail&63)) {
-        return 64-(head&63)+(tailWordOffset-1-headWordOffset<<6)+tail0s+1;
+      if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(words[tailWordOffset])))<=(tail&63)) {
+        return 64-(head&63)+(tailWordOffset-headWordOffset<<6)+tail0s+1;
       }
     }
     return -1;
