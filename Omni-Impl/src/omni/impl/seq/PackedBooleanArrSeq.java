@@ -41,18 +41,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
     }
-    private static void removeIndexShiftDown(long[] words,int tail0s,int wordOffset,long word,int rootBound){
-        final var mask=(1L << tail0s) - 1;
-        if(wordOffset == (rootBound>>=6)){
-            words[wordOffset]=word & mask | word >>> 1 & ~mask;
-        }else{
-            words[wordOffset]=word & mask | word >>> 1 & ~mask | (word=words[++wordOffset]) << -1;
-            while(wordOffset != rootBound){
-                words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << -1;
-            }
-            words[wordOffset]=word >>> 1;
-        }
-    }
+    
     private static int removeTrue(long[] words,int offset,int bitCount){
         for(int j=offset;;bitCount+=Long.bitCount(words[--j])){
             words[j]=0L;
@@ -346,41 +335,27 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
     }
-    private long uncheckedRemoveIndex(final int index,int bound){
-        final long[] words;
-        int wordOffset;
-        final int wordBound;
-        final long retWord;
-        var word=(words=this.words)[wordOffset=index >> 6]=BitSetUtil.partialWordShiftDown(retWord=words[wordOffset],
-                index);
-        if(wordOffset == (wordBound=bound >> 6)){
-            words[wordOffset]=word;
-        }else{
-            words[wordOffset]=word | (word=words[++wordOffset]) << 63;
-            while(wordOffset != wordBound){
-                words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << 63;
-            }
-            words[wordBound]=word >>> 1;
-        }
-        size=bound;
-        return retWord;
+    private static void removeIndexShiftDown(long[] words,int tail0s,int wordOffset,long word,int rootBound){
+      word=BitSetUtil.shiftDownLeadingBits(word,tail0s);
+      if(wordOffset==rootBound) {
+        words[rootBound]=word;
+      }else {
+        words[wordOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(word,word=words[++wordOffset]);
+        words[rootBound]=BitSetUtil.pullDownLoop(words,word,wordOffset,rootBound)>>>1;
+      }
     }
-    private void uncheckedRemoveIndexNoRet(final int index){
-        final long[] words;
-        int wordOffset;
-        final int wordBound,bound;
-        var word=(words=this.words)[wordOffset=index >> 6]=BitSetUtil.partialWordShiftDown(words[wordOffset],index);
-        if(wordOffset == (wordBound=(bound=size - 1) >> 6)){
-            words[wordOffset]=word;
-        }else{
-            words[wordOffset]=word | (word=words[++wordOffset]) << 63;
-            while(wordOffset != wordBound){
-                words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << 63;
-            }
-            words[wordBound]=word >>> 1;
-        }
-        size=bound;
+    private void uncheckedRemoveIndexNoRet(int index){
+      final long[] words;
+      removeIndexShiftDown(words=this.words,index,index>>=6,words[index],(--size)>>6);
+  }
+    private long uncheckedRemoveIndex(int index,int bound){
+      final long[] words;
+      final long retWord;
+      removeIndexShiftDown(words=this.words,index,index>>=6,retWord=words[index],(bound)>>6);
+      size=bound;
+      return retWord;
     }
+    
     public static class CheckedList extends UncheckedList{
         private int multiWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordOffset,int wordBound,ModCountChecker modCountChecker) {
             final var words=this.words;
@@ -395,7 +370,6 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             boolean removeTrue=filter.test(true);
                             modCountChecker.checkModCount();
                             if(removeTrue) {
-                                
                                 if(removeFalse) {
                                     break goToRemoveAll;
                                 }
@@ -502,7 +476,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return 0;
             } 
-            super.removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(1L<<offset)-1 | words[wordBound]&~((1L<<bound)-1)>>>size);
+            super.removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(-1L>>>-offset-1) | words[wordBound]&(-1L<<bound)>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -536,19 +510,19 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         if(removeTrue) {
                             break goToRemoveAll;
                         }else {
-                            super.removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(1L<<offset)-1 | (1L<<bitCount)-1<<offset | (word&~((1L<<bound)-1))>>>numFalse);
+                            super.removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(-1L>>>(-(offset)-1)) | (-1L>>>(-(bitCount)-1))<<offset | (word&(-1L<<bound))>>>numFalse);
                             this.size=size-numFalse;
                             return numFalse;
                         }
                     }else if(removeTrue) {
-                        super.removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~(-1L>>>-bound))>>>bitCount);
+                        super.removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(-1L>>>(-(offset)-1)) | (word&~(-1L>>>-bound))>>>bitCount);
                         this.size=size-bitCount;
                         return bitCount;
                     }
                 }
                 return 0;
             }
-            super.removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~((1L<<bound)-1))>>>size);
+            super.removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(-1L>>>(-(offset)-1)) | (word&(-1L<<bound))>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -1320,7 +1294,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     final var words=root.words;
                     if((offset & 63) == 0){
                         if((size & 63) == 0){
-                            ArrCopy.uncheckedSelfCopy(words,size >> 6,offset >> 6,(tailLength - 1 >> 6) + 1);
+                            ArrCopy.uncheckedSelfCopy(words,offset >> 6,size >> 6,(tailLength - 1 >> 6) + 1);
                         }else{
                             BitSetUtil.srcUnalignedPullDown(words,offset >> 6,size,rootBound - 1 >> 6);
                         }
@@ -2729,7 +2703,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return false;
             }
-            removeIndexShiftDown(words,tail0s,wordOffset,word,--root.size);
+            removeIndexShiftDown(words,tail0s,wordOffset,word,(--root.size)>>6);
             root.modCount=++modCount;
             this.modCount=modCount;
             this.size=size - 1;
@@ -2964,34 +2938,32 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         private static final long serialVersionUID=1L;
         
         private static void removeAllTrue(long[] words,int offset,int numRemoved,int bound,int rootBound) {
-            //TODO bugtest
             int wordOffset;
             final int wordBound=bound-1>>6;
             final int falseWordBound;
             if((falseWordBound=(bound-=numRemoved)-1>>6)==(wordOffset=offset>>6)) {
                 final long word;
-                words[wordOffset]=words[wordOffset]&(1L<<offset)-1|(word=words[wordBound])<<bound;
+                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1)|(word=words[wordBound])<<bound;
                 removeIfShiftDown(rootBound,numRemoved,wordOffset+1,wordBound,words,word);
             }else {
-                words[wordOffset]=words[wordOffset]&(1L<<offset)-1;
+                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1);
                 setRange(words,wordOffset+1,falseWordBound,0L);
                 removeIfShiftDown(rootBound,numRemoved,falseWordBound,wordBound,words,words[wordBound]>>>numRemoved);
             }
         }
         private static void removeAllFalse(long[] words,int offset,int numRemoved,int bound,int rootBound) {
-            //TODO bugtest
             int wordOffset=offset>>6;
             int wordBound=bound-1>>6;
             int numRetained=(bound-=numRemoved)-offset;
             int trueWordBound=bound-1>>6;
             if(trueWordBound==wordOffset) {
                 final long word;
-                words[wordOffset]=words[wordOffset]&(1L<<offset)-1|(1L<<numRetained)-1|(word=words[wordBound])<<bound;
+                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1)|(-1L>>>(-(numRetained)-1))|(word=words[wordBound])<<bound;
                 removeIfShiftDown(rootBound,numRemoved,wordOffset+1,wordBound,words,word);
             }else {
-                words[wordOffset]=words[wordOffset]&(1L<<offset)-1|-1L<<offset;
+                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1)|-1L<<offset;
                 setRange(words,wordOffset+1,trueWordBound,-1L);
-                removeIfShiftDown(rootBound,numRemoved,trueWordBound,wordBound,words,words[wordBound]>>>numRemoved|(1L<<bound)-1);
+                removeIfShiftDown(rootBound,numRemoved,trueWordBound,wordBound,words,words[wordBound]>>>numRemoved|(-1L>>>-bound-1));
             }
         }
         private int multiWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordOffset,int wordBound) {
@@ -3100,7 +3072,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return 0;
             } 
-            removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(1L<<offset)-1 | words[wordBound]&~((1L<<bound)-1)>>>size);
+            removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(-1L>>>-offset-1) | words[wordBound]&(-1L<<bound)>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -3128,19 +3100,19 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         if(filter.test(true)) {
                             break goToRemoveAll;
                         }else {
-                            removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(1L<<offset)-1 | (1L<<bitCount)-1<<offset | (word&~((1L<<bound)-1))>>>numFalse);
+                          removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(-1L>>>-offset-1) | ((-1L>>>-bitCount-1)<<offset) | (word&(-1L<<bound))>>>numFalse);
                             this.size=size-numFalse;
                             return numFalse;
                         }
                     }else if(filter.test(true)) {
-                        removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~(-1L>>>-bound))>>>bitCount);
+                        removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(-1L>>>-offset-1) | (word&(-1L<<bound))>>>bitCount);
                         this.size=size-bitCount;
                         return bitCount;
                     }
                 }
                 return 0;
             }
-            removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(1L<<offset)-1 | (word&~((1L<<bound)-1))>>>size);
+            removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(-1L>>>-offset-1) | (word&(-1L<<bound))>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -3687,9 +3659,10 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             for(final var wordBound=(bound=size - 1) >> 6;wordOffset < wordBound;++wordOffset){
                 long word;
                 if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(word=words[wordOffset]))) != 64){
-                    words[wordOffset]=BitSetUtil.partialWordShiftDown(word,tail0s) | (word=words[++wordOffset]) << 63;
+                    words[wordOffset]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownLeadingBits(word,tail0s),word=words[++wordOffset]);
+                    // words[wordOffset]=BitSetUtil.partialWordShiftDown(word,tail0s) | (word=words[++wordOffset]) << 63;
                     while(wordOffset != wordBound){
-                        words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << 63;
+                        words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << -1;
                     }
                     words[wordBound]=word >>> 1;
                     this.size=bound;
@@ -3700,7 +3673,8 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final long adjustedFinalWord=wordFlipper.applyAsLong(finalWord=words[wordOffset]);
             if((tail0s=Long.numberOfTrailingZeros(
                     (size & 63) == 0?adjustedFinalWord:adjustedFinalWord & (1L << size) - 1)) != 64){
-                words[wordOffset]=BitSetUtil.partialWordShiftDown(finalWord,tail0s);
+                words[wordOffset]=BitSetUtil.shiftDownLeadingBits(finalWord,tail0s);  
+              //words[wordOffset]=BitSetUtil.partialWordShiftDown(finalWord,tail0s);
                 this.size=bound;
                 return true;
             }
@@ -4597,7 +4571,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     final var words=root.words;
                     if((offset & 63) == 0){
                         if((size & 63) == 0){
-                            ArrCopy.uncheckedSelfCopy(words,size >> 6,offset >> 6,(tailLength - 1 >> 6) + 1);
+                            ArrCopy.uncheckedSelfCopy(words,offset >> 6,size >> 6,(tailLength - 1 >> 6) + 1);
                         }else{
                             BitSetUtil.srcUnalignedPullDown(words,offset >> 6,size,rootBound - 1 >> 6);
                         }
@@ -5724,7 +5698,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return false;
             }
-            removeIndexShiftDown(words,tail0s,wordOffset,word,--root.size);
+            removeIndexShiftDown(words,tail0s,wordOffset,word,(--root.size)>>6);
             this.size=size - 1;
             for(var curr=parent;curr != null;--curr.size,curr=curr.parent){}
             return true;

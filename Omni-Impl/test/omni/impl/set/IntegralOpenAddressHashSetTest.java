@@ -8,11 +8,11 @@ import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.CheckedType;
@@ -34,7 +34,7 @@ import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 @TestMethodOrder(OrderAnnotation.class)
-@Tag(value="NewTest")
+@Tag("NewTest")
 public class IntegralOpenAddressHashSetTest{
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
     private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};

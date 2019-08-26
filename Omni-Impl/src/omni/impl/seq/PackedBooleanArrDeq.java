@@ -1254,11 +1254,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
                         out.writeLong(word >>> head | (word=words[++headOffset]) << -head);
                     }
                     if(headOffset == tail >> 6){
-                        if(headOffset == wordLength - 1){
-                            BitSetUtil.writeFinalWord(word >>> head | word << -head,size,out);
-                        }else{
-                            BitSetUtil.writeFinalWord(word >>> head,size,out);
-                        }
+                        BitSetUtil.writeFinalWord(word >>> head,size,out);
                     }else{
                         BitSetUtil.writeFinalWord(word >>> head | words[headOffset + 1] << -head,size,out);
                     }

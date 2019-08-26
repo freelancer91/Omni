@@ -4,11 +4,11 @@ import java.util.Random;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import omni.api.OmniCollection;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
@@ -27,7 +27,9 @@ import omni.impl.QueryVal;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@TestMethodOrder(OrderAnnotation.class) @Tag("NewTest") public class ArrDeqTest{
+@TestMethodOrder(OrderAnnotation.class)
+@Tag("NewTest")
+public class ArrDeqTest{
   private static interface AddTest{
     private void runAllTests(String testName){
       for(final var checkedType:CheckedType.values()){
@@ -1266,43 +1268,63 @@ import omni.util.TestExecutorService;
         int index,bound;
         for(index=tail,bound=expectedCapacity - 1;index >= 0;--index){
           if(indexSearcher.test(index)){
-            int headDist,tailDist;
-            if((headDist=bound - head) + index + 1 < (tailDist=tail - index)){
-              System.arraycopy(expectedArr,0,expectedArr,1,index);
-              System.arraycopy(expectedArr,bound,expectedArr,0,1);
-              System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[head]=null;
+            if(dataType==DataType.BOOLEAN) {
+              if(--tail==-1) {
+                expectedTail=bound;
+              }else {
+                boolean v=(boolean)dataType.convertValUnchecked(inputType,inputVal);
+                boolean[] arr=(boolean[])expectedArr;
+                arr[index]=!v;
+                expectedTail=tail;
               }
-              expectedHead=tail > bound?0:tail;
-            }else{
-              System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tail]=null;
+            }else {
+              int headDist,tailDist;
+              if((headDist=bound - head) + index + 1 < (tailDist=tail - index)){
+                System.arraycopy(expectedArr,0,expectedArr,1,index);
+                System.arraycopy(expectedArr,bound,expectedArr,0,1);
+                System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[head]=null;
+                }
+                expectedHead=tail > bound?0:tail;
+              }else{
+                System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[tail]=null;
+                }
+                expectedTail=--tail == -1?bound:tail;
               }
-              expectedTail=--tail == -1?bound:tail;
             }
+           
             return;
           }
         }
         for(index=bound;;--index){
           if(indexSearcher.test(index)){
-            int headDist,tailDist;
-            if((headDist=index - head) <= (tailDist=bound - index) + tail + 1){
-              System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[head]=null;
+            if(dataType==DataType.BOOLEAN) {
+              boolean v=(boolean)dataType.convertValUnchecked(inputType,inputVal);
+              boolean[] arr=(boolean[])expectedArr;
+              arr[index]=!v;
+              this.expectedTail=(--tail==-1)?bound:tail;
+            }else {
+              int headDist,tailDist;
+              if((headDist=index - head) <= (tailDist=bound - index) + tail + 1){
+                System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[head]=null;
+                }
+                expectedHead=tail > bound?0:tail;
+              }else{
+                System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
+                System.arraycopy(expectedArr,0,expectedArr,bound,1);
+                System.arraycopy(expectedArr,1,expectedArr,0,tail);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[tail]=null;
+                }
+                expectedTail=--tail == -1?bound:tail;
               }
-              expectedHead=tail > bound?0:tail;
-            }else{
-              System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
-              System.arraycopy(expectedArr,0,expectedArr,bound,1);
-              System.arraycopy(expectedArr,1,expectedArr,0,tail);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tail]=null;
-              }
-              expectedTail=--tail == -1?bound:tail;
             }
+           
             return;
           }
         }
@@ -1310,24 +1332,36 @@ import omni.util.TestExecutorService;
         int index;
         for(index=tail;;--index){
           if(indexSearcher.test(index)){
-            int headDist,tailDist;
-            if((tailDist=tail - index) <= (headDist=index - head)){
-              if(headDist == 0){
-                expectedTail=-1;
+            if(dataType==DataType.BOOLEAN) {
+              if(head==tail){
+                this.expectedTail=-1;
+             }else{
+               boolean v=(boolean)dataType.convertValUnchecked(inputType,inputVal);
+               boolean[] arr=(boolean[])expectedArr;
+                arr[index]=!v;
+                this.expectedTail=tail-1;
+             }
+            }else {
+              int headDist,tailDist;
+              if((tailDist=tail - index) <= (headDist=index - head)){
+                if(headDist == 0){
+                  expectedTail=-1;
+                }else{
+                  System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
+                  expectedTail=tail - 1;
+                }
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[tail]=null;
+                }
               }else{
-                System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
-                expectedTail=tail - 1;
+                System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[head]=null;
+                }
+                expectedHead=tail;
               }
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tail]=null;
-              }
-            }else{
-              System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[head]=null;
-              }
-              expectedHead=tail;
             }
+           
             return;
           }
         }
@@ -1343,43 +1377,67 @@ import omni.util.TestExecutorService;
         int index,bound;
         for(index=head,bound=expectedCapacity - 1;index <= bound;++index){
           if(indexSearcher.test(index)){
-            int headDist,tailDist;
-            if((headDist=index - head) <= (tailDist=bound - index) + tail){
-              System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[head]=null;
+            if(dataType==DataType.BOOLEAN) {
+              if(++expectedHead>bound) {
+                expectedHead=0;
+              }else {
+                boolean v=(boolean)dataType.convertValUnchecked(inputType,inputVal);
+                boolean[] arr=(boolean[])expectedArr;
+                arr[index]=!v;
               }
-              expectedHead=tail > bound?0:tail;
-            }else{
-              System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
-              System.arraycopy(expectedArr,0,expectedArr,bound,1);
-              System.arraycopy(expectedArr,1,expectedArr,0,tail);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tail]=null;
+              
+              
+            }else {
+              int headDist,tailDist;
+              if((headDist=index - head) <= (tailDist=bound - index) + tail){
+                System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[head]=null;
+                }
+                expectedHead=tail > bound?0:tail;
+              }else{
+                System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
+                System.arraycopy(expectedArr,0,expectedArr,bound,1);
+                System.arraycopy(expectedArr,1,expectedArr,0,tail);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[tail]=null;
+                }
+                expectedTail=--tail == -1?bound:tail;
               }
-              expectedTail=--tail == -1?bound:tail;
             }
+            
+            
             return;
           }
         }
         for(index=0;;++index){
           if(indexSearcher.test(index)){
-            int headDist,tailDist;
-            if((headDist=bound - head) + index + 1 < (tailDist=tail - index)){
-              System.arraycopy(expectedArr,0,expectedArr,1,index);
-              System.arraycopy(expectedArr,bound,expectedArr,0,1);
-              System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[head]=null;
+            if(dataType==DataType.BOOLEAN) {
+              boolean v=(boolean)dataType.convertValUnchecked(inputType,inputVal);
+              boolean[] arr=(boolean[])expectedArr;
+              arr[index]=!v;
+              if(++expectedHead>bound) {
+                expectedHead=0;
               }
-              expectedHead=tail > bound?0:tail;
-            }else{
-              System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tail]=null;
+            }else {
+              int headDist,tailDist;
+              if((headDist=bound - head) + index + 1 < (tailDist=tail - index)){
+                System.arraycopy(expectedArr,0,expectedArr,1,index);
+                System.arraycopy(expectedArr,bound,expectedArr,0,1);
+                System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[head]=null;
+                }
+                expectedHead=tail > bound?0:tail;
+              }else{
+                System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[tail]=null;
+                }
+                expectedTail=--tail == -1?bound:tail;
               }
-              expectedTail=--tail == -1?bound:tail;
             }
+            
             return;
           }
         }
@@ -1387,24 +1445,36 @@ import omni.util.TestExecutorService;
         int index;
         for(index=head;;++index){
           if(indexSearcher.test(index)){
-            int headDist,tailDist;
-            if((tailDist=tail - index) <= (headDist=index - head)){
-              if(headDist == 0){
+            if(dataType==DataType.BOOLEAN) {
+              if(expectedHead==tail) {
                 expectedTail=-1;
+              }else {
+                boolean v=(boolean)dataType.convertValUnchecked(inputType,inputVal);
+                boolean[] arr=(boolean[])expectedArr;
+                arr[index]=!v;
+                expectedHead=head+1;
+              }
+            }else {
+              int headDist,tailDist;
+              if((tailDist=tail - index) <= (headDist=index - head)){
+                if(headDist == 0){
+                  expectedTail=-1;
+                }else{
+                  System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
+                  expectedTail=tail - 1;
+                }
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[tail]=null;
+                }
               }else{
-                System.arraycopy(expectedArr,index + 1,expectedArr,index,tailDist);
-                expectedTail=tail - 1;
+                System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
+                if(dataType == DataType.REF){
+                  ((Object[])expectedArr)[head]=null;
+                }
+                expectedHead=tail;
               }
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[tail]=null;
-              }
-            }else{
-              System.arraycopy(expectedArr,head,expectedArr,tail=head + 1,headDist);
-              if(dataType == DataType.REF){
-                ((Object[])expectedArr)[head]=null;
-              }
-              expectedHead=tail;
             }
+            
             return;
           }
         }
@@ -3365,5 +3435,8 @@ import omni.util.TestExecutorService;
       System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
     }
     TestExecutorService.reset();
+  }
+  @org.junit.jupiter.api.BeforeEach public void setNumWorkers(){
+    TestExecutorService.setNumWorkers(Runtime.getRuntime().availableProcessors());
   }
 }

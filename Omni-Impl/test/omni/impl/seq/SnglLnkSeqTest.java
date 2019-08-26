@@ -37,8 +37,8 @@ import omni.impl.ShortSnglLnkNode;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@Tag("NewTest")
 @TestMethodOrder(OrderAnnotation.class)
+@Tag("NewTest")
 public class SnglLnkSeqTest{
   private static abstract class AbstractSnglLnkSeqMonitor<SEQ extends AbstractSeq<?>&Externalizable>
       extends AbstractSequenceMonitor<SEQ>{

@@ -910,7 +910,7 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.BooleanArrDeq)obj).arr;
     }
     static interface AbstractDeqItr{
-      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.BooleanArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.AbstractBooleanArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
       public static int cursor(Object obj){
         return getIntValue(cursorField,obj);
       }

@@ -564,7 +564,7 @@ private static class $ClassPrefix$TimSort$<E>$
       }
       while(left<right);
       #MACRO Assert(left==right)
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,start-left);
+      ArrCopy.semicheckedCopy(arr,left,arr,left+1,start-left);
       arr[left]=pivot;
     }
   }
@@ -2004,5 +2004,5 @@ Integer.signum(sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2
 
 
 #MACRODEF Assert(expr)
-//assert expr;
+assert expr;
 #ENDDEF

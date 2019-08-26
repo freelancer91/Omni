@@ -13,219 +13,14 @@ import java.util.function.LongUnaryOperator;
  */
 public interface BitSetUtil{
 
-    public static int convertToPackedIndex(int nonPackedIndex) {
-      return nonPackedIndex>>6;
-    }
-    public static int convertToNonPackedIndex(int packedIndex) {
-      return packedIndex<<6;
-    }
-    public static int getPackedCapacity(int nonPackedCapacity) {
-      return convertToPackedIndex(nonPackedCapacity-1)+1;
-    }
-    
-    public static boolean getFromPackedArr(long[] words,int nonPackedIndex) {
-      return (words[convertToPackedIndex(nonPackedIndex)]>>>nonPackedIndex&1)!=0;
-    }
 
     
     
-    public static void uncheckedAlignedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
-      //TODO
-    }
-    public static void uncheckedSrcAlignedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
-      //TODO
-    }
-    public static void uncheckedDstAlignedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
-      //TODO
-    }
-    public static void uncheckedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
-      int srcWordOffset;
-      int srcWordBound;
-      int dstWordOffset=dstOffset>>6;
-      int dstBound;
-      int dstWordBound=(dstBound=dstOffset+length)-1>>6;
-      long mask;
-      int shift;
-      if((srcWordOffset=srcOffset>>6)==(srcWordBound=srcOffset+length-1>>6)) {
-          long srcWord=src[srcWordOffset];
-          long dstWord;
-          if(dstWordOffset==dstWordBound) {
-              dstWord=src[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset);
-              if((shift=(dstOffset&63)-(srcOffset&63))<0) {
-                src[dstWordOffset]=srcWord>>>-shift&mask | dstWord;
-              }else {
-                src[dstWordOffset]=srcWord<<shift&mask | dstWord;
-              }
-          }else {
-            src[dstWordOffset]=srcWord<<(shift=dstOffset-srcOffset)&(mask=-1L<<dstOffset) | src[dstWordOffset]&~mask;
-            src[++dstWordOffset]=srcWord>>>-shift&~(mask=-1L<<dstBound)|src[dstWordOffset]&mask;
-          }
-      }else {
-          if(dstWordOffset==dstWordBound) {
-            src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset) | (src[srcWordOffset]>>>(shift=srcOffset-dstOffset)|src[srcWordOffset+1]<<-shift)&mask;
-          }else {
-              long srcWord=src[srcWordOffset];
-              switch(Integer.signum(shift=(dstOffset&63)-(srcOffset&63))) {
-              case 0:{
-                src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L<<dstOffset)|srcWord&mask;
-                  ArrCopy.semicheckedSelfCopy(src,++dstWordOffset,srcWordOffset+1,dstWordBound-dstWordOffset);
-                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) | src[srcWordBound]&mask;
-                  break;
-              }
-              case 1:{
-                src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L<<dstOffset) | srcWord<<shift&mask;
-                  while(++dstWordOffset<dstWordBound) {
-                    src[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
-                  }
-                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordBound]<<shift)&mask;
-                  break;
-              }
-              default:{
-                src[dstWordOffset]=src[dstWordOffset]&~(mask=-1L<<dstOffset) | (srcWord>>>-shift|(srcWord=src[++srcWordOffset])<<shift)&mask ;
-                while(++dstWordOffset<dstWordBound) {
-                  src[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
-                }
-                if(srcWordOffset<srcWordBound) {
-                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordBound]<<shift)&mask;
-                }else {
-                  src[dstWordBound]=src[dstWordBound]&~(mask=-1L>>>-dstBound) |srcWord>>>-shift&mask;
-                }
-              }
-              }
-          } 
-      }
-  }
-    public static void semicheckedSelfCopy(long[] src,int dstOffset,int srcOffset,int length) {
-      if(length!=0) {
-        uncheckedSelfCopy(src,dstOffset,srcOffset,length);
-      }
-    }
-    public static void uncheckedAlignedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
-      ArrCopy.semicheckedCopy(src,srcOffset>>6,dst,dstOffset>>6,length>>6);
-      if((length&63)!=0) {
-        dst[dstOffset=dstOffset+length>>6]=dst[dstOffset]&-1L<<length | src[srcOffset+length>>6]&-1L>>>-length;
-      }
-    }
-    public static void uncheckedSrcAlignedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
-      if((dstOffset&63)==0) {
-          uncheckedAlignedCopy(src,srcOffset,dst,dstOffset,length);
-          return;
-      }
-      int srcWordOffset,dstWordOffset;
-      long srcWord;
-      int dstBound;
-      int dstWordBound;
-      final long srcEndMask=-1L>>>-length;
-      if((dstWordOffset=dstOffset>>6)==(dstWordBound=(dstBound=dstOffset+length-1)>>6)) {
-          dst[dstWordOffset]=dst[dstWordOffset]&~(srcEndMask<<dstOffset) | (src[srcOffset>>6]&srcEndMask)<<dstOffset;
-      }else {
-          dst[dstWordOffset]=dst[dstWordOffset]&-1L>>>-dstOffset|(srcWord=src[srcWordOffset=srcOffset>>6])<<dstOffset;
-          while(++dstWordOffset<dstWordBound) {
-            dst[dstWordOffset]=srcWord>>>-dstOffset|(srcWord=src[++srcWordOffset])<<dstOffset;
-          }
-          final long dstEndMask=-1L<<dstBound-1;
-        //TODO this is potentially bugged
-          if(++srcWordOffset==srcOffset+length-1>>6) {
-              
-              dst[dstWordOffset]=srcWord>>>-dstOffset|dst[dstWordOffset]&dstEndMask| (src[srcWordOffset]&srcEndMask)<<dstOffset;
-
-          }else {
-              dst[dstWordOffset]=(srcWord&srcEndMask)>>>-dstOffset|dst[dstWordOffset]&dstEndMask;
-          }
-      }
-    }
-    public static void uncheckedDstAlignedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
-      if((srcOffset&63)==0) {
-        uncheckedAlignedCopy(src,srcOffset,dst,dstOffset,length);
-        return;
-      }
-      int srcWordOffset=srcOffset>>6,dstWordOffset=dstOffset>>6;
-      long srcWord;
-      if(length<=64) {
-          srcWord=src[srcWordOffset]>>>srcOffset;
-          if(srcWordOffset!=srcOffset+length-1>>6) {
-              srcWord|=src[srcWordOffset+1]<<-srcOffset;
-          }
-          final long endMask;
-          dst[dstWordOffset]=dst[dstWordOffset]&~(endMask=-1L>>>-length)|srcWord&endMask;
-      }else {
-          dst[dstWordOffset]=src[srcWordOffset]>>>srcOffset | (srcWord=src[++srcWordOffset])<<-srcOffset;
-          final int dstWordBound=dstOffset+length-1>>6;
-          while(++dstWordOffset<dstWordBound) {
-              dst[dstWordOffset]=srcWord>>>srcOffset|(srcWord=src[++srcWordOffset])<<-srcOffset;
-          }
-          srcWord>>>=srcOffset;
-          if(srcWordOffset!=srcOffset+length-1>>6) {
-              srcWord|=src[srcWordOffset+1]<<-srcOffset;
-          }
-          final long endMask;
-          dst[dstWordOffset]=dst[dstWordOffset]&~(endMask=-1L>>>-length)|srcWord&endMask;
-      }
-    }
 
     
-    public static void uncheckedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
-        int srcWordOffset;
-        int srcWordBound;
-        int dstWordOffset=dstOffset>>6;
-        int dstBound;
-        int dstWordBound=(dstBound=dstOffset+length)-1>>6;
-        long mask;
-        int shift;
-        if((srcWordOffset=srcOffset>>6)==(srcWordBound=srcOffset+length-1>>6)) {
-            long srcWord=src[srcWordOffset];
-            long dstWord;
-            if(dstWordOffset==dstWordBound) {
-                dstWord=dst[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset);
-                if((shift=(dstOffset&63)-(srcOffset&63))<0) {
-                    dst[dstWordOffset]=srcWord>>>-shift&mask | dstWord;
-                }else {
-                    dst[dstWordOffset]=srcWord<<shift&mask | dstWord;
-                }
-            }else {
-                dst[dstWordOffset]=srcWord<<(shift=dstOffset-srcOffset)&(mask=-1L<<dstOffset) | dst[dstWordOffset]&~mask;
-                dst[++dstWordOffset]=srcWord>>>-shift&~(mask=-1L<<dstBound)|dst[dstWordOffset]&mask;
-            }
-        }else {
-            if(dstWordOffset==dstWordBound) {
-                dst[dstWordOffset]=dst[dstWordOffset]&~(mask=-1L>>>-length<<dstOffset) | (src[srcWordOffset]>>>(shift=srcOffset-dstOffset)|src[srcWordOffset+1]<<-shift)&mask;
-            }else {
-                long srcWord=src[srcWordOffset];
-                switch(Integer.signum(shift=(dstOffset&63)-(srcOffset&63))) {
-                case 0:{
-                    dst[dstWordOffset]=dst[dstWordOffset]&~(mask=-1L<<dstOffset)|srcWord&mask;
-                    ArrCopy.semicheckedCopy(src,srcWordOffset+1,dst,++dstWordOffset,dstWordBound-dstWordOffset);
-                    dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) | src[srcWordBound]&mask;
-                    break;
-                }
-                case 1:{
-                    dst[dstWordOffset]=dst[dstWordOffset]&~(mask=-1L<<dstOffset) | srcWord<<shift&mask;
-                    while(++dstWordOffset<dstWordBound) {
-                        dst[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
-                    }
-                    dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordBound]<<shift)&mask;
-                    break;
-                }
-                default:{
-                    dst[dstWordOffset]=dst[dstWordOffset]&~(mask=-1L<<dstOffset) | (srcWord>>>-shift|(srcWord=src[++srcWordOffset])<<shift)&mask ;
-                  while(++dstWordOffset<dstWordBound) {
-                      dst[dstWordOffset]=srcWord>>>-shift | (srcWord=src[++srcWordOffset])<<shift;
-                  }
-                  if(srcWordOffset<srcWordBound) {
-                      dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) |(srcWord>>>-shift|src[srcWordBound]<<shift)&mask;
-                  }else {
-                      dst[dstWordBound]=dst[dstWordBound]&~(mask=-1L>>>-dstBound) |srcWord>>>-shift&mask;
-                  }
-                }
-                }
-            } 
-        }
-    }
-    public static void semicheckedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length) {
-        if(length!=0) {
-            uncheckedCopy(src,srcOffset,dst,dstOffset,length);
-        }
-    }
+
+
+
     public static void writeWordsSrcAligned(long[] words,int begin,int end,DataOutput dataOutput) throws IOException {
       for(int wordOffset=begin>>6,wordBound=end>>6;;++wordOffset) {
         if(wordOffset==wordBound) {
@@ -235,61 +30,55 @@ public interface BitSetUtil{
         dataOutput.writeLong(words[wordOffset]);
       }
     }
-    @Deprecated
-    public static void writeWordsFragmentedAligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException{
-      OmniArray.OfLong.writeArray(words,head>>6,words.length-1>>6,dataOutput);
-      writeWordsSrcAligned(words,0,tail,dataOutput);
-    }
-    public static void writeWordsFragmentedUnaligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException{
-      int wordOffset;
-      var word=words[wordOffset=head>>6];
-      for(int wordBound=words.length-1>>6;wordOffset!=wordBound;dataOutput.writeLong(word>>>head|(word=words[++wordOffset])<<-head)) {}
-      wordOffset=0;
-      for(int wordBound=tail>>6;wordOffset!=wordBound;dataOutput.writeLong(word>>>head|(word=words[wordOffset++])<<-head)) {}
-      writeFinalWord(word>>>head,tail-(head&63),dataOutput);
-    }
     
-    
+
     public static void writeWordsSrcUnaligned(long[] words,int head,int tail,DataOutput dataOutput) throws IOException {
-      int wordOffset;
-      var word=words[wordOffset=head>>6];
-      for(int wordBound=tail>>6;wordOffset!=wordBound;) {
-          dataOutput.writeLong(word>>>head|(word=words[++wordOffset])<<-head);
+      int headOffset;
+      var word=words[headOffset=head >> 6];
+      int size;
+      for(size=tail-head;size >= 64;size-=64){
+        dataOutput.writeLong(word >>> head | (word=words[++headOffset]) << -head);
       }
-      writeFinalWord(word>>>head,tail-(head&63),dataOutput);
+      if(headOffset == tail >> 6){
+          BitSetUtil.writeFinalWord(word >>> head,size,dataOutput);
+      }else{
+          BitSetUtil.writeFinalWord(word >>> head | words[headOffset + 1] << -head,size,dataOutput);
+      }
     }
     
     public static void readWords(long[] words,int end,DataInput dataInput) throws IOException{
       for(int wordOffset=0,wordBound=end>>6;;++wordOffset) {
         if(wordOffset==wordBound) {
-          words[wordOffset]=readFinalWord(end,dataInput);
+          var tmpWord=readFinalWord(end,dataInput);
+          words[wordOffset]=tmpWord;
           return;
         }
-        words[wordOffset]=dataInput.readLong();
+        var tmpWord=dataInput.readLong();
+        words[wordOffset]=tmpWord;
       }
     }
     
     
-    public static long shiftUpLeadingBits(long word,int head)
+    public static long shiftUpLeadingBits(long word,int shiftInclusiveLo)
     {
         final long mask;
-        return word<<1&(mask=-1L<<head)|word&~mask;
+        return word<<1&(mask=-1L<<shiftInclusiveLo)|word&~mask;
     }
-    public static long shiftUpTrailingBits(long word,int cursor) {
+    public static long shiftUpTrailingBits(long word,int shiftInclusiveHi) {
         final long mask;
-        return word<<1&(mask=-1L>>>-cursor-1) | word&~mask;
+        return word<<1&(mask=-1L>>>-shiftInclusiveHi-1) | word&~mask;
     }
-    public static long shiftDownTrailingBits(long word,int tail) {
+    public static long shiftDownTrailingBits(long word,int shiftExclusiveHi) {
         final long mask;
-        return word&(mask=-1L<<tail) | word>>>1&~mask;
+        return word&(mask=-1L<<shiftExclusiveHi) | word>>>1&~mask;
     }
-    public static long shiftDownLeadingBits(long word,int cursor) {
+    public static long shiftDownLeadingBits(long word,int shiftInclusiveLo) {
         final long mask;
-        return word>>>1&(mask=-1L<<cursor)|word&~mask;
+        return word>>>1&(mask=-1L<<shiftInclusiveLo)|word&~mask;
     }
-    public static long shiftDownMiddleBits(long word,int cursor,int tail) {
+    public static long shiftDownMiddleBits(long word,int shiftInclusiveLo,int shiftInclusiveHi) {
         final long mask;
-        return word>>>1&(mask=-1L<<cursor&-1L>>>-tail) | word&~mask;
+        return word>>>1&(mask=-1L<<shiftInclusiveLo&-1L>>>-shiftInclusiveHi) | word&~mask;
     }
     public static long shiftDownEdgeBits(long word,int cursor,int tail) {
         final long mask;
@@ -327,20 +116,20 @@ public interface BitSetUtil{
     }
     
     
-    public static long readFinalWord(int end,DataInput dataInput) throws IOException{
+    private static long readFinalWord(int end,DataInput dataInput) throws IOException{
       switch((end&63)>>3) {
       case 7:
         return dataInput.readLong();
       case 6:
-        return (long)dataInput.readUnsignedByte()<<48|(long)dataInput.readUnsignedShort()<<32|dataInput.readInt();
+        return ((long)dataInput.readUnsignedByte()<<48)|(((long)dataInput.readUnsignedShort()<<32))|(((long)dataInput.readInt())&0xffffffffL);
       case 5:
-        return (long)dataInput.readUnsignedShort()<<32|dataInput.readInt();
+        return ((long)dataInput.readUnsignedShort()<<32)|(((long)dataInput.readInt())&0xffffffffL);
       case 4:
-        return dataInput.readInt() | (long)dataInput.readUnsignedByte()<<32;
+        return (((long)dataInput.readInt())&0xffffffffL) | ((long)dataInput.readUnsignedByte()<<32);
       case 3:
         return dataInput.readInt();
       case 2:
-        return (long)dataInput.readUnsignedByte()<<16 | dataInput.readUnsignedShort();
+        return ((long)dataInput.readUnsignedByte()<<16) | (((long)dataInput.readUnsignedShort()));
       case 1:
         return dataInput.readUnsignedShort();
       default:
@@ -376,40 +165,10 @@ public interface BitSetUtil{
     }
     
     
-    
-    
-    public static boolean getAndSwap(long[] words,int nonPackedIndex,boolean val) {
-      final int packedIndex;
-      final var mask=1L<<nonPackedIndex;
-      final var word=words[packedIndex=convertToPackedIndex(nonPackedIndex)];
-      if(val) {
-        words[packedIndex]=word|mask;
-      }else {
-        words[packedIndex]=word&~mask;
-      }
-      return (word>>nonPackedIndex&1)!=0;
-    }
-    
-    
-    public static void storeInPackedArr(long[] words,int nonPackedIndex,boolean val) {
-      final var packedIndex=convertToPackedIndex(nonPackedIndex);
-      final var mask=1L<<nonPackedIndex;
-      if(val) {
-        words[packedIndex]|=mask;
-      }else {
-        words[packedIndex]&=~mask;
-      }
-    }
-  
+
     public static long flip(long word) {
-        return ~word;
+      return ~word;
     }
-    
-    public static long partialWordShiftDown(long word,int shift) {
-        final long mask;
-        return word & (mask=(1L << shift) - 1) | word >>> 1 & ~mask;
-    }
-    
     public static LongUnaryOperator getWordFlipper(boolean val) {
         if(val) {
             return LongUnaryOperator.identity();
@@ -424,14 +183,68 @@ public interface BitSetUtil{
      * @return
      */
     public static String prettyPrintWord(long word) {
-        var byteArr=new byte[64];
+        var byteArr=new byte[71];
+        int bufferOffset=71;
         for(int i=0;;) {
-            byteArr[63-i]=(byte)(48+(word>>>i&1));
+            byteArr[--bufferOffset]=(byte)(48+(word>>>i&1));
             if(++i==64) {
                 return new String(byteArr,ToStringUtil.IOS8859CharSet);
             }
+            if((i&7)==0) {
+              byteArr[--bufferOffset]='_';
+            }
         }
     }
+    
+    public static String prettyPrintWord(int word) {
+      var byteArr=new byte[35];
+      int bufferOffset=35;
+      for(int i=0;;) {
+          byteArr[--bufferOffset]=(byte)(48+(word>>>i&1));
+          if(++i==32) {
+              return new String(byteArr,ToStringUtil.IOS8859CharSet);
+          }
+          if((i&7)==0) {
+            byteArr[--bufferOffset]='_';
+          }
+      }
+    }
+    public static String prettyPrintWord(short word) {
+      var byteArr=new byte[17];
+      int bufferOffset=17;
+      for(int i=0;;) {
+          byteArr[--bufferOffset]=(byte)(48+(word>>>i&1));
+          if(++i==16) {
+              return new String(byteArr,ToStringUtil.IOS8859CharSet);
+          }
+          if((i&7)==0) {
+            byteArr[--bufferOffset]='_';
+          }
+      }
+    }
+    public static String prettyPrintWord(char word) {
+      var byteArr=new byte[17];
+      int bufferOffset=17;
+      for(int i=0;;) {
+          byteArr[--bufferOffset]=(byte)(48+(word>>>i&1));
+          if(++i==16) {
+              return new String(byteArr,ToStringUtil.IOS8859CharSet);
+          }
+          if((i&7)==0) {
+            byteArr[--bufferOffset]='_';
+          }
+      }
+    }
+    public static String prettyPrintWord(byte word) {
+      var byteArr=new byte[8];
+      for(int i=0;;) {
+          byteArr[7-i]=(byte)(48+(word>>>i&1));
+          if(++i==8) {
+              return new String(byteArr,ToStringUtil.IOS8859CharSet);
+          }
+      }
+    }
+    
 
     
     public static void srcUnalignedPullDown(long[] words,int dstWordOffset,int srcOffset,int srcWordBound) {

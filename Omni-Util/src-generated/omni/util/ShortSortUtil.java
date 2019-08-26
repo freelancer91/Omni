@@ -266,7 +266,7 @@ public final class ShortSortUtil
         {
           newSize=minCapacity;
         }
-        //assert newSize>0;
+        assert newSize>0;
         this.tmp=tmp=new short[newSize];
         this.tmpLength=newSize;
         tmpOffset=0;
@@ -300,18 +300,18 @@ public final class ShortSortUtil
         offset+=runLen;
       }
       while((nRemaining-=runLen)!=0);
-      //assert offset==bound;
+      assert offset==bound;
       super.mergeForceCollapse(); 
     }
     @Override
     int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=4;
-      //assert n>=0;
-      //assert n==stackSize-4 || n==stackSize-6;
-      //assert runLenAndBase[n]>0;
-      //assert runLenAndBase[n+2]>0;
-      //assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
+      assert stackSize>=4;
+      assert n>=0;
+      assert n==stackSize-4 || n==stackSize-6;
+      assert runLenAndBase[n]>0;
+      assert runLenAndBase[n+2]>0;
+      assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
       int len1,len2;
       runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
       int base2=runLenAndBase[n+3];
@@ -324,7 +324,7 @@ public final class ShortSortUtil
       int k,base1;
       //TODO streamline this?
       base1=(base1=runLenAndBase[n+1])+(k=mergeAtGallopRight((short)(arr=this.arr)[base2],arr,base1,len1,sorter));
-      //assert k>=0;
+      assert k>=0;
       if((len1-=k)!=0)
       {
         //if((len2=mergeAtGallopLeft((short)arr[base1+len1-1],arr,base2,len2),sorter)!=0)
@@ -344,7 +344,7 @@ public final class ShortSortUtil
     }
     private static  int mergeAtGallopLeft(short key,short[] arr,int base,int len,ShortComparator sorter)
     {
-      //assert len>0;
+      assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -353,7 +353,7 @@ public final class ShortSortUtil
       {
         return len;
       }
-      //assert len>=2;
+      assert len>=2;
       //#if(len<2 ||
       //#MACRO LessThanOrEqualTo(key,arr[base+len-2])
       //)
@@ -367,8 +367,8 @@ public final class ShortSortUtil
       {
         lastOfs=len-2;
       }
-      //assert -1<=lastOfs;
-      //assert lastOfs<(len-1);
+      assert -1<=lastOfs;
+      assert lastOfs<(len-1);
       if(++lastOfs<(ofs=(len-1)))
       {
         do
@@ -387,12 +387,12 @@ public final class ShortSortUtil
         }
         while(lastOfs<ofs);
       }
-      //assert lastOfs==ofs;
+      assert lastOfs==ofs;
       return ofs;
     }
     private static  int mergeAtGallopRight(short key,short[] arr,int base,int len,ShortComparator sorter)
     {
-      //assert len>0;
+      assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -401,7 +401,7 @@ public final class ShortSortUtil
       {
         return 0;
       }
-      //assert len>=2;
+      assert len>=2;
       //#if(len<2 ||
       //#MACRO GreaterThanOrEqualTo(key,arr[base+1])
       //)
@@ -416,9 +416,9 @@ public final class ShortSortUtil
         ofs=1;
       }
       lastOfs=0;
-      //assert -1<=lastOfs;
-      //assert lastOfs<ofs;
-      //assert ofs<=len;
+      assert -1<=lastOfs;
+      assert lastOfs<ofs;
+      assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -437,7 +437,7 @@ public final class ShortSortUtil
         }
         while(lastOfs<ofs);
       }
-      //assert lastOfs==ofs;
+      assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -454,9 +454,9 @@ public final class ShortSortUtil
      */
     private void mergeLo(short[] arr,int base1,int len1,int base2,int len2)
     {
-      //assert len1>0;
-      //assert len2>0;
-      //assert base1+len1==base2;
+      assert len1>0;
+      assert len2>0;
+      assert base1+len1==base2;
       final short[] tmp;
       //copy the first run into the tmp array
       int cursor1;
@@ -488,8 +488,8 @@ public final class ShortSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          //assert len1>1;
-          //assert len2>0;
+          assert len1>1;
+          assert len2>0;
           if(
           sorter.compare((short)(arr[cursor2]),(short)(tmp[cursor1]))<0
           )
@@ -518,8 +518,8 @@ public final class ShortSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          //assert len1>1;
-          //assert len2>0;
+          assert len1>1;
+          assert len2>0;
           if((count1=gallopRight((short)arr[cursor2],tmp,cursor1,len1,0,sorter))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
@@ -566,14 +566,14 @@ public final class ShortSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len1==1)
       {
-        //assert len2>0;
+        assert len2>0;
         ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
         arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
       }
       else
       {
-        //assert len2==0;
-        //assert len1>1;
+        assert len2==0;
+        assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
@@ -590,9 +590,9 @@ public final class ShortSortUtil
      */
     private void mergeHi(short[] arr,int base1,int len1,int base2,int len2)
     {
-      //assert len1>0;
-      //assert len2>0;
-      //assert base1+len1==base2;
+      assert len1>0;
+      assert len2>0;
+      assert base1+len1==base2;
       final short[] tmp;
       //copy the second run into the tmp array
       int tmpOffset;
@@ -620,8 +620,8 @@ public final class ShortSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          //assert len2>1;
-          //assert len1>0;
+          assert len2>1;
+          assert len1>0;
           if(
           sorter.compare((short)(tmp[cursor2]),(short)(arr[cursor1]))<0
           )
@@ -650,8 +650,8 @@ public final class ShortSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          //assert len2>1;
-          //assert len1>0;
+          assert len2>1;
+          assert len1>0;
           if((count1=len1-gallopRight((short)tmp[cursor2],arr,base1,len1,len1-1,sorter))!=0)
           {
             ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
@@ -694,14 +694,14 @@ public final class ShortSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len2==1)
       {
-        //assert len1>0;
+        assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2]; //move the first element of run2 to the front of the merge
       }
       else
       {
-        //assert len1==0;
-        //assert len2>0;
+        assert len1==0;
+        assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
       }
     }
@@ -724,9 +724,9 @@ public final class ShortSortUtil
     //TODO split this up into mergeLo and mergeHi versions
     private static  int gallopLeft(short key,short[] arr,int base,int len,int hint,ShortComparator sorter)
     {
-      //assert len>0;
-      //assert hint>=0;
-      //assert hint<len;
+      assert len>0;
+      assert hint>=0;
+      assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -761,9 +761,9 @@ public final class ShortSortUtil
         }
         ofs=hint;
       }
-      //assert -1<=lastOfs;
-      //assert lastOfs<ofs;
-      //assert ofs<=len;
+      assert -1<=lastOfs;
+      assert lastOfs<ofs;
+      assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -782,7 +782,7 @@ public final class ShortSortUtil
         }
         while(lastOfs<ofs);
       }
-      //assert lastOfs==ofs;
+      assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -801,9 +801,9 @@ public final class ShortSortUtil
     //TODO split this up into mergeLo and mergeHi versions
     private static  int gallopRight(short key,short[] arr,int base,int len,int hint,ShortComparator sorter)
     {
-      //assert len>0;
-      //assert hint>=0;
-      //assert hint<len;
+      assert len>0;
+      assert hint>=0;
+      assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -838,9 +838,9 @@ public final class ShortSortUtil
         }
         lastOfs=hint;
       }
-      //assert -1<=lastOfs;
-      //assert lastOfs<ofs;
-      //assert ofs<=len;
+      assert -1<=lastOfs;
+      assert lastOfs<ofs;
+      assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -859,21 +859,21 @@ public final class ShortSortUtil
         }
         while(lastOfs<ofs);
       }
-      //assert lastOfs==ofs;
+      assert lastOfs==ofs;
       return ofs;
     }
     private static  void binarySort(short[] arr,int lo,int hi,int start
       ,ShortComparator sorter
     )
     {
-      //assert lo<=start;
-      //assert start<=hi;
+      assert lo<=start;
+      assert start<=hi;
       //TODO streamline
       for(;start<hi;++start)
       {
         final
         short pivot=(short)arr[start];
-        //assert lo<start;
+        assert lo<start;
         int left=lo;
         int right=start;
         do
@@ -891,8 +891,8 @@ public final class ShortSortUtil
           }
         }
         while(left<right);
-        //assert left==right;
-        ArrCopy.uncheckedCopy(arr,left,arr,left+1,start-left);
+        assert left==right;
+        ArrCopy.semicheckedCopy(arr,left,arr,left+1,start-left);
         arr[left]=pivot;
       }
     }
@@ -901,7 +901,7 @@ public final class ShortSortUtil
     )
     {
       //TODO streamline
-      //assert lo<hi;
+      assert lo<hi;
       int runHi;
       if((runHi=lo+1)==hi)
       {

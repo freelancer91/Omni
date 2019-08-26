@@ -186,7 +186,11 @@ static interface CLASSPREFIXArrDeq{
     return ((omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)obj).arr;
   }
   static interface AbstractDeqItr{
+  #IFSWITCH CLASSPREFIX==Boolean
+    static final Field cursorField=prepareFieldForClassName("omni.impl.seq.AbstractCLASSPREFIXArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+  #ELSE
     static final Field cursorField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+  #ENDIF
     public static int cursor(Object obj){
       return getIntValue(cursorField,obj);
     }
