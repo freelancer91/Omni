@@ -1,6 +1,7 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
+//TODO extends java.util.Deque
 public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E>,PeekAndPollIfc<E>
 {
   //TODO add the rest of the methods

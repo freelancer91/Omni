@@ -8,11 +8,7 @@ import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
@@ -42,8 +38,6 @@ import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@TestMethodOrder(OrderAnnotation.class)
-@Tag("NewTest")
 public class PackedBooleanArrSeqTest{
   private abstract static class AbstractPackedBooleanArrSeqMonitor<SEQ extends PackedBooleanArrSeq>
       implements MonitoredSequence<SEQ>{
@@ -1968,7 +1962,7 @@ public void repairModCount() {
       int initCapacity){
     return new PackedBooleanArrStackMonitor(initParams,initCapacity);
   }
-  @Order(81564) @Test public void testadd_intval(){
+   @Test public void testadd_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2046,7 +2040,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testadd_intval");
   }
-  @Order(44492) @Test public void testadd_val(){
+   @Test public void testadd_val(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2084,7 +2078,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testadd_val");
   }
-  @Order(163240) @Test public void testclear_void(){
+   @Test public void testclear_void(){
     BasicTest test=new BasicTest() {
       @Override
     public int getMaxPostAlloc() {
@@ -2098,11 +2092,11 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testclear_void",SHORT_SIZES);
   }
-  @Order(7392) @Test public void testclone_void(){
+   @Test public void testclone_void(){
     final BasicTest test=MonitoredSequence::verifyClone;
     test.runAllTests("PackedBooleanArrSeqTest.testclone_void",SHORT_SIZES);
   }
-  @Order(68) @Test public void testConstructor_int(){
+   @Test public void testConstructor_int(){
     final int[] initCapacities=new int[]{0,5,10,15,63,64,65,66,127,128,129,255,256,257,319,320,321};
     for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
       for(final var initCap:initCapacities){
@@ -2131,7 +2125,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_int");
   }
-  @Order(4) @Test public void testConstructor_void(){
+   @Test public void testConstructor_void(){
     for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
       TestExecutorService.submitTest(()->{
         MonitoredSequence<?> monitor;
@@ -2150,13 +2144,13 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_void");
   }
-  @Order(712716) @Test public void testcontains_val(){
+   @Test public void testcontains_val(){
     final QueryTest<?> test=(monitor,queryVal, inputType, castType,modification, position, seqSize)->{
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
     test.runAllTests("PackedBooleanArrSeqTest.testcontains_val",2);
   }
-  @Order(6) @Test public void testequals_Object(){
+   @Test public void testequals_Object(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       if(initParams.totalPreAlloc>0 ||initParams.totalPostAlloc>0) {
         continue;
@@ -2166,7 +2160,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testequals_Object");
   }
-  @Order(171990) @Test public void testforEach_Consumer(){
+   @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2183,7 +2177,7 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testforEach_Consumer",true);
   }
-  @Order(1034) @Test public void testget_int(){
+   @Test public void testget_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2220,7 +2214,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testget_int");
   }
-  @Order(2112) @Test public void testhashCode_void(){
+   @Test public void testhashCode_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection.OfBoolean seq){
         seq.hashCode();
@@ -2231,7 +2225,7 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void");
   }
-  @Order(710328) @Test public void testindexOf_val(){
+   @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
           int expectedIndex;
@@ -2245,11 +2239,11 @@ public void repairModCount() {
         };
     test.runAllTests("PackedBooleanArrSeqTest.testindexOf_val",0);
   }
-  @Order(7392) @Test public void testisEmpty_void(){
+   @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
     test.runAllTests("PackedBooleanArrSeqTest.testisEmpty_void",SHORT_SIZES);
   }
-  @Order(1056) @Test public void testiterator_void(){
+   @Test public void testiterator_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       if(initParams.totalPostAlloc>0) {
           continue;
@@ -2278,7 +2272,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testiterator_void");
   }
-  @Order(4704) @Test public void testItrclone_void(){
+   @Test public void testItrclone_void(){
     for(final var size:SHORT_SIZES){
       int prevIndex=-1;
       for(final var position:POSITIONS){
@@ -2303,7 +2297,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrclone_void");
   }
-  @Order(185658) @Test public void testItrforEachRemaining_Consumer(){
+   @Test public void testItrforEachRemaining_Consumer(){
     for(final int size:SHORT_SIZES){
       int prevNumToIterate=-1;
       for(final var position:POSITIONS){
@@ -2351,7 +2345,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrforEachRemaining_Consumer");
   }
-  @Order(1078) @Test public void testItrhasNext_void(){
+   @Test public void testItrhasNext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2371,7 +2365,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrhasNext_void");
   }
-  @Order(79056) @Test public void testItrnext_void(){
+   @Test public void testItrnext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2417,7 +2411,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrnext_void");
   }
-  @Order(701881) @Test public void testItrremove_void(){
+   @Test public void testItrremove_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
@@ -2505,7 +2499,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrremove_void");
   }
-  @Order(710328) @Test public void testlastIndexOf_val(){
+   @Test public void testlastIndexOf_val(){
     final QueryTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -2518,7 +2512,7 @@ public void repairModCount() {
         };
     test.runAllTests("PackedBooleanArrSeqTest.testlastIndexOf_val",0);
   }
-  @Order(1010) @Test public void testlistIterator_int(){
+   @Test public void testlistIterator_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2559,7 +2553,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testlistIterator_int");
   }
-  @Order(1034) @Test public void testlistIterator_void(){
+   @Test public void testlistIterator_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2587,7 +2581,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testlistIterator_void");
   }
-  @Order(185360) @Test public void testListItradd_val(){
+   @Test public void testListItradd_val(){
     for(final var position:POSITIONS){
       if(position >= 0){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -2638,7 +2632,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItradd_val");
   }
-  @Order(528) @Test public void testListItrhasPrevious_void(){
+   @Test public void testListItrhasPrevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2655,7 +2649,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrhasPrevious_void");
   }
-  @Order(528) @Test public void testListItrnextIndex_void(){
+   @Test public void testListItrnextIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2672,7 +2666,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrnextIndex_void");
   }
-  @Order(34650) @Test public void testListItrprevious_void(){
+   @Test public void testListItrprevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2717,7 +2711,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrprevious_void");
   }
-  @Order(528) @Test public void testListItrpreviousIndex_void(){
+   @Test public void testListItrpreviousIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2734,7 +2728,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrpreviousIndex_void");
   }
-  @Order(48532) @Test public void testListItrset_val(){
+   @Test public void testListItrset_val(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -2792,7 +2786,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testListItrset_val");
   }
-  @Order(Integer.MAX_VALUE) @Test public void testMASSIVEtoString(){
+   @Test public void testMASSIVEtoString(){
     int seqSize;
     long[] words;
     for(int i=(words=new long[((seqSize=DataType.BOOLEAN.massiveToStringThreshold+1)-1>>6)+1]).length;--i>=0;) {
@@ -2904,7 +2898,7 @@ public void repairModCount() {
   
   }
   
-  @Order(2) @Test public void testpeek_void(){
+   @Test public void testpeek_void(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       TestExecutorService.submitTest(()->{
         final var monitor=getMonitoredStack(initParams,258);
@@ -2921,7 +2915,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testpeek_void");
   }
-  @Order(18) @Test public void testpoll_void(){
+   @Test public void testpoll_void(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       for(final var outputType:DataType.BOOLEAN.validOutputTypes()){
         TestExecutorService.submitTest(()->{
@@ -2937,7 +2931,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testpoll_void");
   }
-  @Order(189) @Test public void testpop_void(){
+   @Test public void testpop_void(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       for(final var size:SHORT_SIZES){
         if(size > 0 || initParams.checkedType.checked){
@@ -2957,7 +2951,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testpop_void");
   }
-  @Order(28) @Test public void testpush_val(){
+   @Test public void testpush_val(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       for(final var inputType:DataType.BOOLEAN.mayBeAddedTo()){
         for(final var functionCallType:inputType.validFunctionCalls){
@@ -2974,7 +2968,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testpush_val");
   }
-  @Order(1034) @Test public void testput_intval(){
+   @Test public void testput_intval(){
 
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
@@ -3019,7 +3013,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testput_intval");
   }
-  @Order(24570) @Test public void testReadAndWrite(){
+   @Test public void testReadAndWrite(){
     TestExecutorService.setNumWorkers(1);
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
@@ -3035,7 +3029,7 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testReadAndWrite",true);
   }
-  @Order(53074) @Test public void testremoveAt_int(){
+   @Test public void testremoveAt_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -3119,73 +3113,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveAt_int");
   }
-  @Tag("testremoveIf_Predicate") @Order(2255760) @Test public void testremoveIf_Predicate(){
-
-//    for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-//      for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
-//        for(var size:SHORT_SIZES){
-//          if((size>65 || initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0) && filterGen.expectedException!=null) {
-//              break;
-//          }
-//          if((size) == 0 || initParams.checkedType.checked || filterGen.expectedException == null){
-//          final int initValBound;
-//          final int periodBound;
-//          initValBound=size == 0?0:1;
-//          periodBound=Math.min(Math.max(0,size - 1),65);
-//            for(final var functionCallType:initParams.collectionType.validFunctionCalls){
-//              for(final var illegalMod:initParams.structType.validPreMods){
-//                if(illegalMod.minDepth <= initParams.preAllocs.length
-//                    && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-//                  long randSeedBound;
-//                  double[] thresholdArr;
-//                  if(filterGen.predicateGenCallType == PredicateGenCallType.Randomized && size > 0
-//                      && !functionCallType.boxed && illegalMod.expectedException == null){
-//                    randSeedBound=100;
-//                    thresholdArr=RANDOM_THRESHOLDS;
-//                  }else{
-//                    randSeedBound=0;
-//                    thresholdArr=NON_RANDOM_THRESHOLD;
-//                  }
-//                  for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-//                    final long randSeed=tmpRandSeed;
-//                    for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-//                      final int initVal=tmpInitVal;
-//                      for(int tmpPeriod=0;tmpPeriod <= periodBound;++tmpPeriod){
-//                        final int period=tmpPeriod;
-//                        for(final var threshold:thresholdArr){
-//                          TestExecutorService.submitTest(()->{
-//                            final var monitor=SequenceInitialization.Ascending
-//                                .initialize(getMonitoredSequence(initParams,size),size,initVal,period);
-//                            final var filter
-//                                =filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,new Random(randSeed));
-//                            if(illegalMod.expectedException == null){
-//                              if(filterGen.expectedException == null || size == 0){
-//                                monitor.verifyRemoveIf(filter,functionCallType);
-//                              }else{
-//                                Assertions.assertThrows(filterGen.expectedException,
-//                                    ()->monitor.verifyRemoveIf(filter,functionCallType));
-//                              }
-//                            }else{
-//                              monitor.illegalMod(illegalMod);
-//                              Assertions.assertThrows(illegalMod.expectedException,
-//                                  ()->monitor.verifyRemoveIf(filter,functionCallType));
-//                            }
-//                          });
-//                        }
-//                      }
-//                    }
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }
-//    }
-//    TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveIf_Predicate");
-//  
-//    
-//    
+   @Test public void testremoveIf_Predicate(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
         for(var size:SHORT_SIZES){
@@ -3242,7 +3170,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveIf_Predicate");
   }
-  @Tag("testremoveVal_val") @Order(1813956) @Test public void testremoveVal_val(){
+  @Test public void testremoveVal_val(){
     QueryTest<?> test=new QueryTest<MonitoredSequence<OmniCollection.OfBoolean>>() {
         @Override public int getMaxPostAlloc() {
             return Integer.MAX_VALUE;
@@ -3254,7 +3182,7 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testremoveVal_val",2);
   }
-  @Order(170520) @Test public void testreplaceAll_UnaryOperator(){
+   @Test public void testreplaceAll_UnaryOperator(){
     final MonitoredFunctionTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,functionGen,functionCallType,illegalMod)->{
           if(illegalMod.expectedException == null){
@@ -3272,7 +3200,7 @@ public void repairModCount() {
         };
     test.runAllTests("PackedBooleanArrSeqTest.testreplaceAll_UnaryOperator",false);
   }
-  @Tag("testsearch_val") @Order(2388) @Test public void testsearch_val(){
+  @Test public void testsearch_val(){
     final QueryTest<PackedBooleanArrStackMonitor> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -3287,7 +3215,7 @@ public void repairModCount() {
         };
     test.runAllTests("PackedBooleanArrSeqTest.testsearch",1);
   }
-  @Order(1034) @Test public void testset_intval(){
+   @Test public void testset_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3327,7 +3255,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testset_intval");
   }
-  @Order(7392) @Test public void testsize_void(){
+   @Test public void testsize_void(){
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("PackedBooleanArrSeqTest.testsize_void",SHORT_SIZES);
   }
@@ -3382,7 +3310,7 @@ public void repairModCount() {
       void runTest(MonitoredList<?> monitor,MonitoredComparatorGen comparatorGen,FunctionCallType functionCallType);
   }
   
-  @Order(488320) @Test public void testsort_Comparator(){
+   @Test public void testsort_Comparator(){
     final SortTest test=(monitor,comparatorGen,functionCallType)->{
         DataType.BOOLEAN.callStableSort(comparatorGen.getMonitoredComparator(monitor),monitor.getCollection(),functionCallType);
         comparatorGen.assertSorted(monitor);
@@ -3391,7 +3319,7 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testsort_Comparator",true);
   }
-  @Order(42488) @Test public void teststableAscendingSort_void(){
+   @Test public void teststableAscendingSort_void(){
 
       final SortTest test=(monitor,comparatorGen,functionCallType)->{
           monitor.getCollection().stableAscendingSort();
@@ -3401,7 +3329,7 @@ public void repairModCount() {
       };
       test.runAllTests("PackedBooleanArrSeqTest.teststableAscendingSort_void",false);
   }
-  @Order(42488) @Test public void teststableDescendingSort_void(){
+   @Test public void teststableDescendingSort_void(){
 
       final SortTest test=(monitor,comparatorGen,functionCallType)->{
           monitor.getCollection().stableDescendingSort();
@@ -3411,7 +3339,7 @@ public void repairModCount() {
       };
       test.runAllTests("PackedBooleanArrSeqTest.teststableDescendingSort_void",false);
     }
-  @Tag("testsubList_intint") @Order(140072) @Test public void testsubList_intint(){
+  @Test public void testsubList_intint(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3463,7 +3391,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testsubList_intint");
   }
-  @Order(171990) @Test public void testtoArray_IntFunction(){
+   @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -3478,7 +3406,7 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testtoArray_IntFunction",true);
   }
-  @Order(117024) @Test public void testtoArray_ObjectArray(){
+   @Test public void testtoArray_ObjectArray(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3506,7 +3434,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testtoArray_ObjectArray");
   }
-  @Order(1056) @Test public void testtoArray_void(){
+   @Test public void testtoArray_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         if(initParams.totalPostAlloc>0) {
             continue;
@@ -3535,7 +3463,7 @@ public void repairModCount() {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testtoArray_void");
   }
-  @Order(2112) @Test public void testtoString_void(){
+   @Test public void testtoString_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection.OfBoolean seq){
         seq.toString();
@@ -3546,14 +3474,4 @@ public void repairModCount() {
     };
     test.runAllTests("PackedBooleanArrSeqTest.testtoString_void");
   }
-  @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
-      int numTestsRemaining;
-      if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-        System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-      }
-      TestExecutorService.reset();
-    }
-  @org.junit.jupiter.api.BeforeEach public void setNumWorkers(){
-      TestExecutorService.setNumWorkers(Runtime.getRuntime().availableProcessors());
-    }
 }

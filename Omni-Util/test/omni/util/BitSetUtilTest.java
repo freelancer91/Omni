@@ -8,11 +8,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-@TestMethodOrder(OrderAnnotation.class)
 public class BitSetUtilTest{
     
     private static final int[] FIB_SEQ=new int[] {0,1,2,3,5,8,13,21,34,55,89,144,233,377,610};
@@ -73,7 +69,7 @@ public class BitSetUtilTest{
             for(int end=begin;end<6400;++end) {
               final int length=end-begin;
               byte[] buffer=null;
-              final var baos=new ByteArrayOutputStream(((length)>>3)+1);
+              final var baos=new ByteArrayOutputStream((length>>3)+1);
               try(
                  
                   final var oos=new ObjectOutputStream(baos);
@@ -112,7 +108,6 @@ public class BitSetUtilTest{
 
    
     
-    @Order(640)
     @Test
     public void testgetFromPackedArr_longArrayint() {
         int nonPackedIndex,currFibIndex;
@@ -135,7 +130,7 @@ public class BitSetUtilTest{
 
     
     private static void storeInPackedArr(long[] words,int nonPackedIndex,boolean val) {
-      final var packedIndex=(nonPackedIndex)>>6;
+      final var packedIndex=nonPackedIndex>>6;
       final var mask=1L<<nonPackedIndex;
       if(val) {
         words[packedIndex]|=mask;
@@ -143,135 +138,150 @@ public class BitSetUtilTest{
         words[packedIndex]&=~mask;
       }
     }
-    @Order(-1)
     @Test
     public void testshiftDownLeadingBits_longint() {
       for(final var testWord:BIT_PATTERN_WORDS) {
-        for(int i=0;i<128;++i) {
-          final int finalI=i;
-          long result=BitSetUtil.shiftDownLeadingBits(testWord,i);
-          int bound=i&63;
-          for(int j=0;j<bound;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>j)&1,(result>>>j)&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+        for(int exclusiveLo=0;exclusiveLo<128;++exclusiveLo) {
+          long result=BitSetUtil.shiftDownLeadingBits(testWord,exclusiveLo);
+          int bound=exclusiveLo&63;
+          for(int i=0;i<bound;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i));
           }
-          for(int j=bound;j<63;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>(j+1))&1,(result>>>(j))&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+          for(int i=bound+1;i<64;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i-1));
           }
-          Assertions.assertEquals(0,(result>>>63)&1,()->"Failed on final index i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
         }
       }
     }
-    @Order(-1)
     @Test
     public void testshiftUpLeadingBits_longint() {
       for(final var testWord:BIT_PATTERN_WORDS) {
-        for(int i=0;i<128;++i) {
-          final int finalI=i;
-          long result=BitSetUtil.shiftUpLeadingBits(testWord,i);
-          int bound=i&63;
-          for(int j=0;j<bound;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>j)&1,(result>>>j)&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+        for(int inclusiveLo=0;inclusiveLo<128;++inclusiveLo) {
+          long result=BitSetUtil.shiftUpLeadingBits(testWord,inclusiveLo);
+          int bound=inclusiveLo&63;
+          for(int i=0;i<bound;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i));
           }
-          for(int j=bound+1;j<64;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>(j-1))&1,(result>>>j)&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+          for(int i=bound;i<63;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i+1));
           }
         }
       }
     }
-    @Order(-1)
     @Test
     public void testshiftDownTrailingBits_longint() {
       for(final var testWord:BIT_PATTERN_WORDS) {
-        for(int i=0;i<128;++i) {
-          final int finalI=i;
-          long result=BitSetUtil.shiftDownTrailingBits(testWord,i);
-          int bound=i&63;
-          for(int j=0;j<bound;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>(j+1))&1,(result>>>(j))&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+        for(int inclusiveHi=0;inclusiveHi<128;++inclusiveHi) {
+          long result=BitSetUtil.shiftDownTrailingBits(testWord,inclusiveHi);
+          int bound=inclusiveHi&63;
+          for(int i=1;i<=bound;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i-1));
           }
-          for(int j=bound+1;j<64;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>(j))&1,(result>>>(j))&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+          for(int i=bound+1;i<64;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i));
           }
         }
       }
     }
-    @Order(-1)
     @Test
     public void testshiftUpTrailingBits_longint() {
       for(final var testWord:BIT_PATTERN_WORDS) {
-        for(int i=0;i<128;++i) {
-          final int finalI=i;
-          long result=BitSetUtil.shiftUpTrailingBits(testWord,i);
-          int bound=i&63;
-          Assertions.assertEquals(0,(result)&1,()->"Failed on firstIndex index i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
-
-          for(int j=1;j<=bound;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>(j-1))&1,(result>>>(j))&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+        for(int exclusiveHi=0;exclusiveHi<128;++exclusiveHi) {
+          long result=BitSetUtil.shiftUpTrailingBits(testWord,exclusiveHi);
+          int bound=exclusiveHi&63;
+          for(int i=0;i<bound;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i+1));
           }
-          for(int j=bound+1;j<64;++j) {
-            final int finalIndex=j;
-            Assertions.assertEquals((testWord>>>(j))&1,(result>>>(j))&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
+          for(int i=bound+1;i<64;++i) {
+              Assertions.assertEquals(get(testWord,i),get(result,i));
           }
         }
       }
     }
-    @Order(-1)
+   
+    
     @Test
     public void testshiftDownMiddleBits_longintint() {
       for(final var testWord:BIT_PATTERN_WORDS) {
-        for(int i=1;i<63;++i) {
-          final int finalI=i;
-          for(int j=0;j<=i;++j) {
-            final int finalJ=j;
-            final long result=BitSetUtil.shiftDownMiddleBits(testWord,j,i);
-            for(int k=0;k<i;++k) {
-              final int finalIndex=k;
-              Assertions.assertEquals((testWord>>>k)&1,(result>>>k)&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; j="+finalJ+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
-            }
-            for(int k=i;k<j;++k) {
-              final int finalIndex=k;
-              Assertions.assertEquals((testWord>>>(k+1))&1,(result>>>k)&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; j="+finalJ+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
-              //TODO
-            }
-          
-           
-
-            //Assertions.assertEquals(0,(result>>>j)&1);
-//            for(int k=j+1;k<64;++k) {
-//              final int finalIndex=k;
-//              Assertions.assertEquals((testWord>>>k)&1,(result>>>k)&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; j="+finalJ+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
-//
-//              //TODO
-//            }
-            
+          for(int exclusiveLo=0;exclusiveLo<64;++exclusiveLo) {
+              for(int inclusiveHi=Math.max(exclusiveLo,1);inclusiveHi<64;++inclusiveHi) {
+                  long result=BitSetUtil.shiftDownMiddleBits(testWord,exclusiveLo,inclusiveHi);
+                  for(int i=0;i<exclusiveLo;++i) {
+                      Assertions.assertEquals(get(testWord,i),get(result,i));
+                  }
+                  for(int i=exclusiveLo+1;i<=inclusiveHi;++i) {
+                      Assertions.assertEquals(get(testWord,i),get(result,i-1));
+                  }
+                  for(int i=inclusiveHi+1;i<64;++i) {
+                      Assertions.assertEquals(get(testWord,i),get(result,i));
+                  }
+              }
           }
-          
-//          long result=BitSetUtil.shiftUpTrailingBits(testWord,i);
-//          int bound=i&63;
-//          Assertions.assertEquals(0,(result)&1,()->"Failed on firstIndex index i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
-//
-//          for(int j=1;j<=bound;++j) {
-//            final int finalIndex=j;
-//            Assertions.assertEquals((testWord>>>(j-1))&1,(result>>>(j))&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
-//          }
-//          for(int j=bound+1;j<64;++j) {
-//            final int finalIndex=j;
-//            Assertions.assertEquals((testWord>>>(j))&1,(result>>>(j))&1,()->"Failed at index "+finalIndex+"; i="+finalI+"; testWord="+BitSetUtil.prettyPrintWord(testWord)+"; result="+BitSetUtil.prettyPrintWord(result));
-//          }
-        }
       }
     }
-
+    @Test
+    public void testshiftUpMiddleBits_longintint() {
+      for(final var testWord:BIT_PATTERN_WORDS) {
+          for(int inclusiveLo=0;inclusiveLo<64;++inclusiveLo) {
+              for(int exclusiveHi=inclusiveLo;exclusiveHi<64;++exclusiveHi) {
+                  long result=BitSetUtil.shiftUpMiddleBits(testWord,inclusiveLo,exclusiveHi);
+                  for(int i=0;i<inclusiveLo;++i) {
+                      Assertions.assertEquals(get(testWord,i),get(result,i));
+                  }
+                  for(int i=inclusiveLo;i<exclusiveHi;++i) {
+                      Assertions.assertEquals(get(testWord,i),get(result,i+1));
+                  }
+                  for(int i=exclusiveHi+1;i<64;++i) {
+                      Assertions.assertEquals(get(testWord,i),get(result,i));
+                  }
+              }
+          }
+      }
+    }
+    @Test
+    public void testpullUpLoop_longArraylongintint() {
+        for(var testWord:BIT_PATTERN_WORDS) {
+            for(int begin=0;begin<10;++begin) {
+                for(int end=begin;end<10;++end) {
+                    long[] words=new long[10];
+                    for(int i=0;i<10;++i) {
+                        words[i]=testWord;
+                    }
+                    long remainderWord=BitSetUtil.pullUpLoop(words,testWord,begin,end);
+                    Assertions.assertEquals(testWord,remainderWord);
+                    for(int i=end;i>begin;--i) {
+                        Assertions.assertEquals(testWord<<1|testWord>>>-1,words[i]);
+                    }
+                }
+            }
+        }
+    }
+    @Test
+    public void testpullDownLoop_longArraylongintint() {
+        for(var testWord:BIT_PATTERN_WORDS) {
+            for(int begin=0;begin<10;++begin) {
+                for(int end=begin;end<10;++end) {
+                    long[] words=new long[10];
+                    for(int i=0;i<10;++i) {
+                        words[i]=testWord;
+                    }
+                    long remainderWord=BitSetUtil.pullDownLoop(words,testWord,begin,end);
+                    Assertions.assertEquals(testWord,remainderWord);
+                    for(int i=begin;i<end;++i) {
+                        Assertions.assertEquals(testWord>>>1|testWord<<-1,words[i]);
+                    }
+                }
+            }
+        }
+    }
     
     
-    @Order(100)
+    
+    private static long get(long word,int index) {
+        return word>>>index&1;
+    }
+ 
+    
     @Test
     public void testgetWordFlipper_boolean() {
         Random rand=new Random(0);
@@ -286,7 +296,6 @@ public class BitSetUtilTest{
         }
         TestExecutorService.completeAllTests("BitSetUtilTest.testgetWordFlipper_boolean");
     }
-    @Order(100)
     @Test
     public void testprettyPrintword_int() {
         Random rand=new Random(0);
@@ -308,7 +317,6 @@ public class BitSetUtilTest{
         }
         TestExecutorService.completeAllTests("BitSetUtilTest.testprettyPrintword_int");
     }
-    @Order(100)
     @Test
     public void testprettyPrintword_short() {
         Random rand=new Random(0);
@@ -330,7 +338,6 @@ public class BitSetUtilTest{
         }
         TestExecutorService.completeAllTests("BitSetUtilTest.testprettyPrintword_short");
     }
-    @Order(100)
     @Test
     public void testprettyPrintword_char() {
         Random rand=new Random(0);
@@ -352,7 +359,6 @@ public class BitSetUtilTest{
         }
         TestExecutorService.completeAllTests("BitSetUtilTest.testprettyPrintword_char");
     }
-    @Order(100)
     @Test
     public void testprettyPrintword_byte() {
         Random rand=new Random(0);
@@ -370,7 +376,6 @@ public class BitSetUtilTest{
         }
         TestExecutorService.completeAllTests("BitSetUtilTest.testprettyPrintword_byte");
     }
-    @Order(100)
     @Test
     public void testprettyPrintword_long() {
         Random rand=new Random(0);
@@ -393,7 +398,6 @@ public class BitSetUtilTest{
         TestExecutorService.completeAllTests("BitSetUtilTest.testprettyPrintword_long");
     }
     @Test
-    @Order(13860)
     public void testsrcUnalignedPullDown_longArrayintintint() {
         long[] testArr=generateTestArr(640,new Random(0));
         for(int tmpDstWordOffset=0;tmpDstWordOffset<10;++tmpDstWordOffset) {
@@ -421,7 +425,6 @@ public class BitSetUtilTest{
         TestExecutorService.completeAllTests("BitSetUtilTest.testsrcUnalignedPullDown_longArrayintintint");
     }
     @Test
-    @Order(772695)
     public void testdstUnalignedPullDown_longArrayintintint() {
         long[] testArr=generateTestArr(640,new Random(0));
         for(int tmpDstOffset=1;tmpDstOffset<640;++tmpDstOffset) {
@@ -456,10 +459,9 @@ public class BitSetUtilTest{
         TestExecutorService.completeAllTests("BitSetUtilTest.testdstUnalignedPullDown_longArrayintintint");
     }
     private static boolean getFromPackedArr(long[] words,int nonPackedIndex) {
-      return (words[(nonPackedIndex)>>6]>>>nonPackedIndex&1)!=0;
+      return get(words[nonPackedIndex>>6],nonPackedIndex)!=0;
     }
     @Test
-    @Order(1280)
     public void testuncheckedcontains_longArrayintLongUnaryOperator() {
         for(int v=0;v<=1;++v) {
             final boolean val=v!=0;
@@ -467,7 +469,7 @@ public class BitSetUtilTest{
             for(int tmpBound=1;tmpBound<=640;++tmpBound) {
                 final int bound=tmpBound;
                 TestExecutorService.submitTest(()->{
-                    long[] arr=new long[(((bound)-1)>>6)+1];
+                    long[] arr=new long[(bound-1>>6)+1];
                     if(!val) {
                         for(int i=arr.length;--i>=0;) {
                             arr[i]=-1L;
@@ -486,7 +488,6 @@ public class BitSetUtilTest{
 
     }
     @Test
-    @Order(85760)
     public void testuncheckedcontains_longArrayintintLongUnaryOperator() {
         for(int v=0;v<=1;++v) {
             final boolean val=v!=0;
@@ -496,7 +497,7 @@ public class BitSetUtilTest{
                 for(int tmpOffset=0;tmpOffset<=66;++tmpOffset) {
                     final int offset=tmpOffset;
                     TestExecutorService.submitTest(()->{
-                        long[] arr=new long[(((size+offset)-1)>>6)+1];
+                        long[] arr=new long[(size+offset-1>>6)+1];
                         if(!val) {
                             for(int i=arr.length;--i>=0;) {
                                 arr[i]=-1L;

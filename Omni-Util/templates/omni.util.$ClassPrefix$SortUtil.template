@@ -2004,5 +2004,5 @@ Integer.signum(sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2
 
 
 #MACRODEF Assert(expr)
-assert expr;
+//assert expr;
 #ENDDEF

@@ -59,40 +59,42 @@ public interface BitSetUtil{
     }
     
     
-    public static long shiftUpLeadingBits(long word,int shiftInclusiveLo)
+    public static long shiftUpLeadingBits(long word,int inclusiveLo)
     {
         final long mask;
-        return word<<1&(mask=-1L<<shiftInclusiveLo)|word&~mask;
+        return word<<1&(mask=-1L<<inclusiveLo)|word&~mask;
     }
-    public static long shiftUpTrailingBits(long word,int shiftInclusiveHi) {
+    public static long shiftUpTrailingBits(long word,int exclusiveHi) {
         final long mask;
-        return word<<1&(mask=-1L>>>-shiftInclusiveHi-1) | word&~mask;
+        return word<<1&(mask=-1L>>>-exclusiveHi-1) | word&~mask;
     }
-    public static long shiftDownTrailingBits(long word,int shiftExclusiveHi) {
+    public static long shiftDownTrailingBits(long word,int inclusiveHi) {
         final long mask;
-        return word&(mask=-1L<<shiftExclusiveHi) | word>>>1&~mask;
+        return word&(mask=-1L<<inclusiveHi) | word>>>1&~mask;
     }
-    public static long shiftDownLeadingBits(long word,int shiftInclusiveLo) {
+    public static long shiftDownLeadingBits(long word,int exclusiveLo) {
         final long mask;
-        return word>>>1&(mask=-1L<<shiftInclusiveLo)|word&~mask;
+        return word>>>1&(mask=-1L<<exclusiveLo)|word&~mask;
     }
-    public static long shiftDownMiddleBits(long word,int shiftInclusiveLo,int shiftInclusiveHi) {
+    
+    /**
+     * @implNote does not work when exclusiveLo==0 && inclusiveHi==0
+     * @param word
+     * @param exclusiveLo
+     * @param inclusiveHi
+     * @return
+     */
+    public static long shiftDownMiddleBits(long word,int exclusiveLo,int inclusiveHi) {
         final long mask;
-        return word>>>1&(mask=-1L<<shiftInclusiveLo&-1L>>>-shiftInclusiveHi) | word&~mask;
+        return word>>>1&(mask=-1L<<exclusiveLo&-1L>>>-inclusiveHi) | word&~mask;
     }
-    public static long shiftDownEdgeBits(long word,int cursor,int tail) {
-        final long mask;
-        return word&(mask=-1L<<tail & -1L>>>-cursor) | word>>>1&~mask;
-    }
-    public static long shiftUpMiddleBits(long word,int head,int cursor)
+    
+    public static long shiftUpMiddleBits(long word,int inclusiveLo,int exclusiveHi)
     {
         final long mask;
-        return word<<1&(mask=-1L<<head&-1L>>>-cursor-1) | word&~mask;
+        return word<<1&(mask=-1L<<inclusiveLo&-1L>>>-exclusiveHi-1) | word&~mask;
     }
-    public static long shiftUpEdgeBits(long word,int cursor,int head) {
-        final long mask;
-        return word&(mask=-1L<<cursor+1&-1L>>>-head) | word<<1&~mask;
-    }
+   
     
     public static long combineWordWithTrailingBitOfNext(long currWord,long nextWord) {
         return currWord | nextWord<<-1;
@@ -121,15 +123,15 @@ public interface BitSetUtil{
       case 7:
         return dataInput.readLong();
       case 6:
-        return ((long)dataInput.readUnsignedByte()<<48)|(((long)dataInput.readUnsignedShort()<<32))|(((long)dataInput.readInt())&0xffffffffL);
+        return (long)dataInput.readUnsignedByte()<<48|(long)dataInput.readUnsignedShort()<<32|dataInput.readInt()&0xffffffffL;
       case 5:
-        return ((long)dataInput.readUnsignedShort()<<32)|(((long)dataInput.readInt())&0xffffffffL);
+        return (long)dataInput.readUnsignedShort()<<32|dataInput.readInt()&0xffffffffL;
       case 4:
-        return (((long)dataInput.readInt())&0xffffffffL) | ((long)dataInput.readUnsignedByte()<<32);
+        return dataInput.readInt()&0xffffffffL | (long)dataInput.readUnsignedByte()<<32;
       case 3:
         return dataInput.readInt();
       case 2:
-        return ((long)dataInput.readUnsignedByte()<<16) | (((long)dataInput.readUnsignedShort()));
+        return (long)dataInput.readUnsignedByte()<<16 | dataInput.readUnsignedShort();
       case 1:
         return dataInput.readUnsignedShort();
       default:

@@ -9,11 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniCollection;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
@@ -49,8 +45,6 @@ import omni.impl.ShortDblLnkNode;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@TestMethodOrder(OrderAnnotation.class)
-@Tag("NewTest")
 public class DblLnkSeqTest{
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
     private static final double[] POSITIONS=new double[]{-1,0,0.25,0.5,0.75,1.0};
@@ -225,7 +219,7 @@ public class DblLnkSeqTest{
         }
         return subListMonitor;
     }
-    @Order(527850)
+    
     @Test
     public void testadd_intval(){
         ALL_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -302,7 +296,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testadd_intval");
     }
-    @Order(124890)
+    
     @Test
     public void testadd_val(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -343,19 +337,19 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testadd_val");
     }
-    @Order(138)
+    
     @Test
     public void testaddFirst_val(){
         final DequeAddTest test=DblLnkSeqMonitor::verifyAddFirst;
         test.runAllTests("DblLnkSeqTest.testaddFirst_val");
     }
-    @Order(138)
+    
     @Test
     public void testaddLast_val(){
         final DequeAddTest test=DblLnkSeqMonitor::verifyAddLast;
         test.runAllTests("DblLnkSeqTest.testaddLast_val");
     }
-    @Order(1872)
+    
     @Test
     public void testclear_void(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -368,13 +362,13 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testclear_void");
     }
-    @Order(1872)
+    
     @Test
     public void testequals_Object(){
         final BasicTest test=(monitor,illegalMod)->Assertions.assertFalse(monitor.getCollection().equals(null));
         test.runAllTests("DblLnkSeqTest.testequals_Object");
     }
-    @Order(1872)
+    
     @Test
     public void testclone_void(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -387,7 +381,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testclone_void");
     }
-    @Order(18)
+    
     @Test
     public void testConstructor_void(){
         for(final var checkedType:CheckedType.values()){
@@ -398,7 +392,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testConstructor_void");
     }
-    @Order(1117984)
+    
     @Test
     public void testcontains_val(){
         final QueryTest<MonitoredSequence<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -411,7 +405,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testcontains_val",true);
     }
-    @Order(36)
+    
     @Test
     public void testdescendingIterator_void(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -432,13 +426,13 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testdescendingIterator_void");
     }
-    @Order(18)
+    
     @Test
     public void testelement_void(){
         final DeqGetTest test=DblLnkSeqMonitor::verifyElement;
         test.runAllGetFirstTests("DblLnkSeqTest.testelement_void",true);
     }
-    @Order(118908)
+    
     @Test
     public void testforEach_Consumer(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -458,7 +452,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testforEach_Consumer",100);
     }
-    @Order(1872)
+    
     @Test
     public void testget_int(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -487,19 +481,19 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testget_int");
     }
-    @Order(18)
+    
     @Test
     public void testgetFirst_void(){
         final DeqGetTest test=DblLnkSeqMonitor::verifyGetFirst;
         test.runAllGetFirstTests("DblLnkSeqTest.testgetFirst_void",true);
     }
-    @Order(18)
+    
     @Test
     public void testgetLast_void(){
         final DeqGetTest test=DblLnkSeqMonitor::verifyGetLast;
         test.runAllGetLastTests("DblLnkSeqTest.testgetLast_void",true);
     }
-    @Order(2960)
+    
     @Test
     public void testhashCode_void(){
         final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
@@ -514,7 +508,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testhashCode_void");
     }
-    @Order(1117984)
+    
     @Test
     public void testindexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -533,7 +527,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testindexOf_val",true);
     }
-    @Order(1872)
+    
     @Test
     public void testisEmpty_void(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -546,7 +540,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testisEmpty_void");
     }
-    @Order(1872)
+    
     @Test
     public void testiterator_void(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -563,7 +557,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testiterator_void");
     }
-    @Order(11340)
+    
     @Test
     public void testItrclone_void(){
         for(final var size:SIZES){
@@ -593,7 +587,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrclone_void");
     }
-    @Order(927902)
+    
     @Test
     public void testItrforEachRemaining_Consumer(){
         for(final int size:MEDIUM_SIZES){
@@ -669,7 +663,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrforEachRemaining_Consumer");
     }
-    @Order(6156)
+    
     @Test
     public void testItrhasNext_void(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -692,7 +686,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrhasNext_void");
     }
-    @Order(64973)
+    
     @Test
     public void testItrnext_void(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -734,7 +728,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrnext_void");
     }
-    @Order(80847)
+    
     @Test
     public void testItrremove_void(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -841,7 +835,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrremove_void");
     }
-    @Order(1117984)
+    
     @Test
     public void testlastIndexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -861,7 +855,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testlastIndexOf_val",true);
     }
-    @Order(1836)
+    
     @Test
     public void testlistIterator_int(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -911,7 +905,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testlistIterator_int");
     }
-    @Order(1872)
+    
     @Test
     public void testlistIterator_void(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -928,7 +922,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testlistIterator_void");
     }
-    @Order(83697)
+    
     @Test
     public void testListItradd_val(){
         for(final var position:POSITIONS){
@@ -994,7 +988,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItradd_val");
     }
-    @Order(144)
+    
     @Test
     public void testListItrhasPrevious_void(){
         final ListItrPositionalQueryTest test=(initParams,size)->{
@@ -1006,7 +1000,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testListItrhasPrevious_void");
     }
-    @Order(144)
+    
     @Test
     public void testListItrnextIndex_void(){
         final ListItrPositionalQueryTest test=(initParams,size)->{
@@ -1018,7 +1012,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testListItrnextIndex_void");
     }
-    @Order(32379)
+    
     @Test
     public void testListItrprevious_void(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1061,7 +1055,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrprevious_void");
     }
-    @Order(144)
+    
     @Test
     public void testListItrpreviousIndex_void(){
         final ListItrPositionalQueryTest test=(initParams,size)->{
@@ -1073,7 +1067,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testListItrpreviousIndex_void");
     }
-    @Order(253920)
+    
     @Test
     public void testListItrset_val(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1305,76 +1299,76 @@ public class DblLnkSeqTest{
                     collectionType.classPrefix + "DblLnkSeq.CheckedSubList.testMASSIVEtoString");
         }
     }
-    @Order(138)
+    
     @Test
     public void testoffer_val(){
         final DequeAddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
                 .assertTrue(monitor.verifyOffer(inputVal,inputType,functionCallType));
         test.runAllTests("DblLnkSeqTest.testoffer_val");
     }
-    @Order(138)
+    
     @Test
     public void testofferFirst_val(){
         final DequeAddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
                 .assertTrue(monitor.verifyOfferFirst(inputVal,inputType,functionCallType));
         test.runAllTests("DblLnkSeqTest.testofferFirst_val");
     }
-    @Order(138)
+    
     @Test
     public void testofferLast_val(){
         final DequeAddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
                 .assertTrue(monitor.verifyOfferLast(inputVal,inputType,functionCallType));
         test.runAllTests("DblLnkSeqTest.testofferLast_val");
     }
-    @Order(18)
+    
     @Test
     public void testpeek_void(){
         final DeqGetTest test=DblLnkSeqMonitor::verifyPeek;
         test.runAllGetFirstTests("DblLnkSeqTest.testpeek_void",false);
     }
-    @Order(18)
+    
     @Test
     public void testpeekFirst_void(){
         final DeqGetTest test=DblLnkSeqMonitor::verifyPeekFirst;
         test.runAllGetFirstTests("DblLnkSeqTest.testpeekFirst_void",false);
     }
-    @Order(18)
+    
     @Test
     public void testpeekLast_void(){
         final DeqGetTest test=DblLnkSeqMonitor::verifyPeekLast;
         test.runAllGetLastTests("DblLnkSeqTest.testpeekLast_void",false);
     }
-    @Order(129)
+    
     @Test
     public void testpoll_void(){
         final DeqPopTest test=DblLnkSeqMonitor::verifyPoll;
         test.runAllTests("DblLnkSeqTest.testpoll_void",false);
     }
-    @Order(129)
+    
     @Test
     public void testpollFirst_void(){
         final DeqPopTest test=DblLnkSeqMonitor::verifyPollFirst;
         test.runAllTests("DblLnkSeqTest.testpollFirst_void",false);
     }
-    @Order(129)
+    
     @Test
     public void testpollLast_void(){
         final DeqPopTest test=DblLnkSeqMonitor::verifyPollLast;
         test.runAllTests("DblLnkSeqTest.testpollLast_void",false);
     }
-    @Order(129)
+    
     @Test
     public void testpop_void(){
         final DeqPopTest test=DblLnkSeqMonitor::verifyPop;
         test.runAllTests("DblLnkSeqTest.testpop_void",true);
     }
-    @Order(138)
+    
     @Test
     public void testpush_val(){
         final DequeAddTest test=DblLnkSeqMonitor::verifyPush;
         test.runAllTests("DblLnkSeqTest.testpush_val");
     }
-    @Order(1872)
+    
     @Test
     public void testput_intval(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -1411,7 +1405,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testput_intval");
     }
-    @Order(8908)
+    
     @Test
     public void testReadAndWrite(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -1429,13 +1423,13 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testReadAndWrite",0);
     }
-    @Order(129)
+    
     @Test
     public void testremove_void(){
         final DeqPopTest test=DblLnkSeqMonitor::verifyRemove;
         test.runAllTests("DblLnkSeqTest.testremove_void",true);
     }
-    @Order(294249)
+    
     @Test
     public void testremoveAt_int(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1491,13 +1485,13 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testremoveAt_int");
     }
-    @Order(129)
+    
     @Test
     public void testremoveFirst_void(){
         final DeqPopTest test=DblLnkSeqMonitor::verifyRemoveFirst;
         test.runAllTests("DblLnkSeqTest.testremoveFirst_void",true);
     }
-    @Order(171954)
+    
     @Test
     public void testremoveFirstOccurrence_val(){
         final QueryTest<DblLnkSeqMonitor<?,?>> test=new QueryTest<>(){
@@ -1518,7 +1512,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.removeFirstOccurrence_val",false);
     }
-    @Order(2674700)
+    
     @Test
     public void testremoveIf_Predicate(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1683,13 +1677,13 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testremoveIf_Predicate");
     }
-    @Order(129)
+    
     @Test
     public void testremoveLast_void(){
         final DeqPopTest test=DblLnkSeqMonitor::verifyRemoveLast;
         test.runAllTests("DblLnkSeqTest.testremoveLast_void",true);
     }
-    @Order(171954)
+    
     @Test
     public void testremoveLastOccurrence_val(){
         final QueryTest<DblLnkSeqMonitor<?,?>> test=new QueryTest<>(){
@@ -1710,7 +1704,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.removeLastOccurrence)val",false);
     }
-    @Order(18278644)
+    
     @Test
     public void testremoveVal_val(){
         final QueryTest<MonitoredSequence<?>> test=new QueryTest<>(){
@@ -1737,7 +1731,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testremoveVal_val",true);
     }
-    @Order(118908)
+    
     @Test
     public void testreplaceAll_UnaryOperator(){
         final MonitoredFunctionTest<MonitoredList<?>> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
@@ -1756,7 +1750,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testreplaceAll_UnaryOperator",100);
     }
-    @Order(171954)
+    
     @Test
     public void testsearch_val(){
         final QueryTest<DblLnkSeqMonitor<?,?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -1775,7 +1769,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testsearch_val",false);
     }
-    @Order(1872)
+    
     @Test
     public void testset_intval(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -1807,7 +1801,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testset_intval");
     }
-    @Order(1872)
+    
     @Test
     public void testsize_void(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -1820,7 +1814,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testsize_void");
     }
-    @Order(46360)
+    
     @Test
     public void testsort_Comparator(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1871,19 +1865,19 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testsort_Comparator");
     }
-    @Order(93346)
+    
     @Test
     public void teststableAscendingSort_void(){
         final NonComparatorSortTest test=MonitoredList::verifyAscendingStableSort;
         test.runStableTests("DblLnkSeqTest.teststableAscendingSort_void");
     }
-    @Order(93346)
+    
     @Test
     public void teststableDescendingSort_void(){
         final NonComparatorSortTest test=MonitoredList::verifyDescendingStableSort;
         test.runStableTests("DblLnkSeqTest.teststableDescendingSort_void");
     }
-    @Order(21042)
+    
     @Test
     public void testsubList_intint(){
         for(final var size:MEDIUM_SIZES){
@@ -1956,7 +1950,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testsubList_intint");
     }
-    @Order(8908)
+    
     @Test
     public void testtoArray_IntFunction(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -1974,7 +1968,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testtoArray_IntFunction",0);
     }
-    @Order(77337)
+    
     @Test
     public void testtoArray_ObjectArray(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -2009,7 +2003,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testtoArray_ObjectArray");
     }
-    @Order(1872)
+    
     @Test
     public void testtoArray_void(){
         final BasicTest test=(monitor,illegalMod)->{
@@ -2027,7 +2021,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testtoArray_void");
     }
-    @Order(2960)
+    
     @Test
     public void testtoString_void(){
         final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
@@ -2042,19 +2036,19 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testtoString_void");
     }
-    @Order(50594)
+    
     @Test
     public void testunstableAscendingSort_void(){
         final NonComparatorSortTest test=MonitoredList::verifyAscendingUnstableSort;
         test.runUnstableTests("DblLnkSeqTest.testunstableAscendingSort_void");
     }
-    @Order(50594)
+    
     @Test
     public void testunstableDescendingSort_void(){
         final NonComparatorSortTest test=MonitoredList::verifyDescendingUnstableSort;
         test.runUnstableTests("DblLnkSeqTest.testunstableDescendingSort_void");
     }
-    @Order(308085)
+    
     @Test
     public void testunstableSort_Comparator(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -2097,14 +2091,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testunstableSort_Comparator");
     }
-    @org.junit.jupiter.api.AfterEach
-    public void verifyAllExecuted(){
-        int numTestsRemaining;
-        if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-            System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-        }
-        TestExecutorService.reset();
-    }
+
     private static interface DequeAddTest{
         void verifyMethod(DblLnkSeqMonitor<?,?> monitor,Object inputVal,DataType inputType,
                 FunctionCallType functionCallType);

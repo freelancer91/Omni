@@ -248,19 +248,19 @@ public final class RefSortUtil
         offset+=runLen;
       }
       while((nRemaining-=runLen)!=0);
-      assert offset==bound;
+      //assert offset==bound;
       super.mergeForceCollapse(); 
     }
     @SuppressWarnings("unchecked")
     @Override
     int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      assert stackSize>=4;
-      assert n>=0;
-      assert n==stackSize-4 || n==stackSize-6;
-      assert runLenAndBase[n]>0;
-      assert runLenAndBase[n+2]>0;
-      assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
       int len1,len2;
       runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
       int base2=runLenAndBase[n+3];
@@ -273,7 +273,7 @@ public final class RefSortUtil
       int k,base1;
       //TODO streamline this?
       base1=(base1=runLenAndBase[n+1])+(k=mergeAtGallopRight((E)(arr=this.arr)[base2],arr,base1,len1,sorter));
-      assert k>=0;
+      //assert k>=0;
       if((len1-=k)!=0)
       {
         //if((len2=mergeAtGallopLeft((E)arr[base1+len1-1],arr,base2,len2),sorter)!=0)
@@ -294,7 +294,7 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int mergeAtGallopLeft(E key,Object[] arr,int base,int len,Comparator<? super E> sorter)
     {
-      assert len>0;
+      //assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -303,7 +303,7 @@ public final class RefSortUtil
       {
         return len;
       }
-      assert len>=2;
+      //assert len>=2;
       //#if(len<2 ||
       //#MACRO LessThanOrEqualTo(key,arr[base+len-2])
       //)
@@ -317,8 +317,8 @@ public final class RefSortUtil
       {
         lastOfs=len-2;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<(len-1);
+      //assert -1<=lastOfs;
+      //assert lastOfs<(len-1);
       if(++lastOfs<(ofs=(len-1)))
       {
         do
@@ -337,13 +337,13 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     @SuppressWarnings("unchecked")
     private static <E> int mergeAtGallopRight(E key,Object[] arr,int base,int len,Comparator<? super E> sorter)
     {
-      assert len>0;
+      //assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -352,7 +352,7 @@ public final class RefSortUtil
       {
         return 0;
       }
-      assert len>=2;
+      //assert len>=2;
       //#if(len<2 ||
       //#MACRO GreaterThanOrEqualTo(key,arr[base+1])
       //)
@@ -367,9 +367,9 @@ public final class RefSortUtil
         ofs=1;
       }
       lastOfs=0;
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -388,7 +388,7 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -406,9 +406,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2)
     {
-      assert len1>0;
-      assert len2>0;
-      assert base1+len1==base2;
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final Object[] tmp;
       //copy the first run into the tmp array
       int cursor1;
@@ -441,8 +441,8 @@ public final class RefSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          assert len1>1;
-          assert len2>0;
+          //assert len1>1;
+          //assert len2>0;
           if(
           sorter.compare((E)(arr[cursor2]),(E)(tmp[cursor1]))<0
           )
@@ -471,8 +471,8 @@ public final class RefSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          assert len1>1;
-          assert len2>0;
+          //assert len1>1;
+          //assert len2>0;
           if((count1=gallopRight((E)arr[cursor2],tmp,cursor1,len1,0,sorter))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
@@ -519,14 +519,14 @@ public final class RefSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len1==1)
       {
-        assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
         arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
       }
       else
       {
-        assert len2==0;
-        assert len1>1;
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
@@ -544,9 +544,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2)
     {
-      assert len1>0;
-      assert len2>0;
-      assert base1+len1==base2;
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final Object[] tmp;
       //copy the second run into the tmp array
       int tmpOffset;
@@ -575,8 +575,8 @@ public final class RefSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          assert len2>1;
-          assert len1>0;
+          //assert len2>1;
+          //assert len1>0;
           if(
           sorter.compare((E)(tmp[cursor2]),(E)(arr[cursor1]))<0
           )
@@ -605,8 +605,8 @@ public final class RefSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          assert len2>1;
-          assert len1>0;
+          //assert len2>1;
+          //assert len1>0;
           if((count1=len1-gallopRight((E)tmp[cursor2],arr,base1,len1,len1-1,sorter))!=0)
           {
             ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
@@ -649,14 +649,14 @@ public final class RefSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len2==1)
       {
-        assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2]; //move the first element of run2 to the front of the merge
       }
       else
       {
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
       }
     }
@@ -680,9 +680,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int gallopLeft(E key,Object[] arr,int base,int len,int hint,Comparator<? super E> sorter)
     {
-      assert len>0;
-      assert hint>=0;
-      assert hint<len;
+      //assert len>0;
+      //assert hint>=0;
+      //assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -717,9 +717,9 @@ public final class RefSortUtil
         }
         ofs=hint;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -738,7 +738,7 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -758,9 +758,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int gallopRight(E key,Object[] arr,int base,int len,int hint,Comparator<? super E> sorter)
     {
-      assert len>0;
-      assert hint>=0;
-      assert hint<len;
+      //assert len>0;
+      //assert hint>=0;
+      //assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -795,9 +795,9 @@ public final class RefSortUtil
         }
         lastOfs=hint;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -816,7 +816,7 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     @SuppressWarnings("unchecked")
@@ -824,14 +824,14 @@ public final class RefSortUtil
       ,Comparator<? super E> sorter
     )
     {
-      assert lo<=start;
-      assert start<=hi;
+      //assert lo<=start;
+      //assert start<=hi;
       //TODO streamline
       for(;start<hi;++start)
       {
         final
         E pivot=(E)arr[start];
-        assert lo<start;
+        //assert lo<start;
         int left=lo;
         int right=start;
         do
@@ -849,7 +849,7 @@ public final class RefSortUtil
           }
         }
         while(left<right);
-        assert left==right;
+        //assert left==right;
         ArrCopy.semicheckedCopy(arr,left,arr,left+1,start-left);
         arr[left]=pivot;
       }
@@ -860,7 +860,7 @@ public final class RefSortUtil
     )
     {
       //TODO streamline
-      assert lo<hi;
+      //assert lo<hi;
       int runHi;
       if((runHi=lo+1)==hi)
       {
@@ -931,19 +931,19 @@ public final class RefSortUtil
         offset+=runLen;
       }
       while((nRemaining-=runLen)!=0);
-      assert offset==bound;
+      //assert offset==bound;
       super.mergeForceCollapse(); 
     }
     @SuppressWarnings("unchecked")
     @Override
     int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      assert stackSize>=4;
-      assert n>=0;
-      assert n==stackSize-4 || n==stackSize-6;
-      assert runLenAndBase[n]>0;
-      assert runLenAndBase[n+2]>0;
-      assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
       int len1,len2;
       runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
       int base2=runLenAndBase[n+3];
@@ -956,7 +956,7 @@ public final class RefSortUtil
       int k,base1;
       //TODO streamline this?
       base1=(base1=runLenAndBase[n+1])+(k=mergeAtGallopRight((Comparable<E>)(arr=this.arr)[base2],arr,base1,len1));
-      assert k>=0;
+      //assert k>=0;
       if((len1-=k)!=0)
       {
         //if((len2=mergeAtGallopLeft((Comparable<E>)arr[base1+len1-1],arr,base2,len2))!=0)
@@ -977,7 +977,7 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int mergeAtGallopLeft(Comparable<E> key,Object[] arr,int base,int len)
     {
-      assert len>0;
+      //assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -986,7 +986,7 @@ public final class RefSortUtil
       {
         return len;
       }
-      assert len>=2;
+      //assert len>=2;
       //#if(len<2 ||
       //#MACRO LessThanOrEqualTo(key,arr[base+len-2])
       //)
@@ -1000,8 +1000,8 @@ public final class RefSortUtil
       {
         lastOfs=len-2;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<(len-1);
+      //assert -1<=lastOfs;
+      //assert lastOfs<(len-1);
       if(++lastOfs<(ofs=(len-1)))
       {
         do
@@ -1020,13 +1020,13 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     @SuppressWarnings("unchecked")
     private static <E> int mergeAtGallopRight(Comparable<E> key,Object[] arr,int base,int len)
     {
-      assert len>0;
+      //assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -1035,7 +1035,7 @@ public final class RefSortUtil
       {
         return 0;
       }
-      assert len>=2;
+      //assert len>=2;
       //#if(len<2 ||
       //#MACRO GreaterThanOrEqualTo(key,arr[base+1])
       //)
@@ -1050,9 +1050,9 @@ public final class RefSortUtil
         ofs=1;
       }
       lastOfs=0;
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -1071,7 +1071,7 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -1089,9 +1089,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2)
     {
-      assert len1>0;
-      assert len2>0;
-      assert base1+len1==base2;
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final Object[] tmp;
       //copy the first run into the tmp array
       int cursor1;
@@ -1123,8 +1123,8 @@ public final class RefSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          assert len1>1;
-          assert len2>0;
+          //assert len1>1;
+          //assert len2>0;
           if(
           ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))<0
           )
@@ -1153,8 +1153,8 @@ public final class RefSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          assert len1>1;
-          assert len2>0;
+          //assert len1>1;
+          //assert len2>0;
           if((count1=gallopRight((Comparable<E>)arr[cursor2],tmp,cursor1,len1,0))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
@@ -1201,14 +1201,14 @@ public final class RefSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len1==1)
       {
-        assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
         arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
       }
       else
       {
-        assert len2==0;
-        assert len1>1;
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
@@ -1226,9 +1226,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2)
     {
-      assert len1>0;
-      assert len2>0;
-      assert base1+len1==base2;
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final Object[] tmp;
       //copy the second run into the tmp array
       int tmpOffset;
@@ -1256,8 +1256,8 @@ public final class RefSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          assert len2>1;
-          assert len1>0;
+          //assert len2>1;
+          //assert len1>0;
           if(
           ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))<0
           )
@@ -1286,8 +1286,8 @@ public final class RefSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          assert len2>1;
-          assert len1>0;
+          //assert len2>1;
+          //assert len1>0;
           if((count1=len1-gallopRight((Comparable<E>)tmp[cursor2],arr,base1,len1,len1-1))!=0)
           {
             ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
@@ -1330,14 +1330,14 @@ public final class RefSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len2==1)
       {
-        assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2]; //move the first element of run2 to the front of the merge
       }
       else
       {
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
       }
     }
@@ -1360,9 +1360,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int gallopLeft(Comparable<E> key,Object[] arr,int base,int len,int hint)
     {
-      assert len>0;
-      assert hint>=0;
-      assert hint<len;
+      //assert len>0;
+      //assert hint>=0;
+      //assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -1397,9 +1397,9 @@ public final class RefSortUtil
         }
         ofs=hint;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -1418,7 +1418,7 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -1437,9 +1437,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int gallopRight(Comparable<E> key,Object[] arr,int base,int len,int hint)
     {
-      assert len>0;
-      assert hint>=0;
-      assert hint<len;
+      //assert len>0;
+      //assert hint>=0;
+      //assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -1474,9 +1474,9 @@ public final class RefSortUtil
         }
         lastOfs=hint;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -1495,21 +1495,21 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     @SuppressWarnings("unchecked")
     private static <E> void binarySort(Object[] arr,int lo,int hi,int start
     )
     {
-      assert lo<=start;
-      assert start<=hi;
+      //assert lo<=start;
+      //assert start<=hi;
       //TODO streamline
       for(;start<hi;++start)
       {
         final
         Comparable<E> pivot=(Comparable<E>)arr[start];
-        assert lo<start;
+        //assert lo<start;
         int left=lo;
         int right=start;
         do
@@ -1527,7 +1527,7 @@ public final class RefSortUtil
           }
         }
         while(left<right);
-        assert left==right;
+        //assert left==right;
         ArrCopy.semicheckedCopy(arr,left,arr,left+1,start-left);
         arr[left]=pivot;
       }
@@ -1537,7 +1537,7 @@ public final class RefSortUtil
     )
     {
       //TODO streamline
-      assert lo<hi;
+      //assert lo<hi;
       int runHi;
       if((runHi=lo+1)==hi)
       {
@@ -1608,19 +1608,19 @@ public final class RefSortUtil
         offset+=runLen;
       }
       while((nRemaining-=runLen)!=0);
-      assert offset==bound;
+      //assert offset==bound;
       super.mergeForceCollapse(); 
     }
     @SuppressWarnings("unchecked")
     @Override
     int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      assert stackSize>=4;
-      assert n>=0;
-      assert n==stackSize-4 || n==stackSize-6;
-      assert runLenAndBase[n]>0;
-      assert runLenAndBase[n+2]>0;
-      assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runLenAndBase[n+1]==runLenAndBase[n+3];
       int len1,len2;
       runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
       int base2=runLenAndBase[n+3];
@@ -1633,7 +1633,7 @@ public final class RefSortUtil
       int k,base1;
       //TODO streamline this?
       base1=(base1=runLenAndBase[n+1])+(k=mergeAtGallopRight((Comparable<E>)(arr=this.arr)[base2],arr,base1,len1));
-      assert k>=0;
+      //assert k>=0;
       if((len1-=k)!=0)
       {
         //if((len2=mergeAtGallopLeft((Comparable<E>)arr[base1+len1-1],arr,base2,len2))!=0)
@@ -1654,7 +1654,7 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int mergeAtGallopLeft(Comparable<E> key,Object[] arr,int base,int len)
     {
-      assert len>0;
+      //assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -1663,7 +1663,7 @@ public final class RefSortUtil
       {
         return len;
       }
-      assert len>=2;
+      //assert len>=2;
       //#if(len<2 ||
       //#MACRO LessThanOrEqualTo(key,arr[base+len-2])
       //)
@@ -1677,8 +1677,8 @@ public final class RefSortUtil
       {
         lastOfs=len-2;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<(len-1);
+      //assert -1<=lastOfs;
+      //assert lastOfs<(len-1);
       if(++lastOfs<(ofs=(len-1)))
       {
         do
@@ -1697,13 +1697,13 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     @SuppressWarnings("unchecked")
     private static <E> int mergeAtGallopRight(Comparable<E> key,Object[] arr,int base,int len)
     {
-      assert len>0;
+      //assert len>0;
       int ofs;
       int lastOfs;
       if(
@@ -1712,7 +1712,7 @@ public final class RefSortUtil
       {
         return 0;
       }
-      assert len>=2;
+      //assert len>=2;
       //#if(len<2 ||
       //#MACRO GreaterThanOrEqualTo(key,arr[base+1])
       //)
@@ -1727,9 +1727,9 @@ public final class RefSortUtil
         ofs=1;
       }
       lastOfs=0;
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -1748,7 +1748,7 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -1766,9 +1766,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2)
     {
-      assert len1>0;
-      assert len2>0;
-      assert base1+len1==base2;
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final Object[] tmp;
       //copy the first run into the tmp array
       int cursor1;
@@ -1800,8 +1800,8 @@ public final class RefSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          assert len1>1;
-          assert len2>0;
+          //assert len1>1;
+          //assert len2>0;
           if(
           ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))>0
           )
@@ -1830,8 +1830,8 @@ public final class RefSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          assert len1>1;
-          assert len2>0;
+          //assert len1>1;
+          //assert len2>0;
           if((count1=gallopRight((Comparable<E>)arr[cursor2],tmp,cursor1,len1,0))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
@@ -1878,14 +1878,14 @@ public final class RefSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len1==1)
       {
-        assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
         arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
       }
       else
       {
-        assert len2==0;
-        assert len1>1;
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
@@ -1903,9 +1903,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2)
     {
-      assert len1>0;
-      assert len2>0;
-      assert base1+len1==base2;
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final Object[] tmp;
       //copy the second run into the tmp array
       int tmpOffset;
@@ -1933,8 +1933,8 @@ public final class RefSortUtil
         //Do the straightforward thing until (if ever) one run starts winning consistently
         do
         {
-          assert len2>1;
-          assert len1>0;
+          //assert len2>1;
+          //assert len1>0;
           if(
           ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))>0
           )
@@ -1963,8 +1963,8 @@ public final class RefSortUtil
         //So try that, an continue galloping until (if ever) neither run appears to be wnning consistently anymore
         do
         {
-          assert len2>1;
-          assert len1>0;
+          //assert len2>1;
+          //assert len1>0;
           if((count1=len1-gallopRight((Comparable<E>)tmp[cursor2],arr,base1,len1,len1-1))!=0)
           {
             ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
@@ -2007,14 +2007,14 @@ public final class RefSortUtil
       this.minGallop = minGallop < 1 ? 1 : minGallop;
       if(len2==1)
       {
-        assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2]; //move the first element of run2 to the front of the merge
       }
       else
       {
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
       }
     }
@@ -2037,9 +2037,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int gallopLeft(Comparable<E> key,Object[] arr,int base,int len,int hint)
     {
-      assert len>0;
-      assert hint>=0;
-      assert hint<len;
+      //assert len>0;
+      //assert hint>=0;
+      //assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -2074,9 +2074,9 @@ public final class RefSortUtil
         }
         ofs=hint;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -2095,7 +2095,7 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     /**
@@ -2114,9 +2114,9 @@ public final class RefSortUtil
     @SuppressWarnings("unchecked")
     private static <E> int gallopRight(Comparable<E> key,Object[] arr,int base,int len,int hint)
     {
-      assert len>0;
-      assert hint>=0;
-      assert hint<len;
+      //assert len>0;
+      //assert hint>=0;
+      //assert hint<len;
       int ofs;
       int lastOfs;
       if(
@@ -2151,9 +2151,9 @@ public final class RefSortUtil
         }
         lastOfs=hint;
       }
-      assert -1<=lastOfs;
-      assert lastOfs<ofs;
-      assert ofs<=len;
+      //assert -1<=lastOfs;
+      //assert lastOfs<ofs;
+      //assert ofs<=len;
       if(++lastOfs<ofs)
       {
         do
@@ -2172,21 +2172,21 @@ public final class RefSortUtil
         }
         while(lastOfs<ofs);
       }
-      assert lastOfs==ofs;
+      //assert lastOfs==ofs;
       return ofs;
     }
     @SuppressWarnings("unchecked")
     private static <E> void binarySort(Object[] arr,int lo,int hi,int start
     )
     {
-      assert lo<=start;
-      assert start<=hi;
+      //assert lo<=start;
+      //assert start<=hi;
       //TODO streamline
       for(;start<hi;++start)
       {
         final
         Comparable<E> pivot=(Comparable<E>)arr[start];
-        assert lo<start;
+        //assert lo<start;
         int left=lo;
         int right=start;
         do
@@ -2204,7 +2204,7 @@ public final class RefSortUtil
           }
         }
         while(left<right);
-        assert left==right;
+        //assert left==right;
         ArrCopy.semicheckedCopy(arr,left,arr,left+1,start-left);
         arr[left]=pivot;
       }
@@ -2214,7 +2214,7 @@ public final class RefSortUtil
     )
     {
       //TODO streamline
-      assert lo<hi;
+      //assert lo<hi;
       int runHi;
       if((runHi=lo+1)==hi)
       {
@@ -4462,7 +4462,7 @@ public final class RefSortUtil
         {
           newSize=minCapacity;
         }
-        assert newSize>0;
+        //assert newSize>0;
         this.tmp=tmp=new Object[newSize];
         this.tmpLength=newSize;
         tmpOffset=0;

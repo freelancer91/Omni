@@ -6,11 +6,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
@@ -27,13 +23,9 @@ import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@TestMethodOrder(OrderAnnotation.class)
-@Tag("NewTest")
 public class PackedBooleanArrDeqTest{
-  //private static final int[] SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10,15,20,30,40,50,60,70,80,90,100};
   private static final int[] SHORT_SIZES;
   private static final int[] SIZES;
-  
   static {
       {
           IntStream.Builder builder=IntStream.builder();
@@ -125,14 +117,14 @@ if(length!=0) {
     
     
     private static boolean getFromPackedArr(long[] arr,int index) {
-      return (arr[index>>6] &(1L<<index))!=0;
+      return (arr[index>>6] &1L<<index)!=0;
     }
     private static int getPackedCapacity(int index) {
-      return ((index-1)>>6)+1;
+      return (index-1>>6)+1;
     }
     private static void storeInPackedArr(long[] arr,int index,boolean val) {
       if(val) {
-        arr[index>>6]|=(1L<<index);
+        arr[index>>6]|=1L<<index;
       }else {
         arr[index>>6]&=~(1L<<index);
       }
@@ -594,8 +586,8 @@ if(length!=0) {
       private static void headRunPullDown(long[] words,int lastRet,int tail,int arrBound)
       {
           if(arrBound==0) {
-              final long word;
-              words[0]=BitSetUtil.combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownEdgeBits(word=words[0],lastRet,tail),word);
+              final long word,mask;
+              words[0]=BitSetUtil.combineWordWithTrailingBitOfNext((word=words[0])&(mask=-1L<<tail & -1L>>>-lastRet) | word>>>1&~mask,word);
           }else {
               int lastRetOffset;
               long word=BitSetUtil.shiftDownLeadingBits(words[lastRetOffset=lastRet>>6],lastRet);
@@ -621,8 +613,9 @@ if(length!=0) {
       }
       private static void tailRunPullUp(long[] words,int lastRet,int head,int arrBound) {
           if(arrBound==0) {
-              final long word;
-              words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpEdgeBits(word=words[0],lastRet,head),word);
+              final long word,mask;
+              words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev((word=words[0])&(mask=-1L<<lastRet+1&-1L>>>-head) | word<<1&~mask,
+                      word);
           }else {
               int lastRetOffset;
               long word=BitSetUtil.shiftUpTrailingBits(words[lastRetOffset=lastRet>>6],lastRet);
@@ -2007,33 +2000,33 @@ if(length!=0) {
         QueryCastType castType,DataType inputType,int size,double position);
   }
 
-  @Order(23040)
+  
   @Test public void testadd_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyAdd(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testadd_val");
   }
-  @Order(23040)
+  
   @Test public void testaddFirst_val(){
     final AddTest test=PackedBooleanArrDeqMonitor::verifyAddFirst;
     test.runAllTests("PackedBooleanArrDeqTest.testaddFirst_val");
   }
-  @Order(23040)
+  
   @Test public void testaddLast_val(){
     final AddTest test=PackedBooleanArrDeqMonitor::verifyAddLast;
     test.runAllTests("PackedBooleanArrDeqTest.testaddLast_val");
   }
-  @Order(256)
+  
   @Test public void testclear_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyClear;
     test.runAllTests("PackedBooleanArrDeqTest.testclear_void",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testclone_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyClone;
     test.runAllTests("PackedBooleanArrDeqTest.testclone_void",SHORT_SIZES);
   }
-  @Order(130) @Test public void testConstructor_int(){
+   @Test public void testConstructor_int(){
     for(final var checkedType:CheckedType.values()){
         for(int tmpInitCap=0;tmpInitCap <= 512;tmpInitCap+=8){
           final int initCap=tmpInitCap;
@@ -2045,7 +2038,7 @@ if(length!=0) {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testConstructor_int");
   }
-  @Order(2)
+  
   @Test public void testConstructor_void(){
     for(final var checkedType:CheckedType.values()){
       TestExecutorService.submitTest(()->{
@@ -2053,16 +2046,14 @@ if(length!=0) {
       });
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testConstructor_void");
-  }
-  @Tag("testcontains_val")
-  @Order(74820)
+  }  
   @Test public void testcontains_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,position)->{
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
     test.runAllTests("PackedBooleanArrDeqTest.testcontains_val");
   }
-  @Order(256)
+  
   @Test public void testdescendingIterator_void(){
     final BasicTest test=monitor->{
       monitor.getMonitoredDescendingIterator().verifyIteratorState();
@@ -2070,7 +2061,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testdescendingIterator_void",SHORT_SIZES);
   }
-  @Order(101376)
+  
   @Test public void testelement_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyElement(outputType);
@@ -2080,12 +2071,12 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testelement_void",true);
   }
-  @Order(256)
+  
   @Test public void testequals_Object(){
     final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
     test.runAllTests("PackedBooleanArrDeqTest.testequals_Object",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2097,7 +2088,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testforEach_Consumer",100,SHORT_SIZES);
   }
-  @Order(101376)
+  
   @Test public void testgetFirst_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyGetFirst(outputType);
@@ -2107,7 +2098,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testgetFirst_void",true);
   }
-  @Order(101376)
+  
   @Test public void testgetLast_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyGetLast(outputType);
@@ -2117,17 +2108,17 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testgetLast_void",true);
   }
-  @Order(256)
+  
   @Test public void testhashCode_void(){
     BasicTest test=PackedBooleanArrDeqMonitor::verifyHashCode;
     test.runAllTests("PackedBooleanArrDeqTest.testhashCode_void",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testisEmpty_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyIsEmpty;
     test.runAllTests("PackedBooleanArrDeqTest.testisEmpty_void",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testiterator_void(){
     final BasicTest test=monitor->{
       monitor.getMonitoredIterator().verifyIteratorState();
@@ -2135,7 +2126,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testiterator_void",SHORT_SIZES);
   }
-  @Order(256) @Test public void testItrclone_void(){
+   @Test public void testItrclone_void(){
     final BasicTest test=monitor->{
       final int size=monitor.size();
       for(final var itrType:StructType.PackedBooleanArrDeq.validItrTypes){
@@ -2150,7 +2141,7 @@ if(length!=0) {
   }
   
  
-  @Order(256)
+  
   @Test public void testItrforEachRemaining_Consumer(){
     BasicTest test=(monitor)->{
         int prevNumToIterate=-1;
@@ -2201,7 +2192,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testItrforEachRemaining_Consumer",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testItrhasNext_void(){
     final BasicTest test=monitor->{
       for(final var itrType:StructType.PackedBooleanArrDeq.validItrTypes){
@@ -2213,7 +2204,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testItrhasNext_void",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testItrnext_void(){
       BasicTest test=monitor->{
           for(var itrType:StructType.PackedBooleanArrDeq.validItrTypes) {
@@ -2244,9 +2235,7 @@ if(length!=0) {
           }
       };
       test.runAllTests("PackedBooleanArrDeqTest.testItrnext_void",SHORT_SIZES);
-  }
-  @Tag("testItrremove_void")
-  @Order(341936)
+  }  
   @Test public void testItrremove_void(){
     for(var size:SHORT_SIZES){
       final int initCapBound=size+64&-64;
@@ -2335,12 +2324,10 @@ if(length!=0) {
     int size=deq.size();
     String str=deq.toString();
     boolean firstVal=deq.booleanElement();
-   
     int offset;
     Assertions.assertEquals('[',str.charAt(offset=0));
-    //int numBatches=TestExecutorService.getNumWorkers();
     int numBatches=1;
-    int batchSize=(((size-1)/2)/numBatches) * 13;
+    int batchSize=(size-1)/2/numBatches * 13;
     if(firstVal)
     {
       Assertions.assertEquals('t',str.charAt(++offset));
@@ -2376,14 +2363,9 @@ if(length!=0) {
         });
         offset=batchBound;
       }
-    
-      
-      
-      
     }
     else
     {
-      
       Assertions.assertEquals('f',str.charAt(++offset));
       Assertions.assertEquals('a',str.charAt(++offset));
       Assertions.assertEquals('l',str.charAt(++offset));
@@ -2423,55 +2405,7 @@ if(length!=0) {
     }
     Assertions.assertEquals(']',str.charAt(str.length()-1));
     TestExecutorService.completeAllTests(testName);
-    
-//      int offset;
-//      Assertions.assertEquals('[',result.charAt(offset=0));
-//      Assertions.assertEquals('f',result.charAt(++offset));
-//      Assertions.assertEquals('a',result.charAt(++offset));
-//      Assertions.assertEquals('l',result.charAt(++offset));
-//      Assertions.assertEquals('s',result.charAt(++offset));
-//      Assertions.assertEquals('e',result.charAt(++offset));
-//      ++offset;
-//      int numBatches=TestExecutorService.getNumWorkers();
-//      int batchSize=(seqSize-2)/numBatches * 13;
-//      for(int batchCount=0;batchCount<numBatches;++batchCount) {
-//          final int batchOffset=offset;
-//          final int batchBound=batchCount == numBatches?result.length() - 1:offset + batchSize;
-//          TestExecutorService.submitTest(()->{
-//              for(int i=batchOffset;;++i) {
-//                if(i>=batchBound) {
-//                    break;
-//                }
-//                Assertions.assertEquals(',',result.charAt(i));
-//                Assertions.assertEquals(' ',result.charAt(++i));
-//                Assertions.assertEquals('t',result.charAt(++i));
-//                Assertions.assertEquals('r',result.charAt(++i));
-//                Assertions.assertEquals('u',result.charAt(++i));
-//                Assertions.assertEquals('e',result.charAt(++i));
-//                if(++i>=batchBound) {
-//                    break;
-//                }
-//                Assertions.assertEquals(',',result.charAt(i));
-//                Assertions.assertEquals(' ',result.charAt(++i));
-//                Assertions.assertEquals('f',result.charAt(++i));
-//                Assertions.assertEquals('a',result.charAt(++i));
-//                Assertions.assertEquals('l',result.charAt(++i));
-//                Assertions.assertEquals('s',result.charAt(++i));
-//                Assertions.assertEquals('e',result.charAt(++i));
-//              }
-//          });
-//      }
-//      Assertions.assertEquals(',',result.charAt(offset=result.length()-7));
-//      Assertions.assertEquals(' ',result.charAt(++offset));
-//      Assertions.assertEquals('t',result.charAt(++offset));
-//      Assertions.assertEquals('r',result.charAt(++offset));
-//      Assertions.assertEquals('u',result.charAt(++offset));
-//      Assertions.assertEquals('e',result.charAt(++offset));
-//      Assertions.assertEquals(']',result.charAt(++offset));
-//      TestExecutorService.completeAllTests(testName);
   }
-  @Order(Integer.MAX_VALUE-1)
-  @Tag("testMASSIVEtoString")
   @Test public void testMASSIVEtoString(){
       int seqSize;
       long[] words;
@@ -2505,41 +2439,26 @@ if(length!=0) {
         ++deq.tail;
         verifyMASSIVEToStringHelper(deq,"PackedBooleanArrDeqTest.testMASSIVEtoString Unchecked fragmented first bit true");        
       }
-      
-      
-//      }
-//      //TODO test checked
-//      deq.tail=seqSize/2+1;
-//      deq.head=deq.head+1;
-//      verifyMASSIVEToStringHelper(deq.toString(),seqSize,"PackedBooleanArrDeqTest.testMASSIVEtoString fragmented");
-//      deq=new PackedBooleanArrDeq.Checked(0,words,seqSize-1);
-//      verifyMASSIVEToStringHelper(deq.toString(),seqSize,"PackedBooleanArrDeqTest.Checked.testMASSIVEtoString nonfragmented");
-//      //TODO test checked
-//      deq.tail=seqSize/2+1;
-//      deq.head=deq.head+1;
-//      verifyMASSIVEToStringHelper(deq.toString(),seqSize,"PackedBooleanArrDeqTest.Checked.testMASSIVEtoString fragmented");
-      
-    
   }
-  @Order(23040)
+  
   @Test public void testoffer_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOffer(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testoffer_val");
   }
-  @Order(23040)
+  
   @Test public void testofferFirst_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOfferFirst(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testofferFirst_val");
   }
-  @Order(23040)
+  
   @Test public void testofferLast_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOfferLast(inputVal,inputType,functionCallType));
     test.runAllTests("PackedBooleanArrDeqTest.testofferLast_val");
   }
-  @Order(101376)
+  
   @Test public void testpeek_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeek(outputType);
@@ -2549,7 +2468,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testpeek_void",false);
   }
-  @Order(101376) @Test public void testpeekFirst_void(){
+   @Test public void testpeekFirst_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeekFirst(outputType);
       if(!monitor.isEmpty()){
@@ -2558,7 +2477,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testpeekFirst_void",false);
   }
-  @Order(101376)
+  
   @Test public void testpeekLast_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeekLast(outputType);
@@ -2568,32 +2487,30 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testpeekLast_void",false);
   }
-  @Order(101376)
+  
   @Test public void testpoll_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPoll;
     test.runAllTests("PackedBooleanArrDeqTest.testpoll_void",false);
   }
-  @Order(101376)
+  
   @Test public void testpollFirst_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPollFirst;
     test.runAllTests("PackedBooleanArrDeqTest.testpollFirst_void",false);
   }
-  @Order(101376)
+  
   @Test public void testpollLast_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPollLast;
     test.runAllTests("PackedBooleanArrDeqTest.testpollLast_void",false);
   }
-  @Order(101376)
+  
   @Test public void testpop_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyPop;
     test.runAllTests("PackedBooleanArrDeqTest.testpop_void",true);
   }
-  @Order(23040) @Test public void testpush_val(){
+   @Test public void testpush_val(){
     final AddTest test=PackedBooleanArrDeqMonitor::verifyPush;
     test.runAllTests("PackedBooleanArrDeqTest.testpush_val");
-  }
-  @Tag("testReadAndWrite")
-  @Order(3676)
+  }  
   @Test public void testReadAndWrite(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
@@ -2605,17 +2522,17 @@ if(length!=0) {
     
     test.runAllTests("PackedBooleanArrDeqTest.testReadAndWrite",0,SIZES);
   }
-  @Order(101376)
+  
   @Test public void testremove_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemove;
     test.runAllTests("PackedBooleanArrDeqTest.testremove_void",true);
   }
-  @Order(101376)
+  
   @Test public void testremoveFirst_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemoveFirst;
     test.runAllTests("PackedBooleanArrDeqTest.testremoveFirst_void",true);
   }
-  @Order(8263580)
+  
   @Test public void testremoveFirstOccurrence_val(){
     final RemoveValTest test=(monitor,queryVal,modification,castType,inputType,size,position)->{
         Assertions.assertEquals(position >= 0,
@@ -2623,9 +2540,7 @@ if(length!=0) {
 
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveFirstOccurrence_val");
-  }
-  @Tag("testremoveIf_Predicate")
-  @Order(4369698)
+  }  
   @Test public void testremoveIf_Predicate(){
       for(final var checkedType:CheckedType.values()){
         for(final var filterGen:StructType.PackedBooleanArrDeq.validMonitoredRemoveIfPredicateGens){
@@ -2707,18 +2622,13 @@ if(length!=0) {
           }
         }
       }
-    
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testremoveIf_Predicate");
-   
-    
   }
-  @Order(101376)
+  
   @Test public void testremoveLast_void(){
     final GetTest test=PackedBooleanArrDeqMonitor::verifyRemoveLast;
     test.runAllTests("PackedBooleanArrDeqTest.testremoveLast_void",true);
-  }
-  @Tag("testremoveLastOccurrence_val")
-  @Order(8263580)
+  }  
   @Test public void testremoveLastOccurrence_val(){
     final RemoveValTest test=(monitor,queryVal,modification,castType,inputType,size,position)->{
         Assertions.assertEquals(position >= 0,
@@ -2726,17 +2636,13 @@ if(length!=0) {
 
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveLastOccurrence_val");
-  }
-  @Tag("testremoveVal_val")
-  @Order(8263580)
+  }  
   @Test public void testremoveVal_val(){
     final RemoveValTest test=(monitor,queryVal,modification,castType,inputType,size,position)->{
         Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
     };
     test.runAllTests("PackedBooleanArrDeqTest.testremoveVal_val");
-  }
-  @Tag("testsearch_val")
-  @Order(74820)
+  }  
   @Test public void testsearch_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,position)->{
         int expectedIndex;
@@ -2749,12 +2655,12 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testsearch_val");
   }
-  @Order(256)
+  
   @Test public void testsize_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifySize;
     test.runAllTests("PackedBooleanArrDeqTest.testsize_void",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
@@ -2765,7 +2671,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testtoArray_IntFunction",0,SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testtoArray_ObjectArray(){
     final BasicTest test=(monitor)->{
       final int size=monitor.size();
@@ -2776,7 +2682,7 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testtoArray_ObjectArray",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testtoArray_void(){
     final BasicTest test=(monitor)->{
       for(final var outputType:monitor.dataType.validOutputTypes()){
@@ -2785,21 +2691,9 @@ if(length!=0) {
     };
     test.runAllTests("PackedBooleanArrDeqTest.testtoArray_void",SHORT_SIZES);
   }
-  @Order(256)
+  
   @Test public void testtoString_void(){
       BasicTest test=PackedBooleanArrDeqMonitor::verifyToString;
       test.runAllTests("PackedBooleanArrDeqTest.testtoString_void",SHORT_SIZES);
-  }
-  @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
-    int numTestsRemaining;
-    if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-      System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-    }
-    TestExecutorService.reset();
-  }
-  @org.junit.jupiter.api.BeforeEach public void setNumWorkers(){
-    //TestExecutorService.setNumWorkers(Math.min(8,Runtime.getRuntime().availableProcessors()));
-
-    TestExecutorService.setNumWorkers(Runtime.getRuntime().availableProcessors());
   }
 }

@@ -20,9 +20,57 @@ import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
+import java.util.Collection;
 //TODO integration into Java Collection library
-public abstract interface OmniCollection<E> extends Cloneable
+public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
 {
+  @Override
+  default java.util.Spliterator<E> spliterator(){
+    //TODO implement in lower classes and remove this
+    return Collection.super.spliterator();
+  }
+  //TODO add overloads for OmniCollection etc.
+  @Override
+  default public boolean addAll(Collection<? extends E> that){
+    //TODO override in lower classes and remove this
+    boolean changed=false;
+    for(var thatVal:that){
+      changed|=this.add(thatVal);
+    }
+    return changed;
+  }
+  @Override
+  default public boolean containsAll(Collection<?> that){
+    //TODO override in lower classes and remove this
+    for(var thatVal:that){
+      if(!this.contains(thatVal)){
+        return false;
+      }
+    }
+    return true;
+  }
+  @Override
+  default public boolean removeAll(Collection<?> that){
+    //TODO override this in lower classes and remove this
+    boolean changed=false;
+    for(var thatVal:that){
+      changed|=this.remove(thatVal);
+    }
+    return changed;
+  }
+  @Override
+  default public boolean retainAll(Collection<?> that){
+    //TODO override this in lower classes and remove this
+    boolean changed=false;
+    for(var itr=this.iterator();itr.hasNext();){
+      if(!that.contains(itr.next())){
+        changed=true;
+        itr.remove();
+      }
+    }
+    return changed;
+  }
+
   //TODO add the rest of the methods
   //public abstract boolean add(E val);
   public abstract OmniIterator<E> iterator();

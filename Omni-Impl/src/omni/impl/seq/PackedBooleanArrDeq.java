@@ -19,9 +19,8 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     private static final long serialVersionUID=1L;
     private static void headRunPullDown(long[] words,int lastRet,int tail,int arrBound){
         if(arrBound == 0){
-            final long word;
-            words[0]=BitSetUtil
-                    .combineWordWithTrailingBitOfNext(BitSetUtil.shiftDownEdgeBits(word=words[0],lastRet,tail),word);
+            final long word,mask;
+            words[0]=BitSetUtil.combineWordWithTrailingBitOfNext((word=words[0])&(mask=-1L<<tail & -1L>>>-lastRet) | word>>>1&~mask,word);
         }else{
             int lastRetOffset;
             long word=BitSetUtil.shiftDownLeadingBits(words[lastRetOffset=lastRet >> 6],lastRet);
@@ -63,8 +62,8 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     }
     private static void tailRunPullUp(long[] words,int lastRet,int head,int arrBound){
         if(arrBound == 0){
-            final long word;
-            words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev(BitSetUtil.shiftUpEdgeBits(word=words[0],lastRet,head),
+            final long word,mask;
+            words[0]=BitSetUtil.combineWordWithLeadingBitOfPrev((word=words[0])&(mask=-1L<<lastRet+1&-1L>>>-head) | word<<1&~mask,
                     word);
         }else{
             int lastRetOffset;

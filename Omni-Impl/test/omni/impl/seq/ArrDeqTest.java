@@ -4,11 +4,7 @@ import java.util.Random;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import omni.api.OmniCollection;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
@@ -27,8 +23,6 @@ import omni.impl.QueryVal;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@TestMethodOrder(OrderAnnotation.class)
-@Tag("NewTest")
 public class ArrDeqTest{
   private static interface AddTest{
     private void runAllTests(String testName){
@@ -1305,7 +1299,7 @@ public class ArrDeqTest{
               boolean v=(boolean)dataType.convertValUnchecked(inputType,inputVal);
               boolean[] arr=(boolean[])expectedArr;
               arr[index]=!v;
-              this.expectedTail=(--tail==-1)?bound:tail;
+              this.expectedTail=--tail==-1?bound:tail;
             }else {
               int headDist,tailDist;
               if((headDist=index - head) <= (tailDist=bound - index) + tail + 1){
@@ -2739,28 +2733,28 @@ public class ArrDeqTest{
     }
     REMOVE_IF_SIZES[REMOVE_IF_SIZES.length - 1]=16384;
   }
-  @Order(6072) @Test public void testadd_val(){
+   @Test public void testadd_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyAdd(inputVal,inputType,functionCallType));
     test.runAllTests("ArrDeqTest.testadd_val");
   }
-  @Order(6072) @Test public void testaddFirst_val(){
+   @Test public void testaddFirst_val(){
     final AddTest test=ArrDeqMonitor::verifyAddFirst;
     test.runAllTests("ArrDeqTest.testaddFirst_val");
   }
-  @Order(6072) @Test public void testaddLast_val(){
+   @Test public void testaddLast_val(){
     final AddTest test=ArrDeqMonitor::verifyAddLast;
     test.runAllTests("ArrDeqTest.testaddLast_val");
   }
-  @Order(31428) @Test public void testclear_void(){
+   @Test public void testclear_void(){
     final BasicTest test=ArrDeqMonitor::verifyClear;
     test.runAllTests("ArrDeqTest.testclear_void");
   }
-  @Order(31428) @Test public void testclone_void(){
+   @Test public void testclone_void(){
     final BasicTest test=ArrDeqMonitor::verifyClone;
     test.runAllTests("ArrDeqTest.testclone_void");
   }
-  @Order(72) @Test public void testConstructor_int(){
+   @Test public void testConstructor_int(){
     for(final var checkedType:CheckedType.values()){
       for(final var collectionType:DataType.values()){
         for(int tmpInitCap=0;tmpInitCap <= 15;tmpInitCap+=5){
@@ -2773,7 +2767,7 @@ public class ArrDeqTest{
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testConstructor_int");
   }
-  @Order(18) @Test public void testConstructor_void(){
+   @Test public void testConstructor_void(){
     for(final var checkedType:CheckedType.values()){
       for(final var collectionType:DataType.values()){
         TestExecutorService.submitTest(()->{
@@ -2783,7 +2777,7 @@ public class ArrDeqTest{
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testConstructor_void");
   }
-  @Order(5012622) @Test public void testcontains_val(){
+   @Test public void testcontains_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,monitoredObjectGen,position)->{
       if(monitoredObjectGen == null){
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
@@ -2793,14 +2787,14 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testcontains_val");
   }
-  @Order(31428) @Test public void testdescendingIterator_void(){
+   @Test public void testdescendingIterator_void(){
     final BasicTest test=monitor->{
       monitor.getMonitoredDescendingIterator().verifyIteratorState();
       monitor.verifyCollectionState();
     };
     test.runAllTests("ArrDeqTest.testdescendingIterator_void");
   }
-  @Order(20812) @Test public void testelement_void(){
+   @Test public void testelement_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyElement(outputType);
       if(!monitor.isEmpty()){
@@ -2809,11 +2803,11 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testelement_void",true);
   }
-  @Order(31428) @Test public void testequals_Object(){
+   @Test public void testequals_Object(){
       final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
       test.runAllTests("ArrDeqTest.testequals_Object");
   }
-  @Order(3971795) @Test public void testforEach_Consumer(){
+   @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null || monitor.isEmpty()){
         monitor.verifyForEach(functionGen,functionCallType,randSeed);
@@ -2824,7 +2818,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testforEach_Consumer",100);
   }
-  @Order(20812) @Test public void testgetFirst_void(){
+   @Test public void testgetFirst_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyGetFirst(outputType);
       if(!monitor.isEmpty()){
@@ -2833,7 +2827,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testgetFirst_void",true);
   }
-  @Order(20812) @Test public void testgetLast_void(){
+   @Test public void testgetLast_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyGetLast(outputType);
       if(!monitor.isEmpty()){
@@ -2842,7 +2836,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testgetLast_void",true);
   }
-  @Order(29743) @Test public void testhashCode_void(){
+   @Test public void testhashCode_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniDeque<?> seq){
         seq.hashCode();
@@ -2853,18 +2847,18 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testhashCode_void");
   }
-  @Order(31428) @Test public void testisEmpty_void(){
+   @Test public void testisEmpty_void(){
     final BasicTest test=ArrDeqMonitor::verifyIsEmpty;
     test.runAllTests("ArrDeqTest.testisEmpty_void");
   }
-  @Order(31428) @Test public void testiterator_void(){
+   @Test public void testiterator_void(){
     final BasicTest test=monitor->{
       monitor.getMonitoredIterator().verifyIteratorState();
       monitor.verifyCollectionState();
     };
     test.runAllTests("ArrDeqTest.testiterator_void");
   }
-  @Order(31428) @Test public void testItrclone_void(){
+   @Test public void testItrclone_void(){
     final BasicTest test=monitor->{
       final int size=monitor.size();
       for(final var itrType:StructType.ArrDeq.validItrTypes){
@@ -2877,7 +2871,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testItrclone_void");
   }
-  @Order(13471054) @Test public void testItrforEachRemaining_Consumer(){
+   @Test public void testItrforEachRemaining_Consumer(){
     for(final var size:SHORT_SIZES){
       final int interval=Math.max(1,size / 10);
       final int rotateBound=size / 2 + interval;
@@ -2938,7 +2932,7 @@ public class ArrDeqTest{
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testItrforEachRemaining_Consumer");
   }
-  @Order(31428) @Test public void testItrhasNext_void(){
+   @Test public void testItrhasNext_void(){
     final BasicTest test=monitor->{
       for(final var itrType:StructType.ArrDeq.validItrTypes){
         final var itrMonitor=monitor.getMonitoredIterator(itrType);
@@ -2949,7 +2943,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testItrhasNext_void");
   }
-  @Order(778042) @Test public void testItrnext_void(){
+   @Test public void testItrnext_void(){
     for(final var size:SIZES){
       final int interval=Math.max(1,size / 10);
       final int rotateBound=size / 2 + interval;
@@ -3006,7 +3000,7 @@ public class ArrDeqTest{
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testItrnext_void");
   }
-  @Order(551862) @Test public void testItrremove_void(){
+   @Test public void testItrremove_void(){
     for(final var size:SIZES){
       final int interval=Math.max(1,size / 10);
       final int rotateBound=size / 2 + interval;
@@ -3089,7 +3083,7 @@ public class ArrDeqTest{
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testItrremove_void");
   }
-  @Order(Integer.MAX_VALUE) @Test public void testMASSIVEtoString(){
+   @Test public void testMASSIVEtoString(){
     for(final var collectionType:DataType.values()){
       int seqSize;
       if((seqSize=collectionType.massiveToStringThreshold + 1) == 0){
@@ -3164,22 +3158,22 @@ public class ArrDeqTest{
           collectionType.classPrefix + "ArrDeqTest.Fragmented.testMassiveToString");
     }
   }
-  @Order(6072) @Test public void testoffer_val(){
+   @Test public void testoffer_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOffer(inputVal,inputType,functionCallType));
     test.runAllTests("ArrDeqTest.testoffer_val");
   }
-  @Order(6072) @Test public void testofferFirst_val(){
+   @Test public void testofferFirst_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOfferFirst(inputVal,inputType,functionCallType));
     test.runAllTests("ArrDeqTest.testofferFirst_val");
   }
-  @Order(6072) @Test public void testofferLast_val(){
+   @Test public void testofferLast_val(){
     final AddTest test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOfferLast(inputVal,inputType,functionCallType));
     test.runAllTests("ArrDeqTest.testofferLast_val");
   }
-  @Order(20812) @Test public void testpeek_void(){
+   @Test public void testpeek_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeek(outputType);
       if(!monitor.isEmpty()){
@@ -3188,7 +3182,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testpeek_void",false);
   }
-  @Order(20812) @Test public void testpeekFirst_void(){
+   @Test public void testpeekFirst_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeekFirst(outputType);
       if(!monitor.isEmpty()){
@@ -3197,7 +3191,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testpeekFirst_void",false);
   }
-  @Order(20812) @Test public void testpeekLast_void(){
+   @Test public void testpeekLast_void(){
     final GetTest test=(monitor,outputType)->{
       monitor.verifyPeekLast(outputType);
       if(!monitor.isEmpty()){
@@ -3206,27 +3200,27 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testpeekLast_void",false);
   }
-  @Order(20812) @Test public void testpoll_void(){
+   @Test public void testpoll_void(){
     final GetTest test=ArrDeqMonitor::verifyPoll;
     test.runAllTests("ArrDeqTest.testpoll_void",false);
   }
-  @Order(20812) @Test public void testpollFirst_void(){
+   @Test public void testpollFirst_void(){
     final GetTest test=ArrDeqMonitor::verifyPollFirst;
     test.runAllTests("ArrDeqTest.testpollFirst_void",false);
   }
-  @Order(20812) @Test public void testpollLast_void(){
+   @Test public void testpollLast_void(){
     final GetTest test=ArrDeqMonitor::verifyPollLast;
     test.runAllTests("ArrDeqTest.testpollLast_void",false);
   }
-  @Order(20812) @Test public void testpop_void(){
+   @Test public void testpop_void(){
     final GetTest test=ArrDeqMonitor::verifyPop;
     test.runAllTests("ArrDeqTest.testpop_void",true);
   }
-  @Order(6072) @Test public void testpush_val(){
+   @Test public void testpush_val(){
     final AddTest test=ArrDeqMonitor::verifyPush;
     test.runAllTests("ArrDeqTest.testpush_val");
   }
-  @Order(122795) @Test public void testReadAndWrite(){
+   @Test public void testReadAndWrite(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
         Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
@@ -3236,15 +3230,15 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testReadAndWrite",0);
   }
-  @Order(20812) @Test public void testremove_void(){
+   @Test public void testremove_void(){
     final GetTest test=ArrDeqMonitor::verifyRemove;
     test.runAllTests("ArrDeqTest.testremove_void",true);
   }
-  @Order(20812) @Test public void testremoveFirst_void(){
+   @Test public void testremoveFirst_void(){
     final GetTest test=ArrDeqMonitor::verifyRemoveFirst;
     test.runAllTests("ArrDeqTest.testremoveFirst_void",true);
   }
-  @Order(5012622) @Test public void testremoveFirstOccurrence_val(){
+   @Test public void testremoveFirstOccurrence_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,monitoredObjectGen,position)->{
       if(monitoredObjectGen == null){
         Assertions.assertEquals(position >= 0,
@@ -3255,7 +3249,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testremoveFirstOccurrence_val");
   }
-  @Order(12353670) @Test public void testremoveIf_Predicate(){
+   @Test public void testremoveIf_Predicate(){
     for(final var collectionType:DataType.values()){
       for(final var checkedType:CheckedType.values()){
         for(final var filterGen:StructType.ArrDeq.validMonitoredRemoveIfPredicateGens){
@@ -3345,11 +3339,11 @@ public class ArrDeqTest{
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testremoveIf_Predicate");
   }
-  @Order(20812) @Test public void testremoveLast_void(){
+   @Test public void testremoveLast_void(){
     final GetTest test=ArrDeqMonitor::verifyRemoveLast;
     test.runAllTests("ArrDeqTest.testremoveLast_void",true);
   }
-  @Order(5012622) @Test public void testremoveLastOccurrence_val(){
+   @Test public void testremoveLastOccurrence_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,monitoredObjectGen,position)->{
       if(monitoredObjectGen == null){
         Assertions.assertEquals(position >= 0,
@@ -3360,7 +3354,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testremoveLastOccurrence_val");
   }
-  @Order(5012622) @Test public void testremoveVal_val(){
+   @Test public void testremoveVal_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,monitoredObjectGen,position)->{
       if(monitoredObjectGen == null){
         Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
@@ -3370,7 +3364,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testremoveVal_val");
   }
-  @Order(5012622) @Test public void testsearch_val(){
+   @Test public void testsearch_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,monitoredObjectGen,position)->{
       if(monitoredObjectGen == null){
         int expectedIndex;
@@ -3386,11 +3380,11 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testsearch_val");
   }
-  @Order(31428) @Test public void testsize_void(){
+   @Test public void testsize_void(){
     final BasicTest test=ArrDeqMonitor::verifySize;
     test.runAllTests("ArrDeqTest.testsize_void");
   }
-  @Order(122795) @Test public void testtoArray_IntFunction(){
+   @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
         monitor.verifyToArray(functionGen);
@@ -3400,7 +3394,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testtoArray_IntFunction",0);
   }
-  @Order(31428) @Test public void testtoArray_ObjectArray(){
+   @Test public void testtoArray_ObjectArray(){
     final BasicTest test=(monitor)->{
       final int size=monitor.size();
       final int inc=Math.max(1,size / 10);
@@ -3410,7 +3404,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testtoArray_ObjectArray");
   }
-  @Order(31428) @Test public void testtoArray_void(){
+   @Test public void testtoArray_void(){
     final BasicTest test=(monitor)->{
       for(final var outputType:monitor.dataType.validOutputTypes()){
         outputType.verifyToArray(monitor);
@@ -3418,7 +3412,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTst.testtoArray_void");
   }
-  @Order(29743) @Test public void testtoString_void(){
+   @Test public void testtoString_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniDeque<?> seq){
         seq.toString();
@@ -3428,15 +3422,5 @@ public class ArrDeqTest{
       }
     };
     test.runAllTests("ArrDeqTst.testtoString_void");
-  }
-  @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
-    int numTestsRemaining;
-    if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-      System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-    }
-    TestExecutorService.reset();
-  }
-  @org.junit.jupiter.api.BeforeEach public void setNumWorkers(){
-    TestExecutorService.setNumWorkers(Runtime.getRuntime().availableProcessors());
   }
 }

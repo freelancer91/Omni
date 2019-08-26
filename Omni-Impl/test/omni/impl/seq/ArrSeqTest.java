@@ -10,11 +10,7 @@ import java.util.function.IntConsumer;
 import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
@@ -41,7 +37,7 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@Tag("NewTest") @TestMethodOrder(OrderAnnotation.class) public class ArrSeqTest{
+public class ArrSeqTest{
   private static abstract class AbstractArrSeqMonitor<SEQ extends AbstractSeq<?>&Externalizable>
       extends AbstractSequenceMonitor<SEQ>{
     AbstractArrSeqMonitor(CheckedType checkedType,DataType dataType){
@@ -4383,7 +4379,7 @@ import omni.util.TestExecutorService;
   private static ArrStackMonitor<?,?> getMonitoredStack(SequenceInitParams initParams,int initCapacity){
     return new ArrStackMonitor<>(initParams,initCapacity);
   }
-  @Order(68172) @Test public void testadd_intval(){
+   @Test public void testadd_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -4448,7 +4444,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testadd_intval");
   }
-  @Order(18768) @Test public void testadd_val(){
+   @Test public void testadd_val(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -4486,15 +4482,15 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testadd_val");
   }
-  @Order(39168) @Test public void testclear_void(){
+   @Test public void testclear_void(){
     final BasicTest test=MonitoredSequence::verifyClear;
     test.runAllTests("ArrSeqTest.testclear_void");
   }
-  @Order(39168) @Test public void testclone_void(){
+   @Test public void testclone_void(){
     final BasicTest test=MonitoredSequence::verifyClone;
     test.runAllTests("ArrSeqTest.testclone_void");
   }
-  @Order(144) @Test public void testConstructor_int(){
+   @Test public void testConstructor_int(){
     for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
       for(final var initCap:INIT_CAPACITIES){
         TestExecutorService.submitTest(()->{
@@ -4557,7 +4553,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_int");
   }
-  @Order(36) @Test public void testConstructor_void(){
+   @Test public void testConstructor_void(){
     for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
       TestExecutorService.submitTest(()->{
         MonitoredSequence<?> monitor;
@@ -4576,7 +4572,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_void");
   }
-  @Order(12510126) @Test public void testcontains_val(){
+   @Test public void testcontains_val(){
     final QueryTest<?> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
       if(monitoredObjectGen == null){
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
@@ -4586,14 +4582,14 @@ import omni.util.TestExecutorService;
     };
     test.runAllTests("ArrSeqTest.testcontains_val",2);
   }
-  @Order(324) @Test public void testequals_Object(){
+   @Test public void testequals_Object(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       TestExecutorService
           .submitTest(()->Assertions.assertFalse(getMonitoredSequence(initParams,0).getCollection().equals(null)));
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testequals_Object");
   }
-  @Order(5724) @Test public void testforEach_Consumer(){
+   @Test public void testforEach_Consumer(){
       for(var size:SIZES) {
           for(final var initParams:ALL_STRUCT_INIT_PARAMS){
               final int initValBound=initParams.collectionType == DataType.BOOLEAN && size != 0?1:0;
@@ -4634,7 +4630,7 @@ import omni.util.TestExecutorService;
       }
       TestExecutorService.completeAllTests("ArrSeqTest.testforEach_Consumer");
   }
-  @Order(1188) @Test public void testget_int(){
+   @Test public void testget_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -4668,7 +4664,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testget_int");
   }
-  @Order(16352) @Test public void testhashCode_void(){
+   @Test public void testhashCode_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection<?> seq){
         seq.hashCode();
@@ -4679,7 +4675,7 @@ import omni.util.TestExecutorService;
     };
     test.runAllTests("ArrSeqTest.testhashCode_void");
   }
-  @Order(12142287) @Test public void testindexOf_val(){
+   @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<? extends AbstractSeq<?>>> test
         =(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
           if(monitoredObjectGen == null){
@@ -4696,13 +4692,11 @@ import omni.util.TestExecutorService;
         };
     test.runAllTests("ArrSeqTest.testindexOf_val",0);
   }
- 
-  
-  @Order(39168) @Test public void testisEmpty_void(){
+   @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
     test.runAllTests("ArrSeqTest.testisEmpty_void");
   }
-  @Order(9792) @Test public void testiterator_void(){
+   @Test public void testiterator_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -4728,7 +4722,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testiterator_void");
   }
-  @Order(28350) @Test public void testItrclone_void(){
+   @Test public void testItrclone_void(){
     for(final var size:SIZES){
       int prevIndex=-1;
       for(final var position:POSITIONS){
@@ -4750,7 +4744,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrclone_void");
   }
-  @Order(5184) @Test public void testItrforEachRemaining_Consumer(){
+   @Test public void testItrforEachRemaining_Consumer(){
       for(final int size:SIZES) {
           for(var initParams:ALL_STRUCT_INIT_PARAMS) {
               TestExecutorService.submitTest(()->{
@@ -4798,7 +4792,7 @@ import omni.util.TestExecutorService;
       }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrforEachRemaining_Consumer");
   }
-  @Order(1260) @Test public void testItrhasNext_void(){
+   @Test public void testItrhasNext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
         for(final int size:SHORT_SIZES){
             TestExecutorService.submitTest(()->{
@@ -4814,7 +4808,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrhasNext_void");
   }
-  @Order(30057) @Test public void testItrnext_void(){
+   @Test public void testItrnext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
@@ -4857,7 +4851,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrnext_void");
   }
-  @Order(189360) @Test public void testItrremove_void(){
+   @Test public void testItrremove_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
@@ -4945,7 +4939,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testItrremove_void");
   }
-  @Order(12142287) @Test public void testlastIndexOf_val(){
+   @Test public void testlastIndexOf_val(){
     final QueryTest<MonitoredList<? extends AbstractSeq<?>>> test
         =(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
           if(monitoredObjectGen == null){
@@ -4962,7 +4956,7 @@ import omni.util.TestExecutorService;
         };
     test.runAllTests("ArrSeqTest.testlastIndexOf_val",0);
   }
-  @Order(9351) @Test public void testlistIterator_int(){
+   @Test public void testlistIterator_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var size:SIZES){
         final int inc=Math.max(1,size / 10);
@@ -5000,7 +4994,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testlistIterator_int");
   }
-  @Order(1188) @Test public void testlistIterator_void(){
+   @Test public void testlistIterator_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -5025,7 +5019,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testlistIterator_void");
   }
-  @Order(68724) @Test public void testListItradd_val(){
+   @Test public void testListItradd_val(){
     for(final var position:POSITIONS){
       if(position >= 0){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -5076,7 +5070,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testListItradd_val");
   }
-  @Order(612) @Test public void testListItrhasPrevious_void(){
+   @Test public void testListItrhasPrevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
@@ -5090,7 +5084,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testListItrhasPrevious_void");
   }
-  @Order(612) @Test public void testListItrnextIndex_void(){
+   @Test public void testListItrnextIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
@@ -5104,7 +5098,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testListItrnextIndex_void");
   }
-  @Order(12642) @Test public void testListItrprevious_void(){
+   @Test public void testListItrprevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var size:SHORT_SIZES){
         if(size > 0 || initParams.checkedType.checked){
@@ -5146,7 +5140,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testListItrprevious_void");
   }
-  @Order(612) @Test public void testListItrpreviousIndex_void(){
+   @Test public void testListItrpreviousIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
@@ -5160,7 +5154,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testListItrhasPrevious_void");
   }
-  @Order(131928) @Test public void testListItrset_val(){
+   @Test public void testListItrset_val(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       final var itrType
           =initParams.structType == StructType.ArrList?IteratorType.BidirectionalItr:IteratorType.SubBidirectionalItr;
@@ -5215,7 +5209,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testListItrset_val");
   }
-  @Test public void testMASSIVEtoString(){
+   @Test public void testMASSIVEtoString(){
     for(final var collectionType:DataType.values()){
       int seqSize;
       if((seqSize=collectionType.massiveToStringThreshold + 1) == 0){
@@ -5294,7 +5288,7 @@ import omni.util.TestExecutorService;
           collectionType.classPrefix + "ArrSeqTest.CheckedStack.testMASSIVEtoString");
     }
   }
-  @Order(18) @Test public void testpeek_void(){
+   @Test public void testpeek_void(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       TestExecutorService.submitTest(()->{
         final var monitor=getMonitoredStack(initParams,100);
@@ -5311,7 +5305,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testpeek_void");
   }
-  @Order(86) @Test public void testpoll_void(){
+   @Test public void testpoll_void(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       for(final var outputType:initParams.collectionType.validOutputTypes()){
         TestExecutorService.submitTest(()->{
@@ -5327,7 +5321,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testpoll_void");
   }
-  @Order(129) @Test public void testpop_void(){
+   @Test public void testpop_void(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       for(final var size:SHORT_SIZES){
         if(size > 0 || initParams.checkedType.checked){
@@ -5347,7 +5341,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testpop_void");
   }
-  @Order(552) @Test public void testpush_val(){
+   @Test public void testpush_val(){
     for(final var initParams:STACK_STRUCT_INIT_PARAMS){
       for(final var inputType:initParams.collectionType.mayBeAddedTo()){
         for(final var functionCallType:inputType.validFunctionCalls){
@@ -5364,7 +5358,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testpush_val");
   }
-  @Order(1188) @Test public void testput_intval(){
+   @Test public void testput_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -5405,7 +5399,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testput_intval");
   }
-  @Order(495280) @Test public void testReadAndWrite(){
+   @Test public void testReadAndWrite(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -5420,7 +5414,7 @@ import omni.util.TestExecutorService;
     };
     test.runAllTests("ArrSeqTest.testReadAndWrite",0,true);
   }
-  @Order(106812) @Test public void testremoveAt_int(){
+   @Test public void testremoveAt_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -5497,7 +5491,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testremoveAt_int");
   }
-  @Tag("testremoveIf_Predicate") @Order(26834020) @Test public void testremoveIf_Predicate(){
+   @Test public void testremoveIf_Predicate(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
         final int sizeBound=initParams.collectionType == DataType.BOOLEAN?10:100;
@@ -5566,7 +5560,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testremoveIf_Predicate");
   }
-  @Tag("testremoveVal_val") @Order(12510126) @Test public void testremoveVal_val(){
+   @Test public void testremoveVal_val(){
     final QueryTest<?> test=new QueryTest<>(){
       @Override public void callAndVerifyResult(MonitoredSequence<? extends AbstractSeq<?>> monitor,QueryVal queryVal,
           DataType inputType,QueryCastType castType,QueryValModification modification,
@@ -5585,7 +5579,7 @@ import omni.util.TestExecutorService;
     };
     test.runAllTests("ArrSeqTest.testremoveVal_val",2);
   }
-  @Order(6929240) @Test public void testreplaceAll_UnaryOperator(){
+   @Test public void testreplaceAll_UnaryOperator(){
     final MonitoredFunctionTest<MonitoredList<? extends AbstractSeq<?>>> test
         =(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
           if(illegalMod.expectedException == null){
@@ -5603,7 +5597,7 @@ import omni.util.TestExecutorService;
         };
     test.runAllTests("ArrSeqTest.testreplaceAll_UnaryOperator",100,false);
   }
-  @Tag("testsearch_val") @Order(367839) @Test public void testsearch_val(){
+   @Test public void testsearch_val(){
     final QueryTest<ArrStackMonitor<?,?>> test
         =(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
           if(monitoredObjectGen == null){
@@ -5622,7 +5616,7 @@ import omni.util.TestExecutorService;
         };
     test.runAllTests("ArrSeqTest.testsearch",1);
   }
-  @Order(1188) @Test public void testset_intval(){
+   @Test public void testset_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -5659,11 +5653,11 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testset_intval");
   }
-  @Order(39168) @Test public void testsize_void(){
+   @Test public void testsize_void(){
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("ArrSeqTest.testsize_void");
   }
-  @Order(266462) @Test public void testsort_Comparator(){
+   @Test public void testsort_Comparator(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var comparatorGen:initParams.structType.validComparatorGens){
           if(comparatorGen.throwsContractViolationException && initParams.collectionType==DataType.BOOLEAN) {
@@ -5701,7 +5695,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testsort_Comparator");
   }
-  @Order(18394) @Test public void teststableAscendingSort_void(){
+   @Test public void teststableAscendingSort_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithNoComparator
@@ -5735,7 +5729,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.teststableAscendingSort_void");
   }
-  @Order(18394) @Test public void teststableDescendingSort_void(){
+   @Test public void teststableDescendingSort_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithNoComparator
@@ -5769,7 +5763,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.teststableDescendingSort_void");
   }
-  @Tag("testsubList_intint") @Order(1014480) @Test public void testsubList_intint(){
+   @Test public void testsubList_intint(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       for(final int size:SIZES){
         final int inc=Math.max(1,size / 10);
@@ -5818,7 +5812,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testsubList_intint");
   }
-  @Order(495280) @Test public void testtoArray_IntFunction(){
+   @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -5833,7 +5827,7 @@ import omni.util.TestExecutorService;
     };
     test.runAllTests("ArrSeqTest.testtoArray_IntFunction",0,true);
   }
-  @Order(404532) @Test public void testtoArray_ObjectArray(){
+   @Test public void testtoArray_ObjectArray(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -5858,7 +5852,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testtoArray_ObjectArray");
   }
-  @Order(9792) @Test public void testtoArray_void(){
+   @Test public void testtoArray_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -5884,7 +5878,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testtoArray_void");
   }
-  @Order(16352) @Test public void testtoString_void(){
+   @Test public void testtoString_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection<?> seq){
         seq.toString();
@@ -5895,7 +5889,7 @@ import omni.util.TestExecutorService;
     };
     test.runAllTests("ArrSeqTest.testtoString_void");
   }
-  @Order(9946) @Test public void testunstableAscendingSort_void(){
+   @Test public void testunstableAscendingSort_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       if(initParams.collectionType == DataType.REF){
         for(final var comparatorGen:initParams.structType.validComparatorGens){
@@ -5930,7 +5924,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testunstableAscendingSort_void");
   }
-  @Order(9946) @Test public void testunstableDescendingSort_void(){
+   @Test public void testunstableDescendingSort_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       if(initParams.collectionType == DataType.REF){
         for(final var comparatorGen:initParams.structType.validComparatorGens){
@@ -5965,7 +5959,7 @@ import omni.util.TestExecutorService;
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testunstableDescendingSort_void");
   }
-  @Order(133146) @Test public void testunstableSort_Comparator(){
+   @Test public void testunstableSort_Comparator(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       if(initParams.collectionType != DataType.BOOLEAN){
         for(final var comparatorGen:initParams.structType.validComparatorGens){
@@ -5999,12 +5993,5 @@ import omni.util.TestExecutorService;
       }
     }
     TestExecutorService.completeAllTests("ArrSeqTest.testunstableSort_Comparator");
-  }
-  @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
-    int numTestsRemaining;
-    if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-      System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-    }
-    TestExecutorService.reset();
   }
 }

@@ -131,7 +131,7 @@ public class TestExecutorService {
         while(nextPercent <= 100){
             nextPercent=incrementProgressBar(nextPercent);
         }
-        System.out.println(" Finished!");
+        System.out.println();
     }
     private static int incrementProgressBar(int nextPercent){
         if(nextPercent % 10 == 0){
@@ -143,7 +143,8 @@ public class TestExecutorService {
     }
     public static void completeAllTests(String testName) {
         final int tnt;
-        System.out.print("Running "+(tnt=totalNumTasks.get())+" "+testName+" tests 0%");
+        System.out.println("Running "+(tnt=totalNumTasks.get())+" "+testName+" tests");
+        System.out.print("0%");
         try {
             int nextPercent;
             int threshold=(int)Math.ceil((nextPercent=1)/100.0*tnt);

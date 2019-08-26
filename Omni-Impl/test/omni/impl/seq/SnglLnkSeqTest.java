@@ -3,11 +3,7 @@ import java.io.Externalizable;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.api.OmniQueue;
@@ -37,8 +33,6 @@ import omni.impl.ShortSnglLnkNode;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@TestMethodOrder(OrderAnnotation.class)
-@Tag("NewTest")
 public class SnglLnkSeqTest{
   private static abstract class AbstractSnglLnkSeqMonitor<SEQ extends AbstractSeq<?>&Externalizable>
       extends AbstractSequenceMonitor<SEQ>{
@@ -2522,23 +2516,23 @@ public class SnglLnkSeqTest{
       throw structType.invalid();
     }
   }
-  @Order(276)
+  
   @Test public void testadd_val(){
     final AddTest<?> test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyAdd(inputVal,inputType,functionCallType));
     test.runAllTests("SnglLnkSeqTest.testadd_val",ALL_STRUCTS);
   }
-  @Order(576)
+  
   @Test public void testclear_void(){
     final BasicTest test=MonitoredSequence::verifyClear;
     test.runAllTests("SnglLnkSeqTest.testclear_void");
   }
-  @Order(576)
+  
   @Test public void testclone_void(){
     final BasicTest test=MonitoredSequence::verifyClone;
     test.runAllTests("SnglLnkSeqTest.testclone_void");
   }
-  @Order(36)
+  
   @Test public void testConstructor_void(){
     for(final var checkedType:CheckedType.values()){
       for(final var collectionType:DataType.values()){
@@ -2550,7 +2544,7 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("SnglLnkSeqTest.testConstructor_void");
   }
-  @Order(236988)
+  
   @Test public void testcontains_val(){
     final QueryTest<MonitoredSequence<?>> test
         =(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
@@ -2562,7 +2556,7 @@ public class SnglLnkSeqTest{
         };
     test.runAllTests("SnglLnkSeqTest.testcontains_val",true);
   }
-  @Order(86)
+  
   @Test public void testelement_void(){
     final PopTest<SnglLnkQueueMonitor<?,?>> test=(monitor,outputType)->{
       monitor.verifyElement(outputType);
@@ -2572,7 +2566,7 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testelement_void",true,StructType.SnglLnkQueue);
   }
-  @Order(31310)
+  
   @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2584,7 +2578,7 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testforEach_Consumer",100);
   }
-  @Order(738)
+  
   @Test public void testhashCode_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection<?> seq){
@@ -2596,18 +2590,18 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testhashCode_void");
   }
-  @Order(576)
+  
   @Test
   public void testequals_Object(){
       final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
       test.runAllTests("SnglLnkSeqTest.testequals_Object");
   }
-  @Order(576)
+  
   @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
     test.runAllTests("SnglLnkSeqTest.testisEmpty_void");
   }
-  @Order(576)
+  
   @Test public void testiterator_void(){
     final BasicTest test=(monitor)->{
       monitor.getMonitoredIterator().verifyIteratorState();
@@ -2615,7 +2609,7 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testiterator_void");
   }
-  @Order(2520)
+  
   @Test public void testItrclone_void(){
     for(final var size:SIZES){
       int prevIndex=-1;
@@ -2640,8 +2634,6 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("SnglLnkSeqTest.testItrclone_void");
   }
-  //@org.junit.jupiter.api.Disabled
-  @Order(137220)
   @Test public void testItrforEachRemaining_Consumer(){
     for(final int size:MEDIUM_SIZES){
       int prevNumToIterate=-1;
@@ -2694,7 +2686,7 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("SnglLnkSeqTest.testItrforEachRemaining_Consumer");
   }
-  @Order(72)
+  
   @Test public void testItrhasNext_void(){
     for(final var collectionType:DataType.values()){
       for(final var checkedType:CheckedType.values()){
@@ -2714,7 +2706,7 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("SnglLnkSeqTest.testItrhasNext_void");
   }
-  @Order(90)
+  
   @Test public void testItrnext_void(){
     for(final var collectionType:DataType.values()){
       final var outputTypes=collectionType.validOutputTypes();
@@ -2764,7 +2756,7 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("SnglLnkSeqTest.testItrnext_void");
   }
-  @Order(468)
+  
   @Test public void testItrremove_void(){
     for(final var collectionType:DataType.values()){
       for(final var checkedType:CheckedType.values()){
@@ -3010,13 +3002,13 @@ public class SnglLnkSeqTest{
           collectionType.classPrefix + "SnglLnkSeq.CheckedStack.testMASSIVEtoString");
     }
   }
-  @Order(138)
+  
   @Test public void testoffer_val(){
     final AddTest<MonitoredQueue<?>> test=(monitor,inputVal,inputType,functionCallType)->Assertions
         .assertTrue(monitor.verifyOffer(inputVal,inputType,functionCallType));
     test.runAllTests("SnglLnkSeqTest.testoffer_val",StructType.SnglLnkQueue);
   }
-  @Order(172)
+  
   @Test public void testpeek_void(){
     final PopTest<?> test=(monitor,outputType)->{
       monitor.verifyPeek(outputType);
@@ -3026,22 +3018,22 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testpeek_void",false,ALL_STRUCTS);
   }
-  @Order(172)
+  
   @Test public void testpoll_void(){
     final PopTest<?> test=MonitoredSequence::verifyPoll;
     test.runAllTests("SnglLnkSeqTest.testpoll_void",false,ALL_STRUCTS);
   }
-  @Order(86)
+  
   @Test public void testpop_void(){
     final PopTest<SnglLnkStackMonitor<?,?>> test=MonitoredStack::verifyPop;
     test.runAllTests("SnglLnkSeqTest.testpop_void",true,StructType.SnglLnkStack);
   }
-  @Order(138)
+  
   @Test public void testpush_val(){
     final AddTest<MonitoredStack<?>> test=MonitoredStack::verifyPush;
     test.runAllTests("SnglLnkSeqTest.testpush_val",StructType.SnglLnkStack);
   }
-  @Order(1310)
+  
   @Test public void testReadAndWrite(){
     final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
@@ -3052,12 +3044,12 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testReadAndWrite",0);
   }
-  @Order(86)
+  
   @Test public void testremove_void(){
     final PopTest<SnglLnkQueueMonitor<?,?>> test=MonitoredQueue::verifyRemove;
     test.runAllTests("SnglLnkSeqTest.testremove_void",true,StructType.SnglLnkQueue);
   }
-  @Order(508680)
+  
   @Test public void testremoveIf_Predicate(){
     for(final var collectionType:DataType.values()){
       for(final var checkedType:CheckedType.values()){
@@ -3167,7 +3159,7 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("SnglLnkSeqTest.testremoveIf_Predicate");
   }
-  @Order(236988)
+  
   @Test public void testremoveVal_val(){
     final QueryTest<MonitoredSequence<?>> test
         =(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
@@ -3179,7 +3171,7 @@ public class SnglLnkSeqTest{
         };
     test.runAllTests("SnglLnkSeqTest.testremoveVal_val",true);
   }
-  @Order(118494)
+  
   @Test public void testsearch_val(){
     final QueryTest<SnglLnkStackMonitor<?,?>> test
         =(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
@@ -3199,12 +3191,12 @@ public class SnglLnkSeqTest{
         };
     test.runAllTests("SnglLnkSeqTest.testsearch_val",false);
   }
-  @Order(576)
+  
   @Test public void testsize_void(){
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("SnglLnkSeqTest.testsize_void");
   }
-  @Order(1310)
+  
   @Test public void testtoArray_IntFunction(){
     final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null){
@@ -3215,7 +3207,7 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testtoArray_IntFunction",0);
   }
-  @Order(23796)
+  
   @Test public void testtoArray_ObjectArray(){
     for(final var collectionType:DataType.values()){
       for(final var checkedType:CheckedType.values()){
@@ -3235,7 +3227,7 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("DblLnkSeqTest.testtoArray_ObjectArray");
   }
-  @Order(576)
+  
   @Test public void testtoArray_void(){
     final BasicTest test=(monitor)->{
       for(final var outputType:monitor.getDataType().validOutputTypes()){
@@ -3244,7 +3236,7 @@ public class SnglLnkSeqTest{
     };
     test.runAllTests("SnglLnkSeqTest.testtoArray_void");
   }
-  @Order(738)
+  
   @Test public void testtoString_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection<?> seq){
@@ -3255,12 +3247,5 @@ public class SnglLnkSeqTest{
       }
     };
     test.runAllTests("SnglLnkSeqTest.testtoString_void");
-  }
-  @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
-    int numTestsRemaining;
-    if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-      System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-    }
-    TestExecutorService.reset();
   }
 }

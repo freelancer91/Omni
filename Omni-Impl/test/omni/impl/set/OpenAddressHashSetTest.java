@@ -9,11 +9,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.CheckedType;
@@ -35,8 +31,7 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
-@TestMethodOrder(OrderAnnotation.class)
-@Tag("NewTest")
+
 public class OpenAddressHashSetTest{
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
     private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
@@ -83,7 +78,7 @@ public class OpenAddressHashSetTest{
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=-1;
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MIN_VALUE;
     }
-    @Order(13650)
+    
     @Test public void testadd_val(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
             for(var inputType:collectionType.mayBeAddedTo()) {
@@ -516,7 +511,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testadd_val");
     }
-    @Order(7770)
+    
     @Test public void testclear_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
@@ -524,7 +519,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testclear_void");
     }
-    @Order(7770)
+    
     @Test
     public void testequals_Object(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->Assertions.assertFalse(initSet.initialize(
@@ -532,7 +527,7 @@ public class OpenAddressHashSetTest{
                 .getCollection().equals(null));
         test.runAllTests("OpenAddressHashSetTest.testequals_Object");
     }
-    @Order(7770)
+    
     @Test public void testclone_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
@@ -540,7 +535,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testclone_void");
     }
-    @Order(63)
+    
     @Test public void testConstructor_float(){
 
         for(final var checkedType:CheckedType.values()){
@@ -562,7 +557,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_float");
     }
-    @Order(558)
+    
     @Test public void testConstructor_int(){
 
         for(final var checkedType:CheckedType.values()){
@@ -584,7 +579,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_int");
     }
-    @Order(5880)
+    
     @Test public void testConstructor_intfloat(){
 
         for(final var checkedType:CheckedType.values()){
@@ -612,7 +607,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_intfloat");
     }
-    @Order(6)
+    
     @Test public void testConstructor_void(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -622,7 +617,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_void");
     }
-    @Order(736344)
+    
     @Test public void testcontains_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{
             if(monitoredObjectGen == null){
@@ -633,7 +628,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testcontains_val");
     }
-    @Order(6620)
+    
     @Test public void testforEach_Consumer(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
             for(final var functionCallType:collectionType.validFunctionCalls){
@@ -666,7 +661,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testforEach_Consumer");
     }
-    @Order(8085)
+    
     @Test public void testhashCode_void(){
         for(final var loadFactor:LOAD_FACTORS){
             if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
@@ -703,7 +698,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testhashCode_void");
     }
-    @Order(7770)
+    
     @Test public void testisEmpty_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
@@ -711,7 +706,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testisEmpty_void");
     }
-    @Order(7770)
+    
     @Test public void testiterator_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
@@ -719,14 +714,14 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testiterator_void");
     }
-    @Order(7770)
+    
     @Test public void testItrclone_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->initSet
                 .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
                 .getMonitoredIterator().verifyClone();
         test.runAllTests("OpenAddressHashSetTest.testItrclone_void");
     }
-    @Order(2035740)
+    
     @Test public void testItrforEachRemaining_Consumer(){
         for(final var loadFactor:LOAD_FACTORS){
             if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
@@ -853,7 +848,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrforEachRemaining_Consumer");
     }
-    @Order(7770)
+    
     @Test public void testItrhasNext_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             final var setMonitor
@@ -868,7 +863,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testItrhasNext_void");
     }
-    @Order(22995)
+    
     @Test public void testItrnext_void(){
         for(final var loadFactor:LOAD_FACTORS){
             if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
@@ -914,7 +909,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrnext_void");
     }
-    @Order(736470)
+    
     @Test public void testItrremove_void(){
         for(final float loadFactor:LOAD_FACTORS){
             if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
@@ -988,7 +983,7 @@ public class OpenAddressHashSetTest{
         DataType.FLOAT.verifyToString(set.toString(),set,
                 "OpenAddressHashSetTest." + DataType.FLOAT + ".testMASSIVEtoString");
     }
-    @Order(185)
+    
     @Test public void testReadAndWrite(){
         final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
             var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
@@ -1000,7 +995,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testReadAndWrite");
     }
-    @Order(96148)
+    
     @Test public void testremoveIf_Predicate(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
             for(final var functionCallType:collectionType.validFunctionCalls){
@@ -1076,7 +1071,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testremoveIf_Predicate");
     }
-    @Order(736344)
+    
     @Test public void testremoveVal_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{
             if(monitoredObjectGen == null){
@@ -1087,7 +1082,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testremoveVal_val");
     }
-    @Order(777)
+    
     @Test public void testsetLoadFactor_float(){
 
         for(final var checkedType:CheckedType.values()){
@@ -1106,7 +1101,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testsetLoadFactor_float");
     }
-    @Order(7770)
+    
     @Test public void testsize_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
@@ -1114,7 +1109,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testsize_void");
     }
-    @Order(185)
+    
     @Test public void testtoArray_IntFunction(){
         final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
             final var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
@@ -1127,7 +1122,7 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testToArray_IntFunction");
     }
-    @Order(646)
+    
     @Test public void testtoArray_ObjectArray(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
             for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
@@ -1144,7 +1139,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoArray_ObjectArray");
     }
-    @Order(146)
+    
     @Test public void testtoArray_void(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
             for(final var outputType:collectionType.validOutputTypes()){
@@ -1159,7 +1154,7 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoArray_void");
     }
-    @Order(8085)
+    
     @Test public void testtoString_void(){
         for(final var loadFactor:LOAD_FACTORS){
             if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
@@ -1195,13 +1190,6 @@ public class OpenAddressHashSetTest{
             }
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoString_void");
-    }
-    @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
-        int numTestsRemaining;
-        if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-            System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-        }
-        TestExecutorService.reset();
     }
     private interface BasicTest{
         void runTest(float loadFactor,int initCapacity,DataType collectionType,CheckedType checkedType,

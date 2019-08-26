@@ -106,12 +106,12 @@ public final class BooleanSortUtil
   }
   private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)
   {
-    assert arr!=null;
-    assert begin>=0;
-    assert end<arr.length;
-    assert begin<end;
-    assert firstVal!=arr[begin];
-    assert firstVal==arr[end];
+    //assert arr!=null;
+    //assert begin>=0;
+    //assert end<arr.length;
+    //assert begin<end;
+    //assert firstVal!=arr[begin];
+    //assert firstVal==arr[end];
     int endValCounter=1;
     for(int curr=begin+1;curr!=end;++curr)
     {

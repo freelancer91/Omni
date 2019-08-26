@@ -1,6 +1,28 @@
 package omni.api;
-public abstract interface OmniSet<E> extends OmniCollection<E>
+import java.util.Set;
+import java.util.Collection;
+public abstract interface OmniSet<E> extends OmniCollection<E>,Set<E>
 {
+  @Override
+  default java.util.Spliterator<E> spliterator(){
+    //TODO implement in lower classes and remove this
+    return Set.super.spliterator();
+  }
+  @Override
+  default boolean containsAll(Collection<?> that){
+    //TODO implement in lower classes and remove this
+    return OmniCollection.super.containsAll(that);
+  }
+  @Override
+  default boolean removeAll(Collection<?> that){
+    //TODO implement in lower classes and remove this
+    return OmniCollection.super.removeAll(that);
+  }
+  @Override
+  default boolean retainAll(Collection<?> that){
+    //TODO implement in lower classes and remove this
+    return OmniCollection.super.retainAll(that);
+  }
     public abstract interface OfBoolean extends OmniCollection<Boolean>,OmniCollection.OfPrimitive<Boolean>,OmniCollection.OfBoolean,OmniSet<Boolean>
   ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
     {}
