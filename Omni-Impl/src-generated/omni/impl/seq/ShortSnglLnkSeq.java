@@ -671,7 +671,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void clear(){
      if(size!=0){
@@ -963,7 +963,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       ShortSnglLnkNode head;
@@ -1266,7 +1266,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public short shortElement(){
       final ShortSnglLnkNode head;
@@ -1669,7 +1669,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void readExternal(ObjectInput in) throws IOException
     {

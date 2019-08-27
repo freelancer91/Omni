@@ -2130,8 +2130,8 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends DoubleArrDeq{
     private static final long serialVersionUID=1L;
@@ -2144,10 +2144,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     Checked(int head,double[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     private void collapseheadHelper(double[] arr,int tail,DoublePredicate filter,int modCount){
       if(tail==0){

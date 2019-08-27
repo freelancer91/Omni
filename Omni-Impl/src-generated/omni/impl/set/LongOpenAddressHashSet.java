@@ -327,7 +327,7 @@ implements OmniSet.OfLong{
   }
   @Override public boolean equals(Object val){
     //TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public void forEach(LongConsumer action){
     int size;
@@ -1661,7 +1661,7 @@ private boolean addToTable(long val){
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfLong iterator(){
       return new Itr(this);

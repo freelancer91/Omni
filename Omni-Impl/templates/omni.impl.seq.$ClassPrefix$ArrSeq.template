@@ -837,7 +837,8 @@ public
 #ENDIF
   @Override public boolean equals(Object val){
     //TODO implements equals method for STRUCTNAME$<E>$
-    return false;
+    throw omni.util.NotYetImplementedException.getNYI();
+
   }
   @Override public Object clone(){
   #IFSWITCH STRUCTNAME==CheckedSubList

@@ -661,7 +661,7 @@ AbstractSeq<Character>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void clear(){
      if(size!=0){
@@ -953,7 +953,7 @@ AbstractSeq<Character>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       CharSnglLnkNode head;
@@ -1256,7 +1256,7 @@ AbstractSeq<Character>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public char charElement(){
       final CharSnglLnkNode head;
@@ -1659,7 +1659,7 @@ AbstractSeq<Character>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void readExternal(ObjectInput in) throws IOException
     {

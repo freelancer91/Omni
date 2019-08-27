@@ -247,7 +247,7 @@ implements OmniSet.OfDouble{
   }
   @Override public boolean equals(Object val){
     //TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public void forEach(DoubleConsumer action){
     int size;
@@ -904,7 +904,7 @@ boolean addToTable(long val,int hash){
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfDouble iterator(){
       return new Itr(this);

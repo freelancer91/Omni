@@ -2084,8 +2084,8 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends ShortArrDeq{
     private static final long serialVersionUID=1L;
@@ -2098,10 +2098,6 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     }
     Checked(int head,short[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     private void collapseheadHelper(short[] arr,int tail,ShortPredicate filter,int modCount){
       if(tail==0){

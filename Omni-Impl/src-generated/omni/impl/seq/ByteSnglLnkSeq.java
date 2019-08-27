@@ -659,7 +659,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void clear(){
      if(size!=0){
@@ -962,7 +962,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       ByteSnglLnkNode head;
@@ -1275,7 +1275,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public byte byteElement(){
       final ByteSnglLnkNode head;
@@ -1692,7 +1692,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void readExternal(ObjectInput in) throws IOException
     {

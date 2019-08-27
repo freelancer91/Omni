@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import static omni.impl.seq.PackedBooleanArrSeq.UncheckedList.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -91,7 +92,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         this.size=size=in.readInt();
         if(size != 0){
           final long[] words;
-          BitSetUtil.readWords(words=new long[((--size) >> 6) + 1],size,in);
+          BitSetUtil.readWords(words=new long[(--size >> 6) + 1],size,in);
           this.words=words;
         }
     }
@@ -346,12 +347,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
     }
     private void uncheckedRemoveIndexNoRet(int index){
       final long[] words;
-      removeIndexShiftDown(words=this.words,index,index>>=6,words[index],(--size)>>6);
+      removeIndexShiftDown(words=this.words,index,index>>=6,words[index],--size>>6);
   }
     private long uncheckedRemoveIndex(int index,int bound){
       final long[] words;
       final long retWord;
-      removeIndexShiftDown(words=this.words,index,index>>=6,retWord=words[index],(bound)>>6);
+      removeIndexShiftDown(words=this.words,index,index>>=6,retWord=words[index],bound>>6);
       size=bound;
       return retWord;
     }
@@ -476,7 +477,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return 0;
             } 
-            super.removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(-1L>>>-offset-1) | words[wordBound]&(-1L<<bound)>>>size);
+            super.removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&-1L>>>-offset-1 | words[wordBound]&-1L<<bound>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -510,19 +511,19 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         if(removeTrue) {
                             break goToRemoveAll;
                         }else {
-                            super.removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(-1L>>>(-(offset)-1)) | (-1L>>>(-(bitCount)-1))<<offset | (word&(-1L<<bound))>>>numFalse);
+                            super.removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&-1L>>>-offset-1 | -1L>>>-bitCount-1<<offset | (word&-1L<<bound)>>>numFalse);
                             this.size=size-numFalse;
                             return numFalse;
                         }
                     }else if(removeTrue) {
-                        super.removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(-1L>>>(-(offset)-1)) | (word&~(-1L>>>-bound))>>>bitCount);
+                        super.removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&-1L>>>-offset-1 | (word&~(-1L>>>-bound))>>>bitCount);
                         this.size=size-bitCount;
                         return bitCount;
                     }
                 }
                 return 0;
             }
-            super.removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(-1L>>>(-(offset)-1)) | (word&(-1L<<bound))>>>size);
+            super.removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&-1L>>>-offset-1 | (word&-1L<<bound)>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -571,7 +572,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         @Override
         public boolean equals(Object val){
             // TODO implements equals method for CheckedList
-            return false;
+            throw omni.util.NotYetImplementedException.getNYI();
         }
         @Override
         public boolean getBoolean(int index){
@@ -961,7 +962,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         @Override
         public boolean equals(Object val){
             // TODO implements equals method for CheckedStack
-            return false;
+            throw omni.util.NotYetImplementedException.getNYI();
         }
         @Override
         public OmniIterator.OfBoolean iterator(){
@@ -1549,7 +1550,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         @Override
         public boolean equals(Object val){
             // TODO Auto-generated method stub
-            return false;
+            throw omni.util.NotYetImplementedException.getNYI();
         }
         @Override
         public void forEach(BooleanConsumer action){
@@ -2703,7 +2704,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return false;
             }
-            removeIndexShiftDown(words,tail0s,wordOffset,word,(--root.size)>>6);
+            removeIndexShiftDown(words,tail0s,wordOffset,word,--root.size>>6);
             root.modCount=++modCount;
             this.modCount=modCount;
             this.size=size - 1;
@@ -2909,7 +2910,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 this.size=size=ois.readInt();
                 if(size != 0){
                     final long[] words;
-                    BitSetUtil.readWords(words=new long[((--size) >> 6) + 1],size,ois);
+                    BitSetUtil.readWords(words=new long[(--size >> 6) + 1],size,ois);
                     this.words=words;
                 }
             }
@@ -2943,10 +2944,10 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final int falseWordBound;
             if((falseWordBound=(bound-=numRemoved)-1>>6)==(wordOffset=offset>>6)) {
                 final long word;
-                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1)|(word=words[wordBound])<<bound;
+                words[wordOffset]=words[wordOffset]&-1L>>>-offset-1|(word=words[wordBound])<<bound;
                 removeIfShiftDown(rootBound,numRemoved,wordOffset+1,wordBound,words,word);
             }else {
-                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1);
+                words[wordOffset]=words[wordOffset]&-1L>>>-offset-1;
                 setRange(words,wordOffset+1,falseWordBound,0L);
                 removeIfShiftDown(rootBound,numRemoved,falseWordBound,wordBound,words,words[wordBound]>>>numRemoved);
             }
@@ -2958,12 +2959,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int trueWordBound=bound-1>>6;
             if(trueWordBound==wordOffset) {
                 final long word;
-                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1)|(-1L>>>(-(numRetained)-1))|(word=words[wordBound])<<bound;
+                words[wordOffset]=words[wordOffset]&-1L>>>-offset-1|-1L>>>-numRetained-1|(word=words[wordBound])<<bound;
                 removeIfShiftDown(rootBound,numRemoved,wordOffset+1,wordBound,words,word);
             }else {
-                words[wordOffset]=words[wordOffset]&(-1L>>>-offset-1)|-1L<<offset;
+                words[wordOffset]=words[wordOffset]&-1L>>>-offset-1|-1L<<offset;
                 setRange(words,wordOffset+1,trueWordBound,-1L);
-                removeIfShiftDown(rootBound,numRemoved,trueWordBound,wordBound,words,words[wordBound]>>>numRemoved|(-1L>>>-bound-1));
+                removeIfShiftDown(rootBound,numRemoved,trueWordBound,wordBound,words,words[wordBound]>>>numRemoved|-1L>>>-bound-1);
             }
         }
         private int multiWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordOffset,int wordBound) {
@@ -3072,7 +3073,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return 0;
             } 
-            removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&(-1L>>>-offset-1) | words[wordBound]&(-1L<<bound)>>>size);
+            removeIfShiftDown(bitCount=this.size,size,wordOffset,wordBound,words,word&-1L>>>-offset-1 | words[wordBound]&-1L<<bound>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -3100,19 +3101,19 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         if(filter.test(true)) {
                             break goToRemoveAll;
                         }else {
-                          removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&(-1L>>>-offset-1) | ((-1L>>>-bitCount-1)<<offset) | (word&(-1L<<bound))>>>numFalse);
+                          removeIfShiftDown(size=this.size,numFalse,wordBound,wordBound,words,word&-1L>>>-offset-1 | -1L>>>-bitCount-1<<offset | (word&-1L<<bound)>>>numFalse);
                             this.size=size-numFalse;
                             return numFalse;
                         }
                     }else if(filter.test(true)) {
-                        removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&(-1L>>>-offset-1) | (word&(-1L<<bound))>>>bitCount);
+                        removeIfShiftDown(size=this.size,bitCount,wordBound,wordBound,words,word&-1L>>>-offset-1 | (word&-1L<<bound)>>>bitCount);
                         this.size=size-bitCount;
                         return bitCount;
                     }
                 }
                 return 0;
             }
-            removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&(-1L>>>-offset-1) | (word&(-1L<<bound))>>>size);
+            removeIfShiftDown(bitCount=this.size,size,wordBound,wordBound,words,word&-1L>>>-offset-1 | (word&-1L<<bound)>>>size);
             this.size=bitCount-size;
             return size;
         }
@@ -3499,7 +3500,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         @Override
         public boolean equals(Object val){
             // TODO implement equals method
-            return false;
+            throw omni.util.NotYetImplementedException.getNYI();
         }
         @Override
         public boolean getBoolean(int index){
@@ -4087,7 +4088,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         @Override
         public boolean equals(Object val){
             // TODO implements equals method
-            return false;
+            throw omni.util.NotYetImplementedException.getNYI();
         }
         @Override
         public OmniIterator.OfBoolean iterator(){
@@ -4403,27 +4404,27 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
           if(val) {
             if((lead0s=Long.numberOfLeadingZeros(word << -size)) == 64){
                 for(int wordOffset=wordBound - 1;wordOffset >= 0;--wordOffset){
-                    if((lead0s=Long.numberOfLeadingZeros((word=words[wordOffset]))) != 64){
-                      words[wordOffset]=word-(1L<<(63-lead0s));
+                    if((lead0s=Long.numberOfLeadingZeros(word=words[wordOffset])) != 64){
+                      words[wordOffset]=word-(1L<<63-lead0s);
                       this.size=bound;
                       return true;
                     }
                 }
                 return false;
             }
-            words[wordBound]=word-(1L<<(size-lead0s-1));
+            words[wordBound]=word-(1L<<size-lead0s-1);
           }else {
-            if((lead0s=Long.numberOfLeadingZeros((~word) << -size)) == 64){
+            if((lead0s=Long.numberOfLeadingZeros(~word << -size)) == 64){
               for(int wordOffset=wordBound - 1;wordOffset >= 0;--wordOffset){
                   if((lead0s=Long.numberOfLeadingZeros(~(word=words[wordOffset]))) != 64){
-                    words[wordOffset]=word+(1L<<(63-lead0s));
+                    words[wordOffset]=word+(1L<<63-lead0s);
                     this.size=bound;
                     return true;
                   }
               }
               return false;
             }
-            words[wordBound]=word+(1L<<(size-lead0s-1));
+            words[wordBound]=word+(1L<<size-lead0s-1);
           }
           this.size=bound;
           return true;
@@ -4794,7 +4795,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         @Override
         public boolean equals(Object val){
             // TODO Auto-generated method stub
-            return false;
+            throw omni.util.NotYetImplementedException.getNYI();
         }
         @Override
         public void forEach(BooleanConsumer action){
@@ -5698,7 +5699,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
                 return false;
             }
-            removeIndexShiftDown(words,tail0s,wordOffset,word,(--root.size)>>6);
+            removeIndexShiftDown(words,tail0s,wordOffset,word,--root.size>>6);
             this.size=size - 1;
             for(var curr=parent;curr != null;--curr.size,curr=curr.parent){}
             return true;
@@ -5872,7 +5873,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 this.size=size=ois.readInt();
                 if(size != 0){
                   final long[] words;
-                  BitSetUtil.readWords(words=new long[((--size) >> 6) + 1],size,ois);
+                  BitSetUtil.readWords(words=new long[(--size >> 6) + 1],size,ois);
                   this.words=words;
                 }
             }

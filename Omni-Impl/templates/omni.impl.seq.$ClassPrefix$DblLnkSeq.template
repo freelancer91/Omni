@@ -391,7 +391,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO SubListAddMethods<Unchecked>()
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
+
     }
     #MACRO SubListRemoveMethods<Unchecked>()
     @Override public Object clone(){
@@ -1211,7 +1212,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
+
     } 
   }
   public static class CheckedList$<E>$ extends UncheckedList$<E>${
@@ -1620,7 +1622,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
+
     }
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
       return new DescendingItr$<E>$(this);
@@ -2073,7 +2076,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
+
     }
     #MACRO QueryMethods<removeVal,Root,false>()
 #IF OfRef

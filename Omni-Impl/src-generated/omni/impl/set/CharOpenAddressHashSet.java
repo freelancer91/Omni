@@ -204,7 +204,7 @@ implements OmniSet.OfChar{
   }
   @Override public boolean equals(Object val){
     //TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public void forEach(CharConsumer action){
     int size;
@@ -1542,7 +1542,7 @@ private boolean addToTable(char val){
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfChar iterator(){
       return new Itr(this);

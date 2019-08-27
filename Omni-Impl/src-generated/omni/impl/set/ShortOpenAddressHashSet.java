@@ -233,7 +233,7 @@ implements OmniSet.OfShort{
   }
   @Override public boolean equals(Object val){
     //TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public void forEach(ShortConsumer action){
     int size;
@@ -1625,7 +1625,7 @@ private boolean addToTable(short val){
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfShort iterator(){
       return new Itr(this);

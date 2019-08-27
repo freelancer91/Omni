@@ -62,7 +62,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
   }
   @Override public boolean equals(Object val){
     // TODO
-    return false;
+               throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public boolean contains(Object val){
     switch(state){
@@ -812,7 +812,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
     }
     @Override public boolean equals(Object val){
         // TODO Auto-generated method stub
-        return false;
+                    throw omni.util.NotYetImplementedException.getNYI();
     }
     @SuppressWarnings("unchecked")
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){

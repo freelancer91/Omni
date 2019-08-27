@@ -619,7 +619,7 @@ AbstractSeq<Integer>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void clear(){
      if(size!=0){
@@ -900,7 +900,7 @@ AbstractSeq<Integer>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       IntSnglLnkNode head;
@@ -1161,7 +1161,7 @@ AbstractSeq<Integer>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public int intElement(){
       final IntSnglLnkNode head;
@@ -1550,7 +1550,7 @@ AbstractSeq<Integer>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void readExternal(ObjectInput in) throws IOException
     {

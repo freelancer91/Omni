@@ -1147,7 +1147,8 @@ ERROR unknown type $ClassPrefix$
 #ENDIF
   @Override public boolean equals(Object val){
     //TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
+
   }
   #MACRO ForEach($TypeNameModifier$Consumer$<? super E>$,action)
 #IFNOT OfRef
@@ -3875,7 +3876,8 @@ return (this.wordWORDNUM & (MASK))!=0;
 #ENDIF
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
+
     }
     
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){

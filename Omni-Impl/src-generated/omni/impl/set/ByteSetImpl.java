@@ -113,7 +113,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   }
   @Override public boolean equals(Object val){
     // TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public void writeExternal(ObjectOutput out) throws IOException{
     out.writeLong(word0);
@@ -904,7 +904,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
     @Override public boolean equals(Object val){
       // TODO Auto-generated method stub
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       int modCount=this.modCount;

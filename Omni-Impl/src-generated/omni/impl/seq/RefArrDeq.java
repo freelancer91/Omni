@@ -2400,8 +2400,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked<E> extends RefArrDeq<E>{
     private static final long serialVersionUID=1L;
@@ -2414,10 +2414,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     Checked(int head,Object[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     @SuppressWarnings("unchecked")
     private void collapseheadHelper(Object[] arr,int tail,Predicate<? super E> filter,int modCount){

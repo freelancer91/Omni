@@ -2396,8 +2396,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends FloatArrDeq{
     private static final long serialVersionUID=1L;
@@ -2410,10 +2410,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     Checked(int head,float[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     private void collapseheadHelper(float[] arr,int tail,FloatPredicate filter,int modCount){
       if(tail==0){

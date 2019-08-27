@@ -6,6 +6,7 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.IntFunction;
 import java.util.function.LongUnaryOperator;
+import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
@@ -225,9 +226,466 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     public OmniIterator.OfBoolean descendingIterator(){
         return new DescendingItr(this);
     }
+    
+    
+    private boolean equalTo(int thisTail,PackedBooleanArrDeq that) {
+        final int thatTail;
+        if((thatTail=that.tail)!=-1) {
+            int thisSize=thisTail-this.head;
+            int thatSize;
+            if((thatSize=thatTail-that.head)<0) {
+                thatSize+=that.words.length<<6;
+                if(thisSize<0) {
+                    if((thisSize+=this.words.length<<6)==thatSize) {
+                        final int shiftDiff=(thisTail+1&63)-(thatTail+1&63);
+                        if(thisTail<=thatTail) {
+                            if(shiftDiff<0) {
+                                return this.fragmentedEqualsFragmentedShiftThatDown(that,thisTail,thatTail,shiftDiff);
+                            }else {
+                                return this.fragmentedEqualsFragmentedShiftThisDown(that,thisTail,thatTail,shiftDiff);
+                            }
+                        }else {
+                            if(shiftDiff<0) {
+                                return that.fragmentedEqualsFragmentedShiftThatDown(this,thatTail,thisTail,-shiftDiff);
+                            }else {
+                                return that.fragmentedEqualsFragmentedShiftThisDown(this,thatTail,thisTail,-shiftDiff);
+                            }
+                        }
+                    }
+                }else {
+                    if(thisSize==thatSize) {
+                        final int shiftDiff;
+                        if((shiftDiff=(thisTail+1&63)-(thatTail+1&63))<0) {
+                            return this.nonfragmentedEqualsFragmentedShiftThatDown(that,thisTail,thatTail,shiftDiff);
+                        }else {
+                            return this.nonfragmentedEqualsFragmentedShiftThisDown(that,thisTail,thatTail,shiftDiff);
+                        }
+                    }
+                }
+            }else {
+                if(thisSize<0) {
+                    if((thisSize+=this.words.length<<6)==thatSize) {
+                        final int shiftDiff;
+                        if((shiftDiff=(thisTail+1&63)-(thatTail+1&63))<0) {
+                            return that.nonfragmentedEqualsFragmentedShiftThatDown(this,thatTail,thisTail,-shiftDiff);
+                        }else {
+                            return that.nonfragmentedEqualsFragmentedShiftThisDown(this,thatTail,thisTail,-shiftDiff);
+                        }
+                    }
+                }else {
+                    if(thisSize==thatSize) {
+                        if((thisTail=(thisTail+1&63)-(thatTail+1&63))<0) {
+                            return this.nonfragmentedEqualsNonfragmented(-thisTail,that);
+                        }else {
+                            return that.nonfragmentedEqualsNonfragmented(thisTail,this);
+                        }
+                    }
+                    
+                }
+            }
+        }
+        return false;
+    }
+    private boolean nonfragmentedEqualsFragmentedShiftThisDown(PackedBooleanArrDeq that,int thisTail,int thatTail,int shiftDiff) {
+        //TODO debug, optimize, and clean up
+        //TODO consider using a word iterator to accomplish this
+        //TODO comment out these assertions
+        assert this.words!=null;
+        assert that.words!=null;
+        assert this.tail!=-1;
+        assert that.tail!=-1;
+        assert this.tail>=this.head;
+        assert that.tail<that.head;
+        assert this.tail-this.head == that.tail-that.head+(that.words.length<<6);
+        assert (this.tail+1&63)>=(that.tail+1&63);
+        assert shiftDiff==(this.tail+1&63)-(that.tail+1&63);
+        long[] thisWords=this.words;
+        long[] thatWords=that.words;
+        int thisHead=this.head;
+        int thatHead=that.head;
+        int thisTailOffset=thisTail>>6;
+        int thatTailOffset=thatTail>>6;
+        long mask;
+        long thisWord=thisWords[thisTailOffset];
+        long thatWord=thatWords[thatTailOffset]&(mask=-1L>>>-thatTail-1);
+        long tmpThisWord=thisWord>>>shiftDiff&mask;
+        for(;;) {
+            if(tmpThisWord!=thatWord) {
+                break;
+            }
+            tmpThisWord=thisWord<<-shiftDiff|(thisWord=thisWords[--thisTailOffset])>>>shiftDiff;
+            if(thatTailOffset==0) {
+                thatTailOffset=thatWords.length;
+                int thisHeadOffset=thisHead>>6;
+                for(;;) {
+                    thatWord=thatWords[--thatTailOffset];
+                    if(thisTailOffset==thisHeadOffset) {
+                        return ((tmpThisWord^thatWord)&-1L<<thatHead)==0;
+                    }
+                    if(tmpThisWord!=thatWord) {
+                        break;
+                    }
+                }
+                break;
+            }
+            thatWord=thatWords[--thatTailOffset];
+        }
+        return false;
+    }
+    private boolean nonfragmentedEqualsFragmentedShiftThatDown(PackedBooleanArrDeq that,int thisTail,int thatTail,int shiftDiff) {
+        //TODO debug, optimize, and clean up
+        //TODO consider using a word iterator to accomplish this
+        //TODO comment out these assertions
+        assert this.words!=null;
+        assert that.words!=null;
+        assert this.tail!=-1;
+        assert that.tail!=-1;
+        assert this.tail>=this.head;
+        assert that.tail<that.head;
+        assert this.tail-this.head == that.tail-that.head+(that.words.length<<6);
+        assert (that.tail+1&63)>=(this.tail+1&63);
+        assert shiftDiff==(this.tail+1&63)-(that.tail+1&63);
+        long[] thisWords=this.words;
+        long[] thatWords=that.words;
+        int thisHead=this.head;
+        int thatHead=that.head;
+        int thisTailOffset=thisTail>>6;
+        int thatTailOffset=thatTail>>6;
+        long mask;
+        long thisWord=thisWords[thisTailOffset]&(mask=-1L>>>-thisTail-1);
+        long thatWord=thatWords[thatTailOffset];
+        long tmpThatWord=thatWord>>>-shiftDiff&mask;
+        for(;;) {
+            if(thisWord!=tmpThatWord) {
+                break;
+            }
+            thisWord=thisWords[--thisTailOffset];
+            if(thatTailOffset==0) {
+                thatTailOffset=thatWords.length;
+                int thatHeadOffset=thatHead>>6;
+                for(;;) {
+                    tmpThatWord=thatWord<<shiftDiff|(thatWord=thatWords[--thatTailOffset])>>>-shiftDiff;
+                    if(thatTailOffset==thatHeadOffset) {
+                        return ((thisWord^tmpThatWord)&-1L<<thisHead)==0;
+                    }
+                    if(thisWord!=tmpThatWord) {
+                        break;
+                    }
+                    thisWord=thisWords[--thisTailOffset];
+                }
+                break;
+            }
+            tmpThatWord=thatWord<<shiftDiff|(thatWord=thatWords[--thatTailOffset])>>>-shiftDiff;
+        }
+        return false;
+    }
+    
+    private boolean nonfragmentedEqualsNonfragmented(int shiftDiff,PackedBooleanArrDeq that) {
+        //TODO debug, optimize, and clean up
+        //TODO consider using a word iterator to accomplish this
+        //TODO comment out these assertions
+        assert this.words!=null;
+        assert that.words!=null;
+        assert this.tail!=-1;
+        assert that.tail!=-1;
+        assert this.head<=this.tail;
+        assert that.head<=that.tail;
+        assert this.tail-this.head==that.tail-that.head;
+        assert (this.tail+1&63)<=(that.tail+1&63);
+        assert shiftDiff==(that.tail+1&63)-(this.tail+1&63);
+        long[] thisWords=this.words;
+        long[] thatWords=that.words;
+        int thisHead=this.head;
+        int thatHead=that.head;
+        int thisTail=this.tail;
+        int thatTail=that.tail;
+        int thisTailOffset=thisTail>>6;
+        int thatTailOffset=thatTail>>6;
+        long mask;
+        long thisWord=thisWords[thisTailOffset]&(mask=-1L>>>-thisTail-1);
+        long thatWord=thatWords[thatTailOffset];
+        long tmpThatWord=thatWord>>>shiftDiff&mask;
+        int thatHeadOffset=thatHead>>6;
+        for(;;) {
+            if(thatTailOffset==thatHeadOffset) {
+                return ((thisWord^tmpThatWord)&-1L<<thisHead)==0;
+            }
+            if(thisWord!=tmpThatWord) {
+                break;
+            }
+            thisWord=thisWords[--thisTailOffset];
+            tmpThatWord=thatWord<<-shiftDiff | (thatWord=thatWords[--thatTailOffset])>>>shiftDiff;
+            
+        }
+        return false;
+    }
+   
+    private boolean fragmentedEqualsFragmentedShiftThisDown(PackedBooleanArrDeq that,int thisTail,int thatTail,
+            int shiftDiff){
+        //TODO debug, optimize, and clean up
+        //TODO consider using a word iterator to accomplish this
+        //TODO comment out these assertions
+        assert this.words!=null;
+        assert that.words!=null;
+        assert this.tail!=-1;
+        assert that.tail!=-1;
+        assert this.tail<this.head;
+        assert that.tail<that.head;
+        assert this.tail-this.head+(this.words.length<<6) == that.tail-that.head+(that.words.length<<6);
+        assert this.tail<that.tail;
+        assert (that.tail+1&63)<=(this.tail+1&63);
+        assert shiftDiff==(this.tail+1&63)-(that.tail+1&63);
+        assert thisTail==this.tail;
+        assert thatTail==that.tail;
+        long[] thisWords=this.words;
+        long[] thatWords=that.words;
+        int thisHead=this.head;
+        int thatHead=that.head;
+        int thisTailOffset=thisTail>>6;
+        int thatTailOffset=thatTail>>6;
+        long mask;
+        long thisWord=thisWords[thisTailOffset];
+        long thatWord=thatWords[thatTailOffset]&(mask=-1L>>>-thatTail-1);
+        long tmpThisWord=thisWord>>>shiftDiff&mask;
+        for(;;) {
+            if(tmpThisWord!=thatWord) {
+                break;
+            }
+            if(thisTailOffset==0) {
+                thisTailOffset=thisWords.length;
+                for(;;) {
+                    tmpThisWord=thisWord<<-shiftDiff|(thisWord=thisWords[--thisTailOffset])>>>shiftDiff;
+                    if(thatTailOffset==0) {
+                        thatTailOffset=thatWords.length;
+                        int thisHeadOffset=thisHead>>6;
+                        for(;;) {
+                            thatWord=thatWords[--thatTailOffset];
+                            if(thisTailOffset==thisHeadOffset) {
+                                return ((tmpThisWord^thatWord)&-1L<<thatHead)==0;
+                            }
+                            if(tmpThisWord!=thatWord) {
+                                break;
+                            }
+                            tmpThisWord=thisWord<<-shiftDiff|(thisWord=thisWords[--thisTailOffset])>>>shiftDiff;
+                        }
+                        break;
+                    }
+                    thatWord=thatWords[--thatTailOffset];
+                    if(tmpThisWord!=thatWord) {
+                        break;
+                    }
+                }
+                break;
+            }
+            thatWord=thatWords[--thatTailOffset];
+            tmpThisWord=thisWord<<-shiftDiff|(thisWord=thisWords[--thisTailOffset])>>>shiftDiff;
+        }
+        return false;
+    }
+    private boolean fragmentedEqualsFragmentedShiftThatDown(PackedBooleanArrDeq that,int thisTail,int thatTail,
+            int shiftDiff){
+        //TODO debug, optimize, and clean up
+        //TODO consider using a word iterator to accomplish this
+        //TODO comment out these assertions
+        assert this.words!=null;
+        assert that.words!=null;
+        assert this.tail!=-1;
+        assert that.tail!=-1;
+        assert this.tail<this.head;
+        assert that.tail<that.head;
+        assert this.tail-this.head+(this.words.length<<6) == that.tail-that.head+(that.words.length<<6);
+        assert this.tail<that.tail;
+        assert (that.tail+1&63)>=(this.tail+1&63);
+        assert shiftDiff==(this.tail+1&63)-(that.tail+1&63);
+        assert thisTail==this.tail;
+        assert thatTail==that.tail;
+        long[] thisWords=this.words;
+        long[] thatWords=that.words;
+        int thisHead=this.head;
+        int thatHead=that.head;
+        int thisTailOffset=thisTail>>6;
+        int thatTailOffset=thatTail>>6;
+        long mask;
+        long thisWord=thisWords[thisTailOffset]&(mask=-1L>>>-thatTail-1);
+        long thatWord=thatWords[thatTailOffset];
+        long tmpThatWord=thatWord>>>-shiftDiff&mask;
+        for(;;) {
+            if(thisWord!=tmpThatWord) {
+                break;
+            }
+            if(thisTailOffset==0) {
+                thisTailOffset=thisWords.length;
+                for(;;) {
+                    thisWord=thisWords[--thisTailOffset];
+                    if(thatTailOffset==0) {
+                        thatTailOffset=thatWords.length;
+                        int thatHeadOffset=thatHead>>6;
+                        for(;;) {
+                            tmpThatWord=thatWord<<shiftDiff|(thatWord=thatWords[--thatTailOffset])>>>-shiftDiff;
+                            if(thatTailOffset==thatHeadOffset) {
+                                return ((thisWord^tmpThatWord)&-1L<<thisHead)==0;
+                            }
+                            if(thisWord!=tmpThatWord) {
+                                break;
+                            }
+                            thisWord=thisWords[--thisTailOffset];
+                        }
+                        break;
+                    }
+                    tmpThatWord=thatWord<<shiftDiff|(thatWord=thatWords[--thatTailOffset])>>>-shiftDiff;
+                    if(thisWord!=tmpThatWord) {
+                        break;
+                    }
+                }
+                break;
+            }
+            thisWord=thisWords[--thisTailOffset];
+            tmpThatWord=thatWord<<shiftDiff|(thatWord=thatWords[--thatTailOffset])>>>-shiftDiff;
+        }
+        return false;
+    }
+
+    private boolean equalTo(int thisTail,OmniDeque.OfBoolean that) {
+        //TODO debug, optimize, and clean up
+        //TODO comment out these assertions
+        assert this.words!=null;
+        assert thisTail!=-1;
+        assert that!=null;
+        int thatSize=that.size();
+        int thisHead,thisSize;
+        long[] words=this.words;
+        long word=(words=this.words)[thisTail>>6];
+        OmniIterator.OfBoolean itr;
+        if((thisSize=thisTail-(thisHead=this.head))<0) {
+            if(thatSize!=thisSize+1+((thisSize=words.length)<<6)) {
+                return false;
+            }
+            itr=that.descendingIterator();
+            for(;;) {
+                if(itr.nextBoolean()^(word>>>thisTail&1)!=0) {
+                    return false;
+                }
+                if((--thisTail&63)==63) {
+                    if(thisTail==-1) {
+                        //TODO
+                        word=words[thisTail=thisSize-1];
+                        thisTail=(thisTail<<6)+63;
+                        break;
+                    }
+                    word=words[thisTail>>6];
+                }
+            }
+            
+        }else {
+            if(thatSize!=thisSize+1) {
+                return false;
+            }
+            itr=that.descendingIterator();
+        }
+        for(;;) {
+            if(itr.nextBoolean()^(word>>>thisTail&1)!=0) {
+                return false;
+            }
+            if(thisTail==thisHead) {
+                return true;
+            }
+            if((--thisTail&63)==63) {
+                word=words[thisTail>>6];
+            }
+        }
+    }
+
+    private boolean equalTo(int thisTail,OmniDeque.OfRef<?> that) {
+        //TODO debug, optimize, and clean up
+        //TODO comment out these assertions
+        assert this.words!=null;
+        assert thisTail!=-1;
+        assert that!=null;
+        int thatSize=that.size();
+        int thisHead,thisSize;
+        long[] words=this.words;
+        long word=(words=this.words)[thisTail>>6];
+        OmniIterator.OfRef<?> itr;
+        if((thisSize=thisTail-(thisHead=this.head))<0) {
+            if(thatSize!=thisSize+1+((thisSize=words.length)<<6)) {
+                return false;
+            }
+            itr=that.descendingIterator();
+            for(;;) {
+                Object nextVal;
+                if(!((nextVal=itr.next()) instanceof Boolean) || (boolean)nextVal^(word>>>thisTail&1)!=0) {
+                    return false;
+                }
+                if((--thisTail&63)==63) {
+                    if(thisTail==-1) {
+                        //TODO
+                        word=words[thisTail=thisSize-1];
+                        thisTail=(thisTail<<6)+63;
+                        break;
+                    }
+                    word=words[thisTail>>6];
+                }
+            }
+            
+        }else {
+            if(thatSize!=thisSize+1) {
+                return false;
+            }
+            itr=that.descendingIterator();
+        }
+        for(;;) {
+            Object nextVal;
+            if(!((nextVal=itr.next()) instanceof Boolean) || (boolean)nextVal^(word>>>thisTail&1)!=0) {
+                return false;
+            }
+            if(thisTail==thisHead) {
+                return true;
+            }
+            if((--thisTail&63)==63) {
+                word=words[thisTail>>6];
+            }
+        }
+    }
     @Override
     public boolean equals(Object obj){
-        // TODO
+        if(obj==this) {
+            return true;
+        }
+        if(obj instanceof OmniDeque.OfBoolean) {
+            int thisTail;
+            if((thisTail=this.tail)==-1) {
+                return ((OmniDeque.OfBoolean)obj).isEmpty();
+            }
+            if(obj instanceof PackedBooleanArrDeq) {
+                return this.equalTo(thisTail,(PackedBooleanArrDeq)obj);
+            }else if(obj instanceof BooleanArrDeq) {
+                final BooleanArrDeq that;
+                final int thatTail;
+                return (thatTail=(that=(BooleanArrDeq)obj).tail)!=-1 && SequenceEqualityUtil.isEqual(this,thisTail,that,thatTail);
+            }else if(obj instanceof BooleanDblLnkSeq) {
+                final BooleanDblLnkSeq that;
+                final int thatSize;
+                return (thatSize=(that=(BooleanDblLnkSeq)obj).size)!=0 && SequenceEqualityUtil.isEqual(this,thisTail,that,thatSize);
+            }else {
+                return this.equalTo(thisTail,(OmniDeque.OfBoolean)obj);
+            }
+        }else if(obj instanceof OmniDeque.OfRef) {
+            int thisTail;
+            if((thisTail=this.tail)==-1) {
+                return ((OmniDeque.OfRef<?>)obj).isEmpty();
+            }
+            if(obj instanceof RefArrDeq) {
+                final RefArrDeq<?> that;
+                final int thatTail;
+                return (thatTail=(that=(RefArrDeq<?>)obj).tail)!=-1 && SequenceEqualityUtil.isEqual(this,thisTail,that,thatTail);
+            }else if(obj instanceof RefDblLnkSeq) {
+                final RefDblLnkSeq<?> that;
+                final int thatSize;
+                return (thatSize=(that=(RefDblLnkSeq<?>)obj).size)!=0 && SequenceEqualityUtil.isEqual(this,thisTail,that,thatSize);
+            }else {
+                return this.equalTo(thisTail,(OmniDeque.OfRef<?>)obj);
+            }
+        }
         return false;
     }
     @Override
@@ -2274,11 +2732,8 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         public OmniIterator.OfBoolean descendingIterator(){
             return new DescendingItr(this);
         }
-        @Override
-        public boolean equals(Object obj){
-            // TODO
-            return false;
-        }
+
+        
         @Override
         public boolean getLastBoolean(){
             final int tail;

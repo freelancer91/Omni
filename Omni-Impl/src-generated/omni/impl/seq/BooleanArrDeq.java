@@ -1391,8 +1391,8 @@ public class BooleanArrDeq extends AbstractBooleanArrDeq{
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends BooleanArrDeq{
     private static final long serialVersionUID=1L;
@@ -1405,10 +1405,6 @@ public class BooleanArrDeq extends AbstractBooleanArrDeq{
     }
     Checked(int head,boolean[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     @Override boolean fragmentedRemoveIf(int head,int tail,BooleanPredicate filter){
       final boolean[] arr;

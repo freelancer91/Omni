@@ -1480,8 +1480,9 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+
   }
   public static class Checked$<E>$ extends $ClassPrefix$ArrDeq$<E>${
     private static final long serialVersionUID=1L;
@@ -1494,10 +1495,6 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     Checked(int head,$ArrayType$[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
 #IFNOT OfBoolean
     #MACRO CollapseEnd<true,head,tail>(++)

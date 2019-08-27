@@ -2056,8 +2056,8 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends CharArrDeq{
     private static final long serialVersionUID=1L;
@@ -2070,10 +2070,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     }
     Checked(int head,char[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     private void collapseheadHelper(char[] arr,int tail,CharPredicate filter,int modCount){
       if(tail==0){

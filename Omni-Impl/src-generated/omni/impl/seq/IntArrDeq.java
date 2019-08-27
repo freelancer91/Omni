@@ -1935,8 +1935,8 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends IntArrDeq{
     private static final long serialVersionUID=1L;
@@ -1949,10 +1949,6 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     }
     Checked(int head,int[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     private void collapseheadHelper(int[] arr,int tail,IntPredicate filter,int modCount){
       if(tail==0){

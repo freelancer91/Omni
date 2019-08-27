@@ -1846,8 +1846,8 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
     }
   }
   @Override public boolean equals(Object obj){
-      //TODO
-      return false;
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends LongArrDeq{
     private static final long serialVersionUID=1L;
@@ -1860,10 +1860,6 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
     }
     Checked(int head,long[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     private void collapseheadHelper(long[] arr,int tail,LongPredicate filter,int modCount){
       if(tail==0){

@@ -238,7 +238,7 @@ implements OmniSet.OfRef<E>{
   }
   @Override public boolean equals(Object val){
     //TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public void forEach(Consumer<? super E> action){
     int size;
@@ -1017,7 +1017,7 @@ private boolean addToTable(Object val,int hash){
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);

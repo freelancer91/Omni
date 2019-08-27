@@ -444,7 +444,8 @@ AbstractSeq<$BoxedType$>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
+
     }
     @Override public void clear(){
      if(size!=0){
@@ -803,7 +804,8 @@ AbstractSeq<$BoxedType$>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
+
     }
     @Override public Object clone(){
       $SNode$$<E>$ head;
@@ -950,7 +952,8 @@ AbstractSeq<$BoxedType$>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
+
     }
     @Override public $exposedType$ $elementMethod$(){
       final $SNode$$<E>$ head;
@@ -1423,7 +1426,8 @@ AbstractSeq<$BoxedType$>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
+
     }
 #IF OfRef
     @SuppressWarnings("unchecked")

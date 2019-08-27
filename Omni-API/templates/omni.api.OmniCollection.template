@@ -27,7 +27,7 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   /**
    * TODO hopefully they will add pattern-matching switch statements to make this irrelevant
    */
-  public abstract DataType getDataType();
+  //public abstract DataType getDataType();
 
   //TODO add overloads for OmniCollection etc.
   @Override
@@ -175,6 +175,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
 ,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
+  /*
   @Override
   public default DataType getDataType(){
 #IFSWITCH CLASSPREFIX==Boolean
@@ -197,6 +198,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
   ERROR unknown type CLASSPREFIX
 #ENDIF
   }
+  */
 
   #MACRO ContainsMethodDefault<Byte>()
   #MACRO ContainsMethodDefault<Character>()
@@ -397,10 +399,12 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
   
   public abstract interface OfRef<E> extends OmniCollection<E>,Iterable<E>
   {
+    /*
     @Override
     public default DataType getDataType(){
       return DataType.REF;
     }
+    */
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);
     public abstract OmniIterator.OfRef<E> iterator();

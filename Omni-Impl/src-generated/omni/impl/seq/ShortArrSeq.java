@@ -733,7 +733,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO implements equals method for UncheckedStack
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       final short[] copy;
@@ -1104,7 +1104,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO implements equals method for UncheckedList
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       final short[] copy;
@@ -1760,7 +1760,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO implements equals method for UncheckedSubList
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       final short[] copy;
@@ -2856,7 +2856,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO implements equals method for CheckedStack
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       final short[] copy;
@@ -3121,7 +3121,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO implements equals method for CheckedList
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       final short[] copy;
@@ -3585,7 +3585,7 @@ AbstractSeq<Short>
     }
     @Override public boolean equals(Object val){
       //TODO implements equals method for CheckedSubList
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       final CheckedList root;

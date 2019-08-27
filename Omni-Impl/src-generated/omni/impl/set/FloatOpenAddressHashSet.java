@@ -286,7 +286,7 @@ implements OmniSet.OfFloat{
   }
   @Override public boolean equals(Object val){
     //TODO
-    return false;
+                throw omni.util.NotYetImplementedException.getNYI();
   }
   @Override public void forEach(FloatConsumer action){
     int size;
@@ -1115,7 +1115,7 @@ boolean addToTable(int val,int hash){
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfFloat iterator(){
       return new Itr(this);

@@ -1055,7 +1055,7 @@ AbstractSeq<Float>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     private void bubbleUpPeelHead(FloatDblLnkNode newHead,FloatDblLnkNode oldHead){
       newHead.prev=null;
@@ -4464,7 +4464,7 @@ AbstractSeq<Float>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     } 
   }
   public static class CheckedList extends UncheckedList{
@@ -4956,7 +4956,7 @@ AbstractSeq<Float>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfFloat descendingIterator(){
       return new DescendingItr(this);
@@ -5690,7 +5690,7 @@ AbstractSeq<Float>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public boolean removeVal(boolean val){
       {

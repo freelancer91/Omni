@@ -974,7 +974,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     }
     private void bubbleUpPeelHead(ByteDblLnkNode newHead,ByteDblLnkNode oldHead){
       newHead.prev=null;
@@ -4072,7 +4072,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+      throw omni.util.NotYetImplementedException.getNYI();
     } 
   }
   public static class CheckedList extends UncheckedList{
@@ -4564,7 +4564,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfByte descendingIterator(){
       return new DescendingItr(this);
@@ -5300,7 +5300,7 @@ AbstractSeq<Byte>
     }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
+                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public boolean removeVal(boolean val){
       {

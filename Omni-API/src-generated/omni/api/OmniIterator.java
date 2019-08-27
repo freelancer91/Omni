@@ -17,15 +17,18 @@ public interface OmniIterator<E> extends Iterator<E>
   //public abstract E next();
   //@Override
   //public abstract boolean hasNext();
+  //public abstract DataType getDataType();
   public abstract Object clone();
   public abstract interface OfBoolean extends OmniIterator<Boolean>
   ,PrimitiveIterator<Boolean,BooleanConsumer>
   ,CharOutput<Boolean>,ByteOutput<Boolean>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.BOOLEAN;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Boolean> action);
     @Override
@@ -59,10 +62,12 @@ public interface OmniIterator<E> extends Iterator<E>
   ,PrimitiveIterator<Byte,ByteConsumer>
   ,ByteOutput<Byte>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.BYTE;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Byte> action);
     @Override
@@ -95,10 +100,12 @@ public interface OmniIterator<E> extends Iterator<E>
   ,PrimitiveIterator<Character,CharConsumer>
   ,CharOutput<Character>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.CHAR;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Character> action);
     @Override
@@ -127,10 +134,12 @@ public interface OmniIterator<E> extends Iterator<E>
   ,PrimitiveIterator<Short,ShortConsumer>
   ,ShortOutput<Short>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.SHORT;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Short> action);
     @Override
@@ -159,10 +168,12 @@ public interface OmniIterator<E> extends Iterator<E>
   ,PrimitiveIterator.OfInt
   ,IntOutput<Integer>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.INT;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Integer> action);
     @Override
@@ -188,10 +199,12 @@ public interface OmniIterator<E> extends Iterator<E>
   ,PrimitiveIterator.OfLong
   ,LongOutput<Long>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.LONG;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Long> action);
     @Override
@@ -213,10 +226,12 @@ public interface OmniIterator<E> extends Iterator<E>
   ,PrimitiveIterator<Float,FloatConsumer>
   ,FloatOutput<Float>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.FLOAT;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Float> action);
     @Override
@@ -233,10 +248,12 @@ public interface OmniIterator<E> extends Iterator<E>
   ,PrimitiveIterator.OfDouble
   ,DoubleOutput<Double>
   {
+    /*
       @Override
       public default DataType getDataType(){
       return DataType.DOUBLE;
     }
+    */
     @Override
     public abstract void forEachRemaining(Consumer<? super Double> action);
     @Override
@@ -269,10 +286,12 @@ public interface OmniIterator<E> extends Iterator<E>
   }
   public interface OfRef<E>extends OmniIterator<E>
   {
+    /*
     @Override
     public default DataType getDataType(){
       return DataType.REF;
     }
+    */
     //@Override
     //public abstract void forEachRemaining(Consumer<? super E> action);
     //@Override
