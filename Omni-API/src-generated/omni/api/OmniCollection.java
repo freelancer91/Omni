@@ -22,11 +22,7 @@ import java.util.Collection;
 //TODO integration into Java Collection library
 public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
 {
-  @Override
-  default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return Collection.super.spliterator();
-  }
+  public abstract DataType getDataType();
   //TODO add overloads for OmniCollection etc.
   @Override
   default public boolean addAll(Collection<? extends E> that){
@@ -190,6 +186,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
   {
     @Override
+    public default DataType getDataType(){
+      return DataType.BOOLEAN;
+    }
+    @Override
     public default boolean contains(Byte val)
     {
       return val!=null && contains(
@@ -284,6 +284,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   ,ByteInput<Byte>,ByteOutput<Byte>
   {
     @Override
+    public default DataType getDataType(){
+      return DataType.BYTE;
+    }
+    @Override
     public default boolean contains(Byte val)
     {
       return val!=null && contains(
@@ -361,6 +365,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   ,CharInput<Character>,CharOutput<Character>
   {
     @Override
+    public default DataType getDataType(){
+      return DataType.CHAR;
+    }
+    @Override
     public default boolean contains(Byte val)
     {
       return val!=null && contains(
@@ -426,6 +434,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract interface OfShort extends OfPrimitive<Short>,Iterable<Short>
   ,ShortInput<Short>,ShortOutput<Short>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.SHORT;
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -496,6 +508,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract interface OfInt extends OfPrimitive<Integer>,Iterable<Integer>
   ,IntInput<Integer>,IntOutput<Integer>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.INT;
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -587,6 +603,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract interface OfLong extends OfPrimitive<Long>,Iterable<Long>
   ,LongInput<Long>,LongOutput<Long>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.LONG;
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -682,6 +702,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract interface OfFloat extends OfPrimitive<Float>,Iterable<Float>
   ,FloatInput<Float>,FloatOutput<Float>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.FLOAT;
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -779,6 +803,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract interface OfDouble extends OfPrimitive<Double>,Iterable<Double>
   ,FloatInput<Double>,DoubleOutput<Double>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.DOUBLE;
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -951,6 +979,10 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   }
   public abstract interface OfRef<E> extends OmniCollection<E>,Iterable<E>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.REF;
+    }
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);
     public abstract OmniIterator.OfRef<E> iterator();

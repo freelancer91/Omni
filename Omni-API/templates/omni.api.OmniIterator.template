@@ -66,6 +66,29 @@ public abstract interface OfCLASSPREFIX extends OmniIterator<BOXEDTYPE>
 ,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
+    @Override
+    public default DataType getDataType(){
+#IFSWITCH CLASSPREFIX==Boolean
+    return DataType.BOOLEAN;
+#ELSEIFSWITCH CLASSPREFIX==Byte
+    return DataType.BYTE;
+#ELSEIFSWITCH CLASSPREFIX==Char
+    return DataType.CHAR;
+#ELSEIFSWITCH CLASSPREFIX==Short
+    return DataType.SHORT;
+#ELSEIFSWITCH CLASSPREFIX==Int
+    return DataType.INT;
+#ELSEIFSWITCH CLASSPREFIX==Long
+    return DataType.LONG;
+#ELSEIFSWITCH CLASSPREFIX==Float
+    return DataType.FLOAT;
+#ELSEIFSWITCH CLASSPREFIX==Double
+    return DataType.DOUBLE;
+#ELSE
+    ERROR unknown type CLASSPREFIX
+#ENDIF
+  }
+  
   @Override
   public abstract void forEachRemaining(Consumer<? super BOXEDTYPE> action);
   @Override
@@ -119,6 +142,10 @@ public abstract interface OfCLASSPREFIX extends OmniIterator<BOXEDTYPE>
 #ENDDEF
   public interface OfRef<E>extends OmniIterator<E>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.REF;
+    }
     //@Override
     //public abstract void forEachRemaining(Consumer<? super E> action);
     //@Override

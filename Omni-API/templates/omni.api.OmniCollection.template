@@ -24,11 +24,11 @@ import java.util.Collection;
 //TODO integration into Java Collection library
 public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
 {
-  @Override
-  default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return Collection.super.spliterator();
-  }
+  /**
+   * TODO hopefully they will add pattern-matching switch statements to make this irrelevant
+   */
+  public abstract DataType getDataType();
+
   //TODO add overloads for OmniCollection etc.
   @Override
   default public boolean addAll(Collection<? extends E> that){
@@ -175,6 +175,29 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
 ,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
+  @Override
+  public default DataType getDataType(){
+#IFSWITCH CLASSPREFIX==Boolean
+    return DataType.BOOLEAN;
+#ELSEIFSWITCH CLASSPREFIX==Byte
+    return DataType.BYTE;
+#ELSEIFSWITCH CLASSPREFIX==Char
+    return DataType.CHAR;
+#ELSEIFSWITCH CLASSPREFIX==Short
+    return DataType.SHORT;
+#ELSEIFSWITCH CLASSPREFIX==Int
+    return DataType.INT;
+#ELSEIFSWITCH CLASSPREFIX==Long
+    return DataType.LONG;
+#ELSEIFSWITCH CLASSPREFIX==Float
+    return DataType.FLOAT;
+#ELSEIFSWITCH CLASSPREFIX==Double
+    return DataType.DOUBLE;
+#ELSE
+  ERROR unknown type CLASSPREFIX
+#ENDIF
+  }
+
   #MACRO ContainsMethodDefault<Byte>()
   #MACRO ContainsMethodDefault<Character>()
   #MACRO ContainsMethodDefault<Short>()
@@ -374,6 +397,10 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
   
   public abstract interface OfRef<E> extends OmniCollection<E>,Iterable<E>
   {
+    @Override
+    public default DataType getDataType(){
+      return DataType.REF;
+    }
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);
     public abstract OmniIterator.OfRef<E> iterator();

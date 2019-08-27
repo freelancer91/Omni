@@ -38,11 +38,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     return OmniCollection.super.retainAll(that);
   }
   @Override
-  default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return List.super.spliterator();
-  }
-  @Override
   default boolean addAll(Collection<? extends E> that){
     //TODO implement in lower classes and remove this
     return OmniCollection.super.addAll(that);
@@ -108,11 +103,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   //public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniList<E>,OmniCollection.OfPrimitive<E>
   {
-     @Override
-     default java.util.Spliterator<E> spliterator(){
-      //TODO implement in lower classes and remove this
-      return OmniList.super.spliterator();
-     }
      public abstract void add(int index,boolean val);
      @Override
      public default int indexOf(Boolean val)
@@ -293,11 +283,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface DoubleOutput<E> extends OmniList<E>,OmniCollection.DoubleOutput<E>
   {
-    @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.super.spliterator();
-   }
     public abstract OmniListIterator.DoubleOutput<E> listIterator();
     public abstract OmniListIterator.DoubleOutput<E> listIterator(int index);
     public abstract OmniList.DoubleOutput<E> subList(int fromIndex,int toIndex);
@@ -306,11 +291,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface FloatOutput<E> extends DoubleOutput<E>,OmniCollection.FloatOutput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.DoubleOutput.super.spliterator();
-   }
     public abstract OmniListIterator.FloatOutput<E> listIterator();
     public abstract OmniListIterator.FloatOutput<E> listIterator(int index);
     public abstract OmniList.FloatOutput<E> subList(int fromIndex,int toIndex);
@@ -319,11 +299,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface LongOutput<E> extends FloatOutput<E>,OmniCollection.LongOutput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.FloatOutput.super.spliterator();
-   }
     public abstract OmniListIterator.LongOutput<E> listIterator();
     public abstract OmniListIterator.LongOutput<E> listIterator(int index);
     public abstract OmniList.LongOutput<E> subList(int fromIndex,int toIndex);
@@ -332,11 +307,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface IntOutput<E> extends LongOutput<E>,OmniCollection.IntOutput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.LongOutput.super.spliterator();
-   }
     public abstract OmniListIterator.IntOutput<E> listIterator();
     public abstract OmniListIterator.IntOutput<E> listIterator(int index);
     public abstract OmniList.IntOutput<E> subList(int fromIndex,int toIndex);
@@ -345,11 +315,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface ShortOutput<E> extends IntOutput<E>,OmniCollection.ShortOutput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.IntOutput.super.spliterator();
-   }
     public abstract OmniListIterator.ShortOutput<E> listIterator();
     public abstract OmniListIterator.ShortOutput<E> listIterator(int index);
     public abstract OmniList.ShortOutput<E> subList(int fromIndex,int toIndex);
@@ -358,11 +323,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface CharOutput<E> extends IntOutput<E>,OmniCollection.CharOutput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.IntOutput.super.spliterator();
-   }
     public abstract OmniListIterator.CharOutput<E> listIterator();
     public abstract OmniListIterator.CharOutput<E> listIterator(int index);
     public abstract OmniList.CharOutput<E> subList(int fromIndex,int toIndex);
@@ -371,11 +331,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface ByteOutput<E> extends ShortOutput<E>,OmniCollection.ByteOutput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.ShortOutput.super.spliterator();
-   }
     public abstract OmniListIterator.ByteOutput<E> listIterator();
     public abstract OmniListIterator.ByteOutput<E> listIterator(int index);
     public abstract OmniList.ByteOutput<E> subList(int fromIndex,int toIndex);
@@ -384,11 +339,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface BooleanInput<E> extends OmniList<E>,OmniCollection.BooleanInput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.super.spliterator();
-   }
     public abstract void add(int index,boolean val);
     public abstract void add(int index,Boolean val);
     public abstract void put(int index,boolean val);
@@ -399,11 +349,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.BooleanInput.super.spliterator();
-   }
     public abstract void add(int index,byte val);
     public abstract void add(int index,Byte val);
     public abstract void put(int index,byte val);
@@ -414,11 +359,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.BooleanInput.super.spliterator();
-   }
     public abstract void add(int index,char val);
     public abstract void add(int index,Character val);
     public abstract void put(int index,char val);
@@ -429,11 +369,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.ByteInput.super.spliterator();
-   }
     public abstract void add(int index,short val);
     public abstract void add(int index,Short val);
     public abstract void put(int index,short val);
@@ -444,11 +379,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface IntInput<E> extends ShortInput<E>,CharInput<E>,OmniCollection.IntInput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.ShortInput.super.spliterator();
-   }
     public abstract void add(int index,int val);
     public abstract void add(int index,Integer val);
     public abstract void put(int index,int val);
@@ -459,11 +389,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.IntInput.super.spliterator();
-   }
     public abstract void add(int index,long val);
     public abstract void add(int index,Long val);
     public abstract void put(int index,long val);
@@ -474,11 +399,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput<E>
   {
-   @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.LongInput.super.spliterator();
-   }
     public abstract void add(int index,float val);
     public abstract void add(int index,Float val);
     public abstract void put(int index,float val);
@@ -490,11 +410,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfBoolean extends OfPrimitive<Boolean>,OmniCollection.OfBoolean
     ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
     {
-      @Override
-       default java.util.Spliterator<Boolean> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Boolean get(int index);
       public abstract boolean getBoolean(int index);
       @Override public abstract void add(int index,boolean val);
@@ -585,11 +500,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfByte extends OfPrimitive<Byte>,OmniCollection.OfByte
     ,ByteInput<Byte>,ByteOutput<Byte>
     {
-      @Override
-       default java.util.Spliterator<Byte> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Byte get(int index);
       public abstract byte getByte(int index);
       public abstract void add(int index,Byte val);
@@ -687,11 +597,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfChar extends OfPrimitive<Character>,OmniCollection.OfChar
     ,CharInput<Character>,CharOutput<Character>
     {
-      @Override
-       default java.util.Spliterator<Character> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Character get(int index);
       public abstract char getChar(int index);
       public abstract void add(int index,Character val);
@@ -781,11 +686,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfShort extends OfPrimitive<Short>,OmniCollection.OfShort
     ,ShortInput<Short>,ShortOutput<Short>
     {
-      @Override
-       default java.util.Spliterator<Short> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Short get(int index);
       public abstract short getShort(int index);
       public abstract void add(int index,Short val);
@@ -891,11 +791,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfInt extends OfPrimitive<Integer>,OmniCollection.OfInt
     ,IntInput<Integer>,IntOutput<Integer>
     {
-      @Override
-       default java.util.Spliterator<Integer> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Integer get(int index);
       public abstract int getInt(int index);
       public abstract void add(int index,Integer val);
@@ -1041,11 +936,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfLong extends OfPrimitive<Long>,OmniCollection.OfLong
     ,LongInput<Long>,LongOutput<Long>
     {
-      @Override
-       default java.util.Spliterator<Long> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Long get(int index);
       public abstract long getLong(int index);
       public abstract void add(int index,Long val);
@@ -1199,11 +1089,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfFloat extends OfPrimitive<Float>,OmniCollection.OfFloat
     ,FloatInput<Float>,FloatOutput<Float>
     {
-      @Override
-       default java.util.Spliterator<Float> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Float get(int index);
       public abstract float getFloat(int index);
       public abstract void add(int index,Float val);
@@ -1349,11 +1234,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     public abstract interface OfDouble extends OfPrimitive<Double>,OmniCollection.OfDouble
     ,FloatInput<Double>,DoubleOutput<Double>
     {
-      @Override
-       default java.util.Spliterator<Double> spliterator(){
-        //TODO implement in lower classes and remove this
-        return OmniList.OfPrimitive.super.spliterator();
-       }
       public abstract Double get(int index);
       public abstract double getDouble(int index);
       public abstract void add(int index,Double val);
@@ -1521,11 +1401,6 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
       }
     }
   public abstract interface OfRef<E> extends OmniList<E>,OmniCollection.OfRef<E>{
-    @Override
-   default java.util.Spliterator<E> spliterator(){
-    //TODO implement in lower classes and remove this
-    return OmniList.super.spliterator();
-   }
     public abstract void add(int index,E val);
     public abstract E get(int index);
     public abstract OmniListIterator.OfRef<E> listIterator();
