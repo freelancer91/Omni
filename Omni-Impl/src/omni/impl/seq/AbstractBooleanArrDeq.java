@@ -87,7 +87,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
     {
       int tail;
       if((tail=this.tail)!=-1){
-        return uncheckedcontains(tail,(val));
+        return uncheckedcontains(tail,val);
       }
     }
     return false;
@@ -165,7 +165,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
         returnFalse:for(;;){
           final boolean v;
           long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+          if(((bits=Double.doubleToRawLongBits(val))&Long.MAX_VALUE)==0){
             v=false;
           }else if(bits==TypeUtil.DBL_TRUE_BITS){
             v=true;
@@ -211,7 +211,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
             }
           }else if(val instanceof Double){
             final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+            if(((bits=Double.doubleToRawLongBits((double)val))&Long.MAX_VALUE)==0){
               b=false;
             }else if(bits==TypeUtil.DBL_TRUE_BITS){
               b=true;
@@ -329,7 +329,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
         returnFalse:for(;;){
           final boolean v;
           long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+          if(((bits=Double.doubleToRawLongBits(val))&Long.MAX_VALUE)==0){
             v=false;
           }else if(bits==TypeUtil.DBL_TRUE_BITS){
             v=true;
@@ -375,7 +375,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
             }
           }else if(val instanceof Double){
             final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+            if(((bits=Double.doubleToRawLongBits((double)val))&Long.MAX_VALUE)==0){
               b=false;
             }else if(bits==TypeUtil.DBL_TRUE_BITS){
               b=true;
@@ -493,7 +493,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
         returnFalse:for(;;){
           final boolean v;
           long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+          if(((bits=Double.doubleToRawLongBits(val))&Long.MAX_VALUE)==0){
             v=false;
           }else if(bits==TypeUtil.DBL_TRUE_BITS){
             v=true;
@@ -539,7 +539,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
             }
           }else if(val instanceof Double){
             final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+            if(((bits=Double.doubleToRawLongBits((double)val))&Long.MAX_VALUE)==0){
               b=false;
             }else if(bits==TypeUtil.DBL_TRUE_BITS){
               b=true;
@@ -579,7 +579,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
     {
       int tail;
       if((tail=this.tail)!=-1){
-        return uncheckedsearch(tail,(val));
+        return uncheckedsearch(tail,val);
       }
     }
     return -1;
@@ -657,7 +657,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
         returnFalse:for(;;){
           final boolean v;
           long bits;
-          if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
+          if(((bits=Double.doubleToRawLongBits(val))&Long.MAX_VALUE)==0){
             v=false;
           }else if(bits==TypeUtil.DBL_TRUE_BITS){
             v=true;
@@ -703,7 +703,7 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
             }
           }else if(val instanceof Double){
             final long bits;
-            if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
+            if(((bits=Double.doubleToRawLongBits((double)val))&Long.MAX_VALUE)==0){
               b=false;
             }else if(bits==TypeUtil.DBL_TRUE_BITS){
               b=true;
@@ -800,13 +800,6 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
     }
     return "[]";
   }
-  @Override public int hashCode(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedHashCode(tail);
-    }
-    return 1;
-  }
   @Override public abstract Object clone();
   abstract void uncheckedForEach(int tail,BooleanConsumer action);
   abstract boolean fragmentedRemoveIf(int head,int tail,BooleanPredicate filter);
@@ -816,7 +809,6 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
   abstract boolean uncheckedremoveLastOccurrence(int tail,boolean val);
   abstract int uncheckedsearch(int tail,boolean val);
   abstract String uncheckedToString(int tail);
-  abstract int uncheckedHashCode(int tail);
 
   static abstract class AbstractDeqItr
   extends AbstractBooleanItr

@@ -4205,8 +4205,8 @@ public class ArrSeqTest{
     }
   }
   private static interface ToStringAndHashCodeTest{
-    private void runAllTests(String testName){
-      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+    private void runAllTests(String testName,SequenceInitParams[] initParamsArr){
+      for(final var initParams:initParamsArr){
         if(initParams.collectionType == DataType.REF){
           for(final var objGen:initParams.structType.validMonitoredObjectGens){
             if(objGen.expectedException == null || initParams.checkedType.checked){
@@ -4584,7 +4584,7 @@ public class ArrSeqTest{
     test.runAllTests("ArrSeqTest.testcontains_val",2);
   }
    @Test public void testequals_Object(){
-    for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+    for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       TestExecutorService
           .submitTest(()->{
               try {
@@ -4680,7 +4680,7 @@ public class ArrSeqTest{
         monitor.verifyHashCode();
       }
     };
-    test.runAllTests("ArrSeqTest.testhashCode_void");
+    test.runAllTests("ArrSeqTest.testhashCode_void",LIST_STRUCT_INIT_PARAMS);
   }
    @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<? extends AbstractSeq<?>>> test
@@ -5894,7 +5894,7 @@ public class ArrSeqTest{
         monitor.verifyToString();
       }
     };
-    test.runAllTests("ArrSeqTest.testtoString_void");
+    test.runAllTests("ArrSeqTest.testtoString_void",ALL_STRUCT_INIT_PARAMS);
   }
    @Test public void testunstableAscendingSort_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){

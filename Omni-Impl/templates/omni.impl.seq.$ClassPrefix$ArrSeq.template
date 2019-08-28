@@ -220,13 +220,7 @@ AbstractSeq<$BoxedType$>
     this.size=0;
   #ENDIF
   }
-  @Override public int hashCode(){
-    final int size;
-    if((size=this.size)!=0){
-      return uncheckedHashCode(size);
-    }
-    return 1;
-  }
+
   @Override public String toString(){
     int size;
     if((size=this.size)!=0){
@@ -271,7 +265,6 @@ AbstractSeq<$BoxedType$>
     }
     return "[]";
   }
-  abstract int uncheckedHashCode(int size);
   #IF OfDouble,OfRef
   abstract void uncheckedToString(int size,StringBuilder builder);
   #ELSEIF OfChar
@@ -649,9 +642,7 @@ AbstractSeq<$BoxedType$>
   #MACRO StructImpl<CheckedSubList>()
 }
 #MACRODEF StructImpl<STRUCTNAME>()
-#IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSublist
-private
-#ELSE
+#IFNOTSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
 public
 #ENDIF
   static class STRUCTNAME$<E>$
@@ -842,11 +833,31 @@ public
   #ENDIF
   }
 #ENDIF
+#IFSWITCH STRUCTNAME==UncheckedList,CheckedSubList,UncheckedSubList
   @Override public boolean equals(Object val){
-    //TODO implements equals method for STRUCTNAME$<E>$
-    throw omni.util.NotYetImplementedException.getNYI();
-
+    if(val==this){
+      return true;
+    }
+    if(val instanceof List){
+      //TODO optimize this
+      int size;
+      List<?> that;
+      if((size=this.size)==(that=(List<?>)val).size()){
+        var thisItr=this.iterator();
+        var thatItr=that.iterator();
+        while(thisItr.hasNext()){
+          if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+            return false;
+          }
+        }
+        return !thatItr.hasNext();
+      }
+    }
+    return false;
   }
+#ENDIF
+
+  
   @Override public Object clone(){
   #IFSWITCH STRUCTNAME==CheckedSubList
     final CheckedList$<E>$ root;
@@ -989,26 +1000,31 @@ public
     #ENDIF
   }
   #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+#IFSWITCH STRUCTNAME==CheckedList
   #IF OfRef
-@Override int uncheckedHashCode(int size){
-  final int modCount=this.modCount;
-  try{
-    return super.uncheckedHashCode(size);
-  }finally{
-    CheckedCollection.checkModCount(modCount,this.modCount);
+@Override public int hashCode(){
+  final int size;
+  if((size=this.size)!=0){
+    final int modCount=this.modCount;
+    try{
+      return OmniArray.Of$ClassPrefix$.ascendingSeqHashCode(this.arr,0,size-1);
+    }finally{
+      CheckedCollection.checkModCount(modCount,this.modCount);
+    }
   }
+  return 1;
 }
   #ENDIF
-#ELSEIFSWITCH STRUCTNAME==UncheckedList,UncheckedStack
-@Override int uncheckedHashCode(int size){
-  #IFSWITCH STRUCTNAME==UncheckedList
-  return OmniArray.Of$ClassPrefix$.ascendingSeqHashCode(this.arr,0,size-1);
-  #ELSE
-  return OmniArray.Of$ClassPrefix$.descendingSeqHashCode(this.arr,0,size-1);
-  #ENDIF
-}
-#ELSE
+#ELSEIFSWITCH STRUCTNAME==UncheckedList
+  @Override public int hashCode(){
+    final int size;
+    if((size=this.size)!=0){
+      return OmniArray.Of$ClassPrefix$.ascendingSeqHashCode(this.arr,0,size-1);
+    }
+    return 1;
+  }
+
+#ELSEIFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
 @Override public int hashCode(){
   #IF OfRef
     #IFSWITCH STRUCTNAME==CheckedSubList

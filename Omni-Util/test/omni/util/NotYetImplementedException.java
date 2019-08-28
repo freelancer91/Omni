@@ -40,7 +40,8 @@ public class NotYetImplementedException extends UnsupportedOperationException{
   }
   
   private static class ReportData<K,V> extends TreeMap<K,V>{
-      long total;
+    private static final long serialVersionUID=1L;
+    long total;
       
       
   }

@@ -9,9 +9,7 @@
 #TYPEDEF OfRef
 package omni.impl.seq;
 
-#IF OfDouble,OfFloat
-import omni.util.HashUtil;
-#ENDIF
+
 import omni.util.OmniArray;
 
 import omni.util.ArrCopy;
@@ -39,7 +37,6 @@ import omni.impl.Abstract$TypeNameModifier$Itr;
 import java.util.ConcurrentModificationException;
 #IF OfRef
 import omni.util.OmniPred;
-import java.util.Objects;
 #ENDIF
 
 import java.io.IOException;
@@ -386,13 +383,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     return "[]";
   }
-  @Override public int hashCode(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedHashCode(tail);
-    }
-    return 1;
-  }
+ 
 #ENDIF
   #MACRO SuppressUnchecked()
   @Override public $exposedType$ pop$TypeNameModifier$(){
@@ -585,25 +576,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
 #ENDIF
   }
-#IFNOT OfBoolean
-  private
-#ENDIF
-  int uncheckedHashCode(int tail){
-    final $ArrayType$[] arr;
-    int head;
-    int hash=31+$hashCodeMethod$((arr=this.arr)[head=this.head]);
-    if(tail<head){
-      for(final int bound=arr.length;;){  
-        if(++head==bound){
-          hash=hash*31+$hashCodeMethod$(arr[head=0]);
-          break;
-        }
-        hash=(hash*31)+$hashCodeMethod$(arr[head]);
-      }
-    }
-    for(;head!=tail;hash=(hash*31)+$hashCodeMethod$(arr[++head])){}
-    return hash;
-  }
+
   @Override public void push($exposedType$ val){
     $ArrayType$[] arr;
     if((arr=this.arr)!=null){
@@ -1479,11 +1452,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       output.writeInt(0);
     }
   }
-  @Override public boolean equals(Object obj){
-    //TODO
-    throw omni.util.NotYetImplementedException.getNYI();
 
-  }
   public static class Checked$<E>$ extends $ClassPrefix$ArrDeq$<E>${
     private static final long serialVersionUID=1L;
     transient int modCount;
@@ -3708,18 +3677,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }
       return "[]";
     }
-    @Override public int hashCode(){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        int modCount=this.modCount;
-        try{
-          return super.uncheckedHashCode(tail);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-      return 1;
-    }
+    
     @Override public boolean contains(Object val){
       final int tail;
       if((tail=this.tail)!=-1){

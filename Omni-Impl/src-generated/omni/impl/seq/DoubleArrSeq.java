@@ -136,13 +136,6 @@ AbstractSeq<Double>
   @Override public void clear(){
     this.size=0;
   }
-  @Override public int hashCode(){
-    final int size;
-    if((size=this.size)!=0){
-      return uncheckedHashCode(size);
-    }
-    return 1;
-  }
   @Override public String toString(){
     int size;
     if((size=this.size)!=0){
@@ -152,7 +145,6 @@ AbstractSeq<Double>
     }
     return "[]";
   }
-  abstract int uncheckedHashCode(int size);
   abstract void uncheckedToString(int size,StringBuilder builder);
   @Override public boolean contains(boolean val){
     {
@@ -652,10 +644,6 @@ AbstractSeq<Double>
     UncheckedStack(int size,double[] arr){
       super(size,arr);
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for UncheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final double[] copy;
       final int size;
@@ -669,9 +657,6 @@ AbstractSeq<Double>
     @Override void uncheckedToString(int size,StringBuilder builder){
       OmniArray.OfDouble.descendingToString(this.arr,0,size-1,builder);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfDouble.descendingSeqHashCode(this.arr,0,size-1);
-  }
     @Override public int search(boolean val){
       {
         {
@@ -986,9 +971,13 @@ AbstractSeq<Double>
     @Override void uncheckedToString(int size,StringBuilder builder){
       OmniArray.OfDouble.ascendingToString(this.arr,0,size-1,builder);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfDouble.ascendingSeqHashCode(this.arr,0,size-1);
-  }
+    @Override public int hashCode(){
+      final int size;
+      if((size=this.size)!=0){
+        return OmniArray.OfDouble.ascendingSeqHashCode(this.arr,0,size-1);
+      }
+      return 1;
+    }
     @Override public int indexOf(boolean val){
       {
         {
@@ -1567,7 +1556,6 @@ AbstractSeq<Double>
       return new UncheckedSubList(this,fromIndex,toIndex-fromIndex);
     }
   }
-  public
     static class UncheckedSubList
       extends AbstractSeq<Double>
       implements DoubleSubListDefault,Cloneable,RandomAccess
@@ -2679,10 +2667,6 @@ AbstractSeq<Double>
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for CheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final double[] copy;
       final int size;
@@ -3364,7 +3348,6 @@ AbstractSeq<Double>
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  private
     static class CheckedSubList
       extends AbstractSeq<Double>
       implements DoubleSubListDefault,Cloneable,RandomAccess

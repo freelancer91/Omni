@@ -21,7 +21,6 @@ import omni.impl.MonitoredRemoveIfPredicateGen;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.StructType;
-import omni.util.NotYetImplementedException;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 public class ArrDeqTest{
@@ -2651,71 +2650,6 @@ public class ArrDeqTest{
     void callAndVerifyResult(ArrDeqMonitor<?> monitor,QueryVal queryVal,QueryVal.QueryValModification modification,
         QueryCastType castType,DataType inputType,int size,MonitoredObjectGen monitoredObjectGen,double position);
   }
-  private static interface ToStringAndHashCodeTest{
-    private void runAllTests(String testName){
-      for(final var size:SIZES){
-        final int interval=Math.max(1,size / 10);
-        final int rotateBound=size / 2 + interval;
-        for(int tmpInitCap=0,initCapBound=size + interval;tmpInitCap <= initCapBound;tmpInitCap+=interval){
-          final int initCap=tmpInitCap;
-          for(int tmpNumToRotate=0;tmpNumToRotate <= rotateBound;tmpNumToRotate+=interval){
-            final int numToRotate=tmpNumToRotate;
-            for(final var collectionType:DataType.values()){
-              final int initValBound=collectionType == DataType.BOOLEAN && size > 0?1:0;
-              for(final var checkedType:CheckedType.values()){
-                if(collectionType == DataType.REF){
-                  for(final var objGen:StructType.ArrDeq.validMonitoredObjectGens){
-                    if(checkedType.checked || size == 0 || objGen.expectedException == null){
-                      TestExecutorService.submitTest(()->{
-                        if(size == 0 || objGen.expectedException == null){
-                          final var monitor=SequenceInitialization.Ascending
-                              .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
-                          if(size > 0 && numToRotate > 0){
-                            monitor.rotate(numToRotate);
-                          }
-                          callVerify(monitor);
-                        }else{
-                          final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
-                          final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
-                              new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0,objGen,throwSwitch);
-                          if(size > 0 && numToRotate > 0){
-                            monitor.rotate(numToRotate);
-                          }
-                          Assertions.assertThrows(objGen.expectedException,()->{
-                            try{
-                              callRaw(monitor.getCollection());
-                            }finally{
-                              throwSwitch.doThrow=false;
-                              monitor.verifyCollectionState();
-                            }
-                          });
-                        }
-                      });
-                    }
-                  }
-                }else{
-                  for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-                    final int initVal=tmpInitVal;
-                    TestExecutorService.submitTest(()->{
-                      final var monitor=SequenceInitialization.Ascending
-                          .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,initVal);
-                      if(size > 0 && numToRotate > 0){
-                        monitor.rotate(numToRotate);
-                      }
-                      callVerify(monitor);
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      TestExecutorService.completeAllTests(testName);
-    }
-    void callRaw(OmniDeque<?> seq);
-    void callVerify(ArrDeqMonitor<?> monitor);
-  }
   private static final int[] REMOVE_IF_SIZES=new int[66 + 8 * 5 + 2];
   private static final int[] SHORT_SIZES=new int[]{0,1,2,3,4,5,6,7,8,9,10};
   private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.10,0.90};
@@ -2804,16 +2738,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testelement_void",true);
   }
-   @Test public void testequals_Object(){
-      final BasicTest test=(monitor)->{
-          try{
-            Assertions.assertFalse(monitor.getCollection().equals(null));
-          }catch(NotYetImplementedException e) {
-              //do nothing
-          }
-      };
-      test.runAllTests("ArrDeqTest.testequals_Object");
-  }
+
    @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2843,17 +2768,7 @@ public class ArrDeqTest{
     };
     test.runAllTests("ArrDeqTest.testgetLast_void",true);
   }
-   @Test public void testhashCode_void(){
-    final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
-      @Override public void callRaw(OmniDeque<?> seq){
-        seq.hashCode();
-      }
-      @Override public void callVerify(ArrDeqMonitor<?> monitor){
-        monitor.verifyHashCode();
-      }
-    };
-    test.runAllTests("ArrDeqTest.testhashCode_void");
-  }
+
    @Test public void testisEmpty_void(){
     final BasicTest test=ArrDeqMonitor::verifyIsEmpty;
     test.runAllTests("ArrDeqTest.testisEmpty_void");
@@ -3420,14 +3335,66 @@ public class ArrDeqTest{
     test.runAllTests("ArrDeqTst.testtoArray_void");
   }
    @Test public void testtoString_void(){
-    final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
-      @Override public void callRaw(OmniDeque<?> seq){
-        seq.toString();
-      }
-      @Override public void callVerify(ArrDeqMonitor<?> monitor){
-        monitor.verifyToString();
-      }
-    };
-    test.runAllTests("ArrDeqTst.testtoString_void");
+
+       for(final var size:SIZES){
+         final int interval=Math.max(1,size / 10);
+         final int rotateBound=size / 2 + interval;
+         for(int tmpInitCap=0,initCapBound=size + interval;tmpInitCap <= initCapBound;tmpInitCap+=interval){
+           final int initCap=tmpInitCap;
+           for(int tmpNumToRotate=0;tmpNumToRotate <= rotateBound;tmpNumToRotate+=interval){
+             final int numToRotate=tmpNumToRotate;
+             for(final var collectionType:DataType.values()){
+               final int initValBound=collectionType == DataType.BOOLEAN && size > 0?1:0;
+               for(final var checkedType:CheckedType.values()){
+                 if(collectionType == DataType.REF){
+                   for(final var objGen:StructType.ArrDeq.validMonitoredObjectGens){
+                     if(checkedType.checked || size == 0 || objGen.expectedException == null){
+                       TestExecutorService.submitTest(()->{
+                         if(size == 0 || objGen.expectedException == null){
+                           final var monitor=SequenceInitialization.Ascending
+                               .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0);
+                           if(size > 0 && numToRotate > 0){
+                             monitor.rotate(numToRotate);
+                           }
+                           monitor.verifyToString();
+                         }else{
+                           final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+                           final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
+                               new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,0,objGen,throwSwitch);
+                           if(size > 0 && numToRotate > 0){
+                             monitor.rotate(numToRotate);
+                           }
+                           Assertions.assertThrows(objGen.expectedException,()->{
+                             try{
+                               monitor.getCollection().toString();
+                             }finally{
+                               throwSwitch.doThrow=false;
+                               monitor.verifyCollectionState();
+                             }
+                           });
+                         }
+                       });
+                     }
+                   }
+                 }else{
+                   for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
+                     final int initVal=tmpInitVal;
+                     TestExecutorService.submitTest(()->{
+                       final var monitor=SequenceInitialization.Ascending
+                           .initialize(new ArrDeqMonitor<>(checkedType,collectionType,initCap),size,initVal);
+                       if(size > 0 && numToRotate > 0){
+                         monitor.rotate(numToRotate);
+                       }
+                       monitor.verifyToString();
+                     });
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+       TestExecutorService.completeAllTests("ArrDeqTst.testtoString_void");
+
   }
 }

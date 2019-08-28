@@ -1299,13 +1299,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     }
     return "[]";
   }
-  @Override public int hashCode(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedHashCode(tail);
-    }
-    return 1;
-  }
   @Override public char popChar(){
     final char[] arr;
     int head;
@@ -1376,23 +1369,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
         return new String(buffer,0,bufferOffset+1);
       }
     }
-  }
-  private
-  int uncheckedHashCode(int tail){
-    final char[] arr;
-    int head;
-    int hash=31+((arr=this.arr)[head=this.head]);
-    if(tail<head){
-      for(final int bound=arr.length;;){  
-        if(++head==bound){
-          hash=hash*31+(arr[head=0]);
-          break;
-        }
-        hash=(hash*31)+(arr[head]);
-      }
-    }
-    for(;head!=tail;hash=(hash*31)+(arr[++head])){}
-    return hash;
   }
   @Override public void push(char val){
     char[] arr;
@@ -2054,10 +2030,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     }else{
       output.writeInt(0);
     }
-  }
-  @Override public boolean equals(Object obj){
-    //TODO
-    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends CharArrDeq{
     private static final long serialVersionUID=1L;

@@ -3,15 +3,11 @@ package omni.impl.seq;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import omni.api.OmniDeque;
 import omni.api.OmniIterator;
-import omni.function.BooleanConsumer;
-import omni.function.BooleanPredicate;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
@@ -25,7 +21,6 @@ import omni.impl.QueryVal;
 import omni.impl.StructType;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
-import omni.util.NotYetImplementedException;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 public class PackedBooleanArrDeqTest{
@@ -2079,28 +2074,7 @@ if(length!=0) {
   
   
   
-  @Test public void testequals_Object(){
-    //TODO test equality with PackedBooleanArrDeq
-    //TODO test equality with BooleanArrDeq
-    //TODO test equality with BooleanDblLnkSeq
-    //TODO test equality with OmniDeque.OfBoolean
-    //TODO test equality with RefArrDeq<Boolean>
-    //TODO test equality with RefDblLnkSeq<Boolean>
-    //TODO test equality with OmniDeque.OfRef<Boolean>
-    //TODO test equality with non-matching types
-    //TODO test equality with null
-      
-      
-    final BasicTest test=(monitor)->{
-        try {
-          Assertions.assertFalse(monitor.getCollection().equals(null));
-        }catch(NotYetImplementedException e) {
-            //do nothing
-        }
-    };
-    test.runAllTests("PackedBooleanArrDeqTest.testequals_Object",SHORT_SIZES);
-  }
-  
+
   @Test public void testforEach_Consumer(){
     final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,randSeed)->{
       if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2133,11 +2107,7 @@ if(length!=0) {
     test.runAllTests("PackedBooleanArrDeqTest.testgetLast_void",true);
   }
   
-  @Test public void testhashCode_void(){
-    BasicTest test=PackedBooleanArrDeqMonitor::verifyHashCode;
-    test.runAllTests("PackedBooleanArrDeqTest.testhashCode_void",SHORT_SIZES);
-  }
-  
+
   @Test public void testisEmpty_void(){
     final BasicTest test=PackedBooleanArrDeqMonitor::verifyIsEmpty;
     test.runAllTests("PackedBooleanArrDeqTest.testisEmpty_void",SHORT_SIZES);

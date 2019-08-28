@@ -31,7 +31,6 @@ import omni.impl.QueryVal;
 import omni.impl.RefSnglLnkNode;
 import omni.impl.ShortSnglLnkNode;
 import omni.impl.StructType;
-import omni.util.NotYetImplementedException;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 public class SnglLnkSeqTest{
@@ -2444,50 +2443,6 @@ public class SnglLnkSeqTest{
       Assertions.assertNull(headNode);
     }
   }
-  private static interface ToStringAndHashCodeTest{
-    private void runAllTests(String testName){
-      for(final var structType:ALL_STRUCTS){
-        for(final var checkedType:CheckedType.values()){
-          for(final var collectionType:DataType.values()){
-            for(final var size:SIZES){
-              if(collectionType == DataType.REF){
-                for(final var objGen:structType.validMonitoredObjectGens){
-                  if(size == 0 || objGen.expectedException == null){
-                    TestExecutorService.submitTest(()->callVerify(SequenceInitialization.Ascending
-                        .initialize(getMonitoredSequence(structType,checkedType,collectionType,size),size,0)));
-                  }else if(checkedType.checked){
-                    TestExecutorService.submitTest(()->{
-                      final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
-                      final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
-                          getMonitoredSequence(structType,checkedType,collectionType,size),size,0,objGen,throwSwitch);
-                      Assertions.assertThrows(objGen.expectedException,()->{
-                        try{
-                          callRaw(monitor.getCollection());
-                        }finally{
-                          throwSwitch.doThrow=false;
-                          monitor.verifyCollectionState();
-                        }
-                      });
-                    });
-                  }
-                }
-              }else{
-                final int initValBound=size > 0 && collectionType == DataType.BOOLEAN?1:0;
-                for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-                  final int initVal=tmpInitVal;
-                  TestExecutorService.submitTest(()->callVerify(SequenceInitialization.Ascending
-                      .initialize(getMonitoredSequence(structType,checkedType,collectionType,size),size,initVal)));
-                }
-              }
-            }
-          }
-        }
-      }
-      TestExecutorService.completeAllTests(testName);
-    }
-    void callRaw(OmniCollection<?> collection);
-    void callVerify(MonitoredSequence<?> monitor);
-  }
   private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
   private static final double[] POSITIONS=new double[]{-1,0,0.25,0.5,0.75,1.0};
   private static final int[] SHORT_SIZES=new int[]{0,10};
@@ -2580,29 +2535,8 @@ public class SnglLnkSeqTest{
     test.runAllTests("SnglLnkSeqTest.testforEach_Consumer",100);
   }
   
-  @Test public void testhashCode_void(){
-    final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
-      @Override public void callRaw(OmniCollection<?> seq){
-        seq.hashCode();
-      }
-      @Override public void callVerify(MonitoredSequence<?> monitor){
-        monitor.verifyHashCode();
-      }
-    };
-    test.runAllTests("SnglLnkSeqTest.testhashCode_void");
-  }
-  
-  @Test
-  public void testequals_Object(){
-      final BasicTest test=(monitor)->{
-          try{
-            Assertions.assertFalse(monitor.getCollection().equals(null));
-          }catch(NotYetImplementedException e) {
-              //do nothing
-          }
-      };
-      test.runAllTests("SnglLnkSeqTest.testequals_Object");
-  }
+
+
   
   @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
@@ -3245,14 +3179,44 @@ public class SnglLnkSeqTest{
   }
   
   @Test public void testtoString_void(){
-    final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
-      @Override public void callRaw(OmniCollection<?> seq){
-        seq.toString();
+
+      for(final var structType:ALL_STRUCTS){
+        for(final var checkedType:CheckedType.values()){
+          for(final var collectionType:DataType.values()){
+            for(final var size:SIZES){
+              if(collectionType == DataType.REF){
+                for(final var objGen:structType.validMonitoredObjectGens){
+                  if(size == 0 || objGen.expectedException == null){
+                    TestExecutorService.submitTest(()->SequenceInitialization.Ascending
+                        .initialize(getMonitoredSequence(structType,checkedType,collectionType,size),size,0).verifyToString());
+                  }else if(checkedType.checked){
+                    TestExecutorService.submitTest(()->{
+                      final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+                      final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
+                          getMonitoredSequence(structType,checkedType,collectionType,size),size,0,objGen,throwSwitch);
+                      Assertions.assertThrows(objGen.expectedException,()->{
+                        try{
+                          monitor.getCollection().toString();
+                        }finally{
+                          throwSwitch.doThrow=false;
+                          monitor.verifyCollectionState();
+                        }
+                      });
+                    });
+                  }
+                }
+              }else{
+                final int initValBound=size > 0 && collectionType == DataType.BOOLEAN?1:0;
+                for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
+                  final int initVal=tmpInitVal;
+                  TestExecutorService.submitTest(()->SequenceInitialization.Ascending
+                      .initialize(getMonitoredSequence(structType,checkedType,collectionType,size),size,initVal).verifyToString());
+                }
+              }
+            }
+          }
+        }
       }
-      @Override public void callVerify(MonitoredSequence<?> monitor){
-        monitor.verifyToString();
-      }
-    };
-    test.runAllTests("SnglLnkSeqTest.testtoString_void");
+      TestExecutorService.completeAllTests("SnglLnkSeqTest.testtoString_void");
   }
 }

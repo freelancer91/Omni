@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import omni.util.HashUtil;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
 import omni.impl.CheckedCollection;
@@ -1614,13 +1613,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     return "[]";
   }
-  @Override public int hashCode(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedHashCode(tail);
-    }
-    return 1;
-  }
   @Override public float popFloat(){
     final float[] arr;
     int head;
@@ -1716,23 +1708,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
     }
-  }
-  private
-  int uncheckedHashCode(int tail){
-    final float[] arr;
-    int head;
-    int hash=31+HashUtil.hashFloat((arr=this.arr)[head=this.head]);
-    if(tail<head){
-      for(final int bound=arr.length;;){  
-        if(++head==bound){
-          hash=hash*31+HashUtil.hashFloat(arr[head=0]);
-          break;
-        }
-        hash=(hash*31)+HashUtil.hashFloat(arr[head]);
-      }
-    }
-    for(;head!=tail;hash=(hash*31)+HashUtil.hashFloat(arr[++head])){}
-    return hash;
   }
   @Override public void push(float val){
     float[] arr;
@@ -2394,10 +2369,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }else{
       output.writeInt(0);
     }
-  }
-  @Override public boolean equals(Object obj){
-    //TODO
-    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends FloatArrDeq{
     private static final long serialVersionUID=1L;

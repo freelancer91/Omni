@@ -873,22 +873,6 @@ public class BooleanArrDeq extends AbstractBooleanArrDeq{
       }
     }
   }
-  int uncheckedHashCode(int tail){
-    final boolean[] arr;
-    int head;
-    int hash=31+Boolean.hashCode((arr=this.arr)[head=this.head]);
-    if(tail<head){
-      for(final int bound=arr.length;;){  
-        if(++head==bound){
-          hash=hash*31+Boolean.hashCode(arr[head=0]);
-          break;
-        }
-        hash=(hash*31)+Boolean.hashCode(arr[head]);
-      }
-    }
-    for(;head!=tail;hash=(hash*31)+Boolean.hashCode(arr[++head])){}
-    return hash;
-  }
   @Override public void push(boolean val){
     boolean[] arr;
     if((arr=this.arr)!=null){
@@ -1389,10 +1373,6 @@ public class BooleanArrDeq extends AbstractBooleanArrDeq{
     }else{
       output.writeInt(0);
     }
-  }
-  @Override public boolean equals(Object obj){
-    //TODO
-    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends BooleanArrDeq{
     private static final long serialVersionUID=1L;

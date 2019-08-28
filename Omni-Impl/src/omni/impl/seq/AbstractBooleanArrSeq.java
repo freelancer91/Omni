@@ -224,7 +224,7 @@ abstract class AbstractBooleanArrSeq extends AbstractSeq<Boolean> implements Omn
     abstract int uncheckedRemoveIfImpl(int size,BooleanPredicate filter);
     abstract int uncheckedToString(int size,byte[] buffer);
     abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
-    abstract int uncheckedHashCode(int size);
+    //abstract int uncheckedHashCode(int size);
 
     @Override
     public boolean contains(Object val){
@@ -1135,13 +1135,6 @@ abstract class AbstractBooleanArrSeq extends AbstractSeq<Boolean> implements Omn
       }
    
     
-    @Override
-    public int hashCode(){
-        final int size;
-        if((size=this.size)!=0){
-          return uncheckedHashCode(size);
-        }
-        return 1;
-      }
+  
     
 }

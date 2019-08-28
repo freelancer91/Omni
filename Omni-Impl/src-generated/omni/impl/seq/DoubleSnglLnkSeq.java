@@ -151,13 +151,6 @@ AbstractSeq<Double>
     this.head=null;
     this.size=0;
   }
-  @Override public int hashCode(){
-    final DoubleSnglLnkNode head;
-    if((head=this.head)!=null){
-      return DoubleSnglLnkNode.uncheckedHashCode(head);
-    }
-    return 1;
-  }
   @Override public String toString(){
     final DoubleSnglLnkNode head;
     if((head=this.head)!=null){
@@ -566,10 +559,6 @@ AbstractSeq<Double>
       ++this.modCount;
       super.push(val);
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public void clear(){
      if(size!=0){
        ++this.modCount;
@@ -851,10 +840,6 @@ AbstractSeq<Double>
     @Override public void push(double val){
       this.head=new DoubleSnglLnkNode(val,this.head);
       ++this.size;
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       DoubleSnglLnkNode head;
@@ -1143,10 +1128,6 @@ AbstractSeq<Double>
     }
     CheckedQueue(DoubleSnglLnkNode head,int size,DoubleSnglLnkNode tail){
       super(head,size,tail);
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public double doubleElement(){
       final DoubleSnglLnkNode head;
@@ -1542,10 +1523,6 @@ AbstractSeq<Double>
     UncheckedQueue(DoubleSnglLnkNode head,int size,DoubleSnglLnkNode tail){
       super(head,size);
       this.tail=tail;
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void readExternal(ObjectInput in) throws IOException
     {

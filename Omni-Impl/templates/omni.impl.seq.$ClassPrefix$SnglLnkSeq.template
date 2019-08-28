@@ -233,13 +233,6 @@ AbstractSeq<$BoxedType$>
     this.head=null;
     this.size=0;
   }
-  @Override public int hashCode(){
-    final $SNode$$<E>$ head;
-    if((head=this.head)!=null){
-      return $SNode$.uncheckedHashCode(head);
-    }
-    return 1;
-  }
   @Override public String toString(){
     final $SNode$$<E>$ head;
     if((head=this.head)!=null){
@@ -442,11 +435,6 @@ AbstractSeq<$BoxedType$>
       ++this.modCount;
       super.push(val);
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-
-    }
     @Override public void clear(){
      if(size!=0){
        ++this.modCount;
@@ -475,18 +463,6 @@ AbstractSeq<$BoxedType$>
       throw new NoSuchElementException();
     }
 #IF OfRef
-    @Override public int hashCode(){
-      final $SNode$$<E>$ head;
-      if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          return $SNode$.uncheckedHashCode(head);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-      return 1;
-    }
     @Override public String toString(){
       final $SNode$$<E>$ head;
       if((head=this.head)!=null){
@@ -802,11 +778,6 @@ AbstractSeq<$BoxedType$>
       this.head=new $SNode$$<E>$(val,this.head);
       ++this.size;
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-
-    }
     @Override public Object clone(){
       $SNode$$<E>$ head;
       if((head=this.head)!=null){
@@ -950,11 +921,6 @@ AbstractSeq<$BoxedType$>
     CheckedQueue($SNode$$<E>$ head,int size,$SNode$$<E>$ tail){
       super(head,size,tail);
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-
-    }
     @Override public $exposedType$ $elementMethod$(){
       final $SNode$$<E>$ head;
       if((head=this.head)!=null){
@@ -1002,18 +968,6 @@ AbstractSeq<$BoxedType$>
       }
     }
 #IF OfRef
-    @Override public int hashCode(){
-      final $SNode$$<E>$ head;
-      if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          return $SNode$.uncheckedHashCode(head,tail);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-      return 1;
-    }
     @Override public String toString(){
       final $SNode$$<E>$ head;
       if((head=this.head)!=null){
@@ -1423,11 +1377,6 @@ AbstractSeq<$BoxedType$>
     UncheckedQueue($SNode$$<E>$ head,int size,$SNode$$<E>$ tail){
       super(head,size);
       this.tail=tail;
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-
     }
 #IF OfRef
     @SuppressWarnings("unchecked")

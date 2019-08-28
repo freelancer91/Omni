@@ -197,10 +197,6 @@ AbstractBooleanArrSeq
     UncheckedStack(int size,boolean[] arr){
       super(size,arr);
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for UncheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final boolean[] copy;
       final int size;
@@ -217,9 +213,6 @@ AbstractBooleanArrSeq
     void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder){
       OmniArray.OfBoolean.descendingToString(this.arr,0,size-1,builder);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfBoolean.descendingSeqHashCode(this.arr,0,size-1);
-  }
     @Override boolean uncheckedremoveVal (int size
     ,boolean val
     ){
@@ -496,9 +489,13 @@ AbstractBooleanArrSeq
     void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder){
       OmniArray.OfBoolean.ascendingToString(this.arr,0,size-1,builder);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfBoolean.ascendingSeqHashCode(this.arr,0,size-1);
-  }
+    @Override public int hashCode(){
+      final int size;
+      if((size=this.size)!=0){
+        return OmniArray.OfBoolean.ascendingSeqHashCode(this.arr,0,size-1);
+      }
+      return 1;
+    }
     @Override boolean uncheckedremoveVal (int size
     ,boolean val
     ){
@@ -782,7 +779,6 @@ AbstractBooleanArrSeq
       return new UncheckedSubList(this,fromIndex,toIndex-fromIndex);
     }
   }
-  public
     static class UncheckedSubList
       extends AbstractSeq<Boolean>
       implements BooleanSubListDefault,Cloneable,RandomAccess
@@ -2061,10 +2057,6 @@ AbstractBooleanArrSeq
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for CheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final boolean[] copy;
       final int size;
@@ -2723,7 +2715,6 @@ AbstractBooleanArrSeq
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  private
     static class CheckedSubList
       extends AbstractSeq<Boolean>
       implements BooleanSubListDefault,Cloneable,RandomAccess

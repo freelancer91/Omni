@@ -729,7 +729,7 @@ AbstractSeq<Double>
     }
     return numRemoved;
   }
-  private static class UncheckedSubList extends DoubleDblLnkSeq{
+  static class UncheckedSubList extends DoubleDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final UncheckedList root;
     transient final UncheckedSubList parent;
@@ -1937,7 +1937,7 @@ AbstractSeq<Double>
       return false;
     }
   }
-  private static class CheckedSubList extends DoubleDblLnkSeq{
+  static class CheckedSubList extends DoubleDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final CheckedList root;
     transient final CheckedSubList parent;

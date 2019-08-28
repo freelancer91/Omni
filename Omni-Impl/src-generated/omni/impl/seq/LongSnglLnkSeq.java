@@ -152,13 +152,6 @@ AbstractSeq<Long>
     this.head=null;
     this.size=0;
   }
-  @Override public int hashCode(){
-    final LongSnglLnkNode head;
-    if((head=this.head)!=null){
-      return LongSnglLnkNode.uncheckedHashCode(head);
-    }
-    return 1;
-  }
   @Override public String toString(){
     final LongSnglLnkNode head;
     if((head=this.head)!=null){
@@ -589,10 +582,6 @@ AbstractSeq<Long>
       ++this.modCount;
       super.push(val);
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public void clear(){
      if(size!=0){
        ++this.modCount;
@@ -859,10 +848,6 @@ AbstractSeq<Long>
       this.head=new LongSnglLnkNode(val,this.head);
       ++this.size;
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       LongSnglLnkNode head;
       if((head=this.head)!=null){
@@ -1101,10 +1086,6 @@ AbstractSeq<Long>
     }
     CheckedQueue(LongSnglLnkNode head,int size,LongSnglLnkNode tail){
       super(head,size,tail);
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public long longElement(){
       final LongSnglLnkNode head;
@@ -1476,10 +1457,6 @@ AbstractSeq<Long>
     UncheckedQueue(LongSnglLnkNode head,int size,LongSnglLnkNode tail){
       super(head,size);
       this.tail=tail;
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public void readExternal(ObjectInput in) throws IOException
     {

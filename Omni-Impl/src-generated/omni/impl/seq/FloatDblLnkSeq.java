@@ -887,7 +887,7 @@ AbstractSeq<Float>
     }
     return numRemoved;
   }
-  private static class UncheckedSubList extends FloatDblLnkSeq{
+  static class UncheckedSubList extends FloatDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final UncheckedList root;
     transient final UncheckedSubList parent;
@@ -2141,7 +2141,7 @@ AbstractSeq<Float>
       return false;
     }
   }
-  private static class CheckedSubList extends FloatDblLnkSeq{
+  static class CheckedSubList extends FloatDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final CheckedList root;
     transient final CheckedSubList parent;

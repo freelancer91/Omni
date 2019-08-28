@@ -806,7 +806,7 @@ AbstractSeq<Byte>
     }
     return numRemoved;
   }
-  private static class UncheckedSubList extends ByteDblLnkSeq{
+  static class UncheckedSubList extends ByteDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final UncheckedList root;
     transient final UncheckedSubList parent;
@@ -1963,7 +1963,7 @@ AbstractSeq<Byte>
       return false;
     }
   }
-  private static class CheckedSubList extends ByteDblLnkSeq{
+  static class CheckedSubList extends ByteDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final CheckedList root;
     transient final CheckedSubList parent;

@@ -878,7 +878,7 @@ AbstractSeq<Boolean>
     }
     return numRemoved;
   }
-  private static class UncheckedSubList extends BooleanDblLnkSeq{
+  static class UncheckedSubList extends BooleanDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final UncheckedList root;
     transient final UncheckedSubList parent;
@@ -2070,7 +2070,7 @@ AbstractSeq<Boolean>
       return false;
     }
   }
-  private static class CheckedSubList extends BooleanDblLnkSeq{
+  static class CheckedSubList extends BooleanDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final CheckedList root;
     transient final CheckedSubList parent;

@@ -148,13 +148,6 @@ AbstractSeq<E>
     this.head=null;
     this.size=0;
   }
-  @Override public int hashCode(){
-    final RefSnglLnkNode<E> head;
-    if((head=this.head)!=null){
-      return RefSnglLnkNode.uncheckedHashCode(head);
-    }
-    return 1;
-  }
   @Override public String toString(){
     final RefSnglLnkNode<E> head;
     if((head=this.head)!=null){
@@ -701,10 +694,6 @@ AbstractSeq<E>
       ++this.modCount;
       super.push(val);
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public void clear(){
      if(size!=0){
        ++this.modCount;
@@ -731,18 +720,6 @@ AbstractSeq<E>
         return head.val;
       }
       throw new NoSuchElementException();
-    }
-    @Override public int hashCode(){
-      final RefSnglLnkNode<E> head;
-      if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          return RefSnglLnkNode.uncheckedHashCode(head);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-      return 1;
     }
     @Override public String toString(){
       final RefSnglLnkNode<E> head;
@@ -1033,10 +1010,6 @@ AbstractSeq<E>
     @Override public void push(E val){
       this.head=new RefSnglLnkNode<E>(val,this.head);
       ++this.size;
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public Object clone(){
       RefSnglLnkNode<E> head;
@@ -1409,10 +1382,6 @@ AbstractSeq<E>
     CheckedQueue(RefSnglLnkNode<E> head,int size,RefSnglLnkNode<E> tail){
       super(head,size,tail);
     }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public E element(){
       final RefSnglLnkNode<E> head;
       if((head=this.head)!=null){
@@ -1438,18 +1407,6 @@ AbstractSeq<E>
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
-    }
-    @Override public int hashCode(){
-      final RefSnglLnkNode<E> head;
-      if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          return RefSnglLnkNode.uncheckedHashCode(head,tail);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-      return 1;
     }
     @Override public String toString(){
       final RefSnglLnkNode<E> head;
@@ -1834,10 +1791,6 @@ AbstractSeq<E>
     UncheckedQueue(RefSnglLnkNode<E> head,int size,RefSnglLnkNode<E> tail){
       super(head,size);
       this.tail=tail;
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @SuppressWarnings("unchecked")
     @Override public void readExternal(ObjectInput in) throws IOException

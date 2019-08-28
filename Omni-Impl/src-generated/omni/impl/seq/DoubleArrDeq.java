@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import omni.util.HashUtil;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
 import omni.impl.CheckedCollection;
@@ -1380,13 +1379,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return "[]";
   }
-  @Override public int hashCode(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedHashCode(tail);
-    }
-    return 1;
-  }
   @Override public double popDouble(){
     final double[] arr;
     int head;
@@ -1450,23 +1442,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         return builder.append(']').toString();
       }
     }
-  }
-  private
-  int uncheckedHashCode(int tail){
-    final double[] arr;
-    int head;
-    int hash=31+HashUtil.hashDouble((arr=this.arr)[head=this.head]);
-    if(tail<head){
-      for(final int bound=arr.length;;){  
-        if(++head==bound){
-          hash=hash*31+HashUtil.hashDouble(arr[head=0]);
-          break;
-        }
-        hash=(hash*31)+HashUtil.hashDouble(arr[head]);
-      }
-    }
-    for(;head!=tail;hash=(hash*31)+HashUtil.hashDouble(arr[++head])){}
-    return hash;
   }
   @Override public void push(double val){
     double[] arr;
@@ -2128,10 +2103,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }else{
       output.writeInt(0);
     }
-  }
-  @Override public boolean equals(Object obj){
-    //TODO
-    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked extends DoubleArrDeq{
     private static final long serialVersionUID=1L;

@@ -1,0 +1,193 @@
+#TYPEDEF OfGeneric
+package omni.impl.seq;
+import omni.impl.BooleanDblLnkNode;
+import omni.impl.ByteDblLnkNode;
+import omni.impl.CharDblLnkNode;
+import omni.impl.ShortDblLnkNode;
+import omni.impl.IntDblLnkNode;
+import omni.impl.LongDblLnkNode;
+import omni.impl.FloatDblLnkNode;
+import omni.impl.DoubleDblLnkNode;
+import omni.impl.RefDblLnkNode;
+import omni.util.TypeUtil;
+import java.util.Objects;
+interface SequenceEqualityUtil{
+  #MACRO PackedBooleanArrSeqEqualsImpl<Boolean>(,boolean)
+  #MACRO PackedBooleanArrSeqEqualsImpl<Ref>(<?>,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl(boolean)
+  #MACRO ArrSeqEqualsArrSeqImpl(byte)
+  #MACRO ArrSeqEqualsArrSeqImpl(char)
+  #MACRO ArrSeqEqualsArrSeqImpl(short)
+  #MACRO ArrSeqEqualsArrSeqImpl(int)
+  #MACRO ArrSeqEqualsArrSeqImpl(long)
+  #MACRO ArrSeqEqualsArrSeqImpl(float)
+  #MACRO ArrSeqEqualsArrSeqImpl(double)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Boolean,Boolean>(boolean,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Boolean,Ref>(boolean,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Byte,Byte>(byte,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Byte,Ref>(byte,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Char,Char>(char,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Char,Ref>(char,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Short,Short>(short,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Short,Ref>(short,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Int,Int>(int,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Int,Ref>(int,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Long,Long>(long,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Long,Ref>(long,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Float,Float>(float,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Float,Ref>(float,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Double,Double>(double,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Double,Ref>(double,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Ref>(Object,<?>)
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Boolean>()
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Byte>()
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Char>()
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Short>()
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Int>()
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Long>()
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Float>()
+  #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Double>()
+}
+#MACRODEF DblLnkSeqEqualsDblLnkSeqImpl<LHSPREFIX>()
+static boolean isEqualTo(LHSPREFIXDblLnkNode lhsHead,LHSPREFIXDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+    if(lhsHead==lhsTail){
+      return true;
+    }
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF ArrSeqEqualsDblLnkSeqImpl<LHSPREFIX,RHSPREFIX>(LHSARRTYPE,RHSTYPEPARAMETER)
+static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,RHSPREFIXDblLnkNodeRHSTYPEPARAMETER rhsHead){
+  for(;
+  #MACRO EqualityMacro(lhsArr[lhsRootOffset],rhsHead.val)
+  ;rhsHead=rhsHead.next){
+    if(++lhsRootOffset==lhsRootBound){
+      return true;
+    }
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF ArrSeqEqualsArrSeqImpl(LHSARRTYPE)
+static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
+  for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    if(++lhsRootOffset==lhsRootBound){
+      return true;
+    }
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF PackedBooleanArrSeqEqualsImpl<CLASSPREFIX>(TYPEPARAMETER,ARRTYPE)
+static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,ARRTYPE[] arr,int arrSeqRootOffset){
+    #IFSWITCH CLASSPREFIX==Boolean
+  for(long pbasWord=pbasWords[pbasRootOffset>>6];arr[arrSeqRootOffset]^(((pbasWord>>>pbasRootOffset)&1L)==0L);++arrSeqRootOffset){
+    #ELSEIFSWITCH CLASSPREFIX==Ref
+  for(long pbasWord=pbasWords[pbasRootOffset>>6];TypeUtil.refEquals(arr[arrSeqRootOffset],(((pbasWord>>>pbasRootOffset)&1L)!=0L));++arrSeqRootOffset){
+    #ELSE
+    ERROR unknown class prefix CLASSPREFIX
+    #ENDIF
+    if(++pbasRootOffset==pbasRootBound){
+      return true;
+    }
+    if((pbasRootOffset&63)==0){
+      pbasWord=pbasWords[pbasRootOffset>>6];
+    }
+  }
+  return false;
+}
+static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,CLASSPREFIXDblLnkNodeTYPEPARAMETER dlsHead){
+  #IFSWITCH CLASSPREFIX==Boolean
+  for(long pbasWord=pbasWords[pbasRootOffset>>6];dlsHead.val^(((pbasWord>>>pbasRootOffset)&1L)==0L);dlsHead=dlsHead.next){
+  #ELSEIFSWITCH CLASSPREFIX==Ref
+  for(long pbasWord=pbasWords[pbasRootOffset>>6];TypeUtil.refEquals(dlsHead.val,(((pbasWord>>>pbasRootOffset)&1L)!=0L));dlsHead=dlsHead.next){
+  #ELSE
+    ERROR unknown class prefix CLASSPREFIX
+  #ENDIF
+    if(++pbasRootOffset==pbasRootBound){
+      return true;
+    }
+    if((pbasRootOffset&63)==0){
+      pbasWord=pbasWords[pbasRootOffset>>6];
+    }
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF EqualityMacro(LHSVAL,RHSVAL)
+#IFSWITCH LHSPREFIX==Boolean
+  #IFSWITCH RHSPREFIX==Boolean
+(LHSVAL)==(RHSVAL)
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL)
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Byte
+  #IFSWITCH RHSPREFIX==Byte
+(LHSVAL)==(RHSVAL)  
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL)   
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Char
+  #IFSWITCH RHSPREFIX==Char
+(LHSVAL)==(RHSVAL) 
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL)   
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Short
+  #IFSWITCH RHSPREFIX==Short
+(LHSVAL)==(RHSVAL)
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL)   
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Int
+  #IFSWITCH RHSPREFIX==Int
+(LHSVAL)==(RHSVAL)
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL)   
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Long
+  #IFSWITCH RHSPREFIX==Long
+(LHSVAL)==(RHSVAL)
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL)   
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Float
+  #IFSWITCH RHSPREFIX==Float
+TypeUtil.floatEquals(RHSVAL,LHSVAL)
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL)
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Double
+  #IFSWITCH RHSPREFIX==Double
+TypeUtil.doubleEquals(RHSVAL,LHSVAL)
+  #ELSEIFSWITCH RHSPREFIX==Ref
+TypeUtil.refEquals(RHSVAL,LHSVAL) 
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSEIFSWITCH LHSPREFIX==Ref
+  #IFSWITCH RHSPREFIX==Ref
+Objects.equals(RHSVAL,LHSVAL)  
+  #ELSE
+ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
+  #ENDIF
+#ELSE
+ERROR unknown lhs prefix LHSPREFIX for rhs prefix RHSPREFIX
+#ENDIF
+#ENDDEF

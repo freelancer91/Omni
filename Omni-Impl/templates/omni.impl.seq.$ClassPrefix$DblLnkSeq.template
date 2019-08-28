@@ -362,7 +362,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
   return numRemoved;
 }
 #ENDDEF
-  private static class UncheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
+  static class UncheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
     private static final long serialVersionUID=1L;
     transient final UncheckedList$<E>$ root;
     transient final UncheckedSubList$<E>$ parent;
@@ -661,7 +661,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO UncheckedRemoveVal<SubList,false,>(val==)
 #ENDIF
   }
-  private static class CheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
+  static class CheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
     private static final long serialVersionUID=1L;
     transient final CheckedList$<E>$ root;
     transient final CheckedSubList$<E>$ parent;

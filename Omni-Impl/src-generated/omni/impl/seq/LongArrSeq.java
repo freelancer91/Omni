@@ -137,13 +137,6 @@ AbstractSeq<Long>
   @Override public void clear(){
     this.size=0;
   }
-  @Override public int hashCode(){
-    final int size;
-    if((size=this.size)!=0){
-      return uncheckedHashCode(size);
-    }
-    return 1;
-  }
   @Override public String toString(){
     int size;
     if((size=this.size)!=0){
@@ -162,7 +155,6 @@ AbstractSeq<Long>
     }
     return "[]";
   }
-  abstract int uncheckedHashCode(int size);
   abstract int uncheckedToString(int size,byte[] buffer);
   abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
   @Override public boolean contains(boolean val){
@@ -663,10 +655,6 @@ AbstractSeq<Long>
     UncheckedStack(int size,long[] arr){
       super(size,arr);
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for UncheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final long[] copy;
       final int size;
@@ -683,9 +671,6 @@ AbstractSeq<Long>
     void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder){
       OmniArray.OfLong.descendingToString(this.arr,0,size-1,builder);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfLong.descendingSeqHashCode(this.arr,0,size-1);
-  }
     @Override public int search(boolean val){
       {
         {
@@ -976,9 +961,13 @@ AbstractSeq<Long>
     void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder){
       OmniArray.OfLong.ascendingToString(this.arr,0,size-1,builder);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfLong.ascendingSeqHashCode(this.arr,0,size-1);
-  }
+    @Override public int hashCode(){
+      final int size;
+      if((size=this.size)!=0){
+        return OmniArray.OfLong.ascendingSeqHashCode(this.arr,0,size-1);
+      }
+      return 1;
+    }
     @Override public int indexOf(boolean val){
       {
         {
@@ -1465,7 +1454,6 @@ AbstractSeq<Long>
       return new UncheckedSubList(this,fromIndex,toIndex-fromIndex);
     }
   }
-  public
     static class UncheckedSubList
       extends AbstractSeq<Long>
       implements LongSubListDefault,Cloneable,RandomAccess
@@ -2470,10 +2458,6 @@ AbstractSeq<Long>
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for CheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final long[] copy;
       final int size;
@@ -3107,7 +3091,6 @@ AbstractSeq<Long>
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  private
     static class CheckedSubList
       extends AbstractSeq<Long>
       implements LongSubListDefault,Cloneable,RandomAccess

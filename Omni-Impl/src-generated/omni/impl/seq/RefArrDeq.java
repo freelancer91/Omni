@@ -7,7 +7,6 @@ import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import java.util.ConcurrentModificationException;
 import omni.util.OmniPred;
-import java.util.Objects;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
@@ -1596,13 +1595,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return "[]";
   }
-  @Override public int hashCode(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedHashCode(tail);
-    }
-    return 1;
-  }
   @SuppressWarnings("unchecked")
   @Override public E pop(){
     final Object[] arr;
@@ -1670,23 +1662,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         return builder.append(']').toString();
       }
     }
-  }
-  private
-  int uncheckedHashCode(int tail){
-    final Object[] arr;
-    int head;
-    int hash=31+Objects.hashCode((arr=this.arr)[head=this.head]);
-    if(tail<head){
-      for(final int bound=arr.length;;){  
-        if(++head==bound){
-          hash=hash*31+Objects.hashCode(arr[head=0]);
-          break;
-        }
-        hash=(hash*31)+Objects.hashCode(arr[head]);
-      }
-    }
-    for(;head!=tail;hash=(hash*31)+Objects.hashCode(arr[++head])){}
-    return hash;
   }
   @Override public void push(E val){
     Object[] arr;
@@ -2398,10 +2373,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }else{
       output.writeInt(0);
     }
-  }
-  @Override public boolean equals(Object obj){
-    //TODO
-    throw omni.util.NotYetImplementedException.getNYI();
   }
   public static class Checked<E> extends RefArrDeq<E>{
     private static final long serialVersionUID=1L;
@@ -4550,18 +4521,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         }
       }
       return "[]";
-    }
-    @Override public int hashCode(){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        int modCount=this.modCount;
-        try{
-          return super.uncheckedHashCode(tail);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-      return 1;
     }
     @Override public boolean contains(Object val){
       final int tail;

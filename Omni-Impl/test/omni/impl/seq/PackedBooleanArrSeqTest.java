@@ -1796,8 +1796,8 @@ public void repairModCount() {
     }
   }
   private static interface ToStringAndHashCodeTest{
-    private void runAllTests(String testName){
-      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+    private void runAllTests(String testName,SequenceInitParams[] initParamsArr){
+      for(final var initParams:initParamsArr){
         if(initParams.totalPostAlloc>0) {
             continue;
         }
@@ -2152,7 +2152,7 @@ public void repairModCount() {
     test.runAllTests("PackedBooleanArrSeqTest.testcontains_val",2);
   }
    @Test public void testequals_Object(){
-    for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+    for(final var initParams:LIST_STRUCT_INIT_PARAMS){
       if(initParams.totalPreAlloc>0 ||initParams.totalPostAlloc>0) {
         continue;
       }
@@ -2230,7 +2230,7 @@ public void repairModCount() {
         monitor.verifyHashCode();
       }
     };
-    test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void");
+    test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void",LIST_STRUCT_INIT_PARAMS);
   }
    @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<OmniList.OfBoolean>> test
@@ -3479,6 +3479,6 @@ public void repairModCount() {
         monitor.verifyToString();
       }
     };
-    test.runAllTests("PackedBooleanArrSeqTest.testtoString_void");
+    test.runAllTests("PackedBooleanArrSeqTest.testtoString_void",ALL_STRUCT_INIT_PARAMS);
   }
 }

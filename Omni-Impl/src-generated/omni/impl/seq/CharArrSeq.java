@@ -136,13 +136,6 @@ AbstractSeq<Character>
   @Override public void clear(){
     this.size=0;
   }
-  @Override public int hashCode(){
-    final int size;
-    if((size=this.size)!=0){
-      return uncheckedHashCode(size);
-    }
-    return 1;
-  }
   @Override public String toString(){
     int size;
     if((size=this.size)!=0){
@@ -154,7 +147,6 @@ AbstractSeq<Character>
     }
     return "[]";
   }
-  abstract int uncheckedHashCode(int size);
   abstract void uncheckedToString(int size,char[] buffer);
   @Override public boolean contains(boolean val){
     {
@@ -720,10 +712,6 @@ AbstractSeq<Character>
     UncheckedStack(int size,char[] arr){
       super(size,arr);
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for UncheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final char[] copy;
       final int size;
@@ -737,9 +725,6 @@ AbstractSeq<Character>
     void uncheckedToString(int size,char[] buffer){
       OmniArray.OfChar.descendingToString(this.arr,0,size-1,buffer,1);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfChar.descendingSeqHashCode(this.arr,0,size-1);
-  }
     @Override public int search(boolean val){
       {
         {
@@ -1105,9 +1090,13 @@ AbstractSeq<Character>
     void uncheckedToString(int size,char[] buffer){
       OmniArray.OfChar.ascendingToString(this.arr,0,size-1,buffer,1);
     }
-  @Override int uncheckedHashCode(int size){
-    return OmniArray.OfChar.ascendingSeqHashCode(this.arr,0,size-1);
-  }
+    @Override public int hashCode(){
+      final int size;
+      if((size=this.size)!=0){
+        return OmniArray.OfChar.ascendingSeqHashCode(this.arr,0,size-1);
+      }
+      return 1;
+    }
     @Override public int indexOf(boolean val){
       {
         {
@@ -1680,7 +1669,6 @@ AbstractSeq<Character>
       return new UncheckedSubList(this,fromIndex,toIndex-fromIndex);
     }
   }
-  public
     static class UncheckedSubList
       extends AbstractSeq<Character>
       implements CharSubListDefault,Cloneable,RandomAccess
@@ -2835,10 +2823,6 @@ AbstractSeq<Character>
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for CheckedStack
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final char[] copy;
       final int size;
@@ -3492,7 +3476,6 @@ AbstractSeq<Character>
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  private
     static class CheckedSubList
       extends AbstractSeq<Character>
       implements CharSubListDefault,Cloneable,RandomAccess
