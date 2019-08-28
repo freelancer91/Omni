@@ -736,6 +736,13 @@ public
     super(size,arr);
   }
   #ENDIF
+#IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  #IFNOT OfRef
+  @Override public boolean add($BoxedType$ val){
+    return add(($exposedType$)val);
+  }
+  #ENDIF
+#ENDIF
 #IFSWITCH STRUCTNAME==CheckedStack,CheckedList
   private class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
     ModCountChecker(int modCount){

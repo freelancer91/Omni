@@ -1486,6 +1486,9 @@ AbstractSeq<Long>
       this.parent=parent;
       this.rootOffset=rootOffset;
     }
+    @Override public boolean add(Long val){
+      return add((long)val);
+    }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
       private transient long[] arr;
@@ -3127,6 +3130,9 @@ AbstractSeq<Long>
       this.parent=parent;
       this.rootOffset=rootOffset;
       this.modCount=parent.modCount;
+    }
+    @Override public boolean add(Long val){
+      return add((long)val);
     }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;

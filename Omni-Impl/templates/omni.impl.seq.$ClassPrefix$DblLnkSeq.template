@@ -81,6 +81,12 @@ AbstractSeq<$BoxedType$>
     this.tail=tail;
   }
   abstract void addLast($exposedType$ val);
+#IFNOT OfRef
+  @Override public boolean add($BoxedType$ val){
+    addLast(($exposedType$)val);
+    return true;
+  }  
+#ENDIF
   @Override public boolean add($exposedType$ val){
     addLast(val);
     return true;

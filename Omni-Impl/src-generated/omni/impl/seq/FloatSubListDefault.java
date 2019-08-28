@@ -2,10 +2,10 @@ package omni.impl.seq;
 import omni.util.TypeUtil;
 abstract interface FloatSubListDefault extends FloatListDefault
 {
-  @Override
-  public default boolean add(Float val){
-    return add((float)val);
-  }
+  //@Override
+  //public default boolean add(Float val){
+  //  return add((float)val);
+  //}
   @Override
   public default boolean add(boolean val){
     return add((float)TypeUtil.castToFloat(val));

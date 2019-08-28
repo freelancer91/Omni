@@ -12,10 +12,10 @@ import omni.util.TypeUtil;
 #ENDIF
 abstract interface $TypeNameModifier$SubListDefault$<E>$ extends $TypeNameModifier$ListDefault$<E>$
 {
-  @Override
-  public default boolean add($BoxedType$ val){
-    return add(($exposedType$)val);
-  }
+  //@Override
+  //public default boolean add($BoxedType$ val){
+  //  return add(($exposedType$)val);
+  //}
 #IFNOT OfBoolean
   @Override
   public default boolean add(boolean val){

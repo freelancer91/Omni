@@ -19,4 +19,28 @@ interface SequenceEqualityUtil{
         //TODO
         throw NotYetImplementedException.getNYI();
     }
+    static boolean isEqual(BooleanArrDeq bad,int badTail,RefArrDeq<?> rad, int radTail) {
+        //TODO
+        throw NotYetImplementedException.getNYI();
+    }
+    static boolean isEqual(BooleanArrDeq bad,int badTail,BooleanDblLnkSeq bdls,int bdlsSize) {
+        //TODO
+        throw NotYetImplementedException.getNYI();
+    }
+    static boolean isEqual(BooleanArrDeq bad,int badTail,RefDblLnkSeq<?> rdls,int rdlsSize) {
+        //TODO
+        throw NotYetImplementedException.getNYI();
+    }
+    static boolean isEqual(BooleanDblLnkSeq bdls,int bdlsSize,RefArrDeq<?> rad,int radTail) {
+        //TODO
+        throw NotYetImplementedException.getNYI();
+    }
+    static boolean isEqual(BooleanDblLnkSeq bdls,int bdlsSize,RefDblLnkSeq<?> rdls,int rdlsSize) {
+        //TODO
+        throw NotYetImplementedException.getNYI();
+    }
+    static boolean isEqual(RefArrDeq<?> rad,int radTail,RefDblLnkSeq<?> rdls,int rdlsSize) {
+        //TODO
+        throw NotYetImplementedException.getNYI();
+    }
 }

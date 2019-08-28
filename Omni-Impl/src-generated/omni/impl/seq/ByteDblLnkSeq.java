@@ -44,6 +44,10 @@ AbstractSeq<Byte>
     this.tail=tail;
   }
   abstract void addLast(byte val);
+  @Override public boolean add(Byte val){
+    addLast((byte)val);
+    return true;
+  }  
   @Override public boolean add(byte val){
     addLast(val);
     return true;

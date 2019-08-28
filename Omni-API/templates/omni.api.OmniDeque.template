@@ -2,8 +2,9 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
+import java.util.Deque;
 //TODO extends java.util.Deque
-public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E>,PeekAndPollIfc<E>
+public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E>,PeekAndPollIfc<E>,Deque<E>
 {
   //TODO add the rest of the methods
   //public abstract void addFirst(E val);

@@ -1701,6 +1701,9 @@ AbstractSeq<Character>
       this.parent=parent;
       this.rootOffset=rootOffset;
     }
+    @Override public boolean add(Character val){
+      return add((char)val);
+    }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
       private transient char[] arr;
@@ -3512,6 +3515,9 @@ AbstractSeq<Character>
       this.parent=parent;
       this.rootOffset=rootOffset;
       this.modCount=parent.modCount;
+    }
+    @Override public boolean add(Character val){
+      return add((char)val);
     }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;

@@ -43,6 +43,10 @@ AbstractSeq<Boolean>
     this.tail=tail;
   }
   abstract void addLast(boolean val);
+  @Override public boolean add(Boolean val){
+    addLast((boolean)val);
+    return true;
+  }  
   @Override public boolean add(boolean val){
     addLast(val);
     return true;

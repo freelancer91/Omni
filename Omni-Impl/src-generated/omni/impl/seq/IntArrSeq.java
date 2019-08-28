@@ -1554,6 +1554,9 @@ AbstractSeq<Integer>
       this.parent=parent;
       this.rootOffset=rootOffset;
     }
+    @Override public boolean add(Integer val){
+      return add((int)val);
+    }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
       private transient int[] arr;
@@ -3246,6 +3249,9 @@ AbstractSeq<Integer>
       this.parent=parent;
       this.rootOffset=rootOffset;
       this.modCount=parent.modCount;
+    }
+    @Override public boolean add(Integer val){
+      return add((int)val);
     }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;

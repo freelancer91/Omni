@@ -1588,6 +1588,9 @@ AbstractSeq<Double>
       this.parent=parent;
       this.rootOffset=rootOffset;
     }
+    @Override public boolean add(Double val){
+      return add((double)val);
+    }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
       private transient double[] arr;
@@ -3384,6 +3387,9 @@ AbstractSeq<Double>
       this.parent=parent;
       this.rootOffset=rootOffset;
       this.modCount=parent.modCount;
+    }
+    @Override public boolean add(Double val){
+      return add((double)val);
     }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;

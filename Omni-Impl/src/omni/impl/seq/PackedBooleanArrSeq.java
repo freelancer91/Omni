@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import static omni.impl.seq.PackedBooleanArrSeq.UncheckedList.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -1243,6 +1242,10 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             this.parent=parent;
             this.rootOffset=rootOffset;
             modCount=parent.modCount;
+        }
+        @Override
+        public boolean add(Boolean val) {
+          return add((boolean)val);
         }
         @Override
         public boolean add(boolean val){
@@ -4533,6 +4536,10 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             root=parent.root;
             this.parent=parent;
             this.rootOffset=rootOffset;
+        }
+        @Override
+        public boolean add(Boolean val) {
+          return add((boolean)val);
         }
         @Override
         public boolean add(boolean val){

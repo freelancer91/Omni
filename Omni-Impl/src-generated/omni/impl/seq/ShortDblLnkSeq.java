@@ -44,6 +44,10 @@ AbstractSeq<Short>
     this.tail=tail;
   }
   abstract void addLast(short val);
+  @Override public boolean add(Short val){
+    addLast((short)val);
+    return true;
+  }  
   @Override public boolean add(short val){
     addLast(val);
     return true;

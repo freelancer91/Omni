@@ -1,8 +1,9 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
+import java.util.Queue;
 //TODO extends java.util.Queue
-public abstract interface OmniQueue<E> extends OmniCollection<E>,PeekAndPollIfc<E>
+public abstract interface OmniQueue<E> extends OmniCollection<E>,PeekAndPollIfc<E>,Queue<E>
 {
   /*
   @Override

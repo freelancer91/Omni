@@ -803,6 +803,9 @@ AbstractBooleanArrSeq
       this.parent=parent;
       this.rootOffset=rootOffset;
     }
+    @Override public boolean add(Boolean val){
+      return add((boolean)val);
+    }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
       private transient boolean[] arr;
@@ -2743,6 +2746,9 @@ AbstractBooleanArrSeq
       this.parent=parent;
       this.rootOffset=rootOffset;
       this.modCount=parent.modCount;
+    }
+    @Override public boolean add(Boolean val){
+      return add((boolean)val);
     }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
