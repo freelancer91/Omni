@@ -1095,6 +1095,7 @@ private boolean addToTable(int val){
     }
     return false;
   }
+  private
   boolean tableContains(
   int val){
     int[] table;

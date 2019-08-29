@@ -16,23 +16,35 @@ import java.util.ConcurrentModificationException;
 public class RefOpenAddressHashSet<E>
 extends AbstractOpenAddressHashSet<E>
 implements OmniSet.OfRef<E>{
-  private static int tableHash(Object val){
+  static int tableHash(Object val){
   //TODO improve this hash function
     int tmp;
     return (tmp=val.hashCode())^(tmp>>>16);
   }
-  private static int tableHash(long val){
+  static int tableHash(long val){
   //TODO improve this hash function
     int tmp;
     return (tmp=(int)(val^(val>>>32)))^(tmp>>>16);
   }
-  private static int tableHash(int val){
+  static int tableHash(int val){
   //TODO improve this hash function
     return val^(val>>>16);
   }
-  private static final Object NULL=new Object();
-  private static final int NULLHASH=tableHash(NULL);
+  static final Object NULL=new Object();
+  static final int NULLHASH=tableHash(NULL);
   static final Object DELETED=new Object();
+  static boolean tableContains(Object val,int hash,Object[] table,int tableLength){
+    Object tableVal;
+    if((tableVal=table[hash&=tableLength])!=null){
+      final int initialHash=hash;
+      do{
+        if(val.equals(tableVal)){
+          return true;
+        }
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=null);
+    }
+    return false;
+  }
   private static void quickInsert(Object[] table,Object val){
     int tableLength;
     int hash;
@@ -271,37 +283,38 @@ implements OmniSet.OfRef<E>{
     return isEqualTo((Set<?>)set);
   }
   private boolean isEqualTo(BooleanSetImpl set){
-    //TODO
-    return isEqualTo((Set<?>)set);
+    switch(set.state){
+      case 0b00:
+        return this.size==0;
+      case 0b01:
+        return this.size==1 && this.tableContains(Boolean.FALSE,1237);
+      case 0b10:
+        return this.size==1 && this.tableContains(Boolean.TRUE,1231);
+      default:
+        final Object[] table;
+        final int tableLength;
+        return this.size==2 && tableContains(Boolean.FALSE,1237,table=this.table,tableLength=table.length-1) && tableContains(Boolean.TRUE,1231,table,tableLength);
+    }
   }
   private boolean isEqualTo(Set<?> set){
     if(this.size==set.size()){
       Iterator<?> thatItr;
       if((thatItr=set.iterator()).hasNext()){
         final Object[] table;
-        outer:for(int tableLength=(table=this.table).length-1;;){
+        final int tableLength=(table=this.table).length-1;
+        do{
+          final int hash;
           Object thatVal;
-          int hash;
           if((thatVal=thatItr.next())==null){
             thatVal=NULL;
-            hash=NULLHASH&tableLength;
+            hash=NULLHASH;
           }else{
-            hash=thatVal.hashCode()&tableLength;
+            hash=thatVal.hashCode();
           }
-          Object tableVal;
-          if((tableVal=table[hash])!=null){
-            final int initialHash=hash;
-            do{
-              if(thatVal.equals(tableVal)){
-                if(!thatItr.hasNext()){
-                  break outer;
-                }
-                continue outer;
-              }
-            }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=null);
+          if(!tableContains(thatVal,hash,table,tableLength)){
+            return false;
           }
-          return false;
-        }  
+        }while(itr.hasNext());
       }
       return true;
     }
@@ -803,6 +816,7 @@ private boolean addToTable(Object val,int hash){
     }
     return false;
   }
+  private
   boolean tableContains(
   Object val,int hash){
     Object[] table;

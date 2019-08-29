@@ -1191,6 +1191,7 @@ private boolean addToTable(short val){
     }
     return false;
   }
+  private
   boolean tableContains(
   int val){
     short[] table;

@@ -1152,6 +1152,7 @@ private boolean addToTable(long val){
     }
     return false;
   }
+  private
   boolean tableContains(
   long val){
     long[] table;

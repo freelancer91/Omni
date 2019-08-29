@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.Iterator;
 import omni.api.OmniSet;
 import omni.api.OmniIterator;
 import omni.function.ByteConsumer;
@@ -40,7 +41,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public Object clone(){
       return new ByteSetImpl(this);
   }
-  private static int size(long word0,long word1,long word2,long word3){
+  static int size(long word0,long word1,long word2,long word3){
     return Long.bitCount(word0) + Long.bitCount(word1) + Long.bitCount(word2) + Long.bitCount(word3);
   }
   private static long processWordToString(long word,int valOffset,int valBound,byte[] buffer,long magicWord){
@@ -112,97 +113,116 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
     return 0;
   }
+  private static int isEqualToHelper(long word,int valOffset,int valBound,BytePredicate filter,int numLeft){
+    do{
+      if((word & 1L << --valBound) != 0L){
+        if(!filter.test((byte)valBound)){
+          return -1;
+        }
+      }
+    }while(--numLeft!=0 && valBound!=valOffset);
+    return numLeft;
+  }
+  /*
+  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,ARRTYPE[] arr) {
+    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
+      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
+        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
+              arr[--size]=CAST(valBound);
+              if(size == 0){
+                  break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  */
+  boolean isEqualTo(Set<?> set){
+     final long word0,word1,word2,word3;
+     if(size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)==set.size()){
+       for(final var itr=set.iterator();;){
+         if(!itr.hasNext()){
+           return true;
+         }
+         Object val;
+         if((val=itr.next()) instanceof Byte){
+           byte v;
+           switch((v=(byte)val)>>6){
+             case -2:
+               if(((word0>>>v)&1L)!=0L){
+                 continue;
+               }
+               break;
+             case -1:
+               if(((word1>>>v)&1L)!=0L){
+                 continue;
+               }
+               break;
+             case 0:
+               if(((word2>>>v)&1L)!=0L){
+                 continue;
+               }
+               break;
+             default:
+               if(((word3>>>v)&1L)!=0L){
+                 continue;
+               }
+           }
+         }
+         break;
+       }
+     }
+     return false;
+  }
+  private boolean isEqualTo(ByteSetImpl set){
+    return this.word0==set.word0 && this.word1==set.word1 && this.word2==set.word2 && this.word3==set.word3;
+  }
+  boolean isEqualTo(RefOpenAddressHashSet<?> set){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))==set.size){
+      if(size!=0){
+        final Object[] table;
+        final int tableLength=(table=set.table).length-1;
+        final BytePredicate tableContains;
+        switch(size=isEqualToHelper(word3,64,128,tableContains=thisVal->RefOpenAddressHashSet.tableContains(thisVal,thisVal,table,tableLength),size)){
+          case -1:
+            return false;
+          default:
+            switch(size=isEqualToHelper(word2,0,64,tableContains,size)){
+              case -1:
+                return false;
+              default:
+                switch(size=isEqualToHelper(word1,-64,0,tableContains,size)){
+                  case -1:
+                    return false;
+                  default:
+                    return isEqualToHelper(word0,-128,-64,tableContains,size)==0;
+                  case 0:
+                }
+              case 0:
+            }
+          case 0:
+        }
+      }
+      return true;
+    }
+    return false;
+  }
   @Override public boolean equals(Object val){
     if(val==this){
       return true;
     }
     if(val instanceof ByteSetImpl){
-      return this.isEqualTo((ByteSetImpl)val);
+      return isEqualTo((ByteSetImpl)val);
     }else if(val instanceof RefOpenAddressHashSet){
-      return this.isEqualTo((RefOpenAddressHashSet<?>)val);
+      return isEqualTo((RefOpenAddressHashSet<?>)val);
     }else if(val instanceof Set){
-      return this.isEqualTo((Set<?>)val);
-    }
-    return false;
-  }
-  private boolean isEqualTo(ByteSetImpl set){
-    return   set.word0 == this.word0
-          && set.word1 == this.word1
-          && set.word2 == this.word2
-          && set.word3 == this.word3;
-  }
-  private boolean isEqualTo(RefOpenAddressHashSet<?> set){
-    int size;
-    final long word0,word1,word2,word3;
-    if((size=set.size)==size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)){
-      Object[] table;
-      goToReturnFalse: for(int i=(table=set.table).length;;){
-        Object tableVal;
-        if((tableVal=table[--i])==null || tableVal==RefOpenAddressHashSet.DELETED){
-          continue;
-        }else if(!(tableVal instanceof Byte)){
-          break;
-        }
-        byte v;
-        switch((v=(byte)tableVal)>>6){
-          case -2:
-            if((word0&(1L<<v))==0){
-              break goToReturnFalse;
-            }
-            break;
-          case -1:
-            if((word1&(1L<<v))==0){
-              break goToReturnFalse;
-            }
-            break;
-          case 0:
-            if((word2&(1L<<v))==0){
-              break goToReturnFalse;
-            }
-            break;
-          default:
-            if((word3&(1L<<v))==0){
-             break goToReturnFalse;
-            }
-        }
-        if(--size==0){
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-  private boolean isEqualTo(Set<?> set){
-    final long word0,word1,word2,word3;
-    if(set.size()==size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)){
-      for(var thatVal:set){
-        if(!(thatVal instanceof Byte)){
-          return false;
-        }
-        final byte v;
-        switch((v=(byte)thatVal)>>6){
-          case -2:
-            if((word0&(1L<<v))==0){
-              return false;
-            }
-            break;
-          case -1:
-            if((word1&(1L<<v))==0){
-              return false;
-            }
-            break;
-          case 0:
-            if((word2&(1L<<v))==0){
-              return false;
-            }
-            break;
-          default:
-            if((word3&(1L<<v))==0){
-             return false;
-            }
-        }
-      }
-      return true;
+      return isEqualTo((Set<?>)val);
     }
     return false;
   }
@@ -1001,6 +1021,85 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
+    boolean isEqualTo(RefOpenAddressHashSet<?> set){
+      int size;
+      if((size=this.size)==set.size){
+        if(size!=0){
+          final Object[] table;
+          final int tableLength=(table=set.table).length-1;
+          final BytePredicate tableContains;
+          switch(size=isEqualToHelper(word3,64,128,tableContains=thisVal->RefOpenAddressHashSet.tableContains(thisVal,thisVal,table,tableLength),size)){
+            case -1:
+              return false;
+            default:
+              switch(size=isEqualToHelper(word2,0,64,tableContains,size)){
+                case -1:
+                  return false;
+                default:
+                  switch(size=isEqualToHelper(word1,-64,0,tableContains,size)){
+                    case -1:
+                      return false;
+                    default:
+                      return isEqualToHelper(word0,-128,-64,tableContains,size)==0;
+                    case 0:
+                  }
+                case 0:
+              }
+            case 0:
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+    boolean isEqualTo(Set<?> set){
+     if(this.size==set.size()){
+       final int modCount=this.modCount;
+       try{
+         final Iterator<?> itr;
+         if((itr=set.iterator()).hasNext()){
+           final long word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3;
+           goToReturnFalse:for(;;){
+             goToHasNext: for(;;){
+               Object val;
+               if((val=itr.next()) instanceof Byte){
+                 byte v;
+                 switch((v=(byte)val)>>6){
+                   case -2:
+                     if(((word0>>>v)&1L)==0L){
+                       break;
+                     }
+                     break goToHasNext;
+                   case -1:
+                     if(((word1>>>v)&1L)==0L){
+                       break;
+                     }
+                     break goToHasNext;
+                   case 0:
+                     if(((word2>>>v)&1L)==0L){
+                       break;
+                     }
+                     break goToHasNext;
+                   default:
+                     if(((word3>>>v)&1L)==0L){
+                       break;
+                     }
+                     break goToHasNext;
+                 }
+               }
+               break goToReturnFalse;
+             }
+             if(!itr.hasNext()){
+               return true;
+             }
+           }
+         }
+       }finally{
+         CheckedCollection.checkModCount(modCount,this.modCount);
+       }
+     }
+     return false;
+  }
     @Override public void readExternal(ObjectInput in) throws IOException{
       this.size=size(word0=in.readLong(),word1=in.readLong(),word2=in.readLong(),word3=in.readLong());
     }

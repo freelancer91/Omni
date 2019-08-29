@@ -20,7 +20,7 @@ import omni.util.ToStringUtil;
 public class FloatOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Float>
 implements OmniSet.OfFloat{
-  private static int tableHash(int bits){
+  static int tableHash(int bits){
   //TODO improve this hash function
     return bits^(bits>>>16);
   }
@@ -863,6 +863,7 @@ boolean addToTable(int val,int hash){
     }
     return false;
   }
+  private
   boolean tableContains(
   int val,int hash){
     int[] table;

@@ -19,7 +19,7 @@ import omni.util.TypeUtil;
 public class DoubleOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Double>
 implements OmniSet.OfDouble{
-  private static int tableHash(long bits){
+  static int tableHash(long bits){
   //TODO improve this hash function
     int tmp;
     return (tmp=(int)(bits^(bits>>>32)))^(tmp>>>16);
@@ -729,6 +729,7 @@ boolean addToTable(long val,int hash){
     }
     return false;
   }
+  private
   boolean tableContains(
   long val,int hash){
     long[] table;

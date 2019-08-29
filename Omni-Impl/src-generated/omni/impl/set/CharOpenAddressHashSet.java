@@ -1128,6 +1128,7 @@ private boolean addToTable(char val){
     }
     return false;
   }
+  private
   boolean tableContains(
   int val){
     char[] table;
