@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import static omni.impl.seq.PackedBooleanArrSeq.UncheckedList.*;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -1609,26 +1608,27 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             if(val==this) {
                 return true;
             }
-            if(val instanceof List) {
-                final var root=this.root;
-                final var modCount=this.modCount;
-                try {
-                    final int size;
-                    if((size=this.size)==0) {
-                        return ((List<?>)val).isEmpty();
-                    }
-                    if(val instanceof OmniList.OfBoolean) {
-                        return equalTo((OmniList.OfBoolean)val,root,size);
-                    }else if(val instanceof OmniList.OfRef) {
-                        return equalTo((OmniList.OfRef<?>)val,root,size);
-                    }
-                    final List<?> that;
-                    final int rootOffset;
-                    return (that=(List<?>)val).size()==size && ((UncheckedList)root).isEqualTo(rootOffset=this.rootOffset,rootOffset+size,that.listIterator());
-                }finally {
-                    CheckedCollection.checkModCount(modCount,root.modCount);
-                }
-            }
+            //TODO
+//            if(val instanceof List) {
+//                final var root=this.root;
+//                final var modCount=this.modCount;
+//                try {
+//                    final int size;
+//                    if((size=this.size)==0) {
+//                        return ((List<?>)val).isEmpty();
+//                    }
+//                    if(val instanceof OmniList.OfBoolean) {
+//                        return equalTo((OmniList.OfBoolean)val,root,size);
+//                    }else if(val instanceof OmniList.OfRef) {
+//                        return equalTo((OmniList.OfRef<?>)val,root,size);
+//                    }
+//                    final List<?> that;
+//                    final int rootOffset;
+//                    return (that=(List<?>)val).size()==size && ((UncheckedList)root).isEqualTo(rootOffset=this.rootOffset,rootOffset+size,that.listIterator());
+//                }finally {
+//                    CheckedCollection.checkModCount(modCount,root.modCount);
+//                }
+//            }
             return false; 
         }
         private boolean equalTo(OmniList.OfRef<?> val,final UncheckedList root,final int size){
@@ -3801,19 +3801,20 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             if(val==this) {
                 return true;
             }
-            if(val instanceof List) {
-                int size;
-                if((size=this.size)==0) {
-                    return ((List<?>)val).isEmpty();
-                }
-                if(val instanceof OmniList.OfBoolean) {
-                    return isEqualTo((OmniList.OfBoolean)val,size);
-                }else if(val instanceof OmniList.OfRef) {
-                    return isEqualTo((OmniList.OfRef<?>)val,size);
-                }
-                List<?> that;
-                return (that=(List<?>)val).size()==size && isEqualTo(0,size,that.listIterator());
-            }
+            //TODO
+//            if(val instanceof List) {
+//                int size;
+//                if((size=this.size)==0) {
+//                    return ((List<?>)val).isEmpty();
+//                }
+//                if(val instanceof OmniList.OfBoolean) {
+//                    return isEqualTo((OmniList.OfBoolean)val,size);
+//                }else if(val instanceof OmniList.OfRef) {
+//                    return isEqualTo((OmniList.OfRef<?>)val,size);
+//                }
+//                List<?> that;
+//                return (that=(List<?>)val).size()==size && isEqualTo(0,size,that.listIterator());
+//            }
             return false;
         }
         @Override
@@ -5096,20 +5097,24 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             if(val==this) {
                 return true;
             }
-            if(val instanceof List) {
-                final int size;
-                if((size=this.size)==0) {
-                    return ((List<?>)val).isEmpty();
-                }
-                if(val instanceof OmniList.OfBoolean) {
-                    return equalTo((OmniList.OfBoolean)val,size);
-                }else if(val instanceof OmniList.OfRef) {
-                    return equalTo((OmniList.OfRef<?>)val,size);
-                }
-                final List<?> that;
-                final int rootOffset;
-                return (that=(List<?>)val).size()==size && root.isEqualTo(rootOffset=this.rootOffset,rootOffset+size,that.listIterator());
+            if(val instanceof OmniList.OfBoolean) {
+              
+              
             }
+//            if(val instanceof List) {
+//                final int size;
+//                if((size=this.size)==0) {
+//                    return ((List<?>)val).isEmpty();
+//                }
+//                if(val instanceof OmniList.OfBoolean) {
+//                    return equalTo((OmniList.OfBoolean)val,size);
+//                }else if(val instanceof OmniList.OfRef) {
+//                    return equalTo((OmniList.OfRef<?>)val,size);
+//                }
+//                final List<?> that;
+//                final int rootOffset;
+//                return (that=(List<?>)val).size()==size && root.isEqualTo(rootOffset=this.rootOffset,rootOffset+size,that.listIterator());
+//            }
             return false;  
         }
         private boolean equalTo(OmniList.OfRef<?> val,final int size){
