@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.List;
 import omni.util.IntSortUtil;
 import omni.api.OmniList;
 import omni.impl.IntDblLnkNode;
@@ -887,8 +888,24 @@ AbstractSeq<Integer>
       }
     }
     @Override public boolean equals(Object val){
-      //TODO
-      throw omni.util.NotYetImplementedException.getNYI();
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     private void bubbleUpPeelHead(IntDblLnkNode newHead,IntDblLnkNode oldHead){
       newHead.prev=null;
@@ -3885,8 +3902,24 @@ AbstractSeq<Integer>
       return super.hashCode();
     }
     @Override public boolean equals(Object val){
-      //TODO
-      throw omni.util.NotYetImplementedException.getNYI();
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     } 
   }
   public static class CheckedList extends UncheckedList{
@@ -4377,8 +4410,24 @@ AbstractSeq<Integer>
       return new CheckedList();
     }
     @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     @Override public OmniIterator.OfInt descendingIterator(){
       return new DescendingItr(this);
@@ -5049,8 +5098,24 @@ AbstractSeq<Integer>
       return new UncheckedList();
     }
     @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     @Override public boolean removeVal(boolean val){
       {

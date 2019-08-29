@@ -1,4 +1,5 @@
 package omni.impl.set;
+import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -8,6 +9,7 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
+import java.util.Iterator;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import omni.impl.AbstractIntItr;
@@ -248,9 +250,44 @@ implements OmniSet.OfInt{
     }
     return false;
   }
-  @Override public boolean equals(Object val){
+  private boolean isEqualTo(IntOpenAddressHashSet set){
     //TODO
-                throw omni.util.NotYetImplementedException.getNYI();
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(RefOpenAddressHashSet<?> set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(Set<?> set){
+    if(this.size==set.size()){
+      Iterator<?> thatItr;
+      if((thatItr=set.iterator()).hasNext()){
+        final int[] table;
+        outer:for(int tableLength=(table=this.table).length-1;;){
+          Object thatVal;
+          if(!((thatVal=thatItr.next()) instanceof Integer)){
+            return false;
+          }
+          //TODO
+          throw omni.util.NotYetImplementedException.getNYI();
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+  @Override public boolean equals(Object val){
+    if(val==this){
+      return true;
+    }
+    if(val instanceof IntOpenAddressHashSet){
+      return isEqualTo((IntOpenAddressHashSet)val);
+    }else if(val instanceof RefOpenAddressHashSet){
+      return isEqualTo((RefOpenAddressHashSet<?>)val);
+    }else if(val instanceof Set){
+      return isEqualTo((Set<?>)val);
+    }
+    return false;
   }
   @Override public void forEach(IntConsumer action){
     int size;
@@ -1058,7 +1095,7 @@ private boolean addToTable(int val){
     }
     return false;
   }
-  private boolean tableContains(
+  boolean tableContains(
   int val){
     int[] table;
     int tableVal;
@@ -1547,6 +1584,27 @@ private boolean addToTable(int val){
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
+    private boolean isEqualTo(Set<?> set){
+      final int modCount=this.modCount;
+      try{
+        return super.isEqualTo(set);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    @Override public boolean equals(Object val){
+      if(val==this){
+        return true;
+      }
+      if(val instanceof IntOpenAddressHashSet){
+        return super.isEqualTo((IntOpenAddressHashSet)val);
+      }else if(val instanceof RefOpenAddressHashSet){
+        return super.isEqualTo((RefOpenAddressHashSet<?>)val);
+      }else if(val instanceof Set){
+        return isEqualTo((Set<?>)val);
+      }
+      return false;
+    }
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
@@ -1594,10 +1652,6 @@ private boolean addToTable(int val){
     }
     @Override public Object clone(){
       return new Checked(this);
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfInt iterator(){
       return new Itr(this);

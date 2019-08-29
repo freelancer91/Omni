@@ -8,6 +8,7 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
+import java.util.List;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -840,9 +841,8 @@ public
     }
     if(val instanceof List){
       //TODO optimize this
-      int size;
       List<?> that;
-      if((size=this.size)==(that=(List<?>)val).size()){
+      if(this.size==(that=(List<?>)val).size()){
         var thisItr=this.iterator();
         var thatItr=that.iterator();
         while(thisItr.hasNext()){

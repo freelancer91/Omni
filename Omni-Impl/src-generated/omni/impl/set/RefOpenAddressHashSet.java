@@ -1,4 +1,5 @@
 package omni.impl.set;
+import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -8,6 +9,7 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
+import java.util.Iterator;
 import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 import java.util.ConcurrentModificationException;
@@ -30,7 +32,7 @@ implements OmniSet.OfRef<E>{
   }
   private static final Object NULL=new Object();
   private static final int NULLHASH=tableHash(NULL);
-  private static final Object DELETED=new Object();
+  static final Object DELETED=new Object();
   private static void quickInsert(Object[] table,Object val){
     int tableLength;
     int hash;
@@ -236,9 +238,101 @@ implements OmniSet.OfRef<E>{
     }
     return false;
   }
-  @Override public boolean equals(Object val){
+  private boolean isEqualTo(RefOpenAddressHashSet<?> set){
     //TODO
-                throw omni.util.NotYetImplementedException.getNYI();
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(DoubleOpenAddressHashSet set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(FloatOpenAddressHashSet set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(LongOpenAddressHashSet set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(IntOpenAddressHashSet set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(ShortOpenAddressHashSet set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(CharOpenAddressHashSet set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(ByteSetImpl set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(BooleanSetImpl set){
+    //TODO
+    return isEqualTo((Set<?>)set);
+  }
+  private boolean isEqualTo(Set<?> set){
+    if(this.size==set.size()){
+      Iterator<?> thatItr;
+      if((thatItr=set.iterator()).hasNext()){
+        final Object[] table;
+        outer:for(int tableLength=(table=this.table).length-1;;){
+          Object thatVal;
+          int hash;
+          if((thatVal=thatItr.next())==null){
+            thatVal=NULL;
+            hash=NULLHASH&tableLength;
+          }else{
+            hash=thatVal.hashCode()&tableLength;
+          }
+          Object tableVal;
+          if((tableVal=table[hash])!=null){
+            final int initialHash=hash;
+            do{
+              if(thatVal.equals(tableVal)){
+                if(!thatItr.hasNext()){
+                  break outer;
+                }
+                continue outer;
+              }
+            }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=null);
+          }
+          return false;
+        }  
+      }
+      return true;
+    }
+    return false;
+  }
+  @Override public boolean equals(Object val){
+    if(val==this){
+      return true;
+    }
+    if(val instanceof RefOpenAddressHashSet){
+      return isEqualTo((RefOpenAddressHashSet<?>)val);
+    }else if(val instanceof IntOpenAddressHashSet){
+      return isEqualTo((IntOpenAddressHashSet)val);
+    }else if(val instanceof FloatOpenAddressHashSet){
+      return isEqualTo((FloatOpenAddressHashSet)val);
+    }else if(val instanceof LongOpenAddressHashSet){
+      return isEqualTo((LongOpenAddressHashSet)val);
+    }else if(val instanceof DoubleOpenAddressHashSet){
+      return isEqualTo((DoubleOpenAddressHashSet)val);
+    }else if(val instanceof ByteSetImpl){
+      return isEqualTo((ByteSetImpl)val);
+    }else if(val instanceof CharOpenAddressHashSet){
+      return isEqualTo((CharOpenAddressHashSet)val);
+    }else if(val instanceof ShortOpenAddressHashSet){
+      return isEqualTo((ShortOpenAddressHashSet)val);
+    }else if(val instanceof BooleanSetImpl){
+      return isEqualTo((BooleanSetImpl)val);
+    }else if(val instanceof Set){
+      return isEqualTo((Set<?>)val);   
+    }
+    return false;
   }
   @Override public void forEach(Consumer<? super E> action){
     int size;
@@ -709,7 +803,7 @@ private boolean addToTable(Object val,int hash){
     }
     return false;
   }
-  private boolean tableContains(
+  boolean tableContains(
   Object val,int hash){
     Object[] table;
     Object tableVal;
@@ -928,6 +1022,45 @@ private boolean addToTable(Object val,int hash){
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
+    private boolean isEqualTo(Set<?> set){
+      final int modCount=this.modCount;
+      try{
+        return super.isEqualTo(set);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    private boolean isEqualTo(RefOpenAddressHashSet<?> set){
+      //TODO
+      return this.isEqualTo((Set<?>)set);
+    }
+    @Override public boolean equals(Object val){
+      if(val==this){
+        return true;
+      }
+      if(val instanceof RefOpenAddressHashSet){
+        return isEqualTo((RefOpenAddressHashSet<?>)val);
+      }else if(val instanceof IntOpenAddressHashSet){
+        return super.isEqualTo((IntOpenAddressHashSet)val);
+      }else if(val instanceof FloatOpenAddressHashSet){
+        return super.isEqualTo((FloatOpenAddressHashSet)val);
+      }else if(val instanceof LongOpenAddressHashSet){
+        return super.isEqualTo((LongOpenAddressHashSet)val);
+      }else if(val instanceof DoubleOpenAddressHashSet){
+        return super.isEqualTo((DoubleOpenAddressHashSet)val);
+      }else if(val instanceof ByteSetImpl){
+        return super.isEqualTo((ByteSetImpl)val);
+      }else if(val instanceof CharOpenAddressHashSet){
+        return super.isEqualTo((CharOpenAddressHashSet)val);
+      }else if(val instanceof ShortOpenAddressHashSet){
+        return super.isEqualTo((ShortOpenAddressHashSet)val);
+      }else if(val instanceof BooleanSetImpl){
+        return super.isEqualTo((BooleanSetImpl)val);
+      }else if(val instanceof Set){
+        return isEqualTo((Set<?>)val); 
+      }
+      return false;
+    }
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
@@ -1014,10 +1147,6 @@ private boolean addToTable(Object val,int hash){
             return super.tableContains(NULL,NULLHASH);
         }
         return false;
-    }
-    @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
     }
     @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);

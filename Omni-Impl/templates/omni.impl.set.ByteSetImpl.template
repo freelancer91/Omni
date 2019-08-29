@@ -1,5 +1,6 @@
 #TYPEDEF OfByte
 package omni.impl.set;
+import java.util.Set;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -113,9 +114,98 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     return 0;
   }
   @Override public boolean equals(Object val){
-    // TODO
-                throw omni.util.NotYetImplementedException.getNYI();
-
+    if(val==this){
+      return true;
+    }
+    if(val instanceof ByteSetImpl){
+      return this.isEqualTo((ByteSetImpl)val);
+    }else if(val instanceof RefOpenAddressHashSet){
+      return this.isEqualTo((RefOpenAddressHashSet<?>)val);
+    }else if(val instanceof Set){
+      return this.isEqualTo((Set<?>)val);
+    }
+    return false;
+  }
+  private boolean isEqualTo(ByteSetImpl set){
+    return   set.word0 == this.word0
+          && set.word1 == this.word1
+          && set.word2 == this.word2
+          && set.word3 == this.word3;
+  }
+  private boolean isEqualTo(RefOpenAddressHashSet<?> set){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=set.size)==size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)){
+      Object[] table;
+      goToReturnFalse: for(int i=(table=set.table).length;;){
+        Object tableVal;
+        if((tableVal=table[--i])==null || tableVal==RefOpenAddressHashSet.DELETED){
+          continue;
+        }else if(!(tableVal instanceof Byte)){
+          break;
+        }
+        byte v;
+        switch((v=(byte)tableVal)>>6){
+          case -2:
+            if((word0&(1L<<v))==0){
+              break goToReturnFalse;
+            }
+            break;
+          case -1:
+            if((word1&(1L<<v))==0){
+              break goToReturnFalse;
+            }
+            break;
+          case 0:
+            if((word2&(1L<<v))==0){
+              break goToReturnFalse;
+            }
+            break;
+          default:
+            if((word3&(1L<<v))==0){
+             break goToReturnFalse;
+            }
+        }
+        if(--size==0){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  private boolean isEqualTo(Set<?> set){
+    final long word0,word1,word2,word3;
+    if(set.size()==size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)){
+      for(var thatVal:set){
+        if(!(thatVal instanceof Byte)){
+          return false;
+        }
+        final byte v;
+        switch((v=(byte)thatVal)>>6){
+          case -2:
+            if((word0&(1L<<v))==0){
+              return false;
+            }
+            break;
+          case -1:
+            if((word1&(1L<<v))==0){
+              return false;
+            }
+            break;
+          case 0:
+            if((word2&(1L<<v))==0){
+              return false;
+            }
+            break;
+          default:
+            if((word3&(1L<<v))==0){
+             return false;
+            }
+        }
+      }
+      return true;
+    }
+    return false;
   }
   @Override public void writeExternal(ObjectOutput out) throws IOException{
     out.writeLong(word0);
@@ -630,11 +720,6 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
         return hashCodeHelper(word0,word1,word2,word3,size);
       }
       return 0;
-    }
-    @Override public boolean equals(Object val){
-      // TODO Auto-generated method stub
-                  throw omni.util.NotYetImplementedException.getNYI();
-
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       int modCount=this.modCount;

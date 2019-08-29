@@ -16,6 +16,7 @@ import omni.function.BooleanPredicate;
 import omni.impl.AbstractBooleanItr;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
+import java.util.Set;
 public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizable{
   private static final long serialVersionUID=1L;
   transient int state;
@@ -61,10 +62,43 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       return 1231 + 1237;
     }
   }
+  
+  
   @Override public boolean equals(Object val){
-    // TODO
-               throw omni.util.NotYetImplementedException.getNYI();
-
+    if(val==this){
+      return true;
+    }
+    if(val instanceof Set){
+      //TODO optimize
+      final Set<?> set;
+      if((set=(Set<?>)val) instanceof BooleanSetImpl){
+        return ((BooleanSetImpl)set).state==this.state;
+      }else if(set instanceof RefOpenAddressHashSet){
+        var refOpenAddressHashSet=(RefOpenAddressHashSet<?>)set;
+        switch(state){
+        case 0b00:
+          return refOpenAddressHashSet.size==0;
+        case 0b01:
+          return refOpenAddressHashSet.size==1 && refOpenAddressHashSet.tableContains(Boolean.FALSE,1237);
+        case 0b10:
+          return refOpenAddressHashSet.size==1 && refOpenAddressHashSet.tableContains(Boolean.TRUE,1231);
+        default:
+          return refOpenAddressHashSet.size==2 && refOpenAddressHashSet.tableContains(Boolean.FALSE,1237) && refOpenAddressHashSet.tableContains(Boolean.TRUE,1231);
+        }
+      }else{
+        switch(state){
+        case 0b00:
+          return set.isEmpty();
+        case 0b01:
+          return set.size()==1 && set.contains(Boolean.FALSE);
+        case 0b10:
+          return set.size()==1 && set.contains(Boolean.FALSE);
+        default:
+          return set.size()==2 && set.contains(Boolean.FALSE) && set.contains(Boolean.TRUE);
+        }
+      }
+    }
+    return false;
   }
   @Override public boolean contains(Object val){
     switch(state){
@@ -687,11 +721,6 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
     }
     @Override public Object clone(){
         return new Checked(state);
-    }
-    @Override public boolean equals(Object val){
-        // TODO Auto-generated method stub
-                    throw omni.util.NotYetImplementedException.getNYI();
-
     }
     @SuppressWarnings("unchecked")
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){

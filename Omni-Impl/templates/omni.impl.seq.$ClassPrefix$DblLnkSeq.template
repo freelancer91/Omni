@@ -8,6 +8,7 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
+import java.util.List;
 import omni.util.$ClassPrefix$SortUtil;
 import omni.api.OmniList;
 import omni.impl.$DNode$;
@@ -396,9 +397,24 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     }
     #MACRO SubListAddMethods<Unchecked>()
     @Override public boolean equals(Object val){
-      //TODO
-      throw omni.util.NotYetImplementedException.getNYI();
-
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     #MACRO SubListRemoveMethods<Unchecked>()
     @Override public Object clone(){
@@ -1217,9 +1233,24 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #ENDIF
     }
     @Override public boolean equals(Object val){
-      //TODO
-      throw omni.util.NotYetImplementedException.getNYI();
-
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     } 
   }
   public static class CheckedList$<E>$ extends UncheckedList$<E>${
@@ -1627,9 +1658,24 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return new CheckedList$<E>$();
     }
     @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
       return new DescendingItr$<E>$(this);
@@ -2081,9 +2127,24 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return new UncheckedList$<E>$();
     }
     @Override public boolean equals(Object val){
-      //TODO
-                  throw omni.util.NotYetImplementedException.getNYI();
-
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     #MACRO QueryMethods<removeVal,Root,false>()
 #IF OfRef

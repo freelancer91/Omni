@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.List;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -1179,8 +1180,24 @@ AbstractSeq<E>
       super(size,arr);
     }
     @Override public boolean equals(Object val){
-      //TODO implements equals method for UncheckedList<E>
-      throw omni.util.NotYetImplementedException.getNYI();
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     @Override public Object clone(){
       final Object[] copy;
@@ -2011,8 +2028,24 @@ AbstractSeq<E>
       return new SerializableSubList<E>(root.arr,this.size,this.rootOffset);
     }
     @Override public boolean equals(Object val){
-      //TODO implements equals method for UncheckedSubList<E>
-      throw omni.util.NotYetImplementedException.getNYI();
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     @Override public Object clone(){
       final Object[] copy;
@@ -3692,10 +3725,6 @@ AbstractSeq<E>
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override public boolean equals(Object val){
-      //TODO implements equals method for CheckedList<E>
-      throw omni.util.NotYetImplementedException.getNYI();
-    }
     @Override public Object clone(){
       final Object[] copy;
       final int size;
@@ -4285,8 +4314,24 @@ AbstractSeq<E>
       return new SerializableSubList<E>((root=this.root).arr,this.size,this.rootOffset,root.new ModCountChecker(this.modCount));
     }
     @Override public boolean equals(Object val){
-      //TODO implements equals method for CheckedSubList<E>
-      throw omni.util.NotYetImplementedException.getNYI();
+      if(val==this){
+        return true;
+      }
+      if(val instanceof List){
+        //TODO optimize this
+        List<?> that;
+        if(this.size==(that=(List<?>)val).size()){
+          var thisItr=this.iterator();
+          var thatItr=that.iterator();
+          while(thisItr.hasNext()){
+            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
+              return false;
+            }
+          }
+          return !thatItr.hasNext();
+        }
+      }
+      return false;
     }
     @Override public Object clone(){
       final CheckedList<E> root;
