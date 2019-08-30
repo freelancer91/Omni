@@ -1,0 +1,317 @@
+#TYPEDEF OfGeneric
+
+interface SetCommonImpl{
+
+  static int tableHash(int val){
+    return val&(val>>>16);
+  }
+  static int tableHash(long val){
+    return tableHash(Long.hashCode(val));
+  }
+  static int tableHash(Object val){
+    return tableHash(val.hashCode());
+  }
+  static int size(long word0,long word1,long word2,long word3){
+    return Long.bitCount(word0)+Long.bitCount(word1)+Long.bitCount(word2)+Long.bitCount(word3);
+  }
+  static boolean isEqualTo(Set<?> thisSet,BooleanSetImpl thatSet) {
+      switch(thatSet.state) {
+      case 0b00:
+          return thisSet.isEmpty();
+      case 0b01:
+          return thisSet.size()==1 && thisSet.contains(Boolean.FALSE);
+      case 0b10:
+          if(thisSet.size()!=1){
+              return false;
+          }
+          break;
+      default:
+          if( thisSet.size()!=2 || !thisSet.contains(Boolean.FALSE)) {
+              return false;
+          }
+      }
+      return thisSet.contains(Boolean.TRUE);
+  }
+  static boolean isEqualTo(Set<?> thisSet,ByteSetImpl thatSet){
+    final long word0,word1,word2,word3;
+    if(size(word0=thatSet.word0,word1=thatSet.word1,word2=thatSet.word2,word3=thatSet.word3)==thisSet.size()) {
+      goToHasNext:for(final var itr=thisSet.iterator();;) {
+          #MACRO ItrHasNextOrReturnTrue()
+          final Object val;
+          if((val=itr.next()) instanceof Byte) {
+              final byte v;
+              switch((v=(byte)val)>>6) {
+              #MACRO WordsContain(v,case -2,case -1,case 0,default)
+              }
+          }
+          break;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Set<?> thisSet,ByteSetImpl.Checked thatSet) {
+    int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+         final Iterator<?> itr;
+         Object val;
+         if(size==thisSet.size() &&(val=(itr=thisSet.iterator()).next()) instanceof Byte) {
+             final long word0=thatSet.word0,word1=thatSet.word1,word2=thatSet.word2,word3=thatSet.word3;
+             goToReturnFalse:do {
+                 final byte v;
+                 goToHasNext:switch((v=(byte)val)>>6) {
+                 #MACRO WordsContain(v,case -2,case -1,case 0,default)
+                 }
+                 #MACRO ItrHasNextOrReturnTrue()
+             }while((val=itr.next()) instanceof Byte);
+         }
+    }finally {
+        CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+    return false;
+  }
+  #MACRO IsEqualToSetOpenAddressHashSet<Char>( )
+  #MACRO IsEqualToSetOpenAddressHashSet<Short>( )
+  #MACRO IsEqualToSetOpenAddressHashSet<Int>( )
+  #MACRO IsEqualToSetOpenAddressHashSet<Long>( )
+  #MACRO IsEqualToSetOpenAddressHashSet<FLoat>( )
+  #MACRO IsEqualToSetOpenAddressHashSet<Double>( )
+  #MACRO IsEqualToSetOpenAddressHashSet<Ref>(<?>)
+  
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,BooleanSetImpl thatSet) {
+    switch(thatSet.state) {
+    case 0b00:
+      return thisSet.size==0;
+    case 0b01:
+      final Object[] table;
+      return thisSet.size==1 && tableContainsRef(table=thisSet.table,table.length-1,Boolean.FALSE,1237);
+    case 0b10:
+      return thisSet.size==1 && tableContainsRef(table=thisSet.table,table.length-1,Boolean.TRUE,1231);
+    default:
+      final int tableLength;
+      return thisSet.size==2 && tableContainsRef(table=thisSet.table,tableLength=table.length-1,Boolean.FALSE,1237)&&tableContainsRef(table,tableLength,Boolean.TRUE,1231);
+    }
+  }
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,ByteSetImpl thatSet) {
+    int size;
+    if((size=thisSet.size)==0) {
+      return thatSet.isEmpty();
+    }
+    final long word0,word1,word2,word3;
+    if(size==size(word0=thatSet.word0,word1=thatSet.word1,word2=thatSet.word2,word3=thatSet.word3)) {
+      goToReturnFalse:for(final var val:thisSet.table) {
+        if(val==null || val==RefOpenAddressHashSet.DELETED) {
+          continue;
+        }
+        if(!(val instanceof Byte)) {
+          break goToReturnFalse;
+        }
+        final byte v;
+        goToHasNext:switch((v=(byte)val)>>6) {
+        #MACRO WordsContain(v,case -2,case -1,case 0,default)
+        }
+        if(--size==0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,ByteSetImpl.Checked thatSet) {
+    int size;
+    if((size=thisSet.size)==0) {
+      return thatSet.size==0;
+    }
+    if(size==thatSet.size) {
+      final long word0=thatSet.word0,word1=thatSet.word1,word2=thatSet.word2,word3=thatSet.word3;
+      goToReturnFalse:for(final var val:thisSet.table) {
+        if(val==null || val==RefOpenAddressHashSet.DELETED) {
+          continue;
+        }
+        if(!(val instanceof Byte)) {
+          break goToReturnFalse;
+        }
+        final byte v;
+        goToHasNext:switch((v=(byte)val)>>6) {
+        #MACRO WordsContain(v,case -2,case -1,case 0,default)
+        }
+        if(--size==0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,CharOpenAddressHashSet thatSet) {
+    int size;
+    if((size=thisSet.size)==thatSet.size) {
+      if(size==0) {
+        return true;
+      }
+      final long word0=thatSet.word0,word1=thatSet.word1,word2=thatSet.word2,word3=thatSet.word3;
+      final char[] thatTable;
+      final int thatTableLength=(thatTable=thatSet.table).length-1;
+      goToReturnFalse:for(final var val:thisSet.table) {
+        if(val==null || val==RefOpenAddressHashSet.DELETED) {
+          continue;
+        }
+        if(!(val instanceof Character)) {
+          break goToReturnFalse;
+        }
+        final char v;
+        goToHasNext:switch((v=(char)val)>>6) {
+        #MACRO WordsContain(v,case 0,case 1,case 2,case 3)
+        default:
+          if(!tableContains(thatTable,thatTableLength,v,v&thatTableLength)) {
+            break goToReturnFalse;
+          }
+        }
+        if(--size==0) {
+          return true;
+        }
+      }
+      
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,ShortOpenAddressHashSet thatSet) {
+    int size;
+    if((size=thisSet.size)==thatSet.size) {
+      if(size==0) {
+        return true;
+      }
+      final long word0=thatSet.word0,word1=thatSet.word1,word2=thatSet.word2,word3=thatSet.word3;
+      final short[] thatTable;
+      final int thatTableLength=(thatTable=thatSet.table).length-1;
+      goToReturnFalse:for(final var val:thisSet.table) {
+        if(val==null || val==RefOpenAddressHashSet.DELETED) {
+          continue;
+        }
+        if(!(val instanceof Short)) {
+          break goToReturnFalse;
+        }
+        final short v;
+        goToHasNext:switch((v=(short)val)>>6) {
+        #MACRO WordsContain(v,case -2,case -1,case 0,case 1)
+        default:
+          if(!tableContains(thatTable,thatTableLength,v,v&thatTableLength)) {
+            break goToReturnFalse;
+          }
+        }
+        if(--size==0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,IntOpenAddressHashSet thatSet) {
+    int size;
+    if((size=thisSet.size)==thatSet.size) {
+      if(size==0) {
+        return true;
+      }
+      final long word0=thatSet.word0,word1=thatSet.word1,word2=thatSet.word2,word3=thatSet.word3;
+      final int[] thatTable;
+      final int thatTableLength=(thatTable=thatSet.table).length-1;
+      goToReturnFalse:for(final var val:thisSet.table) {
+        if(val==null || val==RefOpenAddressHashSet.DELETED) {
+          continue;
+        }
+        if(!(val instanceof Integer)) {
+          break goToReturnFalse;
+        }
+        final int v;
+        goToHasNext:switch((v=(int)val)>>6) {
+        #MACRO WordsContain(v,case -2,case -1,case 0,case 1)
+        default:
+          if(!tableContains(thatTable,thatTableLength,v,v&thatTableLength)) {
+            break goToReturnFalse;
+          }
+        }
+        if(--size==0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,LongOpenAddressHashSet thatSet) {
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  #MACRO TableContains<Ref>(Object,null)
+  #MACRO TableContains<Long>(long,0L)
+  #MACRO TableContains<Int>(int,0)
+  #MACRO TableContains<Short>(short,0)
+  #MACRO TableContains<Char>(char,0)
+}
+#MACRODEF IsEqualToSetOpenAddressHashSet<CLASSPREFIX>(TYPEPARAMETER)
+static boolean isEqualTo(Set<?> thisSet,CLASSPREFIXOpenAddressHashSetTYPEPARAMETER thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    return isEqualToHelper(thisSet,thatSet,size);
+}
+static boolean isEqualTo(Set<?> thisSet,CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER thatSet) {
+  final int size;
+  if((size=thatSet.size)==0) {
+      return thisSet.isEmpty();
+  }
+  final int modCount=thatSet.modCount;
+  try {
+    return isEqualToHelper(thisSet,thatSet,size);
+  }finally {
+    CheckedCollection.checkModCount(modCount,thatSet.modCount);
+  }
+}
+#ENDDEF
+#MACRODEF ItrHasNextOrReturnTrue()
+if(!itr.hasNext()) {
+  return true;
+}
+#ENDDEF
+#MACRODEF WordsContain(VAL,word0Case,word1Case,word2Case,word3Case)
+word0Case:
+     if((word0>>>VAL&1L)==0) {
+         break goToReturnFalse;
+     }
+     break goToHasNext;
+word1Case:
+     if((word1>>>VAL&1L)==0) {
+         break goToReturnFalse;
+     }
+     break goToHasNext;
+word2Case:
+     if((word2>>>VAL&1L)==0) {
+         break goToReturnFalse;
+     }
+     break goToHasNext;
+word3Case:
+     if((word3>>>VAL&1L)==0) {
+         break goToReturnFalse;
+     }
+     break goToHasNext;
+#ENDDEF
+#MACRODEF TableContains<CLASSPREFIX>(ARRTYPE,EMPTYVAL)
+static boolean tableContains(ARRTYPE val,ARRTYPE[] table,int tableLength,int hash){
+  ARRTYPE tableVal;
+  if((tableVal=table[hash])!=EMPTYVAL){
+    final int initialHash=hash;
+    do{
+#IFSWITCH CLASSPREFIX==Ref
+      if(val.equals(tableVal)){
+#ELSE
+      if(val==tableVal){
+#ENDIF
+        return true;
+      }
+    }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=EMPTYVAL);
+  }
+  return false;
+}
+#ENDDEF

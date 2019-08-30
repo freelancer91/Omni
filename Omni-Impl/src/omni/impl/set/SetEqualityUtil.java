@@ -249,7 +249,6 @@ interface SetEqualityUtil{
         final int tableLength;
         return thisSet.size==2 && refTableContains(table=thisSet.table,tableLength=table.length-1,Boolean.FALSE,1237)&&refTableContains(table,tableLength,Boolean.TRUE,1231);
       }
-      
     }
     
     static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,ByteSetImpl thatSet) {
@@ -267,26 +266,27 @@ interface SetEqualityUtil{
             break goToReturnFalse;
           }
           final byte v;
-          switch((v=(byte)val)>>6) {
+          goToHasNext:switch((v=(byte)val)>>6) {
           case -2:
             if((word0>>>v&1L)==0) {
               break goToReturnFalse;
             }
-            break;
+            break goToHasNext;
           case -1:
             if((word1>>>v&1L)==0) {
               break goToReturnFalse;
             }
-            break;
+            break goToHasNext;
           case 0:
             if((word2>>>v&1L)==0) {
               break goToReturnFalse;
             }
-            break;
+            break goToHasNext;
           default:
             if((word3>>>v&1L)==0) {
               break goToReturnFalse;
             }
+            break goToHasNext;
           }
           if(--size==0) {
             return true;
@@ -310,7 +310,7 @@ interface SetEqualityUtil{
             break goToReturnFalse;
           }
           final byte v;
-          switch((v=(byte)val)>>6) {
+          goToHasNext:switch((v=(byte)val)>>6) {
           case -2:
             if((word0>>>v&1L)==0) {
               break goToReturnFalse;
@@ -355,7 +355,7 @@ interface SetEqualityUtil{
             break goToReturnFalse;
           }
           final char v;
-          switch((v=(char)val)>>6) {
+          goToHasNext:switch((v=(char)val)>>6) {
           case 0:
             if((word0>>>v&1L)==0) {
               break goToReturnFalse;
@@ -1063,7 +1063,7 @@ interface SetEqualityUtil{
           if(val==tableVal){
             return true;
           }
-        }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
+        }while((hash=hash+1&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
       }
       return false;
     }
@@ -1075,7 +1075,7 @@ interface SetEqualityUtil{
           if(val==tableVal){
             return true;
           }
-        }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
+        }while((hash=hash+1&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
       }
       return false;
     }
