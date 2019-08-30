@@ -16,6 +16,7 @@ import java.util.ConcurrentModificationException;
 public class RefOpenAddressHashSet<E>
 extends AbstractOpenAddressHashSet<E>
 implements OmniSet.OfRef<E>{
+/*
   static int tableHash(Object val){
   //TODO improve this hash function
     int tmp;
@@ -30,9 +31,11 @@ implements OmniSet.OfRef<E>{
   //TODO improve this hash function
     return val^(val>>>16);
   }
+*/
   static final Object NULL=new Object();
-  static final int NULLHASH=tableHash(NULL);
+  static final int NULLHASH=SetCommonImpl.tableHash(NULL);
   static final Object DELETED=new Object();
+  /*
   static boolean tableContains(Object val,int hash,Object[] table,int tableLength){
     Object tableVal;
     if((tableVal=table[hash&=tableLength])!=null){
@@ -45,7 +48,9 @@ implements OmniSet.OfRef<E>{
     }
     return false;
   }
+  */
   private static void quickInsert(Object[] table,Object val){
+  //TODO move this to SetCommonImpl
     int tableLength;
     int hash;
     for(hash=((hash=val.hashCode()) ^ hash >>> 16) & (tableLength=table.length-1);;){
@@ -94,7 +99,7 @@ implements OmniSet.OfRef<E>{
     if(val==null){
       return addToTable(NULL,NULLHASH);
     }
-    return addToTable(val,tableHash(val));
+    return addToTable(val,SetCommonImpl.tableHash(val));
   }
   @Override public void clear() {
     if(size!=0) {
@@ -112,24 +117,24 @@ implements OmniSet.OfRef<E>{
     return size!=0 && tableContains(val,val?1231:1237);
   }
   @Override public boolean contains(byte val){
-    return size!=0 && tableContains(val,tableHash(val));
+    return size!=0 && tableContains(val,SetCommonImpl.tableHash(val));
   }
   @Override public boolean contains(char val){
     return size!=0 && tableContains(val,val);
   }
   @Override public boolean contains(short val){
-    return size!=0 && tableContains(val,tableHash(val));
+    return size!=0 && tableContains(val,SetCommonImpl.tableHash(val));
   }
   @Override public boolean contains(int val){
-    return size!=0 && tableContains(val,tableHash(val));
+    return size!=0 && tableContains(val,SetCommonImpl.tableHash(val));
   }
   @Override public boolean contains(long val){
-    return size!=0 && tableContains(val,tableHash(val));
+    return size!=0 && tableContains(val,SetCommonImpl.tableHash(val));
   }
   @Override public boolean contains(float val){
     if(size!=0){
       if(val==val){
-        return tableContains(val,tableHash(Float.floatToRawIntBits(val)));
+        return tableContains(val,SetCommonImpl.tableHash(Float.floatToRawIntBits(val)));
       }
       return tableContains(Float.NaN,0x7fc00000 ^ 0x7fc00000 >>> 16);
     }
@@ -138,7 +143,7 @@ implements OmniSet.OfRef<E>{
   @Override public boolean contains(double val){
     if(size!=0){
       if(val==val){
-        return tableContains(val,tableHash(Double.doubleToRawLongBits(val)));
+        return tableContains(val,SetCommonImpl.tableHash(Double.doubleToRawLongBits(val)));
       }
       return tableContains(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
     }
@@ -432,7 +437,7 @@ implements OmniSet.OfRef<E>{
   }
   @Override public boolean removeVal(byte val){
     int size;
-    if((size=this.size)!=0 && removeFromTable(val,tableHash(val))){
+    if((size=this.size)!=0 && removeFromTable(val,SetCommonImpl.tableHash(val))){
       this.size=size-1;
       return true;
     }
@@ -451,7 +456,7 @@ implements OmniSet.OfRef<E>{
   @Override public boolean removeVal(short val){
     int size;
     if((size=this.size)!=0){
-      if(removeFromTable(val,tableHash(val))){
+      if(removeFromTable(val,SetCommonImpl.tableHash(val))){
         this.size=size-1;
         return true;
       }
@@ -461,7 +466,7 @@ implements OmniSet.OfRef<E>{
   @Override public boolean removeVal(int val){
     int size;
     if((size=this.size)!=0){
-      if(removeFromTable(val,tableHash(val))){
+      if(removeFromTable(val,SetCommonImpl.tableHash(val))){
         this.size=size-1;
         return true;
       }
@@ -472,7 +477,7 @@ implements OmniSet.OfRef<E>{
     int size;
     if((size=this.size)!=0)
     {
-      if(removeFromTable(val,tableHash(val)))
+      if(removeFromTable(val,SetCommonImpl.tableHash(val)))
       {
         this.size=size-1;
         return true;
@@ -486,7 +491,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val==val){
-            if(removeFromTable(val,tableHash(Float.floatToRawIntBits(val)))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(Float.floatToRawIntBits(val)))){
               break returnTrue;
             }
           }else if(removeFromTable(Float.NaN,0x7fc00000 ^ 0x7fc00000 >>> 16)){
@@ -506,7 +511,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val==val){
-            if(removeFromTable(val,tableHash(Double.doubleToRawLongBits(val)))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(Double.doubleToRawLongBits(val)))){
               break returnTrue;
             }
           }else if(removeFromTable(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)){
@@ -547,7 +552,7 @@ implements OmniSet.OfRef<E>{
         returnTrue:for(;;){
           if(val!=null){
             int hash;
-            if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
+            if(removeFromTable(val,val.hashCode())){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -587,8 +592,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            int hash;
-            if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
+            if(removeFromTable(val,val.hashCode())){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -608,8 +612,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            int hash;
-            if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -629,8 +632,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            int hash;
-            if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -652,8 +654,7 @@ implements OmniSet.OfRef<E>{
           if(val!=null){
             float f;
             if((f=(float)val)==f){
-              int hash;
-              if(removeFromTable(val,(hash=Float.floatToRawIntBits(val))^(hash>>>16))){
+              if(removeFromTable(val,SetCommonImpl.tableHash(Float.floatToRawIntBits(f)))){
                 break returnTrue;
               }
             }else if(removeFromTable(Float.NaN,0x7fc00000 ^ 0x7fc00000 >>> 16)){
@@ -678,9 +679,7 @@ implements OmniSet.OfRef<E>{
           if(val!=null){
             double d;
             if((d=(double)val)==d){
-              long bits;
-              int hash;
-              if((removeFromTable(val,(hash=(int)((bits=Double.doubleToRawLongBits(d))^(bits>>>32)))^(hash>>>16)))){
+              if((removeFromTable(val,SetCommonImpl.tableHash(Double.doubleToRawLongBits(d)))){
                 break returnTrue;
               }
             }else if(removeFromTable(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)){

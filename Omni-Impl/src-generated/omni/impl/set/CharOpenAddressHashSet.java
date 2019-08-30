@@ -18,6 +18,8 @@ import omni.util.OmniArray;
 public class CharOpenAddressHashSet
 extends AbstractIntegralTypeOpenAddressHashSet<Character>
 implements OmniSet.OfChar{
+/*
+*/
   private  static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
     int hash=(int)(magicWord >>> 32);
     int numLeft=(int)magicWord;
@@ -32,6 +34,7 @@ implements OmniSet.OfChar{
     return numLeft | (long)hash << 32;
   }
   private static void quickInsert(char[] table,char val){
+  //TODO move this to SetCommonImpl
     int tableLength;
     int hash;
     for(hash=(val) & (tableLength=table.length-1);;){

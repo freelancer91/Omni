@@ -20,11 +20,14 @@ import omni.util.ToStringUtil;
 public class FloatOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Float>
 implements OmniSet.OfFloat{
+/*
   static int tableHash(int bits){
   //TODO improve this hash function
     return bits^(bits>>>16);
   }
+*/
   private static void quickInsert(int[] table,int val){
+  //TODO move this to SetCommonImpl
     int tableLength;
     int hash;
     for(hash=(val^val>>>16) & (tableLength=table.length-1);;){
@@ -83,27 +86,27 @@ implements OmniSet.OfFloat{
       return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
     int intBits;
-    return addToTable(intBits=Float.floatToRawIntBits(val),tableHash(intBits));
+    return addToTable(intBits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(intBits));
   }
   @Override public boolean add(short val){
     if(val==0){
       return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
     int intBits;
-    return addToTable(intBits=Float.floatToRawIntBits(val),tableHash(intBits));
+    return addToTable(intBits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(intBits));
   }
   @Override public boolean add(int val){
     if(val == 0){
       return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
-    return addToTable(val=Float.floatToRawIntBits(val),tableHash(val));
+    return addToTable(val=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(val));
   }
   @Override public boolean add(long val){
     if(val == 0){
       return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
     int bits;
-    return addToTable(bits=Float.floatToRawIntBits(val),tableHash(bits));
+    return addToTable(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits));
   }
   @Override public boolean add(float val){
     if(val == val){
@@ -111,7 +114,7 @@ implements OmniSet.OfFloat{
       if((bits=Float.floatToRawIntBits(val)) == 0){
         return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
-      return addToTable(bits,tableHash(bits));
+      return addToTable(bits,SetCommonImpl.tableHash(bits));
     }
     return addToTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
   }
@@ -145,7 +148,7 @@ implements OmniSet.OfFloat{
         return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
       int bits;
-      return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
+      return tableContains(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits));
     }
     return false;
   }
@@ -155,7 +158,7 @@ implements OmniSet.OfFloat{
         return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
       int bits;
-      return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
+      return tableContains(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits));
     }
     return false;
   }
@@ -166,7 +169,7 @@ implements OmniSet.OfFloat{
       }
       else if(TypeUtil.checkCastToFloat(val))
       {
-        return tableContains(val=Float.floatToRawIntBits(val),tableHash(val));
+        return tableContains(val=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(val));
       }
     }
     return false;
@@ -177,7 +180,7 @@ implements OmniSet.OfFloat{
         return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }else if(TypeUtil.checkCastToFloat(val)) {
         int bits;
-        return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
+        return tableContains(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits));
       }
     }
     return false;
@@ -187,7 +190,7 @@ implements OmniSet.OfFloat{
       if(val==val) {
         int bits;
         if((bits=Float.floatToRawIntBits(val))!=0) {
-          return tableContains(bits,tableHash(bits));
+          return tableContains(bits,SetCommonImpl.tableHash(bits));
         }
         return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
@@ -206,7 +209,7 @@ implements OmniSet.OfFloat{
         {
         return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
         }
-        return tableContains(bits,tableHash(bits));
+        return tableContains(bits,SetCommonImpl.tableHash(bits));
       }
       else
       if(d!=d)
@@ -277,7 +280,7 @@ implements OmniSet.OfFloat{
             }else {
               break returnFalse;
             }
-            return tableContains(bits,tableHash(bits));
+            return tableContains(bits,SetCommonImpl.tableHash(bits));
           }
           return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
         }
@@ -448,7 +451,7 @@ implements OmniSet.OfFloat{
               }else {
                 break returnFalse;
               }
-              if(removeFromTable(bits,tableHash(bits))) {
+              if(removeFromTable(bits,SetCommonImpl.tableHash(bits))) {
                 break returnTrue;
               }
               break returnFalse;
@@ -510,7 +513,7 @@ implements OmniSet.OfFloat{
             }
           }else{
             int bits;
-            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -533,7 +536,7 @@ implements OmniSet.OfFloat{
             }
           }else{
             int bits;
-            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -558,7 +561,7 @@ implements OmniSet.OfFloat{
           else if(TypeUtil.checkCastToFloat(val))
           {
             int bits;
-            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -588,7 +591,7 @@ implements OmniSet.OfFloat{
           else if(TypeUtil.checkCastToFloat(val))
           {
             int bits;
-            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits)))
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),SetCommonImpl.tableHash(bits)))
             {
               break returnTrue;
             }
@@ -609,7 +612,7 @@ implements OmniSet.OfFloat{
           if(val==val) {
             int bits;
             if((bits=Float.floatToRawIntBits(val))!=0) {
-              if(removeFromTable(bits,tableHash(bits))) {
+              if(removeFromTable(bits,SetCommonImpl.tableHash(bits))) {
                 break returnTrue;
               }
             }else if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
@@ -639,7 +642,7 @@ implements OmniSet.OfFloat{
               if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
                 break returnTrue;
               }
-            }else if(removeFromTable(bits,tableHash(bits))) {
+            }else if(removeFromTable(bits,SetCommonImpl.tableHash(bits))) {
               break returnTrue;
             }
           }

@@ -19,12 +19,15 @@ import omni.util.TypeUtil;
 public class DoubleOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Double>
 implements OmniSet.OfDouble{
+/*
   static int tableHash(long bits){
   //TODO improve this hash function
     int tmp;
     return (tmp=(int)(bits^(bits>>>32)))^(tmp>>>16);
   }
+*/
   private static void quickInsert(long[] table,long val){
+  //TODO move this to SetCommonImpl
     int tableLength;
     int hash;
     for(hash=((hash=(int)(val ^ val >>> 32)) ^ hash >>> 16) & (tableLength=table.length-1);;){
@@ -80,13 +83,13 @@ implements OmniSet.OfDouble{
       return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
     }
     long bits;
-    return addToTable(bits=Double.doubleToRawLongBits(val),tableHash(bits));
+    return addToTable(bits=Double.doubleToRawLongBits(val),SetCommonImpl.tableHash(bits));
   }
   @Override public boolean add(long val){
     if(val == 0){
       return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
     }
-    return addToTable(val=Double.doubleToRawLongBits(val),tableHash(val));
+    return addToTable(val=Double.doubleToRawLongBits(val),SetCommonImpl.tableHash(val));
   }
   @Override public boolean add(float val){
     if(val == val){
@@ -94,7 +97,7 @@ implements OmniSet.OfDouble{
       if((bits=Double.doubleToRawLongBits(val)) == 0){
         return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }
-      return addToTable(bits,tableHash(bits));
+      return addToTable(bits,SetCommonImpl.tableHash(bits));
     }
     return addToTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
   }
@@ -105,7 +108,7 @@ implements OmniSet.OfDouble{
       if((longBits=Double.doubleToRawLongBits(val)) == 0){
         return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }
-      return addToTable(longBits,tableHash(longBits));
+      return addToTable(longBits,SetCommonImpl.tableHash(longBits));
     }
     return addToTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32)
             ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
@@ -141,7 +144,7 @@ implements OmniSet.OfDouble{
       }
       {
         long bits;
-        return tableContains(bits=Double.doubleToRawLongBits(val),tableHash(bits));
+        return tableContains(bits=Double.doubleToRawLongBits(val),SetCommonImpl.tableHash(bits));
       }
     }
     return false;
@@ -151,7 +154,7 @@ implements OmniSet.OfDouble{
       if(val==0) {
         return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }else if(TypeUtil.checkCastToDouble(val)) {
-        return tableContains(val=Double.doubleToRawLongBits(val),tableHash(val));
+        return tableContains(val=Double.doubleToRawLongBits(val),SetCommonImpl.tableHash(val));
       }
     }
     return false;
@@ -161,7 +164,7 @@ implements OmniSet.OfDouble{
       if(val==val) {
         long bits;
         if((bits=Double.doubleToRawLongBits(val))!=0) {
-          return tableContains(bits,tableHash(bits));
+          return tableContains(bits,SetCommonImpl.tableHash(bits));
         }
         return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }
@@ -177,7 +180,7 @@ implements OmniSet.OfDouble{
         {
         return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
         }
-        return tableContains(bits,tableHash(bits));
+        return tableContains(bits,SetCommonImpl.tableHash(bits));
       }
       else
       {
@@ -238,7 +241,7 @@ implements OmniSet.OfDouble{
             }else {
               break returnFalse;
             }
-            return tableContains(bits,tableHash(bits));
+            return tableContains(bits,SetCommonImpl.tableHash(bits));
           }
           return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
         }
@@ -397,7 +400,7 @@ implements OmniSet.OfDouble{
               }else {
                 break returnFalse;
               }
-              if(removeFromTable(bits,tableHash(bits))) {
+              if(removeFromTable(bits,SetCommonImpl.tableHash(bits))) {
                 break returnTrue;
               }
               break returnFalse;
@@ -460,7 +463,7 @@ implements OmniSet.OfDouble{
           }
           {
             long bits;
-            if(removeFromTable(bits=Double.doubleToRawLongBits(val),tableHash(bits))) {
+            if(removeFromTable(bits=Double.doubleToRawLongBits(val),SetCommonImpl.tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -490,7 +493,7 @@ implements OmniSet.OfDouble{
           else if(TypeUtil.checkCastToDouble(val))
           {
             long bits;
-            if(removeFromTable(bits=Double.doubleToRawLongBits(val),tableHash(bits)))
+            if(removeFromTable(bits=Double.doubleToRawLongBits(val),SetCommonImpl.tableHash(bits)))
             {
               break returnTrue;
             }
@@ -511,7 +514,7 @@ implements OmniSet.OfDouble{
           if(val==val) {
             long bits;
             if((bits=Double.doubleToRawLongBits(val))!=0) {
-              if(removeFromTable(bits,tableHash(bits))) {
+              if(removeFromTable(bits,SetCommonImpl.tableHash(bits))) {
                 break returnTrue;
               }
             }else if(removeFromTable(0xfffc000000000000L,((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))^(((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))>>>16))) {
@@ -539,7 +542,7 @@ implements OmniSet.OfDouble{
               if(removeFromTable(0xfffc000000000000L,((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))^(((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))>>>16))) {
                 break returnTrue;
               }
-            }else if(removeFromTable(bits,tableHash(bits))) {
+            }else if(removeFromTable(bits,SetCommonImpl.tableHash(bits))) {
               break returnTrue;
             }
           }

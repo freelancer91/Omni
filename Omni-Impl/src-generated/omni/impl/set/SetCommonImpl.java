@@ -1,4 +1,3 @@
-#TYPEDEF OfGeneric
 package omni.impl.set;
 import java.util.Iterator;
 import java.util.Set;
@@ -47,7 +46,26 @@ interface SetCommonImpl{
             if((val=itr.next()) instanceof Byte) {
                 final byte v;
                 switch((v=(byte)val)>>6) {
-                #MACRO WordsContain(case -2,case -1,case 0,default)
+                case -2:
+                     if((word0>>>v&1L)==0) {
+                         break goToReturnFalse;
+                     }
+                     break goToHasNext;
+                case -1:
+                     if((word1>>>v&1L)==0) {
+                         break goToReturnFalse;
+                     }
+                     break goToHasNext;
+                case 0:
+                     if((word2>>>v&1L)==0) {
+                         break goToReturnFalse;
+                     }
+                     break goToHasNext;
+                default:
+                     if((word3>>>v&1L)==0) {
+                         break goToReturnFalse;
+                     }
+                     break goToHasNext;
                 }
             }
             break goToReturnFalse;
@@ -70,7 +88,26 @@ interface SetCommonImpl{
              goToReturnFalse:do {
                  final byte v;
                  goToHasNext:switch((v=(byte)val)>>6) {
-                 #MACRO WordsContain(case -2,case -1,case 0,default)
+                 case -2:
+                      if((word0>>>v&1L)==0) {
+                          break goToReturnFalse;
+                      }
+                      break goToHasNext;
+                 case -1:
+                      if((word1>>>v&1L)==0) {
+                          break goToReturnFalse;
+                      }
+                      break goToHasNext;
+                 case 0:
+                      if((word2>>>v&1L)==0) {
+                          break goToReturnFalse;
+                      }
+                      break goToHasNext;
+                 default:
+                      if((word3>>>v&1L)==0) {
+                          break goToReturnFalse;
+                      }
+                      break goToHasNext;
                  }
                  if(!itr.hasNext()) {
                    return true;
@@ -82,14 +119,139 @@ interface SetCommonImpl{
     }
     return false;
   }
-  #MACRO IsEqualToSetOpenAddressHashSet<Char>( )
-  #MACRO IsEqualToSetOpenAddressHashSet<Short>( )
-  #MACRO IsEqualToSetOpenAddressHashSet<Int>( )
-  #MACRO IsEqualToSetOpenAddressHashSet<Long>( )
-  #MACRO IsEqualToSetOpenAddressHashSet<Float>( )
-  #MACRO IsEqualToSetOpenAddressHashSet<Double>( )
-  #MACRO IsEqualToSetOpenAddressHashSet<Ref>(<?>)
-  
+  static boolean isEqualTo(Set<?> thisSet,CharOpenAddressHashSet  thatSet) {
+      final int size;
+      if((size=thatSet.size)==0) {
+          return thisSet.isEmpty();
+      }
+      return isEqualToHelper(thisSet,thatSet,size);
+  }
+  static boolean isEqualTo(Set<?> thisSet,CharOpenAddressHashSet.Checked  thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+      return isEqualToHelper(thisSet,thatSet,size);
+    }finally {
+      CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+  }
+  static boolean isEqualTo(Set<?> thisSet,ShortOpenAddressHashSet  thatSet) {
+      final int size;
+      if((size=thatSet.size)==0) {
+          return thisSet.isEmpty();
+      }
+      return isEqualToHelper(thisSet,thatSet,size);
+  }
+  static boolean isEqualTo(Set<?> thisSet,ShortOpenAddressHashSet.Checked  thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+      return isEqualToHelper(thisSet,thatSet,size);
+    }finally {
+      CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+  }
+  static boolean isEqualTo(Set<?> thisSet,IntOpenAddressHashSet  thatSet) {
+      final int size;
+      if((size=thatSet.size)==0) {
+          return thisSet.isEmpty();
+      }
+      return isEqualToHelper(thisSet,thatSet,size);
+  }
+  static boolean isEqualTo(Set<?> thisSet,IntOpenAddressHashSet.Checked  thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+      return isEqualToHelper(thisSet,thatSet,size);
+    }finally {
+      CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+  }
+  static boolean isEqualTo(Set<?> thisSet,LongOpenAddressHashSet  thatSet) {
+      final int size;
+      if((size=thatSet.size)==0) {
+          return thisSet.isEmpty();
+      }
+      return isEqualToHelper(thisSet,thatSet,size);
+  }
+  static boolean isEqualTo(Set<?> thisSet,LongOpenAddressHashSet.Checked  thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+      return isEqualToHelper(thisSet,thatSet,size);
+    }finally {
+      CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+  }
+  static boolean isEqualTo(Set<?> thisSet,FloatOpenAddressHashSet  thatSet) {
+      final int size;
+      if((size=thatSet.size)==0) {
+          return thisSet.isEmpty();
+      }
+      return isEqualToHelper(thisSet,thatSet,size);
+  }
+  static boolean isEqualTo(Set<?> thisSet,FloatOpenAddressHashSet.Checked  thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+      return isEqualToHelper(thisSet,thatSet,size);
+    }finally {
+      CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+  }
+  static boolean isEqualTo(Set<?> thisSet,DoubleOpenAddressHashSet  thatSet) {
+      final int size;
+      if((size=thatSet.size)==0) {
+          return thisSet.isEmpty();
+      }
+      return isEqualToHelper(thisSet,thatSet,size);
+  }
+  static boolean isEqualTo(Set<?> thisSet,DoubleOpenAddressHashSet.Checked  thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+      return isEqualToHelper(thisSet,thatSet,size);
+    }finally {
+      CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+  }
+  static boolean isEqualTo(Set<?> thisSet,RefOpenAddressHashSet<?> thatSet) {
+      final int size;
+      if((size=thatSet.size)==0) {
+          return thisSet.isEmpty();
+      }
+      return isEqualToHelper(thisSet,thatSet,size);
+  }
+  static boolean isEqualTo(Set<?> thisSet,RefOpenAddressHashSet.Checked<?> thatSet) {
+    final int size;
+    if((size=thatSet.size)==0) {
+        return thisSet.isEmpty();
+    }
+    final int modCount=thatSet.modCount;
+    try {
+      return isEqualToHelper(thisSet,thatSet,size);
+    }finally {
+      CheckedCollection.checkModCount(modCount,thatSet.modCount);
+    }
+  }
   static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,BooleanSetImpl thatSet) {
     switch(thatSet.state) {
     case 0b00:
@@ -120,7 +282,26 @@ interface SetCommonImpl{
           }
           final byte v;
           goToHasNext:switch((v=(byte)val)>>6) {
-          #MACRO WordsContain(case -2,case -1,case 0,default)
+          case -2:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case -1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 0:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          default:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           }
           if(--size==0) {
             return true;
@@ -146,7 +327,26 @@ interface SetCommonImpl{
           }
           final byte v;
           goToHasNext:switch((v=(byte)val)>>6) {
-          #MACRO WordsContain(case -2,case -1,case 0,default)
+          case -2:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case -1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 0:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          default:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           }
           if(--size==0) {
             return true;
@@ -174,7 +374,26 @@ interface SetCommonImpl{
           }
           final char v;
           goToHasNext:switch((v=(char)val)>>6) {
-          #MACRO WordsContain(case 0,case 1,case 2,case 3)
+          case 0:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 2:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 3:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           default:
             if(tableContains(v,thatTable,thatTableLength,v&thatTableLength)) {
               break;
@@ -207,7 +426,26 @@ interface SetCommonImpl{
           }
           final short v;
           goToHasNext:switch((v=(short)val)>>6) {
-          #MACRO WordsContain(case -2,case -1,case 0,case 1)
+          case -2:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case -1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 0:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 1:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           default:
             if(tableContains(v,thatTable,thatTableLength,v&thatTableLength)) {
               break;
@@ -240,7 +478,26 @@ interface SetCommonImpl{
           }
           final int v;
           goToHasNext:switch((v=(int)val)>>6) {
-          #MACRO WordsContain(case -2,case -1,case 0,case 1)
+          case -2:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case -1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 0:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 1:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           default:
             if(tableContains(v,thatTable,thatTableLength,v&thatTableLength)) {
               break;
@@ -276,7 +533,26 @@ interface SetCommonImpl{
             final int v;
             if((l=(long)val)==(v=(int)l)) {
               switch(v>>6){
-              #MACRO WordsContain(case -2,case -1,case 0,case 1)
+              case -2:
+                   if((word0>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
+              case -1:
+                   if((word1>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
+              case 0:
+                   if((word2>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
+              case 1:
+                   if((word3>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
               default:
               }
             }
@@ -390,6 +666,27 @@ interface SetCommonImpl{
     }
     return false;
   }
+  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,RefOpenAddressHashSet.Checked<?> thatSet){
+    final int size;
+    if((size=thisSet.size)==thatSet.size){
+      if(size==0){
+        return true;
+      }
+      final int thatModCount=thatSet.modCount;
+      try{
+        final Object[] thisTable,thatTable;
+        final int thisTableLength,thatTableLength;
+        if((thisTableLength=(thisTable=thisSet.table).length)<=(thatTableLength=(thatTable=thatSet.table).length)){
+          return tableContainsAllRefRef(thisTable,thatTable,thatTableLength-1,size);
+        }else{
+          return tableContainsAllRefRef(thatTable,thisTable,thisTableLength-1,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(thatModCount,thatSet.modCount);
+      }
+    }
+    return false;
+  }
   static boolean isEqualTo(RefOpenAddressHashSet.Checked<?> thisSet,RefOpenAddressHashSet<?> thatSet){
     final int size;
     if((size=thisSet.size)==thatSet.size){
@@ -434,7 +731,6 @@ interface SetCommonImpl{
     }
     return false;
   }
-
   private static boolean tableContainsAllRefRef(Object[] smallTable,Object[] bigTable,int bigTableLength,int numInTable){
     for(int tableIndex=0;;++tableIndex){
       Object smallTableVal;
@@ -465,7 +761,26 @@ interface SetCommonImpl{
         goToReturnFalse:do{
           final char v;
           goToHasNext:switch((v=(char)val)>>6){
-          #MACRO WordsContain(case 0,case 1,case 2,case 3)
+          case 0:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 2:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 3:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           default:
             if(tableContains(v,table,tableLength,v&tableLength)){
               break goToHasNext;
@@ -489,7 +804,26 @@ interface SetCommonImpl{
         goToReturnFalse:do{
           final short v;
           goToHasNext:switch((v=(short)val)>>6){
-          #MACRO WordsContain(case -2,case -1,case 0,case 1)
+          case -2:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case -1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 0:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 1:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           default:
             if(tableContains(v,table,tableLength,v&tableLength)){
               break goToHasNext;
@@ -513,7 +847,26 @@ interface SetCommonImpl{
         goToReturnFalse:do{
           final int v;
           goToHasNext:switch((v=(int)val)>>6){
-          #MACRO WordsContain(case -2,case -1,case 0,case 1)
+          case -2:
+               if((word0>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case -1:
+               if((word1>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 0:
+               if((word2>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
+          case 1:
+               if((word3>>>v&1L)==0) {
+                   break goToReturnFalse;
+               }
+               break goToHasNext;
           default:
             if(tableContains(v,table,tableLength,v&tableLength)){
               break goToHasNext;
@@ -540,7 +893,26 @@ interface SetCommonImpl{
             final int v;
             if((l=(long)val)==(v=(int)l)) {
               switch(v>>6){
-              #MACRO WordsContain(case -2,case -1,case 0,case 1)
+              case -2:
+                   if((word0>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
+              case -1:
+                   if((word1>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
+              case 0:
+                   if((word2>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
+              case 1:
+                   if((word3>>>v&1L)==0) {
+                       break goToReturnFalse;
+                   }
+                   break goToHasNext;
               default:
               }
             }
@@ -641,71 +1013,64 @@ interface SetCommonImpl{
     }
     return false;
   }
-  
-  #MACRO TableContains<Ref>(Object,null)
-  #MACRO TableContains<Long>(long,0L)
-  #MACRO TableContains<Int>(int,0)
-  #MACRO TableContains<Short>(short,0)
-  #MACRO TableContains<Char>(char,0)
-}
-#MACRODEF IsEqualToSetOpenAddressHashSet<CLASSPREFIX>(TYPEPARAMETER)
-static boolean isEqualTo(Set<?> thisSet,CLASSPREFIXOpenAddressHashSetTYPEPARAMETER thatSet) {
-    final int size;
-    if((size=thatSet.size)==0) {
-        return thisSet.isEmpty();
+  static boolean tableContains(Object val,Object[] table,int tableLength,int hash){
+    Object tableVal;
+    if((tableVal=table[hash])!=null){
+      final int initialHash=hash;
+      do{
+        if(val.equals(tableVal)){
+          return true;
+        }
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=null);
     }
-    return isEqualToHelper(thisSet,thatSet,size);
-}
-static boolean isEqualTo(Set<?> thisSet,CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER thatSet) {
-  final int size;
-  if((size=thatSet.size)==0) {
-      return thisSet.isEmpty();
+    return false;
   }
-  final int modCount=thatSet.modCount;
-  try {
-    return isEqualToHelper(thisSet,thatSet,size);
-  }finally {
-    CheckedCollection.checkModCount(modCount,thatSet.modCount);
+  static boolean tableContains(long val,long[] table,int tableLength,int hash){
+    long tableVal;
+    if((tableVal=table[hash])!=0L){
+      final int initialHash=hash;
+      do{
+        if(val==tableVal){
+          return true;
+        }
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0L);
+    }
+    return false;
+  }
+  static boolean tableContains(int val,int[] table,int tableLength,int hash){
+    int tableVal;
+    if((tableVal=table[hash])!=0){
+      final int initialHash=hash;
+      do{
+        if(val==tableVal){
+          return true;
+        }
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
+    }
+    return false;
+  }
+  static boolean tableContains(short val,short[] table,int tableLength,int hash){
+    short tableVal;
+    if((tableVal=table[hash])!=0){
+      final int initialHash=hash;
+      do{
+        if(val==tableVal){
+          return true;
+        }
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
+    }
+    return false;
+  }
+  static boolean tableContains(char val,char[] table,int tableLength,int hash){
+    char tableVal;
+    if((tableVal=table[hash])!=0){
+      final int initialHash=hash;
+      do{
+        if(val==tableVal){
+          return true;
+        }
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
+    }
+    return false;
   }
 }
-#ENDDEF
-#MACRODEF WordsContain(word0Case,word1Case,word2Case,word3Case)
-word0Case:
-     if((word0>>>v&1L)==0) {
-         break goToReturnFalse;
-     }
-     break goToHasNext;
-word1Case:
-     if((word1>>>v&1L)==0) {
-         break goToReturnFalse;
-     }
-     break goToHasNext;
-word2Case:
-     if((word2>>>v&1L)==0) {
-         break goToReturnFalse;
-     }
-     break goToHasNext;
-word3Case:
-     if((word3>>>v&1L)==0) {
-         break goToReturnFalse;
-     }
-     break goToHasNext;
-#ENDDEF
-#MACRODEF TableContains<CLASSPREFIX>(ARRTYPE,EMPTYVAL)
-static boolean tableContains(ARRTYPE val,ARRTYPE[] table,int tableLength,int hash){
-  ARRTYPE tableVal;
-  if((tableVal=table[hash])!=EMPTYVAL){
-    final int initialHash=hash;
-    do{
-#IFSWITCH CLASSPREFIX==Ref
-      if(val.equals(tableVal)){
-#ELSE
-      if(val==tableVal){
-#ENDIF
-        return true;
-      }
-    }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=EMPTYVAL);
-  }
-  return false;
-}
-#ENDDEF

@@ -19,6 +19,8 @@ import omni.util.ToStringUtil;
 public class IntOpenAddressHashSet
 extends AbstractIntegralTypeOpenAddressHashSet<Integer>
 implements OmniSet.OfInt{
+/*
+*/
   private  static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
     int hash=(int)(magicWord >>> 32);
     int numLeft=(int)magicWord;
@@ -33,6 +35,7 @@ implements OmniSet.OfInt{
     return numLeft | (long)hash << 32;
   }
   private static void quickInsert(int[] table,int val){
+  //TODO move this to SetCommonImpl
     int tableLength;
     int hash;
     for(hash=(val) & (tableLength=table.length-1);;){

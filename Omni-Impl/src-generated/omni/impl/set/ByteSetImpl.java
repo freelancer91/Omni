@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.Iterator;
 import omni.api.OmniSet;
 import omni.api.OmniIterator;
 import omni.function.ByteConsumer;
@@ -40,9 +39,6 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   }
   @Override public Object clone(){
       return new ByteSetImpl(this);
-  }
-  static int size(long word0,long word1,long word2,long word3){
-    return Long.bitCount(word0) + Long.bitCount(word1) + Long.bitCount(word2) + Long.bitCount(word3);
   }
   private static long processWordToString(long word,int valOffset,int valBound,byte[] buffer,long magicWord){
     int bufferOffset=(int)(magicWord >>> 32);
@@ -100,7 +96,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public String toString(){
     int size;
     long word0,word1,word2,word3;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
       return toStringHelper(word0,word1,word2,word3,size);
     }
     return "[]";
@@ -108,110 +104,13 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public int hashCode(){
     int size;
     long word0,word1,word2,word3;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
       return hashCodeHelper(word0,word1,word2,word3,size);
     }
     return 0;
   }
-  private static int isEqualToHelper(long word,int valOffset,int valBound,BytePredicate filter,int numLeft){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        if(!filter.test((byte)valBound)){
-          return -1;
-        }
-      }
-    }while(--numLeft!=0 && valBound!=valOffset);
-    return numLeft;
-  }
-  /*
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,ARRTYPE[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=CAST(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  */
-  boolean isEqualTo(Set<?> set){
-     final long word0,word1,word2,word3;
-     if(size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)==set.size()){
-       for(final var itr=set.iterator();;){
-         if(!itr.hasNext()){
-           return true;
-         }
-         Object val;
-         if((val=itr.next()) instanceof Byte){
-           byte v;
-           switch((v=(byte)val)>>6){
-             case -2:
-               if(((word0>>>v)&1L)!=0L){
-                 continue;
-               }
-               break;
-             case -1:
-               if(((word1>>>v)&1L)!=0L){
-                 continue;
-               }
-               break;
-             case 0:
-               if(((word2>>>v)&1L)!=0L){
-                 continue;
-               }
-               break;
-             default:
-               if(((word3>>>v)&1L)!=0L){
-                 continue;
-               }
-           }
-         }
-         break;
-       }
-     }
-     return false;
-  }
-  private boolean isEqualTo(ByteSetImpl set){
-    return this.word0==set.word0 && this.word1==set.word1 && this.word2==set.word2 && this.word3==set.word3;
-  }
-  boolean isEqualTo(RefOpenAddressHashSet<?> set){
-    int size;
-    final long word0,word1,word2,word3;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))==set.size){
-      if(size!=0){
-        final Object[] table;
-        final int tableLength=(table=set.table).length-1;
-        final BytePredicate tableContains;
-        switch(size=isEqualToHelper(word3,64,128,tableContains=thisVal->RefOpenAddressHashSet.tableContains(thisVal,thisVal,table,tableLength),size)){
-          case -1:
-            return false;
-          default:
-            switch(size=isEqualToHelper(word2,0,64,tableContains,size)){
-              case -1:
-                return false;
-              default:
-                switch(size=isEqualToHelper(word1,-64,0,tableContains,size)){
-                  case -1:
-                    return false;
-                  default:
-                    return isEqualToHelper(word0,-128,-64,tableContains,size)==0;
-                  case 0:
-                }
-              case 0:
-            }
-          case 0:
-        }
-      }
-      return true;
-    }
-    return false;
+  private boolean isEqualTo(ByteSetImpl thatSet){
+    return this.word0==thatSet.word0 && this.word1==thatSet.word1 && this.word2==thatSet.word2 && this.word3==thatSet.word3;
   }
   @Override public boolean equals(Object val){
     if(val==this){
@@ -220,9 +119,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if(val instanceof ByteSetImpl){
       return isEqualTo((ByteSetImpl)val);
     }else if(val instanceof RefOpenAddressHashSet){
-      return isEqualTo((RefOpenAddressHashSet<?>)val);
+      return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
     }else if(val instanceof Set){
-      return isEqualTo((Set<?>)val);
+      return SetCommonImpl.isEqualTo((Set<?>)val,this);
     }
     return false;
   }
@@ -418,7 +317,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     return word0 == 0 && word1 == 0 && word2 == 0 && word3 == 0;
   }
   @Override public int size(){
-    return size(word0,word1,word2,word3);
+    return SetCommonImpl.size(word0,word1,word2,word3);
   }
   private static int processWordCopyToArray(long word,int valOffset,int valBound,Object[] dst,int dstOffset){
     do{
@@ -477,7 +376,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public Byte[] toArray(){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
         Byte[] dst;
         toArrayHelper(word0,word1,word2,word3,size,dst=new Byte[size]);
         return dst;
@@ -514,7 +413,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public byte[] toByteArray(){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
         byte[] dst;
         toArrayHelper(word0,word1,word2,word3,size,dst=new byte[size]);
         return dst;
@@ -551,7 +450,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public short[] toShortArray(){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
         short[] dst;
         toArrayHelper(word0,word1,word2,word3,size,dst=new short[size]);
         return dst;
@@ -588,7 +487,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public int[] toIntArray(){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
         int[] dst;
         toArrayHelper(word0,word1,word2,word3,size,dst=new int[size]);
         return dst;
@@ -625,7 +524,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public long[] toLongArray(){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
         long[] dst;
         toArrayHelper(word0,word1,word2,word3,size,dst=new long[size]);
         return dst;
@@ -662,7 +561,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public float[] toFloatArray(){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
         float[] dst;
         toArrayHelper(word0,word1,word2,word3,size,dst=new float[size]);
         return dst;
@@ -699,7 +598,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public double[] toDoubleArray(){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
         double[] dst;
         toArrayHelper(word0,word1,word2,word3,size,dst=new double[size]);
         return dst;
@@ -709,7 +608,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     long word0,word1,word2,word3;
     int size;
-    T[] arr=arrConstructor.apply(size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
+    T[] arr=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
     if(size != 0){
       toArrayHelper(word0,word1,word2,word3,size,arr);
     }
@@ -718,7 +617,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public <T> T[] toArray(T[] dst){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
       toArrayHelper(word0,word1,word2,word3,size,dst=OmniArray.uncheckedArrResize(size,dst));
     }else if(dst.length != 0){
       dst[0]=null;
@@ -775,14 +674,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public void forEach(ByteConsumer action){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
       forEachHelper(word0,word1,word2,word3,size,action);
     }
   }
   @Override public void forEach(Consumer<? super Byte> action){
     long word0,word1,word2,word3;
     int size;
-    if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
       forEachHelper(word0,word1,word2,word3,size,action::accept);
     }
   }
@@ -986,7 +885,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
     Checked(long word0,long word1,long word2,long word3){
       super(word0,word1,word2,word3);
-      this.size=size(word0,word1,word2,word3);
+      this.size=SetCommonImpl.size(word0,word1,word2,word3);
     }
     Checked(long word0,long word1,long word2,long word3,int size){
       super(word0,word1,word2,word3);
@@ -1021,87 +920,21 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    boolean isEqualTo(RefOpenAddressHashSet<?> set){
-      int size;
-      if((size=this.size)==set.size){
-        if(size!=0){
-          final Object[] table;
-          final int tableLength=(table=set.table).length-1;
-          final BytePredicate tableContains;
-          switch(size=isEqualToHelper(word3,64,128,tableContains=thisVal->RefOpenAddressHashSet.tableContains(thisVal,thisVal,table,tableLength),size)){
-            case -1:
-              return false;
-            default:
-              switch(size=isEqualToHelper(word2,0,64,tableContains,size)){
-                case -1:
-                  return false;
-                default:
-                  switch(size=isEqualToHelper(word1,-64,0,tableContains,size)){
-                    case -1:
-                      return false;
-                    default:
-                      return isEqualToHelper(word0,-128,-64,tableContains,size)==0;
-                    case 0:
-                  }
-                case 0:
-              }
-            case 0:
-          }
-        }
+    @Override public boolean equals(Object val){
+      if(val==this){
         return true;
+      }
+      if(val instanceof ByteSetImpl){
+        return super.isEqualTo((ByteSetImpl)val);
+      }else if(val instanceof RefOpenAddressHashSet){
+        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+      }else if(val instanceof Set){
+        return SetCommonImpl.isEqualTo((Set<?>)val,this);
       }
       return false;
     }
-    boolean isEqualTo(Set<?> set){
-     if(this.size==set.size()){
-       final int modCount=this.modCount;
-       try{
-         final Iterator<?> itr;
-         if((itr=set.iterator()).hasNext()){
-           final long word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3;
-           goToReturnFalse:for(;;){
-             goToHasNext: for(;;){
-               Object val;
-               if((val=itr.next()) instanceof Byte){
-                 byte v;
-                 switch((v=(byte)val)>>6){
-                   case -2:
-                     if(((word0>>>v)&1L)==0L){
-                       break;
-                     }
-                     break goToHasNext;
-                   case -1:
-                     if(((word1>>>v)&1L)==0L){
-                       break;
-                     }
-                     break goToHasNext;
-                   case 0:
-                     if(((word2>>>v)&1L)==0L){
-                       break;
-                     }
-                     break goToHasNext;
-                   default:
-                     if(((word3>>>v)&1L)==0L){
-                       break;
-                     }
-                     break goToHasNext;
-                 }
-               }
-               break goToReturnFalse;
-             }
-             if(!itr.hasNext()){
-               return true;
-             }
-           }
-         }
-       }finally{
-         CheckedCollection.checkModCount(modCount,this.modCount);
-       }
-     }
-     return false;
-  }
     @Override public void readExternal(ObjectInput in) throws IOException{
-      this.size=size(word0=in.readLong(),word1=in.readLong(),word2=in.readLong(),word3=in.readLong());
+      this.size=SetCommonImpl.size(word0=in.readLong(),word1=in.readLong(),word2=in.readLong(),word3=in.readLong());
     }
     @Override public void clear(){
       if(this.size!=0) {
