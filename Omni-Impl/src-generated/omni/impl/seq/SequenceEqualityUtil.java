@@ -10,21 +10,7 @@ import omni.impl.DoubleDblLnkNode;
 import omni.impl.RefDblLnkNode;
 import omni.util.TypeUtil;
 import java.util.Objects;
-import java.util.List;
 interface SequenceEqualityUtil{
-  static boolean isEqualTo(List<?> thisList,List<?> thatList){
-    //TODO remove this and optimize
-    if(thisList.size()==thatList.size()){
-      final var thisItr=thisList.listIterator();
-      final var thatItr=thatList.listIterator();
-      do{
-        if(!thisItr.hasNext()){
-          return !thatItr.hasNext();
-        }
-      }while(thatItr.hasNext() && java.util.Objects.equals(thisItr.next(),thatItr.next()));
-    }
-    return false;
-  }
   static boolean isEqualTo(int arrSeqRootOffset,int arrSeqRootBound,boolean[] arr,int pbasRootOffset,long[] pbasWords){
     for(long pbasWord=pbasWords[pbasRootOffset>>6];arr[arrSeqRootOffset]==(((pbasWord>>>pbasRootOffset)&1L)!=0L);){
       if(++arrSeqRootOffset==arrSeqRootBound){
@@ -501,8 +487,24 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,BooleanDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
   static boolean isEqualTo(BooleanDblLnkNode lhsHead,BooleanDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,ByteDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
       }
@@ -517,8 +519,24 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,CharDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
   static boolean isEqualTo(CharDblLnkNode lhsHead,CharDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,ShortDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
       }
@@ -533,8 +551,24 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,IntDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
   static boolean isEqualTo(IntDblLnkNode lhsHead,IntDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,LongDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
       }
@@ -549,8 +583,24 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,FloatDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
   static boolean isEqualTo(FloatDblLnkNode lhsHead,FloatDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+      if(lhsHead==lhsTail){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,DoubleDblLnkNode rhsHead){
+    for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
       }

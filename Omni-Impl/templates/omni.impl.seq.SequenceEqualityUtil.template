@@ -11,21 +11,7 @@ import omni.impl.DoubleDblLnkNode;
 import omni.impl.RefDblLnkNode;
 import omni.util.TypeUtil;
 import java.util.Objects;
-import java.util.List;
 interface SequenceEqualityUtil{
-  static boolean isEqualTo(List<?> thisList,List<?> thatList){
-    //TODO remove this and optimize
-    if(thisList.size()==thatList.size()){
-      final var thisItr=thisList.listIterator();
-      final var thatItr=thatList.listIterator();
-      do{
-        if(!thisItr.hasNext()){
-          return !thatItr.hasNext();
-        }
-      }while(thatItr.hasNext() && java.util.Objects.equals(thisItr.next(),thatItr.next()));
-    }
-    return false;
-  }
   #MACRO PackedBooleanArrSeqEqualsImpl<Boolean>(,boolean)
   #MACRO PackedBooleanArrSeqEqualsImpl<Ref>(<?>,Object)
   #MACRO ArrSeqEqualsArrSeqImpl<Boolean,Ref>(boolean,Object)
@@ -84,8 +70,16 @@ interface SequenceEqualityUtil{
   
 }
 
-#MACRODEF DblLnkSeqEqualsDblLnkSeqImpl<LHSPREFIX>()
-static boolean isEqualTo(LHSPREFIXDblLnkNode lhsHead,LHSPREFIXDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+#MACRODEF DblLnkSeqEqualsDblLnkSeqImpl<CLASSPREFIX>()
+static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,CLASSPREFIXDblLnkNode rhsHead){
+  for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
+    if(lhsHead==lhsTail){
+      return true;
+    }
+  }
+  return false;
+}
+static boolean isEqualTo(CLASSPREFIXDblLnkNode lhsHead,CLASSPREFIXDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
   for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
     if(lhsHead==lhsTail){
       return true;

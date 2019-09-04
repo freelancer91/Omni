@@ -1185,8 +1185,28 @@ AbstractSeq<E>
         }
         final List<?> list;
         if((list=(List<?>)val) instanceof AbstractSeq){
-          //TODO optimize
-          return SequenceEqualityUtil.isEqualTo(list,this);
+          final AbstractSeq<?> abstractSeq;
+          if(size==(abstractSeq=(AbstractSeq<?>)list).size){
+            if(abstractSeq instanceof OmniList.OfRef){
+              return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfInt){
+              return root.isEqualTo(this.head,size,(OmniList.OfInt)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfFloat){
+              return root.isEqualTo(this.head,size,(OmniList.OfFloat)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfLong){
+              return root.isEqualTo(this.head,size,(OmniList.OfLong)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfDouble){
+              return root.isEqualTo(this.head,size,(OmniList.OfDouble)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfByte){
+              return root.isEqualTo(this.head,size,(OmniList.OfByte)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfChar){
+              return root.isEqualTo(this.head,size,(OmniList.OfChar)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfShort){
+              return root.isEqualTo(this.head,size,(OmniList.OfShort)abstractSeq);
+            }else{
+              return root.isEqualTo(this.head,size,(OmniList.OfBoolean)abstractSeq);
+            }
+          }
         }else{
           return size==list.size() && root.isEqualTo(list.listIterator(),this.head);
         }
@@ -4880,8 +4900,28 @@ AbstractSeq<E>
           }
           final List<?> list;
           if((list=(List<?>)val) instanceof AbstractSeq){
-            //TODO optimize
-            return SequenceEqualityUtil.isEqualTo(list,this);
+            final AbstractSeq<?> abstractSeq;
+            if(size==(abstractSeq=(AbstractSeq<?>)list).size){
+              if(abstractSeq instanceof OmniList.OfRef){
+                return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfInt){
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfInt)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfFloat){
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfFloat)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfLong){
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfLong)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfDouble){
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfDouble)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfByte){
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfByte)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfChar){
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfChar)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfShort){
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfShort)abstractSeq);
+              }else{
+                return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfBoolean)abstractSeq);
+              }
+            }
           }else{
             return size==list.size() && ((UncheckedList<E>)root).isEqualTo(list.listIterator(),this.head);
           }
@@ -5410,6 +5450,134 @@ AbstractSeq<E>
       }
       return new CheckedList<E>();
     }
+    private boolean isEqualTo(int size,OmniList.OfRef<?> list){
+      if(list instanceof RefDblLnkSeq){
+        if(list instanceof RefDblLnkSeq.CheckedList){
+          final RefDblLnkSeq.CheckedList<?> that;
+          final int thatModCount=(that=(RefDblLnkSeq.CheckedList<?>)list).modCount;
+          final int thisModCount=this.modCount;
+          try{
+            return super.isEqualToHelper(this.head,that.head,size);
+          }finally{
+            CheckedCollection.checkModCount(thisModCount,this.modCount);
+            CheckedCollection.checkModCount(thatModCount,that.modCount);
+          }
+        }else if(list instanceof RefDblLnkSeq.CheckedSubList){
+          final RefDblLnkSeq.CheckedSubList<?> that;
+          final RefDblLnkNode<?> thatHead,thisHead;
+          if((thatHead=(that=(RefDblLnkSeq.CheckedSubList<?>)list).head)==(thisHead=this.head)){
+            return true;
+          }
+          final int thatModCount=that.modCount;
+          final int thisModCount=this.modCount;
+          try{
+            return super.isEqualToHelper(thisHead,thatHead,size);
+          }finally{
+            CheckedCollection.checkModCount(thisModCount,this.modCount);
+            CheckedCollection.checkModCount(thatModCount,that.root.modCount);
+          }
+        }else{
+          final int thisModCount=this.modCount;
+          try{
+            return super.isEqualToHelper(this.head,((RefDblLnkSeq<?>)list).head,size);
+          }finally{
+            CheckedCollection.checkModCount(thisModCount,this.modCount);
+          }
+        }
+      }else{
+        final int thisModCount=this.modCount;
+        try{
+          if(list instanceof RefArrSeq.UncheckedList){
+            if(list instanceof RefArrSeq.CheckedList){
+              final RefArrSeq.CheckedList<?> that;
+              final int thatModCount=(that=(RefArrSeq.CheckedList<?>)list).modCount;
+              try{
+                return SequenceEqualityUtil.isEqualTo(that.arr,0,size,this.head);
+              }finally{
+                CheckedCollection.checkModCount(thatModCount,that.modCount);
+              }
+            }else{
+              return SequenceEqualityUtil.isEqualTo(((RefArrSeq.UncheckedList<?>)list).arr,0,size,this.head);
+            }
+          }else if(list instanceof RefArrSeq.CheckedSubList){
+            final RefArrSeq.CheckedSubList<?> subList;
+            final RefArrSeq.CheckedList<?> thatRoot=(subList=(RefArrSeq.CheckedSubList<?>)list).root;
+            final int thatModCount=subList.modCount;
+            try{
+              final int rootOffset;
+              return SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,this.head);
+            }finally{
+              CheckedCollection.checkModCount(thatModCount,thatRoot.modCount);
+            }
+          }else{
+            //must be RefArrSeq.UncheckedSubList
+            final RefArrSeq.UncheckedSubList<?> subList;
+            final int rootOffset;
+            return SequenceEqualityUtil.isEqualTo((subList=(RefArrSeq.UncheckedSubList<?>)list).root.arr,rootOffset=subList.rootOffset,rootOffset+size,this.head);
+          }
+        }finally{
+          CheckedCollection.checkModCount(thisModCount,this.modCount);
+        }
+      }
+    }
+    private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfRef<?> list){
+      if(list instanceof RefDblLnkSeq){
+        if(list instanceof RefDblLnkSeq.CheckedList){
+          final RefDblLnkSeq.CheckedList<?> that;
+          final RefDblLnkNode<?> thatHead;
+          if((thatHead=(that=(RefDblLnkSeq.CheckedList<?>)list).head)==thisHead){
+            return true;
+          }
+          final int thatModCount=that.modCount;
+          try{
+            return super.isEqualToHelper(thisHead,thatHead,size);
+          }finally{
+            CheckedCollection.checkModCount(thatModCount,that.modCount);
+          }
+        }else if(list instanceof RefDblLnkSeq.CheckedSubList){
+          final RefDblLnkSeq.CheckedSubList<?> that;
+          final RefDblLnkNode<?> thatHead;
+          if((thatHead=(that=(RefDblLnkSeq.CheckedSubList<?>)list).head)==thisHead){
+            return true;
+          }
+          final int thatModCount=that.modCount;
+          try{
+            return super.isEqualToHelper(thisHead,thatHead,size);
+          }finally{
+            CheckedCollection.checkModCount(thatModCount,that.root.modCount);
+          }
+        }else{
+          return super.isEqualToHelper(thisHead,((RefDblLnkSeq<?>)list).head,size);
+        }
+      }else if(list instanceof RefArrSeq.UncheckedList){
+        if(list instanceof RefArrSeq.CheckedList){
+          final RefArrSeq.CheckedList<?> that;
+          final int thatModCount=(that=(RefArrSeq.CheckedList<?>)list).modCount;
+          try{
+            return SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
+          }finally{
+            CheckedCollection.checkModCount(thatModCount,that.modCount);
+          }
+        }else{
+          return SequenceEqualityUtil.isEqualTo(((RefArrSeq.UncheckedList<?>)list).arr,0,size,thisHead);
+        }
+      }else if(list instanceof RefArrSeq.CheckedSubList){
+        final RefArrSeq.CheckedSubList<?> subList;
+        final RefArrSeq.CheckedList<?> thatRoot=(subList=(RefArrSeq.CheckedSubList<?>)list).root;
+        final int modCount=subList.modCount;
+        try{
+          final int rootOffset;
+          return SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
+        }finally{
+          CheckedCollection.checkModCount(modCount,thatRoot.modCount);
+        }
+      }else{
+        //must be RefArrSeq.CheckedSubList
+        final RefArrSeq.UncheckedSubList<?> subList;
+        final int rootOffset;
+        return SequenceEqualityUtil.isEqualTo((subList=(RefArrSeq.UncheckedSubList<?>)list).root.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
+      }
+    }
     @Override public boolean equals(Object val){
       if(val==this){
         return true;
@@ -5421,8 +5589,28 @@ AbstractSeq<E>
         }
         final List<?> list;
         if((list=(List<?>)val) instanceof AbstractSeq){
-          //TODO optimize
-          return SequenceEqualityUtil.isEqualTo((List<?>)val,this);
+          final AbstractSeq<?> abstractSeq;
+          if((abstractSeq=(AbstractSeq<?>)list).size==size){
+            if(abstractSeq instanceof OmniList.OfRef){
+              return this.isEqualTo(size,(OmniList.OfRef<?>)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfInt){
+              return super.isEqualTo(this.head,size,(OmniList.OfInt)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfFloat){
+              return super.isEqualTo(this.head,size,(OmniList.OfFloat)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfLong){
+              return super.isEqualTo(this.head,size,(OmniList.OfLong)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfDouble){
+              return super.isEqualTo(this.head,size,(OmniList.OfDouble)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfByte){
+              return super.isEqualTo(this.head,size,(OmniList.OfByte)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfChar){
+              return super.isEqualTo(this.head,size,(OmniList.OfChar)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfShort){
+              return super.isEqualTo(this.head,size,(OmniList.OfShort)abstractSeq);
+            }else{
+              return super.isEqualTo(this.head,size,(OmniList.OfBoolean)abstractSeq);
+            }
+          }
         }else{
           final int modCount=this.modCount;
           try{
@@ -6168,7 +6356,7 @@ AbstractSeq<E>
       }
       return new UncheckedList<E>();
     }
-    private boolean isEqualToHelper(RefDblLnkNode<?> thisHead,RefDblLnkNode<?> thatHead,int size){
+    private static boolean isEqualToHelper(RefDblLnkNode<?> thisHead,RefDblLnkNode<?> thatHead,int size){
       for(;Objects.equals(thisHead.val,thatHead.val);thisHead=thisHead.next,thatHead=thatHead.next){
         if(--size==0){
           return true;
@@ -6305,7 +6493,7 @@ AbstractSeq<E>
         final PackedBooleanArrSeq.CheckedList thatRoot;
         CheckedCollection.checkModCount((subList=(PackedBooleanArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
         final int rootOffset;
-        return SequenceEqualityUtil.isEqualTo(rootOffset=subList.rootOffset,subList.root.words,rootOffset+size,thisHead);
+        return SequenceEqualityUtil.isEqualTo(rootOffset=subList.rootOffset,thatRoot.words,rootOffset+size,thisHead);
       }else if(list instanceof BooleanArrSeq.UncheckedSubList){
         final BooleanArrSeq.UncheckedSubList subList;
         final int rootOffset;
