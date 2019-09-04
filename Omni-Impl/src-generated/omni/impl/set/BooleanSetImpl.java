@@ -65,12 +65,14 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
     if(val==this){
       return true;
     }
-    if(val instanceof BooleanSetImpl){
-      return ((BooleanSetImpl)val).state==this.state;
-    }else if(val instanceof RefOpenAddressHashSet){
-      return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-    }else if(val instanceof Set){
-      return SetCommonImpl.isEqualTo((Set<?>)val,this);
+    if(val instanceof Set){
+      if(val instanceof BooleanSetImpl){
+        return ((BooleanSetImpl)val).state==this.state;
+      }else if(val instanceof RefOpenAddressHashSet){
+        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+      }else{
+        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      }
     }
     return false;
   }

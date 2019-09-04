@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.ListIterator;
 import java.util.List;
 import omni.util.CharSortUtil;
 import omni.api.OmniList;
@@ -978,17 +979,16 @@ AbstractSeq<Character>
         return true;
       }
       if(val instanceof List){
-        //TODO optimize this
-        List<?> that;
-        if(this.size==(that=(List<?>)val).size()){
-          var thisItr=this.iterator();
-          var thatItr=that.iterator();
-          while(thisItr.hasNext()){
-            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
-              return false;
-            }
-          }
-          return !thatItr.hasNext();
+        final int size;
+        if((size=this.size)==0){
+          return ((List<?>)val).isEmpty();
+        }
+        final List<?> list;
+        if((list=(List<?>)val) instanceof AbstractSeq){
+          //TODO optimize
+          return SequenceEqualityUtil.isEqualTo(list,this);
+        }else{
+          return size==list.size() && root.isEqualTo(list.listIterator(),this.head);
         }
       }
       return false;
@@ -4129,17 +4129,22 @@ AbstractSeq<Character>
         return true;
       }
       if(val instanceof List){
-        //TODO optimize this
-        List<?> that;
-        if(this.size==(that=(List<?>)val).size()){
-          var thisItr=this.iterator();
-          var thatItr=that.iterator();
-          while(thisItr.hasNext()){
-            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
-              return false;
-            }
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)==0){
+            return ((List<?>)val).isEmpty();
           }
-          return !thatItr.hasNext();
+          final List<?> list;
+          if((list=(List<?>)val) instanceof AbstractSeq){
+            //TODO optimize
+            return SequenceEqualityUtil.isEqualTo(list,this);
+          }else{
+            return size==list.size() && ((UncheckedList)root).isEqualTo(list.listIterator(),this.head);
+          }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
       return false;
@@ -4637,17 +4642,21 @@ AbstractSeq<Character>
         return true;
       }
       if(val instanceof List){
-        //TODO optimize this
-        List<?> that;
-        if(this.size==(that=(List<?>)val).size()){
-          var thisItr=this.iterator();
-          var thatItr=that.iterator();
-          while(thisItr.hasNext()){
-            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
-              return false;
-            }
+        final int size;
+        if((size=this.size)==0){
+          return ((List<?>)val).isEmpty();
+        }
+        final List<?> list;
+        if((list=(List<?>)val) instanceof AbstractSeq){
+          //TODO optimize
+          return SequenceEqualityUtil.isEqualTo((List<?>)val,this);
+        }else{
+          final int modCount=this.modCount;
+          try{
+            return size==list.size() && super.isEqualTo(list.listIterator(),this.head);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
-          return !thatItr.hasNext();
         }
       }
       return false;
@@ -5352,22 +5361,50 @@ AbstractSeq<Character>
       }
       return new UncheckedList();
     }
+    private static boolean isEqualToHelper(CharDblLnkNode thisHead,CharDblLnkNode thatHead,int size){
+      for(;thisHead.val==thatHead.val;thisHead=thisHead.next,thatHead=thatHead.next){
+        if(--size==0){
+          return true;
+        }
+      }
+      return false;
+    }
+    private boolean isEqualTo(int size,AbstractSeq<?> list){
+      //TODO
+      throw omni.util.NotYetImplementedException.getNYI();
+    }
+    private boolean isEqualTo(CharDblLnkNode thisHead,int size,AbstractSeq<?> list){
+      //TODO
+      throw omni.util.NotYetImplementedException.getNYI();
+    }
+    private boolean isEqualTo(ListIterator<?> itr,CharDblLnkNode head){
+      if(itr.hasNext()){
+        while(TypeUtil.refEquals(itr.next(),head.val)){
+          if(!itr.hasNext()){
+            return true;
+          }
+          head=head.next;
+        }
+      }
+      return false;
+    }
     @Override public boolean equals(Object val){
       if(val==this){
         return true;
       }
       if(val instanceof List){
-        //TODO optimize this
-        List<?> that;
-        if(this.size==(that=(List<?>)val).size()){
-          var thisItr=this.iterator();
-          var thatItr=that.iterator();
-          while(thisItr.hasNext()){
-            if(!thatItr.hasNext() || !java.util.Objects.equals(thisItr.next(),thatItr.next())){
-              return false;
-            }
+        final int size;
+        if((size=this.size)==0){
+          return ((List<?>)val).isEmpty();
+        }
+        final List<?> list;
+        if((list=(List<?>)val) instanceof AbstractSeq){
+          final AbstractSeq<?> abstractSeq;
+          if((abstractSeq=(AbstractSeq<?>)list).size==size){
+            return this.isEqualTo(size,abstractSeq);
           }
-          return !thatItr.hasNext();
+        }else{
+          return size==list.size() && this.isEqualTo(list.listIterator(),this.head);
         }
       }
       return false;

@@ -5,7 +5,7 @@ import omni.impl.CheckedCollection;
 interface SetCommonImpl{
   //TODO move quickInsert to here
   static int tableHash(int val){
-    return val&(val>>>16);
+    return val^(val>>>16);
   }
   static int tableHash(long val){
     return tableHash(Long.hashCode(val));
@@ -15,6 +15,36 @@ interface SetCommonImpl{
   }
   static int size(long word0,long word1,long word2,long word3){
     return Long.bitCount(word0)+Long.bitCount(word1)+Long.bitCount(word2)+Long.bitCount(word3);
+  }
+  static void quickInsert(char val,char[] table,int tableLength,int hash){
+    while(table[hash]!=0){
+      hash=(hash+1)&tableLength;
+    }
+    table[hash]=val;
+  }
+  static void quickInsert(short val,short[] table,int tableLength,int hash){
+    while(table[hash]!=0){
+      hash=(hash+1)&tableLength;
+    }
+    table[hash]=val;
+  }
+  static void quickInsert(int val,int[] table,int tableLength,int hash){
+    while(table[hash]!=0){
+      hash=(hash+1)&tableLength;
+    }
+    table[hash]=val;
+  }
+  static void quickInsert(long val,long[] table,int tableLength,int hash){
+    while(table[hash]!=0L){
+      hash=(hash+1)&tableLength;
+    }
+    table[hash]=val;
+  }
+  static void quickInsert(Object val,Object[] table,int tableLength,int hash){
+    while(table[hash]!=null){
+      hash=(hash+1)&tableLength;
+    }
+    table[hash]=val;
   }
   static boolean isEqualTo(Set<?> thisSet,BooleanSetImpl thatSet) {
       switch(thatSet.state) {
@@ -666,27 +696,6 @@ interface SetCommonImpl{
     }
     return false;
   }
-  static boolean isEqualTo(RefOpenAddressHashSet<?> thisSet,RefOpenAddressHashSet.Checked<?> thatSet){
-    final int size;
-    if((size=thisSet.size)==thatSet.size){
-      if(size==0){
-        return true;
-      }
-      final int thatModCount=thatSet.modCount;
-      try{
-        final Object[] thisTable,thatTable;
-        final int thisTableLength,thatTableLength;
-        if((thisTableLength=(thisTable=thisSet.table).length)<=(thatTableLength=(thatTable=thatSet.table).length)){
-          return tableContainsAllRefRef(thisTable,thatTable,thatTableLength-1,size);
-        }else{
-          return tableContainsAllRefRef(thatTable,thisTable,thisTableLength-1,size);
-        }
-      }finally{
-        CheckedCollection.checkModCount(thatModCount,thatSet.modCount);
-      }
-    }
-    return false;
-  }
   static boolean isEqualTo(RefOpenAddressHashSet.Checked<?> thisSet,RefOpenAddressHashSet<?> thatSet){
     final int size;
     if((size=thisSet.size)==thatSet.size){
@@ -733,7 +742,7 @@ interface SetCommonImpl{
   }
   private static boolean tableContainsAllRefRef(Object[] smallTable,Object[] bigTable,int bigTableLength,int numInTable){
     for(int tableIndex=0;;++tableIndex){
-      Object smallTableVal;
+      final Object smallTableVal;
       if((smallTableVal=smallTable[tableIndex])!=null && smallTableVal!=RefOpenAddressHashSet.DELETED){
         final int hash;
         if(smallTableVal==RefOpenAddressHashSet.NULL){

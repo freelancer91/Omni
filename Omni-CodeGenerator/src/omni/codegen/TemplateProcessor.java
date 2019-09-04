@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 public class TemplateProcessor{
@@ -611,17 +612,23 @@ public class TemplateProcessor{
             ifElseStack=new ArrayList<>();
             macroStack=new ArrayList<>();
             currentSwitches=new HashMap<>();
+            System.out.println("Begin createSource() :"+typeDef);
             createSource();
+            System.out.println("end   createSource() :"+typeDef);
             postValidate();
+
         }
     }
     TemplateProcessor(Path templateFile) throws Exception{
         lines=Files.readAllLines(templateFile).toArray(String[]::new);
         typeDefs=new HashMap<>();
         macroDefs=new HashMap<>();
-        sources=new HashMap<>();
+        sources=new ConcurrentHashMap<>();
         extractDefinitions();
+
+        
         final var defItr=typeDefs.keySet().iterator();
+        
         if(defItr.hasNext()){
             TypeDefinition typeDef;
             for(sources.put(typeDef=defItr.next(),new SourceGenerator(true,typeDef).output);defItr.hasNext();sources

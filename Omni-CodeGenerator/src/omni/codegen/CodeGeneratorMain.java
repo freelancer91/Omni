@@ -66,7 +66,7 @@ public class CodeGeneratorMain{
                             if(!fqtMatcher.matches()){
                                 System.err.println("The fully-qualified-type \""+fqt+"\" is not valid");
                             }else{
-                                final TemplateProcessor processor=new TemplateProcessor(file);
+                                final TemplateProcessor2 processor=new TemplateProcessor2(file);
                                 final Map<TypeDefinition,List<String>> sources=processor.sources;
                                 final Map<TypeDefinition,Integer> typeDefs=processor.typeDefs;
                                 typeDefs.keySet().parallelStream().forEach(typeDef->{
@@ -105,7 +105,7 @@ public class CodeGeneratorMain{
                                         System.out.println("writing type "+typeDef.name()+" to "+sourceFilePath);
                                     }
                                 });
-                                if(!processor.trouble){
+                                if(processor.trouble.get()==0){
                                     writeSemaphoreFile(Files.getLastModifiedTime(file).toMillis(),file);
                                 }
                             }

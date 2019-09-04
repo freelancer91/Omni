@@ -19,4 +19,8 @@ public abstract class AbstractSeq<E> implements OmniCollection<E>,Serializable,C
   }
   @Override public abstract Object clone();
   @Override public abstract String toString();
+  
+  
+  
+  
 }

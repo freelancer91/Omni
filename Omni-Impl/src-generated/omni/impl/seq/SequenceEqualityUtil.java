@@ -10,7 +10,32 @@ import omni.impl.DoubleDblLnkNode;
 import omni.impl.RefDblLnkNode;
 import omni.util.TypeUtil;
 import java.util.Objects;
+import java.util.List;
 interface SequenceEqualityUtil{
+  static boolean isEqualTo(List<?> thisList,List<?> thatList){
+    //TODO remove this and optimize
+    if(thisList.size()==thatList.size()){
+      final var thisItr=thisList.listIterator();
+      final var thatItr=thatList.listIterator();
+      do{
+        if(!thisItr.hasNext()){
+          return !thatItr.hasNext();
+        }
+      }while(thatItr.hasNext() && java.util.Objects.equals(thisItr.next(),thatItr.next()));
+    }
+    return false;
+  }
+  static boolean isEqualTo(int arrSeqRootOffset,int arrSeqRootBound,boolean[] arr,int pbasRootOffset,long[] pbasWords){
+    for(long pbasWord=pbasWords[pbasRootOffset>>6];arr[arrSeqRootOffset]==(((pbasWord>>>pbasRootOffset)&1L)!=0L);){
+      if(++arrSeqRootOffset==arrSeqRootBound){
+        return true;
+      }
+      if(((++pbasRootOffset)&63)==0){
+        pbasWord=pbasWords[pbasRootOffset>>6];
+      }
+    }
+    return false;
+  }
   static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,boolean[] arr,int arrSeqRootOffset){
     for(long pbasWord=pbasWords[pbasRootOffset>>6];arr[arrSeqRootOffset]^(((pbasWord>>>pbasRootOffset)&1L)==0L);++arrSeqRootOffset){
       if(++pbasRootOffset==pbasRootBound){
@@ -28,6 +53,17 @@ interface SequenceEqualityUtil{
         return true;
       }
       if((pbasRootOffset&63)==0){
+        pbasWord=pbasWords[pbasRootOffset>>6];
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(int arrSeqRootOffset,int arrSeqRootBound,Object[] arr,int pbasRootOffset,long[] pbasWords){
+    for(long pbasWord=pbasWords[pbasRootOffset>>6];TypeUtil.refEquals(arr[arrSeqRootOffset],(((pbasWord>>>pbasRootOffset)&1L)!=0L));){
+      if(++arrSeqRootOffset==arrSeqRootBound){
+        return true;
+      }
+      if(((++pbasRootOffset)&63)==0){
         pbasWord=pbasWords[pbasRootOffset>>6];
       }
     }
@@ -56,7 +92,9 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(boolean[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset])
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -64,7 +102,9 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(byte[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset])   
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -72,7 +112,9 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(char[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset])   
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -80,7 +122,9 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(short[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset])   
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -88,7 +132,9 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(int[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset])   
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -96,7 +142,9 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(long[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset])   
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -104,7 +152,9 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(float[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset])
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -112,7 +162,89 @@ interface SequenceEqualityUtil{
     return false;
   }
   static boolean isEqualTo(double[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-    for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]) 
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,boolean[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,byte[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,char[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,short[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,int[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,long[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,float[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,double[] rhsArr,int rhsRootOffset){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+    ;++rhsRootOffset){
       if(++lhsRootOffset==lhsRootBound){
         return true;
       }
@@ -281,7 +413,87 @@ interface SequenceEqualityUtil{
   }
   static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
     for(;
-    Objects.equals(rhsHead.val,lhsArr[lhsRootOffset])  
+    Objects.equals(rhsHead.val,lhsArr[lhsRootOffset])
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,BooleanDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,ByteDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,CharDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,ShortDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,IntDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,LongDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,FloatDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
+    ;rhsHead=rhsHead.next){
+      if(++lhsRootOffset==lhsRootBound){
+        return true;
+      }
+    }
+    return false;
+  }
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,DoubleDblLnkNode rhsHead){
+    for(;
+    TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
       if(++lhsRootOffset==lhsRootBound){
         return true;

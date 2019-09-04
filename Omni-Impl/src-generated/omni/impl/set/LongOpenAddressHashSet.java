@@ -9,7 +9,6 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
-import java.util.Iterator;
 import java.util.function.LongConsumer;
 import java.util.function.LongPredicate;
 import omni.impl.AbstractLongItr;
@@ -20,8 +19,6 @@ import omni.util.ToStringUtil;
 public class LongOpenAddressHashSet
 extends AbstractIntegralTypeOpenAddressHashSet<Long>
 implements OmniSet.OfLong{
-/*
-*/
   private  static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
     int hash=(int)(magicWord >>> 32);
     int numLeft=(int)magicWord;
@@ -35,18 +32,6 @@ implements OmniSet.OfLong{
       }
     }while(++valOffset != valBound);
     return numLeft | (long)hash << 32;
-  }
-  private static void quickInsert(long[] table,long val){
-  //TODO move this to SetCommonImpl
-    int tableLength;
-    int hash;
-    for(hash=((int)(val^(val>>>32))) & (tableLength=table.length-1);;){
-      if(table[hash]==0){
-        table[hash]=val;
-        return;
-      }
-      hash=(hash+1)&tableLength;
-    }
   }
   private static  long wordRemoveIf(long word,
   long
@@ -68,16 +53,17 @@ implements OmniSet.OfLong{
     super(that);
     int tableSize;
     if((tableSize=that.tableSize)!=0){
-      long[] table;
-      int tableLength;
-      this.table=table=new long[tableLength=tableSizeFor(tableSize)];
-      this.maxTableSize=(int)(tableLength*loadFactor);
+      long[] thisTable;
+      int thisTableLength;
+      this.table=thisTable=new long[thisTableLength=tableSizeFor(tableSize)];
+      this.maxTableSize=(int)(thisTableLength*loadFactor);
+      --thisTableLength;
       long[] thatTable;
-      for(tableLength=(thatTable=that.table).length;;){
+      for(int thatTableLength=(thatTable=that.table).length;;){
         long tableVal;
-        if(((tableVal=thatTable[--tableLength])&-2)!=0)
+        if(((tableVal=thatTable[--thatTableLength])&-2)!=0)
         {
-          quickInsert(table,tableVal);
+          SetCommonImpl.quickInsert(tableVal,thisTable,thisTableLength,Long.hashCode(tableVal)&thisTableLength);
           if(--tableSize==0){
             break;
           }
@@ -330,42 +316,49 @@ implements OmniSet.OfLong{
     }
     return false;
   }
-  private boolean isEqualTo(LongOpenAddressHashSet set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(RefOpenAddressHashSet<?> set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(Set<?> set){
-    if(this.size==set.size()){
-      Iterator<?> thatItr;
-      if((thatItr=set.iterator()).hasNext()){
-        final long[] table;
-        outer:for(int tableLength=(table=this.table).length-1;;){
-          Object thatVal;
-          if(!((thatVal=thatItr.next()) instanceof Long)){
-            return false;
-          }
-          //TODO
-          throw omni.util.NotYetImplementedException.getNYI();
-        }
-      }
-      return true;
-    }
-    return false;
-  }
   @Override public boolean equals(Object val){
     if(val==this){
       return true;
     }
-    if(val instanceof LongOpenAddressHashSet){
-      return isEqualTo((LongOpenAddressHashSet)val);
-    }else if(val instanceof RefOpenAddressHashSet){
-      return isEqualTo((RefOpenAddressHashSet<?>)val);
-    }else if(val instanceof Set){
-      return isEqualTo((Set<?>)val);
+    if(val instanceof Set){
+      if(val instanceof LongOpenAddressHashSet){
+        return isEqualTo((LongOpenAddressHashSet)val);
+      }else if(val instanceof RefOpenAddressHashSet){
+        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+      }else{
+        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      }
+    }
+    return false;
+  }
+  private static boolean isEqualToHelper(long[] smallTable,long[] bigTable,int bigTableLength,int numInTable){
+    for(int tableIndex=0;;++tableIndex){
+      final long smallTableVal;
+      if(((smallTableVal=smallTable[tableIndex])&-2L)!=0L){
+        if(!SetCommonImpl.tableContains(smallTableVal,bigTable,bigTableLength,Long.hashCode(smallTableVal)&bigTableLength)){
+          return false;
+        }
+        if(--numInTable==0){
+          return true;
+        }
+      }
+    }
+  }
+  private boolean isEqualTo(LongOpenAddressHashSet that){
+    final int size;
+    if((size=this.size)==that.size){
+      if(size==0){
+        return true;
+      }
+      if(this.word0==that.word0 && this.word1==that.word1 && this.word2==that.word2 && this.word3==that.word3){
+        final long[] thisTable,thatTable;
+        final int thisTableLength,thatTableLength;
+        if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+          return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+        }else{
+          return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+        }
+      }
     }
     return false;
   }
@@ -431,8 +424,10 @@ implements OmniSet.OfLong{
               maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
               long[] table;
               this.table=table=new long[tableSize];
+              --tableSize;
               do{
-                  quickInsert(table,in.readLong());
+                  final long val;
+                  SetCommonImpl.quickInsert(val=in.readLong(),table,tableSize,tableSize&Long.hashCode(val));
               }while(--size != 0);
           }else{
               maxTableSize=1;
@@ -1240,19 +1235,20 @@ private boolean addToTable(long val){
       maxTableSize=(int)((hash=table.length<<1)*loadFactor);
       long[] newTable;
       this.table=newTable=new long[hash];
+      --hash;
       if(tableSize!=1){
         for(int i=0;;++i){
           long tableVal;
           if(((tableVal=table[i])&-2)!=0)
           {
-            quickInsert(newTable,tableVal);
+            SetCommonImpl.quickInsert(tableVal,newTable,hash,hash&Long.hashCode(tableVal));
             if(--tableSize==1){
               break;
             }
           }
         }
       }
-      quickInsert(newTable,val);
+      SetCommonImpl.quickInsert(val,newTable,hash,hash&Long.hashCode(val));
     }else{
       table[hash]=val;
     }
@@ -1644,27 +1640,6 @@ private boolean addToTable(long val){
     }
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
-    }
-    private boolean isEqualTo(Set<?> set){
-      final int modCount=this.modCount;
-      try{
-        return super.isEqualTo(set);
-      }finally{
-        CheckedCollection.checkModCount(modCount,this.modCount);
-      }
-    }
-    @Override public boolean equals(Object val){
-      if(val==this){
-        return true;
-      }
-      if(val instanceof LongOpenAddressHashSet){
-        return super.isEqualTo((LongOpenAddressHashSet)val);
-      }else if(val instanceof RefOpenAddressHashSet){
-        return super.isEqualTo((RefOpenAddressHashSet<?>)val);
-      }else if(val instanceof Set){
-        return isEqualTo((Set<?>)val);
-      }
-      return false;
     }
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));

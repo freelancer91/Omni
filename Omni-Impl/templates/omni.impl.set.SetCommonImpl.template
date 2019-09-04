@@ -6,7 +6,7 @@ import omni.impl.CheckedCollection;
 interface SetCommonImpl{
   //TODO move quickInsert to here
   static int tableHash(int val){
-    return val&(val>>>16);
+    return val^(val>>>16);
   }
   static int tableHash(long val){
     return tableHash(Long.hashCode(val));
@@ -17,6 +17,20 @@ interface SetCommonImpl{
   static int size(long word0,long word1,long word2,long word3){
     return Long.bitCount(word0)+Long.bitCount(word1)+Long.bitCount(word2)+Long.bitCount(word3);
   }
+  #MACRO QuickInsert<char>(0)
+  #MACRO QuickInsert<short>(0)
+  #MACRO QuickInsert<int>(0)
+  #MACRO QuickInsert<long>(0L)
+  #MACRO QuickInsert<Object>(null)
+#MACRODEF QuickInsert<ARRTYPE>(EMPTYVAL)
+static void quickInsert(ARRTYPE val,ARRTYPE[] table,int tableLength,int hash){
+  while(table[hash]!=EMPTYVAL){
+    hash=(hash+1)&tableLength;
+  }
+  table[hash]=val;
+}
+#ENDDEF
+  
   static boolean isEqualTo(Set<?> thisSet,BooleanSetImpl thatSet) {
       switch(thatSet.state) {
       case 0b00:
@@ -437,7 +451,7 @@ interface SetCommonImpl{
 
   private static boolean tableContainsAllRefRef(Object[] smallTable,Object[] bigTable,int bigTableLength,int numInTable){
     for(int tableIndex=0;;++tableIndex){
-      Object smallTableVal;
+      final Object smallTableVal;
       if((smallTableVal=smallTable[tableIndex])!=null && smallTableVal!=RefOpenAddressHashSet.DELETED){
         final int hash;
         if(smallTableVal==RefOpenAddressHashSet.NULL){

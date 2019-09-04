@@ -116,12 +116,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if(val==this){
       return true;
     }
-    if(val instanceof ByteSetImpl){
-      return isEqualTo((ByteSetImpl)val);
-    }else if(val instanceof RefOpenAddressHashSet){
-      return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-    }else if(val instanceof Set){
-      return SetCommonImpl.isEqualTo((Set<?>)val,this);
+    if(val instanceof Set){
+      if(val instanceof ByteSetImpl){
+        return isEqualTo((ByteSetImpl)val);
+      }else if(val instanceof RefOpenAddressHashSet){
+        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+      }else{
+        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      }
     }
     return false;
   }
@@ -924,12 +926,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
       if(val==this){
         return true;
       }
-      if(val instanceof ByteSetImpl){
-        return super.isEqualTo((ByteSetImpl)val);
-      }else if(val instanceof RefOpenAddressHashSet){
-        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-      }else if(val instanceof Set){
-        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      if(val instanceof Set){
+        if(val instanceof ByteSetImpl){
+          return super.isEqualTo((ByteSetImpl)val);
+        }else if(val instanceof RefOpenAddressHashSet){
+          return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+        }else{
+          return SetCommonImpl.isEqualTo((Set<?>)val,this);
+        }
       }
       return false;
     }

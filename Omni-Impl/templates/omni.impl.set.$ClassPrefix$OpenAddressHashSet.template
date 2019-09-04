@@ -16,7 +16,6 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
-import java.util.Iterator;
 #IF OfChar,OfShort,OfFloat
 import omni.function.$TypeNameModifier$Consumer;
 import omni.function.$TypeNameModifier$Predicate;
@@ -47,53 +46,10 @@ extends AbstractOpenAddressHashSet$<E>$
 extends AbstractOpenAddressHashSet<$BoxedType$>
 #ENDIF
 implements OmniSet.Of$ClassPrefix$$<E>${
-/*
-#IF OfFloat
-  static int tableHash(int bits){
-  //TODO improve this hash function
-    return bits^(bits>>>16);
-  }
-#ELSEIF OfDouble
-  static int tableHash(long bits){
-  //TODO improve this hash function
-    int tmp;
-    return (tmp=(int)(bits^(bits>>>32)))^(tmp>>>16);
-  }
-#ELSEIF OfRef
-  static int tableHash(Object val){
-  //TODO improve this hash function
-    int tmp;
-    return (tmp=val.hashCode())^(tmp>>>16);
-  }
-  static int tableHash(long val){
-  //TODO improve this hash function
-    int tmp;
-    return (tmp=(int)(val^(val>>>32)))^(tmp>>>16);
-  }
-  static int tableHash(int val){
-  //TODO improve this hash function
-    return val^(val>>>16);
-  }
-#ENDIF
-*/
 #IF OfRef
   static final Object NULL=new Object();
   static final int NULLHASH=SetCommonImpl.tableHash(NULL);
   static final Object DELETED=new Object();
-  /*
-  static boolean tableContains(Object val,int hash,Object[] table,int tableLength){
-    Object tableVal;
-    if((tableVal=table[hash&=tableLength])!=null){
-      final int initialHash=hash;
-      do{
-        if(val.equals(tableVal)){
-          return true;
-        }
-      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=null);
-    }
-    return false;
-  }
-  */
   
   
 #ENDIF
@@ -118,32 +74,6 @@ implements OmniSet.Of$ClassPrefix$$<E>${
     }while(++valOffset != valBound);
     return numLeft | (long)hash << 32;
   }
-#ENDIF
-#MACRODEF QuickInsert(TABLETYPE,VALTYPE,HASHFUNCTION)
-
-private static void quickInsert(TABLETYPE[] table,VALTYPE val){
-//TODO move this to SetCommonImpl
-  int tableLength;
-  int hash;
-  for(hash=(HASHFUNCTION) & (tableLength=table.length-1);;){
-    if(table[hash]==$EMPTY_TABLE_VAL$){
-      table[hash]=val;
-      return;
-    }
-    hash=(hash+1)&tableLength;
-  }
-}
-#ENDDEF
-#IF OfRef
-  #MACRO QuickInsert($queryParameterType$,$queryParameterType$,(hash=val.hashCode()) ^ hash >>> 16)
-#ELSEIF OfDouble
-  #MACRO QuickInsert($queryParameterType$,$queryParameterType$,(hash=(int)(val ^ val >>> 32)) ^ hash >>> 16)
-#ELSEIF OfFloat
-  #MACRO QuickInsert($queryParameterType$,$queryParameterType$,val^val>>>16)
-#ELSEIF OfLong
-  #MACRO QuickInsert($ArrayType$,$ArrayType$,(int)(val^(val>>>32)))
-#ELSE
-  #MACRO QuickInsert($ArrayType$,$ArrayType$,val)
 #ENDIF
 #IF OfLong,OfInt,OfShort,OfChar
   private static $<E>$ long wordRemoveIf(long word,
@@ -176,42 +106,48 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
 #IF OfFloat,OfDouble,OfRef
     int size;
     if((size=that.size)!=0){
-      $queryParameterType$[] table;
-      int tableLength;
-      this.table=table=new $queryParameterType$[tableLength=tableSizeFor(size)];
-      this.maxTableSize=(int)(tableLength*loadFactor);
-      $queryParameterType$[] thatTable;
-      for(tableLength=(thatTable=that.table).length;;){
+      $queryParameterType$[] thisTable;
+      int thisTableLength;
+      this.table=thisTable=new $queryParameterType$[thisTableLength=tableSizeFor(size)];
+      this.maxTableSize=(int)(thisTableLength*loadFactor);
+      final $queryParameterType$[] thatTable;
+      --thisTableLength;
+      for(int thatTableLength=(thatTable=that.table).length;;){
         $queryParameterType$ tableVal;
   #IF OfFloat
-        switch(tableVal=thatTable[--tableLength]) {
+        switch(tableVal=thatTable[--thatTableLength]) {
         case $DELETED_TABLE_VAL$:
         case $EMPTY_TABLE_VAL$:
           continue;
         default:
         }
   #ELSE
-        if((tableVal=thatTable[--tableLength]) == $EMPTY_TABLE_VAL$ || tableVal == $DELETED_TABLE_VAL$){
+        if((tableVal=thatTable[--thatTableLength]) == $EMPTY_TABLE_VAL$ || tableVal == $DELETED_TABLE_VAL$){
           continue;
         }
   #ENDIF
-        quickInsert(table,tableVal);
+        SetCommonImpl.quickInsert(tableVal,thisTable,thisTableLength,SetCommonImpl.tableHash(tableVal)&thisTableLength);
         if(--size==0) {
           return;
         }
 #ELSE
     int tableSize;
     if((tableSize=that.tableSize)!=0){
-      $ArrayType$[] table;
-      int tableLength;
-      this.table=table=new $ArrayType$[tableLength=tableSizeFor(tableSize)];
-      this.maxTableSize=(int)(tableLength*loadFactor);
+      $ArrayType$[] thisTable;
+      int thisTableLength;
+      this.table=thisTable=new $ArrayType$[thisTableLength=tableSizeFor(tableSize)];
+      this.maxTableSize=(int)(thisTableLength*loadFactor);
+      --thisTableLength;
       $ArrayType$[] thatTable;
-      for(tableLength=(thatTable=that.table).length;;){
+      for(int thatTableLength=(thatTable=that.table).length;;){
         $ArrayType$ tableVal;
-        #MACRO IfIsPresentValue(tableVal=thatTable[--tableLength])
+        #MACRO IfIsPresentValue(tableVal=thatTable[--thatTableLength])
         {
-          quickInsert(table,tableVal);
+  #IF OfLong
+          SetCommonImpl.quickInsert(tableVal,thisTable,thisTableLength,Long.hashCode(tableVal)&thisTableLength);
+  #ELSE
+          SetCommonImpl.quickInsert(tableVal,thisTable,thisTableLength,tableVal&thisTableLength);
+  #ENDIF
           if(--tableSize==0){
             break;
           }
@@ -920,8 +856,7 @@ return tableContains(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff800000
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val));
 #ELSE
       returnFalse:for(;;){
   #IF OfFloat,OfDouble
@@ -1076,7 +1011,7 @@ ERROR unknown type $ClassPrefix$
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }else{
-        return tableContains(val,val.hashCode());
+        return tableContains(val,val?1231:1237);
       }
       
     }
@@ -1084,11 +1019,10 @@ ERROR unknown type $ClassPrefix$
   }
   @Override public boolean contains(Byte val){
     if(size!=0){
-      int hash;
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.byteValue()));
     }
     return false;
   }
@@ -1097,7 +1031,7 @@ ERROR unknown type $ClassPrefix$
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      return tableContains(val,val.hashCode());
+      return tableContains(val,val.charValue());
     }
     return false;
   }
@@ -1106,8 +1040,7 @@ ERROR unknown type $ClassPrefix$
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.shortValue()));
     }
     return false;
   }
@@ -1116,8 +1049,7 @@ ERROR unknown type $ClassPrefix$
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.intValue()));
     }
     return false;
   }
@@ -1126,8 +1058,7 @@ ERROR unknown type $ClassPrefix$
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.longValue()));
     }
     return false;
   }
@@ -1139,7 +1070,7 @@ ERROR unknown type $ClassPrefix$
         int hash;
         float f;
         if((f=(float)val)==f){
-          hash=(hash=Float.floatToRawIntBits(f))^(hash>>>16);
+          hash=SetCommonImpl.tableHash(Float.floatToRawIntBits(f));
         }else{
           val=Float.NaN;
           hash=0x7fc00000 ^ 0x7fc00000 >>> 16;
@@ -1157,8 +1088,7 @@ ERROR unknown type $ClassPrefix$
         int hash;
         double d;
         if((d=(double)val)==d){
-          long bits;
-          hash=(hash=(int)((bits=Double.doubleToRawLongBits(d))^(bits>>>32)))^(hash>>>16);
+          hash=SetCommonImpl.tableHash(Double.doubleToRawLongBits(d));
         }else{
           val=Double.NaN;
           hash=(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16;
@@ -1179,10 +1109,9 @@ ERROR unknown type $ClassPrefix$
       if(val instanceof AbstractOpenAddressHashSet){
         if(val instanceof RefOpenAddressHashSet){
           if(val instanceof RefOpenAddressHashSet.Checked){
-            
-            return SetCommonImpl.isEqualTo((RefOpenAddressHashSet.Checked<?>)val,this);
+            return isEqualTo((RefOpenAddressHashSet.Checked<?>)val);
           }
-          return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+          return isEqualTo((RefOpenAddressHashSet<?>)val);
         }else if(val instanceof AbstractIntegralTypeOpenAddressHashSet){
           if(val instanceof IntOpenAddressHashSet){
             return SetCommonImpl.isEqualTo(this,(IntOpenAddressHashSet)val);
@@ -1212,50 +1141,134 @@ ERROR unknown type $ClassPrefix$
       }
    
 #ELSE
-    if(val instanceof $ClassPrefix$OpenAddressHashSet){
-      return isEqualTo(($ClassPrefix$OpenAddressHashSet)val);
-    }else if(val instanceof RefOpenAddressHashSet){
-      return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-    }else{
-      return SetCommonImpl.isEqualTo((Set<?>)val,this);
-    }
+      if(val instanceof $ClassPrefix$OpenAddressHashSet){
+        return isEqualTo(($ClassPrefix$OpenAddressHashSet)val);
+      }else if(val instanceof RefOpenAddressHashSet){
+        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+      }else{
+        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      }
 #ENDIF
     }
     return false;
   }
-#IF OfRef
-  private boolean isEqualTo($ClassPrefix$OpenAddressHashSet<?> that){
-    
-  }
-  private boolean isEqualTo($ClassPrefix$OpenAddressHashSet.Checked<?> that){
-    
-  }
+#IF OfChar,OfShort,OfInt,OfLong,OfRef
+  private static boolean isEqualToHelper($ArrayType$[] smallTable,$ArrayType$[] bigTable,int bigTableLength,int numInTable){
 #ELSE
-  private boolean isEqualTo($ClassPrefix$OpenAddressHashSet that){
-    int size;
+  private static boolean isEqualToHelper($queryParameterType$[] smallTable,$queryParameterType$[] bigTable,int bigTableLength,int numInTable){
+#ENDIF
+    for(int tableIndex=0;;++tableIndex){
+#IF OfChar,OfShort,OfInt,OfLong,OfRef
+      final $ArrayType$ smallTableVal;
+#ELSE
+      final $queryParameterType$ smallTableVal;
+#ENDIF
+#IF OfRef
+      if((smallTableVal=smallTable[tableIndex])!=null && smallTableVal!=RefOpenAddressHashSet.DELETED){
+        if(!SetCommonImpl.tableContains(smallTableVal,bigTable,bigTableLength,SetCommonImpl.tableHash(smallTableVal)&bigTableLength)){
+          return false;
+        }
+        if(--numInTable==0){
+          return true;
+        }
+      }
+#ELSEIF OfDouble
+      if((smallTableVal=smallTable[tableIndex])!=0L && smallTableVal!=0x7ffc000000000000L){
+        if(!SetCommonImpl.tableContains(smallTableVal,bigTable,bigTableLength,SetCommonImpl.tableHash(smallTableVal)&bigTableLength)){
+          return false;
+        }
+        if(--numInTable==0){
+          return true;
+        }
+      }
+#ELSEIF OfFloat
+      switch(smallTableVal=smallTable[tableIndex]){
+        default:
+          if(!SetCommonImpl.tableContains(smallTableVal,bigTable,bigTableLength,SetCommonImpl.tableHash(smallTableVal)&bigTableLength)){
+            return false;
+          }
+          if(--numInTable==0){
+            return true;
+          }
+        case 0:
+        case 0x7fe00000:
+      }
+#ELSEIF OfLong
+      if(((smallTableVal=smallTable[tableIndex])&-2L)!=0L){
+        if(!SetCommonImpl.tableContains(smallTableVal,bigTable,bigTableLength,Long.hashCode(smallTableVal)&bigTableLength)){
+          return false;
+        }
+        if(--numInTable==0){
+          return true;
+        }
+      }
+#ELSE
+      if(((smallTableVal=smallTable[tableIndex])&-2)!=0){
+        if(!SetCommonImpl.tableContains(smallTableVal,bigTable,bigTableLength,smallTableVal&bigTableLength)){
+          return false;
+        }
+        if(--numInTable==0){
+          return true;
+        }
+      }
+#ENDIF   
+    }
+  }
+#IF OfRef
+  private boolean isEqualTo($ClassPrefix$OpenAddressHashSet.Checked<?> that){
+    final int size;
     if((size=this.size)==that.size){
       if(size==0){
         return true;
       }
-  #IF OfChar,OfShort,OfInt,OfLong
+      final int thatModCount=that.modCount;
+      try{
+        final $queryParameterType$[] thisTable,thatTable;
+        final int thisTableLength,thatTableLength;
+        if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+          return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+        }else{
+          return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(thatModCount,that.modCount);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfRef
+  private boolean isEqualTo($ClassPrefix$OpenAddressHashSet<?> that){
+#ELSE
+  private boolean isEqualTo($ClassPrefix$OpenAddressHashSet that){
+#ENDIF
+    final int size;
+    if((size=this.size)==that.size){
+      if(size==0){
+        return true;
+      }
+#IF OfChar,OfShort,OfInt,OfLong
       if(this.word0==that.word0 && this.word1==that.word1 && this.word2==that.word2 && this.word3==that.word3){
         final $ArrayType$[] thisTable,thatTable;
         final int thisTableLength,thatTableLength;
-        if((thisTableLength=(thisTable=this.table).length)<=()
+        if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+          return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+        }else{
+          return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+        }
       }
-  #ELSEIF OfFloat
-  
-  #ELSE
-  
-  #ENDIF
-      
-    //TODO
-    throw omni.impl.NotYetImplementedException.getNYI();
+#ELSE
+      final $queryParameterType$[] thisTable,thatTable;
+      final int thisTableLength,thatTableLength;
+      if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+        return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+      }else{
+        return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+      }
+#ENDIF
     }
     return false;
-  
   }
-#ENDIF
   
   #MACRO ForEach($TypeNameModifier$Consumer$<? super E>$,action)
 #IFNOT OfRef
@@ -1357,18 +1370,25 @@ ERROR unknown type $ClassPrefix$
         maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
         $queryParameterType$[] table;
         this.table=table=new $queryParameterType$[tableSize];
+        --tableSize;
         do {
   #IF OfRef
           Object obj;
+          final int hash;
           if((obj=in.readObject())==null){
             obj=NULL;
+            hash=NULLHASH&tableSize;;
+          }else{
+            hash=SetCommonImpl.tableHash(obj)&tableSize;
           }
-          quickInsert(table,obj);
+          SetCommonImpl.quickInsert(obj,table,tableSize,hash);
   #ELSE
     #IF OfFloat
-          quickInsert(table,in.readInt());
+          final int val;
+          SetCommonImpl.quickInsert(val=in.readInt(),table,tableSize,SetCommonImpl.tableHash(val)&tableSize);
     #ELSE
-          quickInsert(table,in.readLong());
+          final long val;
+          SetCommonImpl.quickInsert(val=in.readLong(),table,tableSize,SetCommonImpl.tableHash(val)&tableSize);
     #ENDIF
   #ENDIF
         }while(--size != 0);
@@ -1384,8 +1404,14 @@ ERROR unknown type $ClassPrefix$
               maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
               $ArrayType$[] table;
               this.table=table=new $ArrayType$[tableSize];
+              --tableSize;
               do{
-                  quickInsert(table,in.read$ClassPrefix$());
+                  final $ArrayType$ val;
+  #IF OfLong
+                  SetCommonImpl.quickInsert(val=in.read$ClassPrefix$(),table,tableSize,tableSize&Long.hashCode(val));
+  #ELSE
+                  SetCommonImpl.quickInsert(val=in.read$ClassPrefix$(),table,tableSize,tableSize&val);
+  #ENDIF
               }while(--size != 0);
           }else{
               maxTableSize=1;
@@ -1402,8 +1428,7 @@ ERROR unknown type $ClassPrefix$
         returnTrue:for(;;){
 #IF OfRef
           if(val!=null){
-            int hash;
-            if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -2264,8 +2289,7 @@ Error unknown type $ClassPrefix$
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            int hash;
-            if(removeFromTable(val,val.hashCode())){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.byteValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -2285,7 +2309,7 @@ Error unknown type $ClassPrefix$
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,val.hashCode())){
+            if(removeFromTable(val,val.charValue())){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -2305,7 +2329,7 @@ Error unknown type $ClassPrefix$
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,val.hashCode())){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.shortValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -2325,7 +2349,7 @@ Error unknown type $ClassPrefix$
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.intValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -2345,7 +2369,7 @@ Error unknown type $ClassPrefix$
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.longValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -3102,6 +3126,7 @@ int val){
         maxTableSize=(int)((hash=table.length << 1) * loadFactor);
         $queryParameterType$[] newTable;
         this.table=newTable=new $queryParameterType$[hash];
+        --hash;
         if(size!=1){
           for(int i=0;;++i){
             $queryParameterType$ tableVal;
@@ -3117,13 +3142,13 @@ int val){
               continue;
             }
   #ENDIF
-            quickInsert(newTable,tableVal);
+            SetCommonImpl.quickInsert(tableVal,newTable,hash,hash&SetCommonImpl.tableHash(tableVal));
             if(--size == 1){
               break;
             }
           }
         }
-        quickInsert(newTable,val);
+        SetCommonImpl.quickInsert(val,newTable,hash,hash&SetCommonImpl.tableHash(val));
     }else{
         table[hash]=val;
     }
@@ -3135,19 +3160,28 @@ int val){
       maxTableSize=(int)((hash=table.length<<1)*loadFactor);
       $ArrayType$[] newTable;
       this.table=newTable=new $ArrayType$[hash];
+      --hash;
       if(tableSize!=1){
         for(int i=0;;++i){
           $ArrayType$ tableVal;
           #MACRO IfIsPresentValue(tableVal=table[i])
           {
-            quickInsert(newTable,tableVal);
+#IF OfLong
+            SetCommonImpl.quickInsert(tableVal,newTable,hash,hash&Long.hashCode(tableVal));
+#ELSE
+            SetCommonImpl.quickInsert(tableVal,newTable,hash,hash&tableVal);
+#ENDIF           
             if(--tableSize==1){
               break;
             }
           }
         }
       }
-      quickInsert(newTable,val);
+#IF OfLong
+      SetCommonImpl.quickInsert(val,newTable,hash,hash&Long.hashCode(val));
+#ELSE
+      SetCommonImpl.quickInsert(val,newTable,hash,hash&val);
+#ENDIF    
     }else{
       table[hash]=val;
     }
@@ -3818,7 +3852,31 @@ return (this.wordWORDNUM & (MASK))!=0;
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
+    
 #IF OfRef
+    private boolean isEqualTo(RefOpenAddressHashSet.Checked<?> that){
+      final int size;
+      if((size=this.size)==that.size){
+        if(size==0){
+          return true;
+        }
+        final int thisModCount=this.modCount;
+        final int thatModCount=that.modCount;
+        try{
+          final $queryParameterType$[] thisTable,thatTable;
+          final int thisTableLength,thatTableLength;
+          if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+            return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+          }else{
+            return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+          }
+        }finally{
+          CheckedCollection.checkModCount(thisModCount,this.modCount);
+          CheckedCollection.checkModCount(thatModCount,that.modCount);
+        }
+      }
+      return false;
+    }
     @Override public boolean equals(Object val){
       if(val==this){
         return true;
@@ -3827,9 +3885,9 @@ return (this.wordWORDNUM & (MASK))!=0;
         if(val instanceof AbstractOpenAddressHashSet){
           if(val instanceof RefOpenAddressHashSet){
             if(val instanceof RefOpenAddressHashSet.Checked){
-              return SetCommonImpl.isEqualTo(this,(RefOpenAddressHashSet.Checked<?>)val);
+              return this.isEqualTo((RefOpenAddressHashSet.Checked<?>)val);
             }
-            return SetCommonImpl.isEqualTo(this,(RefOpenAddressHashSet<?>)val);
+            return ((RefOpenAddressHashSet<?>)val).isEqualTo(this);
           }else if(val instanceof AbstractIntegralTypeOpenAddressHashSet){
             if(val instanceof IntOpenAddressHashSet){
               return SetCommonImpl.isEqualTo(this,(IntOpenAddressHashSet)val);
@@ -4008,8 +4066,7 @@ return (this.wordWORDNUM & (MASK))!=0;
             if(val != null){
                 int modCount=this.modCount;
                 try{
-                    int hash;
-                    return super.tableContains(val,(hash=val.hashCode())^(hash>>>16));
+                    return super.tableContains(val,SetCommonImpl.tableHash(val));
                 }finally{
                     CheckedCollection.checkModCount(modCount,this.modCount);
                 }
@@ -4032,8 +4089,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                     if(val != null){
                         int modCount=this.modCount;
                         try{
-                            int hash;
-                            if(removeFromTable(modCount,val,(hash=val.hashCode())^(hash>>>16))){
+                            if(removeFromTable(modCount,val,SetCommonImpl.tableHash(val))){
                                 break returnTrue;
                             }
                         }catch(ConcurrentModificationException e){

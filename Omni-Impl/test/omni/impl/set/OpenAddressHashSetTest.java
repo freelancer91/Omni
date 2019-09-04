@@ -723,9 +723,11 @@ public class OpenAddressHashSetTest{
     }
     
     @Test public void testItrclone_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->initSet
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->
+        initSet
                 .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
                 .getMonitoredIterator().verifyClone();
+        
         test.runAllTests("OpenAddressHashSetTest.testItrclone_void");
     }
     
@@ -2666,19 +2668,22 @@ public class OpenAddressHashSetTest{
                                 queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
                                     castTypesToInputTypes.forEach((castType,inputTypes)->{
                                         inputTypes.forEach(inputType->{
+                
                                             if(queryVal == QueryVal.NonNull){
                                                 for(var monitoredObjectGen:StructType.OpenAddressHashSet.validMonitoredObjectGens){
                                                     if(monitoredObjectGen.expectedException != null){
                                                         for(final var size:sizes){
                                                             if(size > 0){
-                                                                TestExecutorService
-                                                                .submitTest(()->Assertions.assertThrows(
+                                                                TestExecutorService.submitTest(()->
+                                                                Assertions.assertThrows(
                                                                         monitoredObjectGen.expectedException,
                                                                         ()->runTest(collectionType,queryVal,
                                                                                 modification,inputType,castType,
                                                                                 CheckedType.CHECKED,size,
                                                                                 loadFactor,-1,
-                                                                                monitoredObjectGen)));
+                                                                                monitoredObjectGen))
+                                                                )
+                                                                ;
                                                             }
                                                         }
                                                     }
@@ -2716,9 +2721,13 @@ public class OpenAddressHashSetTest{
                                                                     continue;
                                                                 }
                                                             }
-                                                            TestExecutorService.submitTest(()->runTest(collectionType,
+                                                            TestExecutorService.submitTest(()->
+
+                                                            runTest(collectionType,
                                                                     queryVal,modification,inputType,castType,
-                                                                    checkedType,size,loadFactor,position,null));
+                                                                    checkedType,size,loadFactor,position,null)
+                                                            )
+                                                            ;
                                                         }
                                                     }
                                                 }

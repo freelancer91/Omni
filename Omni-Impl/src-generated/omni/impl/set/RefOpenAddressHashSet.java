@@ -9,58 +9,15 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
-import java.util.Iterator;
 import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 import java.util.ConcurrentModificationException;
 public class RefOpenAddressHashSet<E>
 extends AbstractOpenAddressHashSet<E>
 implements OmniSet.OfRef<E>{
-/*
-  static int tableHash(Object val){
-  //TODO improve this hash function
-    int tmp;
-    return (tmp=val.hashCode())^(tmp>>>16);
-  }
-  static int tableHash(long val){
-  //TODO improve this hash function
-    int tmp;
-    return (tmp=(int)(val^(val>>>32)))^(tmp>>>16);
-  }
-  static int tableHash(int val){
-  //TODO improve this hash function
-    return val^(val>>>16);
-  }
-*/
   static final Object NULL=new Object();
   static final int NULLHASH=SetCommonImpl.tableHash(NULL);
   static final Object DELETED=new Object();
-  /*
-  static boolean tableContains(Object val,int hash,Object[] table,int tableLength){
-    Object tableVal;
-    if((tableVal=table[hash&=tableLength])!=null){
-      final int initialHash=hash;
-      do{
-        if(val.equals(tableVal)){
-          return true;
-        }
-      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=null);
-    }
-    return false;
-  }
-  */
-  private static void quickInsert(Object[] table,Object val){
-  //TODO move this to SetCommonImpl
-    int tableLength;
-    int hash;
-    for(hash=((hash=val.hashCode()) ^ hash >>> 16) & (tableLength=table.length-1);;){
-      if(table[hash]==null){
-        table[hash]=val;
-        return;
-      }
-      hash=(hash+1)&tableLength;
-    }
-  }
   transient Object[] table;
   public RefOpenAddressHashSet(){
     super();
@@ -69,17 +26,18 @@ implements OmniSet.OfRef<E>{
     super(that);
     int size;
     if((size=that.size)!=0){
-      Object[] table;
-      int tableLength;
-      this.table=table=new Object[tableLength=tableSizeFor(size)];
-      this.maxTableSize=(int)(tableLength*loadFactor);
-      Object[] thatTable;
-      for(tableLength=(thatTable=that.table).length;;){
+      Object[] thisTable;
+      int thisTableLength;
+      this.table=thisTable=new Object[thisTableLength=tableSizeFor(size)];
+      this.maxTableSize=(int)(thisTableLength*loadFactor);
+      final Object[] thatTable;
+      --thisTableLength;
+      for(int thatTableLength=(thatTable=that.table).length;;){
         Object tableVal;
-        if((tableVal=thatTable[--tableLength]) == null || tableVal == DELETED){
+        if((tableVal=thatTable[--thatTableLength]) == null || tableVal == DELETED){
           continue;
         }
-        quickInsert(table,tableVal);
+        SetCommonImpl.quickInsert(tableVal,thisTable,thisTableLength,SetCommonImpl.tableHash(tableVal)&thisTableLength);
         if(--size==0) {
           return;
         }
@@ -154,8 +112,7 @@ implements OmniSet.OfRef<E>{
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val));
     }
     return false;
   }
@@ -164,18 +121,17 @@ implements OmniSet.OfRef<E>{
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }else{
-        return tableContains(val,val.hashCode());
+        return tableContains(val,val?1231:1237);
       }
     }
     return false;
   }
   @Override public boolean contains(Byte val){
     if(size!=0){
-      int hash;
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.byteValue()));
     }
     return false;
   }
@@ -184,7 +140,7 @@ implements OmniSet.OfRef<E>{
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      return tableContains(val,val.hashCode());
+      return tableContains(val,val.charValue());
     }
     return false;
   }
@@ -193,8 +149,7 @@ implements OmniSet.OfRef<E>{
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.shortValue()));
     }
     return false;
   }
@@ -203,8 +158,7 @@ implements OmniSet.OfRef<E>{
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.intValue()));
     }
     return false;
   }
@@ -213,8 +167,7 @@ implements OmniSet.OfRef<E>{
       if(val==null){
         return tableContains(NULL,NULLHASH);
       }
-      int hash;
-      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      return tableContains(val,SetCommonImpl.tableHash(val.longValue()));
     }
     return false;
   }
@@ -226,7 +179,7 @@ implements OmniSet.OfRef<E>{
         int hash;
         float f;
         if((f=(float)val)==f){
-          hash=(hash=Float.floatToRawIntBits(f))^(hash>>>16);
+          hash=SetCommonImpl.tableHash(Float.floatToRawIntBits(f));
         }else{
           val=Float.NaN;
           hash=0x7fc00000 ^ 0x7fc00000 >>> 16;
@@ -244,8 +197,7 @@ implements OmniSet.OfRef<E>{
         int hash;
         double d;
         if((d=(double)val)==d){
-          long bits;
-          hash=(hash=(int)((bits=Double.doubleToRawLongBits(d))^(bits>>>32)))^(hash>>>16);
+          hash=SetCommonImpl.tableHash(Double.doubleToRawLongBits(d));
         }else{
           val=Double.NaN;
           hash=(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16;
@@ -255,100 +207,94 @@ implements OmniSet.OfRef<E>{
     }
     return false;
   }
-  private boolean isEqualTo(RefOpenAddressHashSet<?> set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(DoubleOpenAddressHashSet set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(FloatOpenAddressHashSet set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(LongOpenAddressHashSet set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(IntOpenAddressHashSet set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(ShortOpenAddressHashSet set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(CharOpenAddressHashSet set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(ByteSetImpl set){
-    //TODO
-    return isEqualTo((Set<?>)set);
-  }
-  private boolean isEqualTo(BooleanSetImpl set){
-    switch(set.state){
-      case 0b00:
-        return this.size==0;
-      case 0b01:
-        return this.size==1 && this.tableContains(Boolean.FALSE,1237);
-      case 0b10:
-        return this.size==1 && this.tableContains(Boolean.TRUE,1231);
-      default:
-        final Object[] table;
-        final int tableLength;
-        return this.size==2 && tableContains(Boolean.FALSE,1237,table=this.table,tableLength=table.length-1) && tableContains(Boolean.TRUE,1231,table,tableLength);
-    }
-  }
-  private boolean isEqualTo(Set<?> set){
-    if(this.size==set.size()){
-      Iterator<?> thatItr;
-      if((thatItr=set.iterator()).hasNext()){
-        final Object[] table;
-        final int tableLength=(table=this.table).length-1;
-        do{
-          final int hash;
-          Object thatVal;
-          if((thatVal=thatItr.next())==null){
-            thatVal=NULL;
-            hash=NULLHASH;
-          }else{
-            hash=thatVal.hashCode();
-          }
-          if(!tableContains(thatVal,hash,table,tableLength)){
-            return false;
-          }
-        }while(itr.hasNext());
-      }
-      return true;
-    }
-    return false;
-  }
   @Override public boolean equals(Object val){
     if(val==this){
       return true;
     }
-    if(val instanceof RefOpenAddressHashSet){
-      return isEqualTo((RefOpenAddressHashSet<?>)val);
-    }else if(val instanceof IntOpenAddressHashSet){
-      return isEqualTo((IntOpenAddressHashSet)val);
-    }else if(val instanceof FloatOpenAddressHashSet){
-      return isEqualTo((FloatOpenAddressHashSet)val);
-    }else if(val instanceof LongOpenAddressHashSet){
-      return isEqualTo((LongOpenAddressHashSet)val);
-    }else if(val instanceof DoubleOpenAddressHashSet){
-      return isEqualTo((DoubleOpenAddressHashSet)val);
-    }else if(val instanceof ByteSetImpl){
-      return isEqualTo((ByteSetImpl)val);
-    }else if(val instanceof CharOpenAddressHashSet){
-      return isEqualTo((CharOpenAddressHashSet)val);
-    }else if(val instanceof ShortOpenAddressHashSet){
-      return isEqualTo((ShortOpenAddressHashSet)val);
-    }else if(val instanceof BooleanSetImpl){
-      return isEqualTo((BooleanSetImpl)val);
-    }else if(val instanceof Set){
-      return isEqualTo((Set<?>)val);   
+    if(val instanceof Set){
+      if(val instanceof AbstractOpenAddressHashSet){
+        if(val instanceof RefOpenAddressHashSet){
+          if(val instanceof RefOpenAddressHashSet.Checked){
+            return isEqualTo((RefOpenAddressHashSet.Checked<?>)val);
+          }
+          return isEqualTo((RefOpenAddressHashSet<?>)val);
+        }else if(val instanceof AbstractIntegralTypeOpenAddressHashSet){
+          if(val instanceof IntOpenAddressHashSet){
+            return SetCommonImpl.isEqualTo(this,(IntOpenAddressHashSet)val);
+          }else if(val instanceof LongOpenAddressHashSet){
+            return SetCommonImpl.isEqualTo(this,(LongOpenAddressHashSet)val);
+          }else if(val instanceof CharOpenAddressHashSet){
+            return SetCommonImpl.isEqualTo(this,(CharOpenAddressHashSet)val);
+          }else{
+            //must be short
+            return SetCommonImpl.isEqualTo(this,(ShortOpenAddressHashSet)val);
+          }
+        }else if(val instanceof FloatOpenAddressHashSet){
+          return SetCommonImpl.isEqualTo(this,(FloatOpenAddressHashSet)val);
+        }else{
+          //must be double
+          return SetCommonImpl.isEqualTo(this,(DoubleOpenAddressHashSet)val);
+        }
+      }else if(val instanceof ByteSetImpl){
+        if(val instanceof ByteSetImpl.Checked){
+           return SetCommonImpl.isEqualTo(this,(ByteSetImpl.Checked)val);
+        }
+        return SetCommonImpl.isEqualTo(this,(ByteSetImpl)val);
+      }else if(val instanceof BooleanSetImpl){
+        return SetCommonImpl.isEqualTo(this,(BooleanSetImpl)val);
+      }else{
+        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      }
+    }
+    return false;
+  }
+  private static boolean isEqualToHelper(Object[] smallTable,Object[] bigTable,int bigTableLength,int numInTable){
+    for(int tableIndex=0;;++tableIndex){
+      final Object smallTableVal;
+      if((smallTableVal=smallTable[tableIndex])!=null && smallTableVal!=RefOpenAddressHashSet.DELETED){
+        if(!SetCommonImpl.tableContains(smallTableVal,bigTable,bigTableLength,SetCommonImpl.tableHash(smallTableVal)&bigTableLength)){
+          return false;
+        }
+        if(--numInTable==0){
+          return true;
+        }
+      }
+    }
+  }
+  private boolean isEqualTo(RefOpenAddressHashSet.Checked<?> that){
+    final int size;
+    if((size=this.size)==that.size){
+      if(size==0){
+        return true;
+      }
+      final int thatModCount=that.modCount;
+      try{
+        final Object[] thisTable,thatTable;
+        final int thisTableLength,thatTableLength;
+        if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+          return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+        }else{
+          return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(thatModCount,that.modCount);
+      }
+    }
+    return false;
+  }
+  private boolean isEqualTo(RefOpenAddressHashSet<?> that){
+    final int size;
+    if((size=this.size)==that.size){
+      if(size==0){
+        return true;
+      }
+      final Object[] thisTable,thatTable;
+      final int thisTableLength,thatTableLength;
+      if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+        return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+      }else{
+        return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+      }
     }
     return false;
   }
@@ -382,12 +328,17 @@ implements OmniSet.OfRef<E>{
         maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
         Object[] table;
         this.table=table=new Object[tableSize];
+        --tableSize;
         do {
           Object obj;
+          final int hash;
           if((obj=in.readObject())==null){
             obj=NULL;
+            hash=NULLHASH&tableSize;;
+          }else{
+            hash=SetCommonImpl.tableHash(obj)&tableSize;
           }
-          quickInsert(table,obj);
+          SetCommonImpl.quickInsert(obj,table,tableSize,hash);
         }while(--size != 0);
       }else{
         maxTableSize=1;
@@ -399,8 +350,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            int hash;
-            if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -551,8 +501,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            int hash;
-            if(removeFromTable(val,val.hashCode())){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.byteValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -572,7 +521,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,val.hashCode())){
+            if(removeFromTable(val,val.charValue())){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -592,7 +541,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,val.hashCode())){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.shortValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -612,7 +561,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.intValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -632,7 +581,7 @@ implements OmniSet.OfRef<E>{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,SetCommonImpl.tableHash(val))){
+            if(removeFromTable(val,SetCommonImpl.tableHash(val.longValue()))){
               break returnTrue;
             }
           }else if(removeFromTable(NULL,NULLHASH)){
@@ -679,7 +628,7 @@ implements OmniSet.OfRef<E>{
           if(val!=null){
             double d;
             if((d=(double)val)==d){
-              if((removeFromTable(val,SetCommonImpl.tableHash(Double.doubleToRawLongBits(d)))){
+              if(removeFromTable(val,SetCommonImpl.tableHash(Double.doubleToRawLongBits(d)))){
                 break returnTrue;
               }
             }else if(removeFromTable(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)){
@@ -920,19 +869,20 @@ private boolean addToTable(Object val,int hash){
         maxTableSize=(int)((hash=table.length << 1) * loadFactor);
         Object[] newTable;
         this.table=newTable=new Object[hash];
+        --hash;
         if(size!=1){
           for(int i=0;;++i){
             Object tableVal;
             if((tableVal=table[i]) == null || tableVal == DELETED){
               continue;
             }
-            quickInsert(newTable,tableVal);
+            SetCommonImpl.quickInsert(tableVal,newTable,hash,hash&SetCommonImpl.tableHash(tableVal));
             if(--size == 1){
               break;
             }
           }
         }
-        quickInsert(newTable,val);
+        SetCommonImpl.quickInsert(val,newTable,hash,hash&SetCommonImpl.tableHash(val));
     }else{
         table[hash]=val;
     }
@@ -1035,42 +985,67 @@ private boolean addToTable(Object val,int hash){
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
-    private boolean isEqualTo(Set<?> set){
-      final int modCount=this.modCount;
-      try{
-        return super.isEqualTo(set);
-      }finally{
-        CheckedCollection.checkModCount(modCount,this.modCount);
+    private boolean isEqualTo(RefOpenAddressHashSet.Checked<?> that){
+      final int size;
+      if((size=this.size)==that.size){
+        if(size==0){
+          return true;
+        }
+        final int thisModCount=this.modCount;
+        final int thatModCount=that.modCount;
+        try{
+          final Object[] thisTable,thatTable;
+          final int thisTableLength,thatTableLength;
+          if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+            return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+          }else{
+            return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+          }
+        }finally{
+          CheckedCollection.checkModCount(thisModCount,this.modCount);
+          CheckedCollection.checkModCount(thatModCount,that.modCount);
+        }
       }
-    }
-    private boolean isEqualTo(RefOpenAddressHashSet<?> set){
-      //TODO
-      return this.isEqualTo((Set<?>)set);
+      return false;
     }
     @Override public boolean equals(Object val){
       if(val==this){
         return true;
       }
-      if(val instanceof RefOpenAddressHashSet){
-        return isEqualTo((RefOpenAddressHashSet<?>)val);
-      }else if(val instanceof IntOpenAddressHashSet){
-        return super.isEqualTo((IntOpenAddressHashSet)val);
-      }else if(val instanceof FloatOpenAddressHashSet){
-        return super.isEqualTo((FloatOpenAddressHashSet)val);
-      }else if(val instanceof LongOpenAddressHashSet){
-        return super.isEqualTo((LongOpenAddressHashSet)val);
-      }else if(val instanceof DoubleOpenAddressHashSet){
-        return super.isEqualTo((DoubleOpenAddressHashSet)val);
-      }else if(val instanceof ByteSetImpl){
-        return super.isEqualTo((ByteSetImpl)val);
-      }else if(val instanceof CharOpenAddressHashSet){
-        return super.isEqualTo((CharOpenAddressHashSet)val);
-      }else if(val instanceof ShortOpenAddressHashSet){
-        return super.isEqualTo((ShortOpenAddressHashSet)val);
-      }else if(val instanceof BooleanSetImpl){
-        return super.isEqualTo((BooleanSetImpl)val);
-      }else if(val instanceof Set){
-        return isEqualTo((Set<?>)val); 
+      if(val instanceof Set){
+        if(val instanceof AbstractOpenAddressHashSet){
+          if(val instanceof RefOpenAddressHashSet){
+            if(val instanceof RefOpenAddressHashSet.Checked){
+              return this.isEqualTo((RefOpenAddressHashSet.Checked<?>)val);
+            }
+            return ((RefOpenAddressHashSet<?>)val).isEqualTo(this);
+          }else if(val instanceof AbstractIntegralTypeOpenAddressHashSet){
+            if(val instanceof IntOpenAddressHashSet){
+              return SetCommonImpl.isEqualTo(this,(IntOpenAddressHashSet)val);
+            }else if(val instanceof LongOpenAddressHashSet){
+              return SetCommonImpl.isEqualTo(this,(LongOpenAddressHashSet)val);
+            }else if(val instanceof CharOpenAddressHashSet){
+              return SetCommonImpl.isEqualTo(this,(CharOpenAddressHashSet)val);
+            }else{
+              //must be short
+              return SetCommonImpl.isEqualTo(this,(ShortOpenAddressHashSet)val);
+            }
+          }else if(val instanceof FloatOpenAddressHashSet){
+            return SetCommonImpl.isEqualTo(this,(FloatOpenAddressHashSet)val);
+          }else{
+            //must be double
+            return SetCommonImpl.isEqualTo(this,(DoubleOpenAddressHashSet)val);
+          }
+        }else if(val instanceof ByteSetImpl){
+          if(val instanceof ByteSetImpl.Checked){
+             return SetCommonImpl.isEqualTo(this,(ByteSetImpl.Checked)val);
+          }
+          return SetCommonImpl.isEqualTo(this,(ByteSetImpl)val);
+        }else if(val instanceof BooleanSetImpl){
+          return SetCommonImpl.isEqualTo(this,(BooleanSetImpl)val);
+        }else{
+          return SetCommonImpl.isEqualTo((Set<?>)val,this);
+        }
       }
       return false;
     }
@@ -1151,8 +1126,7 @@ private boolean addToTable(Object val,int hash){
             if(val != null){
                 int modCount=this.modCount;
                 try{
-                    int hash;
-                    return super.tableContains(val,(hash=val.hashCode())^(hash>>>16));
+                    return super.tableContains(val,SetCommonImpl.tableHash(val));
                 }finally{
                     CheckedCollection.checkModCount(modCount,this.modCount);
                 }
@@ -1173,8 +1147,7 @@ private boolean addToTable(Object val,int hash){
                     if(val != null){
                         int modCount=this.modCount;
                         try{
-                            int hash;
-                            if(removeFromTable(modCount,val,(hash=val.hashCode())^(hash>>>16))){
+                            if(removeFromTable(modCount,val,SetCommonImpl.tableHash(val))){
                                 break returnTrue;
                             }
                         }catch(ConcurrentModificationException e){

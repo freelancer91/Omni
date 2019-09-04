@@ -11,17 +11,39 @@ import omni.impl.DoubleDblLnkNode;
 import omni.impl.RefDblLnkNode;
 import omni.util.TypeUtil;
 import java.util.Objects;
+import java.util.List;
 interface SequenceEqualityUtil{
+  static boolean isEqualTo(List<?> thisList,List<?> thatList){
+    //TODO remove this and optimize
+    if(thisList.size()==thatList.size()){
+      final var thisItr=thisList.listIterator();
+      final var thatItr=thatList.listIterator();
+      do{
+        if(!thisItr.hasNext()){
+          return !thatItr.hasNext();
+        }
+      }while(thatItr.hasNext() && java.util.Objects.equals(thisItr.next(),thatItr.next()));
+    }
+    return false;
+  }
   #MACRO PackedBooleanArrSeqEqualsImpl<Boolean>(,boolean)
   #MACRO PackedBooleanArrSeqEqualsImpl<Ref>(<?>,Object)
-  #MACRO ArrSeqEqualsArrSeqImpl(boolean)
-  #MACRO ArrSeqEqualsArrSeqImpl(byte)
-  #MACRO ArrSeqEqualsArrSeqImpl(char)
-  #MACRO ArrSeqEqualsArrSeqImpl(short)
-  #MACRO ArrSeqEqualsArrSeqImpl(int)
-  #MACRO ArrSeqEqualsArrSeqImpl(long)
-  #MACRO ArrSeqEqualsArrSeqImpl(float)
-  #MACRO ArrSeqEqualsArrSeqImpl(double)
+  #MACRO ArrSeqEqualsArrSeqImpl<Boolean,Ref>(boolean,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Byte,Ref>(byte,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Char,Ref>(char,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Short,Ref>(short,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Int,Ref>(int,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Long,Ref>(long,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Float,Ref>(float,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Double,Ref>(double,Object)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Boolean>(Object,boolean)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Byte>(Object,byte)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Char>(Object,char)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Short>(Object,short)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Int>(Object,int)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Long>(Object,long)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Float>(Object,float)
+  #MACRO ArrSeqEqualsArrSeqImpl<Ref,Double>(Object,double)
   #MACRO ArrSeqEqualsDblLnkSeqImpl<Boolean,Boolean>(boolean,)
   #MACRO ArrSeqEqualsDblLnkSeqImpl<Boolean,Ref>(boolean,<?>)
   #MACRO ArrSeqEqualsDblLnkSeqImpl<Byte,Byte>(byte,)
@@ -39,6 +61,14 @@ interface SequenceEqualityUtil{
   #MACRO ArrSeqEqualsDblLnkSeqImpl<Double,Double>(double,)
   #MACRO ArrSeqEqualsDblLnkSeqImpl<Double,Ref>(double,<?>)
   #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Ref>(Object,<?>)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Boolean>(Object,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Byte>(Object,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Char>(Object,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Short>(Object,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Int>(Object,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Long>(Object,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Float>(Object,)
+  #MACRO ArrSeqEqualsDblLnkSeqImpl<Ref,Double>(Object,)
   #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Boolean>()
   #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Byte>()
   #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Char>()
@@ -47,7 +77,13 @@ interface SequenceEqualityUtil{
   #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Long>()
   #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Float>()
   #MACRO DblLnkSeqEqualsDblLnkSeqImpl<Double>()
+  
+  
+  
+ 
+  
 }
+
 #MACRODEF DblLnkSeqEqualsDblLnkSeqImpl<LHSPREFIX>()
 static boolean isEqualTo(LHSPREFIXDblLnkNode lhsHead,LHSPREFIXDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
   for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
@@ -70,9 +106,11 @@ static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,
   return false;
 }
 #ENDDEF
-#MACRODEF ArrSeqEqualsArrSeqImpl(LHSARRTYPE)
-static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,Object[] rhsArr,int rhsRootOffset){
-  for(;TypeUtil.refEquals(rhsArr[rhsRootOffset],lhsArr[lhsRootOffset]);++rhsRootOffset){
+#MACRODEF ArrSeqEqualsArrSeqImpl<LHSPREFIX,RHSPREFIX>(LHSARRTYPE,RHSARRTYPE)
+static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,RHSARRTYPE[] rhsArr,int rhsRootOffset){
+  for(;
+  #MACRO EqualityMacro(lhsArr[lhsRootOffset],rhsArr[rhsRootOffset])
+  ;++rhsRootOffset){
     if(++lhsRootOffset==lhsRootBound){
       return true;
     }
@@ -81,6 +119,21 @@ static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,
 }
 #ENDDEF
 #MACRODEF PackedBooleanArrSeqEqualsImpl<CLASSPREFIX>(TYPEPARAMETER,ARRTYPE)
+static boolean isEqualTo(int arrSeqRootOffset,int arrSeqRootBound,ARRTYPE[] arr,int pbasRootOffset,long[] pbasWords){
+#IFSWITCH CLASSPREFIX==Ref
+  for(long pbasWord=pbasWords[pbasRootOffset>>6];TypeUtil.refEquals(arr[arrSeqRootOffset],(((pbasWord>>>pbasRootOffset)&1L)!=0L));){
+#ELSE
+  for(long pbasWord=pbasWords[pbasRootOffset>>6];arr[arrSeqRootOffset]==(((pbasWord>>>pbasRootOffset)&1L)!=0L);){
+#ENDIF
+    if(++arrSeqRootOffset==arrSeqRootBound){
+      return true;
+    }
+    if(((++pbasRootOffset)&63)==0){
+      pbasWord=pbasWords[pbasRootOffset>>6];
+    }
+  }
+  return false;
+}
 static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,ARRTYPE[] arr,int arrSeqRootOffset){
     #IFSWITCH CLASSPREFIX==Boolean
   for(long pbasWord=pbasWords[pbasRootOffset>>6];arr[arrSeqRootOffset]^(((pbasWord>>>pbasRootOffset)&1L)==0L);++arrSeqRootOffset){
@@ -183,7 +236,9 @@ ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
   #ENDIF
 #ELSEIFSWITCH LHSPREFIX==Ref
   #IFSWITCH RHSPREFIX==Ref
-Objects.equals(RHSVAL,LHSVAL)  
+Objects.equals(RHSVAL,LHSVAL)
+  #ELSEIFSWITCH RHSPREFIX==Boolean,Byte,Char,Short,Int,Long,Float,Double
+TypeUtil.refEquals(LHSVAL,RHSVAL)
   #ELSE
 ERROR unknown rhs prefix RHSPREFIX for lhs prefix LHSPREFIX
   #ENDIF
