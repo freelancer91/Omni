@@ -441,7 +441,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
               return root.isEqualTo(this.head,size,(OmniList.OfBoolean)abstractSeq);
             }
 #ELSE
-            return root.isEqualTo(this.head,size,abstractSeq);
+            if(abstractSeq instanceof OmniList.Of$ClassPrefix$){
+              return root.isEqualTo(this.head,size,(OmniList.Of$ClassPrefix$)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfRef){
+              return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)abstractSeq);
+            }
 #ENDIF
           }
         }else{
@@ -1303,7 +1307,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
                 return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfBoolean)abstractSeq);
               }
 #ELSE
-              return root.isEqualTo(this.head,size,abstractSeq);
+              if(abstractSeq instanceof OmniList.Of$ClassPrefix$){
+                return root.isEqualTo(this.head,size,(OmniList.Of$ClassPrefix$)abstractSeq);
+              }else if(abstractSeq instanceof OmniList.OfRef){
+                return ((UncheckedList$<E>$)root).isEqualTo(this.head,size,(OmniList.OfRef<?>)abstractSeq);
+              }
 #ENDIF
             }
           }else{
@@ -1852,7 +1860,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     }
     
 #ELSE
-    private boolean isEqualTo(int size,AbstractSeq<?> list){
+    private boolean isEqualTo(int size,OmniList.Of$ClassPrefix$ list){
       if(list instanceof $ClassPrefix$DblLnkSeq){
         final $ClassPrefix$DblLnkNode thatHead,thisHead=this.head;
         if(list instanceof $ClassPrefix$DblLnkSeq.CheckedSubList){
@@ -1873,20 +1881,6 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           //must be $ClassPrefix$ArrSeq.UncheckedList
           return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,this.head);
         }
-  #ELSE
-      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,this.head);
-  #ENDIF
-      }else if(list instanceof RefArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo(((RefArrSeq.UncheckedList<?>)list).arr,0,size,this.head);
-      }else if(list instanceof RefDblLnkSeq){
-        final RefDblLnkSeq<?> that;
-        if((that=(RefDblLnkSeq<?>)list) instanceof RefDblLnkSeq.CheckedSubList){
-          final RefDblLnkSeq.CheckedSubList<?> subList;
-          CheckedCollection.checkModCount((subList=(RefDblLnkSeq.CheckedSubList<?>)that).modCount,subList.root.modCount);
-        }
-        return SequenceEqualityUtil.isEqualTo(this.head,this.tail,that.head);
-  #IF OfBoolean
       }else if(list instanceof Packed$ClassPrefix$ArrSeq.CheckedSubList){
         final Packed$ClassPrefix$ArrSeq.CheckedSubList subList;
         final Packed$ClassPrefix$ArrSeq.CheckedList thatRoot;
@@ -1897,6 +1891,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final int thatRootOffset;
         final Packed$ClassPrefix$ArrSeq.UncheckedSubList subList;
         return SequenceEqualityUtil.isEqualTo(thatRootOffset=(subList=(Packed$ClassPrefix$ArrSeq.UncheckedSubList)list).rootOffset,subList.root.words,thatRootOffset+size,this.head);
+  #ELSE
+      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
+        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,this.head);
   #ENDIF
       }else if(list instanceof $ClassPrefix$ArrSeq.CheckedSubList){
         final $ClassPrefix$ArrSeq.CheckedSubList subList;
@@ -1911,7 +1908,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return SequenceEqualityUtil.isEqualTo((subList=($ClassPrefix$ArrSeq.UncheckedSubList)list).root.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head); 
       }
     }
-    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,AbstractSeq<?> list){
+    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,OmniList.Of$ClassPrefix$ list){
       if(list instanceof $ClassPrefix$DblLnkSeq){
         final $ClassPrefix$DblLnkNode thatHead;
         if(list instanceof $ClassPrefix$DblLnkSeq.CheckedSubList){
@@ -1932,20 +1929,6 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           //must be $ClassPrefix$ArrSeq.UncheckedList
           return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,thisHead);
         }
-#ELSE
-      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,thisHead);
-#ENDIF
-      }else if(list instanceof RefArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo(((RefArrSeq.UncheckedList<?>)list).arr,0,size,thisHead);
-      }else if(list instanceof RefDblLnkSeq){
-        final RefDblLnkSeq<?> that;
-        if((that=(RefDblLnkSeq<?>)list) instanceof RefDblLnkSeq.CheckedSubList){
-          final RefDblLnkSeq.CheckedSubList<?> subList;
-          CheckedCollection.checkModCount((subList=(RefDblLnkSeq.CheckedSubList<?>)that).modCount,subList.root.modCount);
-        }
-        return SequenceEqualityUtil.isEqualTo(that.head,that.tail,thisHead);
-#IF OfBoolean
       }else if(list instanceof Packed$ClassPrefix$ArrSeq.CheckedSubList){
         final Packed$ClassPrefix$ArrSeq.CheckedSubList subList;
         final Packed$ClassPrefix$ArrSeq.CheckedList thatRoot;
@@ -1956,6 +1939,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final Packed$ClassPrefix$ArrSeq.UncheckedSubList subList;
         final int thatOffset;
         return SequenceEqualityUtil.isEqualTo(thatOffset=(subList=(Packed$ClassPrefix$ArrSeq.UncheckedSubList)list).rootOffset,subList.root.words,thatOffset+size,thisHead);
+#ELSE
+      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
+        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,thisHead);
 #ENDIF
       }else if(list instanceof $ClassPrefix$ArrSeq.CheckedSubList){
         final $ClassPrefix$ArrSeq.CheckedSubList subList;
@@ -2005,7 +1991,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
               return super.isEqualTo(this.head,size,(OmniList.OfBoolean)abstractSeq);
             }
 #ELSE
-            return this.isEqualTo(size,abstractSeq);
+            if(abstractSeq instanceof OmniList.Of$ClassPrefix$){
+              return this.isEqualTo(size,(OmniList.Of$ClassPrefix$)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfRef){
+              return super.isEqualTo(this.head,size,(OmniList.OfRef<?>)abstractSeq);
+            }
 #ENDIF
           }
         }else{
@@ -2649,7 +2639,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
     #MACRO RefUncheckedisEqualToNodeIntOmniList<Double>()
     
 #ELSE
-    private boolean isEqualTo(int size,AbstractSeq<?> list){
+    private boolean isEqualTo(int size,OmniList.Of$ClassPrefix$ list){
       if(list instanceof $ClassPrefix$DblLnkSeq){
         final $ClassPrefix$DblLnkNode thatHead,thisHead=this.head;
         if(list instanceof $ClassPrefix$DblLnkSeq.CheckedSubList){
@@ -2668,20 +2658,6 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
           //must be $ClassPrefix$ArrSeq.UncheckedList
           return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,this.head);
         }
-  #ELSE
-      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,this.head);
-  #ENDIF
-      }else if(list instanceof RefArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo(((RefArrSeq.UncheckedList<?>)list).arr,0,size,this.head);
-      }else if(list instanceof RefDblLnkSeq){
-        final RefDblLnkSeq<?> that;
-        if((that=(RefDblLnkSeq<?>)list) instanceof RefDblLnkSeq.CheckedSubList){
-          final RefDblLnkSeq.CheckedSubList<?> subList;
-          CheckedCollection.checkModCount((subList=(RefDblLnkSeq.CheckedSubList<?>)that).modCount,subList.root.modCount);
-        }
-        return SequenceEqualityUtil.isEqualTo(this.head,this.tail,that.head);
-  #IF OfBoolean
       }else if(list instanceof Packed$ClassPrefix$ArrSeq.UncheckedSubList){
         final int thatRootOffset;
         final Packed$ClassPrefix$ArrSeq.UncheckedSubList subList;
@@ -2692,6 +2668,9 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         CheckedCollection.checkModCount((subList=(Packed$ClassPrefix$ArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
         final int thatOffset;
         return SequenceEqualityUtil.isEqualTo(thatOffset=subList.rootOffset,thatRoot.words,thatOffset+size,this.head);
+  #ELSE
+      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
+        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,this.head);
   #ENDIF
       }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedSubList){
         final int thatOffset;
@@ -2706,7 +2685,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         return SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head);
       }
     }
-    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,AbstractSeq<?> list){
+    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,OmniList.Of$ClassPrefix$ list){
       if(list instanceof $ClassPrefix$DblLnkSeq){
         final $ClassPrefix$DblLnkNode thatHead;
         if(list instanceof $ClassPrefix$DblLnkSeq.CheckedSubList){
@@ -2725,20 +2704,6 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
           //must be $ClassPrefix$ArrSeq.UncheckedList
           return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,thisHead);
         }
-#ELSE
-      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,thisHead);
-#ENDIF
-      }else if(list instanceof RefArrSeq.UncheckedList){
-        return SequenceEqualityUtil.isEqualTo(((RefArrSeq.UncheckedList<?>)list).arr,0,size,thisHead);
-      }else if(list instanceof RefDblLnkSeq){
-        final RefDblLnkSeq<?> that;
-        if((that=(RefDblLnkSeq<?>)list) instanceof RefDblLnkSeq.CheckedSubList){
-          final RefDblLnkSeq.CheckedSubList<?> subList;
-          CheckedCollection.checkModCount((subList=(RefDblLnkSeq.CheckedSubList<?>)that).modCount,subList.root.modCount);
-        }
-        return SequenceEqualityUtil.isEqualTo(that.head,that.tail,thisHead);
-#IF OfBoolean
       }else if(list instanceof Packed$ClassPrefix$ArrSeq.UncheckedSubList){
         final Packed$ClassPrefix$ArrSeq.UncheckedSubList subList;
         final int thatOffset;
@@ -2749,6 +2714,9 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         CheckedCollection.checkModCount((subList=(Packed$ClassPrefix$ArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
         final int thatOffset;
         return SequenceEqualityUtil.isEqualTo(thatOffset=subList.rootOffset,thatRoot.words,thatOffset+size,thisHead);
+#ELSE
+      }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
+        return SequenceEqualityUtil.isEqualTo((($ClassPrefix$ArrSeq.UncheckedList)list).arr,0,size,thisHead);
 #ENDIF
       }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedSubList){
         final $ClassPrefix$ArrSeq.UncheckedSubList subList;
@@ -2759,6 +2727,29 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         final $ClassPrefix$ArrSeq.CheckedSubList subList;
         final $ClassPrefix$ArrSeq.CheckedList thatRoot;
         CheckedCollection.checkModCount((subList=($ClassPrefix$ArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
+        final int thatOffset;
+        return SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
+      }
+    }
+    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,OmniList.OfRef<?> list){
+      if(list instanceof RefArrSeq.UncheckedList){
+        return SequenceEqualityUtil.isEqualTo(((RefArrSeq.UncheckedList<?>)list).arr,0,size,thisHead);
+      }else if(list instanceof RefDblLnkSeq){
+        final RefDblLnkSeq<?> that;
+        if((that=(RefDblLnkSeq<?>)list) instanceof RefDblLnkSeq.CheckedSubList){
+          final RefDblLnkSeq.CheckedSubList<?> subList;
+          CheckedCollection.checkModCount((subList=(RefDblLnkSeq.CheckedSubList<?>)that).modCount,subList.root.modCount);
+        }
+        return SequenceEqualityUtil.isEqualTo(that.head,that.tail,thisHead);
+      }else if(list instanceof RefArrSeq.UncheckedSubList){
+        final int thatOffset;
+        final RefArrSeq.UncheckedSubList<?> subList;
+        return SequenceEqualityUtil.isEqualTo((subList=(RefArrSeq.UncheckedSubList<?>)list).root.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
+      }else{
+        //must be RefArrSeq.CheckedSubList
+        final RefArrSeq.CheckedSubList<?> subList;
+        final RefArrSeq.CheckedList<?> thatRoot;
+        CheckedCollection.checkModCount((subList=(RefArrSeq.CheckedSubList<?>)list).modCount,(thatRoot=subList.root).modCount);
         final int thatOffset;
         return SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
@@ -2813,7 +2804,11 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
               return this.isEqualTo(this.head,size,(OmniList.OfBoolean)abstractSeq);
             }
 #ELSE
-            return this.isEqualTo(size,abstractSeq);
+            if(abstractSeq instanceof OmniList.Of$ClassPrefix$){
+              return this.isEqualTo(size,(OmniList.Of$ClassPrefix$)abstractSeq);
+            }else if(abstractSeq instanceof OmniList.OfRef){
+              return this.isEqualTo(this.head,size,(OmniList.OfRef<?>)abstractSeq);
+            }
 #ENDIF
           }
         }else{
