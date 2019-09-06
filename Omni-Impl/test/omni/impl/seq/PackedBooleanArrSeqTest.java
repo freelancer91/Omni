@@ -553,7 +553,7 @@ public class PackedBooleanArrSeqTest{
     void runTest(MONITOR monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
         IllegalModification illegalMod);
   }
-  private static class PackedBooleanArrListMonitor
+  static class PackedBooleanArrListMonitor
       extends AbstractPackedBooleanArrSeqMonitor<PackedBooleanArrSeq.UncheckedList>
       implements MonitoredList<PackedBooleanArrSeq.UncheckedList>{
     private abstract class AbstractItrMonitor<ITR extends OmniIterator.OfBoolean>

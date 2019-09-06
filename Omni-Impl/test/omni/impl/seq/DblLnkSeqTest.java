@@ -2241,7 +2241,7 @@ public class DblLnkSeqTest{
             TestExecutorService.completeAllTests(testName);
         }
     }
-    private static class DblLnkSeqMonitor<LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
+    static class DblLnkSeqMonitor<LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
             extends
             AbstractSequenceMonitor<LSTDEQ>
             implements

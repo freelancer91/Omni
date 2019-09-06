@@ -600,7 +600,7 @@ public class ArrSeqTest{
     abstract void verifyCloneTypeAndModCount(Object clone);
     abstract void verifyModCount();
   }
-  private static class ArrListMonitor<SEQ extends AbstractSeq<E>&OmniList<E>&Externalizable,E>
+  static class ArrListMonitor<SEQ extends AbstractSeq<E>&OmniList<E>&Externalizable,E>
       extends AbstractArrSeqMonitor<SEQ> implements MonitoredList<SEQ>{
     public static class ArrSubListMonitor<SUBLIST extends AbstractSeq<E>&OmniList<E>,
         SEQ extends AbstractSeq<E>&OmniList<E>&Externalizable,E> implements MonitoredList<SUBLIST>{
