@@ -13,7 +13,8 @@ package omni.impl.seq;
 import omni.util.OmniArray;
 
 import omni.util.ArrCopy;
-
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -58,7 +59,96 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   transient int head;
   transient int tail;
 #ENDIF 
-
+  public $ClassPrefix$ArrDeq(Collection<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+#IFNOT OfBoolean
+    this.tail=-1;
+#ENDIF
+    this.addAll(that);
+  }
+  public $ClassPrefix$ArrDeq(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+#IFNOT OfBoolean
+    this.tail=-1;
+#ENDIF
+    this.addAll(that);
+  }
+#IFNOT OfRef
+  public $ClassPrefix$ArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+  #IFNOT OfBoolean
+    this.tail=-1;
+  #ENDIF
+    this.addAll(that);
+  }
+  #IFNOT OfBoolean
+  public $ClassPrefix$ArrDeq(OmniCollection.$ClassPrefix$Output<?> that){
+    super();
+    //TODO optimize;
+    this.tail=-1;
+    this.addAll(that);
+  }
+    #IFNOT OfChar
+  public $ClassPrefix$ArrDeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+      #IFNOT OfByte
+  public $ClassPrefix$ArrDeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }  
+        #IFNOT OfShort
+  public $ClassPrefix$ArrDeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+          #IFNOT OfInt
+  public $ClassPrefix$ArrDeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+            #IFNOT OfLong
+  public $ClassPrefix$ArrDeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+              #IFNOT OfFloat
+  public $ClassPrefix$ArrDeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+  public $ClassPrefix$ArrDeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+    #ENDIF
+  #ENDIF
+#ENDIF
   public $ClassPrefix$ArrDeq(){
     super();
     this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
@@ -1452,10 +1542,61 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       output.writeInt(0);
     }
   }
-
   public static class Checked$<E>$ extends $ClassPrefix$ArrDeq$<E>${
     private static final long serialVersionUID=1L;
     transient int modCount;
+    
+    public Checked(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+       super(that);
+    }
+#IFNOT OfRef
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+  #IFNOT OfBoolean
+    public Checked(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+    #IFNOT OfChar
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+      #IFNOT OfByte
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+        #IFNOT OfShort
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+          #IFNOT OfInt
+    public Checked(OmniCollection.OfLong that){
+      super(that);
+    }
+            #IFNOT OfLong
+    public Checked(OmniCollection.OfFloat that){
+      super(that);
+    }
+              #IFNOT OfFloat
+    public Checked(OmniCollection.OfDouble that){
+      super(that);
+    }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
+    #ENDIF
+  #ENDIF
+#ENDIF
     public Checked(){
       super();
     }

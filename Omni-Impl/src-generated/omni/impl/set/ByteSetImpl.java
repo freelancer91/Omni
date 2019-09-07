@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.Externalizable;
 import java.io.IOException;
@@ -36,6 +38,31 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     this.word1=that.word1;
     this.word2=that.word2;
     this.word3=that.word3;
+  }
+  public ByteSetImpl(Collection<? extends Byte> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ByteSetImpl(OmniCollection.OfRef<? extends Byte> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ByteSetImpl(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ByteSetImpl(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ByteSetImpl(OmniCollection.ByteOutput<?> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
   }
   @Override public Object clone(){
       return new ByteSetImpl(this);
@@ -884,6 +911,21 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     transient int size;
     public Checked(){
       super();
+    }
+    public Checked(Collection<? extends Byte> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Byte> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.ByteOutput<?> that){
+      super(that);
     }
     Checked(long word0,long word1,long word2,long word3){
       super(word0,word1,word2,word3);

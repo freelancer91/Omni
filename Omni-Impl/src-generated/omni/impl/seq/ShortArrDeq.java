@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -24,6 +26,42 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
   transient short[] arr;
   transient int head;
   transient int tail;
+  public ShortArrDeq(Collection<? extends Short> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ShortArrDeq(OmniCollection.OfRef<? extends Short> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ShortArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ShortArrDeq(OmniCollection.ShortOutput<?> that){
+    super();
+    //TODO optimize;
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ShortArrDeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ShortArrDeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }  
   public ShortArrDeq(){
     super();
     this.arr=OmniArray.OfShort.DEFAULT_ARR;
@@ -2062,6 +2100,24 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
   public static class Checked extends ShortArrDeq{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends Short> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Short> that){
+       super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
     public Checked(){
       super();
     }

@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -46,6 +48,96 @@ implements OmniSet.OfLong{
     return newWord;
   }
   transient long[] table;
+  public LongOpenAddressHashSet(Collection<? extends Long> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(OmniCollection.OfRef<? extends Long> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(OmniCollection.LongOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  public LongOpenAddressHashSet(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,Collection<? extends Long> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.OfRef<? extends Long> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.OfBoolean that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.LongOutput<?> that){
+    super(loadFactor);
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.OfByte that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.OfShort that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }  
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.OfInt that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.OfLong that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public LongOpenAddressHashSet(float loadFactor,OmniCollection.OfChar that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
   public LongOpenAddressHashSet(){
     super();
   }
@@ -1626,6 +1718,60 @@ private boolean addToTable(long val){
   }
   public static class Checked extends LongOpenAddressHashSet{
     transient int modCount;
+    public Checked(Collection<? extends Long> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Long> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.LongOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfLong that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
+    public Checked(float loadFactor,Collection<? extends Long> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfRef<? extends Long> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfBoolean that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.LongOutput<?> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfByte that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfShort that){
+      super(loadFactor,that);
+    }  
+    public Checked(float loadFactor,OmniCollection.OfInt that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfLong that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

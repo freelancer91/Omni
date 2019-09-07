@@ -1,5 +1,6 @@
 package omni.impl.seq;
 import java.util.List;
+import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -43,6 +44,46 @@ AbstractSeq<Integer>
   private IntArrSeq(){
     super();
     this.arr=OmniArray.OfInt.DEFAULT_ARR;
+  }
+  private IntArrSeq(Collection<? extends Integer> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntArrSeq(OmniCollection.OfRef<? extends Integer> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntArrSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntArrSeq(OmniCollection.IntOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private IntArrSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntArrSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private IntArrSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntArrSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
   }
   private IntArrSeq(int initialCapacity){
     super();
@@ -672,6 +713,30 @@ AbstractSeq<Integer>
       implements OmniStack.OfInt,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Integer> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Integer> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.IntOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedStack(){
       super();
     }
@@ -985,6 +1050,30 @@ AbstractSeq<Integer>
       implements IntListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Integer> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Integer> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.IntOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
       super();
     }
@@ -2705,6 +2794,30 @@ AbstractSeq<Integer>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Integer> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Integer> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.IntOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedStack(){
       super();
     }
@@ -2956,6 +3069,30 @@ AbstractSeq<Integer>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedList(Collection<? extends Integer> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Integer> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.IntOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
       super();
     }

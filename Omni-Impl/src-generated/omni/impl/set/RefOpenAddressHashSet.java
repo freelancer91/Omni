@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -19,6 +21,26 @@ implements OmniSet.OfRef<E>{
   static final int NULLHASH=SetCommonImpl.tableHash(NULL);
   static final Object DELETED=new Object();
   transient Object[] table;
+  public RefOpenAddressHashSet(Collection<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public RefOpenAddressHashSet(OmniCollection.OfRef<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public RefOpenAddressHashSet(float loadFactor,Collection<? extends E> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public RefOpenAddressHashSet(float loadFactor,OmniCollection.OfRef<? extends E> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
   public RefOpenAddressHashSet(){
     super();
   }
@@ -970,6 +992,18 @@ private boolean addToTable(Object val,int hash){
   }
   public static class Checked<E> extends RefOpenAddressHashSet<E>{
     transient int modCount;
+    public Checked(Collection<? extends E> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
+    public Checked(float loadFactor,Collection<? extends E> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfRef<? extends E> that){
+      super(loadFactor,that);
+    }
     public Checked(){
       super();
     }

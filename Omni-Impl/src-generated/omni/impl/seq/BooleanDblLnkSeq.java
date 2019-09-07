@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.BooleanSortUtil;
@@ -37,6 +39,21 @@ AbstractSeq<Boolean>
   private static final long serialVersionUID=1L;
   transient BooleanDblLnkNode head;
   transient BooleanDblLnkNode tail;
+  private BooleanDblLnkSeq(Collection<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private BooleanDblLnkSeq(OmniCollection.OfRef<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private BooleanDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  BooleanDblLnkSeq(){
   }
   private BooleanDblLnkSeq(BooleanDblLnkNode head,int size,BooleanDblLnkNode tail){
@@ -4300,6 +4317,15 @@ AbstractSeq<Boolean>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(BooleanDblLnkNode head,int size,BooleanDblLnkNode tail){
@@ -5477,6 +5503,15 @@ AbstractSeq<Boolean>
   }
   public static class UncheckedList extends BooleanDblLnkSeq implements OmniDeque.OfBoolean,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(BooleanDblLnkNode head,int size,BooleanDblLnkNode tail){

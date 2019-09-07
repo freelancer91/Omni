@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -24,6 +26,66 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
   transient float[] arr;
   transient int head;
   transient int tail;
+  public FloatArrDeq(Collection<? extends Float> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.OfRef<? extends Float> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.FloatOutput<?> that){
+    super();
+    //TODO optimize;
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }  
+  public FloatArrDeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public FloatArrDeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
   public FloatArrDeq(){
     super();
     this.arr=OmniArray.OfFloat.DEFAULT_ARR;
@@ -2373,6 +2435,36 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
   public static class Checked extends FloatArrDeq{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends Float> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Float> that){
+       super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.FloatOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfLong that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

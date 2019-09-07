@@ -26,13 +26,13 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
    * TODO hopefully they will add pattern-matching switch statements to make this irrelevant
    */
   //public abstract DataType getDataType();
-  //TODO add overloads for OmniCollection etc.
+  @SuppressWarnings("unchecked")
   @Override
   default public boolean addAll(Collection<? extends E> that){
     //TODO override in lower classes and remove this
     boolean changed=false;
-    for(var thatVal:that){
-      changed|=this.add(thatVal);
+    for(var thatVal:that.toArray()){
+      changed|=this.add((E)thatVal);
     }
     return changed;
   }
@@ -113,6 +113,7 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniCollection<E>
   {
+    public abstract boolean addAll(OmniCollection.OfBoolean that);
     public abstract boolean add(boolean val);
     @Override
     public default boolean contains(Boolean val)
@@ -194,6 +195,23 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.BOOLEAN;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Boolean> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Boolean[]::new)){
+        changed|=this.add((boolean)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final boolean[] thatArr;
+      for(int i=0,bound=(thatArr=that.toBooleanArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -294,6 +312,36 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.BYTE;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Byte> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Byte[]::new)){
+        changed|=this.add((byte)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final byte[] thatArr;
+      for(int i=0,bound=(thatArr=that.toByteArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.ByteOutput<?> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final byte[] thatArr;
+      for(int i=0,bound=(thatArr=that.toByteArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfByte that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.ByteOutput<?>)that);
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -377,6 +425,36 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.CHAR;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Character> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Character[]::new)){
+        changed|=this.add((char)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final char[] thatArr;
+      for(int i=0,bound=(thatArr=that.toCharArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.CharOutput<?> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final char[] thatArr;
+      for(int i=0,bound=(thatArr=that.toCharArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfChar that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.CharOutput<?>)that);
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -449,6 +527,40 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.SHORT;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Short> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Short[]::new)){
+        changed|=this.add((short)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final short[] thatArr;
+      for(int i=0,bound=(thatArr=that.toShortArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.ShortOutput<?> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final short[] thatArr;
+      for(int i=0,bound=(thatArr=that.toShortArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfByte that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.ShortOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfShort that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.ShortOutput<?>)that);
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -525,6 +637,48 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.INT;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Integer> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Integer[]::new)){
+        changed|=this.add((int)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final int[] thatArr;
+      for(int i=0,bound=(thatArr=that.toIntArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.IntOutput<?> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final int[] thatArr;
+      for(int i=0,bound=(thatArr=that.toIntArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfByte that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.IntOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfShort that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.IntOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfInt that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.IntOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfChar that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.IntOutput<?>)that);
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -622,6 +776,52 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.LONG;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Long> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Long[]::new)){
+        changed|=this.add((long)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final long[] thatArr;
+      for(int i=0,bound=(thatArr=that.toLongArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.LongOutput<?> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final long[] thatArr;
+      for(int i=0,bound=(thatArr=that.toLongArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfByte that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.LongOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfShort that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.LongOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfInt that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.LongOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfLong that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.LongOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfChar that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.LongOutput<?>)that);
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -723,6 +923,56 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.FLOAT;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Float> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Float[]::new)){
+        changed|=this.add((float)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final float[] thatArr;
+      for(int i=0,bound=(thatArr=that.toFloatArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.FloatOutput<?> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final float[] thatArr;
+      for(int i=0,bound=(thatArr=that.toFloatArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfByte that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.FloatOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfShort that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.FloatOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfInt that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.FloatOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfLong that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.FloatOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfFloat that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.FloatOutput<?>)that);
+    }       
+    public default boolean addAll(OmniCollection.OfChar that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.FloatOutput<?>)that);
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -826,6 +1076,60 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.DOUBLE;
     }
     */
+    public default boolean addAll(OmniCollection.OfRef<? extends Double> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray(Double[]::new)){
+        changed|=this.add((double)thatVal);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfBoolean that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final double[] thatArr;
+      for(int i=0,bound=(thatArr=that.toDoubleArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.DoubleOutput<?> that){
+      //TODO implement in lower classes and remove this
+      var changed=false;
+      final double[] thatArr;
+      for(int i=0,bound=(thatArr=that.toDoubleArray()).length;i<bound;++i){
+        changed|=this.add(thatArr[i]);
+      }
+      return changed;
+    }
+    public default boolean addAll(OmniCollection.OfByte that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.DoubleOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfShort that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.DoubleOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfInt that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.DoubleOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfLong that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.DoubleOutput<?>)that);
+    }
+    public default boolean addAll(OmniCollection.OfFloat that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.DoubleOutput<?>)that);
+    }       
+    public default boolean addAll(OmniCollection.OfDouble that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.DoubleOutput<?>)that);
+    }  
+    public default boolean addAll(OmniCollection.OfChar that){
+      //TODO implement in lower classes and remove this
+      return addAll((OmniCollection.DoubleOutput<?>)that);
+    }
     @Override
     public default boolean contains(Byte val)
     {
@@ -971,30 +1275,37 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract interface BooleanInput<E> extends OmniCollection<E>{
     public abstract boolean add(boolean val);
     public abstract boolean add(Boolean val);
+    public abstract boolean addAll(OmniCollection.OfBoolean that);
   }
   public abstract interface ByteInput<E> extends BooleanInput<E>{
     public abstract boolean add(byte val);
     public abstract boolean add(Byte val);
+    public abstract boolean addAll(OmniCollection.OfByte that);
   }
   public abstract interface CharInput<E> extends BooleanInput<E>{
     public abstract boolean add(char val);
     public abstract boolean add(Character val);
+    public abstract boolean addAll(OmniCollection.OfChar that);
   }
   public abstract interface ShortInput<E> extends ByteInput<E>{
     public abstract boolean add(short val);
     public abstract boolean add(Short val);
+    public abstract boolean addAll(OmniCollection.OfShort that);
   }
   public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>{
     public abstract boolean add(int val);
     public abstract boolean add(Integer val);
+    public abstract boolean addAll(OmniCollection.OfInt that);
   }
   public abstract interface LongInput<E> extends IntInput<E>{
     public abstract boolean add(long val);
     public abstract boolean add(Long val);
+    public abstract boolean addAll(OmniCollection.OfLong that);
   }
   public abstract interface FloatInput<E> extends LongInput<E>{
     public abstract boolean add(float val);
     public abstract boolean add(Float val);
+    public abstract boolean addAll(OmniCollection.OfFloat that);
   }
   public abstract interface OfRef<E> extends OmniCollection<E>,Iterable<E>
   {
@@ -1004,6 +1315,15 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
       return DataType.REF;
     }
     */
+    @SuppressWarnings("unchecked")
+    public default boolean addAll(OmniCollection.OfRef<? extends E> that){
+    //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray()){
+        changed|=this.add((E)thatVal);
+      }
+      return changed;
+    }
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);
     public abstract OmniIterator.OfRef<E> iterator();

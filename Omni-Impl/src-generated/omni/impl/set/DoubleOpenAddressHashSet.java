@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -19,6 +21,116 @@ public class DoubleOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Double>
 implements OmniSet.OfDouble{
   transient long[] table;
+  public DoubleOpenAddressHashSet(Collection<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfRef<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.DoubleOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  public DoubleOpenAddressHashSet(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,Collection<? extends Double> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfRef<? extends Double> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfBoolean that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.DoubleOutput<?> that){
+    super(loadFactor);
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfByte that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfShort that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }  
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfInt that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfLong that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfFloat that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfDouble that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public DoubleOpenAddressHashSet(float loadFactor,OmniCollection.OfChar that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
   public DoubleOpenAddressHashSet(){
     super();
   }
@@ -901,6 +1013,72 @@ boolean addToTable(long val,int hash){
   }
   public static class Checked extends DoubleOpenAddressHashSet{
     transient int modCount;
+    public Checked(Collection<? extends Double> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfLong that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
+    public Checked(float loadFactor,Collection<? extends Double> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfRef<? extends Double> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfBoolean that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.DoubleOutput<?> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfByte that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfShort that){
+      super(loadFactor,that);
+    }  
+    public Checked(float loadFactor,OmniCollection.OfInt that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfLong that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfFloat that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfDouble that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.ByteSortUtil;
@@ -38,6 +40,31 @@ AbstractSeq<Byte>
   private static final long serialVersionUID=1L;
   transient ByteDblLnkNode head;
   transient ByteDblLnkNode tail;
+  private ByteDblLnkSeq(Collection<? extends Byte> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ByteDblLnkSeq(OmniCollection.OfRef<? extends Byte> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ByteDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ByteDblLnkSeq(OmniCollection.ByteOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private ByteDblLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  ByteDblLnkSeq(){
   }
   private ByteDblLnkSeq(ByteDblLnkNode head,int size,ByteDblLnkNode tail){
@@ -4131,6 +4158,21 @@ AbstractSeq<Byte>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Byte> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Byte> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.ByteOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(ByteDblLnkNode head,int size,ByteDblLnkNode tail){
@@ -5270,6 +5312,21 @@ AbstractSeq<Byte>
   }
   public static class UncheckedList extends ByteDblLnkSeq implements OmniDeque.OfByte,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Byte> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Byte> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.ByteOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(ByteDblLnkNode head,int size,ByteDblLnkNode tail){

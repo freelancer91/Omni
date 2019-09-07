@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -44,6 +46,66 @@ implements OmniSet.OfShort{
     return newWord;
   }
   transient short[] table;
+  public ShortOpenAddressHashSet(Collection<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(OmniCollection.OfRef<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(OmniCollection.ShortOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  public ShortOpenAddressHashSet(float loadFactor,Collection<? extends Short> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(float loadFactor,OmniCollection.OfRef<? extends Short> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(float loadFactor,OmniCollection.OfBoolean that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(float loadFactor,OmniCollection.ShortOutput<?> that){
+    super(loadFactor);
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(float loadFactor,OmniCollection.OfByte that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public ShortOpenAddressHashSet(float loadFactor,OmniCollection.OfShort that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }  
   public ShortOpenAddressHashSet(){
     super();
   }
@@ -1604,6 +1666,42 @@ private boolean addToTable(short val){
   }
   public static class Checked extends ShortOpenAddressHashSet{
     transient int modCount;
+    public Checked(Collection<? extends Short> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public Checked(float loadFactor,Collection<? extends Short> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfRef<? extends Short> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfBoolean that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.ShortOutput<?> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfByte that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfShort that){
+      super(loadFactor,that);
+    }  
     public Checked(){
       super();
     }

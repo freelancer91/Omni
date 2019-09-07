@@ -1,5 +1,6 @@
 package omni.impl.seq;
 import java.util.List;
+import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -42,6 +43,21 @@ AbstractBooleanArrSeq
   private BooleanArrSeq(){
     super();
     this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
+  }
+  private BooleanArrSeq(Collection<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private BooleanArrSeq(OmniCollection.OfRef<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private BooleanArrSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
   }
   private BooleanArrSeq(int initialCapacity){
     super();
@@ -192,6 +208,15 @@ AbstractBooleanArrSeq
       implements OmniStack.OfBoolean,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public UncheckedStack(){
       super();
     }
@@ -464,6 +489,15 @@ AbstractBooleanArrSeq
       implements BooleanListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public UncheckedList(){
       super();
     }
@@ -2222,6 +2256,15 @@ AbstractBooleanArrSeq
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public CheckedStack(){
       super();
     }
@@ -2513,6 +2556,15 @@ AbstractBooleanArrSeq
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedList(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public CheckedList(){
       super();
     }

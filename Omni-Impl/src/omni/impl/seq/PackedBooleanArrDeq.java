@@ -2,10 +2,12 @@ package omni.impl.seq;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.IntFunction;
 import java.util.function.LongUnaryOperator;
+import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
@@ -80,6 +82,21 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         }
     }
     transient long[] words;
+    public PackedBooleanArrDeq(Collection<? extends Boolean> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public PackedBooleanArrDeq(OmniCollection.OfRef<? extends Boolean> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public PackedBooleanArrDeq(OmniCollection.OfBoolean that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
     public PackedBooleanArrDeq(){
         super();
     }
@@ -2158,6 +2175,15 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
     public static class Checked extends PackedBooleanArrDeq{
         private static final long serialVersionUID=1L;
         transient int modCount;
+        public Checked(Collection<? extends Boolean> that){
+          super(that);
+        }
+        public Checked(OmniCollection.OfRef<? extends Boolean> that){
+          super(that);
+        }
+        public Checked(OmniCollection.OfBoolean that){
+          super(that);
+        }
         public Checked(){
             super();
         }

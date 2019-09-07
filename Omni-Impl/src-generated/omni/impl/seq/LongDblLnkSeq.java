@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.LongSortUtil;
@@ -38,6 +40,51 @@ AbstractSeq<Long>
   private static final long serialVersionUID=1L;
   transient LongDblLnkNode head;
   transient LongDblLnkNode tail;
+  private LongDblLnkSeq(Collection<? extends Long> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private LongDblLnkSeq(OmniCollection.OfRef<? extends Long> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private LongDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private LongDblLnkSeq(OmniCollection.LongOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private LongDblLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private LongDblLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private LongDblLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private LongDblLnkSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private LongDblLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  LongDblLnkSeq(){
   }
   private LongDblLnkSeq(LongDblLnkNode head,int size,LongDblLnkNode tail){
@@ -3864,6 +3911,33 @@ AbstractSeq<Long>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Long> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Long> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.LongOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(LongDblLnkNode head,int size,LongDblLnkNode tail){
@@ -4907,6 +4981,33 @@ AbstractSeq<Long>
   }
   public static class UncheckedList extends LongDblLnkSeq implements OmniDeque.OfLong,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Long> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Long> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.LongOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(LongDblLnkNode head,int size,LongDblLnkNode tail){

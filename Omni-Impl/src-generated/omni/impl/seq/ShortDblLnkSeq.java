@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.ShortSortUtil;
@@ -38,6 +40,36 @@ AbstractSeq<Short>
   private static final long serialVersionUID=1L;
   transient ShortDblLnkNode head;
   transient ShortDblLnkNode tail;
+  private ShortDblLnkSeq(Collection<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortDblLnkSeq(OmniCollection.OfRef<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortDblLnkSeq(OmniCollection.ShortOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private ShortDblLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortDblLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
   private  ShortDblLnkSeq(){
   }
   private ShortDblLnkSeq(ShortDblLnkNode head,int size,ShortDblLnkNode tail){
@@ -4168,6 +4200,24 @@ AbstractSeq<Short>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Short> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
     public CheckedList(){
     }
     CheckedList(ShortDblLnkNode head,int size,ShortDblLnkNode tail){
@@ -5275,6 +5325,24 @@ AbstractSeq<Short>
   }
   public static class UncheckedList extends ShortDblLnkSeq implements OmniDeque.OfShort,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Short> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
     public UncheckedList(){
     }
     UncheckedList(ShortDblLnkNode head,int size,ShortDblLnkNode tail){

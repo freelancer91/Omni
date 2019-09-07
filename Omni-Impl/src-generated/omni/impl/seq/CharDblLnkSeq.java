@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.CharSortUtil;
@@ -37,6 +39,31 @@ AbstractSeq<Character>
   private static final long serialVersionUID=1L;
   transient CharDblLnkNode head;
   transient CharDblLnkNode tail;
+  private CharDblLnkSeq(Collection<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharDblLnkSeq(OmniCollection.OfRef<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharDblLnkSeq(OmniCollection.CharOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private CharDblLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  CharDblLnkSeq(){
   }
   private CharDblLnkSeq(CharDblLnkNode head,int size,CharDblLnkNode tail){
@@ -4164,6 +4191,21 @@ AbstractSeq<Character>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Character> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(CharDblLnkNode head,int size,CharDblLnkNode tail){
@@ -5271,6 +5313,21 @@ AbstractSeq<Character>
   }
   public static class UncheckedList extends CharDblLnkSeq implements OmniDeque.OfChar,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Character> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(CharDblLnkNode head,int size,CharDblLnkNode tail){

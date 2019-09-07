@@ -13,6 +13,7 @@ enum TypeDefinition{
 
     private static List<DefVar> getOfBoolean(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Boolean"));
         defVars.add(new DefVar("DNode","BooleanDblLnkNode"));
         defVars.add(new DefVar("SNode","BooleanSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -46,6 +47,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfByte(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Byte"));
         defVars.add(new DefVar("DNode","ByteDblLnkNode"));
         defVars.add(new DefVar("SNode","ByteSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -78,6 +80,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfChar(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Character"));
         defVars.add(new DefVar("DNode","CharDblLnkNode"));
         defVars.add(new DefVar("SNode","CharSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -111,6 +114,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfDouble(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Double"));
         defVars.add(new DefVar("DNode","DoubleDblLnkNode"));
         defVars.add(new DefVar("SNode","DoubleSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -144,6 +148,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfFloat(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Float"));
         defVars.add(new DefVar("DNode","FloatDblLnkNode"));
         defVars.add(new DefVar("SNode","FloatSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -178,6 +183,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfInt(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Integer"));
         defVars.add(new DefVar("DNode","IntDblLnkNode"));
         defVars.add(new DefVar("SNode","IntSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -210,6 +216,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfLong(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Long"));
         defVars.add(new DefVar("DNode","LongDblLnkNode"));
         defVars.add(new DefVar("SNode","LongSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -241,6 +248,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfString(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","String"));
         defVars.add(new DefVar("ArrayType","String"));
         defVars.add(new DefVar("BoxedType","String"));
         defVars.add(new DefVar("compareMethod","compare"));
@@ -251,6 +259,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfInteger(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Integer"));
         defVars.add(new DefVar("ArrayType","Integer"));
         defVars.add(new DefVar("BoxedType","Integer"));
         defVars.add(new DefVar("compareMethod","compare"));
@@ -261,6 +270,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfRef(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","E"));
         defVars.add(new DefVar("DNode","RefDblLnkNode"));
         defVars.add(new DefVar("SNode","RefSnglLnkNode"));
         defVars.add(new DefVar("<E>","<E>"));
@@ -289,6 +299,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfShort(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","Short"));
         defVars.add(new DefVar("DNode","ShortDblLnkNode"));
         defVars.add(new DefVar("SNode","ShortSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));

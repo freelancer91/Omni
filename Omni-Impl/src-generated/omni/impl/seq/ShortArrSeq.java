@@ -1,5 +1,6 @@
 package omni.impl.seq;
 import java.util.List;
+import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -44,6 +45,36 @@ AbstractSeq<Short>
     super();
     this.arr=OmniArray.OfShort.DEFAULT_ARR;
   }
+  private ShortArrSeq(Collection<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortArrSeq(OmniCollection.OfRef<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortArrSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortArrSeq(OmniCollection.ShortOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private ShortArrSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortArrSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
   private ShortArrSeq(int initialCapacity){
     super();
     switch(initialCapacity){ 
@@ -718,6 +749,24 @@ AbstractSeq<Short>
       implements OmniStack.OfShort,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Short> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
     public UncheckedStack(){
       super();
     }
@@ -1082,6 +1131,24 @@ AbstractSeq<Short>
       implements ShortListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Short> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
     public UncheckedList(){
       super();
     }
@@ -2983,6 +3050,24 @@ AbstractSeq<Short>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Short> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
     public CheckedStack(){
       super();
     }
@@ -3244,6 +3329,24 @@ AbstractSeq<Short>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedList(Collection<? extends Short> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
     public CheckedList(){
       super();
     }

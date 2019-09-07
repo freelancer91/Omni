@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.Collection;
 import java.util.function.IntFunction;
 import omni.api.OmniIterator;
 import omni.api.OmniCollection;
@@ -25,6 +26,56 @@ AbstractSeq<Float>
  implements OmniCollection.OfFloat,Externalizable{
   private static final long serialVersionUID=1L;
   transient FloatSnglLnkNode head;
+  private FloatSnglLnkSeq(Collection<? extends Float> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.OfRef<? extends Float> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.FloatOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private FloatSnglLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatSnglLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private FloatSnglLnkSeq(){
   }
   private FloatSnglLnkSeq(FloatSnglLnkNode head,int size){
@@ -665,6 +716,36 @@ AbstractSeq<Float>
   public static class CheckedStack extends UncheckedStack{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Float> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Float> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.FloatOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedStack(){
     }
     CheckedStack(FloatSnglLnkNode head,int size){
@@ -957,6 +1038,36 @@ AbstractSeq<Float>
   }
   public static class UncheckedStack extends FloatSnglLnkSeq implements OmniStack.OfFloat{
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Float> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Float> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.FloatOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedStack(){
     }
     UncheckedStack(FloatSnglLnkNode head,int size){
@@ -1313,6 +1424,36 @@ AbstractSeq<Float>
   public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedQueue(Collection<? extends Float> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfRef<? extends Float> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.FloatOutput<?> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedQueue(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedQueue(){
       super();
     }
@@ -1721,6 +1862,36 @@ AbstractSeq<Float>
   public static class UncheckedQueue extends FloatSnglLnkSeq implements OmniQueue.OfFloat{
     private static final long serialVersionUID=1L;
     transient FloatSnglLnkNode tail;
+    public UncheckedQueue(Collection<? extends Float> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfRef<? extends Float> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.FloatOutput<?> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedQueue(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedQueue(){
       super();
     }

@@ -45,15 +45,18 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
     //TODO implement in lower classes and remove this
     return OmniCollection.super.addAll(that);
   }
+  @SuppressWarnings("unchecked")
   @Override
   default boolean addAll(int index,Collection<? extends E> that){
     //TODO implement in lower classes and remove this
-    var thisItr=this.listIterator(index);
-    var thatItr=that.iterator();
-    if(thatItr.hasNext()){
+    final var thisItr=this.listIterator(index);
+    final int size;
+    final Object[] thatArr;
+    if((size=(thatArr=that.toArray()).length)!=0){
+      var i=0;
       do{
-        thisItr.add(thatItr.next());
-      }while(thatItr.hasNext());
+        thisItr.add((E)thatArr[i]);
+      }while(++i!=size);
       return true;
     }
     return false;
@@ -82,6 +85,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   
   public abstract interface OfPrimitive<E> extends OmniList<E>,OmniCollection.OfPrimitive<E>
   {
+     public abstract boolean addAll(int index,OmniCollection.OfBoolean that);
      public abstract void add(int index,boolean val);
      #MACRO BoxedMethods(IndexOfMethodDefault)
      #MACRO BoxedMethods(LastIndexOfMethodDefault)
@@ -145,6 +149,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface BooleanInput<E> extends OmniList<E>,OmniCollection.BooleanInput<E>
   {
+    public abstract boolean addAll(int index,OmniCollection.OfBoolean that);
     public abstract void add(int index,boolean val);
     public abstract void add(int index,Boolean val);
     public abstract void put(int index,boolean val);
@@ -155,6 +160,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput<E>
   {
+    public abstract boolean addAll(int index,OmniCollection.OfByte that);
     public abstract void add(int index,byte val);
     public abstract void add(int index,Byte val);
     public abstract void put(int index,byte val);
@@ -165,6 +171,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput<E>
   {
+    public abstract boolean addAll(int index,OmniCollection.OfChar that);
     public abstract void add(int index,char val);
     public abstract void add(int index,Character val);
     public abstract void put(int index,char val);
@@ -175,6 +182,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput<E>
   {
+    public abstract boolean addAll(int index,OmniCollection.OfShort that);
     public abstract void add(int index,short val);
     public abstract void add(int index,Short val);
     public abstract void put(int index,short val);
@@ -185,6 +193,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface IntInput<E> extends ShortInput<E>,CharInput<E>,OmniCollection.IntInput<E>
   {
+    public abstract boolean addAll(int index,OmniCollection.OfInt that);
     public abstract void add(int index,int val);
     public abstract void add(int index,Integer val);
     public abstract void put(int index,int val);
@@ -195,6 +204,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput<E>
   {
+    public abstract boolean addAll(int index,OmniCollection.OfLong that);
     public abstract void add(int index,long val);
     public abstract void add(int index,Long val);
     public abstract void put(int index,long val);
@@ -205,6 +215,7 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
   }
   public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput<E>
   {
+    public abstract boolean addAll(int index,OmniCollection.OfFloat that);
     public abstract void add(int index,float val);
     public abstract void add(int index,Float val);
     public abstract void put(int index,float val);
@@ -233,6 +244,91 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,OmniColle
 ,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
+  public default boolean addAll(int index,OmniCollection.OfRef<? extends BOXEDTYPE> that){
+    //TODO implement in lower classes and remove this
+    final var thisItr=this.listIterator(index);
+    final int size;
+    final BOXEDTYPE[] thatArr;
+    if((size=(thatArr=that.toArray(BOXEDTYPE[]::new)).length)!=0){
+      var i=0;
+      do{
+        thisItr.add(thatArr[i]);
+      }while(++i!=size);
+      return true;
+    }
+    return false;
+  }
+  public default boolean addAll(int index,OmniCollection.OfBoolean that){
+    //TODO implement in lower classes and remove this
+    final var thisItr=this.listIterator(index);
+    final int size;
+    final ARRTYPE[] thatArr;
+    if((size=(thatArr=that.toCLASSPREFIXArray()).length)!=0){
+      var i=0;
+      do{
+        thisItr.add(thatArr[i]);
+      }while(++i!=size);
+    }
+    return false;
+  }
+#IFNOTSWITCH CLASSPREFIX==Boolean
+  public default boolean addAll(int index,OmniCollection.CLASSPREFIXOutput<?> that){
+    //TODO implement in lower classes and remove this
+    final var thisItr=this.listIterator(index);
+    final int size;
+    final ARRTYPE[] thatArr;
+    if((size=(thatArr=that.toCLASSPREFIXArray()).length)!=0){
+      var i=0;
+      do{
+        thisItr.add(thatArr[i]);
+      }while(++i!=size);
+    }
+    return false;
+  }
+  #IFNOTSWITCH CLASSPREFIX==Char
+  public default boolean addAll(int index,OmniCollection.OfByte that){
+    //TODO implement in lower classes and remove this
+    return addAll(index,(OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+    #IFNOTSWITCH CLASSPREFIX==Byte
+  public default boolean addAll(int index,OmniCollection.OfShort that){
+    //TODO implement in lower classes and remove this
+    return addAll(index,(OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+      #IFNOTSWITCH CLASSPREFIX==Short
+  public default boolean addAll(int index,OmniCollection.OfInt that){
+    //TODO implement in lower classes and remove this
+    return addAll(index,(OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+        #IFNOTSWITCH CLASSPREFIX==Int
+  public default boolean addAll(int index,OmniCollection.OfLong that){
+    //TODO implement in lower classes and remove this
+    return addAll(index,(OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+          #IFNOTSWITCH CLASSPREFIX==Long
+  public default boolean addAll(int index,OmniCollection.OfFloat that){
+    //TODO implement in lower classes and remove this
+    return addAll(index,(OmniCollection.CLASSPREFIXOutput<?>)that);
+  }       
+            #IFNOTSWITCH CLASSPREFIX==Float
+  public default boolean addAll(int index,OmniCollection.OfDouble that){
+    //TODO implement in lower classes and remove this
+    return addAll(index,(OmniCollection.CLASSPREFIXOutput<?>)that);
+  }  
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFNOTSWITCH CLASSPREFIX==Byte,Short
+  public default boolean addAll(int index,OmniCollection.OfChar that){
+    //TODO implement in lower classes and remove this
+    return addAll(index,(OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+  #ENDIF
+#ENDIF
+
   public abstract BOXEDTYPE get(int index);
   public abstract ARRTYPE getCLASSPREFIX(int index);
 #IFSWITCH ARRTYPE==boolean
@@ -438,6 +534,21 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,OmniColle
 }
 #ENDDEF
   public abstract interface OfRef<E> extends OmniList<E>,OmniCollection.OfRef<E>{
+    @SuppressWarnings("unchecked")
+    public default boolean addAll(int index,OmniCollection.OfRef<? extends E> that){
+    //TODO implement in lower classes and remove this
+      final var thisItr=this.listIterator(index);
+      final int size;
+      final Object[] thatArr;
+      if((size=(thatArr=that.toArray()).length)!=0){
+        var i=0;
+        do{
+          thisItr.add((E)thatArr[i]);
+        }while(++i!=size);
+        return true;
+      }
+      return false;
+    }
     public abstract void add(int index,E val);
     public abstract E get(int index);
     public abstract OmniListIterator.OfRef<E> listIterator();

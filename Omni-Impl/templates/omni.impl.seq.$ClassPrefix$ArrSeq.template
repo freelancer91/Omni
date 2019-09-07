@@ -9,6 +9,7 @@
 #TYPEDEF OfRef
 package omni.impl.seq;
 import java.util.List;
+import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -90,6 +91,79 @@ AbstractSeq<$BoxedType$>
     super();
     this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
   }
+  private $ClassPrefix$ArrSeq(Collection<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private $ClassPrefix$ArrSeq(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+#IFNOT OfRef
+  private $ClassPrefix$ArrSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  #IFNOT OfBoolean
+  private $ClassPrefix$ArrSeq(OmniCollection.$ClassPrefix$Output<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+    #IFNOT OfChar
+  private $ClassPrefix$ArrSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+      #IFNOT OfByte
+  private $ClassPrefix$ArrSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+        #IFNOT OfShort
+  private $ClassPrefix$ArrSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+          #IFNOT OfInt
+  private $ClassPrefix$ArrSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+            #IFNOT OfLong
+  private $ClassPrefix$ArrSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+              #IFNOT OfFloat
+  private $ClassPrefix$ArrSeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+  private $ClassPrefix$ArrSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+    #ENDIF
+  #ENDIF
+#ENDIF
   private $ClassPrefix$ArrSeq(int initialCapacity){
     super();
     switch(initialCapacity){ 
@@ -701,6 +775,60 @@ public
   transient final UncheckedList$<E>$ root;
   transient final UncheckedSubList$<E>$ parent;
   #ENDIF
+  #IFSWITCH STRUCTNAME==UncheckedList,UncheckedStack,CheckedList,CheckedStack
+  public STRUCTNAME(Collection<? extends $BoxedExposed$> that){
+    super(that);
+  }
+  public STRUCTNAME(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+    super(that);
+  }
+#IFNOT OfRef
+  public STRUCTNAME(OmniCollection.OfBoolean that){
+    super(that);
+  }
+  #IFNOT OfBoolean
+  public STRUCTNAME(OmniCollection.$ClassPrefix$Output<?> that){
+    super(that);
+  }
+    #IFNOT OfChar
+  public STRUCTNAME(OmniCollection.OfByte that){
+    super(that);
+  }
+      #IFNOT OfByte
+  public STRUCTNAME(OmniCollection.OfShort that){
+    super(that);
+  }  
+        #IFNOT OfShort
+  public STRUCTNAME(OmniCollection.OfInt that){
+    super(that);
+  }
+          #IFNOT OfInt
+  public STRUCTNAME(OmniCollection.OfLong that){
+    super(that);
+  }
+            #IFNOT OfLong
+  public STRUCTNAME(OmniCollection.OfFloat that){
+    super(that);
+  }
+              #IFNOT OfFloat
+  public STRUCTNAME(OmniCollection.OfDouble that){
+    super(that);
+  }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+  public STRUCTNAME(OmniCollection.OfChar that){
+    super(that);
+  }
+    #ENDIF
+  #ENDIF
+#ENDIF
+  #ENDIF
+  
   #IFSWITCH STRUCTNAME==CheckedSubList
   private CheckedSubList(CheckedList$<E>$ root,int rootOffset,int size){
     super(size);

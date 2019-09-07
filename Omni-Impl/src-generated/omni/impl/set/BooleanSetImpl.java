@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -21,6 +23,21 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
   transient int state;
   public BooleanSetImpl(){
     super();
+  }
+  public BooleanSetImpl(Collection<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public BooleanSetImpl(OmniCollection.OfRef<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public BooleanSetImpl(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
   }
   BooleanSetImpl(int state){
     this.state=state;
@@ -800,6 +817,15 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
     private static final long serialVersionUID=1L;
     public Checked(){
         super();
+    }
+    public Checked(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
     }
     Checked(int state){
         super(state);

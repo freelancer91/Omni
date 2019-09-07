@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -44,6 +46,86 @@ implements OmniSet.OfInt{
     return newWord;
   }
   transient int[] table;
+  public IntOpenAddressHashSet(Collection<? extends Integer> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(OmniCollection.OfRef<? extends Integer> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(OmniCollection.IntOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  public IntOpenAddressHashSet(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(float loadFactor,Collection<? extends Integer> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(float loadFactor,OmniCollection.OfRef<? extends Integer> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(float loadFactor,OmniCollection.OfBoolean that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(float loadFactor,OmniCollection.IntOutput<?> that){
+    super(loadFactor);
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(float loadFactor,OmniCollection.OfByte that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(float loadFactor,OmniCollection.OfShort that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }  
+  public IntOpenAddressHashSet(float loadFactor,OmniCollection.OfInt that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public IntOpenAddressHashSet(float loadFactor,OmniCollection.OfChar that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
   public IntOpenAddressHashSet(){
     super();
   }
@@ -1569,6 +1651,54 @@ private boolean addToTable(int val){
   }
   public static class Checked extends IntOpenAddressHashSet{
     transient int modCount;
+    public Checked(Collection<? extends Integer> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Integer> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.IntOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
+    public Checked(float loadFactor,Collection<? extends Integer> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfRef<? extends Integer> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfBoolean that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.IntOutput<?> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfByte that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfShort that){
+      super(loadFactor,that);
+    }  
+    public Checked(float loadFactor,OmniCollection.OfInt that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

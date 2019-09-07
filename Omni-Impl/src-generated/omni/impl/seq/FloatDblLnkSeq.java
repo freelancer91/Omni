@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.FloatSortUtil;
@@ -38,6 +40,56 @@ AbstractSeq<Float>
   private static final long serialVersionUID=1L;
   transient FloatDblLnkNode head;
   transient FloatDblLnkNode tail;
+  private FloatDblLnkSeq(Collection<? extends Float> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.OfRef<? extends Float> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.FloatOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private FloatDblLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private FloatDblLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  FloatDblLnkSeq(){
   }
   private FloatDblLnkSeq(FloatDblLnkNode head,int size,FloatDblLnkNode tail){
@@ -4523,6 +4575,36 @@ AbstractSeq<Float>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Float> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Float> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.FloatOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(FloatDblLnkNode head,int size,FloatDblLnkNode tail){
@@ -5660,6 +5742,36 @@ AbstractSeq<Float>
   }
   public static class UncheckedList extends FloatDblLnkSeq implements OmniDeque.OfFloat,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Float> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Float> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.FloatOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(FloatDblLnkNode head,int size,FloatDblLnkNode tail){

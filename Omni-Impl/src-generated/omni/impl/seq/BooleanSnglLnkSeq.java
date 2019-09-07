@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.Collection;
 import java.util.function.IntFunction;
 import omni.api.OmniIterator;
 import omni.api.OmniCollection;
@@ -25,6 +26,21 @@ AbstractSeq<Boolean>
  implements OmniCollection.OfBoolean,Externalizable{
   private static final long serialVersionUID=1L;
   transient BooleanSnglLnkNode head;
+  private BooleanSnglLnkSeq(Collection<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private BooleanSnglLnkSeq(OmniCollection.OfRef<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private BooleanSnglLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private BooleanSnglLnkSeq(){
   }
   private BooleanSnglLnkSeq(BooleanSnglLnkNode head,int size){
@@ -664,6 +680,15 @@ AbstractSeq<Boolean>
   public static class CheckedStack extends UncheckedStack{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public CheckedStack(){
     }
     CheckedStack(BooleanSnglLnkNode head,int size){
@@ -973,6 +998,15 @@ AbstractSeq<Boolean>
   }
   public static class UncheckedStack extends BooleanSnglLnkSeq implements OmniStack.OfBoolean{
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public UncheckedStack(){
     }
     UncheckedStack(BooleanSnglLnkNode head,int size){
@@ -1360,6 +1394,15 @@ AbstractSeq<Boolean>
   public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedQueue(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public CheckedQueue(){
       super();
     }
@@ -1778,6 +1821,15 @@ AbstractSeq<Boolean>
   public static class UncheckedQueue extends BooleanSnglLnkSeq implements OmniQueue.OfBoolean{
     private static final long serialVersionUID=1L;
     transient BooleanSnglLnkNode tail;
+    public UncheckedQueue(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfRef<? extends Boolean> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public UncheckedQueue(){
       super();
     }

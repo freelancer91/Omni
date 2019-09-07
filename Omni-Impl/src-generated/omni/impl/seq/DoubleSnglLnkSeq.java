@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.Collection;
 import java.util.function.IntFunction;
 import omni.api.OmniIterator;
 import omni.api.OmniCollection;
@@ -24,6 +25,61 @@ AbstractSeq<Double>
  implements OmniCollection.OfDouble,Externalizable{
   private static final long serialVersionUID=1L;
   transient DoubleSnglLnkNode head;
+  private DoubleSnglLnkSeq(Collection<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfRef<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.DoubleOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private DoubleSnglLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleSnglLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private DoubleSnglLnkSeq(){
   }
   private DoubleSnglLnkSeq(DoubleSnglLnkNode head,int size){
@@ -542,6 +598,39 @@ AbstractSeq<Double>
   public static class CheckedStack extends UncheckedStack{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Double> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedStack(){
     }
     CheckedStack(DoubleSnglLnkNode head,int size){
@@ -823,6 +912,39 @@ AbstractSeq<Double>
   }
   public static class UncheckedStack extends DoubleSnglLnkSeq implements OmniStack.OfDouble{
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Double> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedStack(){
     }
     UncheckedStack(DoubleSnglLnkNode head,int size){
@@ -1123,6 +1245,39 @@ AbstractSeq<Double>
   public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedQueue(Collection<? extends Double> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedQueue(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedQueue(){
       super();
     }
@@ -1517,6 +1672,39 @@ AbstractSeq<Double>
   public static class UncheckedQueue extends DoubleSnglLnkSeq implements OmniQueue.OfDouble{
     private static final long serialVersionUID=1L;
     transient DoubleSnglLnkNode tail;
+    public UncheckedQueue(Collection<? extends Double> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedQueue(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedQueue(){
       super();
     }

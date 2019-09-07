@@ -1,4 +1,6 @@
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -43,6 +45,56 @@ implements OmniSet.OfChar{
     return newWord;
   }
   transient char[] table;
+  public CharOpenAddressHashSet(Collection<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(OmniCollection.OfRef<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(OmniCollection.CharOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(float loadFactor,Collection<? extends Character> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(float loadFactor,OmniCollection.OfRef<? extends Character> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(float loadFactor,OmniCollection.OfBoolean that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(float loadFactor,OmniCollection.CharOutput<?> that){
+    super(loadFactor);
+    //TODO optimize;
+    this.addAll(that);
+  }
+  public CharOpenAddressHashSet(float loadFactor,OmniCollection.OfChar that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
   public CharOpenAddressHashSet(){
     super();
   }
@@ -1528,6 +1580,36 @@ private boolean addToTable(char val){
   }
   public static class Checked extends CharOpenAddressHashSet{
     transient int modCount;
+    public Checked(Collection<? extends Character> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
+    public Checked(float loadFactor,Collection<? extends Character> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfRef<? extends Character> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfBoolean that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.CharOutput<?> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

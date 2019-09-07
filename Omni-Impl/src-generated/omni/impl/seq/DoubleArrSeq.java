@@ -1,5 +1,6 @@
 package omni.impl.seq;
 import java.util.List;
+import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -42,6 +43,61 @@ AbstractSeq<Double>
   private DoubleArrSeq(){
     super();
     this.arr=OmniArray.OfDouble.DEFAULT_ARR;
+  }
+  private DoubleArrSeq(Collection<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfRef<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.DoubleOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private DoubleArrSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleArrSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
   }
   private DoubleArrSeq(int initialCapacity){
     super();
@@ -639,6 +695,39 @@ AbstractSeq<Double>
       implements OmniStack.OfDouble,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Double> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedStack(){
       super();
     }
@@ -949,6 +1038,39 @@ AbstractSeq<Double>
       implements DoubleListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Double> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
       super();
     }
@@ -2805,6 +2927,39 @@ AbstractSeq<Double>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Double> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedStack(){
       super();
     }
@@ -3060,6 +3215,39 @@ AbstractSeq<Double>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedList(Collection<? extends Double> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
       super();
     }

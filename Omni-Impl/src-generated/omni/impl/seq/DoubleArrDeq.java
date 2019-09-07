@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -23,6 +25,72 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
   transient double[] arr;
   transient int head;
   transient int tail;
+  public DoubleArrDeq(Collection<? extends Double> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfRef<? extends Double> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.DoubleOutput<?> that){
+    super();
+    //TODO optimize;
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }  
+  public DoubleArrDeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public DoubleArrDeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
   public DoubleArrDeq(){
     super();
     this.arr=OmniArray.OfDouble.DEFAULT_ARR;
@@ -2107,6 +2175,39 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
   public static class Checked extends DoubleArrDeq{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends Double> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Double> that){
+       super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfLong that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

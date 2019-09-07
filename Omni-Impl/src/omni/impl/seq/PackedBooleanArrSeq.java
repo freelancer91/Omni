@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -71,18 +72,33 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
     }
     transient long[] words;
-    PackedBooleanArrSeq(){
+    private PackedBooleanArrSeq(){
         super();
     }
-    PackedBooleanArrSeq(int initialCapacity){
+    private PackedBooleanArrSeq(int initialCapacity){
         super();
         if(initialCapacity > 64){
             words=new long[(initialCapacity - 1 >> 6) + 1];
         }
     }
-    PackedBooleanArrSeq(int size,long[] words){
+    private PackedBooleanArrSeq(int size,long[] words){
         super(size);
         this.words=words;
+    }
+    private PackedBooleanArrSeq(Collection<? extends Boolean> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    private PackedBooleanArrSeq(OmniCollection.OfRef<? extends Boolean> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    private PackedBooleanArrSeq(OmniCollection.OfBoolean that){
+      super();
+      //TODO optimize
+      this.addAll(that);
     }
     @Override
     public boolean popBoolean(){
@@ -359,6 +375,15 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
       return retWord;
     }
     public static class CheckedList extends UncheckedList{
+        public CheckedList(Collection<? extends Boolean> that){
+          super(that);
+        }
+        public CheckedList(OmniCollection.OfRef<? extends Boolean> that){
+          super(that);
+        }
+        public CheckedList(OmniCollection.OfBoolean that){
+          super(that);
+        }
         private int multiWordRemoveIfImpl(int offset,int size,BooleanPredicate filter,int bound,int wordOffset,int wordBound,ModCountChecker modCountChecker) {
             final var words=this.words;
             long word;
@@ -1044,7 +1069,15 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             return new CheckedStack(size,words);
         }
-
+        public CheckedStack(Collection<? extends Boolean> that){
+           super(that);
+        }
+        public CheckedStack(OmniCollection.OfRef<? extends Boolean> that){
+          super(that);
+        }
+        public CheckedStack(OmniCollection.OfBoolean that){
+          super(that);
+        }
         @Override
         public OmniIterator.OfBoolean iterator(){
             return new Itr(this);
@@ -3050,6 +3083,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
     }
     public static class UncheckedList extends PackedBooleanArrSeq implements BooleanListDefault,Cloneable,RandomAccess{
+        
         private static final long serialVersionUID=1L;
         private static void removeAllTrue(long[] words,int offset,int numRemoved,int bound,int rootBound) {
             int wordOffset;
@@ -3576,6 +3610,15 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     ++dstOffset;
                 }while((srcOffset & 63) != 0);
             }
+        }
+        public UncheckedList(Collection<? extends Boolean> that){
+          super(that);
+        }
+        public UncheckedList(OmniCollection.OfRef<? extends Boolean> that){
+          super(that);
+        }
+        public UncheckedList(OmniCollection.OfBoolean that){
+          super(that);
         }
         public UncheckedList(){
             super();
@@ -4321,6 +4364,15 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         public UncheckedStack(int initialCapacity){
             super(initialCapacity);
+        }
+        public UncheckedStack(Collection<? extends Boolean> that){
+          super(that);
+        }
+        public UncheckedStack(OmniCollection.OfRef<? extends Boolean> that){
+          super(that);
+        }
+        public UncheckedStack(OmniCollection.OfBoolean that){
+          super(that);
         }
         UncheckedStack(int size,long[] words){
             super(size,words);

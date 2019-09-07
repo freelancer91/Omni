@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.IntSortUtil;
@@ -38,6 +40,46 @@ AbstractSeq<Integer>
   private static final long serialVersionUID=1L;
   transient IntDblLnkNode head;
   transient IntDblLnkNode tail;
+  private IntDblLnkSeq(Collection<? extends Integer> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntDblLnkSeq(OmniCollection.OfRef<? extends Integer> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntDblLnkSeq(OmniCollection.IntOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private IntDblLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntDblLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private IntDblLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private IntDblLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  IntDblLnkSeq(){
   }
   private IntDblLnkSeq(IntDblLnkNode head,int size,IntDblLnkNode tail){
@@ -3941,6 +3983,30 @@ AbstractSeq<Integer>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Integer> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Integer> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.IntOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(IntDblLnkNode head,int size,IntDblLnkNode tail){
@@ -5016,6 +5082,30 @@ AbstractSeq<Integer>
   }
   public static class UncheckedList extends IntDblLnkSeq implements OmniDeque.OfInt,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Integer> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Integer> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.IntOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(IntDblLnkNode head,int size,IntDblLnkNode tail){

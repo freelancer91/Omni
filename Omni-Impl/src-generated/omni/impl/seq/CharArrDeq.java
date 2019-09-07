@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -23,6 +25,36 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
   transient char[] arr;
   transient int head;
   transient int tail;
+  public CharArrDeq(Collection<? extends Character> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public CharArrDeq(OmniCollection.OfRef<? extends Character> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public CharArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public CharArrDeq(OmniCollection.CharOutput<?> that){
+    super();
+    //TODO optimize;
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public CharArrDeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
   public CharArrDeq(){
     super();
     this.arr=OmniArray.OfChar.DEFAULT_ARR;
@@ -2034,6 +2066,21 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
   public static class Checked extends CharArrDeq{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends Character> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Character> that){
+       super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

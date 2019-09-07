@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -16,6 +18,21 @@ import java.io.ObjectInput;
 public class BooleanArrDeq extends AbstractBooleanArrDeq{
   private static final long serialVersionUID=1L;
   transient boolean[] arr;
+  public BooleanArrDeq(Collection<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public BooleanArrDeq(OmniCollection.OfRef<? extends Boolean> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public BooleanArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   public BooleanArrDeq(){
     super();
     this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
@@ -1377,6 +1394,15 @@ public class BooleanArrDeq extends AbstractBooleanArrDeq{
   public static class Checked extends BooleanArrDeq{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends Boolean> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Boolean> that){
+       super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
     public Checked(){
       super();
     }

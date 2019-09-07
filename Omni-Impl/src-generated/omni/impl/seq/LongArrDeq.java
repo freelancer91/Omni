@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -24,6 +26,60 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
   transient long[] arr;
   transient int head;
   transient int tail;
+  public LongArrDeq(Collection<? extends Long> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public LongArrDeq(OmniCollection.OfRef<? extends Long> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public LongArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public LongArrDeq(OmniCollection.LongOutput<?> that){
+    super();
+    //TODO optimize;
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public LongArrDeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public LongArrDeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }  
+  public LongArrDeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public LongArrDeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public LongArrDeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
   public LongArrDeq(){
     super();
     this.arr=OmniArray.OfLong.DEFAULT_ARR;
@@ -1824,6 +1880,33 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
   public static class Checked extends LongArrDeq{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends Long> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Long> that){
+       super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.LongOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfLong that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
     public Checked(){
       super();
     }

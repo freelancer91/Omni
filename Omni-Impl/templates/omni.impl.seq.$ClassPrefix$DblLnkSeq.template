@@ -8,6 +8,8 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.$ClassPrefix$SortUtil;
@@ -85,6 +87,79 @@ AbstractSeq<$BoxedType$>
   private static final long serialVersionUID=1L;
   transient $DNode$$<E>$ head;
   transient $DNode$$<E>$ tail;
+  private $ClassPrefix$DblLnkSeq(Collection<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+#IFNOT OfRef
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  #IFNOT OfBoolean
+  private $ClassPrefix$DblLnkSeq(OmniCollection.$ClassPrefix$Output<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+    #IFNOT OfChar
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+      #IFNOT OfByte
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+        #IFNOT OfShort
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+          #IFNOT OfInt
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+            #IFNOT OfLong
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+              #IFNOT OfFloat
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+  private $ClassPrefix$DblLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+    #ENDIF
+  #ENDIF
+#ENDIF
   private  $ClassPrefix$DblLnkSeq(){
   }
   private $ClassPrefix$DblLnkSeq($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
@@ -1326,6 +1401,57 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
   }
   public static class CheckedList$<E>$ extends UncheckedList$<E>${
     transient int modCount;
+    public CheckedList(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(that);
+    }
+#IFNOT OfRef
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+  #IFNOT OfBoolean
+    public CheckedList(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+    #IFNOT OfChar
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+      #IFNOT OfByte
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+        #IFNOT OfShort
+    public CheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+          #IFNOT OfInt
+    public CheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+            #IFNOT OfLong
+    public CheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+              #IFNOT OfFloat
+    public CheckedList(OmniCollection.OfDouble that){
+      super(that);
+    }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
+    #ENDIF
+  #ENDIF
+#ENDIF
     public CheckedList(){
     }
     CheckedList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
@@ -2377,6 +2503,57 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
   }
   public static class UncheckedList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(that);
+    }
+#IFNOT OfRef
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+  #IFNOT OfBoolean
+    public UncheckedList(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+    #IFNOT OfChar
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+      #IFNOT OfByte
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+        #IFNOT OfShort
+    public UncheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+          #IFNOT OfInt
+    public UncheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+            #IFNOT OfLong
+    public UncheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+              #IFNOT OfFloat
+    public UncheckedList(OmniCollection.OfDouble that){
+      super(that);
+    }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
+    #ENDIF
+  #ENDIF
+#ENDIF
     public UncheckedList(){
     }
     UncheckedList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){

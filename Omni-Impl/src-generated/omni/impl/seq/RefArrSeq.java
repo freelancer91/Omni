@@ -1,5 +1,6 @@
 package omni.impl.seq;
 import java.util.List;
+import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -44,6 +45,16 @@ AbstractSeq<E>
   private RefArrSeq(){
     super();
     this.arr=OmniArray.OfRef.DEFAULT_ARR;
+  }
+  private RefArrSeq(Collection<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private RefArrSeq(OmniCollection.OfRef<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
   }
   private RefArrSeq(int initialCapacity){
     super();
@@ -808,6 +819,12 @@ AbstractSeq<E>
       implements OmniStack.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends E> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public UncheckedStack(){
       super();
     }
@@ -1180,6 +1197,12 @@ AbstractSeq<E>
       implements OmniList.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends E> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public UncheckedList(){
       super();
     }
@@ -3765,6 +3788,12 @@ AbstractSeq<E>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends E> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public CheckedStack(){
       super();
     }
@@ -4063,6 +4092,12 @@ AbstractSeq<E>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedList(Collection<? extends E> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public CheckedList(){
       super();
     }

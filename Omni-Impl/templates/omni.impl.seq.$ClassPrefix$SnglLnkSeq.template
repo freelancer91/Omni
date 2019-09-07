@@ -8,6 +8,7 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
+import java.util.Collection;
 import java.util.function.IntFunction;
 import omni.api.OmniIterator;
 import omni.api.OmniCollection;
@@ -49,6 +50,79 @@ AbstractSeq<$BoxedType$>
  implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable{
   private static final long serialVersionUID=1L;
   transient $SNode$$<E>$ head;
+  private $ClassPrefix$SnglLnkSeq(Collection<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+#IFNOT OfRef
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  #IFNOT OfBoolean
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.$ClassPrefix$Output<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+    #IFNOT OfChar
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+      #IFNOT OfByte
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+        #IFNOT OfShort
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+          #IFNOT OfInt
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+            #IFNOT OfLong
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+              #IFNOT OfFloat
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+  private $ClassPrefix$SnglLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+    #ENDIF
+  #ENDIF
+#ENDIF
   private $ClassPrefix$SnglLnkSeq(){
   }
   private $ClassPrefix$SnglLnkSeq($SNode$$<E>$ head,int size){
@@ -418,6 +492,57 @@ AbstractSeq<$BoxedType$>
   public static class CheckedStack$<E>$ extends UncheckedStack$<E>${
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(that);
+    }
+#IFNOT OfRef
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+  #IFNOT OfBoolean
+    public CheckedStack(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+    #IFNOT OfChar
+    public CheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+      #IFNOT OfByte
+    public CheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+        #IFNOT OfShort
+    public CheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+          #IFNOT OfInt
+    public CheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+            #IFNOT OfLong
+    public CheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+              #IFNOT OfFloat
+    public CheckedStack(OmniCollection.OfDouble that){
+      super(that);
+    }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+    public CheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
+    #ENDIF
+  #ENDIF
+#ENDIF
     public CheckedStack(){
     }
     CheckedStack($SNode$$<E>$ head,int size){
@@ -742,6 +867,57 @@ AbstractSeq<$BoxedType$>
   }
   public static class UncheckedStack$<E>$ extends $ClassPrefix$SnglLnkSeq$<E>$ implements OmniStack.Of$ClassPrefix$$<E>${
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(that);
+    }
+#IFNOT OfRef
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+  #IFNOT OfBoolean
+    public UncheckedStack(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+    #IFNOT OfChar
+    public UncheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+      #IFNOT OfByte
+    public UncheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
+        #IFNOT OfShort
+    public UncheckedStack(OmniCollection.OfInt that){
+      super(that);
+    }
+          #IFNOT OfInt
+    public UncheckedStack(OmniCollection.OfLong that){
+      super(that);
+    }
+            #IFNOT OfLong
+    public UncheckedStack(OmniCollection.OfFloat that){
+      super(that);
+    }
+              #IFNOT OfFloat
+    public UncheckedStack(OmniCollection.OfDouble that){
+      super(that);
+    }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+    public UncheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
+    #ENDIF
+  #ENDIF
+#ENDIF
     public UncheckedStack(){
     }
     UncheckedStack($SNode$$<E>$ head,int size){
@@ -915,6 +1091,57 @@ AbstractSeq<$BoxedType$>
   public static class CheckedQueue$<E>$ extends UncheckedQueue$<E>${
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedQueue(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(that);
+    }
+#IFNOT OfRef
+    public CheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+  #IFNOT OfBoolean
+    public CheckedQueue(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+    #IFNOT OfChar
+    public CheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+      #IFNOT OfByte
+    public CheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
+        #IFNOT OfShort
+    public CheckedQueue(OmniCollection.OfInt that){
+      super(that);
+    }
+          #IFNOT OfInt
+    public CheckedQueue(OmniCollection.OfLong that){
+      super(that);
+    }
+            #IFNOT OfLong
+    public CheckedQueue(OmniCollection.OfFloat that){
+      super(that);
+    }
+              #IFNOT OfFloat
+    public CheckedQueue(OmniCollection.OfDouble that){
+      super(that);
+    }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+    public CheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
+    #ENDIF
+  #ENDIF
+#ENDIF
     public CheckedQueue(){
       super();
     }
@@ -1371,6 +1598,57 @@ AbstractSeq<$BoxedType$>
   public static class UncheckedQueue$<E>$ extends $ClassPrefix$SnglLnkSeq$<E>$ implements OmniQueue.Of$ClassPrefix$$<E>${
     private static final long serialVersionUID=1L;
     transient $SNode$$<E>$ tail;
+    public UncheckedQueue(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(that);
+    }
+#IFNOT OfRef
+    public UncheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+  #IFNOT OfBoolean
+    public UncheckedQueue(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+    #IFNOT OfChar
+    public UncheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+      #IFNOT OfByte
+    public UncheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
+        #IFNOT OfShort
+    public UncheckedQueue(OmniCollection.OfInt that){
+      super(that);
+    }
+          #IFNOT OfInt
+    public UncheckedQueue(OmniCollection.OfLong that){
+      super(that);
+    }
+            #IFNOT OfLong
+    public UncheckedQueue(OmniCollection.OfFloat that){
+      super(that);
+    }
+              #IFNOT OfFloat
+    public UncheckedQueue(OmniCollection.OfDouble that){
+      super(that);
+    }
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #IFNOT OfByte,OfShort
+    public UncheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
+    #ENDIF
+  #ENDIF
+#ENDIF
     public UncheckedQueue(){
       super();
     }

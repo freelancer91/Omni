@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.RefSortUtil;
@@ -41,6 +43,16 @@ AbstractSeq<E>
   private static final long serialVersionUID=1L;
   transient RefDblLnkNode<E> head;
   transient RefDblLnkNode<E> tail;
+  private RefDblLnkSeq(Collection<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private RefDblLnkSeq(OmniCollection.OfRef<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  RefDblLnkSeq(){
   }
   private RefDblLnkSeq(RefDblLnkNode<E> head,int size,RefDblLnkNode<E> tail){
@@ -4934,6 +4946,12 @@ AbstractSeq<E>
   }
   public static class CheckedList<E> extends UncheckedList<E>{
     transient int modCount;
+    public CheckedList(Collection<? extends E> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(RefDblLnkNode<E> head,int size,RefDblLnkNode<E> tail){
@@ -6190,6 +6208,12 @@ AbstractSeq<E>
   }
   public static class UncheckedList<E> extends RefDblLnkSeq<E> implements OmniDeque.OfRef<E>,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends E> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(RefDblLnkNode<E> head,int size,RefDblLnkNode<E> tail){

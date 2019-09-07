@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -24,6 +26,36 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
   transient byte[] arr;
   transient int head;
   transient int tail;
+  public ByteArrDeq(Collection<? extends Byte> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ByteArrDeq(OmniCollection.OfRef<? extends Byte> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ByteArrDeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ByteArrDeq(OmniCollection.ByteOutput<?> that){
+    super();
+    //TODO optimize;
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public ByteArrDeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
   public ByteArrDeq(){
     super();
     this.arr=OmniArray.OfByte.DEFAULT_ARR;
@@ -2099,6 +2131,21 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
   public static class Checked extends ByteArrDeq{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends Byte> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Byte> that){
+       super(that);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.ByteOutput<?> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
     public Checked(){
       super();
     }

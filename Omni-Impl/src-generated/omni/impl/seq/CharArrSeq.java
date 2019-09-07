@@ -1,5 +1,6 @@
 package omni.impl.seq;
 import java.util.List;
+import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.util.OmniArray;
 import omni.api.OmniList;
@@ -42,6 +43,31 @@ AbstractSeq<Character>
   private CharArrSeq(){
     super();
     this.arr=OmniArray.OfChar.DEFAULT_ARR;
+  }
+  private CharArrSeq(Collection<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharArrSeq(OmniCollection.OfRef<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharArrSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharArrSeq(OmniCollection.CharOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private CharArrSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
   }
   private CharArrSeq(int initialCapacity){
     super();
@@ -707,6 +733,21 @@ AbstractSeq<Character>
       implements OmniStack.OfChar,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Character> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedStack(){
       super();
     }
@@ -1068,6 +1109,21 @@ AbstractSeq<Character>
       implements CharListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Character> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
       super();
     }
@@ -2961,6 +3017,21 @@ AbstractSeq<Character>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Character> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedStack(){
       super();
     }
@@ -3222,6 +3293,21 @@ AbstractSeq<Character>
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedList(Collection<? extends Character> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
       super();
     }

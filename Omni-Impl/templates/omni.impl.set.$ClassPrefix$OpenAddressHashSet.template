@@ -6,6 +6,8 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.set;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.Set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -98,6 +100,146 @@ implements OmniSet.Of$ClassPrefix$$<E>${
 #ELSE
   transient $ArrayType$[] table;
 #ENDIF
+  public $ClassPrefix$OpenAddressHashSet(Collection<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+#IFNOT OfRef
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.$ClassPrefix$Output<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  #IFNOT OfChar
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+    #IFNOT OfShort
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+      #IFNOT OfInt
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+        #IFNOT OfLong
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+          #IFNOT OfFloat
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFNOT OfShort
+  public $ClassPrefix$OpenAddressHashSet(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  #ENDIF
+#ENDIF
+
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,Collection<? extends $BoxedExposed$> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfRef<? extends $BoxedExposed$> that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+#IFNOT OfRef
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfBoolean that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.$ClassPrefix$Output<?> that){
+    super(loadFactor);
+    //TODO optimize;
+    this.addAll(that);
+  }
+  #IFNOT OfChar
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfByte that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfShort that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }  
+    #IFNOT OfShort
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfInt that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+      #IFNOT OfInt
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfLong that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+        #IFNOT OfLong
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfFloat that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+          #IFNOT OfFloat
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfDouble that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFNOT OfShort
+  public $ClassPrefix$OpenAddressHashSet(float loadFactor,OmniCollection.OfChar that){
+    super(loadFactor);
+    //TODO optimize
+    this.addAll(that);
+  }
+  #ENDIF
+#ENDIF
+
   public $ClassPrefix$OpenAddressHashSet(){
     super();
   }
@@ -3837,6 +3979,100 @@ return (this.wordWORDNUM & (MASK))!=0;
   }
   public static class Checked$<E>$ extends $ClassPrefix$OpenAddressHashSet$<E>${
     transient int modCount;
+    public Checked(Collection<? extends $BoxedExposed$> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(that);
+    }
+#IFNOT OfRef
+    public Checked(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public Checked(OmniCollection.$ClassPrefix$Output<?> that){
+      super(that);
+    }
+  #IFNOT OfChar
+    public Checked(OmniCollection.OfByte that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfShort that){
+      super(that);
+    }  
+    #IFNOT OfShort
+    public Checked(OmniCollection.OfInt that){
+      super(that);
+    }
+      #IFNOT OfInt
+    public Checked(OmniCollection.OfLong that){
+      super(that);
+    }
+        #IFNOT OfLong
+    public Checked(OmniCollection.OfFloat that){
+      super(that);
+    }
+          #IFNOT OfFloat
+    public Checked(OmniCollection.OfDouble that){
+      super(that);
+    }
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFNOT OfShort
+    public Checked(OmniCollection.OfChar that){
+      super(that);
+    }
+  #ENDIF
+#ENDIF
+    public Checked(float loadFactor,Collection<? extends $BoxedExposed$> that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfRef<? extends $BoxedExposed$> that){
+      super(loadFactor,that);
+    }
+#IFNOT OfRef
+    public Checked(float loadFactor,OmniCollection.OfBoolean that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.$ClassPrefix$Output<?> that){
+      super(loadFactor,that);
+    }
+  #IFNOT OfChar
+    public Checked(float loadFactor,OmniCollection.OfByte that){
+      super(loadFactor,that);
+    }
+    public Checked(float loadFactor,OmniCollection.OfShort that){
+      super(loadFactor,that);
+    }  
+    #IFNOT OfShort
+    public Checked(float loadFactor,OmniCollection.OfInt that){
+      super(loadFactor,that);
+    }
+      #IFNOT OfInt
+    public Checked(float loadFactor,OmniCollection.OfLong that){
+      super(loadFactor,that);
+    }
+        #IFNOT OfLong
+    public Checked(float loadFactor,OmniCollection.OfFloat that){
+      super(loadFactor,that);
+    }
+          #IFNOT OfFloat
+    public Checked(float loadFactor,OmniCollection.OfDouble that){
+      super(loadFactor,that);
+    }
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFNOT OfShort
+    public Checked(float loadFactor,OmniCollection.OfChar that){
+      super(that);
+    }
+  #ENDIF
+#ENDIF
     public Checked(){
       super();
     }

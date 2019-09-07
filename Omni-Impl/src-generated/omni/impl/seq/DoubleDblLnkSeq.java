@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.util.Collection;
+import omni.api.OmniCollection;
 import java.util.ListIterator;
 import java.util.List;
 import omni.util.DoubleSortUtil;
@@ -37,6 +39,61 @@ AbstractSeq<Double>
   private static final long serialVersionUID=1L;
   transient DoubleDblLnkNode head;
   transient DoubleDblLnkNode tail;
+  private DoubleDblLnkSeq(Collection<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfRef<? extends Double> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.DoubleOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
+  private DoubleDblLnkSeq(OmniCollection.OfInt that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfLong that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfFloat that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfDouble that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private DoubleDblLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private  DoubleDblLnkSeq(){
   }
   private DoubleDblLnkSeq(DoubleDblLnkNode head,int size,DoubleDblLnkNode tail){
@@ -4123,6 +4180,39 @@ AbstractSeq<Double>
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
+    public CheckedList(Collection<? extends Double> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public CheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public CheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedList(){
     }
     CheckedList(DoubleDblLnkNode head,int size,DoubleDblLnkNode tail){
@@ -5228,6 +5318,39 @@ AbstractSeq<Double>
   }
   public static class UncheckedList extends DoubleDblLnkSeq implements OmniDeque.OfDouble,Externalizable{
     private static final long serialVersionUID=1L;
+    public UncheckedList(Collection<? extends Double> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfRef<? extends Double> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.DoubleOutput<?> that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfShort that){
+      super(that);
+    }  
+    public UncheckedList(OmniCollection.OfInt that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfLong that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfFloat that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfDouble that){
+      super(that);
+    }
+    public UncheckedList(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedList(){
     }
     UncheckedList(DoubleDblLnkNode head,int size,DoubleDblLnkNode tail){

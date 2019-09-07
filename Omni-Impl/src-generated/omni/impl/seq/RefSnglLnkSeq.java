@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.Collection;
 import java.util.function.IntFunction;
 import omni.api.OmniIterator;
 import omni.api.OmniCollection;
@@ -21,6 +22,16 @@ AbstractSeq<E>
  implements OmniCollection.OfRef<E>,Externalizable{
   private static final long serialVersionUID=1L;
   transient RefSnglLnkNode<E> head;
+  private RefSnglLnkSeq(Collection<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private RefSnglLnkSeq(OmniCollection.OfRef<? extends E> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private RefSnglLnkSeq(){
   }
   private RefSnglLnkSeq(RefSnglLnkNode<E> head,int size){
@@ -677,6 +688,12 @@ AbstractSeq<E>
   public static class CheckedStack<E> extends UncheckedStack<E>{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends E> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public CheckedStack(){
     }
     CheckedStack(RefSnglLnkNode<E> head,int size){
@@ -991,6 +1008,12 @@ AbstractSeq<E>
   }
   public static class UncheckedStack<E> extends RefSnglLnkSeq<E> implements OmniStack.OfRef<E>{
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends E> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public UncheckedStack(){
     }
     UncheckedStack(RefSnglLnkNode<E> head,int size){
@@ -1376,6 +1399,12 @@ AbstractSeq<E>
   public static class CheckedQueue<E> extends UncheckedQueue<E>{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedQueue(Collection<? extends E> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public CheckedQueue(){
       super();
     }
@@ -1785,6 +1814,12 @@ AbstractSeq<E>
   public static class UncheckedQueue<E> extends RefSnglLnkSeq<E> implements OmniQueue.OfRef<E>{
     private static final long serialVersionUID=1L;
     transient RefSnglLnkNode<E> tail;
+    public UncheckedQueue(Collection<? extends E> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfRef<? extends E> that){
+      super(that);
+    }
     public UncheckedQueue(){
       super();
     }

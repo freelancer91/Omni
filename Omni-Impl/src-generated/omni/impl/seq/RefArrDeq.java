@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.api.OmniCollection;
+import java.util.Collection;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
@@ -20,6 +22,18 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
   transient Object[] arr;
   transient int head;
   transient int tail;
+  public RefArrDeq(Collection<? extends E> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
+  public RefArrDeq(OmniCollection.OfRef<? extends E> that){
+    super();
+    //TODO optimize
+    this.tail=-1;
+    this.addAll(that);
+  }
   public RefArrDeq(){
     super();
     this.arr=OmniArray.OfRef.DEFAULT_ARR;
@@ -2377,6 +2391,12 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
   public static class Checked<E> extends RefArrDeq<E>{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public Checked(Collection<? extends E> that){
+      super(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends E> that){
+       super(that);
+    }
     public Checked(){
       super();
     }

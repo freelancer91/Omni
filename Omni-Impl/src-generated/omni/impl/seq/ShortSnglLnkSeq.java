@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.Collection;
 import java.util.function.IntFunction;
 import omni.api.OmniIterator;
 import omni.api.OmniCollection;
@@ -25,6 +26,36 @@ AbstractSeq<Short>
  implements OmniCollection.OfShort,Externalizable{
   private static final long serialVersionUID=1L;
   transient ShortSnglLnkNode head;
+  private ShortSnglLnkSeq(Collection<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortSnglLnkSeq(OmniCollection.OfRef<? extends Short> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortSnglLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortSnglLnkSeq(OmniCollection.ShortOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private ShortSnglLnkSeq(OmniCollection.OfByte that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private ShortSnglLnkSeq(OmniCollection.OfShort that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }  
   private ShortSnglLnkSeq(){
   }
   private ShortSnglLnkSeq(ShortSnglLnkNode head,int size){
@@ -645,6 +676,24 @@ AbstractSeq<Short>
   public static class CheckedStack extends UncheckedStack{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Short> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
     public CheckedStack(){
     }
     CheckedStack(ShortSnglLnkNode head,int size){
@@ -932,6 +981,24 @@ AbstractSeq<Short>
   }
   public static class UncheckedStack extends ShortSnglLnkSeq implements OmniStack.OfShort{
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Short> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfShort that){
+      super(that);
+    }  
     public UncheckedStack(){
     }
     UncheckedStack(ShortSnglLnkNode head,int size){
@@ -1243,6 +1310,24 @@ AbstractSeq<Short>
   public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedQueue(Collection<? extends Short> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
     public CheckedQueue(){
       super();
     }
@@ -1641,6 +1726,24 @@ AbstractSeq<Short>
   public static class UncheckedQueue extends ShortSnglLnkSeq implements OmniQueue.OfShort{
     private static final long serialVersionUID=1L;
     transient ShortSnglLnkNode tail;
+    public UncheckedQueue(Collection<? extends Short> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfRef<? extends Short> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.ShortOutput<?> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfByte that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfShort that){
+      super(that);
+    }  
     public UncheckedQueue(){
       super();
     }

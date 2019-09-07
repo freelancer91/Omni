@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.Collection;
 import java.util.function.IntFunction;
 import omni.api.OmniIterator;
 import omni.api.OmniCollection;
@@ -24,6 +25,31 @@ AbstractSeq<Character>
  implements OmniCollection.OfChar,Externalizable{
   private static final long serialVersionUID=1L;
   transient CharSnglLnkNode head;
+  private CharSnglLnkSeq(Collection<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharSnglLnkSeq(OmniCollection.OfRef<? extends Character> that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharSnglLnkSeq(OmniCollection.OfBoolean that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
+  private CharSnglLnkSeq(OmniCollection.CharOutput<?> that){
+    super();
+    //TODO optimize;
+    this.addAll(that);
+  }
+  private CharSnglLnkSeq(OmniCollection.OfChar that){
+    super();
+    //TODO optimize
+    this.addAll(that);
+  }
   private CharSnglLnkSeq(){
   }
   private CharSnglLnkSeq(CharSnglLnkNode head,int size){
@@ -635,6 +661,21 @@ AbstractSeq<Character>
   public static class CheckedStack extends UncheckedStack{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedStack(Collection<? extends Character> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public CheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedStack(){
     }
     CheckedStack(CharSnglLnkNode head,int size){
@@ -922,6 +963,21 @@ AbstractSeq<Character>
   }
   public static class UncheckedStack extends CharSnglLnkSeq implements OmniStack.OfChar{
     private static final long serialVersionUID=1L;
+    public UncheckedStack(Collection<? extends Character> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public UncheckedStack(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedStack(){
     }
     UncheckedStack(CharSnglLnkNode head,int size){
@@ -1233,6 +1289,21 @@ AbstractSeq<Character>
   public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
+    public CheckedQueue(Collection<? extends Character> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public CheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
     public CheckedQueue(){
       super();
     }
@@ -1631,6 +1702,21 @@ AbstractSeq<Character>
   public static class UncheckedQueue extends CharSnglLnkSeq implements OmniQueue.OfChar{
     private static final long serialVersionUID=1L;
     transient CharSnglLnkNode tail;
+    public UncheckedQueue(Collection<? extends Character> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfRef<? extends Character> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfBoolean that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.CharOutput<?> that){
+      super(that);
+    }
+    public UncheckedQueue(OmniCollection.OfChar that){
+      super(that);
+    }
     public UncheckedQueue(){
       super();
     }

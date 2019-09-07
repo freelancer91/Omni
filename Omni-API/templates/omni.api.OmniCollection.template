@@ -29,13 +29,13 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
    */
   //public abstract DataType getDataType();
 
-  //TODO add overloads for OmniCollection etc.
+  @SuppressWarnings("unchecked")
   @Override
   default public boolean addAll(Collection<? extends E> that){
     //TODO override in lower classes and remove this
     boolean changed=false;
-    for(var thatVal:that){
-      changed|=this.add(thatVal);
+    for(var thatVal:that.toArray()){
+      changed|=this.add((E)thatVal);
     }
     return changed;
   }
@@ -95,6 +95,7 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniCollection<E>
   {
+    public abstract boolean addAll(OmniCollection.OfBoolean that);
     public abstract boolean add(boolean val);
     #MACRO BoxedMethods(ContainsMethodDefault)
     #MACRO BoxedMethods(RemoveValMethodDefault)
@@ -139,30 +140,37 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract interface BooleanInput<E> extends OmniCollection<E>{
     public abstract boolean add(boolean val);
     public abstract boolean add(Boolean val);
+    public abstract boolean addAll(OmniCollection.OfBoolean that);
   }
   public abstract interface ByteInput<E> extends BooleanInput<E>{
     public abstract boolean add(byte val);
     public abstract boolean add(Byte val);
+    public abstract boolean addAll(OmniCollection.OfByte that);
   }
   public abstract interface CharInput<E> extends BooleanInput<E>{
     public abstract boolean add(char val);
     public abstract boolean add(Character val);
+    public abstract boolean addAll(OmniCollection.OfChar that);
   }
   public abstract interface ShortInput<E> extends ByteInput<E>{
     public abstract boolean add(short val);
     public abstract boolean add(Short val);
+    public abstract boolean addAll(OmniCollection.OfShort that);
   }
   public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>{
     public abstract boolean add(int val);
     public abstract boolean add(Integer val);
+    public abstract boolean addAll(OmniCollection.OfInt that);
   }
   public abstract interface LongInput<E> extends IntInput<E>{
     public abstract boolean add(long val);
     public abstract boolean add(Long val);
+    public abstract boolean addAll(OmniCollection.OfLong that);
   }
   public abstract interface FloatInput<E> extends LongInput<E>{
     public abstract boolean add(float val);
     public abstract boolean add(Float val);
+    public abstract boolean addAll(OmniCollection.OfFloat that);
   }
   
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
@@ -175,6 +183,8 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
 ,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
+ 
+
   /*
   @Override
   public default DataType getDataType(){
@@ -199,6 +209,80 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
 #ENDIF
   }
   */
+  
+  
+  
+
+  public default boolean addAll(OmniCollection.OfRef<? extends BOXEDTYPE> that){
+    //TODO implement in lower classes and remove this
+    var changed=false;
+    for(var thatVal:that.toArray(BOXEDTYPE[]::new)){
+      changed|=this.add((ARRTYPE)thatVal);
+    }
+    return changed;
+  }
+  public default boolean addAll(OmniCollection.OfBoolean that){
+    //TODO implement in lower classes and remove this
+    var changed=false;
+    final ARRTYPE[] thatArr;
+    for(int i=0,bound=(thatArr=that.toCLASSPREFIXArray()).length;i<bound;++i){
+      changed|=this.add(thatArr[i]);
+    }
+    return changed;
+  }
+#IFNOTSWITCH CLASSPREFIX==Boolean
+  public default boolean addAll(OmniCollection.CLASSPREFIXOutput<?> that){
+    //TODO implement in lower classes and remove this
+    var changed=false;
+    final ARRTYPE[] thatArr;
+    for(int i=0,bound=(thatArr=that.toCLASSPREFIXArray()).length;i<bound;++i){
+      changed|=this.add(thatArr[i]);
+    }
+    return changed;
+  }
+  #IFNOTSWITCH CLASSPREFIX==Char
+  public default boolean addAll(OmniCollection.OfByte that){
+    //TODO implement in lower classes and remove this
+    return addAll((OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+    #IFNOTSWITCH CLASSPREFIX==Byte
+  public default boolean addAll(OmniCollection.OfShort that){
+    //TODO implement in lower classes and remove this
+    return addAll((OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+      #IFNOTSWITCH CLASSPREFIX==Short
+  public default boolean addAll(OmniCollection.OfInt that){
+    //TODO implement in lower classes and remove this
+    return addAll((OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+        #IFNOTSWITCH CLASSPREFIX==Int
+  public default boolean addAll(OmniCollection.OfLong that){
+    //TODO implement in lower classes and remove this
+    return addAll((OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+          #IFNOTSWITCH CLASSPREFIX==Long
+  public default boolean addAll(OmniCollection.OfFloat that){
+    //TODO implement in lower classes and remove this
+    return addAll((OmniCollection.CLASSPREFIXOutput<?>)that);
+  }       
+            #IFNOTSWITCH CLASSPREFIX==Float
+  public default boolean addAll(OmniCollection.OfDouble that){
+    //TODO implement in lower classes and remove this
+    return addAll((OmniCollection.CLASSPREFIXOutput<?>)that);
+  }  
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFNOTSWITCH CLASSPREFIX==Byte,Short
+  public default boolean addAll(OmniCollection.OfChar that){
+    //TODO implement in lower classes and remove this
+    return addAll((OmniCollection.CLASSPREFIXOutput<?>)that);
+  }
+  #ENDIF
+#ENDIF
 
   #MACRO ContainsMethodDefault<Byte>()
   #MACRO ContainsMethodDefault<Character>()
@@ -405,6 +489,15 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
       return DataType.REF;
     }
     */
+    @SuppressWarnings("unchecked")
+    public default boolean addAll(OmniCollection.OfRef<? extends E> that){
+    //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray()){
+        changed|=this.add((E)thatVal);
+      }
+      return changed;
+    }
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);
     public abstract OmniIterator.OfRef<E> iterator();
