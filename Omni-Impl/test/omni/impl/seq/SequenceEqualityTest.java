@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -48,6 +50,31 @@ public class SequenceEqualityTest{
         PACKED_BOOLEAN_SIZES=packedSizeBuilder.build().toArray();
         
         Stream.Builder<SequenceInitParams> listInitParamsBuilder=Stream.builder();
+        for(final var checkedType:CheckedType.values()){
+          listInitParamsBuilder.accept(new SequenceInitParams(StructType.PackedBooleanArrList,DataType.BOOLEAN,checkedType,
+                  OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR));
+      }
+      final int[] buffers=new int[]{0,1,2,3,4,60,61,62,63,64,65,66,67,68,124,125,126,127,128,129,130,131,132};
+      for(final var pre0:buffers){
+          for(final var pre1:buffers){
+              if(pre1 > 0){
+                  continue;
+              }
+              final var preAllocs=new int[]{pre0,pre1};
+              for(final var post0:buffers){
+                  for(final var post1:buffers){
+                      if(post1 > 0){
+                          continue;
+                      }
+                      final var postAllocs=new int[]{post0,post1};
+                      for(final var checkedType:CheckedType.values()){
+                          listInitParamsBuilder.accept(new SequenceInitParams(StructType.PackedBooleanArrSubList,
+                                  DataType.BOOLEAN,checkedType,preAllocs,postAllocs));
+                      }
+                  }
+              }
+          }
+      }
         for(var dataType:DataType.values()) {
             for(var checkedType:CheckedType.values()) {
                 listInitParamsBuilder.accept(new SequenceInitParams(StructType.ArrList,dataType,checkedType,OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR));
@@ -79,31 +106,7 @@ public class SequenceEqualityTest{
             }
             
         }
-        for(final var checkedType:CheckedType.values()){
-            listInitParamsBuilder.accept(new SequenceInitParams(StructType.PackedBooleanArrList,DataType.BOOLEAN,checkedType,
-                    OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR));
-        }
-        final int[] buffers=new int[]{0,1,2,3,4,60,61,62,63,64,65,66,67,68,124,125,126,127,128,129,130,131,132};
-        for(final var pre0:buffers){
-            for(final var pre1:buffers){
-                if(pre1 > 0){
-                    continue;
-                }
-                final var preAllocs=new int[]{pre0,pre1};
-                for(final var post0:buffers){
-                    for(final var post1:buffers){
-                        if(post1 > 0){
-                            continue;
-                        }
-                        final var postAllocs=new int[]{post0,post1};
-                        for(final var checkedType:CheckedType.values()){
-                            listInitParamsBuilder.accept(new SequenceInitParams(StructType.PackedBooleanArrSubList,
-                                    DataType.BOOLEAN,checkedType,preAllocs,postAllocs));
-                        }
-                    }
-                }
-            }
-        }
+        
         LIST_INIT_PARAMS=listInitParamsBuilder.build().toArray(SequenceInitParams[]::new);
     }
     
@@ -419,12 +422,27 @@ public class SequenceEqualityTest{
                         asList.remove(size-1);
                         builder.accept(asList);
                     }
-                    //modify one
+                    //modify one at the end
                     for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
-                        @SuppressWarnings("unchecked")
-                        List<Object> asList=(List<Object>)val;
+                      @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
                         asList.set(size-1,new Object());
                         builder.accept(asList);
+                    }
+                    if(size>1) {
+                      //modify one at the beginning
+                      for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                        @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
+                          asList.set(0,new Object());
+                          builder.accept(asList);
+                      }
+                      if(size>2) {
+                        //modify one in the middle
+                        for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                          @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
+                            asList.set(size/2,new Object());
+                            builder.accept(asList);
+                        }
+                      }
                     }
                 }
                 return builder.build().toArray();
@@ -485,12 +503,27 @@ public class SequenceEqualityTest{
                         asList.remove(size-1);
                         builder.accept(asList);
                     }
-                    //modify one
+                    //modify one at the end
                     for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
-                        @SuppressWarnings("unchecked")
-                        List<Object> asList=(List<Object>)val;
+                      @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
                         asList.set(size-1,new Object());
                         builder.accept(asList);
+                    }
+                    if(size>1) {
+                      //modify one at the beginning
+                      for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                        @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
+                          asList.set(0,new Object());
+                          builder.accept(asList);
+                      }
+                      if(size>2) {
+                        //modify one in the middle
+                        for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                          @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
+                            asList.set(size/2,new Object());
+                            builder.accept(asList);
+                        }
+                      }
                     }
                 }
                 return builder.build().toArray();
@@ -502,11 +535,43 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
-                
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BYTE:
+                case CHAR:
+                case SHORT:
+                case INT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                  if(size==0) {
+                    builder.accept(new PackedBooleanArrSeq.UncheckedList());
+                    builder.accept(new PackedBooleanArrSeq.CheckedList());
+                    builder.accept(new BooleanArrSeq.UncheckedList());
+                    builder.accept(new BooleanArrSeq.CheckedList());
+                    builder.accept(new BooleanDblLnkSeq.UncheckedList());
+                    builder.accept(new BooleanDblLnkSeq.CheckedList());
+                    builder.accept(new PackedBooleanArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new PackedBooleanArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new BooleanArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new BooleanArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new BooleanDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new BooleanDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedPackedRoot=new PackedBooleanArrSeq.UncheckedList(10+size);
+                    for(int i=0;i<10;++i) {
+                        uncheckedPackedRoot.add((i&1)!=0);
+                    }
+                    builder.accept(uncheckedPackedRoot.subList(5,5+size));
+                    builder.accept(new PackedBooleanArrSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
+                    builder.accept(new BooleanArrSeq.UncheckedList(uncheckedPackedRoot).subList(5,5+size));
+                    builder.accept(new BooleanArrSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
+                    builder.accept(new BooleanDblLnkSeq.UncheckedList(uncheckedPackedRoot).subList(5,5+size));
+                    builder.accept(new BooleanDblLnkSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
+                  }
+                  break;
                 case BOOLEAN:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                    
                     var thisList=(OmniList.OfBoolean)seq.getCollection();
                     builder.accept(new PackedBooleanArrSeq.UncheckedList(thisList));
                     builder.accept(new PackedBooleanArrSeq.CheckedList(thisList));
@@ -534,24 +599,16 @@ public class SequenceEqualityTest{
                     builder.accept(new BooleanArrSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
                     builder.accept(new BooleanDblLnkSeq.UncheckedList(uncheckedPackedRoot).subList(5,5+size));
                     builder.accept(new BooleanDblLnkSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
                     //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BYTE:
-                case CHAR:
-                case SHORT:
-                case INT:
-                case LONG:
-                case FLOAT:
-                case DOUBLE:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                    break;
+
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -575,11 +632,27 @@ public class SequenceEqualityTest{
                             asList.removeBooleanAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfBoolean asList=(OmniList.OfBoolean)val;
                             asList.set(size-1,!asList.getBoolean(size-1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfBoolean asList=(OmniList.OfBoolean)val;
+                              asList.set(0,!asList.getBoolean(0));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfBoolean asList=(OmniList.OfBoolean)val;
+                                asList.set(size/2,!asList.getBoolean(size/2));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -642,38 +715,40 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
-                
-                var checkedPackedList=new PackedBooleanArrSeq.CheckedList(uncheckedPackedList);
-                var uncheckedArrList=new BooleanArrSeq.UncheckedList(uncheckedPackedList);
-                var checkedArrList=new BooleanArrSeq.CheckedList(uncheckedPackedList);
-                var uncheckedDblLnkList=new BooleanDblLnkSeq.UncheckedList(uncheckedPackedList);
-                var checkedDblLnkList=new BooleanDblLnkSeq.CheckedList(uncheckedPackedList);
-                builder.accept(uncheckedPackedList);
-                builder.accept(checkedPackedList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedPackedList.subList(0,size));
-                builder.accept(checkedPackedList.subList(0,size));
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedPackedRoot=new PackedBooleanArrSeq.UncheckedList(10+size);
-                for(int i=0;i<5;++i) {
-                    uncheckedPackedRoot.add((i&1)!=0);
+                if(size!=0) {
+                  var checkedPackedList=new PackedBooleanArrSeq.CheckedList(uncheckedPackedList);
+                  var uncheckedArrList=new BooleanArrSeq.UncheckedList(uncheckedPackedList);
+                  var checkedArrList=new BooleanArrSeq.CheckedList(uncheckedPackedList);
+                  var uncheckedDblLnkList=new BooleanDblLnkSeq.UncheckedList(uncheckedPackedList);
+                  var checkedDblLnkList=new BooleanDblLnkSeq.CheckedList(uncheckedPackedList);
+                  builder.accept(uncheckedPackedList);
+                  builder.accept(checkedPackedList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedPackedList.subList(0,size));
+                  builder.accept(checkedPackedList.subList(0,size));
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedPackedRoot=new PackedBooleanArrSeq.UncheckedList(10+size);
+                  for(int i=0;i<5;++i) {
+                      uncheckedPackedRoot.add((i&1)!=0);
+                  }
+                  uncheckedPackedRoot.addAll(uncheckedPackedList);
+                  for(int i=0;i<5;++i) {
+                      uncheckedPackedRoot.add((i&1)!=0);
+                  }
+                  builder.accept(uncheckedPackedRoot.subList(5,5+size));
+                  builder.accept(new PackedBooleanArrSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
+                  builder.accept(new BooleanArrSeq.UncheckedList(uncheckedPackedRoot).subList(5,5+size));
+                  builder.accept(new BooleanArrSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
+                  builder.accept(new BooleanDblLnkSeq.UncheckedList(uncheckedPackedRoot).subList(5,5+size));
+                  builder.accept(new BooleanDblLnkSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
                 }
-                uncheckedPackedRoot.addAll(uncheckedPackedList);
-                for(int i=0;i<5;++i) {
-                    uncheckedPackedRoot.add((i&1)!=0);
-                }
-                builder.accept(uncheckedPackedRoot.subList(5,5+size));
-                builder.accept(new PackedBooleanArrSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
-                builder.accept(new BooleanArrSeq.UncheckedList(uncheckedPackedRoot).subList(5,5+size));
-                builder.accept(new BooleanArrSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
-                builder.accept(new BooleanDblLnkSeq.UncheckedList(uncheckedPackedRoot).subList(5,5+size));
-                builder.accept(new BooleanDblLnkSeq.CheckedList(uncheckedPackedRoot).subList(5,5+size));
+              
                 return builder.build().toArray();
             }
             
@@ -683,10 +758,37 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BOOLEAN:
+                case CHAR:
+                case SHORT:
+                case INT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                  if(size==0) {
+                    builder.accept(new ByteArrSeq.UncheckedList());
+                    builder.accept(new ByteArrSeq.CheckedList());
+                    builder.accept(new ByteDblLnkSeq.UncheckedList());
+                    builder.accept(new ByteDblLnkSeq.CheckedList());
+                    builder.accept(new ByteArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new ByteArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new ByteDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new ByteDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedRoot=new ByteArrSeq.UncheckedList(10+size);
+                    for(int i=0;i<10;++i) {
+                      uncheckedRoot.add((byte)i);
+                    }  
+                    builder.accept(uncheckedRoot.subList(5,5+size));
+                    builder.accept(new ByteArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new ByteDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new ByteDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  }
+                  break;
                 case BYTE:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                    
                     var thisList=(OmniList.OfByte)seq.getCollection();
                     builder.accept(new ByteArrSeq.UncheckedList(thisList));
                     builder.accept(new ByteArrSeq.CheckedList(thisList));
@@ -708,24 +810,15 @@ public class SequenceEqualityTest{
                     builder.accept(new ByteArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new ByteDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new ByteDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
-                    //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BOOLEAN:
-                case CHAR:
-                case SHORT:
-                case INT:
-                case LONG:
-                case FLOAT:
-                case DOUBLE:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                  //TODO
+                  break;
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -749,11 +842,27 @@ public class SequenceEqualityTest{
                             asList.removeByteAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfByte asList=(OmniList.OfByte)val;
                             asList.set(size-1,(byte)(asList.getByte(size-1)+1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfByte asList=(OmniList.OfByte)val;
+                              asList.set(0,(byte)(asList.getByte(0)+1));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfByte asList=(OmniList.OfByte)val;
+                                asList.set(size/2,(byte)(asList.getByte(size/2)+1));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -811,30 +920,31 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
-                
-                var checkedArrList=new ByteArrSeq.CheckedList(uncheckedArrList);
-                var uncheckedDblLnkList=new ByteDblLnkSeq.UncheckedList(uncheckedArrList);
-                var checkedDblLnkList=new ByteDblLnkSeq.CheckedList(uncheckedArrList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedRoot=new ByteArrSeq.UncheckedList(10+size);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add((byte)i);
+                if(size!=0) {
+                  var checkedArrList=new ByteArrSeq.CheckedList(uncheckedArrList);
+                  var uncheckedDblLnkList=new ByteDblLnkSeq.UncheckedList(uncheckedArrList);
+                  var checkedDblLnkList=new ByteDblLnkSeq.CheckedList(uncheckedArrList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedRoot=new ByteArrSeq.UncheckedList(10+size);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add((byte)i);
+                  }
+                  uncheckedRoot.addAll(uncheckedArrList);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add((byte)i);
+                  }
+                  builder.accept(uncheckedRoot.subList(5,5+size));
+                  builder.accept(new ByteArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new ByteDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new ByteDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 }
-                uncheckedRoot.addAll(uncheckedArrList);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add((byte)i);
-                }
-                builder.accept(uncheckedRoot.subList(5,5+size));
-                builder.accept(new ByteArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new ByteDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new ByteDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 return builder.build().toArray();
             }
             
@@ -844,10 +954,37 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BOOLEAN:
+                case BYTE:
+                case SHORT:
+                case INT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                  if(size==0) {
+                    builder.accept(new CharArrSeq.UncheckedList());
+                    builder.accept(new CharArrSeq.CheckedList());
+                    builder.accept(new CharDblLnkSeq.UncheckedList());
+                    builder.accept(new CharDblLnkSeq.CheckedList());
+                    builder.accept(new CharArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new CharArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new CharDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new CharDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedRoot=new CharArrSeq.UncheckedList(10+size);
+                    for(int i=0;i<10;++i) {
+                      uncheckedRoot.add((char)i);
+                    }  
+                    builder.accept(uncheckedRoot.subList(5,5+size));
+                    builder.accept(new CharArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new CharDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new CharDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  }
+                  break;
                 case CHAR:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                    
                     var thisList=(OmniList.OfChar)seq.getCollection();
                     builder.accept(new CharArrSeq.UncheckedList(thisList));
                     builder.accept(new CharArrSeq.CheckedList(thisList));
@@ -869,24 +1006,15 @@ public class SequenceEqualityTest{
                     builder.accept(new CharArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new CharDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new CharDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
                     //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BOOLEAN:
-                case BYTE:
-                case SHORT:
-                case INT:
-                case LONG:
-                case FLOAT:
-                case DOUBLE:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                    break;
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -910,11 +1038,27 @@ public class SequenceEqualityTest{
                             asList.removeCharAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfChar asList=(OmniList.OfChar)val;
                             asList.set(size-1,(char)(asList.getChar(size-1)+1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfChar asList=(OmniList.OfChar)val;
+                              asList.set(0,(char)(asList.getChar(0)+1));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfChar asList=(OmniList.OfChar)val;
+                                asList.set(size/2,(char)(asList.getChar(size/2)+1));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -972,30 +1116,32 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
-                
-                var checkedArrList=new CharArrSeq.CheckedList(uncheckedArrList);
-                var uncheckedDblLnkList=new CharDblLnkSeq.UncheckedList(uncheckedArrList);
-                var checkedDblLnkList=new CharDblLnkSeq.CheckedList(uncheckedArrList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedRoot=new CharArrSeq.UncheckedList(10+size);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add((char)i);
+                if(size!=0) {
+                  var checkedArrList=new CharArrSeq.CheckedList(uncheckedArrList);
+                  var uncheckedDblLnkList=new CharDblLnkSeq.UncheckedList(uncheckedArrList);
+                  var checkedDblLnkList=new CharDblLnkSeq.CheckedList(uncheckedArrList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedRoot=new CharArrSeq.UncheckedList(10+size);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add((char)i);
+                  }
+                  uncheckedRoot.addAll(uncheckedArrList);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add((char)i);
+                  }
+                  builder.accept(uncheckedRoot.subList(5,5+size));
+                  builder.accept(new CharArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new CharDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new CharDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 }
-                uncheckedRoot.addAll(uncheckedArrList);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add((char)i);
-                }
-                builder.accept(uncheckedRoot.subList(5,5+size));
-                builder.accept(new CharArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new CharDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new CharDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+               
                 return builder.build().toArray();
             }
             
@@ -1005,10 +1151,37 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BOOLEAN:
+                case CHAR:
+                case BYTE:
+                case INT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                  if(size==0) {
+                    builder.accept(new ShortArrSeq.UncheckedList());
+                    builder.accept(new ShortArrSeq.CheckedList());
+                    builder.accept(new ShortDblLnkSeq.UncheckedList());
+                    builder.accept(new ShortDblLnkSeq.CheckedList());
+                    builder.accept(new ShortArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new ShortArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new ShortDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new ShortDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedRoot=new ShortArrSeq.UncheckedList(10+size);
+                    for(int i=0;i<10;++i) {
+                      uncheckedRoot.add((short)i);
+                    }  
+                    builder.accept(uncheckedRoot.subList(5,5+size));
+                    builder.accept(new ShortArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new ShortDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new ShortDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  }
+                  break;
                 case SHORT:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                    
                     var thisList=(OmniList.OfShort)seq.getCollection();
                     builder.accept(new ShortArrSeq.UncheckedList(thisList));
                     builder.accept(new ShortArrSeq.CheckedList(thisList));
@@ -1030,24 +1203,15 @@ public class SequenceEqualityTest{
                     builder.accept(new ShortArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new ShortDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new ShortDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
                     //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BOOLEAN:
-                case CHAR:
-                case BYTE:
-                case INT:
-                case LONG:
-                case FLOAT:
-                case DOUBLE:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                    break;
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -1071,11 +1235,27 @@ public class SequenceEqualityTest{
                             asList.removeShortAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfShort asList=(OmniList.OfShort)val;
                             asList.set(size-1,(short)(asList.getShort(size-1)+1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfShort asList=(OmniList.OfShort)val;
+                              asList.set(0,(short)(asList.getShort(0)+1));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfShort asList=(OmniList.OfShort)val;
+                                asList.set(size/2,(short)(asList.getShort(size/2)+1));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -1128,30 +1308,32 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
+                if(size!=0) {
+                  var checkedArrList=new ShortArrSeq.CheckedList(uncheckedArrList);
+                  var uncheckedDblLnkList=new ShortDblLnkSeq.UncheckedList(uncheckedArrList);
+                  var checkedDblLnkList=new ShortDblLnkSeq.CheckedList(uncheckedArrList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedRoot=new ShortArrSeq.UncheckedList(10+size);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add((short)i);
+                  }
+                  uncheckedRoot.addAll(uncheckedArrList);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add((short)i);
+                  }
+                  builder.accept(uncheckedRoot.subList(5,5+size));
+                  builder.accept(new ShortArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new ShortDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new ShortDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                }
                 
-                var checkedArrList=new ShortArrSeq.CheckedList(uncheckedArrList);
-                var uncheckedDblLnkList=new ShortDblLnkSeq.UncheckedList(uncheckedArrList);
-                var checkedDblLnkList=new ShortDblLnkSeq.CheckedList(uncheckedArrList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedRoot=new ShortArrSeq.UncheckedList(10+size);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add((short)i);
-                }
-                uncheckedRoot.addAll(uncheckedArrList);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add((short)i);
-                }
-                builder.accept(uncheckedRoot.subList(5,5+size));
-                builder.accept(new ShortArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new ShortDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new ShortDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 return builder.build().toArray();
             }
             
@@ -1161,10 +1343,37 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BOOLEAN:
+                case CHAR:
+                case BYTE:
+                case SHORT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                  if(size==0) {
+                    builder.accept(new IntArrSeq.UncheckedList());
+                    builder.accept(new IntArrSeq.CheckedList());
+                    builder.accept(new IntDblLnkSeq.UncheckedList());
+                    builder.accept(new IntDblLnkSeq.CheckedList());
+                    builder.accept(new IntArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new IntArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new IntDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new IntDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedRoot=new IntArrSeq.UncheckedList(10+size);
+                    for(int i=0;i<10;++i) {
+                      uncheckedRoot.add(i);
+                    }  
+                    builder.accept(uncheckedRoot.subList(5,5+size));
+                    builder.accept(new IntArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new IntDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new IntDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  }
+                  break;
                 case INT:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                   
                     var thisList=(OmniList.OfInt)seq.getCollection();
                     builder.accept(new IntArrSeq.UncheckedList(thisList));
                     builder.accept(new IntArrSeq.CheckedList(thisList));
@@ -1186,24 +1395,15 @@ public class SequenceEqualityTest{
                     builder.accept(new IntArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new IntDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new IntDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
                     //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BOOLEAN:
-                case CHAR:
-                case BYTE:
-                case SHORT:
-                case LONG:
-                case FLOAT:
-                case DOUBLE:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                    break;
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -1227,11 +1427,27 @@ public class SequenceEqualityTest{
                             asList.removeIntAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfInt asList=(OmniList.OfInt)val;
-                            asList.set(size-1,asList.getInt(size-1)+1);
+                            asList.set(size-1,(asList.getInt(size-1)+1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfInt asList=(OmniList.OfInt)val;
+                              asList.set(0,(asList.getInt(0)+1));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfInt asList=(OmniList.OfInt)val;
+                                asList.set(size/2,(asList.getInt(size/2)+1));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -1271,30 +1487,32 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
+                if(size!=0) {
+                  var checkedArrList=new IntArrSeq.CheckedList(uncheckedArrList);
+                  var uncheckedDblLnkList=new IntDblLnkSeq.UncheckedList(uncheckedArrList);
+                  var checkedDblLnkList=new IntDblLnkSeq.CheckedList(uncheckedArrList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedRoot=new IntArrSeq.UncheckedList(10+size);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  uncheckedRoot.addAll(uncheckedArrList);
+                  for(int i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  builder.accept(uncheckedRoot.subList(5,5+size));
+                  builder.accept(new IntArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new IntDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new IntDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                }
                 
-                var checkedArrList=new IntArrSeq.CheckedList(uncheckedArrList);
-                var uncheckedDblLnkList=new IntDblLnkSeq.UncheckedList(uncheckedArrList);
-                var checkedDblLnkList=new IntDblLnkSeq.CheckedList(uncheckedArrList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedRoot=new IntArrSeq.UncheckedList(10+size);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
-                }
-                uncheckedRoot.addAll(uncheckedArrList);
-                for(int i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
-                }
-                builder.accept(uncheckedRoot.subList(5,5+size));
-                builder.accept(new IntArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new IntDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new IntDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 return builder.build().toArray();
             }
             
@@ -1304,10 +1522,37 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BOOLEAN:
+                case CHAR:
+                case BYTE:
+                case SHORT:
+                case INT:
+                case FLOAT:
+                case DOUBLE:
+                  if(size==0) {
+                    builder.accept(new LongArrSeq.UncheckedList());
+                    builder.accept(new LongArrSeq.CheckedList());
+                    builder.accept(new LongDblLnkSeq.UncheckedList());
+                    builder.accept(new LongDblLnkSeq.CheckedList());
+                    builder.accept(new LongArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new LongArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new LongDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new LongDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedRoot=new LongArrSeq.UncheckedList(10+size);
+                    for(long i=0;i<10;++i) {
+                      uncheckedRoot.add(i);
+                    }   
+                    builder.accept(uncheckedRoot.subList(5,5+size));
+                    builder.accept(new LongArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new LongDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new LongDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  }
+                  break;
                 case LONG:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                    
                     var thisList=(OmniList.OfLong)seq.getCollection();
                     builder.accept(new LongArrSeq.UncheckedList(thisList));
                     builder.accept(new LongArrSeq.CheckedList(thisList));
@@ -1329,24 +1574,15 @@ public class SequenceEqualityTest{
                     builder.accept(new LongArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new LongDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new LongDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
                     //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BOOLEAN:
-                case CHAR:
-                case BYTE:
-                case SHORT:
-                case INT:
-                case FLOAT:
-                case DOUBLE:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                    break;
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -1370,11 +1606,27 @@ public class SequenceEqualityTest{
                             asList.removeLongAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfLong asList=(OmniList.OfLong)val;
-                            asList.set(size-1,asList.getLong(size-1)+1L);
+                            asList.set(size-1,(asList.getLong(size-1)+1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfLong asList=(OmniList.OfLong)val;
+                              asList.set(0,(asList.getLong(0)+1));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfLong asList=(OmniList.OfLong)val;
+                                asList.set(size/2,(asList.getLong(size/2)+1));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -1408,30 +1660,32 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
-                
-                var checkedArrList=new LongArrSeq.CheckedList(uncheckedArrList);
-                var uncheckedDblLnkList=new LongDblLnkSeq.UncheckedList(uncheckedArrList);
-                var checkedDblLnkList=new LongDblLnkSeq.CheckedList(uncheckedArrList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedRoot=new LongArrSeq.UncheckedList(10+size);
-                for(long i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
+                if(size!=0) {
+                  var checkedArrList=new LongArrSeq.CheckedList(uncheckedArrList);
+                  var uncheckedDblLnkList=new LongDblLnkSeq.UncheckedList(uncheckedArrList);
+                  var checkedDblLnkList=new LongDblLnkSeq.CheckedList(uncheckedArrList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedRoot=new LongArrSeq.UncheckedList(10+size);
+                  for(long i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  uncheckedRoot.addAll(uncheckedArrList);
+                  for(long i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  builder.accept(uncheckedRoot.subList(5,5+size));
+                  builder.accept(new LongArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new LongDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new LongDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 }
-                uncheckedRoot.addAll(uncheckedArrList);
-                for(long i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
-                }
-                builder.accept(uncheckedRoot.subList(5,5+size));
-                builder.accept(new LongArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new LongDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new LongDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+               
                 return builder.build().toArray();
             }
             
@@ -1441,10 +1695,37 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BOOLEAN:
+                case CHAR:
+                case BYTE:
+                case SHORT:
+                case INT:
+                case LONG:
+                case DOUBLE:
+                  if(size==0) {
+                    builder.accept(new FloatArrSeq.UncheckedList());
+                    builder.accept(new FloatArrSeq.CheckedList());
+                    builder.accept(new FloatDblLnkSeq.UncheckedList());
+                    builder.accept(new FloatDblLnkSeq.CheckedList());
+                    builder.accept(new FloatArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new FloatArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new FloatDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new FloatDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedRoot=new FloatArrSeq.UncheckedList(10+size);
+                    for(float i=0;i<10;++i) {
+                      uncheckedRoot.add(i);
+                    }   
+                    builder.accept(uncheckedRoot.subList(5,5+size));
+                    builder.accept(new FloatArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new FloatDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new FloatDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  }
+                  break;
                 case FLOAT:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                   
                     var thisList=(OmniList.OfFloat)seq.getCollection();
                     builder.accept(new FloatArrSeq.UncheckedList(thisList));
                     builder.accept(new FloatArrSeq.CheckedList(thisList));
@@ -1466,24 +1747,16 @@ public class SequenceEqualityTest{
                     builder.accept(new FloatArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new FloatDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new FloatDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
                     //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BOOLEAN:
-                case CHAR:
-                case BYTE:
-                case SHORT:
-                case INT:
-                case LONG:
-                case DOUBLE:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                    break;
+               
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -1507,11 +1780,27 @@ public class SequenceEqualityTest{
                             asList.removeFloatAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfFloat asList=(OmniList.OfFloat)val;
-                            asList.set(size-1,asList.getFloat(size-1)+1.0F);
+                            asList.set(size-1,(asList.getFloat(size-1)+1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfFloat asList=(OmniList.OfFloat)val;
+                              asList.set(0,(asList.getFloat(0)+1));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfFloat asList=(OmniList.OfFloat)val;
+                                asList.set(size/2,(asList.getFloat(size/2)+1));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -1539,30 +1828,32 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
-                
-                var checkedArrList=new FloatArrSeq.CheckedList(uncheckedArrList);
-                var uncheckedDblLnkList=new FloatDblLnkSeq.UncheckedList(uncheckedArrList);
-                var checkedDblLnkList=new FloatDblLnkSeq.CheckedList(uncheckedArrList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedRoot=new FloatArrSeq.UncheckedList(10+size);
-                for(float i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
+                if(size!=0) {
+                  var checkedArrList=new FloatArrSeq.CheckedList(uncheckedArrList);
+                  var uncheckedDblLnkList=new FloatDblLnkSeq.UncheckedList(uncheckedArrList);
+                  var checkedDblLnkList=new FloatDblLnkSeq.CheckedList(uncheckedArrList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedRoot=new FloatArrSeq.UncheckedList(10+size);
+                  for(float i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  uncheckedRoot.addAll(uncheckedArrList);
+                  for(float i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  builder.accept(uncheckedRoot.subList(5,5+size));
+                  builder.accept(new FloatArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new FloatDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new FloatDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 }
-                uncheckedRoot.addAll(uncheckedArrList);
-                for(float i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
-                }
-                builder.accept(uncheckedRoot.subList(5,5+size));
-                builder.accept(new FloatArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new FloatDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new FloatDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+              
                 return builder.build().toArray();
             }
             
@@ -1572,10 +1863,37 @@ public class SequenceEqualityTest{
             @Override
             Object[] getEqualsOpponents(MonitoredList<OmniList<?>> seq,SequenceInitParams initParams,
                     SequenceInitialization initSeq,int size,int period,int initVal){
+              Stream.Builder<Object> builder=Stream.builder();
                 switch(initParams.collectionType) {
+                case BOOLEAN:
+                case CHAR:
+                case BYTE:
+                case SHORT:
+                case INT:
+                case LONG:
+                case FLOAT:
+                  if(size==0) {
+                    builder.accept(new DoubleArrSeq.UncheckedList());
+                    builder.accept(new DoubleArrSeq.CheckedList());
+                    builder.accept(new DoubleDblLnkSeq.UncheckedList());
+                    builder.accept(new DoubleDblLnkSeq.CheckedList());
+                    builder.accept(new DoubleArrSeq.UncheckedList().subList(0,size));
+                    builder.accept(new DoubleArrSeq.CheckedList().subList(0,size));
+                    builder.accept(new DoubleDblLnkSeq.UncheckedList().subList(0,size));
+                    builder.accept(new DoubleDblLnkSeq.CheckedList().subList(0,size));
+                    var uncheckedRoot=new DoubleArrSeq.UncheckedList(10+size);
+                    for(double i=0;i<10;++i) {
+                        uncheckedRoot.add(i);
+                    }     
+                    builder.accept(uncheckedRoot.subList(5,5+size));
+                    builder.accept(new DoubleArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new DoubleDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                    builder.accept(new DoubleDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  }
+                  break;
                 case DOUBLE:
                 {
-                    Stream.Builder<Object> builder=Stream.builder();
+                   
                     var thisList=(OmniList.OfDouble)seq.getCollection();
                     builder.accept(new DoubleArrSeq.UncheckedList(thisList));
                     builder.accept(new DoubleArrSeq.CheckedList(thisList));
@@ -1597,24 +1915,15 @@ public class SequenceEqualityTest{
                     builder.accept(new DoubleArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new DoubleDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
                     builder.accept(new DoubleDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                    return builder.build().toArray();
+                    break;
                 }
                 case REF:
                     //TODO
-                    return OmniArray.OfRef.DEFAULT_ARR;
-                    
-                    
-                case BOOLEAN:
-                case CHAR:
-                case BYTE:
-                case SHORT:
-                case INT:
-                case LONG:
-                case FLOAT:
-                    return OmniArray.OfRef.DEFAULT_ARR;
+                    break;
                 default:
                     throw initParams.collectionType.invalid();
                 }
+                return builder.build().toArray();
             }
 
             @Override
@@ -1638,11 +1947,27 @@ public class SequenceEqualityTest{
                             asList.removeDoubleAt(size-1);
                             builder.accept(asList);
                         }
-                        //modify one
+                        //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfDouble asList=(OmniList.OfDouble)val;
-                            asList.set(size-1,asList.getDouble(size-1)+1.0D);
+                            asList.set(size-1,(asList.getDouble(size-1)+1));
                             builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              OmniList.OfDouble asList=(OmniList.OfDouble)val;
+                              asList.set(0,(asList.getDouble(0)+1));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                                OmniList.OfDouble asList=(OmniList.OfDouble)val;
+                                asList.set(size/2,(asList.getDouble(size/2)+1));
+                                builder.accept(asList);
+                            }
+                          }
                         }
                     }
                     return builder.build().toArray();
@@ -1664,30 +1989,32 @@ public class SequenceEqualityTest{
                     throw initParams.collectionType.invalid();
                 }
                 Stream.Builder<Object> builder=Stream.builder();
-                
-                var checkedArrList=new DoubleArrSeq.CheckedList(uncheckedArrList);
-                var uncheckedDblLnkList=new DoubleDblLnkSeq.UncheckedList(uncheckedArrList);
-                var checkedDblLnkList=new DoubleDblLnkSeq.CheckedList(uncheckedArrList);
-                builder.accept(uncheckedArrList);
-                builder.accept(checkedArrList);
-                builder.accept(uncheckedDblLnkList);
-                builder.accept(checkedDblLnkList);
-                builder.accept(uncheckedArrList.subList(0,size));
-                builder.accept(checkedArrList.subList(0,size));
-                builder.accept(uncheckedDblLnkList.subList(0,size));
-                builder.accept(checkedDblLnkList.subList(0,size));
-                var uncheckedRoot=new DoubleArrSeq.UncheckedList(10+size);
-                for(double i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
+                if(size!=0) {
+                  var checkedArrList=new DoubleArrSeq.CheckedList(uncheckedArrList);
+                  var uncheckedDblLnkList=new DoubleDblLnkSeq.UncheckedList(uncheckedArrList);
+                  var checkedDblLnkList=new DoubleDblLnkSeq.CheckedList(uncheckedArrList);
+                  builder.accept(uncheckedArrList);
+                  builder.accept(checkedArrList);
+                  builder.accept(uncheckedDblLnkList);
+                  builder.accept(checkedDblLnkList);
+                  builder.accept(uncheckedArrList.subList(0,size));
+                  builder.accept(checkedArrList.subList(0,size));
+                  builder.accept(uncheckedDblLnkList.subList(0,size));
+                  builder.accept(checkedDblLnkList.subList(0,size));
+                  var uncheckedRoot=new DoubleArrSeq.UncheckedList(10+size);
+                  for(double i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  uncheckedRoot.addAll(uncheckedArrList);
+                  for(double i=0;i<5;++i) {
+                      uncheckedRoot.add(i);
+                  }
+                  builder.accept(uncheckedRoot.subList(5,5+size));
+                  builder.accept(new DoubleArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new DoubleDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
+                  builder.accept(new DoubleDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
                 }
-                uncheckedRoot.addAll(uncheckedArrList);
-                for(double i=0;i<5;++i) {
-                    uncheckedRoot.add(i);
-                }
-                builder.accept(uncheckedRoot.subList(5,5+size));
-                builder.accept(new DoubleArrSeq.CheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new DoubleDblLnkSeq.UncheckedList(uncheckedRoot).subList(5,5+size));
-                builder.accept(new DoubleDblLnkSeq.CheckedList(uncheckedRoot).subList(5,5+size));
+              
                 return builder.build().toArray();
             }
             
@@ -1716,16 +2043,12 @@ public class SequenceEqualityTest{
         default:
             throw structType.invalid();
         }
-    }
+    } 
     
-    
-    
+
     
     @Test
     public void testequals_Object() {
-        AtomicInteger testsPassed=new AtomicInteger(0);
-        AtomicInteger totalTests=new AtomicInteger(0);
-        Vector<Throwable> failedExceptions=new Vector<>();
         for(var initParams:LIST_INIT_PARAMS) {
             final int[] sizes;
             switch(initParams.structType){
@@ -1740,55 +2063,16 @@ public class SequenceEqualityTest{
             for(var size:sizes) {
                 TestExecutorService.submitTest(()->{
                     var thisListMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
-                    
                     var thisList=thisListMonitor.getCollection();
                     for(var equalsOpponentType:EqualsOpponentTypes.values()) {
                         for(var equalsOpponent:equalsOpponentType.getEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {
-                            try {
-                                totalTests.incrementAndGet();
-                                Assertions.assertTrue(thisList.equals(equalsOpponent));
-                                testsPassed.incrementAndGet();
-                            }catch(Throwable e) {
-                                if(e instanceof OutOfMemoryError) {
-                                    throw (OutOfMemoryError)e;
-                                }
-                                failedExceptions.add(e);
-                            }
-                            try {
-                                totalTests.incrementAndGet();
-                                Assertions.assertTrue(equalsOpponent.equals(thisList));
-                                testsPassed.incrementAndGet();
-                            }catch(Throwable e) {
-                                if(e instanceof OutOfMemoryError) {
-                                    throw (OutOfMemoryError)e;
-                                }
-                                failedExceptions.add(e);
-                            }
-                            
+                            Assertions.assertTrue(thisList.equals(equalsOpponent));
+                            Assertions.assertTrue(equalsOpponent.equals(thisList));
                         }
-                        for(var notEqualsOpponent:equalsOpponentType.getNotEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {
-                            try {
-                                totalTests.incrementAndGet();
-                                Assertions.assertFalse(thisList.equals(notEqualsOpponent));
-                                testsPassed.incrementAndGet();
-                            }catch(Throwable e) {
-                                if(e instanceof OutOfMemoryError) {
-                                    throw (OutOfMemoryError)e;
-                                }
-                                failedExceptions.add(e);
-                            }
-                            
+                        for(var notEqualsOpponent:equalsOpponentType.getNotEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {       
+                            Assertions.assertFalse(thisList.equals(notEqualsOpponent));    
                             if(notEqualsOpponent!=null) {
-                                try {
-                                    totalTests.incrementAndGet();
-                                    Assertions.assertFalse(notEqualsOpponent.equals(thisList));
-                                    testsPassed.incrementAndGet();
-                                }catch(Throwable e) {
-                                    if(e instanceof OutOfMemoryError) {
-                                        throw (OutOfMemoryError)e;
-                                    }
-                                    failedExceptions.add(e);
-                                }
+                                Assertions.assertFalse(notEqualsOpponent.equals(thisList));
                             }
                         }
                     }
@@ -1796,19 +2080,6 @@ public class SequenceEqualityTest{
             }
         }
         TestExecutorService.completeAllTests("SequenceEqualityTest.testequals_Object");
-        int totalTestsInt=totalTests.get();
-        int totalPassedInt=testsPassed.get();
-        double passPercent=(double)totalPassedInt/(double)totalTestsInt*100;
-        System.out.printf("totalTests = %d, totalPassed = %d, passPercent = %f%n",totalTestsInt,totalPassedInt,passPercent);
-        if(!failedExceptions.isEmpty()) {
-            
-            for(int i=0,bound=Math.min(failedExceptions.size(),10);i<bound;++i) {
-                failedExceptions.get(i).printStackTrace();
-            }
-            System.err.println("total tests exceptions = "+failedExceptions.size());
-            Assertions.fail(failedExceptions.get(0));
-        }
-        
     }
     
     

@@ -1,6 +1,7 @@
 package omni.impl.seq;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntPredicate;
@@ -21,6 +22,12 @@ abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Externalizab
   int expectedCapacity;
   int expectedModCount;
   Object expectedArr;
+  AbstractSequenceMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+    this.dataType=dataType;
+    this.checkedType=checkedType;
+    this.seq=initSeq(collection,collectionClass);
+    updateCollectionState();
+  }
   AbstractSequenceMonitor(CheckedType checkedType,DataType dataType){
     this.dataType=dataType;
     this.checkedType=checkedType;
@@ -33,8 +40,7 @@ abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Externalizab
     this.seq=initSeq(initCap);
     updateCollectionState();
   }
-  @Override
-public void repairModCount() {
+  @Override public void repairModCount() {
       //nothing to do
   }
   @Override
@@ -988,6 +994,7 @@ public void repairModCount() {
   }
   abstract SEQ initSeq();
   abstract SEQ initSeq(int initCap);
+  abstract SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass);
   abstract void updateModCount();
   public void updateAddFirstState(Object inputVal,DataType inputType){
     updateAddState(0,inputVal,inputType);

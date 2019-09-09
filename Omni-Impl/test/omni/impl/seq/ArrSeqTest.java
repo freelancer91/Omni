@@ -1,6 +1,9 @@
 package omni.impl.seq;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -331,6 +334,10 @@ public class ArrSeqTest{
             }
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_int");
+    }
+    @Test
+    public void testConstructor_Collection() {
+      
     }
     @Test
     public void testConstructor_void(){
@@ -1923,7 +1930,10 @@ public class ArrSeqTest{
             extends
             AbstractArrSeqMonitor<SEQ>
             implements
-            MonitoredList<SEQ>{
+            MonitoredList<SEQ>{      
+        ArrListMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            super(checkedType,dataType,collection,collectionClass);
+        }
         ArrListMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
@@ -2082,6 +2092,86 @@ public class ArrSeqTest{
             default:
                 throw dataType.invalid();
             }
+        }
+        @SuppressWarnings("unchecked") SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
+          Constructor<?> constructor;
+          try {
+            switch(dataType) {
+            case BOOLEAN:
+              if(checkedType.checked) {
+                constructor=BooleanArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=BooleanArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case BYTE:
+              if(checkedType.checked) {
+                constructor=ByteArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=ByteArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case CHAR:
+              if(checkedType.checked) {
+                constructor=CharArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=CharArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case SHORT:
+              if(checkedType.checked) {
+                constructor=ShortArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=ShortArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case INT:
+              if(checkedType.checked) {
+                constructor=IntArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=IntArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case LONG:
+              if(checkedType.checked) {
+                constructor=LongArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=LongArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case FLOAT:
+              if(checkedType.checked) {
+                constructor=FloatArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=FloatArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case DOUBLE:
+              if(checkedType.checked) {
+                constructor=DoubleArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=DoubleArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case REF:
+              if(checkedType.checked) {
+                constructor=RefArrSeq.CheckedList.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=RefArrSeq.UncheckedList.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            default:
+              throw dataType.invalid();
+            }
+          }catch(NoSuchMethodException e) {
+            throw new Error(e);
+          }
+          try{
+            return (SEQ)constructor.newInstance(collection);
+          }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+              | InvocationTargetException e){
+            throw new Error(e);
+          }
         }
         @SuppressWarnings("unchecked")
         @Override
@@ -4432,7 +4522,10 @@ public class ArrSeqTest{
     }
     private static abstract class AbstractArrSeqMonitor<SEQ extends AbstractSeq<?>&Externalizable>
             extends
-            AbstractSequenceMonitor<SEQ>{
+            AbstractSequenceMonitor<SEQ>{      
+        AbstractArrSeqMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+          super(checkedType,dataType,collection,collectionClass);
+        }
         AbstractArrSeqMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
@@ -4996,14 +5089,19 @@ public class ArrSeqTest{
         abstract SEQ initSeq();
         @Override
         abstract SEQ initSeq(int initCap);
+        abstract SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass);
         abstract void verifyCloneTypeAndModCount(Object clone);
         abstract void verifyModCount();
     }
+    
     private static class ArrStackMonitor<SEQ extends AbstractSeq<E>&OmniStack<E>&Externalizable,E>
             extends
             AbstractArrSeqMonitor<SEQ>
             implements
             MonitoredStack<SEQ>{
+        ArrStackMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+          super(checkedType,dataType,collection,collectionClass);
+        }
         public ArrStackMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
@@ -5605,6 +5703,86 @@ public class ArrSeqTest{
             default:
                 throw dataType.invalid();
             }
+        }
+        @SuppressWarnings("unchecked") SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
+          Constructor<?> constructor;
+          try {
+            switch(dataType) {
+            case BOOLEAN:
+              if(checkedType.checked) {
+                constructor=BooleanArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=BooleanArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case BYTE:
+              if(checkedType.checked) {
+                constructor=ByteArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=ByteArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case CHAR:
+              if(checkedType.checked) {
+                constructor=CharArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=CharArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case SHORT:
+              if(checkedType.checked) {
+                constructor=ShortArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=ShortArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case INT:
+              if(checkedType.checked) {
+                constructor=IntArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=IntArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case LONG:
+              if(checkedType.checked) {
+                constructor=LongArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=LongArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case FLOAT:
+              if(checkedType.checked) {
+                constructor=FloatArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=FloatArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case DOUBLE:
+              if(checkedType.checked) {
+                constructor=DoubleArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=DoubleArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            case REF:
+              if(checkedType.checked) {
+                constructor=RefArrSeq.CheckedStack.class.getDeclaredConstructor(collectionClass);
+              }else {
+                constructor=RefArrSeq.UncheckedStack.class.getDeclaredConstructor(collectionClass); 
+              }
+              break;
+            default:
+              throw dataType.invalid();
+            }
+          }catch(NoSuchMethodException e) {
+            throw new Error(e);
+          }
+          try{
+            return (SEQ)constructor.newInstance(collection);
+          }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+              | InvocationTargetException e){
+            throw new Error(e);
+          }
         }
         @Override
         void updateModCount(){
