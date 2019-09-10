@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.EnumMap;
 import java.util.NoSuchElementException;
@@ -378,6 +380,21 @@ public class DblLnkSeqTest{
             }
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testConstructor_void");
+    }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_Collection() {
+      for(var dataType:DataType.values()) {
+          for(var checkedType:CheckedType.values()) {
+              for(var collectionClass:dataType.validCollectionConstructorClasses) {
+                  TestExecutorService.submitTest(()->{
+                      Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(dataType,(Class<? extends Collection<?>>)collectionClass);
+                      new DblLnkSeqMonitor<>(checkedType,dataType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testConstructor_Collection");
     }
     @Test
     public void testcontains_val(){
@@ -2035,6 +2052,10 @@ public class DblLnkSeqTest{
             implements
             MonitoredDeque<LSTDEQ>,
             MonitoredList<LSTDEQ>{
+        DblLnkSeqMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            super(checkedType,dataType,collection,collectionClass);
+            updateCollectionState();
+        }
         DblLnkSeqMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
             updateCollectionState();
@@ -2365,6 +2386,84 @@ public class DblLnkSeqTest{
         @Override
         LSTDEQ initSeq(int initCap){
             return initSeq();
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        LSTDEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            Class<?> clazz;
+            switch(this.dataType) {
+            case BOOLEAN:
+                if(this.checkedType.checked) {
+                    clazz=BooleanDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=BooleanDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case BYTE:
+                if(this.checkedType.checked) {
+                    clazz=ByteDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=ByteDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case CHAR:
+                if(this.checkedType.checked) {
+                    clazz=CharDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=CharDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case SHORT:
+                if(this.checkedType.checked) {
+                    clazz=ShortDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=ShortDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case INT:
+                if(this.checkedType.checked) {
+                    clazz=IntDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=IntDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case LONG:
+                if(this.checkedType.checked) {
+                    clazz=LongDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=LongDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case FLOAT:
+                if(this.checkedType.checked) {
+                    clazz=FloatDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=FloatDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case DOUBLE:
+                if(this.checkedType.checked) {
+                    clazz=DoubleDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=DoubleDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            case REF:
+                if(this.checkedType.checked) {
+                    clazz=RefDblLnkSeq.CheckedList.class;
+                }else {
+                    clazz=RefDblLnkSeq.UncheckedList.class;
+                }
+                break;
+            default:
+                throw this.dataType.invalid();
+            }
+            try{
+                return (LSTDEQ)clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+            }catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                    | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
         }
         @Override
         void updateModCount(){
@@ -4605,7 +4704,7 @@ public class DblLnkSeqTest{
                     case BOOLEAN:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.BooleanDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4614,7 +4713,7 @@ public class DblLnkSeqTest{
                     case BYTE:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.ByteArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.ByteDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4623,7 +4722,7 @@ public class DblLnkSeqTest{
                     case CHAR:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.CharArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4632,7 +4731,7 @@ public class DblLnkSeqTest{
                     case SHORT:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.ShortArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.ShortDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4641,7 +4740,7 @@ public class DblLnkSeqTest{
                     case INT:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.IntArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.IntDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4650,7 +4749,7 @@ public class DblLnkSeqTest{
                     case LONG:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.LongArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.LongDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4659,7 +4758,7 @@ public class DblLnkSeqTest{
                     case FLOAT:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.FloatDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4668,7 +4767,7 @@ public class DblLnkSeqTest{
                     case DOUBLE:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.DoubleArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.DoubleDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };
@@ -4677,7 +4776,7 @@ public class DblLnkSeqTest{
                     case REF:{
                         modCountRepairer=monitor->{
                             FieldAndMethodAccessor.setIntValue(
-                                    FieldAndMethodAccessor.RefArrSeq.CheckedSubList.modCountField,monitor.seq,
+                                    FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.modCountField,monitor.seq,
                                     rootModCount);
                             monitor.expectedModCount=rootModCount;
                         };

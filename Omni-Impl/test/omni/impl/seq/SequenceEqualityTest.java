@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +13,9 @@ import org.junit.jupiter.api.Test;
 import omni.api.OmniList;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
+import omni.impl.IllegalModification;
 import omni.impl.MonitoredList;
+import omni.impl.MonitoredObjectGen;
 import omni.impl.StructType;
 import omni.impl.set.BooleanSetImpl;
 import omni.impl.set.ByteSetImpl;
@@ -108,6 +107,37 @@ public class SequenceEqualityTest{
         }
         
         LIST_INIT_PARAMS=listInitParamsBuilder.build().toArray(SequenceInitParams[]::new);
+    }
+    
+    private static Object modifyVal(Object oldVal,DataType dataType) {
+        switch(dataType) {
+        case BOOLEAN:
+            return !((boolean)oldVal);
+
+        case BYTE:
+            return (byte)((byte)oldVal+1);
+
+        case CHAR:
+            return (char)((char)oldVal+1);
+
+        case SHORT:
+            return (short)((short)oldVal+1);
+
+        case INT:
+            return (int)((int)oldVal+1);
+
+        case LONG:
+            return (long)((long)oldVal+1);
+
+        case FLOAT:
+            return (float)((float)oldVal+1);
+
+        case DOUBLE:
+            return (double)((double)oldVal+1);
+
+        default:
+            throw dataType.invalid();
+        }
     }
     
     static enum EqualsOpponentTypes{
@@ -226,6 +256,14 @@ public class SequenceEqualityTest{
                             builder.accept(parent);
                         }
                         curr=parent;
+                    }
+                    
+                    if(thisSize>1 && thisSize!=root.size) {
+                        if(rootOffset==0) {
+                            builder.accept(((List<?>)root).subList(1,1+thisSize));
+                        }else {
+                            builder.accept(((List<?>)root).subList(rootOffset-1,rootOffset-1+thisSize));
+                        }
                     }
                 }
                     break;
@@ -422,21 +460,46 @@ public class SequenceEqualityTest{
                         asList.remove(size-1);
                         builder.accept(asList);
                     }
-                    //modify one at the end
+                    if(initParams.collectionType!=DataType.REF) {
+                        //modify one at the end
+                        for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                          @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
+                          asList.set(size-1,modifyVal(asList.get(size-1),initParams.collectionType));
+                            builder.accept(asList);
+                        }
+                        if(size>1) {
+                          //modify one at the beginning
+                          for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                            @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
+                            asList.set(0,modifyVal(asList.get(0),initParams.collectionType));
+                              builder.accept(asList);
+                          }
+                          if(size>2) {
+                            //modify one in the middle
+                            for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
+                              @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
+                                asList.set(size/2,modifyVal(asList.get(size/2),initParams.collectionType));
+                                builder.accept(asList);
+                            }
+                          }
+                        }
+                    }
+                   
+                    //change the type of one at the end
                     for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                       @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
                         asList.set(size-1,new Object());
                         builder.accept(asList);
                     }
                     if(size>1) {
-                      //modify one at the beginning
+                      //change the type of one at the beginning
                       for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                         @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
                           asList.set(0,new Object());
                           builder.accept(asList);
                       }
                       if(size>2) {
-                        //modify one in the middle
+                        //change the type of one in the middle
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                           @SuppressWarnings("unchecked") List<Object> asList=(List<Object>)val;
                             asList.set(size/2,new Object());
@@ -1430,21 +1493,21 @@ public class SequenceEqualityTest{
                         //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfInt asList=(OmniList.OfInt)val;
-                            asList.set(size-1,(asList.getInt(size-1)+1));
+                            asList.set(size-1,asList.getInt(size-1)+1);
                             builder.accept(asList);
                         }
                         if(size>1) {
                           //modify one at the beginning
                           for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                               OmniList.OfInt asList=(OmniList.OfInt)val;
-                              asList.set(0,(asList.getInt(0)+1));
+                              asList.set(0,asList.getInt(0)+1);
                               builder.accept(asList);
                           }
                           if(size>2) {
                             //modify one in the middle
                             for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                                 OmniList.OfInt asList=(OmniList.OfInt)val;
-                                asList.set(size/2,(asList.getInt(size/2)+1));
+                                asList.set(size/2,asList.getInt(size/2)+1);
                                 builder.accept(asList);
                             }
                           }
@@ -1609,21 +1672,21 @@ public class SequenceEqualityTest{
                         //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfLong asList=(OmniList.OfLong)val;
-                            asList.set(size-1,(asList.getLong(size-1)+1));
+                            asList.set(size-1,asList.getLong(size-1)+1);
                             builder.accept(asList);
                         }
                         if(size>1) {
                           //modify one at the beginning
                           for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                               OmniList.OfLong asList=(OmniList.OfLong)val;
-                              asList.set(0,(asList.getLong(0)+1));
+                              asList.set(0,asList.getLong(0)+1);
                               builder.accept(asList);
                           }
                           if(size>2) {
                             //modify one in the middle
                             for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                                 OmniList.OfLong asList=(OmniList.OfLong)val;
-                                asList.set(size/2,(asList.getLong(size/2)+1));
+                                asList.set(size/2,asList.getLong(size/2)+1);
                                 builder.accept(asList);
                             }
                           }
@@ -1783,21 +1846,21 @@ public class SequenceEqualityTest{
                         //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfFloat asList=(OmniList.OfFloat)val;
-                            asList.set(size-1,(asList.getFloat(size-1)+1));
+                            asList.set(size-1,asList.getFloat(size-1)+1);
                             builder.accept(asList);
                         }
                         if(size>1) {
                           //modify one at the beginning
                           for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                               OmniList.OfFloat asList=(OmniList.OfFloat)val;
-                              asList.set(0,(asList.getFloat(0)+1));
+                              asList.set(0,asList.getFloat(0)+1);
                               builder.accept(asList);
                           }
                           if(size>2) {
                             //modify one in the middle
                             for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                                 OmniList.OfFloat asList=(OmniList.OfFloat)val;
-                                asList.set(size/2,(asList.getFloat(size/2)+1));
+                                asList.set(size/2,asList.getFloat(size/2)+1);
                                 builder.accept(asList);
                             }
                           }
@@ -1950,21 +2013,21 @@ public class SequenceEqualityTest{
                         //modify one at the end
                         for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                             OmniList.OfDouble asList=(OmniList.OfDouble)val;
-                            asList.set(size-1,(asList.getDouble(size-1)+1));
+                            asList.set(size-1,asList.getDouble(size-1)+1);
                             builder.accept(asList);
                         }
                         if(size>1) {
                           //modify one at the beginning
                           for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                               OmniList.OfDouble asList=(OmniList.OfDouble)val;
-                              asList.set(0,(asList.getDouble(0)+1));
+                              asList.set(0,asList.getDouble(0)+1);
                               builder.accept(asList);
                           }
                           if(size>2) {
                             //modify one in the middle
                             for(Object val:getEqualsOpponents(seq,initParams,initSeq,size,period,initVal)) {
                                 OmniList.OfDouble asList=(OmniList.OfDouble)val;
-                                asList.set(size/2,(asList.getDouble(size/2)+1));
+                                asList.set(size/2,asList.getDouble(size/2)+1);
                                 builder.accept(asList);
                             }
                           }
@@ -2044,8 +2107,29 @@ public class SequenceEqualityTest{
             throw structType.invalid();
         }
     } 
-    
 
+    static Object[] getRefModEqualsOpponents(List<?> list,MonitoredObjectGen objGen,MonitoredList<?> monitoredList,MonitoredObjectGen.ThrowSwitch throwSwitch) {
+        throwSwitch.doThrow=false;
+        
+        Stream.Builder<Object> builder=Stream.builder();
+        ArrayList<Object> arrList=new ArrayList<>();
+        int size=list.size();
+        for(int i=0;i<size;++i) {
+            arrList.add(objGen.getMonitoredObject(monitoredList,throwSwitch));
+        }
+        builder.add(arrList);
+        builder.add(new RefArrSeq.CheckedList<>(arrList));
+        builder.add(new RefArrSeq.CheckedList<>(arrList).subList(0,size));
+        builder.add(new RefDblLnkSeq.CheckedList<>(arrList));
+        builder.add(new RefDblLnkSeq.CheckedList<>(arrList).subList(0,size));
+        builder.add(new RefArrSeq.UncheckedList<>(arrList));
+        builder.add(new RefArrSeq.UncheckedList<>(arrList).subList(0,size));
+        builder.add(new RefDblLnkSeq.UncheckedList<>(arrList));
+        builder.add(new RefDblLnkSeq.UncheckedList<>(arrList).subList(0,size));
+        throwSwitch.doThrow=true;
+        return builder.build().toArray();
+    }
+    
     
     @Test
     public void testequals_Object() {
@@ -2061,27 +2145,174 @@ public class SequenceEqualityTest{
                     break;
             }
             for(var size:sizes) {
-                TestExecutorService.submitTest(()->{
-                    var thisListMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
-                    var thisList=thisListMonitor.getCollection();
-                    for(var equalsOpponentType:EqualsOpponentTypes.values()) {
-                        for(var equalsOpponent:equalsOpponentType.getEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {
-                            Assertions.assertTrue(thisList.equals(equalsOpponent));
-                            Assertions.assertTrue(equalsOpponent.equals(thisList));
-                        }
-                        for(var notEqualsOpponent:equalsOpponentType.getNotEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {       
-                            Assertions.assertFalse(thisList.equals(notEqualsOpponent));    
-                            if(notEqualsOpponent!=null) {
-                                Assertions.assertFalse(notEqualsOpponent.equals(thisList));
+                for(var illegalMod:initParams.structType.validPreMods) {
+                    if(illegalMod!=IllegalModification.ModParent && (initParams.checkedType.checked || illegalMod.expectedException==null)) {
+                        if(illegalMod.expectedException==null) {
+                            if(size>0 && initParams.checkedType.checked && initParams.collectionType==DataType.REF) {
+                                for(var objGen:initParams.structType.validMonitoredObjectGens) {
+                                    if(objGen.minDepth<2 && objGen.expectedException!=null) {
+                                        TestExecutorService.submitTest(()->{
+                                            MonitoredObjectGen.ThrowSwitch throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+                                            var thisListMonitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(getMonitoredList(initParams,size),size,0,objGen,throwSwitch);
+                                            var thisList=thisListMonitor.getCollection();
+                                            for(var equalsOpponent:getRefModEqualsOpponents(thisList,objGen,thisListMonitor,throwSwitch)) {
+                                                Assertions.assertThrows(objGen.expectedException,()->thisList.equals(equalsOpponent));
+                                                throwSwitch.doThrow=false;
+                                                thisListMonitor.verifyCollectionState();
+                                                thisListMonitor.repairModCount();
+                                                throwSwitch.doThrow=true;
+                                            }
+                                            thisListMonitor.verifyCollectionState();
+                                        });
+                                    }
+                                }
                             }
+                            TestExecutorService.submitTest(()->{
+                                var thisListMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
+                                var thisList=thisListMonitor.getCollection();
+                                for(var equalsOpponentType:EqualsOpponentTypes.values()) {
+                                    for(var equalsOpponent:equalsOpponentType.getEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {
+                                        Assertions.assertTrue(thisList.equals(equalsOpponent));
+                                        Assertions.assertTrue(equalsOpponent.equals(thisList));
+                                    }
+                                    for(var notEqualsOpponent:equalsOpponentType.getNotEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {
+                                        Assertions.assertFalse(thisList.equals(notEqualsOpponent));    
+                                        if(notEqualsOpponent!=null) {
+                                            Assertions.assertFalse(notEqualsOpponent.equals(thisList));
+                                            
+                                        }
+                                    }
+                                }
+                                thisListMonitor.verifyCollectionState();
+                            });
+                        }else if(initParams.checkedType.checked) {
+                            if(size>0 && initParams.collectionType==DataType.REF) {
+                                for(var objGen:initParams.structType.validMonitoredObjectGens) {
+                                    if(objGen.minDepth<2 && objGen.expectedException!=null) {
+                                        TestExecutorService.submitTest(()->{
+                                            MonitoredObjectGen.ThrowSwitch throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+                                            var thisListMonitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(getMonitoredList(initParams,size),size,0,objGen,throwSwitch);
+                                            var thisList=thisListMonitor.getCollection();
+                                            for(var equalsOpponent:getRefModEqualsOpponents(thisList,objGen,thisListMonitor,throwSwitch)) {
+                                                thisListMonitor.illegalMod(illegalMod);
+                                                Assertions.assertThrows(illegalMod.expectedException,()->thisList.equals(equalsOpponent));
+                                                
+                                                throwSwitch.doThrow=false;
+                                                thisListMonitor.verifyCollectionState();
+                                                thisListMonitor.repairModCount();
+                                                throwSwitch.doThrow=true;
+                                                thisListMonitor.illegalMod(illegalMod);
+                                                Assertions.assertThrows(illegalMod.expectedException,()->equalsOpponent.equals(thisList));
+                                                
+                                                throwSwitch.doThrow=false;
+                                                thisListMonitor.verifyCollectionState();
+                                                thisListMonitor.repairModCount();
+                                                throwSwitch.doThrow=true;
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            TestExecutorService.submitTest(()->{
+                                var thisListMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
+                                var thisList=thisListMonitor.getCollection();
+                                for(var equalsOpponentType:EqualsOpponentTypes.values()) {
+                                    for(var equalsOpponent:equalsOpponentType.getEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {
+                                        thisListMonitor.illegalMod(illegalMod);
+                                        if(equalsOpponent==thisList) {
+                                            Assertions.assertTrue(thisList.equals(equalsOpponent));
+                                            Assertions.assertTrue(equalsOpponent.equals(thisList));
+                                        }else {
+                                            Assertions.assertThrows(illegalMod.expectedException,()->thisList.equals(equalsOpponent));
+                                            Assertions.assertThrows(illegalMod.expectedException,()->equalsOpponent.equals(thisList));
+                                        }
+                                        thisListMonitor.verifyCollectionState();
+                                        thisListMonitor.repairModCount();
+                                    }
+                                    outer:for(var notEqualsOpponent:equalsOpponentType.getNotEqualsOpponents(thisListMonitor,initParams,SequenceInitialization.Ascending,size,0,0)) {
+                                        thisListMonitor.illegalMod(illegalMod);
+                                        goToNoThrow:for(;;) {
+                                            goToThrowOneDirection:for(;;) {
+                                                if(!(notEqualsOpponent instanceof List)) {
+                                                    break goToNoThrow;
+                                                }
+                                                if(notEqualsOpponent instanceof AbstractSeq && !(notEqualsOpponent instanceof OmniList.OfRef)) {
+                                                    switch(initParams.collectionType) {
+                                                    case BOOLEAN:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfBoolean)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                        break;
+                                                    case BYTE:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfByte)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                        break;
+                                                    case CHAR:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfChar)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                        break;
+                                                    case DOUBLE:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfDouble)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                        break;
+                                                    case FLOAT:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfFloat)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                        break;
+                                                    case INT:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfInt)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                        break;
+                                                    case LONG:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfLong)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                        break;
+                                                    case SHORT:
+                                                        if(!(notEqualsOpponent instanceof OmniList.OfShort)) {
+                                                            break goToThrowOneDirection;
+                                                        }
+                                                    case REF:
+                                                        break;
+                                                    default:
+                                                        throw initParams.collectionType.invalid();
+                                                    }
+                                                }
+                                                Assertions.assertThrows(illegalMod.expectedException,()->thisList.equals(notEqualsOpponent));  
+                                                Assertions.assertThrows(illegalMod.expectedException,()->notEqualsOpponent.equals(thisList));
+                                                thisListMonitor.verifyCollectionState();
+                                                thisListMonitor.repairModCount();
+                                                continue outer;
+                                            }
+                                            Assertions.assertThrows(illegalMod.expectedException,()->thisList.equals(notEqualsOpponent));  
+                                            Assertions.assertFalse(notEqualsOpponent.equals(thisList));
+                                            thisListMonitor.verifyCollectionState();
+                                            thisListMonitor.repairModCount();
+                                            continue outer;
+                                        }
+                                        Assertions.assertFalse(thisList.equals(notEqualsOpponent));    
+                                        if(notEqualsOpponent!=null) {
+                                            if(notEqualsOpponent instanceof List && !(notEqualsOpponent instanceof AbstractSeq)) {
+                                                Assertions.assertThrows(illegalMod.expectedException,()->notEqualsOpponent.equals(thisList));
+                                            }else {
+                                                Assertions.assertFalse(notEqualsOpponent.equals(thisList));
+                                            }                   
+                                        }
+                                        thisListMonitor.verifyCollectionState();
+                                        thisListMonitor.repairModCount();
+                                    }
+                                }
+                            });
                         }
                     }
-                });
+                }
             }
         }
         TestExecutorService.completeAllTests("SequenceEqualityTest.testequals_Object");
     }
-    
-    
-    
 }

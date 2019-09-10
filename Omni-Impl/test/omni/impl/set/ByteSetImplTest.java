@@ -1,6 +1,8 @@
 package omni.impl.set;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -123,7 +125,19 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testConstructor_void");
     }
-    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_Collection() {
+        for(var checkedType:CheckedType.values()) {
+            for(var collectionClass:DataType.BYTE.validCollectionConstructorClasses) {
+                TestExecutorService.submitTest(()->{
+                    Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(DataType.BYTE,(Class<? extends Collection<?>>)collectionClass);
+                    new ByteSetImplMonitor(checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                });
+            }
+        }
+        TestExecutorService.completeAllTests("ByteSetImplTest.testConstructor_Collection");
+    }
     @Test
     public void testcontains_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyContains(queryVal,
@@ -543,6 +557,23 @@ public class ByteSetImplTest{
                 set=new ByteSetImpl();
             }
             expectedWords=new long[4];
+        }
+        ByteSetImplMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            this.checkedType=checkedType;
+            Class<? extends ByteSetImpl> clazz;
+            if(checkedType.checked) {
+                clazz=ByteSetImpl.Checked.class;
+            }else {
+                clazz=ByteSetImpl.class;
+            }
+            try{
+                this.set=clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+            }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
+            expectedWords=new long[4];
+            this.updateCollectionState();
         }
         @Override public MonitoredIterator<? extends OmniIterator<?>,ByteSetImpl> getMonitoredIterator(IteratorType itrType){
             if(itrType!=IteratorType.AscendingItr) {

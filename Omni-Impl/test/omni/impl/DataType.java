@@ -1,8 +1,10 @@
 package omni.impl;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
@@ -4131,6 +4133,8 @@ public enum DataType{
     public final int massiveToStringThreshold;
     public final Object defaultArr;
     public final EnumSet<FunctionCallType> validFunctionCalls;
+    @SuppressWarnings("rawtypes")
+    public final Set<Class<? extends Collection>> validCollectionConstructorClasses;
     
     
     DataType(String name,String mayBeAddedTo,String validOutputTypes,boolean isIntegral,boolean isFloatingPoint,
@@ -4171,6 +4175,63 @@ public enum DataType{
             this.validFunctionCalls=EnumSet.of(FunctionCallType.Unboxed);
         }else {
             this.validFunctionCalls=EnumSet.allOf(FunctionCallType.class);
+        }
+        switch(name) {
+        case "BOOLEAN":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class);
+            break;
+        case "BYTE":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class,
+                    OmniCollection.OfByte.class,OmniCollection.ByteOutput.class);
+            break;
+        case "CHAR":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class,
+                    OmniCollection.OfChar.class,OmniCollection.CharOutput.class);
+            break;
+        case "SHORT":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class,
+                    OmniCollection.OfByte.class,
+                    OmniCollection.OfShort.class,OmniCollection.ShortOutput.class);
+            break;
+        case "INT":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class,
+                    OmniCollection.OfByte.class,
+                    OmniCollection.OfChar.class,
+                    OmniCollection.OfShort.class,
+                    OmniCollection.OfInt.class,OmniCollection.IntOutput.class);
+            break;
+        case "LONG":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class,
+                    OmniCollection.OfByte.class,
+                    OmniCollection.OfChar.class,
+                    OmniCollection.OfShort.class,
+                    OmniCollection.OfInt.class,
+                    OmniCollection.OfLong.class,OmniCollection.LongOutput.class);
+            break;
+        case "FLOAT":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class,
+                    OmniCollection.OfByte.class,
+                    OmniCollection.OfChar.class,
+                    OmniCollection.OfShort.class,
+                    OmniCollection.OfInt.class,
+                    OmniCollection.OfLong.class,
+                    OmniCollection.OfFloat.class,OmniCollection.FloatOutput.class);
+            break;
+        case "DOUBLE":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class,OmniCollection.OfBoolean.class,
+                    OmniCollection.OfByte.class,
+                    OmniCollection.OfChar.class,
+                    OmniCollection.OfShort.class,
+                    OmniCollection.OfInt.class,
+                    OmniCollection.OfLong.class,
+                    OmniCollection.OfFloat.class,
+                    OmniCollection.OfDouble.class,OmniCollection.DoubleOutput.class);
+            break;
+        case "REF":
+            validCollectionConstructorClasses=Set.of(Collection.class,OmniCollection.OfRef.class);
+            break;
+        default:
+            throw this.invalid();
         }
     }
     public boolean isValidQueryVal(QueryVal queryVal){

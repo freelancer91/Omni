@@ -556,9 +556,9 @@ AbstractBooleanArrSeq
           return false;
         }
         if(abstractBooleanArrSeq instanceof BooleanArrSeq.UncheckedList){
-          return this.isEqualToHelper(rootOffset,rootOffset+size,((BooleanArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0);
+          return abstractBooleanArrSeq==this || this.isEqualToHelper(rootOffset,rootOffset+size,((BooleanArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0);
         }else{
-          return (abstractBooleanArrSeq==this && rootOffset==0) || SequenceEqualityUtil.isEqualTo(rootOffset,rootOffset+size,this.arr,0,((PackedBooleanArrSeq.UncheckedList)abstractBooleanArrSeq).words);
+          return SequenceEqualityUtil.isEqualTo(rootOffset,rootOffset+size,this.arr,0,((PackedBooleanArrSeq.UncheckedList)abstractBooleanArrSeq).words);
         }
       }else if(list instanceof BooleanArrSeq.UncheckedSubList){
         final BooleanArrSeq.UncheckedSubList subList;
@@ -2614,7 +2614,7 @@ AbstractBooleanArrSeq
           return false;
         }
         if(abstractBooleanArrSeq instanceof BooleanArrSeq.UncheckedList){
-          return (abstractBooleanArrSeq==this && rootOffset==0)|| (super.isEqualToHelper(rootOffset,rootOffset+size,((BooleanArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0));
+          return (abstractBooleanArrSeq==this)|| (super.isEqualToHelper(rootOffset,rootOffset+size,((BooleanArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0));
         }else{
           return SequenceEqualityUtil.isEqualTo(rootOffset,rootOffset+size,this.arr,0,((PackedBooleanArrSeq.UncheckedList)list).words);
         }
@@ -2622,7 +2622,8 @@ AbstractBooleanArrSeq
         final BooleanArrSeq.CheckedSubList subList;
         final BooleanArrSeq.CheckedList thatRoot;
         CheckedCollection.checkModCount((subList=(BooleanArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
-        return size==subList.size && (thatRoot==this || super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,subList.rootOffset));
+        final int thatOffset;
+        return size==subList.size && (((thatOffset=subList.rootOffset)==rootOffset&&thatRoot==this)|| super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,thatOffset));
       }else if(list instanceof BooleanArrSeq.UncheckedSubList){
         final BooleanArrSeq.UncheckedSubList subList;
         return size==(subList=(BooleanArrSeq.UncheckedSubList)list).size && super.isEqualToHelper(rootOffset,rootOffset+size,subList.root.arr,subList.rootOffset);

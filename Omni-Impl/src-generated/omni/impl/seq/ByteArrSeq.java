@@ -1193,7 +1193,7 @@ AbstractSeq<Byte>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfByte list){
       if(list instanceof ByteArrSeq.UncheckedList){
         final ByteArrSeq.UncheckedList uncheckedList;
-        return (uncheckedList=(ByteArrSeq.UncheckedList)list).size==size && ((uncheckedList==this && rootOffset==0) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
+        return (uncheckedList=(ByteArrSeq.UncheckedList)list).size==size && ((uncheckedList==this) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
       }else if(list instanceof ByteArrSeq.UncheckedSubList){
         final ByteArrSeq.UncheckedSubList subList;
         final int thatOffset=(subList=(ByteArrSeq.UncheckedSubList)list).rootOffset;
@@ -3366,12 +3366,13 @@ AbstractSeq<Byte>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfByte list){
       if(list instanceof ByteArrSeq.UncheckedList){
         final ByteArrSeq.UncheckedList that;
-        return size==(that=(ByteArrSeq.UncheckedList)list).size && ((that==this && rootOffset==0)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
+        return size==(that=(ByteArrSeq.UncheckedList)list).size && ((that==this)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
       }else if(list instanceof ByteArrSeq.CheckedSubList){
         final ByteArrSeq.CheckedSubList subList;
         final ByteArrSeq.CheckedList thatRoot;
         CheckedCollection.checkModCount((subList=(ByteArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
-        return size==subList.size && (thatRoot==this || super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,subList.rootOffset));
+        final int thatOffset;
+        return size==subList.size && (((thatOffset=subList.rootOffset)==rootOffset&&thatRoot==this)|| super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,thatOffset));
       }else if(list instanceof ByteArrSeq.UncheckedSubList){
         final ByteArrSeq.UncheckedSubList subList;
         return size==(subList=(ByteArrSeq.UncheckedSubList)list).size && super.isEqualToHelper(rootOffset,rootOffset+size,subList.root.arr,subList.rootOffset);

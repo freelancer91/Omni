@@ -1,6 +1,8 @@
 package omni.impl.set;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -174,6 +176,49 @@ public class IntegralOpenAddressHashSetTest{
             }
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_int");
+    }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_Collection(){
+        for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
+            for(final var checkedType:CheckedType.values()){
+                for(var collectionClass:collectionType.validCollectionConstructorClasses) {
+                    TestExecutorService.submitTest(()->{
+                        Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(collectionType,(Class<? extends Collection<?>>)collectionClass);
+                        new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                    });
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_Collection");
+    }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_floatCollection(){
+        for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
+            for(final var checkedType:CheckedType.values()){
+                for(var collectionClass:collectionType.validCollectionConstructorClasses) {
+                    for(final float loadFactor:LOAD_FACTORS){
+                        if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
+                            TestExecutorService.submitTest(()->{
+                                Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(collectionType,(Class<? extends Collection<?>>)collectionClass);
+                                if(loadFactor == loadFactor && loadFactor <= 1.0f
+                                        && loadFactor > 0){
+                                    new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,
+                                            loadFactor,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                                }else{
+                                    Assertions.assertThrows(IllegalArgumentException.class,
+                                            ()->new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,
+                                                    loadFactor,collectionParam,(Class<? extends Collection<?>>)collectionClass));
+                                }
+                            });
+                        }
+                    }
+                    
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_floatCollection");
     }
     @Test
     public void testConstructor_intfloat(){
@@ -919,6 +964,107 @@ public class IntegralOpenAddressHashSetTest{
             this.dataType=dataType;
             expectedWords=new long[4];
             updateCollectionState();
+        }
+        IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            this.checkedType=checkedType;
+            this.dataType=dataType;
+            expectedWords=new long[4];
+            Class<? extends AbstractIntegralTypeOpenAddressHashSet<?>> clazz;
+            switch(dataType){
+            case CHAR:
+                if(checkedType.checked){
+                    clazz= CharOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= CharOpenAddressHashSet.class;
+                }
+                break;
+            case SHORT:
+                if(checkedType.checked){
+                    clazz= ShortOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= ShortOpenAddressHashSet.class;
+                }
+                break;
+            case INT:
+                if(checkedType.checked){
+                    clazz= IntOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= IntOpenAddressHashSet.class;
+                }
+                break;
+            case LONG:
+                if(checkedType.checked){
+                    clazz= LongOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= LongOpenAddressHashSet.class;
+                }
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            try{
+                this.set=clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+            }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
+            updateCollectionState();
+            
+        }
+        IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,float loadFactor,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            this.checkedType=checkedType;
+            this.dataType=dataType;
+            expectedWords=new long[4];
+            Class<? extends AbstractIntegralTypeOpenAddressHashSet<?>> clazz;
+            switch(dataType){
+            case CHAR:
+                if(checkedType.checked){
+                    clazz= CharOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= CharOpenAddressHashSet.class;
+                }
+                break;
+            case SHORT:
+                if(checkedType.checked){
+                    clazz= ShortOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= ShortOpenAddressHashSet.class;
+                }
+                break;
+            case INT:
+                if(checkedType.checked){
+                    clazz= IntOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= IntOpenAddressHashSet.class;
+                }
+                break;
+            case LONG:
+                if(checkedType.checked){
+                    clazz= LongOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= LongOpenAddressHashSet.class;
+                }
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            try{
+                this.set=clazz.getDeclaredConstructor(float.class,collectionClass).newInstance(loadFactor,collection);
+            }catch(InvocationTargetException e) {
+                var cause=e.getCause();
+                if(cause instanceof RuntimeException) {
+                    throw (RuntimeException)cause;
+                }
+                if(cause instanceof Error) {
+                    throw (Error)cause;
+                }
+                throw new Error(cause);
+            }catch(InstantiationException | IllegalAccessException
+                    | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
+            updateCollectionState();
+            
         }
         IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,float loadFactor){
             switch(dataType){

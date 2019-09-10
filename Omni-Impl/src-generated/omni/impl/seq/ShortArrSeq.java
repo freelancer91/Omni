@@ -1203,7 +1203,7 @@ AbstractSeq<Short>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfShort list){
       if(list instanceof ShortArrSeq.UncheckedList){
         final ShortArrSeq.UncheckedList uncheckedList;
-        return (uncheckedList=(ShortArrSeq.UncheckedList)list).size==size && ((uncheckedList==this && rootOffset==0) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
+        return (uncheckedList=(ShortArrSeq.UncheckedList)list).size==size && ((uncheckedList==this) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
       }else if(list instanceof ShortArrSeq.UncheckedSubList){
         final ShortArrSeq.UncheckedSubList subList;
         final int thatOffset=(subList=(ShortArrSeq.UncheckedSubList)list).rootOffset;
@@ -3386,12 +3386,13 @@ AbstractSeq<Short>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfShort list){
       if(list instanceof ShortArrSeq.UncheckedList){
         final ShortArrSeq.UncheckedList that;
-        return size==(that=(ShortArrSeq.UncheckedList)list).size && ((that==this && rootOffset==0)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
+        return size==(that=(ShortArrSeq.UncheckedList)list).size && ((that==this)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
       }else if(list instanceof ShortArrSeq.CheckedSubList){
         final ShortArrSeq.CheckedSubList subList;
         final ShortArrSeq.CheckedList thatRoot;
         CheckedCollection.checkModCount((subList=(ShortArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
-        return size==subList.size && (thatRoot==this || super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,subList.rootOffset));
+        final int thatOffset;
+        return size==subList.size && (((thatOffset=subList.rootOffset)==rootOffset&&thatRoot==this)|| super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,thatOffset));
       }else if(list instanceof ShortArrSeq.UncheckedSubList){
         final ShortArrSeq.UncheckedSubList subList;
         return size==(subList=(ShortArrSeq.UncheckedSubList)list).size && super.isEqualToHelper(rootOffset,rootOffset+size,subList.root.arr,subList.rootOffset);

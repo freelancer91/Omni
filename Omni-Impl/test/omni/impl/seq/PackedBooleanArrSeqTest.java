@@ -1,6 +1,8 @@
 package omni.impl.seq;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -403,6 +405,20 @@ public class PackedBooleanArrSeqTest{
     public void testclone_void(){
         final BasicTest test=MonitoredSequence::verifyClone;
         test.runAllTests("PackedBooleanArrSeqTest.testclone_void",SHORT_SIZES);
+    }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_Collection() {
+          for(var checkedType:CheckedType.values()) {
+              for(var collectionClass:DataType.BOOLEAN.validCollectionConstructorClasses) {
+                  TestExecutorService.submitTest(()->{
+                      Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(DataType.BOOLEAN,(Class<? extends Collection<?>>)collectionClass);
+                      new PackedBooleanArrListMonitor(checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                      new PackedBooleanArrStackMonitor(checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                  });
+              }
+          }
+      TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_Collection");
     }
     @Test
     public void testConstructor_int(){
@@ -1742,6 +1758,9 @@ public class PackedBooleanArrSeqTest{
         PackedBooleanArrListMonitor(CheckedType checkedType){
             super(checkedType);
         }
+        PackedBooleanArrListMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            super(checkedType,collection,collectionClass);
+        }
         PackedBooleanArrListMonitor(CheckedType checkedType,int initCapacity){
             super(checkedType,initCapacity);
         }
@@ -1871,6 +1890,23 @@ public class PackedBooleanArrSeqTest{
                 return new PackedBooleanArrSeq.CheckedList(initCapacity);
             }
             return new PackedBooleanArrSeq.UncheckedList(initCapacity);
+        }
+        @Override
+        UncheckedList initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
+            Class<? extends UncheckedList> clazz;
+            if(checkedType.checked) {
+                clazz=PackedBooleanArrSeq.CheckedList.class;
+            }else {
+                clazz=PackedBooleanArrSeq.UncheckedList.class;
+            }
+            try{
+                return clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+            }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
+            
+            
         }
         @Override
         void updateModCount(){
@@ -2731,6 +2767,11 @@ public class PackedBooleanArrSeqTest{
             this.seq=initSeq();
             updateCollectionState();
         }
+        AbstractPackedBooleanArrSeqMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            this.checkedType=checkedType;
+            this.seq=initSeq(collection,collectionClass);
+            updateCollectionState();
+        }
         AbstractPackedBooleanArrSeqMonitor(CheckedType checkedType,int initCapacity){
             this.checkedType=checkedType;
             this.seq=initSeq(initCapacity);
@@ -3149,6 +3190,7 @@ public class PackedBooleanArrSeqTest{
         abstract int findRemoveValIndex(Object inputVal,DataType inputType,int fromIndex,int toIndex);
         abstract SEQ initSeq();
         abstract SEQ initSeq(int initCapacity);
+        abstract SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass);
         abstract void updateModCount();
         abstract void verifyCloneTypeAndModCount(Object clone);
         abstract void verifyModCount();
@@ -3254,6 +3296,9 @@ public class PackedBooleanArrSeqTest{
         }
         PackedBooleanArrStackMonitor(CheckedType checkedType){
             super(checkedType);
+        }
+        PackedBooleanArrStackMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            super(checkedType,collection,collectionClass);
         }
         PackedBooleanArrStackMonitor(CheckedType checkedType,int initCapacity){
             super(checkedType,initCapacity);
@@ -3420,6 +3465,23 @@ public class PackedBooleanArrSeqTest{
                 return new PackedBooleanArrSeq.CheckedStack(initCapacity);
             }
             return new PackedBooleanArrSeq.UncheckedStack(initCapacity);
+        }
+        @Override
+        UncheckedStack initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
+            Class<? extends UncheckedStack> clazz;
+            if(checkedType.checked) {
+                clazz=PackedBooleanArrSeq.CheckedStack.class;
+            }else {
+                clazz=PackedBooleanArrSeq.UncheckedStack.class;
+            }
+            try{
+                return clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+            }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
+            
+            
         }
         @Override
         void updateModCount(){

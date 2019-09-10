@@ -1,5 +1,7 @@
 package omni.impl.set;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -40,6 +42,23 @@ public class BooleanSetImplTest{
             }else{
                 this.set=new BooleanSetImpl();
             }
+        }
+        BooleanSetImplMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            this.checkedType=checkedType;
+            Class<? extends BooleanSetImpl> clazz;
+            if(checkedType.checked) {
+                clazz=BooleanSetImpl.Checked.class;
+            }else {
+                clazz=BooleanSetImpl.class;
+            }
+            try{
+                this.set=clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+            }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
+            this.updateCollectionState();
+            
         }
         BooleanSetImplMonitor(CheckedType checkedType,int expectedState){
             this.checkedType=checkedType;
@@ -534,6 +553,8 @@ public class BooleanSetImplTest{
         test.runAllTests("BooleanSetImplTest.testclone_void");
     }
     
+    
+    
     @Test
     public void testConstructor_int(){
         BasicTest test=(checkedType,initSet)->{
@@ -565,6 +586,20 @@ public class BooleanSetImplTest{
             TestExecutorService.submitTest(()->new BooleanSetImplMonitor(checkedType).verifyCollectionState());
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testConstructor_void");
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_Collection() {
+        for(var checkedType:CheckedType.values()) {
+            for(var collectionClass:DataType.BOOLEAN.validCollectionConstructorClasses) {
+                TestExecutorService.submitTest(()->{
+                    Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(DataType.BOOLEAN,(Class<? extends Collection<?>>)collectionClass);
+                    new BooleanSetImplMonitor(checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                });
+            }
+        }
+        TestExecutorService.completeAllTests("BooleanSetImplTest.testConstructor_Collection");
     }
     
     @Test

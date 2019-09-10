@@ -1,5 +1,7 @@
 package omni.impl.seq;
 import java.io.Externalizable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import org.junit.jupiter.api.Assertions;
@@ -178,6 +180,9 @@ public class SnglLnkSeqTest{
     AbstractSnglLnkSeqMonitor(CheckedType checkedType,DataType dataType){
       super(checkedType,dataType);
     }
+    AbstractSnglLnkSeqMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        super(checkedType,dataType,collection,collectionClass);
+      }
     AbstractSnglLnkSeqMonitor(CheckedType checkedType,DataType dataType,int initCap){
       super(checkedType,dataType,initCap);
     }
@@ -795,6 +800,9 @@ public class SnglLnkSeqTest{
     SnglLnkQueueMonitor(CheckedType checkedType,DataType dataType,int initCap){
       super(checkedType,dataType,initCap);
     }
+    SnglLnkQueueMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        super(checkedType,dataType,collection,collectionClass);
+      }
     @Override public MonitoredIterator<? extends OmniIterator<?>,SEQ> getMonitoredIterator(){
       return new ItrMonitor();
     }
@@ -1625,6 +1633,84 @@ public class SnglLnkSeqTest{
       }
       Assertions.assertNull(headNode);
     }
+    @SuppressWarnings("unchecked")
+    @Override
+    SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        Class<?> clazz;
+        switch(this.dataType) {
+        case BOOLEAN:
+            if(this.checkedType.checked) {
+                clazz=BooleanSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=BooleanSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case BYTE:
+            if(this.checkedType.checked) {
+                clazz=ByteSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=ByteSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case CHAR:
+            if(this.checkedType.checked) {
+                clazz=CharSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=CharSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case SHORT:
+            if(this.checkedType.checked) {
+                clazz=ShortSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=ShortSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case INT:
+            if(this.checkedType.checked) {
+                clazz=IntSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=IntSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case LONG:
+            if(this.checkedType.checked) {
+                clazz=LongSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=LongSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case FLOAT:
+            if(this.checkedType.checked) {
+                clazz=FloatSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=FloatSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case DOUBLE:
+            if(this.checkedType.checked) {
+                clazz=DoubleSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=DoubleSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        case REF:
+            if(this.checkedType.checked) {
+                clazz=RefSnglLnkSeq.CheckedQueue.class;
+            }else {
+                clazz=RefSnglLnkSeq.UncheckedQueue.class;
+            }
+            break;
+        default:
+            throw this.dataType.invalid();
+        }
+        try{
+            return (SEQ)clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+        }catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e){
+            throw new Error(e);
+        }
+    }
   }
   private static class SnglLnkStackMonitor<SEQ extends AbstractSeq<E>&Externalizable&OmniStack<E>,E>
       extends AbstractSnglLnkSeqMonitor<SEQ> implements MonitoredStack<SEQ>{
@@ -1772,6 +1858,9 @@ public class SnglLnkSeqTest{
     SnglLnkStackMonitor(CheckedType checkedType,DataType dataType,int initCap){
       super(checkedType,dataType,initCap);
     }
+    SnglLnkStackMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        super(checkedType,dataType,collection,collectionClass);
+      }
     @Override public MonitoredIterator<? extends OmniIterator<?>,SEQ> getMonitoredIterator(){
       return new ItrMonitor();
     }
@@ -2048,6 +2137,84 @@ public class SnglLnkSeqTest{
       default:
         throw dataType.invalid();
       }
+    }
+    @SuppressWarnings("unchecked")
+    @Override
+    SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        Class<?> clazz;
+        switch(this.dataType) {
+        case BOOLEAN:
+            if(this.checkedType.checked) {
+                clazz=BooleanSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=BooleanSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case BYTE:
+            if(this.checkedType.checked) {
+                clazz=ByteSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=ByteSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case CHAR:
+            if(this.checkedType.checked) {
+                clazz=CharSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=CharSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case SHORT:
+            if(this.checkedType.checked) {
+                clazz=ShortSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=ShortSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case INT:
+            if(this.checkedType.checked) {
+                clazz=IntSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=IntSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case LONG:
+            if(this.checkedType.checked) {
+                clazz=LongSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=LongSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case FLOAT:
+            if(this.checkedType.checked) {
+                clazz=FloatSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=FloatSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case DOUBLE:
+            if(this.checkedType.checked) {
+                clazz=DoubleSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=DoubleSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        case REF:
+            if(this.checkedType.checked) {
+                clazz=RefSnglLnkSeq.CheckedStack.class;
+            }else {
+                clazz=RefSnglLnkSeq.UncheckedStack.class;
+            }
+            break;
+        default:
+            throw this.dataType.invalid();
+        }
+        try{
+            return (SEQ)clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+        }catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e){
+            throw new Error(e);
+        }
     }
     @Override void updateModCount(){
       switch(dataType){
@@ -2500,7 +2667,22 @@ public class SnglLnkSeqTest{
     }
     TestExecutorService.completeAllTests("SnglLnkSeqTest.testConstructor_void");
   }
-  
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testConstructor_Collection() {
+    for(var dataType:DataType.values()) {
+        for(var checkedType:CheckedType.values()) {
+            for(var collectionClass:dataType.validCollectionConstructorClasses) {
+                TestExecutorService.submitTest(()->{
+                    Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(dataType,(Class<? extends Collection<?>>)collectionClass);
+                    new SnglLnkStackMonitor<>(checkedType,dataType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                    new SnglLnkQueueMonitor<>(checkedType,dataType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                });
+            }
+        }
+    }
+    TestExecutorService.completeAllTests("SnglLnkSeqTest.testConstructor_Collection");
+  }
   @Test public void testcontains_val(){
     final QueryTest<MonitoredSequence<?>> test
         =(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{

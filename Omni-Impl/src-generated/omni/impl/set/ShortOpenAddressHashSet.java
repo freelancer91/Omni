@@ -1685,22 +1685,22 @@ private boolean addToTable(short val){
       super(that);
     }  
     public Checked(float loadFactor,Collection<? extends Short> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfRef<? extends Short> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfBoolean that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.ShortOutput<?> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfByte that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfShort that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }  
     public Checked(){
       super();

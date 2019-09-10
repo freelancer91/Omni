@@ -4,6 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
@@ -26,7 +29,136 @@ import omni.function.FloatPredicate;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import omni.impl.QueryVal.QueryValModification;
+import omni.impl.seq.BooleanArrSeq;
+import omni.impl.seq.ByteArrSeq;
+import omni.impl.seq.CharArrSeq;
+import omni.impl.seq.DoubleArrSeq;
+import omni.impl.seq.FloatArrSeq;
+import omni.impl.seq.IntArrSeq;
+import omni.impl.seq.LongArrSeq;
+import omni.impl.seq.RefArrSeq;
+import omni.impl.seq.ShortArrSeq;
 public interface MonitoredCollection<COL extends OmniCollection<?>>{
+    
+    @SuppressWarnings("unchecked")
+    static Collection<?> getConstructorCollectionParam(DataType dataType,Class<? extends Collection<?>> collectionClass){
+       
+          if(collectionClass==Collection.class || collectionClass==OmniCollection.OfRef.class) {
+              Collection<?> collectionParam;
+              if(collectionClass==OmniCollection.OfRef.class) {
+                  collectionParam=new RefArrSeq.UncheckedList<>();
+              }else {
+                  collectionParam=new ArrayList<>();
+              }
+            switch(dataType) {
+            case BOOLEAN:
+                Collections.addAll((Collection<Boolean>)collectionParam,Boolean.FALSE,Boolean.TRUE,Boolean.FALSE,Boolean.TRUE,Boolean.FALSE,Boolean.TRUE,Boolean.FALSE,Boolean.TRUE,Boolean.FALSE,Boolean.TRUE);
+                break;
+            case BYTE:
+                Collections.addAll((Collection<Byte>)collectionParam,(byte)0,(byte)1,(byte)2,(byte)3,(byte)4,(byte)5,(byte)6,(byte)7,(byte)8,(byte)9);
+                break;
+            case CHAR:
+                Collections.addAll((Collection<Character>)collectionParam,(char)0,(char)1,(char)2,(char)3,(char)4,(char)5,(char)6,(char)7,(char)8,(char)9);
+                break;
+            case SHORT:
+                Collections.addAll((Collection<Short>)collectionParam,(short)0,(short)1,(short)2,(short)3,(short)4,(short)5,(short)6,(short)7,(short)8,(short)9);
+                break;
+            case INT:
+                Collections.addAll((Collection<Integer>)collectionParam,0,1,2,3,4,5,6,7,8,9);
+                break;
+            case LONG:
+                Collections.addAll((Collection<Long>)collectionParam,(long)0,(long)1,(long)2,(long)3,(long)4,(long)5,(long)6,(long)7,(long)8,(long)9);
+                break;
+            case FLOAT:
+                Collections.addAll((Collection<Float>)collectionParam,(float)0,(float)1,(float)2,(float)3,(float)4,(float)5,(float)6,(float)7,(float)8,(float)9);
+                break;
+            case DOUBLE:
+            case REF:
+                Collections.addAll((Collection<Double>)collectionParam,(double)0,(double)1,(double)2,(double)3,(double)4,(double)5,(double)6,(double)7,(double)8,(double)9);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            return collectionParam;
+          }else {
+              switch(collectionClass.getSimpleName()) {
+              case "OfBoolean":
+              {
+                  BooleanArrSeq.UncheckedList col=new BooleanArrSeq.UncheckedList();
+                  for(int i=0;i<10;++i) {
+                      col.add((i&1)!=0);
+                  }
+                  return col;
+              }
+              case "OfByte":
+              case "ByteOutput":
+              {
+                  ByteArrSeq.UncheckedList col=new ByteArrSeq.UncheckedList();
+                  for(byte i=0;i<10;++i) {
+                      col.add(i);
+                  }
+                  return col;
+              }
+              case "OfChar":
+              case "CharOutput":
+              {
+                  CharArrSeq.UncheckedList col=new CharArrSeq.UncheckedList();
+                  for(char i=0;i<10;++i) {
+                      col.add(i);
+                  }
+                  return col;
+              }
+              case "OfShort":
+              case "ShortOutput":
+              {
+                  ShortArrSeq.UncheckedList col=new ShortArrSeq.UncheckedList();
+                  for(short i=0;i<10;++i) {
+                      col.add(i);
+                  }
+                  return col;
+              }
+              case "OfInt":
+              case "IntOutput":
+              {
+                  IntArrSeq.UncheckedList col=new IntArrSeq.UncheckedList();
+                  for(int i=0;i<10;++i) {
+                      col.add(i);
+                  }
+                  return col;
+              }
+              case "OfLong":
+              case "LongOutput":
+              {
+                  LongArrSeq.UncheckedList col=new LongArrSeq.UncheckedList();
+                  for(long i=0;i<10;++i) {
+                      col.add(i);
+                  }
+                  return col;
+              }
+              case "OfFloat":
+              case "FloatOutput":
+              {
+                  FloatArrSeq.UncheckedList col=new FloatArrSeq.UncheckedList();
+                  for(float i=0;i<10;++i) {
+                      col.add(i);
+                  }
+                  return col;
+              }
+              case "OfDouble":
+              case "DoubleOutput":
+              {
+                  DoubleArrSeq.UncheckedList col=new DoubleArrSeq.UncheckedList();
+                  for(double i=0;i<10;++i) {
+                      col.add(i);
+                  }
+                  return col;
+              }
+              default:
+                  throw new UnsupportedOperationException("Unknown collectionClass "+collectionClass+" (simpleName="+collectionClass.getSimpleName()+", dataType="+dataType+")");
+              }
+          }
+
+    }
     Object get(int iterationIndex,DataType outputType);
     default Object get(int iterationIndex) {
         return get(iterationIndex,getDataType());

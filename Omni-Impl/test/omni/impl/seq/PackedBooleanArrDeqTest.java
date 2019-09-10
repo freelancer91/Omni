@@ -1,5 +1,7 @@
 package omni.impl.seq;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.function.IntConsumer;
@@ -12,6 +14,7 @@ import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
 import omni.impl.IteratorType;
+import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredRemoveIfPredicate;
@@ -909,6 +912,10 @@ if(length!=0) {
       super(checkedType,DataType.BOOLEAN);
       updateCollectionState();
     }
+    PackedBooleanArrDeqMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        super(checkedType,DataType.BOOLEAN,collection,collectionClass);
+        updateCollectionState();
+      }
 
     PackedBooleanArrDeqMonitor(CheckedType checkedType,int capacity){
       super(checkedType,DataType.BOOLEAN,capacity);
@@ -1609,6 +1616,21 @@ if(length!=0) {
       }
       return new PackedBooleanArrDeq();
     }
+    @Override PackedBooleanArrDeq initDeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        Class<? extends PackedBooleanArrDeq> clazz;
+        if(checkedType.checked) {
+          clazz=PackedBooleanArrDeq.Checked.class;
+        }
+        else{
+            clazz=PackedBooleanArrDeq.class;
+        }
+        try{
+            return clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+        }catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e){
+            throw new Error(e);
+        }
+      }
 
     @Override PackedBooleanArrDeq initDeq(int capacity){
       if(checkedType.checked) {
@@ -2038,7 +2060,19 @@ if(length!=0) {
     }
     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testConstructor_int");
   }
-  
+   @SuppressWarnings("unchecked")
+   @Test
+   public void testConstructor_Collection() {
+         for(var checkedType:CheckedType.values()) {
+             for(var collectionClass:DataType.BOOLEAN.validCollectionConstructorClasses) {
+                 TestExecutorService.submitTest(()->{
+                     Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(DataType.BOOLEAN,(Class<? extends Collection<?>>)collectionClass);
+                     new PackedBooleanArrDeqMonitor(checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                 });
+             }
+         }
+     TestExecutorService.completeAllTests("PackedBooleanArrDeqTest.testConstructor_Collection");
+   }
   @Test public void testConstructor_void(){
     for(final var checkedType:CheckedType.values()){
       TestExecutorService.submitTest(()->{

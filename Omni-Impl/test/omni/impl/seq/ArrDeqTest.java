@@ -1,4 +1,6 @@
 package omni.impl.seq;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.function.IntConsumer;
@@ -830,6 +832,10 @@ public class ArrDeqTest{
       super(checkedType,dataType);
       updateCollectionState();
     }
+    ArrDeqMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        super(checkedType,dataType,collection,collectionClass);
+        updateCollectionState();
+      }
     ArrDeqMonitor(CheckedType checkedType,DataType dataType,int initCap){
       super(checkedType,dataType,initCap);
       updateCollectionState();
@@ -2332,6 +2338,83 @@ public class ArrDeqTest{
         throw dataType.invalid();
       }
     }
+    @SuppressWarnings("unchecked") @Override OmniDeque<E> initDeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+        Class<?> clazz;
+        switch(this.dataType) {
+        case BOOLEAN:
+            if(checkedType.checked) {
+                clazz=BooleanArrDeq.Checked.class;
+            }else {
+                clazz=BooleanArrDeq.class;
+            }
+            break;
+        case BYTE:
+            if(checkedType.checked) {
+                clazz=ByteArrDeq.Checked.class;
+            }else {
+                clazz=ByteArrDeq.class;
+            }
+            break;
+        case CHAR:
+            if(checkedType.checked) {
+                clazz=CharArrDeq.Checked.class;
+            }else {
+                clazz=CharArrDeq.class;
+            }
+            break;
+        case SHORT:
+            if(checkedType.checked) {
+                clazz=ShortArrDeq.Checked.class;
+            }else {
+                clazz=ShortArrDeq.class;
+            }
+            break;
+        case INT:
+            if(checkedType.checked) {
+                clazz=IntArrDeq.Checked.class;
+            }else {
+                clazz=IntArrDeq.class;
+            }
+            break;
+        case LONG:
+            if(checkedType.checked) {
+                clazz=LongArrDeq.Checked.class;
+            }else {
+                clazz=LongArrDeq.class;
+            }
+            break;
+        case FLOAT:
+            if(checkedType.checked) {
+                clazz=FloatArrDeq.Checked.class;
+            }else {
+                clazz=FloatArrDeq.class;
+            }
+            break;
+        case DOUBLE:
+            if(checkedType.checked) {
+                clazz=DoubleArrDeq.Checked.class;
+            }else {
+                clazz=DoubleArrDeq.class;
+            }
+            break;
+        case REF:
+            if(checkedType.checked) {
+                clazz=RefArrDeq.Checked.class;
+            }else {
+                clazz=RefArrDeq.class;
+            }
+            break;
+        default:
+            throw dataType.invalid();
+        }
+        try{
+            return (OmniDeque<E>)clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+        }catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e){
+            throw new Error(e);
+        }
+       
+    }
     @SuppressWarnings("unchecked") @Override OmniDeque<E> initDeq(int initCap){
       final var checked=checkedType.checked;
       switch(dataType){
@@ -2712,6 +2795,21 @@ public class ArrDeqTest{
     }
     TestExecutorService.completeAllTests("ArrDeqTest.testConstructor_void");
   }
+   @SuppressWarnings("unchecked")
+   @Test
+   public void testConstructor_Collection() {
+     for(var dataType:DataType.values()) {
+         for(var checkedType:CheckedType.values()) {
+             for(var collectionClass:dataType.validCollectionConstructorClasses) {
+                 TestExecutorService.submitTest(()->{
+                     Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(dataType,(Class<? extends Collection<?>>)collectionClass);
+                     new ArrDeqMonitor<>(checkedType,dataType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                 });
+             }
+         }
+     }
+     TestExecutorService.completeAllTests("ArrDeqTest.testConstructor_Collection");
+   }
    @Test public void testcontains_val(){
     final QueryTest test=(monitor,queryVal,modification,castType,inputType,size,monitoredObjectGen,position)->{
       if(monitoredObjectGen == null){

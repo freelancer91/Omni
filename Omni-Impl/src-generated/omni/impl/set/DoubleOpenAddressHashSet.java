@@ -1047,37 +1047,37 @@ boolean addToTable(long val,int hash){
       super(that);
     }
     public Checked(float loadFactor,Collection<? extends Double> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfRef<? extends Double> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfBoolean that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.DoubleOutput<?> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfByte that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfShort that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }  
     public Checked(float loadFactor,OmniCollection.OfInt that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfLong that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfFloat that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfDouble that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfChar that){
-      super(that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(){
       super();

@@ -1596,19 +1596,19 @@ private boolean addToTable(char val){
       super(that);
     }
     public Checked(float loadFactor,Collection<? extends Character> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfRef<? extends Character> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfBoolean that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.CharOutput<?> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfChar that){
-      super(that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(){
       super();

@@ -1479,7 +1479,7 @@ AbstractSeq<E>
             CheckedCollection.checkModCount(modCount,that.modCount);
           }
         }else{
-          return size==uncheckedList.size && ((uncheckedList==this && rootOffset==0) || (this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0)));
+          return size==uncheckedList.size && (uncheckedList==this || (this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0)));
         }
       }else if(list instanceof RefArrSeq.UncheckedSubList){
         final RefArrSeq.UncheckedSubList<?> subList;

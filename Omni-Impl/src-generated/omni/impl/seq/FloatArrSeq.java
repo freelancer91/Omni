@@ -1299,7 +1299,7 @@ AbstractSeq<Float>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfFloat list){
       if(list instanceof FloatArrSeq.UncheckedList){
         final FloatArrSeq.UncheckedList uncheckedList;
-        return (uncheckedList=(FloatArrSeq.UncheckedList)list).size==size && ((uncheckedList==this && rootOffset==0) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
+        return (uncheckedList=(FloatArrSeq.UncheckedList)list).size==size && ((uncheckedList==this) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
       }else if(list instanceof FloatArrSeq.UncheckedSubList){
         final FloatArrSeq.UncheckedSubList subList;
         final int thatOffset=(subList=(FloatArrSeq.UncheckedSubList)list).rootOffset;
@@ -3771,12 +3771,13 @@ AbstractSeq<Float>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfFloat list){
       if(list instanceof FloatArrSeq.UncheckedList){
         final FloatArrSeq.UncheckedList that;
-        return size==(that=(FloatArrSeq.UncheckedList)list).size && ((that==this && rootOffset==0)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
+        return size==(that=(FloatArrSeq.UncheckedList)list).size && ((that==this)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
       }else if(list instanceof FloatArrSeq.CheckedSubList){
         final FloatArrSeq.CheckedSubList subList;
         final FloatArrSeq.CheckedList thatRoot;
         CheckedCollection.checkModCount((subList=(FloatArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
-        return size==subList.size && (thatRoot==this || super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,subList.rootOffset));
+        final int thatOffset;
+        return size==subList.size && (((thatOffset=subList.rootOffset)==rootOffset&&thatRoot==this)|| super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,thatOffset));
       }else if(list instanceof FloatArrSeq.UncheckedSubList){
         final FloatArrSeq.UncheckedSubList subList;
         return size==(subList=(FloatArrSeq.UncheckedSubList)list).size && super.isEqualToHelper(rootOffset,rootOffset+size,subList.root.arr,subList.rootOffset);

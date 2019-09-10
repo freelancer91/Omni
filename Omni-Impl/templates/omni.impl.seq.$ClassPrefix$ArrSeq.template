@@ -1104,20 +1104,21 @@ public
         return false;
       }
       if(abstractBooleanArrSeq instanceof $ClassPrefix$ArrSeq.UncheckedList){
-        return (abstractBooleanArrSeq==this && rootOffset==0)|| (super.isEqualToHelper(rootOffset,rootOffset+size,(($ClassPrefix$ArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0));
+        return (abstractBooleanArrSeq==this)|| (super.isEqualToHelper(rootOffset,rootOffset+size,(($ClassPrefix$ArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0));
       }else{
         return SequenceEqualityUtil.isEqualTo(rootOffset,rootOffset+size,this.arr,0,((PackedBooleanArrSeq.UncheckedList)list).words);
       }
     #ELSE
     if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
       final $ClassPrefix$ArrSeq.UncheckedList that;
-      return size==(that=($ClassPrefix$ArrSeq.UncheckedList)list).size && ((that==this && rootOffset==0)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
+      return size==(that=($ClassPrefix$ArrSeq.UncheckedList)list).size && ((that==this)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
     #ENDIF
     }else if(list instanceof $ClassPrefix$ArrSeq.CheckedSubList){
       final $ClassPrefix$ArrSeq.CheckedSubList subList;
       final $ClassPrefix$ArrSeq.CheckedList thatRoot;
       CheckedCollection.checkModCount((subList=($ClassPrefix$ArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
-      return size==subList.size && (thatRoot==this || super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,subList.rootOffset));
+      final int thatOffset;
+      return size==subList.size && (((thatOffset=subList.rootOffset)==rootOffset&&thatRoot==this)|| super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,thatOffset));
     }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedSubList){
       final $ClassPrefix$ArrSeq.UncheckedSubList subList;
       return size==(subList=($ClassPrefix$ArrSeq.UncheckedSubList)list).size && super.isEqualToHelper(rootOffset,rootOffset+size,subList.root.arr,subList.rootOffset);
@@ -1315,7 +1316,6 @@ public
     return false;
   }
   #IF OfRef
-
   #MACRO UncheckedListRefEqualsImpl<Boolean>()
   #MACRO UncheckedListRefEqualsImpl<Byte>()
   #MACRO UncheckedListRefEqualsImpl<Char>()
@@ -1324,8 +1324,6 @@ public
   #MACRO UncheckedListRefEqualsImpl<Long>()
   #MACRO UncheckedListRefEqualsImpl<Float>()
   #MACRO UncheckedListRefEqualsImpl<Double>()
-  
- 
   private boolean isEqualTo(int size,OmniList.OfRef<?> list){
     if(list instanceof RefArrSeq.UncheckedList){
       final RefArrSeq.UncheckedList<?> uncheckedList;
@@ -1389,7 +1387,7 @@ public
           CheckedCollection.checkModCount(modCount,that.modCount);
         }
       }else{
-        return size==uncheckedList.size && ((uncheckedList==this && rootOffset==0) || (this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0)));
+        return size==uncheckedList.size && (uncheckedList==this || (this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0)));
       }
     }else if(list instanceof RefArrSeq.UncheckedSubList){
       final RefArrSeq.UncheckedSubList<?> subList;
@@ -1461,14 +1459,14 @@ public
         return false;
       }
       if(abstractBooleanArrSeq instanceof $ClassPrefix$ArrSeq.UncheckedList){
-        return this.isEqualToHelper(rootOffset,rootOffset+size,(($ClassPrefix$ArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0);
+        return abstractBooleanArrSeq==this || this.isEqualToHelper(rootOffset,rootOffset+size,(($ClassPrefix$ArrSeq.UncheckedList)abstractBooleanArrSeq).arr,0);
       }else{
-        return (abstractBooleanArrSeq==this && rootOffset==0) || SequenceEqualityUtil.isEqualTo(rootOffset,rootOffset+size,this.arr,0,((PackedBooleanArrSeq.UncheckedList)abstractBooleanArrSeq).words);
+        return SequenceEqualityUtil.isEqualTo(rootOffset,rootOffset+size,this.arr,0,((PackedBooleanArrSeq.UncheckedList)abstractBooleanArrSeq).words);
       }
     #ELSE
     if(list instanceof $ClassPrefix$ArrSeq.UncheckedList){
       final $ClassPrefix$ArrSeq.UncheckedList uncheckedList;
-      return (uncheckedList=($ClassPrefix$ArrSeq.UncheckedList)list).size==size && ((uncheckedList==this && rootOffset==0) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
+      return (uncheckedList=($ClassPrefix$ArrSeq.UncheckedList)list).size==size && ((uncheckedList==this) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
     #ENDIF
     }else if(list instanceof $ClassPrefix$ArrSeq.UncheckedSubList){
       final $ClassPrefix$ArrSeq.UncheckedSubList subList;

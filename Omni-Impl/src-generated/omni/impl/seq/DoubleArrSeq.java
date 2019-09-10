@@ -1125,7 +1125,7 @@ AbstractSeq<Double>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfDouble list){
       if(list instanceof DoubleArrSeq.UncheckedList){
         final DoubleArrSeq.UncheckedList uncheckedList;
-        return (uncheckedList=(DoubleArrSeq.UncheckedList)list).size==size && ((uncheckedList==this && rootOffset==0) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
+        return (uncheckedList=(DoubleArrSeq.UncheckedList)list).size==size && ((uncheckedList==this) || this.isEqualToHelper(rootOffset,rootOffset+size,uncheckedList.arr,0));
       }else if(list instanceof DoubleArrSeq.UncheckedSubList){
         final DoubleArrSeq.UncheckedSubList subList;
         final int thatOffset=(subList=(DoubleArrSeq.UncheckedSubList)list).rootOffset;
@@ -3287,12 +3287,13 @@ AbstractSeq<Double>
     private boolean isEqualTo(int rootOffset,int size,OmniList.OfDouble list){
       if(list instanceof DoubleArrSeq.UncheckedList){
         final DoubleArrSeq.UncheckedList that;
-        return size==(that=(DoubleArrSeq.UncheckedList)list).size && ((that==this && rootOffset==0)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
+        return size==(that=(DoubleArrSeq.UncheckedList)list).size && ((that==this)||(super.isEqualToHelper(rootOffset,rootOffset+size,that.arr,0)));
       }else if(list instanceof DoubleArrSeq.CheckedSubList){
         final DoubleArrSeq.CheckedSubList subList;
         final DoubleArrSeq.CheckedList thatRoot;
         CheckedCollection.checkModCount((subList=(DoubleArrSeq.CheckedSubList)list).modCount,(thatRoot=subList.root).modCount);
-        return size==subList.size && (thatRoot==this || super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,subList.rootOffset));
+        final int thatOffset;
+        return size==subList.size && (((thatOffset=subList.rootOffset)==rootOffset&&thatRoot==this)|| super.isEqualToHelper(rootOffset,rootOffset+size,thatRoot.arr,thatOffset));
       }else if(list instanceof DoubleArrSeq.UncheckedSubList){
         final DoubleArrSeq.UncheckedSubList subList;
         return size==(subList=(DoubleArrSeq.UncheckedSubList)list).size && super.isEqualToHelper(rootOffset,rootOffset+size,subList.root.arr,subList.rootOffset);

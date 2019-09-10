@@ -2,6 +2,7 @@ package omni.impl.seq;
 
 import java.io.Externalizable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 import org.junit.jupiter.api.Assertions;
@@ -73,6 +74,12 @@ public void repairModCount() {
   }
   abstract DEQ initDeq();
   abstract DEQ initDeq(int capacity);
+  abstract DEQ initDeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass);
+  AbstractArrDeqMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+      this.checkedType=checkedType;
+      this.dataType=dataType;
+      this.seq=initDeq(collection,collectionClass);
+  }
   AbstractArrDeqMonitor(CheckedType checkedType,DataType dataType){
     this.checkedType=checkedType;
     this.dataType=dataType;

@@ -4027,40 +4027,40 @@ return (this.wordWORDNUM & (MASK))!=0;
   #ENDIF
 #ENDIF
     public Checked(float loadFactor,Collection<? extends $BoxedExposed$> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfRef<? extends $BoxedExposed$> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
 #IFNOT OfRef
     public Checked(float loadFactor,OmniCollection.OfBoolean that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.$ClassPrefix$Output<?> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
   #IFNOT OfChar
     public Checked(float loadFactor,OmniCollection.OfByte that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfShort that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }  
     #IFNOT OfShort
     public Checked(float loadFactor,OmniCollection.OfInt that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
       #IFNOT OfInt
     public Checked(float loadFactor,OmniCollection.OfLong that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
         #IFNOT OfLong
     public Checked(float loadFactor,OmniCollection.OfFloat that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
           #IFNOT OfFloat
     public Checked(float loadFactor,OmniCollection.OfDouble that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
           #ENDIF
         #ENDIF
@@ -4069,7 +4069,7 @@ return (this.wordWORDNUM & (MASK))!=0;
   #ENDIF
   #IFNOT OfShort
     public Checked(float loadFactor,OmniCollection.OfChar that){
-      super(that);
+      super(validateLoadFactor(loadFactor),that);
     }
   #ENDIF
 #ENDIF

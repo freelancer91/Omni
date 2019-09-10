@@ -147,6 +147,7 @@ public class ArrSeqTest{
             return getMonitoredList(initParams,initCapacity);
         }
     }
+   
     private static ArrStackMonitor<?,?> getMonitoredStack(SequenceInitParams initParams,int initCapacity){
         return new ArrStackMonitor<>(initParams,initCapacity);
     }
@@ -335,10 +336,23 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_int");
     }
+    @SuppressWarnings("unchecked")
     @Test
     public void testConstructor_Collection() {
-      
+      for(var dataType:DataType.values()) {
+          for(var checkedType:CheckedType.values()) {
+              for(var collectionClass:dataType.validCollectionConstructorClasses) {
+                  TestExecutorService.submitTest(()->{
+                      Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(dataType,(Class<? extends Collection<?>>)collectionClass);
+                      new ArrListMonitor<>(checkedType,dataType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                      new ArrStackMonitor<>(checkedType,dataType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_Collection");
     }
+    
     @Test
     public void testConstructor_void(){
         for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
@@ -2093,6 +2107,7 @@ public class ArrSeqTest{
                 throw dataType.invalid();
             }
         }
+        @Override
         @SuppressWarnings("unchecked") SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
           Constructor<?> constructor;
           try {
@@ -5089,6 +5104,7 @@ public class ArrSeqTest{
         abstract SEQ initSeq();
         @Override
         abstract SEQ initSeq(int initCap);
+        @Override
         abstract SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass);
         abstract void verifyCloneTypeAndModCount(Object clone);
         abstract void verifyModCount();
@@ -5704,6 +5720,7 @@ public class ArrSeqTest{
                 throw dataType.invalid();
             }
         }
+        @Override
         @SuppressWarnings("unchecked") SEQ initSeq(Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
           Constructor<?> constructor;
           try {

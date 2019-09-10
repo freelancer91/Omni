@@ -1,6 +1,8 @@
 package omni.impl.set;
 import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -563,6 +565,49 @@ public class OpenAddressHashSetTest{
             }
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_float");
+    }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_Collection(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var checkedType:CheckedType.values()){
+                for(var collectionClass:collectionType.validCollectionConstructorClasses) {
+                    TestExecutorService.submitTest(()->{
+                        Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(collectionType,(Class<? extends Collection<?>>)collectionClass);
+                        new OpenAddressHashSetMonitor(collectionType,checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                    });
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_Collection");
+    }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructor_floatCollection(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var checkedType:CheckedType.values()){
+                for(var collectionClass:collectionType.validCollectionConstructorClasses) {
+                    for(final float loadFactor:LOAD_FACTORS){
+                        if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
+                            TestExecutorService.submitTest(()->{
+                                Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(collectionType,(Class<? extends Collection<?>>)collectionClass);
+                                if(loadFactor == loadFactor && loadFactor <= 1.0f
+                                        && loadFactor > 0){
+                                    new OpenAddressHashSetMonitor(collectionType,checkedType,
+                                            loadFactor,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+                                }else{
+                                    Assertions.assertThrows(IllegalArgumentException.class,
+                                            ()->new OpenAddressHashSetMonitor(collectionType,checkedType,
+                                                    loadFactor,collectionParam,(Class<? extends Collection<?>>)collectionClass));
+                                }
+                            });
+                        }
+                    }
+                    
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_floatCollection");
     }
     
     @Test public void testConstructor_int(){
@@ -1392,6 +1437,91 @@ public class OpenAddressHashSetTest{
             }
             this.checkedType=checkedType;
             this.dataType=dataType;
+            updateCollectionState();
+        }
+        OpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,float loadFactor,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            @SuppressWarnings("rawtypes")
+            Class<? extends AbstractOpenAddressHashSet> clazz;
+            switch(dataType){
+            case FLOAT:
+                if(checkedType.checked){
+                    clazz= FloatOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= FloatOpenAddressHashSet.class;
+                }
+                break;
+            case DOUBLE:
+                if(checkedType.checked){
+                    clazz= DoubleOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= DoubleOpenAddressHashSet.class;
+                }
+                break;
+            case REF:
+                if(checkedType.checked){
+                    clazz= RefOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= RefOpenAddressHashSet.class;
+                }
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            this.checkedType=checkedType;
+            this.dataType=dataType;
+            try{
+                this.set=clazz.getDeclaredConstructor(float.class,collectionClass).newInstance(loadFactor,collection);
+            }catch(InvocationTargetException e) {
+                var cause=e.getCause();
+                if(cause instanceof RuntimeException) {
+                    throw (RuntimeException)cause;
+                }
+                if(cause instanceof Error) {
+                    throw (Error)cause;
+                }
+                throw new Error(cause);
+            }catch(InstantiationException | IllegalAccessException
+                    | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
+            updateCollectionState();
+        }
+        OpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+            @SuppressWarnings("rawtypes")
+            Class<? extends AbstractOpenAddressHashSet> clazz;
+            switch(dataType){
+            case FLOAT:
+                if(checkedType.checked){
+                    clazz= FloatOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= FloatOpenAddressHashSet.class;
+                }
+                break;
+            case DOUBLE:
+                if(checkedType.checked){
+                    clazz= DoubleOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= DoubleOpenAddressHashSet.class;
+                }
+                break;
+            case REF:
+                if(checkedType.checked){
+                    clazz= RefOpenAddressHashSet.Checked.class;
+                }else{
+                    clazz= RefOpenAddressHashSet.class;
+                }
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            this.checkedType=checkedType;
+            this.dataType=dataType;
+            try{
+                this.set=clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
+            }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException e){
+                throw new Error(e);
+            }
             updateCollectionState();
         }
         OpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,int initialCapacity){

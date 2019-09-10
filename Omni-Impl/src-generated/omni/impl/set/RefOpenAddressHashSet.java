@@ -999,10 +999,10 @@ private boolean addToTable(Object val,int hash){
       super(that);
     }
     public Checked(float loadFactor,Collection<? extends E> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(float loadFactor,OmniCollection.OfRef<? extends E> that){
-      super(loadFactor,that);
+      super(validateLoadFactor(loadFactor),that);
     }
     public Checked(){
       super();
