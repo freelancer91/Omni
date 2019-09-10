@@ -68,8 +68,6 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public Object clone(){
       return new ByteSetImpl(this);
   }
- 
-  
   private static long processWordToString(long word,int valOffset,int valBound,byte[] buffer,long magicWord){
     int bufferOffset=(int)(magicWord >>> 32);
     int numLeft=(int)magicWord;
@@ -142,23 +140,34 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   private boolean isEqualTo(ByteSetImpl thatSet){
     return this.word0==thatSet.word0 && this.word1==thatSet.word1 && this.word2==thatSet.word2 && this.word3==thatSet.word3;
   }
-  
   @Override public boolean equals(Object val){
     if(val==this){
       return true;
     }
     if(val instanceof Set){
-      if(val instanceof ByteSetImpl){
-        return isEqualTo((ByteSetImpl)val);
-      }else if(val instanceof RefOpenAddressHashSet){
-        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-      }else{
-        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      //TODO optimize
+      final Set<?> that;
+      if(this.size()==(that=(Set<?>)val).size()){
+        for(var thatVal:that){
+          if(!(thatVal instanceof Byte) || !this.contains((byte)thatVal)){
+            return false;
+          }
+        }
+        return true;
+      
       }
+      //if(val instanceof ByteSetImpl){
+      //  return this.isEqualTo((ByteSetImpl)val);
+      //}else if(val instanceof RefOpenAddressHashSet){
+      //  return SetCommonImpl.isEqualTo(this,(RefOpenAddressHashSet<?>)val);
+      //}else if(val instanceof OmniSet){
+      //  return this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0 && ((OmniSet<?>)val).isEmpty();
+      //}else{
+      //  return SetCommonImpl.isEqualTo(this,(Set<?>)val);
+      //}
     }
     return false;
   }
-  
   @Override public void writeExternal(ObjectOutput out) throws IOException{
     out.writeLong(word0);
     out.writeLong(word1);
@@ -704,13 +713,44 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
         return true;
       }
       if(val instanceof Set){
+        //TODO optimize
+        int modCount=this.modCount;
+        try{
+          final Set<?> that;
+          if(size==(that=(Set<?>)val).size()){
+            for(var thatVal:that){
+              if(!(thatVal instanceof Byte) || !this.contains((byte)thatVal)){
+                return false;
+              }
+            }
+            return true;
+          
+          }
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        /*
+        final int size;
+        if((size=this.size)==0){
+          return ((Set<?>)val).isEmpty();
+        }
         if(val instanceof ByteSetImpl){
           return super.isEqualTo((ByteSetImpl)val);
         }else if(val instanceof RefOpenAddressHashSet){
-          return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+          final RefOpenAddressHashSet<?> roahs;
+          return size==(roahs=(RefOpenAddressHashSet<?>)val).size && SetCommonImpl.isEqualTo(size,this,roahs.table);
+        }else if(val instanceof OmniSet){
+          return this.size==0 && ((OmniSet<?>)val).isEmpty();
         }else{
-          return SetCommonImpl.isEqualTo((Set<?>)val,this);
+          final int modCount=this.modCount;
+          try{
+              return SetCommonImpl.isEqualTo(size,this,(Set<?>)val);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        
         }
+        */
       }
       return false;
     }

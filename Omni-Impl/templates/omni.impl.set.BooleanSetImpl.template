@@ -79,19 +79,80 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       return 1231 + 1237;
     }
   }
-  
+  private boolean isEqualTo(Set<?> that){
+    switch(this.state) {
+    case 0b00:
+      return that.isEmpty();
+    case 0b01:
+      return that.size()==1 && that.contains(Boolean.FALSE);
+    case 0b10:
+      if(that.size()!=1){
+        return false;
+      }
+      break;
+    default:
+      if(that.size()!=2 || !that.contains(Boolean.FALSE)) {
+        return false;
+      }
+    }
+    return that.contains(Boolean.TRUE);
+  }
+  private boolean thatEqualsFalseState(Set<?> thatSet){
+    if(thatSet instanceof BooleanSetImpl){
+      return ((BooleanSetImpl)thatSet).state==0b01;
+    }else if(thatSet instanceof RefOpenAddressHashSet){
+      final int tableLength;
+      final RefOpenAddressHashSet<?> roahs;
+      final Object[] table;
+      return (roahs=(RefOpenAddressHashSet<?>)thatSet).size==1 && SetCommonImpl.tableContains(Boolean.FALSE,table=roahs.table,tableLength=table.length-1,tableLength&1237);
+    }else{
+      return !(thatSet instanceof OmniSet) && thatSet.size()==1 && thatSet.contains(Boolean.FALSE);
+    }
+  }
+  private boolean thatEqualsTrueState(Set<?> thatSet){
+    if(thatSet instanceof BooleanSetImpl){
+      return ((BooleanSetImpl)thatSet).state==0b10;
+    }else if(thatSet instanceof RefOpenAddressHashSet){
+      final int tableLength;
+      final RefOpenAddressHashSet<?> roahs;
+      final Object[] table;
+      return (roahs=(RefOpenAddressHashSet<?>)thatSet).size==1 && SetCommonImpl.tableContains(Boolean.TRUE,table=roahs.table,tableLength=table.length-1,tableLength&1231);
+    }else{
+      return !(thatSet instanceof OmniSet) && thatSet.size()==1 && thatSet.contains(Boolean.TRUE);
+    }
+  }
+  private boolean thatEqualsFullState(Set<?> thatSet){
+    if(thatSet instanceof BooleanSetImpl){
+       return ((BooleanSetImpl)thatSet).state==0b11;
+    }else if(thatSet instanceof RefOpenAddressHashSet){
+      final int tableLength;
+      final RefOpenAddressHashSet<?> roahs;
+      final Object[] table;
+      return (roahs=(RefOpenAddressHashSet<?>)thatSet).size==2 && SetCommonImpl.tableContains(Boolean.FALSE,table=roahs.table,tableLength=table.length-1,tableLength&1237)&&SetCommonImpl.tableContains(Boolean.TRUE,table,tableLength,tableLength&1231);
+    }else{
+      return !(thatSet instanceof OmniSet) && thatSet.size()==2 && thatSet.contains(Boolean.FALSE) && thatSet.contains(Boolean.TRUE);
+    }
+  }
   @Override public boolean equals(Object val){
     if(val==this){
       return true;
     }
     if(val instanceof Set){
-      if(val instanceof BooleanSetImpl){
-        return ((BooleanSetImpl)val).state==this.state;
-      }else if(val instanceof RefOpenAddressHashSet){
-        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-      }else{
-        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      //TODO optimize
+      for(final var val:((Set<?>)val)){
+        if(!(val instanceof Boolean) || !this.contains((boolean)val)){
+          return false;
+        }
       }
+      //if(val instanceof BooleanSetImpl){
+      //  return this.state==((BooleanSetImpl)val).state;
+      //}else if(val instanceof RefOpenAddressHashSet){
+      //  return SetCommonImpl.isEqualTo(this.state,(RefOpenAddressHashSet<?>)val);
+      //}else if(val instanceof OmniSet){
+      //  return this.state==0b00 && ((OmniSet<?>)val).isEmpty();
+      //}else{
+      //  return SetCommonImpl.isEqualTo(this.state,(Set<?>)val);
+      //}
     }
     return false;
   }
