@@ -10,22 +10,17 @@
 #TYPEDEF OfInteger
 package omni.util;
 
-#IF OfInt
-import java.util.function.$Comparator$;
-#ELSEIF OfString,OfInteger
+#IF OfString,OfInteger
 import java.util.Comparator;
 #ELSE
-import omni.function.$Comparator$;
+import omni.function.$TypeNameModifier$Comparator;
 #ENDIF
 
-public enum $ArrayType$Comparators implements $Comparator$
-#IFNOT OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
-<$ArrayType$>
-#ENDIF
+public enum $ArrayType$Comparators implements $TypeNameModifier$Comparator$<E>$
 {
   Ascending
   {
-    public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2)
+    public int compare($ArrayType$ val1,$ArrayType$ val2)
     {
 #IF OfInteger,OfString
       return val1.compareTo(val2);
@@ -36,7 +31,7 @@ public enum $ArrayType$Comparators implements $Comparator$
   },
   Descending
   {
-    public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2)
+    public int compare($ArrayType$ val1,$ArrayType$ val2)
     {
 #IF OfInteger,OfString
       return -val1.compareTo(val2);
@@ -47,7 +42,7 @@ public enum $ArrayType$Comparators implements $Comparator$
   },
   Unsorted
   {
-    public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2)
+    public int compare($ArrayType$ val1,$ArrayType$ val2)
     {
       return 0;
     }
@@ -55,7 +50,7 @@ public enum $ArrayType$Comparators implements $Comparator$
 #IF OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   Unstable
   {
-    public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2)
+    public int compare($ArrayType$ val1,$ArrayType$ val2)
     {
   #IF OfByte,OfChar,OfShort,OfInt
       //even comes first

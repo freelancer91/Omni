@@ -11,14 +11,16 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import omni.api.OmniList;
+import omni.impl.AbstractOmniCollection;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.IllegalModification;
 import omni.impl.MonitoredList;
 import omni.impl.MonitoredObjectGen;
 import omni.impl.StructType;
-import omni.impl.set.BooleanSetImpl;
-import omni.impl.set.ByteSetImpl;
+//TODO
+//import omni.impl.set.BooleanSetImplOld;
+//import omni.impl.set.ByteSetImplOld;
 import omni.impl.set.CharOpenAddressHashSet;
 import omni.impl.set.DoubleOpenAddressHashSet;
 import omni.impl.set.FloatOpenAddressHashSet;
@@ -172,13 +174,13 @@ public class SequenceEqualityTest{
                     var rootField=FieldAndMethodAccessor.prepareFieldForObj(self,"root");
                     var parentField=FieldAndMethodAccessor.prepareFieldForObj(self,"parent");
                     var rootOffsetField=FieldAndMethodAccessor.prepareFieldForObj(self,"rootOffset");
-                    var root=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(rootField,self);
+                    var root=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(rootField,self);
                     var rootOffset=FieldAndMethodAccessor.getIntValue(rootOffsetField,self);
                     if(rootOffset==0 && thisSize==root.size) {
                         builder.accept(root);
                     }
-                    for(AbstractSeq<?> curr=(AbstractSeq<?>)self;;) {
-                        AbstractSeq<?> parent=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(parentField,curr);
+                    for(AbstractOmniCollection<?> curr=(AbstractOmniCollection<?>)self;;) {
+                        AbstractOmniCollection<?> parent=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(parentField,curr);
                         if(parent==null || parent.size!=thisSize || rootOffset!=FieldAndMethodAccessor.getIntValue(rootOffsetField,parent)) {
                            break;   
                         }
@@ -191,13 +193,13 @@ public class SequenceEqualityTest{
                     var parentField=FieldAndMethodAccessor.prepareFieldForObj(self,"parent");
                     var rootField=FieldAndMethodAccessor.prepareFieldForObj(self,"root");
                     var headField=FieldAndMethodAccessor.prepareFieldForClass(self.getClass().getSuperclass(),"head");
-                    var root=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(rootField,self);
+                    var root=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(rootField,self);
                     var thisHead=FieldAndMethodAccessor.getValue(headField,self);
                     if(thisSize==root.size && thisHead==FieldAndMethodAccessor.getValue(headField,root)) {
                         builder.accept(root);
                     }
-                    for(AbstractSeq<?> curr=(AbstractSeq<?>)self;;) {
-                        AbstractSeq<?> parent=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(parentField,curr);
+                    for(AbstractOmniCollection<?> curr=(AbstractOmniCollection<?>)self;;) {
+                        AbstractOmniCollection<?> parent=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(parentField,curr);
                         if(parent==null || parent.size!=thisSize || thisHead!=FieldAndMethodAccessor.getValue(headField,parent)) {
                            break;   
                         }
@@ -242,13 +244,13 @@ public class SequenceEqualityTest{
                     var rootField=FieldAndMethodAccessor.prepareFieldForObj(self,"root");
                     var parentField=FieldAndMethodAccessor.prepareFieldForObj(self,"parent");
                     var rootOffsetField=FieldAndMethodAccessor.prepareFieldForObj(self,"rootOffset");
-                    var root=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(rootField,self);
+                    var root=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(rootField,self);
                     var rootOffset=FieldAndMethodAccessor.getIntValue(rootOffsetField,self);
                     if(rootOffset!=0 || thisSize!=root.size) {
                         builder.accept(root);
                     }
-                    for(AbstractSeq<?> curr=(AbstractSeq<?>)self;;) {
-                        AbstractSeq<?> parent=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(parentField,curr);
+                    for(AbstractOmniCollection<?> curr=(AbstractOmniCollection<?>)self;;) {
+                        AbstractOmniCollection<?> parent=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(parentField,curr);
                         if(parent==null) {
                            break;   
                         }
@@ -272,13 +274,13 @@ public class SequenceEqualityTest{
                     var parentField=FieldAndMethodAccessor.prepareFieldForObj(self,"parent");
                     var rootField=FieldAndMethodAccessor.prepareFieldForObj(self,"root");
                     var headField=FieldAndMethodAccessor.prepareFieldForClass(self.getClass().getSuperclass(),"head");
-                    var root=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(rootField,self);
+                    var root=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(rootField,self);
                     var thisHead=FieldAndMethodAccessor.getValue(headField,self);
                     if(thisSize!=root.size || thisHead!=FieldAndMethodAccessor.getValue(headField,root)) {
                         builder.accept(root);
                     }
-                    for(AbstractSeq<?> curr=(AbstractSeq<?>)self;;) {
-                        AbstractSeq<?> parent=(AbstractSeq<?>)FieldAndMethodAccessor.getValue(parentField,curr);
+                    for(AbstractOmniCollection<?> curr=(AbstractOmniCollection<?>)self;;) {
+                        AbstractOmniCollection<?> parent=(AbstractOmniCollection<?>)FieldAndMethodAccessor.getValue(parentField,curr);
                         if(parent==null) {
                            break;   
                         }
@@ -389,8 +391,9 @@ public class SequenceEqualityTest{
                 builder.accept(new FloatArrDeq.Checked());
                 builder.accept(new DoubleArrDeq.Checked());
                 builder.accept(new PackedBooleanArrDeq.Checked());
-                builder.accept(new BooleanSetImpl());
-                builder.accept(new ByteSetImpl());
+                //TODO
+                //builder.accept(new BooleanSetImplOld());
+                //builder.accept(new ByteSetImplOld());
                 builder.accept(new CharOpenAddressHashSet());
                 builder.accept(new ShortOpenAddressHashSet());
                 builder.accept(new IntOpenAddressHashSet());
@@ -398,8 +401,9 @@ public class SequenceEqualityTest{
                 builder.accept(new FloatOpenAddressHashSet());
                 builder.accept(new DoubleOpenAddressHashSet());
                 builder.accept(new RefOpenAddressHashSet<>());
-                builder.accept(new BooleanSetImpl.Checked());
-                builder.accept(new ByteSetImpl.Checked());
+                //TODO
+                //builder.accept(new BooleanSetImplOld.Checked());
+                //builder.accept(new ByteSetImplOld.Checked());
                 builder.accept(new CharOpenAddressHashSet.Checked());
                 builder.accept(new ShortOpenAddressHashSet.Checked());
                 builder.accept(new IntOpenAddressHashSet.Checked());
@@ -2236,7 +2240,7 @@ public class SequenceEqualityTest{
                                                 if(!(notEqualsOpponent instanceof List)) {
                                                     break goToNoThrow;
                                                 }
-                                                if(notEqualsOpponent instanceof AbstractSeq && !(notEqualsOpponent instanceof OmniList.OfRef)) {
+                                                if(notEqualsOpponent instanceof AbstractOmniCollection && !(notEqualsOpponent instanceof OmniList.OfRef)) {
                                                     switch(initParams.collectionType) {
                                                     case BOOLEAN:
                                                         if(!(notEqualsOpponent instanceof OmniList.OfBoolean)) {
@@ -2297,7 +2301,7 @@ public class SequenceEqualityTest{
                                         }
                                         Assertions.assertFalse(thisList.equals(notEqualsOpponent));    
                                         if(notEqualsOpponent!=null) {
-                                            if(notEqualsOpponent instanceof List && !(notEqualsOpponent instanceof AbstractSeq)) {
+                                            if(notEqualsOpponent instanceof List && !(notEqualsOpponent instanceof AbstractOmniCollection)) {
                                                 Assertions.assertThrows(illegalMod.expectedException,()->notEqualsOpponent.equals(thisList));
                                             }else {
                                                 Assertions.assertFalse(notEqualsOpponent.equals(thisList));

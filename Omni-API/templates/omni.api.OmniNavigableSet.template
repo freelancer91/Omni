@@ -1,0 +1,185 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import java.util.NavigableSet;
+public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,NavigableSet<E>{
+  OmniIterator<E> iterator();
+  OmniIterator<E> descendingIterator();
+  OmniNavigableSet<E> descendingSet();
+  OmniNavigableSet<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+  OmniNavigableSet<E> headSet(E toElement,boolean inclusive);
+  OmniNavigableSet<E> tailSet(E fromElement,boolean inclusive);
+  OmniNavigableSet<E> subSet(E fromElement,E toElement);
+  OmniNavigableSet<E> headSet(E toElement);
+  OmniNavigableSet<E> tailSet(E fromElement);
+  public abstract interface OfRef<E> extends OmniNavigableSet<E>,OmniSortedSet.OfRef<E>{
+    OmniIterator.OfRef<E> iterator();
+    OmniIterator.OfRef<E> descendingIterator();
+    OmniNavigableSet.OfRef<E> descendingSet();
+    OmniNavigableSet.OfRef<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.OfRef<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.OfRef<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.OfRef<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.OfRef<E> headSet(E toElement);
+    OmniNavigableSet.OfRef<E> tailSet(E fromElement);
+  }
+  public abstract interface DoubleOutput<E> extends OmniNavigableSet<E>,OmniSortedSet.DoubleOutput<E>{
+    OmniIterator.DoubleOutput<E> iterator();
+    OmniIterator.DoubleOutput<E> descendingIterator();
+    OmniNavigableSet.DoubleOutput<E> descendingSet();
+    OmniNavigableSet.DoubleOutput<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.DoubleOutput<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.DoubleOutput<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.DoubleOutput<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.DoubleOutput<E> headSet(E toElement);
+    OmniNavigableSet.DoubleOutput<E> tailSet(E fromElement);
+    double pollFirstDouble();
+    double pollLastDouble();
+  }
+  public abstract interface FloatOutput<E> extends OmniNavigableSet.DoubleOutput<E>,OmniSortedSet.FloatOutput<E>{
+    OmniIterator.FloatOutput<E> iterator();
+    OmniIterator.FloatOutput<E> descendingIterator();
+    OmniNavigableSet.FloatOutput<E> descendingSet();
+    OmniNavigableSet.FloatOutput<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.FloatOutput<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.FloatOutput<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.FloatOutput<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.FloatOutput<E> headSet(E toElement);
+    OmniNavigableSet.FloatOutput<E> tailSet(E fromElement);
+    float pollFirstFloat();
+    float pollLastFloat();
+  }
+  public abstract interface LongOutput<E> extends OmniNavigableSet.FloatOutput<E>,OmniSortedSet.LongOutput<E>{
+    OmniIterator.LongOutput<E> iterator();
+    OmniIterator.LongOutput<E> descendingIterator();
+    OmniNavigableSet.LongOutput<E> descendingSet();
+    OmniNavigableSet.LongOutput<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.LongOutput<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.LongOutput<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.LongOutput<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.LongOutput<E> headSet(E toElement);
+    OmniNavigableSet.LongOutput<E> tailSet(E fromElement);
+    long pollFirstLong();
+    long pollLastLong();
+  }
+  public abstract interface IntOutput<E> extends OmniNavigableSet.LongOutput<E>,OmniSortedSet.IntOutput<E>{
+    OmniIterator.IntOutput<E> iterator();
+    OmniIterator.IntOutput<E> descendingIterator();
+    OmniNavigableSet.IntOutput<E> descendingSet();
+    OmniNavigableSet.IntOutput<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.IntOutput<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.IntOutput<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.IntOutput<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.IntOutput<E> headSet(E toElement);
+    OmniNavigableSet.IntOutput<E> tailSet(E fromElement);
+    int pollFirstInt();
+    int pollLastInt();
+  }
+  public abstract interface ShortOutput<E> extends OmniNavigableSet.IntOutput<E>,OmniSortedSet.ShortOutput<E>{
+    OmniIterator.ShortOutput<E> iterator();
+    OmniIterator.ShortOutput<E> descendingIterator();
+    OmniNavigableSet.ShortOutput<E> descendingSet();
+    OmniNavigableSet.ShortOutput<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.ShortOutput<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.ShortOutput<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.ShortOutput<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.ShortOutput<E> headSet(E toElement);
+    OmniNavigableSet.ShortOutput<E> tailSet(E fromElement);
+    short pollFirstShort();
+    short pollLastShort();
+  }
+  public abstract interface CharOutput<E> extends OmniNavigableSet.IntOutput<E>,OmniSortedSet.CharOutput<E>{
+    OmniIterator.CharOutput<E> iterator();
+    OmniIterator.CharOutput<E> descendingIterator();
+    OmniNavigableSet.CharOutput<E> descendingSet();
+    OmniNavigableSet.CharOutput<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.CharOutput<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.CharOutput<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.CharOutput<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.CharOutput<E> headSet(E toElement);
+    OmniNavigableSet.CharOutput<E> tailSet(E fromElement);
+    char pollFirstChar();
+    char pollLastChar();
+  }
+  public abstract interface ByteOutput<E> extends OmniNavigableSet.ShortOutput<E>,OmniSortedSet.ByteOutput<E>{
+    OmniIterator.ByteOutput<E> iterator();
+    OmniIterator.ByteOutput<E> descendingIterator();
+    OmniNavigableSet.ByteOutput<E> descendingSet();
+    OmniNavigableSet.ByteOutput<E> subSet(E fromElement,boolean fromInclusive,E toElement,boolean toInclusive);
+    OmniNavigableSet.ByteOutput<E> headSet(E toElement,boolean inclusive);
+    OmniNavigableSet.ByteOutput<E> tailSet(E fromElement,boolean inclusive);
+    OmniNavigableSet.ByteOutput<E> subSet(E fromElement,E toElement);
+    OmniNavigableSet.ByteOutput<E> headSet(E toElement);
+    OmniNavigableSet.ByteOutput<E> tailSet(E fromElement);
+    byte pollFirstByte();
+    byte pollLastByte();
+  }
+  #MACRO PrimitiveSubInterface<Boolean>(Boolean,boolean)
+  #MACRO PrimitiveSubInterface<Byte>(Byte,byte)
+  #MACRO PrimitiveSubInterface<Char>(Character,char)
+  #MACRO PrimitiveSubInterface<Short>(Short,short)
+  #MACRO PrimitiveSubInterface<Int>(Integer,int)
+  #MACRO PrimitiveSubInterface<Long>(Long,long)
+  #MACRO PrimitiveSubInterface<Float>(Float,float)
+  #MACRO PrimitiveSubInterface<Double>(Double,double)
+#MACRODEF PrimitiveSubInterface<CLASSPREFIX>(BOXEDTYPE,EXPOSEDTYPE)
+public abstract interface OfCLASSPREFIX
+#IFSWITCH CLASSPREFIX==Boolean
+  extends OmniNavigableSet.ByteOutput<BOXEDTYPE>,OmniNavigableSet.CharOutput<BOXEDTYPE>,OmniSortedSet.OfCLASSPREFIX{
+#ELSE
+  extends OmniNavigableSet.CLASSPREFIXOutput<BOXEDTYPE>,OmniSortedSet.OfCLASSPREFIX{
+#ENDIF
+  OmniIterator.OfCLASSPREFIX iterator();
+  OmniIterator.OfCLASSPREFIX descendingIterator();
+  OmniNavigableSet.OfCLASSPREFIX descendingSet();
+  OmniNavigableSet.OfCLASSPREFIX subSet(EXPOSEDTYPE fromElement,boolean fromInclusive,EXPOSEDTYPE toElement,boolean toInclusive);
+  OmniNavigableSet.OfCLASSPREFIX headSet(EXPOSEDTYPE toElement,boolean inclusive);
+  OmniNavigableSet.OfCLASSPREFIX tailSet(EXPOSEDTYPE fromElement,boolean inclusive);
+  OmniNavigableSet.OfCLASSPREFIX subSet(EXPOSEDTYPE fromElement,EXPOSEDTYPE toElement);
+  OmniNavigableSet.OfCLASSPREFIX headSet(EXPOSEDTYPE toElement);
+  OmniNavigableSet.OfCLASSPREFIX tailSet(EXPOSEDTYPE fromElement);
+  EXPOSEDTYPE pollFirstCLASSPREFIX();
+  EXPOSEDTYPE pollLastCLASSPREFIX();
+  BOXEDTYPE lower(EXPOSEDTYPE val);
+  BOXEDTYPE floor(EXPOSEDTYPE val);
+  BOXEDTYPE ceiling(EXPOSEDTYPE val);
+  BOXEDTYPE higher(EXPOSEDTYPE val);
+  EXPOSEDTYPE lowerCLASSPREFIX(EXPOSEDTYPE val);
+  EXPOSEDTYPE EXPOSEDTYPEFloor(EXPOSEDTYPE val);
+  EXPOSEDTYPE EXPOSEDTYPECeiling(EXPOSEDTYPE val);
+  EXPOSEDTYPE higherCLASSPREFIX(EXPOSEDTYPE val);
+  default OmniNavigableSet.OfCLASSPREFIX subSet(BOXEDTYPE fromElement,boolean fromInclusive,BOXEDTYPE toElement,boolean toInclusive){
+    return this.subSet((EXPOSEDTYPE)fromElement,fromInclusive,(EXPOSEDTYPE)toElement,toInclusive);
+  }
+  default OmniNavigableSet.OfCLASSPREFIX headSet(BOXEDTYPE toElement,boolean inclusive){
+    return this.headSet((EXPOSEDTYPE)toElement,inclusive);
+  }
+  default OmniNavigableSet.OfCLASSPREFIX tailSet(BOXEDTYPE fromElement,boolean inclusive){
+    return this.tailSet((EXPOSEDTYPE)fromElement,inclusive);
+  }
+  default OmniNavigableSet.OfCLASSPREFIX subSet(BOXEDTYPE fromElement,BOXEDTYPE toElement){
+    return this.subSet((EXPOSEDTYPE)fromElement,(EXPOSEDTYPE)toElement);
+  }
+  default OmniNavigableSet.OfCLASSPREFIX headSet(BOXEDTYPE toElement){
+    return this.headSet((EXPOSEDTYPE)toElement);
+  }
+  default OmniNavigableSet.OfCLASSPREFIX tailSet(BOXEDTYPE fromElement){
+    return this.tailSet((EXPOSEDTYPE)fromElement);
+  }
+  default BOXEDTYPE lower(BOXEDTYPE val){
+    return lower((EXPOSEDTYPE)val);
+  }
+  default BOXEDTYPE higher(BOXEDTYPE val){
+    return higher((EXPOSEDTYPE)val);
+  }
+  default BOXEDTYPE floor(BOXEDTYPE val){
+    return floor((EXPOSEDTYPE)val);
+  }
+  default BOXEDTYPE ceiling(BOXEDTYPE val){
+    return ceiling((EXPOSEDTYPE)val);
+  }
+  
+  
+}
+#ENDDEF
+  
+}

@@ -1,7 +1,6 @@
 package omni.api;
 import java.util.Comparator;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.IntBinaryOperator;
 import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
@@ -14,6 +13,7 @@ import omni.function.CharUnaryOperator;
 import omni.function.DoubleComparator;
 import omni.function.FloatComparator;
 import omni.function.FloatUnaryOperator;
+import omni.function.IntComparator;
 import omni.function.LongComparator;
 import omni.function.ShortComparator;
 import omni.function.ShortUnaryOperator;
@@ -1038,8 +1038,8 @@ public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
       public abstract void replaceAll(UnaryOperator<Integer> operator);
       public abstract int set(int index,int val);
       public abstract Integer set(int index,Integer val);
-      public abstract void sort(IntBinaryOperator sorter);
-      public abstract void unstableSort(IntBinaryOperator sorter);
+      public abstract void sort(IntComparator sorter);
+      public abstract void unstableSort(IntComparator sorter);  
       public abstract void sort(Comparator<? super Integer> sorter);
       public abstract OmniList.OfInt subList(int fromIndex,int toIndex);
       public default void add(int index,boolean val)

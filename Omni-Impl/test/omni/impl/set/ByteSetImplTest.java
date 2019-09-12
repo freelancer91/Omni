@@ -1,36 +1,7 @@
 package omni.impl.set;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.NoSuchElementException;
-import java.util.Random;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import omni.api.OmniIterator;
-import omni.impl.CheckedType;
-import omni.impl.DataType;
-import omni.impl.FunctionCallType;
-import omni.impl.IteratorRemoveScenario;
-import omni.impl.IteratorType;
-import omni.impl.MonitoredCollection;
-import omni.impl.MonitoredFunction;
-import omni.impl.MonitoredFunctionGen;
-import omni.impl.MonitoredObjectOutputStream;
-import omni.impl.MonitoredRemoveIfPredicate;
-import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
-import omni.impl.MonitoredSet;
-import omni.impl.QueryCastType;
-import omni.impl.QueryVal;
-import omni.impl.QueryVal.QueryValModification;
-import omni.impl.StructType;
-import omni.util.NotYetImplementedException;
-import omni.util.TestExecutorService;
+
 public class ByteSetImplTest{
+    /*
     private static final EnumSet<SetInitialization> VALID_INIT_SEQS=EnumSet.of(SetInitialization.Empty,
             SetInitialization.AddTrue,SetInitialization.AddFalse,
             SetInitialization.AddTrueAndFalse,SetInitialization.AddPrime,
@@ -543,28 +514,28 @@ public class ByteSetImplTest{
         }
         void runTest(CheckedType checkedType,SetInitialization initSet);
     }
-    private static class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
+    private static class ByteSetImplMonitor implements MonitoredSet<ByteSetImplOld>{
         final CheckedType checkedType;
-        final ByteSetImpl set;
+        final ByteSetImplOld set;
         final long[] expectedWords;
         int expectedSize;
         int expectedModCount;
         ByteSetImplMonitor(CheckedType checkedType){
             this.checkedType=checkedType;
             if(checkedType.checked){
-                set=new ByteSetImpl.Checked();
+                set=new ByteSetImplOld.Checked();
             }else{
-                set=new ByteSetImpl();
+                set=new ByteSetImplOld();
             }
             expectedWords=new long[4];
         }
         ByteSetImplMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
             this.checkedType=checkedType;
-            Class<? extends ByteSetImpl> clazz;
+            Class<? extends ByteSetImplOld> clazz;
             if(checkedType.checked) {
-                clazz=ByteSetImpl.Checked.class;
+                clazz=ByteSetImplOld.Checked.class;
             }else {
-                clazz=ByteSetImpl.class;
+                clazz=ByteSetImplOld.class;
             }
             try{
                 this.set=clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
@@ -575,13 +546,13 @@ public class ByteSetImplTest{
             expectedWords=new long[4];
             this.updateCollectionState();
         }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,ByteSetImpl> getMonitoredIterator(IteratorType itrType){
+        @Override public MonitoredIterator<? extends OmniIterator<?>,ByteSetImplOld> getMonitoredIterator(IteratorType itrType){
             if(itrType!=IteratorType.AscendingItr) {
                 throw itrType.invalid();
             }
             return getMonitoredIterator();
         }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,ByteSetImpl> getMonitoredIterator(int index,IteratorType itrType){
+        @Override public MonitoredIterator<? extends OmniIterator<?>,ByteSetImplOld> getMonitoredIterator(int index,IteratorType itrType){
             var itrMonitor=getMonitoredIterator(itrType);
             while(--index>=0 && itrMonitor.hasNext()) {
                 itrMonitor.iterateForward();
@@ -604,9 +575,9 @@ public class ByteSetImplTest{
             expectedWords[2]=word2;
             expectedWords[3]=word3;
             if(checkedType.checked){
-                set=new ByteSetImpl.Checked(word0,word1,word2,word3);
+                set=new ByteSetImplOld.Checked(word0,word1,word2,word3);
             }else{
-                set=new ByteSetImpl(word0,word1,word2,word3);
+                set=new ByteSetImplOld(word0,word1,word2,word3);
             }
             expectedSize=getExpectedSize();
         }
@@ -617,7 +588,7 @@ public class ByteSetImplTest{
             expectedWords[1]=word1;
             expectedWords[2]=word2;
             expectedWords[3]=word3;
-            set=new ByteSetImpl.Checked(word0,word1,word2,word3,expectedSize);
+            set=new ByteSetImplOld.Checked(word0,word1,word2,word3,expectedSize);
             this.expectedSize=getExpectedSize();
         }
         @Override
@@ -625,7 +596,7 @@ public class ByteSetImplTest{
             return checkedType;
         }
         @Override
-        public ByteSetImpl getCollection(){
+        public ByteSetImplOld getCollection(){
             return set;
         }
         @Override
@@ -633,7 +604,7 @@ public class ByteSetImplTest{
             return DataType.BYTE;
         }
         @Override
-        public MonitoredIterator<? extends OmniIterator<?>,ByteSetImpl> getMonitoredIterator(){
+        public MonitoredIterator<? extends OmniIterator<?>,ByteSetImplOld> getMonitoredIterator(){
             int expectedValOffset;
             for(expectedValOffset=-128;expectedValOffset < 128;++expectedValOffset){
                 if((expectedWords[(expectedValOffset >> 6) + 2] & 1L << expectedValOffset) != 0){
@@ -700,7 +671,7 @@ public class ByteSetImplTest{
         @Override
         public void updateCollectionState(){
             if(checkedType.checked){
-                expectedModCount=((ByteSetImpl.Checked)set).modCount;
+                expectedModCount=((ByteSetImplOld.Checked)set).modCount;
             }
             expectedWords[0]=set.word0;
             expectedWords[1]=set.word1;
@@ -722,22 +693,22 @@ public class ByteSetImplTest{
 
         @Override
         public void verifyClone(Object clone){
-            ByteSetImpl cast;
-            Assertions.assertEquals(expectedWords[0],(cast=(ByteSetImpl)clone).word0);
+            ByteSetImplOld cast;
+            Assertions.assertEquals(expectedWords[0],(cast=(ByteSetImplOld)clone).word0);
             Assertions.assertEquals(expectedWords[1],cast.word1);
             Assertions.assertEquals(expectedWords[2],cast.word2);
             Assertions.assertEquals(expectedWords[3],cast.word3);
             if(checkedType.checked){
-                ByteSetImpl.Checked checked;
-                Assertions.assertEquals(0,(checked=(ByteSetImpl.Checked)cast).modCount);
+                ByteSetImplOld.Checked checked;
+                Assertions.assertEquals(0,(checked=(ByteSetImplOld.Checked)cast).modCount);
                 Assertions.assertEquals(expectedSize,checked.size);
             }
         }
         @Override
         public void verifyCollectionState(){
             if(checkedType.checked){
-                ByteSetImpl.Checked cast;
-                Assertions.assertEquals(expectedModCount,(cast=(ByteSetImpl.Checked)set).modCount);
+                ByteSetImplOld.Checked cast;
+                Assertions.assertEquals(expectedModCount,(cast=(ByteSetImplOld.Checked)set).modCount);
                 Assertions.assertEquals(expectedSize,cast.size);
             }
             Assertions.assertEquals(expectedWords[0],set.word0);
@@ -772,7 +743,7 @@ public class ByteSetImplTest{
         }
         abstract class AbstractMonitoredItr
         implements
-        MonitoredSet.MonitoredSetIterator<OmniIterator.OfByte,ByteSetImpl>{
+        MonitoredSet.MonitoredSetIterator<OmniIterator.OfByte,ByteSetImplOld>{
             final OmniIterator.OfByte itr;
             int expectedValOffset;
             AbstractMonitoredItr(OmniIterator.OfByte itr,int expectedValOffset){
@@ -784,7 +755,7 @@ public class ByteSetImplTest{
                 return itr;
             }
             @Override
-            public MonitoredCollection<ByteSetImpl> getMonitoredCollection(){
+            public MonitoredCollection<ByteSetImplOld> getMonitoredCollection(){
                 return ByteSetImplMonitor.this;
             }
             @Override
@@ -1009,4 +980,5 @@ public class ByteSetImplTest{
             Assertions.assertEquals(expectedResult,actualResult);
         }
     }
+    */
 }

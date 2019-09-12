@@ -14,6 +14,7 @@ import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
+import omni.impl.AbstractOmniCollection;
 import java.util.ListIterator;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
@@ -34,7 +35,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.RandomAccess;
 public abstract class ByteArrSeq extends 
-AbstractSeq<Byte>
+AbstractOmniCollection<Byte>
  implements OmniCollection.OfByte,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
@@ -1269,7 +1270,7 @@ AbstractSeq<Byte>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfByte){
             return this.isEqualTo(size,(OmniList.OfByte)list);
           }else if(list instanceof OmniList.OfRef){
@@ -1880,7 +1881,7 @@ AbstractSeq<Byte>
     }
   }
     static class UncheckedSubList
-      extends AbstractSeq<Byte>
+      extends AbstractOmniCollection<Byte>
       implements ByteSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -1951,7 +1952,7 @@ AbstractSeq<Byte>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfByte){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfByte)list);
             }else if(list instanceof OmniList.OfRef){
@@ -3440,7 +3441,7 @@ AbstractSeq<Byte>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
            if(list instanceof OmniList.OfByte){
              return this.isEqualTo(size,(OmniList.OfByte)list);
            }else if(list instanceof OmniList.OfRef){
@@ -3846,7 +3847,7 @@ AbstractSeq<Byte>
     }
   }
     static class CheckedSubList
-      extends AbstractSeq<Byte>
+      extends AbstractOmniCollection<Byte>
       implements ByteSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -3931,7 +3932,7 @@ AbstractSeq<Byte>
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfByte){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfByte)list);
             }else if(list instanceof OmniList.OfRef){

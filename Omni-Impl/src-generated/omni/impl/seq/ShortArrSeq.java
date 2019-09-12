@@ -14,6 +14,7 @@ import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
+import omni.impl.AbstractOmniCollection;
 import java.util.ListIterator;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
@@ -34,7 +35,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.RandomAccess;
 public abstract class ShortArrSeq extends 
-AbstractSeq<Short>
+AbstractOmniCollection<Short>
  implements OmniCollection.OfShort,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
@@ -1279,7 +1280,7 @@ AbstractSeq<Short>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfShort){
             return this.isEqualTo(size,(OmniList.OfShort)list);
           }else if(list instanceof OmniList.OfRef){
@@ -1887,7 +1888,7 @@ AbstractSeq<Short>
     }
   }
     static class UncheckedSubList
-      extends AbstractSeq<Short>
+      extends AbstractOmniCollection<Short>
       implements ShortSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -1959,7 +1960,7 @@ AbstractSeq<Short>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfShort){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfShort)list);
             }else if(list instanceof OmniList.OfRef){
@@ -3460,7 +3461,7 @@ AbstractSeq<Short>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
            if(list instanceof OmniList.OfShort){
              return this.isEqualTo(size,(OmniList.OfShort)list);
            }else if(list instanceof OmniList.OfRef){
@@ -3866,7 +3867,7 @@ AbstractSeq<Short>
     }
   }
     static class CheckedSubList
-      extends AbstractSeq<Short>
+      extends AbstractOmniCollection<Short>
       implements ShortSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -3952,7 +3953,7 @@ AbstractSeq<Short>
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfShort){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfShort)list);
             }else if(list instanceof OmniList.OfRef){

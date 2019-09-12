@@ -8,24 +8,6 @@ import java.lang.reflect.Method;
 import omni.api.OmniList;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import omni.impl.BooleanSnglLnkNode;
-import omni.impl.ByteSnglLnkNode;
-import omni.impl.CharSnglLnkNode;
-import omni.impl.ShortSnglLnkNode;
-import omni.impl.IntSnglLnkNode;
-import omni.impl.LongSnglLnkNode;
-import omni.impl.FloatSnglLnkNode;
-import omni.impl.DoubleSnglLnkNode;
-import omni.impl.RefSnglLnkNode;
-import omni.impl.BooleanDblLnkNode;
-import omni.impl.ByteDblLnkNode;
-import omni.impl.CharDblLnkNode;
-import omni.impl.ShortDblLnkNode;
-import omni.impl.IntDblLnkNode;
-import omni.impl.LongDblLnkNode;
-import omni.impl.FloatDblLnkNode;
-import omni.impl.DoubleDblLnkNode;
-import omni.impl.RefDblLnkNode;
 final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
     super();
@@ -247,10 +229,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.RefDblLnkSeq<?>)obj).size;
     }
-    public static RefDblLnkNode<?> head(Object obj){
+    public static omni.impl.seq.RefDblLnkSeq.Node<?> head(Object obj){
       return ((omni.impl.seq.RefDblLnkSeq<?>)obj).head;
     }
-    public static RefDblLnkNode<?> tail(Object obj){
+    public static omni.impl.seq.RefDblLnkSeq.Node<?> tail(Object obj){
       return ((omni.impl.seq.RefDblLnkSeq<?>)obj).tail;
     }
     interface UncheckedList extends RefDblLnkSeq{
@@ -260,10 +242,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.UncheckedList<?>)obj).size;
       }
-      public static RefDblLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.UncheckedList<?>)obj).head;
       }
-      public static RefDblLnkNode<?> tail(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> tail(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.UncheckedList<?>)obj).tail;
       }
       interface AscendingItr{
@@ -272,16 +254,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq.UncheckedList<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq.UncheckedList<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.RefDblLnkSeq.UncheckedList<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq.UncheckedList<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -290,11 +272,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq.UncheckedList<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq.UncheckedList<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
-        public static RefDblLnkNode<?> lastRet(Object obj){
-          return (RefDblLnkNode<?>)getValue(lastRetField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> lastRet(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -308,10 +290,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.CheckedList<?>)obj).size;
       }
-      public static RefDblLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.CheckedList<?>)obj).head;
       }
-      public static RefDblLnkNode<?> tail(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> tail(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.CheckedList<?>)obj).tail;
       }
       public static int modCount(Object obj){
@@ -326,11 +308,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq.CheckedList<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq.CheckedList<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
-        public static RefDblLnkNode<?> lastRet(Object obj){
-          return (RefDblLnkNode<?>)getValue(lastRetField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> lastRet(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -343,11 +325,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq.CheckedList<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq.CheckedList<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
-        public static RefDblLnkNode<?> lastRet(Object obj){
-          return (RefDblLnkNode<?>)getValue(lastRetField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> lastRet(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -360,11 +342,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq.CheckedList<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq.CheckedList<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
-        public static RefDblLnkNode<?> lastRet(Object obj){
-          return (RefDblLnkNode<?>)getValue(lastRetField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> lastRet(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -385,10 +367,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq<?>)obj).size;
       }
-      public static RefDblLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq<?>)obj).head;
       }
-      public static RefDblLnkNode<?> tail(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> tail(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq<?>)obj).tail;
       }
       public static omni.impl.seq.RefDblLnkSeq.UncheckedList<?> root(Object obj){
@@ -406,8 +388,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -416,11 +398,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
-        public static RefDblLnkNode<?> lastRet(Object obj){
-          return (RefDblLnkNode<?>)getValue(lastRetField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> lastRet(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -444,10 +426,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq<?>)obj).size;
       }
-      public static RefDblLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq<?>)obj).head;
       }
-      public static RefDblLnkNode<?> tail(Object obj){
+      public static omni.impl.seq.RefDblLnkSeq.Node<?> tail(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq<?>)obj).tail;
       }
       public static omni.impl.seq.RefDblLnkSeq.CheckedList<?> root(Object obj){
@@ -471,11 +453,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
-        public static RefDblLnkNode<?> lastRet(Object obj){
-          return (RefDblLnkNode<?>)getValue(lastRetField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> lastRet(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -488,11 +470,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.RefDblLnkSeq<?> parent(Object obj){
           return (omni.impl.seq.RefDblLnkSeq<?>)getValue(parentField,obj);
         }
-        public static RefDblLnkNode<?> curr(Object obj){
-          return (RefDblLnkNode<?>)getValue(currField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(currField,obj);
         }
-        public static RefDblLnkNode<?> lastRet(Object obj){
-          return (RefDblLnkNode<?>)getValue(lastRetField,obj);
+        public static omni.impl.seq.RefDblLnkSeq.Node<?> lastRet(Object obj){
+          return (omni.impl.seq.RefDblLnkSeq.Node<?>)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -507,7 +489,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
     }
-    public static RefSnglLnkNode<?> head(Object obj){
+    public static omni.impl.seq.RefSnglLnkSeq.Node<?> head(Object obj){
       return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
     }
     interface UncheckedStack extends RefSnglLnkSeq{
@@ -517,7 +499,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
       }
-      public static RefSnglLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefSnglLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -525,14 +507,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.RefSnglLnkSeq.UncheckedStack<?> parent(Object obj){
           return (omni.impl.seq.RefSnglLnkSeq.UncheckedStack<?>)getValue(parentField,obj);
         }
-        static RefSnglLnkNode<?> prev(Object obj){
-          return (RefSnglLnkNode<?>)getValue(prevField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> prev(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(prevField,obj);
         }
-        static RefSnglLnkNode<?> curr(Object obj){
-          return (RefSnglLnkNode<?>)getValue(currField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(currField,obj);
         }
-        static RefSnglLnkNode<?> next(Object obj){
-          return (RefSnglLnkNode<?>)getValue(nextField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> next(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(nextField,obj);
         }
       }
     }
@@ -543,10 +525,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
       }
-      public static RefSnglLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefSnglLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
       }
-      public static RefSnglLnkNode<?> tail(Object obj){
+      public static omni.impl.seq.RefSnglLnkSeq.Node<?> tail(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq.UncheckedQueue<?>)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -554,14 +536,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.RefSnglLnkSeq.UncheckedQueue<?> parent(Object obj){
           return (omni.impl.seq.RefSnglLnkSeq.UncheckedQueue<?>)getValue(parentField,obj);
         }
-        static RefSnglLnkNode<?> prev(Object obj){
-          return (RefSnglLnkNode<?>)getValue(prevField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> prev(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(prevField,obj);
         }
-        static RefSnglLnkNode<?> curr(Object obj){
-          return (RefSnglLnkNode<?>)getValue(currField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(currField,obj);
         }
-        static RefSnglLnkNode<?> next(Object obj){
-          return (RefSnglLnkNode<?>)getValue(nextField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> next(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(nextField,obj);
         }
       }
     }
@@ -572,7 +554,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
       }
-      public static RefSnglLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefSnglLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
       }
       public static int modCount(Object obj){
@@ -587,14 +569,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.RefSnglLnkSeq.CheckedStack<?> parent(Object obj){
           return (omni.impl.seq.RefSnglLnkSeq.CheckedStack<?>)getValue(parentField,obj);
         }
-        static RefSnglLnkNode<?> prev(Object obj){
-          return (RefSnglLnkNode<?>)getValue(prevField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> prev(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(prevField,obj);
         }
-        static RefSnglLnkNode<?> curr(Object obj){
-          return (RefSnglLnkNode<?>)getValue(currField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(currField,obj);
         }
-        static RefSnglLnkNode<?> next(Object obj){
-          return (RefSnglLnkNode<?>)getValue(nextField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> next(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(nextField,obj);
         }
       }
     }
@@ -602,13 +584,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static RefSnglLnkNode<?> tail(Object obj){
+      public static omni.impl.seq.RefSnglLnkSeq.Node<?> tail(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?>)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
       }
-      public static RefSnglLnkNode<?> head(Object obj){
+      public static omni.impl.seq.RefSnglLnkSeq.Node<?> head(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
       }
       public static int modCount(Object obj){
@@ -623,14 +605,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?> parent(Object obj){
           return (omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?>)getValue(parentField,obj);
         }
-        static RefSnglLnkNode<?> prev(Object obj){
-          return (RefSnglLnkNode<?>)getValue(prevField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> prev(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(prevField,obj);
         }
-        static RefSnglLnkNode<?> curr(Object obj){
-          return (RefSnglLnkNode<?>)getValue(currField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> curr(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(currField,obj);
         }
-        static RefSnglLnkNode<?> next(Object obj){
-          return (RefSnglLnkNode<?>)getValue(nextField,obj);
+        static omni.impl.seq.RefSnglLnkSeq.Node<?> next(Object obj){
+          return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(nextField,obj);
         }
       }
     }
@@ -638,14 +620,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static RefSnglLnkNode<?> prev(Object obj){
-        return (RefSnglLnkNode<?>)getValue(prevField,obj);
+      static omni.impl.seq.RefSnglLnkSeq.Node<?> prev(Object obj){
+        return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(prevField,obj);
       }
-      static RefSnglLnkNode<?> curr(Object obj){
-        return (RefSnglLnkNode<?>)getValue(currField,obj);
+      static omni.impl.seq.RefSnglLnkSeq.Node<?> curr(Object obj){
+        return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(currField,obj);
       }
-      static RefSnglLnkNode<?> next(Object obj){
-        return (RefSnglLnkNode<?>)getValue(nextField,obj);
+      static omni.impl.seq.RefSnglLnkSeq.Node<?> next(Object obj){
+        return (omni.impl.seq.RefSnglLnkSeq.Node<?>)getValue(nextField,obj);
       }
     }
   }
@@ -815,7 +797,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -870,7 +852,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -985,10 +967,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.BooleanDblLnkSeq)obj).size;
     }
-    public static BooleanDblLnkNode head(Object obj){
+    public static omni.impl.seq.BooleanDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.BooleanDblLnkSeq)obj).head;
     }
-    public static BooleanDblLnkNode tail(Object obj){
+    public static omni.impl.seq.BooleanDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.BooleanDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends BooleanDblLnkSeq{
@@ -998,10 +980,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.UncheckedList)obj).size;
       }
-      public static BooleanDblLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.UncheckedList)obj).head;
       }
-      public static BooleanDblLnkNode tail(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -1010,16 +992,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.BooleanDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -1028,11 +1010,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static BooleanDblLnkNode lastRet(Object obj){
-          return (BooleanDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -1046,10 +1028,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.CheckedList)obj).size;
       }
-      public static BooleanDblLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.CheckedList)obj).head;
       }
-      public static BooleanDblLnkNode tail(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -1064,11 +1046,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static BooleanDblLnkNode lastRet(Object obj){
-          return (BooleanDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -1081,11 +1063,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static BooleanDblLnkNode lastRet(Object obj){
-          return (BooleanDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -1098,11 +1080,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static BooleanDblLnkNode lastRet(Object obj){
-          return (BooleanDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -1123,10 +1105,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq)obj).size;
       }
-      public static BooleanDblLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq)obj).head;
       }
-      public static BooleanDblLnkNode tail(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.BooleanDblLnkSeq.UncheckedList root(Object obj){
@@ -1144,8 +1126,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -1154,11 +1136,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static BooleanDblLnkNode lastRet(Object obj){
-          return (BooleanDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -1182,10 +1164,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq)obj).size;
       }
-      public static BooleanDblLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq)obj).head;
       }
-      public static BooleanDblLnkNode tail(Object obj){
+      public static omni.impl.seq.BooleanDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.BooleanDblLnkSeq.CheckedList root(Object obj){
@@ -1209,11 +1191,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static BooleanDblLnkNode lastRet(Object obj){
-          return (BooleanDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -1226,11 +1208,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.BooleanDblLnkSeq parent(Object obj){
           return (omni.impl.seq.BooleanDblLnkSeq)getValue(parentField,obj);
         }
-        public static BooleanDblLnkNode curr(Object obj){
-          return (BooleanDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static BooleanDblLnkNode lastRet(Object obj){
-          return (BooleanDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.BooleanDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.BooleanDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -1245,7 +1227,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
     }
-    public static BooleanSnglLnkNode head(Object obj){
+    public static omni.impl.seq.BooleanSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends BooleanSnglLnkSeq{
@@ -1255,7 +1237,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
       }
-      public static BooleanSnglLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -1263,14 +1245,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.BooleanSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.BooleanSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static BooleanSnglLnkNode prev(Object obj){
-          return (BooleanSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static BooleanSnglLnkNode curr(Object obj){
-          return (BooleanSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static BooleanSnglLnkNode next(Object obj){
-          return (BooleanSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -1281,10 +1263,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
       }
-      public static BooleanSnglLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
       }
-      public static BooleanSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.BooleanSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -1292,14 +1274,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.BooleanSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.BooleanSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static BooleanSnglLnkNode prev(Object obj){
-          return (BooleanSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static BooleanSnglLnkNode curr(Object obj){
-          return (BooleanSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static BooleanSnglLnkNode next(Object obj){
-          return (BooleanSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -1310,7 +1292,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
       }
-      public static BooleanSnglLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -1325,14 +1307,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.BooleanSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.BooleanSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static BooleanSnglLnkNode prev(Object obj){
-          return (BooleanSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static BooleanSnglLnkNode curr(Object obj){
-          return (BooleanSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static BooleanSnglLnkNode next(Object obj){
-          return (BooleanSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -1340,13 +1322,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static BooleanSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.BooleanSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
       }
-      public static BooleanSnglLnkNode head(Object obj){
+      public static omni.impl.seq.BooleanSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -1361,14 +1343,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static BooleanSnglLnkNode prev(Object obj){
-          return (BooleanSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static BooleanSnglLnkNode curr(Object obj){
-          return (BooleanSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static BooleanSnglLnkNode next(Object obj){
-          return (BooleanSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.BooleanSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -1376,14 +1358,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static BooleanSnglLnkNode prev(Object obj){
-        return (BooleanSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.BooleanSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static BooleanSnglLnkNode curr(Object obj){
-        return (BooleanSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.BooleanSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static BooleanSnglLnkNode next(Object obj){
-        return (BooleanSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.BooleanSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.BooleanSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -1637,7 +1619,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -1692,7 +1674,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -1884,7 +1866,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -1939,7 +1921,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -2054,10 +2036,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.ByteDblLnkSeq)obj).size;
     }
-    public static ByteDblLnkNode head(Object obj){
+    public static omni.impl.seq.ByteDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.ByteDblLnkSeq)obj).head;
     }
-    public static ByteDblLnkNode tail(Object obj){
+    public static omni.impl.seq.ByteDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.ByteDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends ByteDblLnkSeq{
@@ -2067,10 +2049,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.UncheckedList)obj).size;
       }
-      public static ByteDblLnkNode head(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.UncheckedList)obj).head;
       }
-      public static ByteDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -2079,16 +2061,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.ByteDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -2097,11 +2079,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ByteDblLnkNode lastRet(Object obj){
-          return (ByteDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2115,10 +2097,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.CheckedList)obj).size;
       }
-      public static ByteDblLnkNode head(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.CheckedList)obj).head;
       }
-      public static ByteDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -2133,11 +2115,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ByteDblLnkNode lastRet(Object obj){
-          return (ByteDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2150,11 +2132,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ByteDblLnkNode lastRet(Object obj){
-          return (ByteDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2167,11 +2149,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ByteDblLnkNode lastRet(Object obj){
-          return (ByteDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2192,10 +2174,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq)obj).size;
       }
-      public static ByteDblLnkNode head(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq)obj).head;
       }
-      public static ByteDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.ByteDblLnkSeq.UncheckedList root(Object obj){
@@ -2213,8 +2195,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -2223,11 +2205,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ByteDblLnkNode lastRet(Object obj){
-          return (ByteDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2251,10 +2233,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq)obj).size;
       }
-      public static ByteDblLnkNode head(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq)obj).head;
       }
-      public static ByteDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ByteDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.ByteDblLnkSeq.CheckedList root(Object obj){
@@ -2278,11 +2260,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ByteDblLnkNode lastRet(Object obj){
-          return (ByteDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2295,11 +2277,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ByteDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ByteDblLnkSeq)getValue(parentField,obj);
         }
-        public static ByteDblLnkNode curr(Object obj){
-          return (ByteDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ByteDblLnkNode lastRet(Object obj){
-          return (ByteDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ByteDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ByteDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2314,7 +2296,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
     }
-    public static ByteSnglLnkNode head(Object obj){
+    public static omni.impl.seq.ByteSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends ByteSnglLnkSeq{
@@ -2324,7 +2306,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
       }
-      public static ByteSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ByteSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -2332,14 +2314,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ByteSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.ByteSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static ByteSnglLnkNode prev(Object obj){
-          return (ByteSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ByteSnglLnkNode curr(Object obj){
-          return (ByteSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ByteSnglLnkNode next(Object obj){
-          return (ByteSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -2350,10 +2332,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
       }
-      public static ByteSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ByteSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
       }
-      public static ByteSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.ByteSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -2361,14 +2343,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ByteSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.ByteSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static ByteSnglLnkNode prev(Object obj){
-          return (ByteSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ByteSnglLnkNode curr(Object obj){
-          return (ByteSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ByteSnglLnkNode next(Object obj){
-          return (ByteSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -2379,7 +2361,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
       }
-      public static ByteSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ByteSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -2394,14 +2376,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ByteSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.ByteSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static ByteSnglLnkNode prev(Object obj){
-          return (ByteSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ByteSnglLnkNode curr(Object obj){
-          return (ByteSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ByteSnglLnkNode next(Object obj){
-          return (ByteSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -2409,13 +2391,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static ByteSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.ByteSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
       }
-      public static ByteSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ByteSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -2430,14 +2412,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ByteSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.ByteSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static ByteSnglLnkNode prev(Object obj){
-          return (ByteSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ByteSnglLnkNode curr(Object obj){
-          return (ByteSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ByteSnglLnkNode next(Object obj){
-          return (ByteSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ByteSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -2445,14 +2427,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static ByteSnglLnkNode prev(Object obj){
-        return (ByteSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.ByteSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static ByteSnglLnkNode curr(Object obj){
-        return (ByteSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.ByteSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static ByteSnglLnkNode next(Object obj){
-        return (ByteSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.ByteSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.ByteSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -2622,7 +2604,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -2677,7 +2659,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -2792,10 +2774,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.CharDblLnkSeq)obj).size;
     }
-    public static CharDblLnkNode head(Object obj){
+    public static omni.impl.seq.CharDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.CharDblLnkSeq)obj).head;
     }
-    public static CharDblLnkNode tail(Object obj){
+    public static omni.impl.seq.CharDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.CharDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends CharDblLnkSeq{
@@ -2805,10 +2787,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.UncheckedList)obj).size;
       }
-      public static CharDblLnkNode head(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.UncheckedList)obj).head;
       }
-      public static CharDblLnkNode tail(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -2817,16 +2799,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.CharDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -2835,11 +2817,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static CharDblLnkNode lastRet(Object obj){
-          return (CharDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2853,10 +2835,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.CheckedList)obj).size;
       }
-      public static CharDblLnkNode head(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.CheckedList)obj).head;
       }
-      public static CharDblLnkNode tail(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -2871,11 +2853,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static CharDblLnkNode lastRet(Object obj){
-          return (CharDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2888,11 +2870,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static CharDblLnkNode lastRet(Object obj){
-          return (CharDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2905,11 +2887,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static CharDblLnkNode lastRet(Object obj){
-          return (CharDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2930,10 +2912,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq)obj).size;
       }
-      public static CharDblLnkNode head(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq)obj).head;
       }
-      public static CharDblLnkNode tail(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.CharDblLnkSeq.UncheckedList root(Object obj){
@@ -2951,8 +2933,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -2961,11 +2943,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static CharDblLnkNode lastRet(Object obj){
-          return (CharDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -2989,10 +2971,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq)obj).size;
       }
-      public static CharDblLnkNode head(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq)obj).head;
       }
-      public static CharDblLnkNode tail(Object obj){
+      public static omni.impl.seq.CharDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.CharDblLnkSeq.CheckedList root(Object obj){
@@ -3016,11 +2998,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static CharDblLnkNode lastRet(Object obj){
-          return (CharDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3033,11 +3015,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.CharDblLnkSeq parent(Object obj){
           return (omni.impl.seq.CharDblLnkSeq)getValue(parentField,obj);
         }
-        public static CharDblLnkNode curr(Object obj){
-          return (CharDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static CharDblLnkNode lastRet(Object obj){
-          return (CharDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.CharDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.CharDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3052,7 +3034,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
     }
-    public static CharSnglLnkNode head(Object obj){
+    public static omni.impl.seq.CharSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends CharSnglLnkSeq{
@@ -3062,7 +3044,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
       }
-      public static CharSnglLnkNode head(Object obj){
+      public static omni.impl.seq.CharSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -3070,14 +3052,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.CharSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.CharSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static CharSnglLnkNode prev(Object obj){
-          return (CharSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static CharSnglLnkNode curr(Object obj){
-          return (CharSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static CharSnglLnkNode next(Object obj){
-          return (CharSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3088,10 +3070,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
       }
-      public static CharSnglLnkNode head(Object obj){
+      public static omni.impl.seq.CharSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
       }
-      public static CharSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.CharSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -3099,14 +3081,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.CharSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.CharSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static CharSnglLnkNode prev(Object obj){
-          return (CharSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static CharSnglLnkNode curr(Object obj){
-          return (CharSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static CharSnglLnkNode next(Object obj){
-          return (CharSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3117,7 +3099,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
       }
-      public static CharSnglLnkNode head(Object obj){
+      public static omni.impl.seq.CharSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -3132,14 +3114,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.CharSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.CharSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static CharSnglLnkNode prev(Object obj){
-          return (CharSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static CharSnglLnkNode curr(Object obj){
-          return (CharSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static CharSnglLnkNode next(Object obj){
-          return (CharSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3147,13 +3129,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static CharSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.CharSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
       }
-      public static CharSnglLnkNode head(Object obj){
+      public static omni.impl.seq.CharSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -3168,14 +3150,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.CharSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.CharSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static CharSnglLnkNode prev(Object obj){
-          return (CharSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static CharSnglLnkNode curr(Object obj){
-          return (CharSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static CharSnglLnkNode next(Object obj){
-          return (CharSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.CharSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3183,14 +3165,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static CharSnglLnkNode prev(Object obj){
-        return (CharSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.CharSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static CharSnglLnkNode curr(Object obj){
-        return (CharSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.CharSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static CharSnglLnkNode next(Object obj){
-        return (CharSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.CharSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.CharSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -3360,7 +3342,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -3415,7 +3397,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -3530,10 +3512,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.ShortDblLnkSeq)obj).size;
     }
-    public static ShortDblLnkNode head(Object obj){
+    public static omni.impl.seq.ShortDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.ShortDblLnkSeq)obj).head;
     }
-    public static ShortDblLnkNode tail(Object obj){
+    public static omni.impl.seq.ShortDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.ShortDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends ShortDblLnkSeq{
@@ -3543,10 +3525,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.UncheckedList)obj).size;
       }
-      public static ShortDblLnkNode head(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.UncheckedList)obj).head;
       }
-      public static ShortDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -3555,16 +3537,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.ShortDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -3573,11 +3555,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ShortDblLnkNode lastRet(Object obj){
-          return (ShortDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3591,10 +3573,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.CheckedList)obj).size;
       }
-      public static ShortDblLnkNode head(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.CheckedList)obj).head;
       }
-      public static ShortDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -3609,11 +3591,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ShortDblLnkNode lastRet(Object obj){
-          return (ShortDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3626,11 +3608,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ShortDblLnkNode lastRet(Object obj){
-          return (ShortDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3643,11 +3625,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ShortDblLnkNode lastRet(Object obj){
-          return (ShortDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3668,10 +3650,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq)obj).size;
       }
-      public static ShortDblLnkNode head(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq)obj).head;
       }
-      public static ShortDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.ShortDblLnkSeq.UncheckedList root(Object obj){
@@ -3689,8 +3671,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -3699,11 +3681,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ShortDblLnkNode lastRet(Object obj){
-          return (ShortDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3727,10 +3709,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq)obj).size;
       }
-      public static ShortDblLnkNode head(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq)obj).head;
       }
-      public static ShortDblLnkNode tail(Object obj){
+      public static omni.impl.seq.ShortDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.ShortDblLnkSeq.CheckedList root(Object obj){
@@ -3754,11 +3736,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ShortDblLnkNode lastRet(Object obj){
-          return (ShortDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3771,11 +3753,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.ShortDblLnkSeq parent(Object obj){
           return (omni.impl.seq.ShortDblLnkSeq)getValue(parentField,obj);
         }
-        public static ShortDblLnkNode curr(Object obj){
-          return (ShortDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static ShortDblLnkNode lastRet(Object obj){
-          return (ShortDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.ShortDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.ShortDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -3790,7 +3772,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
     }
-    public static ShortSnglLnkNode head(Object obj){
+    public static omni.impl.seq.ShortSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends ShortSnglLnkSeq{
@@ -3800,7 +3782,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
       }
-      public static ShortSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ShortSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -3808,14 +3790,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ShortSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.ShortSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static ShortSnglLnkNode prev(Object obj){
-          return (ShortSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ShortSnglLnkNode curr(Object obj){
-          return (ShortSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ShortSnglLnkNode next(Object obj){
-          return (ShortSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3826,10 +3808,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
       }
-      public static ShortSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ShortSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
       }
-      public static ShortSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.ShortSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -3837,14 +3819,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ShortSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.ShortSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static ShortSnglLnkNode prev(Object obj){
-          return (ShortSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ShortSnglLnkNode curr(Object obj){
-          return (ShortSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ShortSnglLnkNode next(Object obj){
-          return (ShortSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3855,7 +3837,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
       }
-      public static ShortSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ShortSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -3870,14 +3852,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ShortSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.ShortSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static ShortSnglLnkNode prev(Object obj){
-          return (ShortSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ShortSnglLnkNode curr(Object obj){
-          return (ShortSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ShortSnglLnkNode next(Object obj){
-          return (ShortSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3885,13 +3867,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static ShortSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.ShortSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
       }
-      public static ShortSnglLnkNode head(Object obj){
+      public static omni.impl.seq.ShortSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -3906,14 +3888,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.ShortSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.ShortSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static ShortSnglLnkNode prev(Object obj){
-          return (ShortSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static ShortSnglLnkNode curr(Object obj){
-          return (ShortSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static ShortSnglLnkNode next(Object obj){
-          return (ShortSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.ShortSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -3921,14 +3903,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static ShortSnglLnkNode prev(Object obj){
-        return (ShortSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.ShortSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static ShortSnglLnkNode curr(Object obj){
-        return (ShortSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.ShortSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static ShortSnglLnkNode next(Object obj){
-        return (ShortSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.ShortSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.ShortSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -4098,7 +4080,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -4153,7 +4135,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -4268,10 +4250,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.IntDblLnkSeq)obj).size;
     }
-    public static IntDblLnkNode head(Object obj){
+    public static omni.impl.seq.IntDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.IntDblLnkSeq)obj).head;
     }
-    public static IntDblLnkNode tail(Object obj){
+    public static omni.impl.seq.IntDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.IntDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends IntDblLnkSeq{
@@ -4281,10 +4263,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.UncheckedList)obj).size;
       }
-      public static IntDblLnkNode head(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.UncheckedList)obj).head;
       }
-      public static IntDblLnkNode tail(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -4293,16 +4275,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.IntDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -4311,11 +4293,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static IntDblLnkNode lastRet(Object obj){
-          return (IntDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -4329,10 +4311,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.CheckedList)obj).size;
       }
-      public static IntDblLnkNode head(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.CheckedList)obj).head;
       }
-      public static IntDblLnkNode tail(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -4347,11 +4329,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static IntDblLnkNode lastRet(Object obj){
-          return (IntDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -4364,11 +4346,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static IntDblLnkNode lastRet(Object obj){
-          return (IntDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -4381,11 +4363,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static IntDblLnkNode lastRet(Object obj){
-          return (IntDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -4406,10 +4388,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq)obj).size;
       }
-      public static IntDblLnkNode head(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq)obj).head;
       }
-      public static IntDblLnkNode tail(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.IntDblLnkSeq.UncheckedList root(Object obj){
@@ -4427,8 +4409,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -4437,11 +4419,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static IntDblLnkNode lastRet(Object obj){
-          return (IntDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -4465,10 +4447,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq)obj).size;
       }
-      public static IntDblLnkNode head(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq)obj).head;
       }
-      public static IntDblLnkNode tail(Object obj){
+      public static omni.impl.seq.IntDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.IntDblLnkSeq.CheckedList root(Object obj){
@@ -4492,11 +4474,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static IntDblLnkNode lastRet(Object obj){
-          return (IntDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -4509,11 +4491,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.IntDblLnkSeq parent(Object obj){
           return (omni.impl.seq.IntDblLnkSeq)getValue(parentField,obj);
         }
-        public static IntDblLnkNode curr(Object obj){
-          return (IntDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static IntDblLnkNode lastRet(Object obj){
-          return (IntDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.IntDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.IntDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -4528,7 +4510,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
     }
-    public static IntSnglLnkNode head(Object obj){
+    public static omni.impl.seq.IntSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends IntSnglLnkSeq{
@@ -4538,7 +4520,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
       }
-      public static IntSnglLnkNode head(Object obj){
+      public static omni.impl.seq.IntSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -4546,14 +4528,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.IntSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.IntSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static IntSnglLnkNode prev(Object obj){
-          return (IntSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static IntSnglLnkNode curr(Object obj){
-          return (IntSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static IntSnglLnkNode next(Object obj){
-          return (IntSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -4564,10 +4546,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
       }
-      public static IntSnglLnkNode head(Object obj){
+      public static omni.impl.seq.IntSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
       }
-      public static IntSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.IntSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -4575,14 +4557,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.IntSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.IntSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static IntSnglLnkNode prev(Object obj){
-          return (IntSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static IntSnglLnkNode curr(Object obj){
-          return (IntSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static IntSnglLnkNode next(Object obj){
-          return (IntSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -4593,7 +4575,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
       }
-      public static IntSnglLnkNode head(Object obj){
+      public static omni.impl.seq.IntSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -4608,14 +4590,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.IntSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.IntSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static IntSnglLnkNode prev(Object obj){
-          return (IntSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static IntSnglLnkNode curr(Object obj){
-          return (IntSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static IntSnglLnkNode next(Object obj){
-          return (IntSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -4623,13 +4605,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static IntSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.IntSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
       }
-      public static IntSnglLnkNode head(Object obj){
+      public static omni.impl.seq.IntSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -4644,14 +4626,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.IntSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.IntSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static IntSnglLnkNode prev(Object obj){
-          return (IntSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static IntSnglLnkNode curr(Object obj){
-          return (IntSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static IntSnglLnkNode next(Object obj){
-          return (IntSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.IntSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -4659,14 +4641,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static IntSnglLnkNode prev(Object obj){
-        return (IntSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.IntSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static IntSnglLnkNode curr(Object obj){
-        return (IntSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.IntSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static IntSnglLnkNode next(Object obj){
-        return (IntSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.IntSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.IntSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -4836,7 +4818,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -4891,7 +4873,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -5006,10 +4988,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.LongDblLnkSeq)obj).size;
     }
-    public static LongDblLnkNode head(Object obj){
+    public static omni.impl.seq.LongDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.LongDblLnkSeq)obj).head;
     }
-    public static LongDblLnkNode tail(Object obj){
+    public static omni.impl.seq.LongDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.LongDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends LongDblLnkSeq{
@@ -5019,10 +5001,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.UncheckedList)obj).size;
       }
-      public static LongDblLnkNode head(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.UncheckedList)obj).head;
       }
-      public static LongDblLnkNode tail(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -5031,16 +5013,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.LongDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -5049,11 +5031,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static LongDblLnkNode lastRet(Object obj){
-          return (LongDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5067,10 +5049,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.CheckedList)obj).size;
       }
-      public static LongDblLnkNode head(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.CheckedList)obj).head;
       }
-      public static LongDblLnkNode tail(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -5085,11 +5067,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static LongDblLnkNode lastRet(Object obj){
-          return (LongDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5102,11 +5084,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static LongDblLnkNode lastRet(Object obj){
-          return (LongDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5119,11 +5101,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static LongDblLnkNode lastRet(Object obj){
-          return (LongDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5144,10 +5126,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq)obj).size;
       }
-      public static LongDblLnkNode head(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq)obj).head;
       }
-      public static LongDblLnkNode tail(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.LongDblLnkSeq.UncheckedList root(Object obj){
@@ -5165,8 +5147,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -5175,11 +5157,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static LongDblLnkNode lastRet(Object obj){
-          return (LongDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5203,10 +5185,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq)obj).size;
       }
-      public static LongDblLnkNode head(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq)obj).head;
       }
-      public static LongDblLnkNode tail(Object obj){
+      public static omni.impl.seq.LongDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.LongDblLnkSeq.CheckedList root(Object obj){
@@ -5230,11 +5212,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static LongDblLnkNode lastRet(Object obj){
-          return (LongDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5247,11 +5229,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.LongDblLnkSeq parent(Object obj){
           return (omni.impl.seq.LongDblLnkSeq)getValue(parentField,obj);
         }
-        public static LongDblLnkNode curr(Object obj){
-          return (LongDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static LongDblLnkNode lastRet(Object obj){
-          return (LongDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.LongDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.LongDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5266,7 +5248,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
     }
-    public static LongSnglLnkNode head(Object obj){
+    public static omni.impl.seq.LongSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends LongSnglLnkSeq{
@@ -5276,7 +5258,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
       }
-      public static LongSnglLnkNode head(Object obj){
+      public static omni.impl.seq.LongSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -5284,14 +5266,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.LongSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.LongSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static LongSnglLnkNode prev(Object obj){
-          return (LongSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static LongSnglLnkNode curr(Object obj){
-          return (LongSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static LongSnglLnkNode next(Object obj){
-          return (LongSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -5302,10 +5284,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
       }
-      public static LongSnglLnkNode head(Object obj){
+      public static omni.impl.seq.LongSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
       }
-      public static LongSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.LongSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -5313,14 +5295,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.LongSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.LongSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static LongSnglLnkNode prev(Object obj){
-          return (LongSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static LongSnglLnkNode curr(Object obj){
-          return (LongSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static LongSnglLnkNode next(Object obj){
-          return (LongSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -5331,7 +5313,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
       }
-      public static LongSnglLnkNode head(Object obj){
+      public static omni.impl.seq.LongSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -5346,14 +5328,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.LongSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.LongSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static LongSnglLnkNode prev(Object obj){
-          return (LongSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static LongSnglLnkNode curr(Object obj){
-          return (LongSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static LongSnglLnkNode next(Object obj){
-          return (LongSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -5361,13 +5343,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static LongSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.LongSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
       }
-      public static LongSnglLnkNode head(Object obj){
+      public static omni.impl.seq.LongSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -5382,14 +5364,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.LongSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.LongSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static LongSnglLnkNode prev(Object obj){
-          return (LongSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static LongSnglLnkNode curr(Object obj){
-          return (LongSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static LongSnglLnkNode next(Object obj){
-          return (LongSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.LongSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -5397,14 +5379,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static LongSnglLnkNode prev(Object obj){
-        return (LongSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.LongSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static LongSnglLnkNode curr(Object obj){
-        return (LongSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.LongSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static LongSnglLnkNode next(Object obj){
-        return (LongSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.LongSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.LongSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -5574,7 +5556,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -5629,7 +5611,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -5744,10 +5726,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.FloatDblLnkSeq)obj).size;
     }
-    public static FloatDblLnkNode head(Object obj){
+    public static omni.impl.seq.FloatDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.FloatDblLnkSeq)obj).head;
     }
-    public static FloatDblLnkNode tail(Object obj){
+    public static omni.impl.seq.FloatDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.FloatDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends FloatDblLnkSeq{
@@ -5757,10 +5739,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.UncheckedList)obj).size;
       }
-      public static FloatDblLnkNode head(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.UncheckedList)obj).head;
       }
-      public static FloatDblLnkNode tail(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -5769,16 +5751,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.FloatDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -5787,11 +5769,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static FloatDblLnkNode lastRet(Object obj){
-          return (FloatDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5805,10 +5787,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.CheckedList)obj).size;
       }
-      public static FloatDblLnkNode head(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.CheckedList)obj).head;
       }
-      public static FloatDblLnkNode tail(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -5823,11 +5805,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static FloatDblLnkNode lastRet(Object obj){
-          return (FloatDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5840,11 +5822,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static FloatDblLnkNode lastRet(Object obj){
-          return (FloatDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5857,11 +5839,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static FloatDblLnkNode lastRet(Object obj){
-          return (FloatDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5882,10 +5864,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq)obj).size;
       }
-      public static FloatDblLnkNode head(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq)obj).head;
       }
-      public static FloatDblLnkNode tail(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.FloatDblLnkSeq.UncheckedList root(Object obj){
@@ -5903,8 +5885,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -5913,11 +5895,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static FloatDblLnkNode lastRet(Object obj){
-          return (FloatDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5941,10 +5923,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq)obj).size;
       }
-      public static FloatDblLnkNode head(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq)obj).head;
       }
-      public static FloatDblLnkNode tail(Object obj){
+      public static omni.impl.seq.FloatDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.FloatDblLnkSeq.CheckedList root(Object obj){
@@ -5968,11 +5950,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static FloatDblLnkNode lastRet(Object obj){
-          return (FloatDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -5985,11 +5967,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.FloatDblLnkSeq parent(Object obj){
           return (omni.impl.seq.FloatDblLnkSeq)getValue(parentField,obj);
         }
-        public static FloatDblLnkNode curr(Object obj){
-          return (FloatDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static FloatDblLnkNode lastRet(Object obj){
-          return (FloatDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.FloatDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.FloatDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6004,7 +5986,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
     }
-    public static FloatSnglLnkNode head(Object obj){
+    public static omni.impl.seq.FloatSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends FloatSnglLnkSeq{
@@ -6014,7 +5996,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
       }
-      public static FloatSnglLnkNode head(Object obj){
+      public static omni.impl.seq.FloatSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -6022,14 +6004,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.FloatSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.FloatSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static FloatSnglLnkNode prev(Object obj){
-          return (FloatSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static FloatSnglLnkNode curr(Object obj){
-          return (FloatSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static FloatSnglLnkNode next(Object obj){
-          return (FloatSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6040,10 +6022,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
       }
-      public static FloatSnglLnkNode head(Object obj){
+      public static omni.impl.seq.FloatSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
       }
-      public static FloatSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.FloatSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -6051,14 +6033,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.FloatSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.FloatSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static FloatSnglLnkNode prev(Object obj){
-          return (FloatSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static FloatSnglLnkNode curr(Object obj){
-          return (FloatSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static FloatSnglLnkNode next(Object obj){
-          return (FloatSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6069,7 +6051,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
       }
-      public static FloatSnglLnkNode head(Object obj){
+      public static omni.impl.seq.FloatSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -6084,14 +6066,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.FloatSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.FloatSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static FloatSnglLnkNode prev(Object obj){
-          return (FloatSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static FloatSnglLnkNode curr(Object obj){
-          return (FloatSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static FloatSnglLnkNode next(Object obj){
-          return (FloatSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6099,13 +6081,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static FloatSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.FloatSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
       }
-      public static FloatSnglLnkNode head(Object obj){
+      public static omni.impl.seq.FloatSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -6120,14 +6102,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.FloatSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.FloatSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static FloatSnglLnkNode prev(Object obj){
-          return (FloatSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static FloatSnglLnkNode curr(Object obj){
-          return (FloatSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static FloatSnglLnkNode next(Object obj){
-          return (FloatSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.FloatSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6135,14 +6117,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static FloatSnglLnkNode prev(Object obj){
-        return (FloatSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.FloatSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static FloatSnglLnkNode curr(Object obj){
-        return (FloatSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.FloatSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static FloatSnglLnkNode next(Object obj){
-        return (FloatSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.FloatSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.FloatSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -6312,7 +6294,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -6367,7 +6349,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -6482,10 +6464,10 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.DoubleDblLnkSeq)obj).size;
     }
-    public static DoubleDblLnkNode head(Object obj){
+    public static omni.impl.seq.DoubleDblLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.DoubleDblLnkSeq)obj).head;
     }
-    public static DoubleDblLnkNode tail(Object obj){
+    public static omni.impl.seq.DoubleDblLnkSeq.Node tail(Object obj){
       return ((omni.impl.seq.DoubleDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends DoubleDblLnkSeq{
@@ -6495,10 +6477,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.UncheckedList)obj).size;
       }
-      public static DoubleDblLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.UncheckedList)obj).head;
       }
-      public static DoubleDblLnkNode tail(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.UncheckedList)obj).tail;
       }
       interface AscendingItr{
@@ -6507,16 +6489,16 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface DescendingItr extends AscendingItr{
         public static omni.impl.seq.DoubleDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -6525,11 +6507,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq.UncheckedList parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq.UncheckedList)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static DoubleDblLnkNode lastRet(Object obj){
-          return (DoubleDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6543,10 +6525,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.CheckedList)obj).size;
       }
-      public static DoubleDblLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.CheckedList)obj).head;
       }
-      public static DoubleDblLnkNode tail(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.CheckedList)obj).tail;
       }
       public static int modCount(Object obj){
@@ -6561,11 +6543,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static DoubleDblLnkNode lastRet(Object obj){
-          return (DoubleDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6578,11 +6560,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static DoubleDblLnkNode lastRet(Object obj){
-          return (DoubleDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6595,11 +6577,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq.CheckedList parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq.CheckedList)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static DoubleDblLnkNode lastRet(Object obj){
-          return (DoubleDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6620,10 +6602,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq)obj).size;
       }
-      public static DoubleDblLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq)obj).head;
       }
-      public static DoubleDblLnkNode tail(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.DoubleDblLnkSeq.UncheckedList root(Object obj){
@@ -6641,8 +6623,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
       }
       interface BidirectionalItr extends AscendingItr{
@@ -6651,11 +6633,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static DoubleDblLnkNode lastRet(Object obj){
-          return (DoubleDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6679,10 +6661,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq)obj).size;
       }
-      public static DoubleDblLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq)obj).head;
       }
-      public static DoubleDblLnkNode tail(Object obj){
+      public static omni.impl.seq.DoubleDblLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq)obj).tail;
       }
       public static omni.impl.seq.DoubleDblLnkSeq.CheckedList root(Object obj){
@@ -6706,11 +6688,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static DoubleDblLnkNode lastRet(Object obj){
-          return (DoubleDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6723,11 +6705,11 @@ final class FieldAndMethodAccessor{
         public static omni.impl.seq.DoubleDblLnkSeq parent(Object obj){
           return (omni.impl.seq.DoubleDblLnkSeq)getValue(parentField,obj);
         }
-        public static DoubleDblLnkNode curr(Object obj){
-          return (DoubleDblLnkNode)getValue(currField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(currField,obj);
         }
-        public static DoubleDblLnkNode lastRet(Object obj){
-          return (DoubleDblLnkNode)getValue(lastRetField,obj);
+        public static omni.impl.seq.DoubleDblLnkSeq.Node lastRet(Object obj){
+          return (omni.impl.seq.DoubleDblLnkSeq.Node)getValue(lastRetField,obj);
         }
         public static int currIndex(Object obj){
           return getIntValue(currIndexField,obj);
@@ -6742,7 +6724,7 @@ final class FieldAndMethodAccessor{
     public static int size(Object obj){
       return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
     }
-    public static DoubleSnglLnkNode head(Object obj){
+    public static omni.impl.seq.DoubleSnglLnkSeq.Node head(Object obj){
       return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends DoubleSnglLnkSeq{
@@ -6752,7 +6734,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
       }
-      public static DoubleSnglLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
       }
       interface Itr extends AbstractItr{
@@ -6760,14 +6742,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.DoubleSnglLnkSeq.UncheckedStack parent(Object obj){
           return (omni.impl.seq.DoubleSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
         }
-        static DoubleSnglLnkNode prev(Object obj){
-          return (DoubleSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static DoubleSnglLnkNode curr(Object obj){
-          return (DoubleSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static DoubleSnglLnkNode next(Object obj){
-          return (DoubleSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6778,10 +6760,10 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
       }
-      public static DoubleSnglLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
       }
-      public static DoubleSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.DoubleSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq.UncheckedQueue)obj).tail;
       }
       interface Itr extends AbstractItr{
@@ -6789,14 +6771,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.DoubleSnglLnkSeq.UncheckedQueue parent(Object obj){
           return (omni.impl.seq.DoubleSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
         }
-        static DoubleSnglLnkNode prev(Object obj){
-          return (DoubleSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static DoubleSnglLnkNode curr(Object obj){
-          return (DoubleSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static DoubleSnglLnkNode next(Object obj){
-          return (DoubleSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6807,7 +6789,7 @@ final class FieldAndMethodAccessor{
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
       }
-      public static DoubleSnglLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -6822,14 +6804,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.DoubleSnglLnkSeq.CheckedStack parent(Object obj){
           return (omni.impl.seq.DoubleSnglLnkSeq.CheckedStack)getValue(parentField,obj);
         }
-        static DoubleSnglLnkNode prev(Object obj){
-          return (DoubleSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static DoubleSnglLnkNode curr(Object obj){
-          return (DoubleSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static DoubleSnglLnkNode next(Object obj){
-          return (DoubleSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6837,13 +6819,13 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static DoubleSnglLnkNode tail(Object obj){
+      public static omni.impl.seq.DoubleSnglLnkSeq.Node tail(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue)obj).tail;
       }
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
       }
-      public static DoubleSnglLnkNode head(Object obj){
+      public static omni.impl.seq.DoubleSnglLnkSeq.Node head(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
       }
       public static int modCount(Object obj){
@@ -6858,14 +6840,14 @@ final class FieldAndMethodAccessor{
         static omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue parent(Object obj){
           return (omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
         }
-        static DoubleSnglLnkNode prev(Object obj){
-          return (DoubleSnglLnkNode)getValue(prevField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node prev(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(prevField,obj);
         }
-        static DoubleSnglLnkNode curr(Object obj){
-          return (DoubleSnglLnkNode)getValue(currField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node curr(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(currField,obj);
         }
-        static DoubleSnglLnkNode next(Object obj){
-          return (DoubleSnglLnkNode)getValue(nextField,obj);
+        static omni.impl.seq.DoubleSnglLnkSeq.Node next(Object obj){
+          return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(nextField,obj);
         }
       }
     }
@@ -6873,14 +6855,14 @@ final class FieldAndMethodAccessor{
       static final Field prevField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
       static final Field currField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
       static final Field nextField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-      static DoubleSnglLnkNode prev(Object obj){
-        return (DoubleSnglLnkNode)getValue(prevField,obj);
+      static omni.impl.seq.DoubleSnglLnkSeq.Node prev(Object obj){
+        return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(prevField,obj);
       }
-      static DoubleSnglLnkNode curr(Object obj){
-        return (DoubleSnglLnkNode)getValue(currField,obj);
+      static omni.impl.seq.DoubleSnglLnkSeq.Node curr(Object obj){
+        return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(currField,obj);
       }
-      static DoubleSnglLnkNode next(Object obj){
-        return (DoubleSnglLnkNode)getValue(nextField,obj);
+      static omni.impl.seq.DoubleSnglLnkSeq.Node next(Object obj){
+        return (omni.impl.seq.DoubleSnglLnkSeq.Node)getValue(nextField,obj);
       }
     }
   }
@@ -7050,7 +7032,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -7105,7 +7087,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+        return ((omni.impl.AbstractOmniCollection<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");

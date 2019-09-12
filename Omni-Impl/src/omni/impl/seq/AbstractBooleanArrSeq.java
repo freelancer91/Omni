@@ -8,11 +8,12 @@ import java.util.function.Predicate;
 import omni.api.OmniCollection;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
+import omni.impl.AbstractOmniCollection;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
 import omni.util.TypeUtil;
 
-abstract class AbstractBooleanArrSeq extends AbstractSeq<Boolean> implements OmniCollection.OfBoolean,Externalizable,RandomAccess{
+abstract class AbstractBooleanArrSeq extends AbstractOmniCollection<Boolean> implements OmniCollection.OfBoolean,Externalizable,RandomAccess{
     AbstractBooleanArrSeq(){
         super();
     }

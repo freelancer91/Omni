@@ -1,8 +1,5 @@
 #TYPEDEF OfGeneric
 package omni.impl.set;
-import java.util.Iterator;
-import java.util.Set;
-import omni.impl.CheckedCollection;
 interface SetCommonImpl{
   //TODO move quickInsert to here
   static int tableHash(int val){
@@ -30,6 +27,7 @@ static void quickInsert(ARRTYPE val,ARRTYPE[] table,int tableLength,int hash){
   table[hash]=val;
 }
 #ENDDEF
+/*
   static boolean isEqualTo(int booleanState,RefOpenAddressHashSet<?> thatSet){
      switch(booleanState){
        case 0b00:
@@ -166,8 +164,8 @@ static void quickInsert(ARRTYPE val,ARRTYPE[] table,int tableLength,int hash){
     final Iterator<?> itr;
     if((itr=thatSet.iterator()).hasNext()){
       if(size==thatSet.size()){
-        final Object[] thisTable;
-        for(final int thisTableLength=(thisTable=thisSet.table).length-1;;){
+        final Object[] table;
+        for(final int tableLength=(table=thisSet.table).length-1;;){
           Object val;
           final int hash;
           if((val=itr.next())==null){
@@ -201,7 +199,7 @@ static void quickInsert(ARRTYPE val,ARRTYPE[] table,int tableLength,int hash){
     }
   }
   
-  
+  */
   
 
   #MACRO TableContains<Ref>(Object,null)

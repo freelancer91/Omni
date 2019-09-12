@@ -1,0 +1,190 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import java.util.SortedSet;
+import omni.util.TypeUtil;
+import omni.function.BooleanComparator;
+import omni.function.ByteComparator;
+import omni.function.CharComparator;
+import omni.function.ShortComparator;
+import omni.function.IntComparator;
+import omni.function.LongComparator;
+import omni.function.FloatComparator;
+import omni.function.DoubleComparator;
+public abstract interface OmniSortedSet<E> extends OmniSet<E>,SortedSet<E>{
+
+  OmniSortedSet<E> subSet(E fromElement,E toElement);
+  OmniSortedSet<E> headSet(E toElement);
+  OmniSortedSet<E> tailSet(E fromElement);
+  
+  public abstract interface OfRef<E> extends OmniSortedSet<E>,OmniSet.OfRef<E>{
+    OmniSortedSet.OfRef<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.OfRef<E> headSet(E toElement);
+    OmniSortedSet.OfRef<E> tailSet(E fromElement);
+  }
+  public abstract interface DoubleOutput<E> extends OmniSortedSet<E>,OmniSet.DoubleOutput<E>{
+    OmniSortedSet.DoubleOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.DoubleOutput<E> headSet(E toElement);
+    OmniSortedSet.DoubleOutput<E> tailSet(E fromElement);
+    double firstDouble();
+    double lastDouble();
+  }
+  public abstract interface FloatOutput<E> extends OmniSortedSet.DoubleOutput<E>,OmniSet.FloatOutput<E>{
+    OmniSortedSet.FloatOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.FloatOutput<E> headSet(E toElement);
+    OmniSortedSet.FloatOutput<E> tailSet(E fromElement);
+    float firstFloat();
+    float lastFloat();
+  }
+  public abstract interface LongOutput<E> extends OmniSortedSet.FloatOutput<E>,OmniSet.LongOutput<E>{
+    OmniSortedSet.LongOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.LongOutput<E> headSet(E toElement);
+    OmniSortedSet.LongOutput<E> tailSet(E fromElement);
+    long firstLong();
+    long lastLong();
+  }
+  public abstract interface IntOutput<E> extends OmniSortedSet.LongOutput<E>,OmniSet.IntOutput<E>{
+    OmniSortedSet.IntOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.IntOutput<E> headSet(E toElement);
+    OmniSortedSet.IntOutput<E> tailSet(E fromElement);
+    int firstInt();
+    int lastInt();
+  }
+  public abstract interface CharOutput<E> extends OmniSortedSet.IntOutput<E>,OmniSet.CharOutput<E>{
+    OmniSortedSet.CharOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.CharOutput<E> headSet(E toElement);
+    OmniSortedSet.CharOutput<E> tailSet(E fromElement);
+    char firstChar();
+    char lastChar();
+  }
+  public abstract interface ShortOutput<E> extends OmniSortedSet.IntOutput<E>,OmniSet.ShortOutput<E>{
+    OmniSortedSet.ShortOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.ShortOutput<E> headSet(E toElement);
+    OmniSortedSet.ShortOutput<E> tailSet(E fromElement);
+    short firstShort();
+    short lastShort();
+  }
+  public abstract interface ByteOutput<E> extends OmniSortedSet.ShortOutput<E>,OmniSet.ByteOutput<E>{
+    OmniSortedSet.ByteOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.ByteOutput<E> headSet(E toElement);
+    OmniSortedSet.ByteOutput<E> tailSet(E fromElement);
+    byte firstByte();
+    byte lastByte();
+  }
+  #MACRO PrimitiveSubInterface<Boolean>(Boolean,boolean)
+  #MACRO PrimitiveSubInterface<Byte>(Byte,byte)
+  #MACRO PrimitiveSubInterface<Char>(Character,char)
+  #MACRO PrimitiveSubInterface<Short>(Short,short)
+  #MACRO PrimitiveSubInterface<Int>(Integer,int)
+  #MACRO PrimitiveSubInterface<Long>(Long,long)
+  #MACRO PrimitiveSubInterface<Float>(Float,float)
+  #MACRO PrimitiveSubInterface<Double>(Double,double)
+#MACRODEF PrimitiveSubInterface<CLASSPREFIX>(BOXEDTYPE,EXPOSEDTYPE)
+public abstract interface OfCLASSPREFIX
+#IFSWITCH CLASSPREFIX==Boolean
+  extends OmniSortedSet.ByteOutput<BOXEDTYPE>,OmniSortedSet.CharOutput<BOXEDTYPE>,OmniSet.OfCLASSPREFIX{
+#ELSE
+  extends OmniSortedSet.CLASSPREFIXOutput<BOXEDTYPE>,OmniSet.OfCLASSPREFIX{
+#ENDIF
+  CLASSPREFIXComparator comparator();
+  OmniSortedSet.OfCLASSPREFIX subSet(EXPOSEDTYPE fromElement,EXPOSEDTYPE toElement);
+  OmniSortedSet.OfCLASSPREFIX headSet(EXPOSEDTYPE toElement);
+  OmniSortedSet.OfCLASSPREFIX tailSet(EXPOSEDTYPE fromElement);
+  EXPOSEDTYPE firstCLASSPREFIX();
+  EXPOSEDTYPE lastCLASSPREFIX();
+  OmniSortedSet.OfCLASSPREFIX subSet(BOXEDTYPE fromElement,BOXEDTYPE toElement);
+  OmniSortedSet.OfCLASSPREFIX headSet(BOXEDTYPE toElement);
+  OmniSortedSet.OfCLASSPREFIX tailSet(BOXEDTYPE fromElement);
+  default BOXEDTYPE first(){
+    return firstCLASSPREFIX();
+  }
+  default BOXEDTYPE last(){
+    return lastCLASSPREFIX();
+  }
+#IFSWITCH CLASSPREFIX==Boolean
+  default double firstDouble(){
+    return TypeUtil.castToDouble(firstCLASSPREFIX());
+  }
+  default double lastDouble(){
+    return TypeUtil.castToDouble(lastCLASSPREFIX());
+  }
+  default float firstFloat(){
+    return TypeUtil.castToFloat(firstCLASSPREFIX());
+  }
+  default float lastFloat(){
+    return TypeUtil.castToFloat(lastCLASSPREFIX());
+  }
+  default long firstLong(){
+    return TypeUtil.castToLong(firstCLASSPREFIX());
+  }
+  default long lastLong(){
+    return TypeUtil.castToLong(lastCLASSPREFIX());
+  }
+  default int firstInt(){
+    return TypeUtil.castToByte(firstCLASSPREFIX());
+  }
+  default int lastInt(){
+    return TypeUtil.castToByte(lastCLASSPREFIX());
+  }
+  default short firstShort(){
+    return TypeUtil.castToByte(firstCLASSPREFIX());
+  }
+  default short lastShort(){
+    return TypeUtil.castToByte(lastCLASSPREFIX());
+  }
+  default byte firstByte(){
+    return TypeUtil.castToByte(firstCLASSPREFIX());
+  }
+  default byte lastByte(){
+    return TypeUtil.castToByte(lastCLASSPREFIX());
+  }
+  default char firstChar(){
+    return TypeUtil.castToChar(firstCLASSPREFIX());
+  }
+  default char lastChar(){
+    return TypeUtil.castToChar(lastCLASSPREFIX());
+  }
+#ELSEIFNOTSWITCH CLASSPREFIX==Double
+  default double firstDouble(){
+    return firstCLASSPREFIX();
+  }
+  default double lastDouble(){
+    return lastCLASSPREFIX();
+  }
+  #IFNOTSWITCH CLASSPREFIX==Float
+  default float firstFloat(){
+    return firstCLASSPREFIX();
+  }
+  default float lastFloat(){
+    return lastCLASSPREFIX();
+  }
+    #IFNOTSWITCH CLASSPREFIX==Long
+  default long firstLong(){
+    return firstCLASSPREFIX();
+  }
+  default long lastLong(){
+    return lastCLASSPREFIX();
+  }
+      #IFNOTSWITCH CLASSPREFIX==Int
+  default int firstInt(){
+    return firstCLASSPREFIX();
+  }
+  default int lastInt(){
+    return lastCLASSPREFIX();
+  }
+        #IFNOTSWITCH CLASSPREFIX==Short,Char
+  default short firstShort(){
+    return firstCLASSPREFIX();
+  }
+  default short lastShort(){
+    return lastCLASSPREFIX();
+  }
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+#ENDDEF
+  
+  
+}

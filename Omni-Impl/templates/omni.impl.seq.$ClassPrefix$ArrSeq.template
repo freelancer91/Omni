@@ -23,6 +23,7 @@ import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
+import omni.impl.AbstractOmniCollection;
 import java.util.ListIterator;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
@@ -35,10 +36,8 @@ import java.util.function.$UnaryOperator$;
 #ELSEIFNOT OfBoolean,OfRef
 import omni.function.$UnaryOperator$;
 #ENDIF
-#IF OfInt
-import java.util.function.$Comparator$;
-#ELSEIFNOT OfRef
-import omni.function.$Comparator$;
+#IFNOT OfRef
+import omni.function.$TypeNameModifier$Comparator;
 #ENDIF
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
@@ -67,11 +66,11 @@ import java.io.ObjectInputStream;
 import java.util.RandomAccess;
 public abstract class $ClassPrefix$ArrSeq$<E>$ extends 
 #IF OfRef
-AbstractSeq$<E>$
+AbstractOmniCollection$<E>$
 #ELSEIF OfBoolean
 AbstractBooleanArrSeq
 #ELSE
-AbstractSeq<$BoxedType$>
+AbstractOmniCollection<$BoxedType$>
 #ENDIF
  implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
@@ -731,9 +730,9 @@ public
     extends $ClassPrefix$ArrSeq$<E>$
 #ELSE
   #IF OfRef
-    extends AbstractSeq$<E>$
+    extends AbstractOmniCollection$<E>$
   #ELSE
-    extends AbstractSeq<$BoxedType$>
+    extends AbstractOmniCollection<$BoxedType$>
   #ENDIF
 #ENDIF
 #IFSWITCH STRUCTNAME==UncheckedList,CheckedSubList,UncheckedSubList
@@ -1229,7 +1228,7 @@ public
          return ((List<?>)val).isEmpty();
        }
        final List<?> list;
-       if((list=(List<?>)val) instanceof AbstractSeq){
+       if((list=(List<?>)val) instanceof AbstractOmniCollection){
   #IF OfRef
          if(list instanceof OmniList.OfRef){
            return this.isEqualTo(size,(OmniList.OfRef<?>)list);
@@ -1589,7 +1588,7 @@ public
         return ((List<?>)val).isEmpty();
       }
       final List<?> list;
-      if((list=(List<?>)val) instanceof AbstractSeq){
+      if((list=(List<?>)val) instanceof AbstractOmniCollection){
   #IF OfRef
         if(list instanceof OmniList.OfRef){
           return this.isEqualTo(size,(OmniList.OfRef<?>)list);
@@ -1637,7 +1636,7 @@ public
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
   #IF OfRef
           final int rootOffset=this.rootOffset;
           if(list instanceof OmniList.OfRef){
@@ -1687,7 +1686,7 @@ public
          return ((List<?>)val).isEmpty();
        }
        final List<?> list;
-       if((list=(List<?>)val) instanceof AbstractSeq){
+       if((list=(List<?>)val) instanceof AbstractOmniCollection){
   #IF OfRef
           if(list instanceof OmniList.OfRef){
             return root.isEqualTo(this.rootOffset,size,(OmniList.OfRef<?>)list);
@@ -2819,7 +2818,7 @@ public
   #MACRO SubListRemoveIfImpl(Predicate<? super $BoxedType$>,filter::test)
   #ENDIF
   #MACRO ReplaceAllImpl($UnaryOperator$$<E>$,operator)
-  #MACRO ComparatorSortImpl<Stable>($Comparator$$<? super E>$,sorter)
+  #MACRO ComparatorSortImpl<Stable>($TypeNameModifier$Comparator$<? super E>$,sorter)
   #MACRO NonComparatorSortImpl<Stable,Ascending>()
   #MACRO NonComparatorSortImpl<Stable,Descending>()
 #IFNOT OfRef
@@ -2827,7 +2826,7 @@ public
   #MACRO ComparatorSortImpl<Stable>(Comparator<? super $BoxedType$>,sorter::compare)
 #ENDIF
 #IFNOT OfBoolean
-  #MACRO ComparatorSortImpl<Unstable>($Comparator$$<? super E>$,sorter)
+  #MACRO ComparatorSortImpl<Unstable>($TypeNameModifier$Comparator$<? super E>$,sorter)
 #ENDIF
 #IF OfRef
   #MACRO NonComparatorSortImpl<Unstable,Ascending>()

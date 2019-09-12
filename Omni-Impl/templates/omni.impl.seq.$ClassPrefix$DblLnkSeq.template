@@ -14,7 +14,6 @@ import java.util.ListIterator;
 import java.util.List;
 import omni.util.$ClassPrefix$SortUtil;
 import omni.api.OmniList;
-import omni.impl.$DNode$;
 import java.util.function.Consumer;
 #IF OfDouble,OfLong,OfInt
 import java.util.function.$TypeNameModifier$Consumer;
@@ -41,14 +40,13 @@ import omni.util.OmniPred;
 import java.util.function.Predicate;
 import java.util.function.IntFunction;
 import java.util.Comparator;
-#IF OfInt
-import java.util.function.$Comparator$;
-#ELSEIFNOT OfRef
-import omni.function.$Comparator$;
+#IFNOT OfRef
+import omni.function.$TypeNameModifier$Comparator;
 #ENDIF
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
+import omni.impl.AbstractOmniCollection;
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
@@ -62,11 +60,14 @@ import omni.impl.CheckedCollection;
 #IFNOT OfRef,OfDouble,OfChar
 import omni.util.ToStringUtil;
 #ENDIF
+#IF OfDouble,OfFloat
+import omni.util.HashUtil;
+#ENDIF
 public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends 
 #IF OfRef
-AbstractSeq$<E>$
+AbstractOmniCollection$<E>$
 #ELSE
-AbstractSeq<$BoxedType$>
+AbstractOmniCollection<$BoxedType$>
 #ENDIF
  implements
 #IF OfRef
@@ -75,10 +76,242 @@ AbstractSeq<$BoxedType$>
    $ClassPrefix$SubListDefault$<E>$
 #ENDIF
 {
-
+  static final class Node$<E>${
+    transient Node$<E>$ prev;
+    transient $exposedType$ val;
+    transient Node$<E>$ next;
+    Node($exposedType$ val){
+      this.val=val;
+    }
+    Node(Node$<E>$ prev,$exposedType$ val){
+      this.prev=prev;
+      this.val=val;
+    }
+    Node($exposedType$ val,Node$<E>$ next){
+      this.val=val;
+      this.next=next;
+    }
+    Node(Node$<E>$ prev,$exposedType$ val,Node$<E>$ next){
+      this.prev=prev;
+      this.val=val;
+      this.next=next;
+    }
+    #IF OfRef
+    @SuppressWarnings("unchecked")
+    #ENDIF
+    static $<E>$ void uncheckedCopyFrom($ArrayType$[] src,int length,Node$<E>$ dst){
+      for(;;dst=dst.prev)
+      {
+        dst.val=($exposedType$)src[--length];
+        if(length==0)
+        {
+          return;
+        }
+      }
+    }
+#IF OfRef,OfDouble
+  #IF OfRef
+    static $<E>$ void uncheckedToString(Node$<E>$ curr,int size,StringBuilder builder){
+      for(builder.append(curr.val);--size!=0;builder.append(',').append(' ').append((curr=curr.next).val)){}
+    }
+  #ENDIF
+    static $<E>$ void uncheckedToString(Node$<E>$ curr,Node$<E>$ tail,StringBuilder builder){
+      for(;;curr=curr.next,builder.append(',').append(' ')){
+        builder.append(curr.val);
+        if(curr==tail){
+          return;
+        }
+      }
+    }
+#ELSEIF OfChar
+    static $<E>$ void uncheckedToString(Node$<E>$ curr,Node$<E>$ tail,char[] buffer){
+      int bufferOffset=1;
+      for(;;curr=curr.next,buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
+        buffer[bufferOffset]=curr.val;
+        if(curr==tail){
+          return;
+        }
+      }
+    }
+#ELSE
+    static $<E>$ int uncheckedToString(Node$<E>$ curr,Node$<E>$ tail,byte[] buffer){
+      int bufferOffset=1;
+      for(;;curr=curr.next,buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+#IF OfByte
+        bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+#ELSE
+        bufferOffset=ToStringUtil.getString$TypeNameModifier$(curr.val,buffer,bufferOffset);
+#ENDIF
+        if(curr==tail){
+          return bufferOffset;
+        }
+      }
+    }
+    static $<E>$ void uncheckedToString(Node$<E>$ curr,Node$<E>$ tail,ToStringUtil.OmniStringBuilderByte builder){
+      for(;;curr=curr.next,builder.uncheckedAppendCommaAndSpace()){
+#IF OfByte
+        builder.uncheckedAppendShort(curr.val);
+#ELSE
+        builder.uncheckedAppend$TypeNameModifier$(curr.val);
+#ENDIF
+        if(curr==tail){
+          return;
+        }
+      }
+    }
+#ENDIF
+    static $<E>$ int uncheckedHashCode(Node$<E>$ curr,Node$<E>$ tail){
+      int hash=31+$hashCodeMethod$(curr.val);
+      while(curr!=tail){
+        hash=(hash*31)+$hashCodeMethod$((curr=curr.next).val);
+      }
+      return hash;
+    }
+#IF OfRef
+    static $<E>$ int uncheckedHashCode(Node$<E>$ curr,int size){
+      int hash=31+$hashCodeMethod$(curr.val);
+      while(--size!=0){
+        hash=(hash*31)+$hashCodeMethod$((curr=curr.next).val);
+      }
+      return hash;
+    }
+#ENDIF
+    static $<E>$ void uncheckedForEachAscending(Node$<E>$ node,int size,$TypeNameModifier$Consumer$<? super E>$ action){
+      for(;;node=node.next){
+        action.accept(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static $<E>$ void uncheckedReplaceAll(Node$<E>$ node,int size,$UnaryOperator$$<E>$ operator){
+      for(;;node=node.next){
+        node.val=operator.$applyMethod$(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static $<E>$ void uncheckedForEachAscending(Node$<E>$ node,$TypeNameModifier$Consumer$<? super E>$ action){
+      for(;;){
+        action.accept(node.val);
+        if((node=node.next)==null){
+          return;
+        }
+      }
+    }
+    static $<E>$ void uncheckedForEachAscending(Node$<E>$ node,Node$<E>$ tail,$TypeNameModifier$Consumer$<? super E>$ action){
+      for(;;node=node.next){
+        action.accept(node.val);
+        if(node==tail){
+          return;
+        }
+      }
+    }
+    static $<E>$ void uncheckedReplaceAll(Node$<E>$ node,Node$<E>$ tail,$UnaryOperator$$<E>$ operator){
+      for(;;node=node.next){
+        node.val=operator.$applyMethod$(node.val);
+        if(node==tail){
+          return;
+        }
+      }
+    }
+    static $<E>$ void uncheckedForEachDescending(Node$<E>$ node,$TypeNameModifier$Consumer$<? super E>$ action){
+      for(;;){
+        action.accept(node.val);
+        if((node=node.prev)==null){
+          return;
+        }
+      }
+    }
+    static $<E>$ void uncheckedForEachDescending(Node$<E>$ node,int size,$TypeNameModifier$Consumer$<? super E>$ action){
+      for(;;node=node.prev){
+        action.accept(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static $<E>$ void eraseNode(Node$<E>$ node){
+      Node$<E>$ next,prev;
+      (next=node.next).prev=(prev=node.prev);
+      prev.next=next;
+    }
+    static $<E>$ Node$<E>$ iterateAscending(Node$<E>$ node,int length){
+      if(length!=0){
+        do{
+          node=node.next;
+        }while(--length!=0);
+      }
+      return node;
+    }
+    static $<E>$ Node$<E>$ iterateDescending(Node$<E>$ node,int length){
+      if(length!=0){
+        do{
+          node=node.prev;
+        }while(--length!=0);
+      }
+      return node;
+    }
+    static $<E>$ Node$<E>$ uncheckedIterateDescending(Node$<E>$ node,int length){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+      return node;
+    }
+#IF OfRef
+    static $<E>$ boolean uncheckedcontainsNonNull(Node$<E>$ head,int size,Object nonNull){
+      for(;!nonNull.equals(head.val);head=head.next){if(--size==0){return false;}}
+      return true;
+    }
+    static $<E>$ int uncheckedsearchNonNull(Node$<E>$ head,int size,Object nonNull){
+      int index=1;
+      for(;!nonNull.equals(head.val);++index,head=head.next){if(--size==0){return -1;}}
+      return index;
+    }
+    static $<E>$ int uncheckedindexOfNonNull(Node$<E>$ head,int size,Object nonNull){
+      int index=0;
+      for(;!nonNull.equals(head.val);++index,head=head.next){if(--size==0){return -1;}}
+      return index;
+    }
+    #MACRO NodeQuery<NonNull>(!nonNull.equals)
+    #MACRO NodeQuery<Null>(null!=)
+    #MACRO NodeQuery< >(!pred.test)
+#ELSEIF OfDouble,OfFloat
+    #MACRO NodeQuery<Bits>(bits!=$convertToBits$)
+    #MACRO NodeQuery<0>(0!=)
+    #MACRO NodeQuery<NaN>(!$BoxedType$.isNaN)
+#ELSE
+    #MACRO NodeQuery< >(val!=)
+#ENDIF
+    #MACRO UncheckedCopyInto($ArrayType$,)
+#IFNOT OfRef
+    #MACRO UncheckedCopyInto($BoxedType$,)
+    #MACRO UncheckedCopyInto(Object,)
+  #IFNOT OfDouble
+    #MACRO UncheckedCopyInto(double,$castToDouble$)
+    #IFNOT OfFloat
+    #MACRO UncheckedCopyInto(float,$castToFloat$)
+      #IFNOT OfLong
+    #MACRO UncheckedCopyInto(long,$castToLong$)
+        #IFNOT OfInt
+    #MACRO UncheckedCopyInto(int,$castToInt$)
+          #IFNOT OfShort,OfChar
+    #MACRO UncheckedCopyInto(short,$castToShort$)
+            #IFNOT OfByte
+    #MACRO UncheckedCopyInto(byte,$castToByte$)
+    #MACRO UncheckedCopyInto(char,$castToChar$)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  }
   private static final long serialVersionUID=1L;
-  transient $DNode$$<E>$ head;
-  transient $DNode$$<E>$ tail;
+  transient Node$<E>$ head;
+  transient Node$<E>$ tail;
   private $ClassPrefix$DblLnkSeq(Collection<? extends $BoxedExposed$> that){
     super();
     //TODO optimize
@@ -154,7 +387,7 @@ AbstractSeq<$BoxedType$>
 #ENDIF
   private  $ClassPrefix$DblLnkSeq(){
   }
-  private $ClassPrefix$DblLnkSeq($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+  private $ClassPrefix$DblLnkSeq(Node$<E>$ head,int size,Node$<E>$ tail){
     super(size);
     this.head=head;
     this.tail=tail;
@@ -170,21 +403,21 @@ AbstractSeq<$BoxedType$>
     addLast(val);
     return true;
   }
-  private void iterateDescendingAndInsert(int dist,$DNode$$<E>$ after,$DNode$$<E>$ newNode){
-    newNode.next=after=$DNode$.iterateDescending(after,dist-2);
-    final $DNode$$<E>$ before;
+  private void iterateDescendingAndInsert(int dist,Node$<E>$ after,Node$<E>$ newNode){
+    newNode.next=after=Node.iterateDescending(after,dist-2);
+    final Node$<E>$ before;
     newNode.prev=before=after.prev;
     before.next=newNode;
     after.prev=newNode;
   }
-  private void iterateAscendingAndInsert(int dist,$DNode$$<E>$ before,$DNode$$<E>$ newNode){
-    newNode.prev=before=$DNode$.iterateAscending(before,dist-1);
-    final $DNode$$<E>$ after;
+  private void iterateAscendingAndInsert(int dist,Node$<E>$ before,Node$<E>$ newNode){
+    newNode.prev=before=Node.iterateAscending(before,dist-1);
+    final Node$<E>$ after;
     newNode.next=after=before.next;
     before.next=newNode;
     after.prev=newNode;
   }
-  private void insertNode(int index,$DNode$$<E>$ newNode){
+  private void insertNode(int index,Node$<E>$ newNode){
     int tailDist;
     if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
@@ -202,7 +435,7 @@ AbstractSeq<$BoxedType$>
       //the insertion point is closer to the head
       if(index==0){
         //the insertion point IS the head
-        $DNode$$<E>$ head;
+        Node$<E>$ head;
         (head=this.head).prev=newNode;
         newNode.next=head;
         this.head=newNode;
@@ -213,7 +446,7 @@ AbstractSeq<$BoxedType$>
     }
   }
 #IFNOT OfBoolean
-  private static $<E>$ int markSurvivors($DNode$$<E>$ curr,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
+  private static $<E>$ int markSurvivors(Node$<E>$ curr,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -231,7 +464,7 @@ AbstractSeq<$BoxedType$>
       survivorSet[wordOffset++]=word;
     }
   }
-  private static $<E>$ long markSurvivors($DNode$$<E>$ curr,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter){
+  private static $<E>$ long markSurvivors(Node$<E>$ curr,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter){
     for(long word=0L,marker=1L;;marker<<=1,curr=curr.next){
       if(!filter.test(curr.val)){
         word|=marker;
@@ -243,16 +476,16 @@ AbstractSeq<$BoxedType$>
     }
   }
 #ENDIF
-  private $DNode$$<E>$ getNode(int index,int size){
+  private Node$<E>$ getNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
-      return $DNode$.iterateDescending(tail,size-1);
+      return Node.iterateDescending(tail,size-1);
     }else{
       //the node is closer to the head
-      return $DNode$.iterateAscending(head,index);
+      return Node.iterateAscending(head,index);
     }
   }
-  private $DNode$$<E>$ getItrNode(int index,int size){
+  private Node$<E>$ getItrNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       switch(size){
@@ -261,15 +494,15 @@ AbstractSeq<$BoxedType$>
       case 1:
         return tail;
       default:
-        return $DNode$.uncheckedIterateDescending(tail,size-1);
+        return Node.uncheckedIterateDescending(tail,size-1);
       }
     }else{
       //the node is closer to the head
-      return $DNode$.iterateAscending(head,index);
+      return Node.iterateAscending(head,index);
     }
   }
   @Override public $exposedType$ set(int index,$exposedType$ val){
-    $DNode$$<E>$ tmp;
+    Node$<E>$ tmp;
     final var ret=(tmp=getNode(index,size)).val;
     tmp.val=val;
     return ret;
@@ -281,23 +514,23 @@ AbstractSeq<$BoxedType$>
     return getNode(index,size).val;
   }
   @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
-    final $DNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      $DNode$.uncheckedForEachAscending(head,tail,action);
+      Node.uncheckedForEachAscending(head,tail,action);
     }
   }
 #IFNOT OfRef
   @Override public void forEach(Consumer<? super $BoxedType$> action){
-    final $DNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      $DNode$.uncheckedForEachAscending(head,tail,action::accept);
+      Node.uncheckedForEachAscending(head,tail,action::accept);
     }
   }
 #ENDIF
   @Override public <T> T[] toArray(T[] dst){
     final int size;
     if((size=this.size)!=0){
-      $DNode$.uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),this.tail,size);
+      Node.uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),this.tail,size);
     }else if(dst.length!=0){
       dst[0]=null;
     }
@@ -307,7 +540,7 @@ AbstractSeq<$BoxedType$>
     final int size;
     final T[] dst=arrConstructor.apply(size=this.size);
     if(size!=0){
-      $DNode$.uncheckedCopyInto(dst,this.tail,size);
+      Node.uncheckedCopyInto(dst,this.tail,size);
     }
     return dst;
   }
@@ -335,20 +568,20 @@ AbstractSeq<$BoxedType$>
   #ENDIF
 #ENDIF
   @Override public void replaceAll($UnaryOperator$$<E>$ operator){
-    final $DNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      $DNode$.uncheckedReplaceAll(head,tail,operator);
+      Node.uncheckedReplaceAll(head,tail,operator);
     }
   }
 #IFNOT OfRef
   @Override public void replaceAll(UnaryOperator<$BoxedType$> operator){
-    final $DNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      $DNode$.uncheckedReplaceAll(head,tail,operator::apply);
+      Node.uncheckedReplaceAll(head,tail,operator::apply);
     }
   }
 #ENDIF
-  #MACRO ComparatorSortImpl<Stable,Root,false>($Comparator$$<? super E>$,sorter)
+  #MACRO ComparatorSortImpl<Stable,Root,false>($TypeNameModifier$Comparator$<? super E>$,sorter)
 #IFNOT OfRef
   #MACRO ComparatorSortImpl<Stable,Root,false>(Comparator<? super $BoxedType$>,sorter::compare)
 #ENDIF
@@ -359,20 +592,20 @@ AbstractSeq<$BoxedType$>
   #MACRO NonComparatorSortImpl<Unstable,Root,false,Descending>()
 #ENDIF
 #IFNOT OfBoolean
-  #MACRO ComparatorSortImpl<Unstable,Root,false>($Comparator$$<? super E>$,sorter)
+  #MACRO ComparatorSortImpl<Unstable,Root,false>($TypeNameModifier$Comparator$<? super E>$,sorter)
 #ENDIF
   @Override public String toString(){
-    final $DNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
 #IF OfDouble,OfRef
       final StringBuilder builder;
-      $DNode$.uncheckedToString(head,tail,builder=new StringBuilder("["));
+      Node.uncheckedToString(head,tail,builder=new StringBuilder("["));
       return builder.append(']').toString();
 #ELSE
       int size;
   #IF OfChar
       final char[] buffer;
-      $DNode$.uncheckedToString(head,tail,buffer=new char[size=this.size*3]);
+      Node.uncheckedToString(head,tail,buffer=new char[size=this.size*3]);
       buffer[0]='[';
       buffer[size-1]=']';
       return new String(buffer,0,size);
@@ -391,12 +624,12 @@ AbstractSeq<$BoxedType$>
     #ELSEIF OfFloat
       if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
     #ENDIF
-        [size=$DNode$.uncheckedToString(head,tail,buffer)]=(byte)']';
+        [size=Node.uncheckedToString(head,tail,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
         final ToStringUtil.OmniStringBuilderByte builder;
-        $DNode$.uncheckedToString(head,tail,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        Node.uncheckedToString(head,tail,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
         (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
@@ -407,9 +640,9 @@ AbstractSeq<$BoxedType$>
     return "[]";
   }
   @Override public int hashCode(){
-    final $DNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      return $DNode$.uncheckedHashCode(head,tail);
+      return Node.uncheckedHashCode(head,tail);
     }
     return 1;
   }
@@ -422,9 +655,9 @@ AbstractSeq<$BoxedType$>
   #MACRO CollapseBodyHelper(filter.test,$TypeNameModifier$Predicate$<? super E>$ filter)
 #ENDIF
 #MACRODEF CollapseBodyHelper(TEST,PARAM)
-private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ newTail,PARAM){
+private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,PARAM){
   int numRemoved=0;
-  outer:for($DNode$$<E>$ prev;(newHead=(prev=newHead).next)!=newTail;){
+  outer:for(Node$<E>$ prev;(newHead=(prev=newHead).next)!=newTail;){
     if(TEST(newHead.val)){
       do{
         ++numRemoved;
@@ -446,13 +679,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     transient final UncheckedList$<E>$ root;
     transient final UncheckedSubList$<E>$ parent;
     transient final int parentOffset;
-    private UncheckedSubList(UncheckedList$<E>$ root,int rootOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    private UncheckedSubList(UncheckedList$<E>$ root,int rootOffset,Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
       this.parentOffset=rootOffset;
     }
-    private UncheckedSubList(UncheckedSubList$<E>$ parent,int parentOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    private UncheckedSubList(UncheckedSubList$<E>$ parent,int parentOffset,Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
@@ -484,7 +717,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
 #IF OfRef
           if(list instanceof OmniList.OfRef){
             return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
@@ -522,9 +755,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        $DNode$$<E>$ head,newTail;
-        final var newHead=newTail=new $DNode$$<E>$((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new $DNode$$<E>$(newTail,(head=head.next).val),++i){}
+        Node$<E>$ head,newTail;
+        final var newHead=newTail=new Node$<E>$((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node$<E>$(newTail,(head=head.next).val),++i){}
         return new UncheckedList$<E>$(newHead,size,newTail);
       }
       return new UncheckedList$<E>$();
@@ -537,8 +770,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #ENDIF
     {
       transient final UncheckedSubList$<E>$ parent;
-      transient $DNode$$<E>$ curr;
-      private AscendingItr(UncheckedSubList$<E>$ parent,$DNode$$<E>$ curr){
+      transient Node$<E>$ curr;
+      private AscendingItr(UncheckedSubList$<E>$ parent,Node$<E>$ curr){
         this.parent=parent;
         this.curr=curr;
       }
@@ -557,7 +790,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return curr!=null;
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         this.curr=(curr=this.curr)==parent.tail?null:curr.next;
         return curr.val;
       }
@@ -566,11 +799,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         if(--(parent=this.parent).size==0){
           parent.removeLastNode(parent.tail);
         }else{
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           if((curr=this.curr)==null){
             parent.peelTail(parent.tail);
           }else{
-            $DNode$$<E>$ lastRet;
+            Node$<E>$ lastRet;
             if((lastRet=curr.prev)==parent.head){
               parent.peelHead(lastRet);
             }else{
@@ -583,17 +816,17 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         --parent.root.size;
       }
       @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,parent.tail,action);
+          Node.uncheckedForEachAscending(curr,parent.tail,action);
           this.curr=null;
         }
       }
 #IFNOT OfRef
       @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,parent.tail,action::accept);
+          Node.uncheckedForEachAscending(curr,parent.tail,action::accept);
           this.curr=null;
         }
       }
@@ -601,7 +834,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     }
     private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
       private transient int currIndex;
-      private transient $DNode$$<E>$ lastRet;
+      private transient Node$<E>$ lastRet;
       private BidirectionalItr(BidirectionalItr$<E>$ itr){
         super(itr);
         this.currIndex=itr.currIndex;
@@ -610,7 +843,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       private BidirectionalItr(UncheckedSubList$<E>$ parent){
         super(parent);
       }
-      private BidirectionalItr(UncheckedSubList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+      private BidirectionalItr(UncheckedSubList$<E>$ parent,Node$<E>$ curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
       }
@@ -618,14 +851,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return new BidirectionalItr$<E>$(this);
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         this.lastRet=curr=this.curr;
         this.curr=curr.next;
         ++this.currIndex;
         return curr.val;
       }
       @Override public $exposedType$ previous$TypeNameModifier$(){
-        $DNode$$<E>$ curr;
+        Node$<E>$ curr;
         this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
         this.curr=curr;
         --this.currIndex;
@@ -654,44 +887,44 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         ++currIndex;
         if(++(root=(currList=this.parent).root).size!=1){
           if(++currList.size!=1){
-            $DNode$$<E>$ after,before;
+            Node$<E>$ after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new $DNode$$<E>$(before,val,after);
+                before.next=before=new Node$<E>$(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new $DNode$$<E>$(val,after));
+                currList.bubbleUpPrepend(before=new Node$<E>$(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
-              $DNode$$<E>$ newNode;
+              Node$<E>$ newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new $DNode$$<E>$(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new Node$<E>$(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new $DNode$$<E>$(before,val));
+                currList.bubbleUpAppend(newNode=new Node$<E>$(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new $DNode$$<E>$(val));
+            currList.bubbleUpInit(new Node$<E>$(val));
           }
         }else{
-          $DNode$$<E>$ newNode;
-          currList.bubbleUpRootInit(newNode=new $DNode$$<E>$(val));
+          Node$<E>$ newNode;
+          currList.bubbleUpRootInit(newNode=new Node$<E>$(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
         }
       }
       @Override public void remove(){
-        $DNode$$<E>$ lastRet,curr;
+        Node$<E>$ lastRet,curr;
         if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
         }else{
@@ -720,8 +953,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final int bound;
         final UncheckedSubList$<E>$ parent;
         if(this.currIndex<(bound=(parent=this.parent).size)){
-          final $DNode$$<E>$ lastRet;
-          $DNode$.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
+          final Node$<E>$ lastRet;
+          Node.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
           this.lastRet=lastRet;
           this.curr=null;
           this.currIndex=bound;
@@ -732,8 +965,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final int bound;
         final UncheckedSubList$<E>$ parent;
         if(this.currIndex<(bound=(parent=this.parent).size)){
-          final $DNode$$<E>$ lastRet;
-          $DNode$.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
+          final Node$<E>$ lastRet;
+          Node.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
           this.lastRet=lastRet;
           this.curr=null;
           this.currIndex=bound;
@@ -754,13 +987,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       final int subListSize;
       if((subListSize=toIndex-fromIndex)!=0){
         int tailDist;
-        final $DNode$$<E>$ subListHead,subListTail;
+        final Node$<E>$ subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
-          subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -785,14 +1018,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     transient final CheckedSubList$<E>$ parent;
     transient final int parentOffset;
     transient int modCount;
-    private CheckedSubList(CheckedList$<E>$ root,int rootOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    private CheckedSubList(CheckedList$<E>$ root,int rootOffset,Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
       this.parentOffset=rootOffset;
       this.modCount=root.modCount;
     }
-    private CheckedSubList(CheckedSubList$<E>$ parent,int parentOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    private CheckedSubList(CheckedSubList$<E>$ parent,int parentOffset,Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
@@ -846,8 +1079,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       implements OmniListIterator.Of$ClassPrefix$$<E>${
       private transient final CheckedSubList$<E>$ parent;
       private transient int modCount;
-      private transient $DNode$$<E>$ curr;
-      private transient $DNode$$<E>$ lastRet;
+      private transient Node$<E>$ curr;
+      private transient Node$<E>$ lastRet;
       private transient int currIndex;
       private BidirectionalItr(BidirectionalItr$<E>$ itr){
         this.parent=itr.parent;
@@ -862,7 +1095,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         this.modCount=parent.modCount;
         this.curr=parent.head;
       }
-      private BidirectionalItr(CheckedSubList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+      private BidirectionalItr(CheckedSubList$<E>$ parent,Node$<E>$ curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -876,7 +1109,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
         final int currIndex;
         if((currIndex=this.currIndex)<parent.size){
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           this.lastRet=curr=this.curr;
           this.curr=curr.next;
           this.currIndex=currIndex+1;
@@ -889,7 +1122,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
         final int currIndex;
         if((currIndex=this.currIndex)!=0){
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
           this.curr=curr;
           this.currIndex=currIndex-1;
@@ -910,7 +1143,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return this.currIndex-1;
       }
       @Override public void set($exposedType$ val){
-        final $DNode$$<E>$ lastRet;
+        final Node$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.root.modCount);
           lastRet.val=val;
@@ -925,7 +1158,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
-            $DNode$.uncheckedForEachAscending(this.curr,numLeft,action);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
@@ -942,7 +1175,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
-            $DNode$.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
@@ -953,7 +1186,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       }
 #ENDIF
       @Override public void remove(){
-        $DNode$$<E>$ lastRet;
+        Node$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedSubList$<E>$ parent;
           CheckedList$<E>$ root;
@@ -962,7 +1195,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           root.modCount=++modCount;
           this.modCount=modCount;
           parent.modCount=modCount;
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           if((curr=lastRet.next)==this.curr){
             --currIndex;
           }else{
@@ -1001,37 +1234,37 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         ++currIndex;
         if(++root.size!=1){
           if(++currList.size!=1){
-            $DNode$$<E>$ after,before;
+            Node$<E>$ after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new $DNode$$<E>$(before,val,after);
+                before.next=before=new Node$<E>$(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new $DNode$$<E>$(val,after));
+                currList.bubbleUpPrepend(before=new Node$<E>$(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
-              $DNode$$<E>$ newNode;
+              Node$<E>$ newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new $DNode$$<E>$(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new Node$<E>$(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new $DNode$$<E>$(before,val));
+                currList.bubbleUpAppend(newNode=new Node$<E>$(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new $DNode$$<E>$(val));
+            currList.bubbleUpInit(new Node$<E>$(val));
           }
         }else{
-          $DNode$$<E>$ newNode;
-          currList.bubbleUpRootInit(newNode=new $DNode$$<E>$(val));
+          Node$<E>$ newNode;
+          currList.bubbleUpRootInit(newNode=new Node$<E>$(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
@@ -1043,13 +1276,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       int tailDist;
       final int subListSize;
       if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
-        final $DNode$$<E>$ subListHead,subListTail;
+        final Node$<E>$ subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
-          subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -1059,9 +1292,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       CheckedCollection.checkModCount(modCount,root.modCount);
       final int size;
       if((size=this.size)!=0){
-        $DNode$$<E>$ head,newTail;
-        final var newHead=newTail=new $DNode$$<E>$((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new $DNode$$<E>$(newTail,(head=head.next).val),++i){}
+        Node$<E>$ head,newTail;
+        final var newHead=newTail=new Node$<E>$((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node$<E>$(newTail,(head=head.next).val),++i){}
         return new CheckedList$<E>$(newHead,size,newTail);
       }
       return new CheckedList$<E>$();
@@ -1072,11 +1305,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO QueryMethods<contains,SubList,true>()
     private static class SerializableSubList$<E>$ implements Serializable{
       private static final long serialVersionUID=1L;
-      private transient $DNode$$<E>$ head;
-      private transient $DNode$$<E>$ tail;
+      private transient Node$<E>$ head;
+      private transient Node$<E>$ tail;
       private transient int size;
       private transient final CheckedList$<E>$.ModCountChecker modCountChecker;
-      private SerializableSubList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail,CheckedList$<E>$.ModCountChecker modCountChecker){
+      private SerializableSubList(Node$<E>$ head,int size,Node$<E>$ tail,CheckedList$<E>$.ModCountChecker modCountChecker){
         this.head=head;
         this.tail=tail;
         this.size=size;
@@ -1096,19 +1329,19 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
 #IF OfBoolean
           int word,marker;
-          for(this.head=curr=new $DNode$(((marker=1)&(word=ois.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $DNode$$<E>$(curr,(word&marker)!=0)){
+          for(this.head=curr=new Node(((marker=1)&(word=ois.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new Node$<E>$(curr,(word&marker)!=0)){
             if((marker<<=1)==(1<<8)){
               word=ois.readUnsignedByte();
               marker=1;
             }
           }
 #ELSEIF OfRef
-          for(this.head=curr=new $DNode$$<E>$(($exposedType$)ois.readObject());--size!=0;curr=curr.next=new $DNode$$<E>$(curr,($exposedType$)ois.readObject())){}
+          for(this.head=curr=new Node$<E>$(($exposedType$)ois.readObject());--size!=0;curr=curr.next=new Node$<E>$(curr,($exposedType$)ois.readObject())){}
 #ELSE
-          for(this.head=curr=new $DNode$$<E>$(($exposedType$)ois.read$TypeNameModifier$());--size!=0;curr=curr.next=new $DNode$$<E>$(curr,($exposedType$)ois.read$TypeNameModifier$())){}
+          for(this.head=curr=new Node$<E>$(($exposedType$)ois.read$TypeNameModifier$());--size!=0;curr=curr.next=new Node$<E>$(curr,($exposedType$)ois.read$TypeNameModifier$())){}
 #ENDIF
           this.tail=curr;
         }
@@ -1161,7 +1394,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      final $DNode$$<E>$ node;
+      final Node$<E>$ node;
       final var ret=(node=(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size)).val;
       node.val=val;
       return ret;
@@ -1189,7 +1422,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return this.size==0;
     }
     @Override public void replaceAll($UnaryOperator$$<E>$ operator){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)==null){
         CheckedCollection.checkModCount(modCount,root.modCount);
         return;
@@ -1197,7 +1430,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       final CheckedList$<E>$ root;
       int modCount=this.modCount;
       try{
-        $DNode$.uncheckedReplaceAll(head,this.size,operator);
+        Node.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         root.modCount=++modCount;
@@ -1210,15 +1443,15 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
       final int modCount=this.modCount;
       try{
-        final $DNode$$<E>$ head;
+        final Node$<E>$ head;
         if((head=this.head)!=null){
-          $DNode$.uncheckedForEachAscending(head,this.size,action);
+          Node.uncheckedForEachAscending(head,this.size,action);
         }
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
-    #MACRO ComparatorSortImpl<Stable,SubList,true>($Comparator$$<? super E>$,sorter)
+    #MACRO ComparatorSortImpl<Stable,SubList,true>($TypeNameModifier$Comparator$<? super E>$,sorter)
     #MACRO NonComparatorSortImpl<Stable,SubList,true,Ascending>()
     #MACRO NonComparatorSortImpl<Stable,SubList,true,Descending>()
 #IF OfRef
@@ -1226,7 +1459,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO NonComparatorSortImpl<Unstable,SubList,true,Descending>()
 #ELSE
     @Override public void replaceAll(UnaryOperator<$BoxedType$> operator){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)==null){
         CheckedCollection.checkModCount(modCount,root.modCount);
         return;
@@ -1234,7 +1467,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       final CheckedList$<E>$ root;
       int modCount=this.modCount;
       try{
-        $DNode$.uncheckedReplaceAll(head,this.size,operator::apply);
+        Node.uncheckedReplaceAll(head,this.size,operator::apply);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         root.modCount=++modCount;
@@ -1247,9 +1480,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     @Override public void forEach(Consumer<? super $BoxedType$> action){
       final int modCount=this.modCount;
       try{
-        final $DNode$$<E>$ head;
+        final Node$<E>$ head;
         if((head=this.head)!=null){
-          $DNode$.uncheckedForEachAscending(head,this.size,action::accept);
+          Node.uncheckedForEachAscending(head,this.size,action::accept);
         }
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1258,7 +1491,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO ComparatorSortImpl<Stable,SubList,true>(Comparator<? super $BoxedType$>,sorter::compare)
 #ENDIF
 #IFNOT OfBoolean
-    #MACRO ComparatorSortImpl<Unstable,SubList,true>($Comparator$$<? super E>$,sorter)
+    #MACRO ComparatorSortImpl<Unstable,SubList,true>($TypeNameModifier$Comparator$<? super E>$,sorter)
 #ENDIF
     @Override public <T> T[] toArray(T[] dst){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1302,10 +1535,10 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #IF OfRef
       final int modCount=this.modCount;
       try{
-        final $DNode$$<E>$ head;
+        final Node$<E>$ head;
         if((head=this.head)!=null){
            final StringBuilder builder;
-           RefDblLnkNode.uncheckedToString(head,size,builder=new StringBuilder("["));
+           Node.uncheckedToString(head,size,builder=new StringBuilder("["));
            return builder.append(']').toString();
         }
         return "[]";
@@ -1321,9 +1554,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #IF OfRef
       final int modCount=this.modCount;
       try{
-        final $DNode$$<E>$ head;
+        final Node$<E>$ head;
         if((head=this.head)!=null){
-           return RefDblLnkNode.uncheckedHashCode(head,size);
+           return Node.uncheckedHashCode(head,size);
         }
         return 1;
       }finally{
@@ -1347,7 +1580,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
 #IF OfRef
             if(list instanceof OmniList.OfRef){
               return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
@@ -1440,7 +1673,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #ENDIF
     public CheckedList(){
     }
-    CheckedList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    CheckedList(Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size,tail);
     }
     private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
@@ -1466,7 +1699,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      $DNode$$<E>$ tmp;
+      Node$<E>$ tmp;
       final var ret=(tmp=(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size)).val;
       tmp.val=val;
       return ret;
@@ -1484,14 +1717,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val;
     }
     @Override public $exposedType$ getLast$TypeNameModifier$(){
-      final $DNode$$<E>$ tail;
+      final Node$<E>$ tail;
       if((tail=this.tail)!=null){
          return tail.val;
       }
       throw new NoSuchElementException();
     }
     @Override public $exposedType$ $elementMethod$(){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
          return head.val;
       }
@@ -1508,39 +1741,39 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       });
     }
     @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $DNode$.uncheckedForEachAscending(head,this.size,action);
+          Node.uncheckedForEachAscending(head,this.size,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void replaceAll($UnaryOperator$$<E>$ operator){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $DNode$.uncheckedReplaceAll(head,this.size,operator);
+          Node.uncheckedReplaceAll(head,this.size,operator);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
     }
-    #MACRO ComparatorSortImpl<Stable,Root,true>($Comparator$$<? super E>$,sorter)
+    #MACRO ComparatorSortImpl<Stable,Root,true>($TypeNameModifier$Comparator$<? super E>$,sorter)
     #MACRO NonComparatorSortImpl<Stable,Root,true,Ascending>()
     #MACRO NonComparatorSortImpl<Stable,Root,true,Descending>()
 #IF OfRef
     @Override public String toString(){
-      final RefDblLnkNode<E> head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          RefDblLnkNode.uncheckedToString(head,size,builder);
+          Node.uncheckedToString(head,size,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1549,11 +1782,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return "[]";
     }
     @Override public int hashCode(){
-      final RefDblLnkNode<E> head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          return RefDblLnkNode.uncheckedHashCode(head,size);
+          return Node.uncheckedHashCode(head,size);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1564,22 +1797,22 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO NonComparatorSortImpl<Unstable,Root,true,Descending>()
 #ELSE
     @Override public void forEach(Consumer<? super $BoxedType$> action){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $DNode$.uncheckedForEachAscending(head,this.size,action::accept);
+          Node.uncheckedForEachAscending(head,this.size,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void replaceAll(UnaryOperator<$BoxedType$> operator){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $DNode$.uncheckedReplaceAll(head,this.size,operator::apply);
+          Node.uncheckedReplaceAll(head,this.size,operator::apply);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
@@ -1589,9 +1822,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO ComparatorSortImpl<Stable,Root,true>(Comparator<? super $BoxedType$>,sorter::compare)
 #ENDIF
 #IF OfBoolean
-    private int removeIfHelper($DNode$$<E>$ prev,int numLeft,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,int numLeft,boolean retainThis){
       int numSurvivors=1;
-      outer:for($DNode$$<E>$ next;--numLeft!=0;prev=next,++numSurvivors){
+      outer:for(Node$<E>$ next;--numLeft!=0;prev=next,++numSurvivors){
         if((next=prev.next).val^retainThis){
           do{
             if(--numLeft==0){
@@ -1606,7 +1839,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       }
       return numSurvivors;
     }
-    private int removeIfHelper($DNode$$<E>$ prev,$DNode$$<E>$ head,int numLeft,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ head,int numLeft,boolean retainThis){
       int numSurvivors=0;
       outer:for(;;){
         if(--numLeft==0){
@@ -1629,8 +1862,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return numSurvivors;
     }
 #ELSE
-    #MACRO ComparatorSortImpl<Unstable,Root,true>($Comparator$$<? super E>$,sorter)
-    private void pullSurvivorsDown($DNode$$<E>$ prev,long[] survivorSet,int numSurvivors,int numRemoved){
+    #MACRO ComparatorSortImpl<Unstable,Root,true>($TypeNameModifier$Comparator$<? super E>$,sorter)
+    private void pullSurvivorsDown(Node$<E>$ prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1666,7 +1899,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         prev=curr;
       }
     }
-    private void pullSurvivorsDown($DNode$$<E>$ prev,long word,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node$<E>$ prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -1694,7 +1927,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         prev=curr;
       }
     }
-    private int removeIfHelper($DNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
+    private int removeIfHelper(Node$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -1717,7 +1950,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return 0;
     }
 #ENDIF
-    @Override boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+    @Override boolean uncheckedRemoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
       final int modCount=this.modCount;
       try{
         int numLeft=this.size;
@@ -1745,7 +1978,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           return true;
         }else{
           for(int numSurvivors=1;--numLeft!=0;++numSurvivors){
-            $DNode$$<E>$ prev;
+            Node$<E>$ prev;
             if((head=(prev=head).next).val^firstVal){
               if(filter.test(!firstVal)){
                 CheckedCollection.checkModCount(modCount,this.modCount);
@@ -1833,9 +2066,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        $DNode$$<E>$ head,newTail;
-        final var newHead=newTail=new $DNode$$<E>$((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new $DNode$$<E>$(newTail,(head=head.next).val),++i){}
+        Node$<E>$ head,newTail;
+        final var newHead=newTail=new Node$<E>$((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node$<E>$(newTail,(head=head.next).val),++i){}
         return new CheckedList$<E>$(newHead,size,newTail);
       }
       return new CheckedList$<E>$();
@@ -1859,7 +2092,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           final int thatModCount=(that=(RefDblLnkSeq.CheckedSubList<?>)dls).modCount;
           final int thisModCount=this.modCount;
           try{
-            final RefDblLnkNode<?> thatHead,thisHead;
+            final Node<?> thatHead,thisHead;
             return size==that.size && (((thatHead=that.head)==(thisHead=this.head))||UncheckedList.isEqualToHelper(thisHead,thatHead,this.tail));
           }finally{
             CheckedCollection.checkModCount(thisModCount,this.modCount);
@@ -1910,14 +2143,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         }
       }
     }
-    private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfRef<?> list){
+    private boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfRef<?> list){
       if(list instanceof RefDblLnkSeq){
         final RefDblLnkSeq<?> dls;
         if((dls=(RefDblLnkSeq<?>)list) instanceof RefDblLnkSeq.CheckedList){
           final RefDblLnkSeq.CheckedList<?> that;
           final int thatModCount=(that=(RefDblLnkSeq.CheckedList<?>)dls).modCount;
           try{
-            final RefDblLnkNode<?> thatHead;
+            final Node<?> thatHead;
             return size==that.size && (((thatHead=that.head)==thisHead)||UncheckedList.isEqualToHelper(thatHead,thisHead,dls.tail));
           }finally{
             CheckedCollection.checkModCount(thatModCount,that.modCount);
@@ -1926,7 +2159,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           final RefDblLnkSeq.CheckedSubList<?> that;
           final int thatModCount=(that=(RefDblLnkSeq.CheckedSubList<?>)list).modCount;
           try{
-            final RefDblLnkNode<?> thatHead;
+            final Node<?> thatHead;
             return size==that.size && ((thatHead=that.head)==thisHead||UncheckedList.isEqualToHelper(thatHead,thisHead,dls.tail));
           }finally{
             CheckedCollection.checkModCount(thatModCount,that.root.modCount);
@@ -1971,7 +2204,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         if((dls=($ClassPrefix$DblLnkSeq)list) instanceof $ClassPrefix$DblLnkSeq.CheckedSubList){
           final $ClassPrefix$DblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=($ClassPrefix$DblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
-          final $ClassPrefix$DblLnkNode thatHead,thisHead;
+          final Node thatHead,thisHead;
           return size==subList.size && ((thatHead=subList.head)==(thisHead=this.head) || UncheckedList.isEqualToHelper(thisHead,thatHead,this.tail));
         }else{
           return size==dls.size && UncheckedList.isEqualToHelper(this.head,dls.head,this.tail);
@@ -2016,14 +2249,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return size==(subList=($ClassPrefix$ArrSeq.UncheckedSubList)list).size && SequenceEqualityUtil.isEqualTo(subList.root.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head); 
       }
     }
-    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,OmniList.Of$ClassPrefix$ list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.Of$ClassPrefix$ list){
       if(list instanceof $ClassPrefix$DblLnkSeq){
         final $ClassPrefix$DblLnkSeq dls;
         if((dls=($ClassPrefix$DblLnkSeq)list) instanceof $ClassPrefix$DblLnkSeq.CheckedSubList){
           final $ClassPrefix$DblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=($ClassPrefix$DblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
         }
-        final $ClassPrefix$DblLnkNode thatHead;
+        final Node thatHead;
         return size==dls.size && ((thatHead=dls.head)==thisHead||UncheckedList.isEqualToHelper(thatHead,thisHead,dls.tail));
 #IF OfBoolean
       }else if(list instanceof Abstract$ClassPrefix$ArrSeq){
@@ -2076,7 +2309,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
 #IF OfRef
           if(list instanceof OmniList.OfRef){
             return this.isEqualTo(size,(OmniList.OfRef<?>)list);
@@ -2134,13 +2367,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       int tailDist;
       final int subListSize;
       if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
-        final $DNode$$<E>$ subListHead,subListTail;
+        final Node$<E>$ subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
-          subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -2148,62 +2381,62 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     } 
 #IF OfRef
     @Override public int search(Object val){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $DNode$.uncheckedsearchNonNull(head,this.size,val);
+            return Node.uncheckedsearchNonNull(head,this.size,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return $DNode$.uncheckedsearchNull(head);
+        return Node.uncheckedsearchNull(head);
       }
       return -1;
     }
     @Override public boolean contains(Object val){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $DNode$.uncheckedcontainsNonNull(head,this.size,val);
+            return Node.uncheckedcontainsNonNull(head,this.size,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return $DNode$.uncheckedcontainsNull(head,tail);
+        return Node.uncheckedcontainsNull(head,tail);
       }
       return false;
     }
     @Override public int indexOf(Object val){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $DNode$.uncheckedindexOfNonNull(head,this.size,val);
+            return Node.uncheckedindexOfNonNull(head,this.size,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return $DNode$.uncheckedindexOfNull(head,tail);
+        return Node.uncheckedindexOfNull(head,tail);
       }
       return -1;
     }
     @Override public int lastIndexOf(Object val){
-      final $DNode$$<E>$ tail;
+      final Node$<E>$ tail;
       if((tail=this.tail)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $DNode$.uncheckedlastIndexOfNonNull(this.size,tail,val);
+            return Node.uncheckedlastIndexOfNonNull(this.size,tail,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return $DNode$.uncheckedlastIndexOfNull(this.size,tail);
+        return Node.uncheckedlastIndexOfNull(this.size,tail);
       }
       return -1;
     }
@@ -2236,8 +2469,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     {
       transient final CheckedList$<E>$ parent;
       transient int modCount;
-      transient $DNode$$<E>$ curr;
-      transient $DNode$$<E>$ lastRet;
+      transient Node$<E>$ curr;
+      transient Node$<E>$ lastRet;
       transient int currIndex;
       private DescendingItr(DescendingItr$<E>$ itr){
         this.parent=itr.parent;
@@ -2252,7 +2485,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         this.currIndex=parent.size;
         this.curr=parent.tail;
       }
-      private DescendingItr(CheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+      private DescendingItr(CheckedList$<E>$ parent,Node$<E>$ curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -2266,7 +2499,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         if((curr=this.curr)!=null){
           this.lastRet=curr;
           this.curr=curr.prev;
@@ -2276,7 +2509,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         throw new NoSuchElementException();
       }
       @Override public void remove(){
-        $DNode$$<E>$ lastRet;
+        Node$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
           final CheckedList$<E>$ parent;
           int modCount;
@@ -2294,7 +2527,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
               parent.head=lastRet=lastRet.next;
               lastRet.prev=null;
             }else{
-              $DNode$.eraseNode(lastRet);
+              Node.eraseNode(lastRet);
             }
           }
           this.lastRet=null;
@@ -2306,7 +2539,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final int modCount=this.modCount;
         final CheckedList$<E>$ parent;
         try{
-          $DNode$.uncheckedForEachDescending(this.curr,currIndex,action);
+          Node.uncheckedForEachDescending(this.curr,currIndex,action);
         }finally{
           CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount,currIndex,this.currIndex);
         }
@@ -2336,7 +2569,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       private BidirectionalItr(CheckedList$<E>$ parent){
         super(parent,parent.head,0);
       }
-      private BidirectionalItr(CheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+      private BidirectionalItr(CheckedList$<E>$ parent,Node$<E>$ curr,int currIndex){
         super(parent,curr,currIndex);
       }
       @Override public Object clone(){
@@ -2344,7 +2577,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         if((curr=this.curr)!=null){
           this.lastRet=curr;
           this.curr=curr.next;
@@ -2358,7 +2591,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
         final int currIndex;
         if((currIndex=this.currIndex)!=0){
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
           this.curr=curr;
           this.currIndex=currIndex-1;
@@ -2376,7 +2609,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return this.currIndex-1;
       }
       @Override public void set($exposedType$ val){
-        final $DNode$$<E>$ lastRet;
+        final Node$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.modCount);
           lastRet.val=val;
@@ -2390,36 +2623,36 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
         parent.modCount=++modCount;
         this.modCount=modCount;
-        $DNode$$<E>$ newNode;
+        Node$<E>$ newNode;
         final int currIndex;
         if((currIndex=++this.currIndex)==++parent.size){
           if(currIndex==1){
-            parent.head=newNode=new $DNode$$<E>$(val);
+            parent.head=newNode=new Node$<E>$(val);
           }else{
-            (newNode=parent.tail).next=newNode=new $DNode$$<E>$(newNode,val);
+            (newNode=parent.tail).next=newNode=new Node$<E>$(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new $DNode$$<E>$(val,newNode);
+            (newNode=parent.head).prev=newNode=new Node$<E>$(val,newNode);
             parent.head=newNode;
           }else{
-            final $DNode$$<E>$ tmp;
-            (newNode=curr).prev=newNode=new $DNode$$<E>$(tmp=newNode.prev,val,newNode);
+            final Node$<E>$ tmp;
+            (newNode=curr).prev=newNode=new Node$<E>$(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }
         this.lastRet=null;
       }
       @Override public void remove(){
-        $DNode$$<E>$ lastRet;
+        Node$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
           final CheckedList$<E>$ parent;
           int modCount;
           CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
           parent.modCount=++modCount;
           this.modCount=modCount;
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           if((curr=lastRet.next)==this.curr){
             --currIndex;
           }else{
@@ -2452,7 +2685,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
-            $DNode$.uncheckedForEachAscending(this.curr,numLeft,action);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
@@ -2469,7 +2702,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
-            $DNode$.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
@@ -2536,7 +2769,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #ENDIF
     public UncheckedList(){
     }
-    UncheckedList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    UncheckedList(Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size,tail);
     }
     @Override public void clear(){
@@ -2588,19 +2821,19 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        $DNode$$<E>$ curr;
+        Node$<E>$ curr;
 #IF OfBoolean
         int word,marker;
-        for(this.head=curr=new $DNode$(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $DNode$$<E>$(curr,(word&marker)!=0)){
+        for(this.head=curr=new Node(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new Node$<E>$(curr,(word&marker)!=0)){
           if((marker<<=1)==(1<<8)){
             word=in.readUnsignedByte();
             marker=1;
           }
         }
 #ELSEIF OfRef
-        for(this.head=curr=new $DNode$$<E>$(($exposedType$)in.readObject());--size!=0;curr=curr.next=new $DNode$$<E>$(curr,($exposedType$)in.readObject())){}
+        for(this.head=curr=new Node$<E>$(($exposedType$)in.readObject());--size!=0;curr=curr.next=new Node$<E>$(curr,($exposedType$)in.readObject())){}
 #ELSE
-        for(this.head=curr=new $DNode$$<E>$(($exposedType$)in.read$TypeNameModifier$());--size!=0;curr=curr.next=new $DNode$$<E>$(curr,($exposedType$)in.read$TypeNameModifier$())){}
+        for(this.head=curr=new Node$<E>$(($exposedType$)in.read$TypeNameModifier$());--size!=0;curr=curr.next=new Node$<E>$(curr,($exposedType$)in.read$TypeNameModifier$())){}
 #ENDIF
         this.tail=curr;
       }
@@ -2608,18 +2841,18 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        $DNode$$<E>$ head,newTail;
-        final var newHead=newTail=new $DNode$$<E>$((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new $DNode$$<E>$(newTail,(head=head.next).val),++i){}
+        Node$<E>$ head,newTail;
+        final var newHead=newTail=new Node$<E>$((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node$<E>$(newTail,(head=head.next).val),++i){}
         return new UncheckedList$<E>$(newHead,size,newTail);
       }
       return new UncheckedList$<E>$();
     }
 #IF OfRef
-    private static boolean isEqualToHelper($ClassPrefix$DblLnkNode<?> thisHead,$ClassPrefix$DblLnkNode<?> thatHead,$ClassPrefix$DblLnkNode<?> thisTail){
+    private static boolean isEqualToHelper(Node<?> thisHead,Node<?> thatHead,Node<?> thisTail){
       for(;Objects.equals(thisHead.val,thatHead.val);thisHead=thisHead.next,thatHead=thatHead.next){
 #ELSE
-    private static boolean isEqualToHelper($ClassPrefix$DblLnkNode thisHead,$ClassPrefix$DblLnkNode thatHead,$ClassPrefix$DblLnkNode thisTail){
+    private static boolean isEqualToHelper(Node thisHead,Node thatHead,Node thisTail){
   #IF OfDouble,OfFloat
       for(;TypeUtil.$exposedType$Equals(thisHead.val,thatHead.val);thisHead=thisHead.next,thatHead=thatHead.next){
   #ELSE
@@ -2654,7 +2887,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
             CheckedCollection.checkModCount(thatModCount,that.root.modCount);
           }
         }else{
-          final RefDblLnkNode<?> thatHead,thisHead;
+          final Node<?> thatHead,thisHead;
           return size==dls.size && ((thatHead=dls.head)==(thisHead=this.head)|| isEqualToHelper(thisHead,thatHead,this.tail));
         }
       }else if(list instanceof RefArrSeq.UncheckedList){
@@ -2687,7 +2920,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         }
       }
     }
-    private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfRef<?> list){
+    private boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfRef<?> list){
       if(list instanceof RefDblLnkSeq){
         final RefDblLnkSeq<?> dls;
         if((dls=(RefDblLnkSeq<?>)list) instanceof RefDblLnkSeq.CheckedList){
@@ -2707,7 +2940,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
             CheckedCollection.checkModCount(thatModCount,that.root.modCount);
           }
         }else{
-          final RefDblLnkNode<?> thatHead;
+          final Node<?> thatHead;
           return dls.size==size && ((thatHead=dls.head)==thisHead|| isEqualToHelper(thatHead,thisHead,dls.tail));
         }
       }else if(list instanceof RefArrSeq.UncheckedList){
@@ -2741,7 +2974,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       }
     }
 #MACRODEF RefUncheckedisEqualToNodeIntOmniList<CLASSPREFIX>()
-private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPREFIX list){
+private boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfCLASSPREFIX list){
 #IFSWITCH CLASSPREFIX==Boolean
   if(list instanceof AbstractCLASSPREFIXArrSeq){
     final AbstractCLASSPREFIXArrSeq abstractArrSeq;
@@ -2808,7 +3041,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
           final $ClassPrefix$DblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=($ClassPrefix$DblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
         }
-        final $ClassPrefix$DblLnkNode thatHead,thisHead;
+        final Node thatHead,thisHead;
         return dls.size==size && ((thatHead=dls.head)==(thisHead=this.head)||isEqualToHelper(thisHead,thatHead,this.tail));
   #IF OfBoolean
       }else if(list instanceof Abstract$ClassPrefix$ArrSeq){
@@ -2850,14 +3083,14 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head);
       }
     }
-    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,OmniList.Of$ClassPrefix$ list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.Of$ClassPrefix$ list){
       if(list instanceof $ClassPrefix$DblLnkSeq){
         final $ClassPrefix$DblLnkSeq dls;
         if((dls=($ClassPrefix$DblLnkSeq)list) instanceof $ClassPrefix$DblLnkSeq.CheckedSubList){
           final $ClassPrefix$DblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=($ClassPrefix$DblLnkSeq.CheckedSubList)list).modCount,subList.root.modCount);
         }
-        final $ClassPrefix$DblLnkNode thatHead;
+        final Node thatHead;
         return dls.size==size && ((thatHead=dls.head)==thisHead || isEqualToHelper(thatHead,thisHead,dls.tail));
 #IF OfBoolean
       }else if(list instanceof Abstract$ClassPrefix$ArrSeq){
@@ -2899,7 +3132,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         return size==subList.size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo($ClassPrefix$DblLnkNode thisHead,int size,OmniList.OfRef<?> list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.OfRef<?> list){
       //TODO
       if(list instanceof RefArrSeq.UncheckedList){
         final RefArrSeq.UncheckedList<?> that;
@@ -2926,10 +3159,10 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
     }
 #ENDIF
 #IF OfRef
-    private static boolean isEqualTo(ListIterator<?> itr,$ClassPrefix$DblLnkNode<?> head,$ClassPrefix$DblLnkNode<?> tail){ 
+    private static boolean isEqualTo(ListIterator<?> itr,Node<?> head,Node<?> tail){ 
       while(itr.hasNext() && Objects.equals(head.val,itr.next())){
 #ELSE
-    private static boolean isEqualTo(ListIterator<?> itr,$ClassPrefix$DblLnkNode head,$ClassPrefix$DblLnkNode tail){ 
+    private static boolean isEqualTo(ListIterator<?> itr,Node head,Node tail){ 
       while(itr.hasNext() && TypeUtil.refEquals(itr.next(),head.val)){
 #ENDIF
         if(head==tail){
@@ -2949,7 +3182,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
 #IF OfRef
           if(list instanceof OmniList.OfRef){
             return this.isEqualTo(size,(OmniList.OfRef<?>)list);
@@ -3011,13 +3244,13 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       final int subListSize;
       if((subListSize=toIndex-fromIndex)!=0){
         final int tailDist;
-        final $DNode$$<E>$ subListHead,subListTail;
+        final Node$<E>$ subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
-          subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -3133,19 +3366,19 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
     #MACRO OutputMethods<false>(PollImpl)
     #MACRO OutputMethods<false>(PeekImpl)
     @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
     }
 #IFNOT OfRef
     @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
-      final $DNode$$<E>$ head;
+      final Node$<E>$ head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
     }
 #ENDIF
 #IF OfBoolean
-    private int removeIfHelper($DNode$$<E>$ prev,$DNode$$<E>$ tail,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ tail,boolean retainThis){
       int numSurvivors=1;
-      outer:for($DNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node$<E>$ next;prev!=tail;++numSurvivors,prev=next){
         if((next=prev.next).val^retainThis){
           do{
             if(next==tail){
@@ -3161,7 +3394,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       }
       return numSurvivors;
     }
-    private int removeIfHelper($DNode$$<E>$ prev,$DNode$$<E>$ curr,$DNode$$<E>$ tail,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ curr,Node$<E>$ tail,boolean retainThis){
       int numSurvivors=0;
       while(curr!=tail) {
         if((curr=curr.next).val==retainThis){
@@ -3180,9 +3413,9 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       return numSurvivors;
     }
 #ELSE
-    private int removeIfHelper($DNode$$<E>$ prev,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
       int numSurvivors=1;
-      outer:for($DNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node$<E>$ next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
           do{
             if(next==tail){
@@ -3198,7 +3431,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       }
       return numSurvivors;
     }
-    private int removeIfHelper($DNode$$<E>$ prev,$DNode$$<E>$ curr,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ curr,Node$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -3217,7 +3450,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       return numSurvivors;
     }
 #ENDIF
-    boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+    boolean uncheckedRemoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
 #IF OfBoolean
       boolean firstVal;
       if(filter.test(firstVal=head.val)){
@@ -3239,7 +3472,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final $DNode$$<E>$ prev;
+          final Node$<E>$ prev;
           if((head=(prev=head).next).val^firstVal){
             if(filter.test(!firstVal)){
               this.size=numSurvivors+removeIfHelper(prev,head,tail,firstVal);
@@ -3267,7 +3500,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final $DNode$$<E>$ prev;
+          final Node$<E>$ prev;
           if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
@@ -3293,12 +3526,12 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
           parent.head=null;
           parent.tail=null;
         }else{
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           if((curr=this.curr)==null){
             (curr=parent.head.next).prev=null;
             parent.head=curr;
           }else{
-            $DNode$$<E>$ lastRet;
+            Node$<E>$ lastRet;
             if((lastRet=curr.next)==parent.tail){
               parent.tail=curr;
               curr.next=null;
@@ -3310,12 +3543,12 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         }
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         this.curr=(curr=this.curr).prev;
         return curr.val;
       }
-      @Override void uncheckedForEachRemaining($DNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
-        $DNode$.uncheckedForEachDescending(curr,action);
+      @Override void uncheckedForEachRemaining(Node$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+        Node.uncheckedForEachDescending(curr,action);
       }
     }
     private static class AscendingItr$<E>$
@@ -3326,12 +3559,12 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
 #ENDIF
     {
       transient final UncheckedList$<E>$ parent;
-      transient $DNode$$<E>$ curr;
+      transient Node$<E>$ curr;
       private AscendingItr(AscendingItr$<E>$ itr){
         this.parent=itr.parent;
         this.curr=itr.curr;
       }
-      private AscendingItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr){
+      private AscendingItr(UncheckedList$<E>$ parent,Node$<E>$ curr){
         this.parent=parent;
         this.curr=curr;
       }
@@ -3351,12 +3584,12 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
           parent.head=null;
           parent.tail=null;
         }else{
-          $DNode$$<E>$ curr;
+          Node$<E>$ curr;
           if((curr=this.curr)==null){
             (curr=parent.tail.prev).next=null;
             parent.tail=curr;
           }else{
-            $DNode$$<E>$ lastRet;
+            Node$<E>$ lastRet;
             if((lastRet=curr.prev)==parent.head){
               parent.head=curr;
               curr.prev=null;
@@ -3368,15 +3601,15 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         }
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         this.curr=(curr=this.curr).next;
         return curr.val;
       }
-      void uncheckedForEachRemaining($DNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
-        $DNode$.uncheckedForEachAscending(curr,action);
+      void uncheckedForEachRemaining(Node$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+        Node.uncheckedForEachAscending(curr,action);
       }
       @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         if((curr=this.curr)!=null){
           uncheckedForEachRemaining(curr,action);
           this.curr=null;
@@ -3384,7 +3617,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       }
 #IFNOT OfRef
       @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         if((curr=this.curr)!=null){
           uncheckedForEachRemaining(curr,action::accept);
           this.curr=null;
@@ -3394,7 +3627,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
     }
     private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
       private transient int currIndex;
-      private transient $DNode$$<E>$ lastRet;
+      private transient Node$<E>$ lastRet;
       private BidirectionalItr(BidirectionalItr$<E>$ itr){
         super(itr);
         this.currIndex=itr.currIndex;
@@ -3403,7 +3636,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       private BidirectionalItr(UncheckedList$<E>$ parent){
         super(parent);
       }
-      private BidirectionalItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+      private BidirectionalItr(UncheckedList$<E>$ parent,Node$<E>$ curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
       }
@@ -3411,14 +3644,14 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         return new BidirectionalItr$<E>$(this);
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
+        final Node$<E>$ curr;
         this.lastRet=curr=this.curr;
         this.curr=curr.next;
         ++this.currIndex;
         return curr.val;
       }
       @Override public $exposedType$ previous$TypeNameModifier$(){
-        $DNode$$<E>$ curr;
+        Node$<E>$ curr;
         this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
         this.curr=curr;
         --this.currIndex;
@@ -3435,22 +3668,22 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
       }
       @Override public void add($exposedType$ val){
         final UncheckedList$<E>$ parent;
-        $DNode$$<E>$ newNode;
+        Node$<E>$ newNode;
         final int currIndex;
         if((currIndex=++this.currIndex)==++(parent=this.parent).size){
           if(currIndex==1){
-            parent.head=newNode=new $DNode$$<E>$(val);
+            parent.head=newNode=new Node$<E>$(val);
           }else{
-            (newNode=parent.tail).next=newNode=new $DNode$$<E>$(newNode,val);
+            (newNode=parent.tail).next=newNode=new Node$<E>$(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new $DNode$$<E>$(val,newNode);
+            (newNode=parent.head).prev=newNode=new Node$<E>$(val,newNode);
             parent.head=newNode;
           }else{
-            final $DNode$$<E>$ tmp;
-            (newNode=curr).prev=newNode=new $DNode$$<E>$(tmp=newNode.prev,val,newNode);
+            final Node$<E>$ tmp;
+            (newNode=curr).prev=newNode=new Node$<E>$(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }
@@ -3460,7 +3693,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         lastRet.val=val;
       }
       @Override public void remove(){
-        $DNode$$<E>$ lastRet,curr;
+        Node$<E>$ lastRet,curr;
         if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
         }else{
@@ -3484,8 +3717,8 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
         }
         this.lastRet=null;
       }
-      @Override void uncheckedForEachRemaining($DNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
-        $DNode$.uncheckedForEachAscending(curr,action);
+      @Override void uncheckedForEachRemaining(Node$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+        Node.uncheckedForEachAscending(curr,action);
         final UncheckedList$<E>$ parent;
         this.lastRet=(parent=this.parent).tail;
         this.currIndex=parent.size;
@@ -3502,7 +3735,7 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
   int size;
   if((size=this.size)!=0){
     final RETTYPE[] dst;
-    $DNode$.uncheckedCopyInto(dst=new RETTYPE[size],tail,size);
+    Node.uncheckedCopyInto(dst=new RETTYPE[size],tail,size);
     return dst;
   }
   return DEFAULTARR;
@@ -3636,10 +3869,10 @@ private boolean isEqualTo(RefDblLnkNode<E> thisHead,int size,OmniList.OfCLASSPRE
 
 #MACRODEF SizeCheck()
 #IFSWITCH METHODNAME==contains,indexOf,search,removeVal
-final $DNode$$<E>$ head;
+final Node$<E>$ head;
 if((head=this.head)!=null)
 #ELSEIFSWITCH METHODNAME==lastIndexOf,removeLastOccurrence
-final $DNode$$<E>$ tail;
+final Node$<E>$ tail;
 if((tail=this.tail)!=null)
 #ELSE
 ERROR unknown method name METHODNAME in SizeCheck()
@@ -3650,11 +3883,11 @@ ERROR unknown method name METHODNAME in SizeCheck()
 ERROR ReturnUncheckedQueryBits(VAL) is only valid for Float and Double
 #ENDIF
 #IFSWITCH METHODNAME==contains,indexOf
-return $DNode$.uncheckedMETHODNAMEBits(head,tail,VAL);
+return Node.uncheckedMETHODNAMEBits(head,tail,VAL);
 #ELSEIFSWITCH METHODNAME==search
-return $DNode$.uncheckedMETHODNAMEBits(head,VAL);
+return Node.uncheckedMETHODNAMEBits(head,VAL);
 #ELSEIFSWITCH METHODNAME==lastIndexOf
-return $DNode$.uncheckedMETHODNAMEBits(size,tail,VAL);
+return Node.uncheckedMETHODNAMEBits(size,tail,VAL);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMEBits(head,VAL);
 #ELSEIFSWITCH METHODNAME==removeLastOccurrence
@@ -3668,11 +3901,11 @@ ERROR unknown method name METHODNAME in ReturnUncheckedQueryBits(VAL)
 ERROR ReturnUncheckedQuery0() is only valid for Float and Double
 #ENDIF
 #IFSWITCH METHODNAME==contains,indexOf
-return $DNode$.uncheckedMETHODNAME0(head,tail);
+return Node.uncheckedMETHODNAME0(head,tail);
 #ELSEIFSWITCH METHODNAME==search
-return $DNode$.uncheckedMETHODNAME0(head);
+return Node.uncheckedMETHODNAME0(head);
 #ELSEIFSWITCH METHODNAME==lastIndexOf
-return $DNode$.uncheckedMETHODNAME0(size,tail);
+return Node.uncheckedMETHODNAME0(size,tail);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAME0(head);
 #ELSEIFSWITCH METHODNAME==removeLastOccurrence
@@ -3686,11 +3919,11 @@ ERROR unknown method name METHODNAME in  ReturnUncheckedQuery0()
 ERROR ReturnUncheckedQueryNaN() is only valid for Float and Double
 #ENDIF
 #IFSWITCH METHODNAME==contains,indexOf
-return $DNode$.uncheckedMETHODNAMENaN(head,tail);
+return Node.uncheckedMETHODNAMENaN(head,tail);
 #ELSEIFSWITCH METHODNAME==search
-return $DNode$.uncheckedMETHODNAMENaN(head);
+return Node.uncheckedMETHODNAMENaN(head);
 #ELSEIFSWITCH METHODNAME==lastIndexOf
-return $DNode$.uncheckedMETHODNAMENaN(size,tail);
+return Node.uncheckedMETHODNAMENaN(size,tail);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMENaN(head);
 #ELSEIFSWITCH METHODNAME==removeLastOccurrence
@@ -3704,11 +3937,11 @@ ERROR unknown method name METHODNAME in ReturnUncheckedQueryNaN()
 ERROR ReturnUncheckedQuery(VAL) is not valid for $ClassPrefix$
 #ENDIF
 #IFSWITCH METHODNAME==contains,indexOf
-return $DNode$.uncheckedMETHODNAME(head,tail,VAL);
+return Node.uncheckedMETHODNAME(head,tail,VAL);
 #ELSEIFSWITCH METHODNAME==search
-return $DNode$.uncheckedMETHODNAME(head,VAL);
+return Node.uncheckedMETHODNAME(head,VAL);
 #ELSEIFSWITCH METHODNAME==lastIndexOf
-return $DNode$.uncheckedMETHODNAME(size,tail,VAL);
+return Node.uncheckedMETHODNAME(size,tail,VAL);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAME(head,VAL);
 #ELSEIFSWITCH METHODNAME==removeLastOccurrence
@@ -3723,14 +3956,14 @@ ERROR ReturnUncheckedQueryNonNull(VAL) is not valid for $ClassPrefix$
 #ENDIF
 #IFSWITCH METHODNAME==contains,indexOf
   #IFSWITCH CHECKED==true
-return $DNode$.uncheckedMETHODNAMENonNull(head,this.size,VAL);
+return Node.uncheckedMETHODNAMENonNull(head,this.size,VAL);
   #ELSE
-return $DNode$.uncheckedMETHODNAMENonNull(head,tail,VAL);
+return Node.uncheckedMETHODNAMENonNull(head,tail,VAL);
   #ENDIF
 #ELSEIFSWITCH METHODNAME==search
-return $DNode$.uncheckedMETHODNAMENonNull(head,VAL);
+return Node.uncheckedMETHODNAMENonNull(head,VAL);
 #ELSEIFSWITCH METHODNAME==lastIndexOf
-return $DNode$.uncheckedMETHODNAMENonNull(size,tail,VAL);
+return Node.uncheckedMETHODNAMENonNull(size,tail,VAL);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMENonNull(head,VAL);
 #ELSEIFSWITCH METHODNAME==removeLastOccurrence
@@ -3744,11 +3977,11 @@ ERROR unknown method name METHODNAME in ReturnUncheckedQueryNonNull(VAL)
 ERROR ReturnUncheckedQueryNull() is not valid for $ClassPrefix$
 #ENDIF
 #IFSWITCH METHODNAME==contains,indexOf
-return $DNode$.uncheckedMETHODNAMENull(head,tail);
+return Node.uncheckedMETHODNAMENull(head,tail);
 #ELSEIFSWITCH METHODNAME==search
-return $DNode$.uncheckedMETHODNAMENull(head);
+return Node.uncheckedMETHODNAMENull(head);
 #ELSEIFSWITCH METHODNAME==lastIndexOf
-return $DNode$.uncheckedMETHODNAMENull(size,tail);
+return Node.uncheckedMETHODNAMENull(size,tail);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMENull(head);
 #ELSEIFSWITCH METHODNAME==removeLastOccurrence
@@ -4331,7 +4564,7 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
 #ENDIF
 #ENDDEF
 #MACRODEF UncheckedRemoveVal<STRUCTNAME,CHECKED,SUFFIX>(POSTEST)
-boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
+boolean uncheckedremoveValSUFFIX(Node$<E>$ head
 #MACRO UncheckedQueryParam()
 ){
 #IFSWITCH STRUCTNAME==Root
@@ -4355,7 +4588,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
     }
     int numLeft=--size;
     for(;numLeft!=0;--numLeft){
-      $DNode$$<E>$ prev;
+      Node$<E>$ prev;
       if(POSTEST((head=(prev=head).next).val)){
         CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
@@ -4389,7 +4622,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
       }
       return true;
     }
-    for($DNode$$<E>$ prev;(head=(prev=head).next)!=null;){
+    for(Node$<E>$ prev;(head=(prev=head).next)!=null;){
       if(POSTEST(head.val)){
         ++this.modCount;
         if((head=head.next)==null){
@@ -4417,7 +4650,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
       }
       return true;
     }
-    for($DNode$$<E>$ prev;(head=(prev=head).next)!=null;){
+    for(Node$<E>$ prev;(head=(prev=head).next)!=null;){
       if(POSTEST(head.val)){
         if((head=head.next)==null){
           this.tail=prev;
@@ -4461,7 +4694,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
     }
     #IFSWITCH SUFFIX==NonNull
     for(int numLeft=--size;numLeft!=0;--numLeft){
-      $DNode$$<E>$ prev;
+      Node$<E>$ prev;
       if(POSTEST((head=(prev=head).next).val)){
         CheckedCollection.checkModCount(modCount,root.modCount);
         root.modCount=++modCount;
@@ -4480,7 +4713,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
     }
     #ELSE
     for(final var tail=this.tail;head!=tail;){
-      $DNode$$<E>$ prev;
+      Node$<E>$ prev;
       if(POSTEST((head=(prev=head).next).val)){
         root.modCount=++modCount;
         this.modCount=modCount;
@@ -4517,7 +4750,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
     return true;
   }else{
     for(final var tail=this.tail;tail!=head;){
-      $DNode$$<E>$ prev;
+      Node$<E>$ prev;
       if(POSTEST((head=(prev=head).next).val)){
         --root.size;
         --this.size;
@@ -4538,7 +4771,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
 }
 #ENDDEF
 #MACRODEF UncheckedRemoveLastOccurrence<CHECKED,SUFFIX>(POSTEST)
-boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
+boolean uncheckedremoveLastOccurrenceSUFFIX(Node$<E>$ tail
 #MACRO UncheckedQueryParam()
 ){
 #IFSWITCH CHECKED==true
@@ -4574,7 +4807,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   #IFSWITCH SUFFIX==NonNull
     int numLeft=--size;
     for(;numLeft!=0;--numLeft){
-      $DNode$$<E>$ next;
+      Node$<E>$ next;
       if(POSTEST((tail=(next=tail).prev).val)){
         CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
@@ -4591,7 +4824,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
       }
     }
   #ELSE
-    for($DNode$$<E>$ next;(tail=(next=tail).prev)!=null;){
+    for(Node$<E>$ next;(tail=(next=tail).prev)!=null;){
       if(POSTEST(tail.val)){
         this.modCount=modCount+1;
         if((tail=tail.prev)==null){
@@ -4607,7 +4840,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     }
   #ENDIF
 #ELSE
-    for($DNode$$<E>$ next;(tail=(next=tail).prev)!=null;){
+    for(Node$<E>$ next;(tail=(next=tail).prev)!=null;){
       if(POSTEST(tail.val)){
         if((tail=tail.prev)==null){
           this.head=next;
@@ -4662,7 +4895,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 #ENDDEF
 #MACRODEF PollImpl(CLASSPREFIX,RETTYPE,DEFAULTVAL,CAST)
 @Override public RETTYPE pollCLASSPREFIX(){
-  $DNode$$<E>$ head;
+  Node$<E>$ head;
   if((head=this.head)!=null){
 #IFSWITCH CHECKED==true
     ++this.modCount;
@@ -4680,7 +4913,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   return DEFAULTVAL;
 }
 @Override public RETTYPE pollLastCLASSPREFIX(){
-  $DNode$$<E>$ tail;
+  Node$<E>$ tail;
   if((tail=this.tail)!=null){
 #IFSWITCH CHECKED==true
     ++this.modCount;
@@ -4700,14 +4933,14 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 #ENDDEF
 #MACRODEF PeekImpl(CLASSPREFIX,RETTYPE,DEFAULTVAL,CAST)
 @Override public RETTYPE peekCLASSPREFIX(){
-  final $DNode$$<E>$ head;
+  final Node$<E>$ head;
   if((head=this.head)!=null){
     return CAST(head.val);
   }
   return DEFAULTVAL;
 }
 @Override public RETTYPE peekLastCLASSPREFIX(){
-  final $DNode$$<E>$ tail;
+  final Node$<E>$ tail;
   if((tail=this.tail)!=null){
     return CAST(tail.val);
   }
@@ -4729,8 +4962,8 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   final int size;
   if((size=this.size)>1){
     final $ArrayType$[] tmp;
-    final $DNode$$<E>$ tail;
-    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    final Node$<E>$ tail;
+    Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
     final CheckedList$<E>$ root;
     int modCount=this.modCount;
     try{
@@ -4743,7 +4976,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     root.modCount=++modCount;
     for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
     this.modCount=modCount;
-    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+    Node.uncheckedCopyFrom(tmp,size,tail);
   }else{
     CheckedCollection.checkModCount(modCount,root.modCount);
   }
@@ -4754,21 +4987,21 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   final int size;
   if((size=this.size)>1){
     final $ArrayType$[] tmp;
-    final $DNode$$<E>$ tail;
-    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    final Node$<E>$ tail;
+    Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
     root.modCount=++modCount;
     for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
     this.modCount=modCount;
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(tmp,0,size);
-    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+    Node.uncheckedCopyFrom(tmp,size,tail);
   }
     #ENDIF
   #ELSE
   final int size;
   if((size=this.size)>1){
     final $ArrayType$[] tmp;
-    final $DNode$$<E>$ tail;
-    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    final Node$<E>$ tail;
+    Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
     #IF OfRef
     int modCount=this.modCount;
     try{
@@ -4782,21 +5015,21 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(tmp,0,size);
     #ENDIF
     this.modCount=modCount+1;
-    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+    Node.uncheckedCopyFrom(tmp,size,tail);
   }
   #ENDIF
 #ELSE
   final int size;
   if((size=this.size)>1){
     final $ArrayType$[] tmp;
-    final $DNode$$<E>$ tail;
-    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    final Node$<E>$ tail;
+    Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
   #IF OfRef
     $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(tmp,0,size);
   #ELSE
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(tmp,0,size);
   #ENDIF
-    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+    Node.uncheckedCopyFrom(tmp,size,tail);
   }
 #ENDIF
 }
@@ -4815,9 +5048,9 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     int modCount=this.modCount;
     final CheckedList$<E>$ root;
     final $ArrayType$[] tmp;
-    final $DNode$$<E>$ tail;
+    final Node$<E>$ tail;
     #IF OfRef
-    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
     try{
       if(sorter==null){
         $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(tmp,0,size);
@@ -4832,10 +5065,10 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     #ELSE
     if(sorter==null){
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+      Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
       $ClassPrefix$SortUtil.uncheckedAscendingSort(tmp,0,size);
     }else{
-      $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+      Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
       try{
       #IF OfBoolean
         $ClassPrefix$SortUtil.uncheckedSort(tmp,0,size,COMPARE);
@@ -4852,7 +5085,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     root.modCount=++modCount;
     for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
     this.modCount=modCount;
-    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+    Node.uncheckedCopyFrom(tmp,size,tail);
   }else{
     CheckedCollection.checkModCount(modCount,root.modCount);
   }
@@ -4860,8 +5093,8 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   final int size;
   if((size=this.size)>1){
     final $ArrayType$[] tmp;
-    final $DNode$$<E>$ tail;
-    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    final Node$<E>$ tail;
+    Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
     #IF OfRef
     int modCount=this.modCount;
     try{
@@ -4896,15 +5129,15 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
       this.modCount=modCount+1;
     }
     #ENDIF
-    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+    Node.uncheckedCopyFrom(tmp,size,tail);
   }
   #ENDIF
 #ELSE
   final int size;
   if((size=this.size)>1){
     final $ArrayType$[] tmp;
-    final $DNode$$<E>$ tail;
-    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    final Node$<E>$ tail;
+    Node.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
     if(sorter==null){
   #IF OfRef
       $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(tmp,0,size);
@@ -4918,7 +5151,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
       $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
   #ENDIF
     }
-    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+    Node.uncheckedCopyFrom(tmp,size,tail);
   }
 #ENDIF
 }
@@ -4931,7 +5164,7 @@ private void bubbleUpIncrementSize(){
 #ENDIF
   }
 }
-private void bubbleUpAppend($DNode$$<E>$ oldTail,$DNode$$<E>$ newTail){
+private void bubbleUpAppend(Node$<E>$ oldTail,Node$<E>$ newTail){
   oldTail.next=newTail;
   this.tail=newTail;
   for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
@@ -4945,7 +5178,7 @@ private void bubbleUpAppend($DNode$$<E>$ oldTail,$DNode$$<E>$ newTail){
     }
   }
 }
-private void bubbleUpAppend($DNode$$<E>$ newTail){
+private void bubbleUpAppend(Node$<E>$ newTail){
   this.tail=newTail;
   for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
 #IFSWITCH CHECKED==Checked
@@ -4953,7 +5186,7 @@ private void bubbleUpAppend($DNode$$<E>$ newTail){
 #ENDIF  
   }
 }
-private void bubbleUpPrepend($DNode$$<E>$ oldHead,$DNode$$<E>$ newHead){
+private void bubbleUpPrepend(Node$<E>$ oldHead,Node$<E>$ newHead){
   this.head=newHead;
   for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
 #IFSWITCH CHECKED==Checked
@@ -4966,7 +5199,7 @@ private void bubbleUpPrepend($DNode$$<E>$ oldHead,$DNode$$<E>$ newHead){
     }
   }
 }
-private void bubbleUpPrepend($DNode$$<E>$ newHead){
+private void bubbleUpPrepend(Node$<E>$ newHead){
   this.head=newHead;
   for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
 #IFSWITCH CHECKED==Checked
@@ -4974,7 +5207,7 @@ private void bubbleUpPrepend($DNode$$<E>$ newHead){
 #ENDIF  
   }
 }
-private void bubbleUpRootInit($DNode$$<E>$ newNode){
+private void bubbleUpRootInit(Node$<E>$ newNode){
   this.head=newNode;
   this.tail=newNode;
   for(var parent=this.parent;parent!=null;parent=parent.parent){
@@ -4986,8 +5219,8 @@ private void bubbleUpRootInit($DNode$$<E>$ newNode){
     parent.tail=newNode;
   }
 }
-private void bubbleUpInitHelper(int index,int size,$DNode$$<E>$ newNode){
-  $DNode$$<E>$ after,before;   
+private void bubbleUpInitHelper(int index,int size,Node$<E>$ newNode){
+  Node$<E>$ after,before;   
   if((size-=index)<=index){
     before=this.tail;
     if(size==1){
@@ -5000,7 +5233,7 @@ private void bubbleUpInitHelper(int index,int size,$DNode$$<E>$ newNode){
       }
     }else{
       this.bubbleUpIncrementSize();
-      before=(after=$DNode$.iterateDescending(before,size-2)).prev;
+      before=(after=Node.iterateDescending(before,size-2)).prev;
       after.prev=newNode;
     }
     before.next=newNode;        
@@ -5016,7 +5249,7 @@ private void bubbleUpInitHelper(int index,int size,$DNode$$<E>$ newNode){
       }
     }else{
       this.bubbleUpIncrementSize();
-      after=(before=$DNode$.iterateAscending(after,index-1)).next;
+      after=(before=Node.iterateAscending(after,index-1)).next;
       before.next=newNode;
     }
     after.prev=newNode;
@@ -5024,7 +5257,7 @@ private void bubbleUpInitHelper(int index,int size,$DNode$$<E>$ newNode){
   newNode.next=after;
   newNode.prev=before;
 }
-private void bubbleUpInit($DNode$$<E>$ newNode){
+private void bubbleUpInit(Node$<E>$ newNode){
   this.head=newNode;
   this.tail=newNode;
   CHECKEDSubList$<E>$ curr;
@@ -5052,12 +5285,12 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
   CheckedCollection.checkWriteHi(index,currSize=this.size);
   root.modCount=++modCount;
   this.modCount=modCount;
-  final var newNode=new $DNode$$<E>$(val);
+  final var newNode=new Node$<E>$(val);
   if(++root.size!=1){
     this.size=++currSize;
     if(currSize!=1){    
 #ELSE
-  final var newNode=new $DNode$$<E>$(val);
+  final var newNode=new Node$<E>$(val);
   if(++(root=this.root).size!=1){
     final int currSize;
     if((currSize=++this.size)!=1){
@@ -5085,21 +5318,21 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
   if(++(root=this.root).size!=1){
 #ENDIF
     if(++this.size!=1){
-      $DNode$$<E>$ currTail,after;
+      Node$<E>$ currTail,after;
       if((after=(currTail=this.tail).next)==null){
-        currTail.next=currTail=new $DNode$$<E>$(currTail,val);
+        currTail.next=currTail=new Node$<E>$(currTail,val);
         bubbleUpAppend(currTail);
         root.tail=currTail;
       }else{
-        bubbleUpAppend(currTail,currTail=new $DNode$$<E>$(currTail,val,after));
+        bubbleUpAppend(currTail,currTail=new Node$<E>$(currTail,val,after));
         after.prev=currTail;
       }
     }else{
-      bubbleUpInit(new $DNode$$<E>$(val));
+      bubbleUpInit(new Node$<E>$(val));
     }
   }else{
-    $DNode$$<E>$ newNode;
-    bubbleUpRootInit(newNode=new $DNode$$<E>$(val));
+    Node$<E>$ newNode;
+    bubbleUpRootInit(newNode=new Node$<E>$(val));
     this.size=1;
     root.head=newNode;
     root.tail=newNode;
@@ -5108,7 +5341,7 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
 #ENDDEF
 #MACRODEF RootRemoveMethods<CHECKED>()
 @Override public $exposedType$ removeLast$TypeNameModifier$(){
-  $DNode$$<E>$ tail;
+  Node$<E>$ tail;
 #IFSWITCH CHECKED==Checked
   if((tail=this.tail)!=null){
     ++this.modCount;
@@ -5130,7 +5363,7 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
 #ENDIF
 }
 @Override public $exposedType$ pop$TypeNameModifier$(){
-  $DNode$$<E>$ head;
+  Node$<E>$ head;
 #IFSWITCH CHECKED==Checked
   if((head=this.head)!=null){
     ++this.modCount;
@@ -5180,8 +5413,8 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
       }
     }else{
       //iterate from the tail
-      $DNode$$<E>$ before;
-      ret=(before=(tail=$DNode$.iterateDescending(tail,size-1)).prev).val;
+      Node$<E>$ before;
+      ret=(before=(tail=Node.iterateDescending(tail,size-1)).prev).val;
       (before=before.prev).next=tail;
       tail.prev=before;
     }
@@ -5195,8 +5428,8 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
       head.prev=null;
     }else{
       //iterate from the head
-      $DNode$$<E>$ after;
-      ret=(after=(head=$DNode$.iterateAscending(head,index-1)).next).val;
+      Node$<E>$ after;
+      ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
       (after=after.next).prev=head;
       head.next=after;
     }
@@ -5220,29 +5453,29 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
     var tail=this.tail;
     if(size==1){
       //the insertion point IS the tail
-      tail.next=tail=new $DNode$$<E>$(tail,val);
+      tail.next=tail=new Node$<E>$(tail,val);
       this.tail=tail;
     }else{
       //iterate from the tail and insert
-      $DNode$$<E>$ before;
-      (before=(tail=$DNode$.iterateDescending(tail,size-2)).prev).next=before=new $DNode$$<E>$(before,val,tail);
+      Node$<E>$ before;
+      (before=(tail=Node.iterateDescending(tail,size-2)).prev).next=before=new Node$<E>$(before,val,tail);
       tail.prev=before;
     }
   }else{
     //the insertion point is closer to the head
-    $DNode$$<E>$ head;
+    Node$<E>$ head;
     if((head=this.head)==null){
       //initialize the list
-      this.head=head=new $DNode$$<E>$(val);
+      this.head=head=new Node$<E>$(val);
       this.tail=head;
     }else if(index==0){
       //the insertion point IS the head
-      head.prev=head=new $DNode$$<E>$(val,head);
+      head.prev=head=new Node$<E>$(val,head);
       this.head=head;
     }else{
       //iterate from the head and insert
-      $DNode$$<E>$ after;
-      (after=(head=$DNode$.iterateAscending(head,index-1)).next).prev=after=new $DNode$$<E>$(head,val,after);
+      Node$<E>$ after;
+      (after=(head=Node.iterateAscending(head,index-1)).next).prev=after=new Node$<E>$(head,val,after);
       head.next=after;
     }
   }
@@ -5258,21 +5491,21 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
 }
 #ELSE
 @Override public void addLast($exposedType$ val){
-  $DNode$$<E>$ tail;
+  Node$<E>$ tail;
   if((tail=this.tail)==null){
-    this.head=tail=new $DNode$$<E>$(val);
+    this.head=tail=new Node$<E>$(val);
   }else{
-    tail.next=tail=new $DNode$$<E>$(tail,val);
+    tail.next=tail=new Node$<E>$(tail,val);
   }
   this.tail=tail;
   ++this.size;
 }
 @Override public void push($exposedType$ val){
-  $DNode$$<E>$ head;
+  Node$<E>$ head;
   if((head=this.head)==null){
-    tail=head=new $DNode$$<E>$(val);
+    tail=head=new Node$<E>$(val);
   }else{
-    head.prev=head=new $DNode$$<E>$(val,head);
+    head.prev=head=new Node$<E>$(val,head);
   }
   this.head=head;
   ++this.size;
@@ -5282,7 +5515,7 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
 #MACRODEF SubListRemoveMethods<CHECKED>()
 #IFNOT OfBoolean
   #IFSWITCH CHECKED==Checked
-private static $<E>$ $DNode$$<E>$ pullSurvivorsDown($DNode$$<E>$ prev,long[] survivorSet,int numSurvivors,int numRemoved){
+private static $<E>$ Node$<E>$ pullSurvivorsDown(Node$<E>$ prev,long[] survivorSet,int numSurvivors,int numRemoved){
   int wordOffset;
   for(long word=survivorSet[wordOffset=0],marker=1L;;){
     var curr=prev.next;
@@ -5311,7 +5544,7 @@ private static $<E>$ $DNode$$<E>$ pullSurvivorsDown($DNode$$<E>$ prev,long[] sur
     prev=curr;
   }
 }
-private static $<E>$ $DNode$$<E>$ pullSurvivorsDown($DNode$$<E>$ prev,long word,int numSurvivors,int numRemoved){
+private static $<E>$ Node$<E>$ pullSurvivorsDown(Node$<E>$ prev,long word,int numSurvivors,int numRemoved){
   for(long marker=1L;;marker<<=1){
     var curr=prev.next;
     if((marker&word)==0){
@@ -5334,7 +5567,7 @@ private static $<E>$ $DNode$$<E>$ pullSurvivorsDown($DNode$$<E>$ prev,long word,
 }
   #ENDIF
 #ENDIF
-private void bubbleUpPeelHead($DNode$$<E>$ newHead,$DNode$$<E>$ oldHead){
+private void bubbleUpPeelHead(Node$<E>$ newHead,Node$<E>$ oldHead){
   newHead.prev=null;
   for(var curr=parent;curr!=null;curr=curr.parent){
     if(curr.tail!=oldHead){
@@ -5349,7 +5582,7 @@ private void bubbleUpPeelHead($DNode$$<E>$ newHead,$DNode$$<E>$ oldHead){
     curr.tail=null;
   }
 }
-private void bubbleUpPeelHead($DNode$$<E>$ newHead){
+private void bubbleUpPeelHead(Node$<E>$ newHead){
   var curr=this;
   do{
 #IFSWITCH CHECKED==Checked
@@ -5359,7 +5592,7 @@ private void bubbleUpPeelHead($DNode$$<E>$ newHead){
     --curr.size; 
   }while((curr=curr.parent)!=null);
 }
-private void bubbleUpPeelTail($DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
+private void bubbleUpPeelTail(Node$<E>$ newTail,Node$<E>$ oldTail){
   newTail.next=null;
   for(var curr=parent;curr!=null;curr=curr.parent){
     if(curr.head!=oldTail){
@@ -5374,7 +5607,7 @@ private void bubbleUpPeelTail($DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
     curr.tail=null;
   }
 }
-private void bubbleUpPeelTail($DNode$$<E>$ newTail){
+private void bubbleUpPeelTail(Node$<E>$ newTail){
   var curr=this;
   do{
 #IFSWITCH CHECKED==Checked
@@ -5399,9 +5632,9 @@ private void bubbleUpDecrementSize(){
      parent.uncheckedBubbleUpDecrementSize();
    }
 }
-private void peelTail($DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
+private void peelTail(Node$<E>$ newTail,Node$<E>$ oldTail){
   this.tail=newTail;
-  $DNode$$<E>$ after;
+  Node$<E>$ after;
   if((after=oldTail.next)==null){
     final CHECKEDSubList$<E>$ parent;
     if((parent=this.parent)!=null){
@@ -5424,8 +5657,8 @@ private void peelTail($DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
   }
   newTail.next=after;
 }
-private void peelTail($DNode$$<E>$ tail){
-  $DNode$$<E>$ after,before;
+private void peelTail(Node$<E>$ tail){
+  Node$<E>$ after,before;
   (before=tail.prev).next=(after=tail.next);
   this.tail=before;
   if(after==null){
@@ -5452,8 +5685,8 @@ private void peelTail($DNode$$<E>$ tail){
     }
   }
 }
-private void removeLastNode($DNode$$<E>$ lastNode){
-  $DNode$$<E>$ after,before=lastNode.prev;
+private void removeLastNode(Node$<E>$ lastNode){
+  Node$<E>$ after,before=lastNode.prev;
   if((after=lastNode.next)==null){
     CHECKEDList$<E>$ root;
     (root=this.root).tail=before;
@@ -5518,8 +5751,8 @@ private void removeLastNode($DNode$$<E>$ lastNode){
   this.head=null;
   this.tail=null;
 }
-private void peelHead($DNode$$<E>$ head){
-  $DNode$$<E>$ after,before;
+private void peelHead(Node$<E>$ head){
+  Node$<E>$ after,before;
   (after=head.next).prev=(before=head.prev);
   this.head=after;
   if(before==null){
@@ -5571,8 +5804,8 @@ private void peelHead($DNode$$<E>$ head){
         peelTail(tail);
       }
     }else{
-      $DNode$$<E>$ before;
-      ret=(before=( tail=$DNode$.iterateDescending(tail,size-1)).prev).val;
+      Node$<E>$ before;
+      ret=(before=( tail=Node.iterateDescending(tail,size-1)).prev).val;
       (before=before.prev).next=tail;
       tail.prev=before;
       bubbleUpDecrementSize();
@@ -5583,8 +5816,8 @@ private void peelHead($DNode$$<E>$ head){
       ret=head.val;
       peelHead(head);
     }else{
-      $DNode$$<E>$ after;
-      ret=(after=(head=$DNode$.iterateAscending(head,index-1)).next).val;
+      Node$<E>$ after;
+      ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
       (after=after.next).prev=head;
       head.next=after;
       bubbleUpDecrementSize();
@@ -5594,7 +5827,7 @@ private void peelHead($DNode$$<E>$ head){
   return ret;
 }
 @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
-  final $DNode$$<E>$ head;
+  final Node$<E>$ head;
 #IFSWITCH CHECKED==Checked
   if((head=this.head)!=null){
     return uncheckedRemoveIf(head,filter);
@@ -5608,7 +5841,7 @@ private void peelHead($DNode$$<E>$ head){
 }
 #IFNOT OfRef
 @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
-  final $DNode$$<E>$ head;
+  final Node$<E>$ head;
   #IFSWITCH CHECKED==Checked
   if((head=this.head)!=null){
     return uncheckedRemoveIf(head,filter::test);
@@ -5623,10 +5856,10 @@ private void peelHead($DNode$$<E>$ head){
 #ENDIF
 #MACRO CollapseEnd<head>(tail,next,prev)
 #MACRO CollapseEnd<tail>(head,prev,next)
-private void bubbleUpCollapseHeadAndTail($DNode$$<E>$ oldHead,$DNode$$<E>$ newHead,int numRemoved,$DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
+private void bubbleUpCollapseHeadAndTail(Node$<E>$ oldHead,Node$<E>$ newHead,int numRemoved,Node$<E>$ newTail,Node$<E>$ oldTail){
   this.head=newHead;
   this.tail=newTail;
-  final $DNode$$<E>$ after,before=oldHead.prev;
+  final Node$<E>$ after,before=oldHead.prev;
   if((after=oldTail.next)==null){
     if(before==null){
       for(var parent=this.parent;parent!=null;
@@ -5729,8 +5962,8 @@ private void bubbleUpCollapseHeadAndTail($DNode$$<E>$ oldHead,$DNode$$<E>$ newHe
   newHead.prev=before;
   newTail.next=after;
 }
-private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
-  $DNode$$<E>$ tail;
+private boolean uncheckedRemoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+  Node$<E>$ tail;
 #IFSWITCH CHECKED==Checked
   int modCount=this.modCount;
   int size=this.size;
@@ -5889,8 +6122,8 @@ private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$
     clearAllHelper(size,this.head,this.tail,root);
   }
 }
-private void clearAllHelper(int size,$DNode$$<E>$ head,$DNode$$<E>$ tail,CHECKEDList$<E>$ root){
-  $DNode$$<E>$ before,after=tail.next;
+private void clearAllHelper(int size,Node$<E>$ head,Node$<E>$ tail,CHECKEDList$<E>$ root){
+  Node$<E>$ before,after=tail.next;
   if((before=head.prev)==null){
     //this sublist is not preceded by nodes
     if(after==null){
@@ -5929,7 +6162,7 @@ private void bubbleUpDecrementSize(int numRemoved){
 #ENDIF
   }
 }
-private void bubbleUpClearBody($DNode$$<E>$ before,$DNode$$<E>$ head,int numRemoved,$DNode$$<E>$ tail,$DNode$$<E>$ after){
+private void bubbleUpClearBody(Node$<E>$ before,Node$<E>$ head,int numRemoved,Node$<E>$ tail,Node$<E>$ after){
   for(var curr=parent;curr!=null;
 #IFSWITCH CHECKED==Checked
   ++curr.modCount,
@@ -5972,7 +6205,7 @@ private void bubbleUpClearBody($DNode$$<E>$ before,$DNode$$<E>$ head,int numRemo
     }
   }
 }
-private void bubbleUpClearHead($DNode$$<E>$ tail, $DNode$$<E>$ after,int numRemoved){
+private void bubbleUpClearHead(Node$<E>$ tail, Node$<E>$ after,int numRemoved){
   for(var curr=parent;curr!=null;
 #IFSWITCH CHECKED==Checked
   ++curr.modCount,
@@ -5990,7 +6223,7 @@ private void bubbleUpClearHead($DNode$$<E>$ tail, $DNode$$<E>$ after,int numRemo
     }
   }
 }
-private void bubbleUpClearTail($DNode$$<E>$ head, $DNode$$<E>$ before,int numRemoved){
+private void bubbleUpClearTail(Node$<E>$ head, Node$<E>$ before,int numRemoved){
   for(var curr=parent;curr!=null;
 #IFSWITCH CHECKED==Checked
   ++curr.modCount,
@@ -6009,7 +6242,7 @@ private void bubbleUpClearTail($DNode$$<E>$ head, $DNode$$<E>$ before,int numRem
   }
 }
 #IF OfBoolean
-private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ removeThis,$TypeNameModifier$Predicate$<? super E>$ filter
+private void collapseHeadAndTail(Node$<E>$ head,Node$<E>$ tail,$ArrayType$ removeThis,$TypeNameModifier$Predicate$<? super E>$ filter
   #IFSWITCH CHECKED==Checked
   ,int size,int modCount
   #ENDIF
@@ -6036,7 +6269,7 @@ private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$
         root.modCount=++modCount;
         this.modCount=modCount;
   #ENDIF
-        $DNode$$<E>$ newTail;
+        Node$<E>$ newTail;
         for(newTail=tail.prev;newTail!=newHead;++numRemoved,newTail=newTail.prev){
           if(newTail.val^removeThis){
             numRemoved+=collapseBodyHelper(newHead,newTail,removeThis);
@@ -6067,14 +6300,14 @@ private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$
   #ENDIF
   clearAllHelper(size,head,tail,root);
 }
-private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ retainThis,$TypeNameModifier$Predicate$<? super E>$ filter
+private boolean collapseBody(Node$<E>$ head,Node$<E>$ tail,$ArrayType$ retainThis,$TypeNameModifier$Predicate$<? super E>$ filter
   #IFSWITCH CHECKED==Checked
   ,int size,int modCount
   #ENDIF
 ){
   #IFSWITCH CHECKED==Checked
   for(int numLeft=size-2;numLeft!=0;--numLeft){
-    $DNode$$<E>$ prev;
+    Node$<E>$ prev;
     if((head=(prev=head).next).val^retainThis){
       if(filter.test(!retainThis)){
         final CHECKEDList$<E>$ root;
@@ -6082,7 +6315,7 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ ret
         root.modCount=++modCount;
         this.modCount=modCount;
   #ELSE
-  for($DNode$$<E>$ prev;(head=(prev=head).next)!=tail;){
+  for(Node$<E>$ prev;(head=(prev=head).next)!=tail;){
     if(head.val^retainThis){
       if(filter.test(!retainThis)){
   #ENDIF
@@ -6115,7 +6348,7 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ ret
 }
 #ELSE
   #IFSWITCH CHECKED==Checked
-private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ newTail,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,CHECKEDList$<E>$.ModCountChecker modCountChecker)
+private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,CHECKEDList$<E>$.ModCountChecker modCountChecker)
 {
   if(numLeft!=0){
     int numSurvivors;
@@ -6146,7 +6379,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 }
   #ENDIF
 
-private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
+private void collapseHeadAndTail(Node$<E>$ head,Node$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
   #IFSWITCH CHECKED==Checked
   ,int size,int modCount
   #ENDIF
@@ -6186,11 +6419,11 @@ private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameMo
   this.modCount=modCount;
   root.size-=size;
   #ELSE
-  $DNode$$<E>$ newHead;
+  Node$<E>$ newHead;
   if((newHead=head.next)!=tail){
     for(int numRemoved=2;;++numRemoved){
       if(!filter.test(newHead.val)){
-        $DNode$$<E>$ prev;
+        Node$<E>$ prev;
         outer: for(var curr=(prev=newHead).next;curr!=tail;curr=(prev=curr).next){
           if(filter.test(curr.val)){
             do{
@@ -6218,14 +6451,14 @@ private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameMo
   #ENDIF
   clearAllHelper(size,head,tail,root);
 }
-private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
+private boolean collapseBody(Node$<E>$ head,Node$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
   #IFSWITCH CHECKED==Checked
   ,int size,int modCount
   #ENDIF
 ){
 #IFSWITCH CHECKED==Checked
   for(int numLeft=size-2;numLeft!=0;--numLeft){
-    $DNode$$<E>$ prev;
+    Node$<E>$ prev;
     if(filter.test((head=(prev=head).next).val)){
       int numRemoved=1;
       var root=this.root;
@@ -6242,7 +6475,7 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifi
       root.modCount=++modCount;
       this.modCount=modCount;
 #ELSE
-  for($DNode$$<E>$ prev;(head=(prev=head).next)!=tail;){
+  for(Node$<E>$ prev;(head=(prev=head).next)!=tail;){
     if(filter.test(head.val)){
       int numRemoved=1;
       for(;(head=head.next)!=tail;++numRemoved){
@@ -6269,12 +6502,12 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifi
 #ENDDEF
 #MACRODEF CollapseEnd<HEAD>(TAIL,NEXT,PREV)
 #IF OfBoolean
-private int collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$ArrayType$ retainThis){
+private int collapseHEAD(Node$<E>$ oldHEAD,Node$<E>$ TAIL,$ArrayType$ retainThis){
   int numRemoved=1;
-  $DNode$$<E>$ newHEAD;
+  Node$<E>$ newHEAD;
   outer:for(newHEAD=oldHEAD.NEXT;newHEAD!=TAIL;++numRemoved,newHEAD=newHEAD.NEXT){
     if(newHEAD.val==retainThis){
-      $DNode$$<E>$ PREV,curr;
+      Node$<E>$ PREV,curr;
       for(curr=(PREV=newHEAD).NEXT;curr!=TAIL;curr=(PREV=curr).NEXT){
         if(curr.val^retainThis){
           do{
@@ -6293,7 +6526,7 @@ private int collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$ArrayType$ reta
     }
   }
   this.HEAD=newHEAD;
-  $DNode$$<E>$ tmp;
+  Node$<E>$ tmp;
   if((tmp=oldHEAD.PREV)==null){
     for(var parent=this.parent;parent!=null;
 #IFSWITCH CHECKED==Checked
@@ -6322,7 +6555,7 @@ private int collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$ArrayType$ reta
   return numRemoved;
 }
 #ELSE
-private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifier$Predicate$<? super E>$ filter
+private void collapseHEAD(Node$<E>$ oldHEAD,Node$<E>$ TAIL,$TypeNameModifier$Predicate$<? super E>$ filter
   #IFSWITCH CHECKED==Checked
   ,int size,int modCount
   #ENDIF
@@ -6334,7 +6567,7 @@ private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifi
   #ELSE
   int numRemoved=1;
   #ENDIF
-  $DNode$$<E>$ newHEAD;
+  Node$<E>$ newHEAD;
   #IFNOTSWITCH CHECKED==Checked
   outer:
   #ENDIF
@@ -6362,7 +6595,7 @@ private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifi
     }
   }
   #ELSE
-      $DNode$$<E>$ PREV,curr;
+      Node$<E>$ PREV,curr;
       for(curr=(PREV=newHEAD).NEXT;curr!=TAIL;curr=(PREV=curr).NEXT){
         if(filter.test(curr.val)){
           do{
@@ -6390,7 +6623,7 @@ private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifi
   #ENDIF
   this.size-=numRemoved;
   this.HEAD=newHEAD;
-  $DNode$$<E>$ tmp;
+  Node$<E>$ tmp;
   if((tmp=oldHEAD.PREV)==null){
     for(var parent=this.parent;parent!=null;parent.HEAD=newHEAD,parent.size-=numRemoved,parent=parent.parent){
 #IFSWITCH CHECKED==Checked
@@ -6417,4 +6650,42 @@ private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifi
   newHEAD.PREV=tmp;
 }
 #ENDIF
+#ENDDEF
+#MACRODEF NodeQuery<SUFFIX>(TEST)
+static $<E>$ boolean uncheckedcontainsSUFFIX(Node$<E>$ head,Node$<E>$ tail
+#MACRO UncheckedQueryParam()
+){
+  for(;TEST(head.val);head=head.next){if(head==tail){return false;}}
+  return true;
+}
+static $<E>$ int uncheckedsearchSUFFIX(Node$<E>$ head
+#MACRO UncheckedQueryParam()
+){
+  int index=1;
+  for(;TEST(head.val);++index){if((head=head.next)==null){return -1;}}
+  return index;
+}
+static $<E>$ int uncheckedindexOfSUFFIX(Node$<E>$ head,Node$<E>$ tail
+#MACRO UncheckedQueryParam()
+){
+  int index=0;
+  for(;TEST(head.val);++index,head=head.next){if(head==tail){return -1;}}
+  return index;
+}
+static $<E>$ int uncheckedlastIndexOfSUFFIX(int length,Node$<E>$ tail
+#MACRO UncheckedQueryParam()
+){
+  for(;TEST(tail.val);tail=tail.prev){if(--length==0){return -1;}}
+  return length-1;
+}
+#ENDDEF
+#MACRODEF UncheckedCopyInto(DSTTYPE,CAST)
+static $<E>$ void uncheckedCopyInto(DSTTYPE[] dst,Node$<E>$ curr,int length){
+  for(;;curr=curr.prev){
+    dst[--length]=CAST(curr.val);
+    if(length==0){
+      return;
+    }
+  }
+}
 #ENDDEF

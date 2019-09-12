@@ -150,6 +150,7 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  /*
   static interface BooleanSetImpl{
     public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
@@ -186,6 +187,8 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  */
+  /*
   static interface ByteSetImpl{
     public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
@@ -254,6 +257,7 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  */
   static interface CharOpenAddressHashSet
     extends AbstractIntegralTypeOpenAddressHashSet{
     public static long word0(Object obj){

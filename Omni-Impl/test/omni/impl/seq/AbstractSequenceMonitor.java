@@ -7,6 +7,7 @@ import java.util.function.IntBinaryOperator;
 import java.util.function.IntPredicate;
 import org.junit.jupiter.api.Assertions;
 import omni.api.OmniList;
+import omni.impl.AbstractOmniCollection;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.MonitoredFunction;
@@ -14,7 +15,7 @@ import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredSequence;
 import omni.util.OmniArray;
-abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Externalizable> implements MonitoredSequence<SEQ>{
+abstract class AbstractSequenceMonitor<SEQ extends AbstractOmniCollection<?> & Externalizable> implements MonitoredSequence<SEQ>{
   final DataType dataType;
   final CheckedType checkedType;
   final SEQ seq;
@@ -655,7 +656,7 @@ abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Externalizab
       updateModCount();
     }
     copyListContents();
-    this.expectedSize=((AbstractSeq<?>)seq).size;
+    this.expectedSize=((AbstractOmniCollection<?>)seq).size;
   }
   @Override public void updateRemoveIndexState(int index){
     System.arraycopy(expectedArr,index + 1,expectedArr,index,(--expectedSize) - index);

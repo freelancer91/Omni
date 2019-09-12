@@ -234,42 +234,20 @@ implements OmniSet.OfRef<E>{
       return true;
     }
     if(val instanceof Set){
-      if(val instanceof AbstractOpenAddressHashSet){
-        if(val instanceof RefOpenAddressHashSet){
-          if(val instanceof RefOpenAddressHashSet.Checked){
-            return isEqualTo((RefOpenAddressHashSet.Checked<?>)val);
+      //TODO optimize
+      Set<?> that;
+      if(size==(that=(Set<?>)val).size()){
+        for(final var thatVal:that){
+          if(!this.contains(thatVal)){
+            return false;
           }
-          return isEqualTo((RefOpenAddressHashSet<?>)val);
-        }else if(val instanceof AbstractIntegralTypeOpenAddressHashSet){
-          if(val instanceof IntOpenAddressHashSet){
-            return SetCommonImpl.isEqualTo(this,(IntOpenAddressHashSet)val);
-          }else if(val instanceof LongOpenAddressHashSet){
-            return SetCommonImpl.isEqualTo(this,(LongOpenAddressHashSet)val);
-          }else if(val instanceof CharOpenAddressHashSet){
-            return SetCommonImpl.isEqualTo(this,(CharOpenAddressHashSet)val);
-          }else{
-            //must be short
-            return SetCommonImpl.isEqualTo(this,(ShortOpenAddressHashSet)val);
-          }
-        }else if(val instanceof FloatOpenAddressHashSet){
-          return SetCommonImpl.isEqualTo(this,(FloatOpenAddressHashSet)val);
-        }else{
-          //must be double
-          return SetCommonImpl.isEqualTo(this,(DoubleOpenAddressHashSet)val);
         }
-      }else if(val instanceof ByteSetImpl){
-        if(val instanceof ByteSetImpl.Checked){
-           return SetCommonImpl.isEqualTo(this,(ByteSetImpl.Checked)val);
-        }
-        return SetCommonImpl.isEqualTo(this,(ByteSetImpl)val);
-      }else if(val instanceof BooleanSetImpl){
-        return SetCommonImpl.isEqualTo(this,(BooleanSetImpl)val);
-      }else{
-        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+        return true;
       }
     }
     return false;
   }
+  /*
   private static boolean isEqualToHelper(Object[] smallTable,Object[] bigTable,int bigTableLength,int numInTable){
     for(int tableIndex=0;;++tableIndex){
       final Object smallTableVal;
@@ -283,43 +261,16 @@ implements OmniSet.OfRef<E>{
       }
     }
   }
-  private boolean isEqualTo(RefOpenAddressHashSet.Checked<?> that){
-    final int size;
-    if((size=this.size)==that.size){
-      if(size==0){
-        return true;
-      }
-      final int thatModCount=that.modCount;
-      try{
-        final Object[] thisTable,thatTable;
-        final int thisTableLength,thatTableLength;
-        if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
-          return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
-        }else{
-          return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
-        }
-      }finally{
-        CheckedCollection.checkModCount(thatModCount,that.modCount);
-      }
-    }
-    return false;
+  private boolean isEqualTo(int size,RefOpenAddressHashSet<?> that){
+          final Object[] thisTable,thatTable;
+          final int thisTableLength,thatTableLength;
+          if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+            return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+          }else{
+            return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+          }
   }
-  private boolean isEqualTo(RefOpenAddressHashSet<?> that){
-    final int size;
-    if((size=this.size)==that.size){
-      if(size==0){
-        return true;
-      }
-      final Object[] thisTable,thatTable;
-      final int thisTableLength,thatTableLength;
-      if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
-        return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
-      }else{
-        return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
-      }
-    }
-    return false;
-  }
+  */
   @Override public void forEach(Consumer<? super E> action){
     int size;
     if((size=this.size)!=0){
@@ -1019,70 +970,90 @@ private boolean addToTable(Object val,int hash){
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
-    private boolean isEqualTo(RefOpenAddressHashSet.Checked<?> that){
-      final int size;
-      if((size=this.size)==that.size){
-        if(size==0){
-          return true;
-        }
-        final int thisModCount=this.modCount;
-        final int thatModCount=that.modCount;
-        try{
-          final Object[] thisTable,thatTable;
-          final int thisTableLength,thatTableLength;
-          if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
-            return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
-          }else{
-            return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
-          }
-        }finally{
-          CheckedCollection.checkModCount(thisModCount,this.modCount);
-          CheckedCollection.checkModCount(thatModCount,that.modCount);
-        }
-      }
-      return false;
-    }
     @Override public boolean equals(Object val){
       if(val==this){
         return true;
       }
       if(val instanceof Set){
-        if(val instanceof AbstractOpenAddressHashSet){
-          if(val instanceof RefOpenAddressHashSet){
-            if(val instanceof RefOpenAddressHashSet.Checked){
-              return this.isEqualTo((RefOpenAddressHashSet.Checked<?>)val);
+        //TODO optimize
+        int modCount=this.modCount;
+        try{
+          Set<?> that;
+          if(size==(that=(Set<?>)val).size()){
+            for(final var thatVal:that){
+              if(!this.contains(thatVal)){
+                return false;
+              }
             }
-            return ((RefOpenAddressHashSet<?>)val).isEqualTo(this);
-          }else if(val instanceof AbstractIntegralTypeOpenAddressHashSet){
-            if(val instanceof IntOpenAddressHashSet){
-              return SetCommonImpl.isEqualTo(this,(IntOpenAddressHashSet)val);
-            }else if(val instanceof LongOpenAddressHashSet){
-              return SetCommonImpl.isEqualTo(this,(LongOpenAddressHashSet)val);
-            }else if(val instanceof CharOpenAddressHashSet){
-              return SetCommonImpl.isEqualTo(this,(CharOpenAddressHashSet)val);
-            }else{
-              //must be short
-              return SetCommonImpl.isEqualTo(this,(ShortOpenAddressHashSet)val);
-            }
-          }else if(val instanceof FloatOpenAddressHashSet){
-            return SetCommonImpl.isEqualTo(this,(FloatOpenAddressHashSet)val);
-          }else{
-            //must be double
-            return SetCommonImpl.isEqualTo(this,(DoubleOpenAddressHashSet)val);
+            return true;
           }
-        }else if(val instanceof ByteSetImpl){
-          if(val instanceof ByteSetImpl.Checked){
-             return SetCommonImpl.isEqualTo(this,(ByteSetImpl.Checked)val);
-          }
-          return SetCommonImpl.isEqualTo(this,(ByteSetImpl)val);
-        }else if(val instanceof BooleanSetImpl){
-          return SetCommonImpl.isEqualTo(this,(BooleanSetImpl)val);
-        }else{
-          return SetCommonImpl.isEqualTo((Set<?>)val,this);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
       return false;
     }
+  /*  
+    @Override public boolean equals(Object val){
+      if(val==this){
+        return true;
+      }
+      if(val instanceof Set){
+        final int size;
+        if((size=this.size)==0){
+          return ((Set<?>)val).isEmpty();
+        }
+        if(val instanceof AbstractOpenAddressHashSet){
+          final AbstractOpenAddressHashSet<?> aoahs;
+          if(size==(aoahs=(AbstractOpenAddressHashSet<?>)val).size){
+            if(aoahs instanceof RefOpenAddressHashSet){
+              final int thisModCount=this.modCount;
+              try{
+                if(aoahs instanceof RefOpenAddressHashSet.Checked){
+                  final RefOpenAddressHashSet.Checked<?> that;
+                  final int thatModCount=(that=(RefOpenAddressHashSet.Checked<?>)aoahs).modCount;
+                  try{
+                    return super.isEqualTo(size,that);
+                  }finally{
+                    CheckedCollection.checkModCount(thatModCount,that.modCount);
+                  }
+                }else{
+                  return super.isEqualTo(size,(RefOpenAddressHashSet<?>)aoahs);
+                }
+              }finally{
+                CheckedCollection.checkModCount(thisModCount,this.modCount);
+              }
+            }else if(aoahs instanceof AbstractIntegralTypeOpenAddressHashSet){
+              if(aoahs instanceof IntOpenAddressHashSet){
+                return SetCommonImpl.isEqualTo(size,this,(IntOpenAddressHashSet)aoahs);
+              }else if(aoahs instanceof LongOpenAddressHashSet){
+                return SetCommonImpl.isEqualTo(size,this,(LongOpenAddressHashSet)aoahs);
+              }else if(aoahs instanceof CharOpenAddressHashSet){
+                return SetCommonImpl.isEqualTo(size,this,(CharOpenAddressHashSet)aoahs);
+              }else{
+                //must be ShortOpenAddressHashSet
+                return SetCommonImpl.isEqualTo(size,this,(ShortOpenAddressHashSet)aoahs);
+              }
+            }else if(aoahs instanceof FloatOpenAddressHashSet){
+               return SetCommonImpl.isEqualTo(size,this,(FloatOpenAddressHashSet)aoahs);
+            }else{
+               return SetCommonImpl.isEqualTo(size,this,(DoubleOpenAddressHashSet)aoahs);
+            }
+          }
+        }else if(val instanceof ByteSetImpl){
+          if(val instanceof ByteSetImpl.Checked){
+             return SetCommonImpl.isEqualTo(size,this,(ByteSetImpl.Checked)val);
+          }
+          return SetCommonImpl.isEqualTo(size,this,(ByteSetImpl)val);
+        }else if(val instanceof BooleanSetImpl){
+          return SetCommonImpl.isEqualTo(size,this.table,((BooleanSetImpl)val).state);
+        }else{
+          return SetCommonImpl.isEqualTo(size,(Set<?>)val,this);
+        }
+      }
+      return false;
+    }
+*/
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }

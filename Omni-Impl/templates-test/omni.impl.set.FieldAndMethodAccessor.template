@@ -135,7 +135,9 @@ final class FieldAndMethodAccessor{
   
 }
 #MACRODEF TypeImpl<CLASSPREFIX>(TYPEPARAMETER,ARRTYPE)
+
 #IFSWITCH CLASSPREFIX==Boolean,Byte
+/*
 static interface CLASSPREFIXSetImpl{
   public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
     ((Externalizable)obj).writeExternal(oos);
@@ -231,6 +233,7 @@ static interface CLASSPREFIXSetImpl{
     }
   }
 }
+*/
 #ELSE
 static interface CLASSPREFIXOpenAddressHashSet
   #IFSWITCH CLASSPREFIX==Char,Short,Int,Long

@@ -10,10 +10,36 @@ public class NotYetImplementedException extends UnsupportedOperationException{
 
   public static final HashMap<String,HashMap<String,HashMap<Integer,Integer>>> COUNT_MAP=new HashMap<>();
   
-  public static NotYetImplementedException getNYI() {
-      final NotYetImplementedException exception;
+//  public static NotYetImplementedException getNYI() {
+//      final NotYetImplementedException exception;
+//      final StackTraceElement s;
+//      final var fileName=(s=(exception=new NotYetImplementedException()).getStackTrace()[1]).getFileName();
+//      final HashMap<String,HashMap<Integer,Integer>> mapForFile;
+//      synchronized(COUNT_MAP) {
+//          mapForFile=COUNT_MAP.computeIfAbsent(fileName,fn->new HashMap<>());
+//      }
+//      final var methodName=s.getMethodName();
+//      final HashMap<Integer,Integer> mapForMethod;
+//      synchronized(mapForFile) {
+//          mapForMethod=mapForFile.computeIfAbsent(methodName,mn->new HashMap<>());
+//      }
+//      final var lineNumber=s.getLineNumber();
+//      synchronized(mapForMethod) {
+//          mapForMethod.compute(lineNumber,(ln,count)->{
+//            if(count==null) {
+//                return Integer.valueOf(1);
+//            }
+//            return count+1;
+//         });
+//      }
+//      return exception;
+//  }
+
+  public NotYetImplementedException() {
+      super();
       final StackTraceElement s;
-      final var fileName=(s=(exception=new NotYetImplementedException()).getStackTrace()[1]).getFileName();
+      //TODO verify that the correct stack trace element is retrieved
+      final var fileName=(s=this.getStackTrace()[0]).getFileName();
       final HashMap<String,HashMap<Integer,Integer>> mapForFile;
       synchronized(COUNT_MAP) {
           mapForFile=COUNT_MAP.computeIfAbsent(fileName,fn->new HashMap<>());
@@ -32,11 +58,6 @@ public class NotYetImplementedException extends UnsupportedOperationException{
             return count+1;
          });
       }
-      return exception;
-  }
-  
-  private NotYetImplementedException() {
-      super();
   }
   
   private static class ReportData<K,V> extends TreeMap<K,V>{

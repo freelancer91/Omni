@@ -10,24 +10,6 @@ import java.lang.reflect.Method;
 import omni.api.OmniList;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import omni.impl.BooleanSnglLnkNode;
-import omni.impl.ByteSnglLnkNode;
-import omni.impl.CharSnglLnkNode;
-import omni.impl.ShortSnglLnkNode;
-import omni.impl.IntSnglLnkNode;
-import omni.impl.LongSnglLnkNode;
-import omni.impl.FloatSnglLnkNode;
-import omni.impl.DoubleSnglLnkNode;
-import omni.impl.RefSnglLnkNode;
-import omni.impl.BooleanDblLnkNode;
-import omni.impl.ByteDblLnkNode;
-import omni.impl.CharDblLnkNode;
-import omni.impl.ShortDblLnkNode;
-import omni.impl.IntDblLnkNode;
-import omni.impl.LongDblLnkNode;
-import omni.impl.FloatDblLnkNode;
-import omni.impl.DoubleDblLnkNode;
-import omni.impl.RefDblLnkNode;
 final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
     super();
@@ -265,10 +247,10 @@ static interface CLASSPREFIXDblLnkSeq{
   public static int size(Object obj){
     return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).size;
   }
-  public static CLASSPREFIXDblLnkNodeTYPEPARAMETER head(Object obj){
+  public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER head(Object obj){
     return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).head;
   }
-  public static CLASSPREFIXDblLnkNodeTYPEPARAMETER tail(Object obj){
+  public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER tail(Object obj){
     return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).tail;
   }
   interface UncheckedList extends CLASSPREFIXDblLnkSeq{
@@ -278,10 +260,10 @@ static interface CLASSPREFIXDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER)obj).head;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER tail(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER tail(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER)obj).tail;
     }
     interface AscendingItr{
@@ -290,16 +272,16 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
     }
     interface DescendingItr extends AscendingItr{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
     }
     interface BidirectionalItr extends AscendingItr{
@@ -308,11 +290,11 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER lastRet(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(lastRetField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER lastRet(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(lastRetField,obj);
       }
       public static int currIndex(Object obj){
         return getIntValue(currIndexField,obj);
@@ -326,10 +308,10 @@ static interface CLASSPREFIXDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER)obj).head;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER tail(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER tail(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER)obj).tail;
     }
     public static int modCount(Object obj){
@@ -344,11 +326,11 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER lastRet(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(lastRetField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER lastRet(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(lastRetField,obj);
       }
       public static int currIndex(Object obj){
         return getIntValue(currIndexField,obj);
@@ -361,11 +343,11 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER lastRet(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(lastRetField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER lastRet(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(lastRetField,obj);
       }
       public static int currIndex(Object obj){
         return getIntValue(currIndexField,obj);
@@ -378,11 +360,11 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER lastRet(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(lastRetField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER lastRet(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(lastRetField,obj);
       }
       public static int currIndex(Object obj){
         return getIntValue(currIndexField,obj);
@@ -403,10 +385,10 @@ static interface CLASSPREFIXDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).head;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER tail(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER tail(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).tail;
     }
     public static omni.impl.seq.CLASSPREFIXDblLnkSeq.UncheckedListTYPEPARAMETER root(Object obj){
@@ -424,8 +406,8 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
     }
     interface BidirectionalItr extends AscendingItr{
@@ -434,11 +416,11 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER lastRet(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(lastRetField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER lastRet(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(lastRetField,obj);
       }
       public static int currIndex(Object obj){
         return getIntValue(currIndexField,obj);
@@ -462,10 +444,10 @@ static interface CLASSPREFIXDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).head;
     }
-    public static CLASSPREFIXDblLnkNodeTYPEPARAMETER tail(Object obj){
+    public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER tail(Object obj){
       return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).tail;
     }
     public static omni.impl.seq.CLASSPREFIXDblLnkSeq.CheckedListTYPEPARAMETER root(Object obj){
@@ -489,11 +471,11 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER lastRet(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(lastRetField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER lastRet(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(lastRetField,obj);
       }
       public static int currIndex(Object obj){
         return getIntValue(currIndexField,obj);
@@ -506,11 +488,11 @@ static interface CLASSPREFIXDblLnkSeq{
       public static omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)getValue(parentField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      public static CLASSPREFIXDblLnkNodeTYPEPARAMETER lastRet(Object obj){
-        return (CLASSPREFIXDblLnkNodeTYPEPARAMETER)getValue(lastRetField,obj);
+      public static omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER lastRet(Object obj){
+        return (omni.impl.seq.CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER)getValue(lastRetField,obj);
       }
       public static int currIndex(Object obj){
         return getIntValue(currIndexField,obj);
@@ -525,7 +507,7 @@ static interface CLASSPREFIXSnglLnkSeq{
   public static int size(Object obj){
     return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
   }
-  public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+  public static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER head(Object obj){
     return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
   }
   interface UncheckedStack extends CLASSPREFIXSnglLnkSeq{
@@ -535,7 +517,7 @@ static interface CLASSPREFIXSnglLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
     }
     interface Itr extends AbstractItr{
@@ -543,14 +525,14 @@ static interface CLASSPREFIXSnglLnkSeq{
       static omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedStackTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedStackTYPEPARAMETER)getValue(parentField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER prev(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(prevField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER next(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(nextField,obj);
       }
     }
   }
@@ -561,10 +543,10 @@ static interface CLASSPREFIXSnglLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
     }
-    public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER tail(Object obj){
+    public static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER tail(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedQueueTYPEPARAMETER)obj).tail;
     }
     interface Itr extends AbstractItr{
@@ -572,14 +554,14 @@ static interface CLASSPREFIXSnglLnkSeq{
       static omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedQueueTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedQueueTYPEPARAMETER)getValue(parentField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER prev(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(prevField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER next(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(nextField,obj);
       }
     }
   }
@@ -590,7 +572,7 @@ static interface CLASSPREFIXSnglLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
     }
     public static int modCount(Object obj){
@@ -605,14 +587,14 @@ static interface CLASSPREFIXSnglLnkSeq{
       static omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedStackTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedStackTYPEPARAMETER)getValue(parentField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER prev(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(prevField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER next(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(nextField,obj);
       }
     }
   }
@@ -620,13 +602,13 @@ static interface CLASSPREFIXSnglLnkSeq{
     public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
     }
-    public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER tail(Object obj){
+    public static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER tail(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedQueueTYPEPARAMETER)obj).tail;
     }
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
     }
-    public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+    public static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER head(Object obj){
       return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
     }
     public static int modCount(Object obj){
@@ -641,14 +623,14 @@ static interface CLASSPREFIXSnglLnkSeq{
       static omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedQueueTYPEPARAMETER parent(Object obj){
         return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedQueueTYPEPARAMETER)getValue(parentField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER prev(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(prevField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
       }
-      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
-        return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+      static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER next(Object obj){
+        return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(nextField,obj);
       }
     }
   }
@@ -656,14 +638,14 @@ static interface CLASSPREFIXSnglLnkSeq{
     static final Field prevField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
     static final Field currField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
     static final Field nextField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
-    static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
-      return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+    static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER prev(Object obj){
+      return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(prevField,obj);
     }
-    static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
-      return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+    static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER curr(Object obj){
+      return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(currField,obj);
     }
-    static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
-      return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+    static omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER next(Object obj){
+      return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.NodeTYPEPARAMETER)getValue(nextField,obj);
     }
   }
 }
@@ -922,7 +904,7 @@ static interface PackedCLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+      return ((omni.impl.AbstractOmniCollection<?>)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -977,7 +959,7 @@ static interface PackedCLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+      return ((omni.impl.AbstractOmniCollection<?>)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedCLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -1170,7 +1152,7 @@ static interface CLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+      return ((omni.impl.AbstractOmniCollection<?>)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -1225,7 +1207,7 @@ static interface CLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+      return ((omni.impl.AbstractOmniCollection<?>)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");

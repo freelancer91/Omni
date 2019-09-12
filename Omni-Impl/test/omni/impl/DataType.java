@@ -39,6 +39,7 @@ import omni.function.FloatComparator;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
 import omni.function.FloatUnaryOperator;
+import omni.function.IntComparator;
 import omni.function.LongComparator;
 import omni.function.ShortComparator;
 import omni.function.ShortConsumer;
@@ -53,7 +54,7 @@ public enum DataType{
     BOOLEAN("BOOLEAN","BOOLEAN","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Boolean.class,
             boolean.class,Boolean[].class,boolean[].class,"Boolean","Boolean",
             BooleanPredicate.class,BooleanConsumer.class,BooleanComparator.class,BooleanPredicate.class,Boolean.FALSE,
-            BooleanDblLnkNode.class,BooleanSnglLnkNode.class,"removeBooleanAt",boolean.class,"test","compare",
+            "removeBooleanAt",boolean.class,"test","compare",
             boolean.class,"booleanElement",OmniArray.MAX_ARR_SIZE / 7,OmniArray.OfBoolean.DEFAULT_ARR){
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
@@ -567,8 +568,7 @@ public enum DataType{
     },
     BYTE("BYTE","BOOLEAN,BYTE","BYTE,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Byte.class,byte.class,
             Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
-            ByteConsumer.class,ByteComparator.class,ByteUnaryOperator.class,Byte.MIN_VALUE,ByteDblLnkNode.class,
-            ByteSnglLnkNode.class,"removeByteAt",int.class,"applyAsByte","compare",byte.class,"byteElement",
+            ByteConsumer.class,ByteComparator.class,ByteUnaryOperator.class,Byte.MIN_VALUE,"removeByteAt",int.class,"applyAsByte","compare",byte.class,"byteElement",
             OmniArray.MAX_ARR_SIZE / 6,OmniArray.OfByte.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
@@ -928,18 +928,17 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.ByteOutput<?>)collection).removeByteAt(index);
         }
-        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                ((OmniList.OfByte)collection).sort((Comparator<? super Byte>)sorter);
+                ((OmniList.OfByte)collection).sort((Comparator<? super Byte>)sorter::compare);
             }else{
-                ((OmniList.OfByte)collection).sort((ByteComparator)sorter);
+                ((OmniList.OfByte)collection).sort((ByteComparator)sorter::compare);
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfByte)collection).unstableSort(sorter);
+            ((OmniList.OfByte)collection).unstableSort(sorter::compare);
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -1022,7 +1021,7 @@ public enum DataType{
     },
     CHAR("CHAR","BOOLEAN,CHAR","CHAR,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Character.class,char.class,
             Character[].class,char[].class,"Char","Char",CharPredicate.class,CharConsumer.class,CharComparator.class,
-            CharUnaryOperator.class,Character.MIN_VALUE,CharDblLnkNode.class,CharSnglLnkNode.class,"removeCharAt",
+            CharUnaryOperator.class,Character.MIN_VALUE,"removeCharAt",
             int.class,"applyAsChar","compare",char.class,"charElement",-1,OmniArray.OfChar.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
@@ -1382,18 +1381,17 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.CharOutput<?>)collection).removeCharAt(index);
         }
-        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                ((OmniList.OfChar)collection).sort((Comparator<? super Character>)sorter);
+                ((OmniList.OfChar)collection).sort((Comparator<? super Character>)sorter::compare);
             }else{
-                ((OmniList.OfChar)collection).sort((CharComparator)sorter);
+                ((OmniList.OfChar)collection).sort((CharComparator)sorter::compare);
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfChar)collection).unstableSort(sorter);
+            ((OmniList.OfChar)collection).unstableSort(sorter::compare);
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -1476,7 +1474,7 @@ public enum DataType{
     },
     SHORT("SHORT","BOOLEAN,BYTE,SHORT","SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Short.class,short.class,
             Short[].class,short[].class,"Short","Short",ShortPredicate.class,ShortConsumer.class,ShortComparator.class,
-            ShortUnaryOperator.class,Short.MIN_VALUE,ShortDblLnkNode.class,ShortSnglLnkNode.class,"removeShortAt",
+            ShortUnaryOperator.class,Short.MIN_VALUE,"removeShortAt",
             int.class,"applyAsShort","compare",short.class,"shortElement",OmniArray.MAX_ARR_SIZE / 8,OmniArray.OfShort.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
@@ -1833,18 +1831,17 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.ShortOutput<?>)collection).removeShortAt(index);
         }
-        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                ((OmniList.OfShort)collection).sort((Comparator<? super Short>)sorter);
+                ((OmniList.OfShort)collection).sort((Comparator<? super Short>)sorter::compare);
             }else{
-                ((OmniList.OfShort)collection).sort((ShortComparator)sorter);
+                ((OmniList.OfShort)collection).sort((ShortComparator)sorter::compare);
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfShort)collection).unstableSort(sorter);
+            ((OmniList.OfShort)collection).unstableSort(sorter::compare);
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -1927,8 +1924,7 @@ public enum DataType{
     },
     INT("INT","BOOLEAN,BYTE,CHAR,SHORT,INT","INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Integer.class,int.class,
             Integer[].class,int[].class,"Int","Int",IntPredicate.class,
-            IntConsumer.class,IntBinaryOperator.class,IntUnaryOperator.class,Integer.MIN_VALUE,IntDblLnkNode.class,
-            IntSnglLnkNode.class,"removeIntAt",int.class,"applyAsInt","applyAsInt",int.class,"intElement",
+            IntConsumer.class,IntBinaryOperator.class,IntUnaryOperator.class,Integer.MIN_VALUE,"removeIntAt",int.class,"applyAsInt","applyAsInt",int.class,"intElement",
             OmniArray.MAX_ARR_SIZE / 13,OmniArray.OfInt.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
@@ -2273,18 +2269,17 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.IntOutput<?>)collection).removeIntAt(index);
         }
-        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                ((OmniList.OfInt)collection).sort((Comparator<? super Integer>)sorter);
+                ((OmniList.OfInt)collection).sort((Comparator<? super Integer>)sorter::compare);
             }else{
-                ((OmniList.OfInt)collection).sort((IntBinaryOperator)sorter);
+                ((OmniList.OfInt)collection).sort((IntComparator)sorter::compare);
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfInt)collection).unstableSort(sorter);
+            ((OmniList.OfInt)collection).unstableSort(sorter::compare);
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -2367,8 +2362,7 @@ public enum DataType{
     },
     LONG("LONG","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG","LONG,FLOAT,DOUBLE,REF",true,false,true,Long.class,long.class,
             Long[].class,long[].class,"Long","Long",LongPredicate.class,
-            LongConsumer.class,LongComparator.class,LongUnaryOperator.class,Long.MIN_VALUE,LongDblLnkNode.class,
-            LongSnglLnkNode.class,"removeLongAt",long.class,"applyAsLong","compare",long.class,"longElement",
+            LongConsumer.class,LongComparator.class,LongUnaryOperator.class,Long.MIN_VALUE,"removeLongAt",long.class,"applyAsLong","compare",long.class,"longElement",
             OmniArray.MAX_ARR_SIZE / 22,OmniArray.OfLong.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
@@ -2705,18 +2699,17 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.LongOutput<?>)collection).removeLongAt(index);
         }
-        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                ((OmniList.OfLong)collection).sort((Comparator<? super Long>)sorter);
+                ((OmniList.OfLong)collection).sort((Comparator<? super Long>)sorter::compare);
             }else{
-                ((OmniList.OfLong)collection).sort((LongComparator)sorter);
+                ((OmniList.OfLong)collection).sort((LongComparator)sorter::compare);
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfLong)collection).unstableSort(sorter);
+            ((OmniList.OfLong)collection).unstableSort(sorter::compare);
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -2799,8 +2792,7 @@ public enum DataType{
     },
     FLOAT("FLOAT","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT","FLOAT,DOUBLE,REF",false,true,true,Float.class,float.class,
             Float[].class,float[].class,"Float","Float",FloatPredicate.class,
-            FloatConsumer.class,FloatComparator.class,FloatUnaryOperator.class,Float.NaN,FloatDblLnkNode.class,
-            FloatSnglLnkNode.class,"removeFloatAt",int.class,"applyAsFloat","compare",float.class,"floatElement",
+            FloatConsumer.class,FloatComparator.class,FloatUnaryOperator.class,Float.NaN,"removeFloatAt",int.class,"applyAsFloat","compare",float.class,"floatElement",
             OmniArray.MAX_ARR_SIZE / 17,OmniArray.OfFloat.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
@@ -3158,18 +3150,17 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.FloatOutput<?>)collection).removeFloatAt(index);
         }
-        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                ((OmniList.OfFloat)collection).sort((Comparator<? super Float>)sorter);
+                ((OmniList.OfFloat)collection).sort((Comparator<? super Float>)sorter::compare);
             }else{
-                ((OmniList.OfFloat)collection).sort((FloatComparator)sorter);
+                ((OmniList.OfFloat)collection).sort((FloatComparator)sorter::compare);
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfFloat)collection).unstableSort(sorter);
+            ((OmniList.OfFloat)collection).unstableSort(sorter::compare);
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -3260,7 +3251,7 @@ public enum DataType{
     DOUBLE("DOUBLE","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE","DOUBLE,REF",false,true,true,Double.class,
             double.class,Double[].class,double[].class,"Double","Double",
             DoublePredicate.class,DoubleConsumer.class,DoubleComparator.class,DoubleUnaryOperator.class,Double.NaN,
-            DoubleDblLnkNode.class,DoubleSnglLnkNode.class,"removeDoubleAt",long.class,"applyAsDouble","compare",
+            "removeDoubleAt",long.class,"applyAsDouble","compare",
             double.class,"doubleElement",-1,OmniArray.OfDouble.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
@@ -3533,18 +3524,17 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.DoubleOutput<?>)collection).removeDoubleAt(index);
         }
-        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                ((OmniList.OfDouble)collection).sort((Comparator<? super Double>)sorter);
+                ((OmniList.OfDouble)collection).sort((Comparator<? super Double>)sorter::compare);
             }else{
-                ((OmniList.OfDouble)collection).sort((DoubleComparator)sorter);
+                ((OmniList.OfDouble)collection).sort((DoubleComparator)sorter::compare);
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfDouble)collection).unstableSort(sorter);
+            ((OmniList.OfDouble)collection).unstableSort(sorter::compare);
         }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
@@ -3684,8 +3674,7 @@ public enum DataType{
         }
     },
     REF("REF","REF","REF",false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,
-            RefDblLnkNode.class,
-            RefSnglLnkNode.class,"remove",Object.class,"apply","compare",Comparable.class,"element",-1,OmniArray.OfRef.DEFAULT_ARR){
+            "remove",Object.class,"apply","compare",Comparable.class,"element",-1,OmniArray.OfRef.DEFAULT_ARR){
         @Override
         public Object getFromArray(int index,Object arrayOfThisType){
             return ((Object[])arrayOfThisType)[index];
@@ -3986,12 +3975,12 @@ public enum DataType{
             if(functionCallType.boxed){
                 throw DataType.cannotBeBoxed();
             }
-            ((OmniList.OfRef<Object>)collection).sort(sorter);
+            ((OmniList.OfRef<Object>)collection).sort(sorter::compare);
         }
         @SuppressWarnings("unchecked")
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfRef<Object>)collection).unstableSort(sorter);
+            ((OmniList.OfRef<Object>)collection).unstableSort(sorter::compare);
         }
         @SuppressWarnings("unchecked")
         @Override
@@ -4122,8 +4111,6 @@ public enum DataType{
     public final Class<?> comparatorClass;
     public final Class<?> unaryOperatorClass;
     public final Object defaultVal;
-    public final Class<?> dblLnkNodeClass;
-    public final Class<?> snglLnkNodeClass;
     public final String removeAtIndexMethodName;
     public final Class<?> queryParameterType;
     public final String applyMethodName;
@@ -4141,7 +4128,7 @@ public enum DataType{
             boolean isSigned,Class<?> boxedClass,Class<?> primitiveClass,
             Class<?> boxedArrayClass,Class<?> primitiveArrayClass,String classPrefix,String typeNameModifier,
             Class<?> predicateClass,Class<?> consumerClass,Class<?> comparatorClass,Class<?> unaryOperatorClass,
-            Object defaultVal,Class<?> dblLnkNodeClass,Class<?> snglLnkNodeClass,String removeAtIndexMethodName,
+            Object defaultVal,String removeAtIndexMethodName,
             Class<?> queryParameterType,String applyMethodName,String compareMethodName,Class<?> comparableType,
             String elementMethodName,int massiveToStringThreshold,Object defaultArr){
         this.name=name;
@@ -4161,8 +4148,6 @@ public enum DataType{
         this.comparatorClass=comparatorClass;
         this.unaryOperatorClass=unaryOperatorClass;
         this.defaultVal=defaultVal;
-        this.dblLnkNodeClass=dblLnkNodeClass;
-        this.snglLnkNodeClass=snglLnkNodeClass;
         this.removeAtIndexMethodName=removeAtIndexMethodName;
         this.queryParameterType=queryParameterType;
         this.applyMethodName=applyMethodName;

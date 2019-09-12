@@ -1,55 +1,27 @@
 package omni.impl.set;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.NoSuchElementException;
-import java.util.Random;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import omni.api.OmniIterator;
-import omni.impl.CheckedType;
-import omni.impl.DataType;
-import omni.impl.FunctionCallType;
-import omni.impl.IteratorRemoveScenario;
-import omni.impl.IteratorType;
-import omni.impl.MonitoredCollection;
-import omni.impl.MonitoredFunction;
-import omni.impl.MonitoredFunctionGen;
-import omni.impl.MonitoredObjectOutputStream;
-import omni.impl.MonitoredRemoveIfPredicate;
-import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
-import omni.impl.MonitoredSet;
-import omni.impl.QueryCastType;
-import omni.impl.QueryVal;
-import omni.impl.QueryVal.QueryValModification;
-import omni.impl.StructType;
-import omni.util.NotYetImplementedException;
-import omni.util.TestExecutorService;
 
 public class BooleanSetImplTest{
-    private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
+    /*
+    private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImplOld>{
         final CheckedType checkedType;
-        final BooleanSetImpl set;
+        final BooleanSetImplOld set;
         int expectedState;
         BooleanSetImplMonitor(CheckedType checkedType){
             this.checkedType=checkedType;
             this.expectedState=0;
             if(checkedType.checked){
-                this.set=new BooleanSetImpl.Checked();
+                this.set=new BooleanSetImplOld.Checked();
             }else{
-                this.set=new BooleanSetImpl();
+                this.set=new BooleanSetImplOld();
             }
         }
         BooleanSetImplMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
             this.checkedType=checkedType;
-            Class<? extends BooleanSetImpl> clazz;
+            Class<? extends BooleanSetImplOld> clazz;
             if(checkedType.checked) {
-                clazz=BooleanSetImpl.Checked.class;
+                clazz=BooleanSetImplOld.Checked.class;
             }else {
-                clazz=BooleanSetImpl.class;
+                clazz=BooleanSetImplOld.class;
             }
             try{
                 this.set=clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
@@ -64,9 +36,9 @@ public class BooleanSetImplTest{
             this.checkedType=checkedType;
             this.expectedState=expectedState;
             if(checkedType.checked) {
-                this.set=new BooleanSetImpl.Checked(expectedState);
+                this.set=new BooleanSetImplOld.Checked(expectedState);
             }else {
-                this.set=new BooleanSetImpl(expectedState);
+                this.set=new BooleanSetImplOld(expectedState);
             }
         }
 
@@ -90,7 +62,7 @@ public class BooleanSetImplTest{
             return this.checkedType;
         }
 
-        @Override public BooleanSetImpl getCollection(){
+        @Override public BooleanSetImplOld getCollection(){
             return set;
         }
 
@@ -98,19 +70,19 @@ public class BooleanSetImplTest{
             return DataType.BOOLEAN;
         }
 
-        @Override public MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImpl> getMonitoredIterator(){
+        @Override public MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImplOld> getMonitoredIterator(){
             if(checkedType.checked) {
                 return new CheckedMonitoredItr();
             }
             return new UncheckedMonitoredItr();
         }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(IteratorType itrType){
+        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImplOld> getMonitoredIterator(IteratorType itrType){
             if(itrType!=IteratorType.AscendingItr) {
                 throw itrType.invalid();
             }
             return getMonitoredIterator();
         }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(int index,IteratorType itrType){
+        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImplOld> getMonitoredIterator(int index,IteratorType itrType){
             var itrMonitor=getMonitoredIterator(itrType);
             while(--index>=0 && itrMonitor.hasNext()) {
                 itrMonitor.iterateForward();
@@ -142,8 +114,8 @@ public class BooleanSetImplTest{
         }
 
         @Override public void verifyClone(Object clone){
-            var cast=(BooleanSetImpl)clone;
-            Assertions.assertEquals(checkedType.checked,cast instanceof BooleanSetImpl.Checked);
+            var cast=(BooleanSetImplOld)clone;
+            Assertions.assertEquals(checkedType.checked,cast instanceof BooleanSetImplOld.Checked);
             Assertions.assertEquals(set.state,cast.state);
         }
 
@@ -257,7 +229,7 @@ public class BooleanSetImplTest{
             //nothing to do
         }
 
-        abstract class AbstractMonitoredItr implements MonitoredSet.MonitoredSetIterator<OmniIterator.OfBoolean,BooleanSetImpl>{
+        abstract class AbstractMonitoredItr implements MonitoredSet.MonitoredSetIterator<OmniIterator.OfBoolean,BooleanSetImplOld>{
 
             final OmniIterator.OfBoolean itr;
             int expectedItrState;
@@ -270,7 +242,7 @@ public class BooleanSetImplTest{
                 return itr;
             }
 
-            @Override public MonitoredCollection<BooleanSetImpl> getMonitoredCollection(){
+            @Override public MonitoredCollection<BooleanSetImplOld> getMonitoredCollection(){
                 return BooleanSetImplMonitor.this;
             }
         }
@@ -1103,4 +1075,5 @@ public class BooleanSetImplTest{
             Assertions.assertEquals(expectedResult,actualResult);
         }
     }
+    */
 }

@@ -14,6 +14,7 @@ import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
+import omni.impl.AbstractOmniCollection;
 import java.util.ListIterator;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
@@ -33,7 +34,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.RandomAccess;
 public abstract class DoubleArrSeq extends 
-AbstractSeq<Double>
+AbstractOmniCollection<Double>
  implements OmniCollection.OfDouble,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
@@ -1201,7 +1202,7 @@ AbstractSeq<Double>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfDouble){
             return this.isEqualTo(size,(OmniList.OfDouble)list);
           }else if(list instanceof OmniList.OfRef){
@@ -1812,7 +1813,7 @@ AbstractSeq<Double>
     }
   }
     static class UncheckedSubList
-      extends AbstractSeq<Double>
+      extends AbstractOmniCollection<Double>
       implements DoubleSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -1884,7 +1885,7 @@ AbstractSeq<Double>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfDouble){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfDouble)list);
             }else if(list instanceof OmniList.OfRef){
@@ -3361,7 +3362,7 @@ AbstractSeq<Double>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
            if(list instanceof OmniList.OfDouble){
              return this.isEqualTo(size,(OmniList.OfDouble)list);
            }else if(list instanceof OmniList.OfRef){
@@ -3801,7 +3802,7 @@ AbstractSeq<Double>
     }
   }
     static class CheckedSubList
-      extends AbstractSeq<Double>
+      extends AbstractOmniCollection<Double>
       implements DoubleSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -3887,7 +3888,7 @@ AbstractSeq<Double>
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfDouble){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfDouble)list);
             }else if(list instanceof OmniList.OfRef){

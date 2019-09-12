@@ -4,6 +4,11 @@ import java.util.Collection;
 public abstract interface OmniSet<E> extends OmniCollection<E>,Set<E>
 {
   @Override
+  default boolean addAll(Collection<? extends E> that){
+    //TODO implement in lower classes and remove this
+    return OmniCollection.super.addAll(that);
+  }
+  @Override
   default boolean containsAll(Collection<?> that){
     //TODO implement in lower classes and remove this
     return OmniCollection.super.containsAll(that);

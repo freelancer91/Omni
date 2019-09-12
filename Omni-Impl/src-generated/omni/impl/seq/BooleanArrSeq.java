@@ -14,6 +14,7 @@ import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
+import omni.impl.AbstractOmniCollection;
 import java.util.ListIterator;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
@@ -661,7 +662,7 @@ AbstractBooleanArrSeq
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfBoolean){
             return this.isEqualTo(size,(OmniList.OfBoolean)list);
           }else if(list instanceof OmniList.OfRef){
@@ -980,7 +981,7 @@ AbstractBooleanArrSeq
     }
   }
     static class UncheckedSubList
-      extends AbstractSeq<Boolean>
+      extends AbstractOmniCollection<Boolean>
       implements BooleanSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -1052,7 +1053,7 @@ AbstractBooleanArrSeq
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfBoolean){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfBoolean)list);
             }else if(list instanceof OmniList.OfRef){
@@ -2717,7 +2718,7 @@ AbstractBooleanArrSeq
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
            if(list instanceof OmniList.OfBoolean){
              return this.isEqualTo(size,(OmniList.OfBoolean)list);
            }else if(list instanceof OmniList.OfRef){
@@ -3098,7 +3099,7 @@ AbstractBooleanArrSeq
     }
   }
     static class CheckedSubList
-      extends AbstractSeq<Boolean>
+      extends AbstractOmniCollection<Boolean>
       implements BooleanSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -3184,7 +3185,7 @@ AbstractBooleanArrSeq
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfBoolean){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfBoolean)list);
             }else if(list instanceof OmniList.OfRef){

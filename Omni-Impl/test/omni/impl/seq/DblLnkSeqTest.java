@@ -17,18 +17,12 @@ import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
-import omni.impl.BooleanDblLnkNode;
-import omni.impl.ByteDblLnkNode;
-import omni.impl.CharDblLnkNode;
+import omni.impl.AbstractOmniCollection;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
-import omni.impl.DoubleDblLnkNode;
-import omni.impl.FloatDblLnkNode;
 import omni.impl.FunctionCallType;
 import omni.impl.IllegalModification;
-import omni.impl.IntDblLnkNode;
 import omni.impl.IteratorType;
-import omni.impl.LongDblLnkNode;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredComparatorGen;
 import omni.impl.MonitoredDeque;
@@ -42,8 +36,6 @@ import omni.impl.MonitoredSequence;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
-import omni.impl.RefDblLnkNode;
-import omni.impl.ShortDblLnkNode;
 import omni.impl.StructType;
 import omni.util.NotYetImplementedException;
 import omni.util.OmniArray;
@@ -1133,9 +1125,9 @@ public class DblLnkSeqTest{
             final int threadSpan=(int)Math.ceil((double)seqSize / (double)numWorkers) - 1;
             switch(collectionType){
             case BOOLEAN:{
-                final var wayPoints=new BooleanDblLnkNode[numWorkers + 1];
+                final var wayPoints=new BooleanDblLnkSeq.Node[numWorkers + 1];
                 for(int i=0;i < wayPoints.length;++i){
-                    wayPoints[i]=new BooleanDblLnkNode(true);
+                    wayPoints[i]=new BooleanDblLnkSeq.Node(true);
                 }
                 for(int i=0;i < numWorkers;){
                     final var threadHead=wayPoints[i];
@@ -1143,7 +1135,7 @@ public class DblLnkSeqTest{
                     TestExecutorService.submitTest(()->{
                         var curr=threadHead;
                         for(int j=threadSpan;--j >= 0;){
-                            curr=curr.next=new BooleanDblLnkNode(curr,true);
+                            curr=curr.next=new BooleanDblLnkSeq.Node(curr,true);
                         }
                         threadTail.prev=curr;
                         curr.next=threadTail;
@@ -1157,9 +1149,9 @@ public class DblLnkSeqTest{
                 break;
             }
             case BYTE:{
-                final var wayPoints=new ByteDblLnkNode[numWorkers + 1];
+                final var wayPoints=new ByteDblLnkSeq.Node[numWorkers + 1];
                 for(int i=0;i < wayPoints.length;++i){
-                    wayPoints[i]=new ByteDblLnkNode((byte)0);
+                    wayPoints[i]=new ByteDblLnkSeq.Node((byte)0);
                 }
                 for(int i=0;i < numWorkers;){
                     final var threadHead=wayPoints[i];
@@ -1167,7 +1159,7 @@ public class DblLnkSeqTest{
                     TestExecutorService.submitTest(()->{
                         var curr=threadHead;
                         for(int j=threadSpan;--j >= 0;){
-                            curr=curr.next=new ByteDblLnkNode(curr,(byte)0);
+                            curr=curr.next=new ByteDblLnkSeq.Node(curr,(byte)0);
                         }
                         threadTail.prev=curr;
                         curr.next=threadTail;
@@ -1181,9 +1173,9 @@ public class DblLnkSeqTest{
                 break;
             }
             case SHORT:{
-                final var wayPoints=new ShortDblLnkNode[numWorkers + 1];
+                final var wayPoints=new ShortDblLnkSeq.Node[numWorkers + 1];
                 for(int i=0;i < wayPoints.length;++i){
-                    wayPoints[i]=new ShortDblLnkNode((short)0);
+                    wayPoints[i]=new ShortDblLnkSeq.Node((short)0);
                 }
                 for(int i=0;i < numWorkers;){
                     final var threadHead=wayPoints[i];
@@ -1191,7 +1183,7 @@ public class DblLnkSeqTest{
                     TestExecutorService.submitTest(()->{
                         var curr=threadHead;
                         for(int j=threadSpan;--j >= 0;){
-                            curr=curr.next=new ShortDblLnkNode(curr,(short)0);
+                            curr=curr.next=new ShortDblLnkSeq.Node(curr,(short)0);
                         }
                         threadTail.prev=curr;
                         curr.next=threadTail;
@@ -1205,9 +1197,9 @@ public class DblLnkSeqTest{
                 break;
             }
             case INT:{
-                final var wayPoints=new IntDblLnkNode[numWorkers + 1];
+                final var wayPoints=new IntDblLnkSeq.Node[numWorkers + 1];
                 for(int i=0;i < wayPoints.length;++i){
-                    wayPoints[i]=new IntDblLnkNode(0);
+                    wayPoints[i]=new IntDblLnkSeq.Node(0);
                 }
                 for(int i=0;i < numWorkers;){
                     final var threadHead=wayPoints[i];
@@ -1215,7 +1207,7 @@ public class DblLnkSeqTest{
                     TestExecutorService.submitTest(()->{
                         var curr=threadHead;
                         for(int j=threadSpan;--j >= 0;){
-                            curr=curr.next=new IntDblLnkNode(curr,0);
+                            curr=curr.next=new IntDblLnkSeq.Node(curr,0);
                         }
                         threadTail.prev=curr;
                         curr.next=threadTail;
@@ -1229,9 +1221,9 @@ public class DblLnkSeqTest{
                 break;
             }
             case LONG:{
-                final var wayPoints=new LongDblLnkNode[numWorkers + 1];
+                final var wayPoints=new LongDblLnkSeq.Node[numWorkers + 1];
                 for(int i=0;i < wayPoints.length;++i){
-                    wayPoints[i]=new LongDblLnkNode(0L);
+                    wayPoints[i]=new LongDblLnkSeq.Node(0L);
                 }
                 for(int i=0;i < numWorkers;){
                     final var threadHead=wayPoints[i];
@@ -1239,7 +1231,7 @@ public class DblLnkSeqTest{
                     TestExecutorService.submitTest(()->{
                         var curr=threadHead;
                         for(int j=threadSpan;--j >= 0;){
-                            curr=curr.next=new LongDblLnkNode(curr,0L);
+                            curr=curr.next=new LongDblLnkSeq.Node(curr,0L);
                         }
                         threadTail.prev=curr;
                         curr.next=threadTail;
@@ -1253,9 +1245,9 @@ public class DblLnkSeqTest{
                 break;
             }
             case FLOAT:{
-                final var wayPoints=new FloatDblLnkNode[numWorkers + 1];
+                final var wayPoints=new FloatDblLnkSeq.Node[numWorkers + 1];
                 for(int i=0;i < wayPoints.length;++i){
-                    wayPoints[i]=new FloatDblLnkNode(0F);
+                    wayPoints[i]=new FloatDblLnkSeq.Node(0F);
                 }
                 for(int i=0;i < numWorkers;){
                     final var threadHead=wayPoints[i];
@@ -1263,7 +1255,7 @@ public class DblLnkSeqTest{
                     TestExecutorService.submitTest(()->{
                         var curr=threadHead;
                         for(int j=threadSpan;--j >= 0;){
-                            curr=curr.next=new FloatDblLnkNode(curr,0F);
+                            curr=curr.next=new FloatDblLnkSeq.Node(curr,0F);
                         }
                         threadTail.prev=curr;
                         curr.next=threadTail;
@@ -2046,7 +2038,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testunstableSort_Comparator");
     }
-    private static class DblLnkSeqMonitor<LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
+    private static class DblLnkSeqMonitor<LSTDEQ extends AbstractOmniCollection<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
             extends
             AbstractSequenceMonitor<LSTDEQ>
             implements
@@ -2675,7 +2667,7 @@ public class DblLnkSeqTest{
                 currNode=currNode.prev;
             }
         }
-        private Object getNode(int index,AbstractSeq<E> seq,int expectedSize){
+        private Object getNode(int index,AbstractOmniCollection<E> seq,int expectedSize){
             if((expectedSize-=index) <= index){
                 // the node is closer to the tail
                 if(expectedSize == 0){
@@ -2687,7 +2679,7 @@ public class DblLnkSeqTest{
                 return iterateUp(head(seq),index);
             }
         }
-        private Object head(AbstractSeq<E> seq){
+        private Object head(AbstractOmniCollection<E> seq){
             switch(dataType){
             case BOOLEAN:
                 return ((BooleanDblLnkSeq)seq).head;
@@ -2715,7 +2707,7 @@ public class DblLnkSeqTest{
             if(dist != 0){
                 switch(dataType){
                 case BOOLEAN:{
-                    var cast=(BooleanDblLnkNode)node;
+                    var cast=(BooleanDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2723,7 +2715,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case BYTE:{
-                    var cast=(ByteDblLnkNode)node;
+                    var cast=(ByteDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2731,7 +2723,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case CHAR:{
-                    var cast=(CharDblLnkNode)node;
+                    var cast=(CharDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2739,7 +2731,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case SHORT:{
-                    var cast=(ShortDblLnkNode)node;
+                    var cast=(ShortDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2747,7 +2739,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case INT:{
-                    var cast=(IntDblLnkNode)node;
+                    var cast=(IntDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2755,7 +2747,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case LONG:{
-                    var cast=(LongDblLnkNode)node;
+                    var cast=(LongDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2763,7 +2755,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case FLOAT:{
-                    var cast=(FloatDblLnkNode)node;
+                    var cast=(FloatDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2771,7 +2763,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case DOUBLE:{
-                    var cast=(DoubleDblLnkNode)node;
+                    var cast=(DoubleDblLnkSeq.Node)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2780,7 +2772,7 @@ public class DblLnkSeqTest{
                 }
                 case REF:{
                     @SuppressWarnings("unchecked")
-                    var cast=(RefDblLnkNode<E>)node;
+                    var cast=(RefDblLnkSeq.Node<E>)node;
                     do{
                         cast=cast.prev;
                     }while(--dist > 0);
@@ -2797,7 +2789,7 @@ public class DblLnkSeqTest{
             if(dist != 0){
                 switch(dataType){
                 case BOOLEAN:{
-                    var cast=(BooleanDblLnkNode)node;
+                    var cast=(BooleanDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2805,7 +2797,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case BYTE:{
-                    var cast=(ByteDblLnkNode)node;
+                    var cast=(ByteDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2813,7 +2805,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case CHAR:{
-                    var cast=(CharDblLnkNode)node;
+                    var cast=(CharDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2821,7 +2813,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case SHORT:{
-                    var cast=(ShortDblLnkNode)node;
+                    var cast=(ShortDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2829,7 +2821,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case INT:{
-                    var cast=(IntDblLnkNode)node;
+                    var cast=(IntDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2837,7 +2829,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case LONG:{
-                    var cast=(LongDblLnkNode)node;
+                    var cast=(LongDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2845,7 +2837,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case FLOAT:{
-                    var cast=(FloatDblLnkNode)node;
+                    var cast=(FloatDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2853,7 +2845,7 @@ public class DblLnkSeqTest{
                     break;
                 }
                 case DOUBLE:{
-                    var cast=(DoubleDblLnkNode)node;
+                    var cast=(DoubleDblLnkSeq.Node)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2862,7 +2854,7 @@ public class DblLnkSeqTest{
                 }
                 case REF:{
                     @SuppressWarnings("unchecked")
-                    var cast=(RefDblLnkNode<E>)node;
+                    var cast=(RefDblLnkSeq.Node<E>)node;
                     do{
                         cast=cast.next;
                     }while(--dist > 0);
@@ -2879,23 +2871,23 @@ public class DblLnkSeqTest{
         private Object next(Object node){
             switch(dataType){
             case BOOLEAN:
-                return ((BooleanDblLnkNode)node).next;
+                return ((BooleanDblLnkSeq.Node)node).next;
             case BYTE:
-                return ((ByteDblLnkNode)node).next;
+                return ((ByteDblLnkSeq.Node)node).next;
             case CHAR:
-                return ((CharDblLnkNode)node).next;
+                return ((CharDblLnkSeq.Node)node).next;
             case DOUBLE:
-                return ((DoubleDblLnkNode)node).next;
+                return ((DoubleDblLnkSeq.Node)node).next;
             case FLOAT:
-                return ((FloatDblLnkNode)node).next;
+                return ((FloatDblLnkSeq.Node)node).next;
             case INT:
-                return ((IntDblLnkNode)node).next;
+                return ((IntDblLnkSeq.Node)node).next;
             case LONG:
-                return ((LongDblLnkNode)node).next;
+                return ((LongDblLnkSeq.Node)node).next;
             case REF:
-                return ((RefDblLnkNode<E>)node).next;
+                return ((RefDblLnkSeq.Node<E>)node).next;
             case SHORT:
-                return ((ShortDblLnkNode)node).next;
+                return ((ShortDblLnkSeq.Node)node).next;
             default:
                 throw dataType.invalid();
             }
@@ -2904,28 +2896,28 @@ public class DblLnkSeqTest{
         private Object prev(Object node){
             switch(dataType){
             case BOOLEAN:
-                return ((BooleanDblLnkNode)node).prev;
+                return ((BooleanDblLnkSeq.Node)node).prev;
             case BYTE:
-                return ((ByteDblLnkNode)node).prev;
+                return ((ByteDblLnkSeq.Node)node).prev;
             case CHAR:
-                return ((CharDblLnkNode)node).prev;
+                return ((CharDblLnkSeq.Node)node).prev;
             case DOUBLE:
-                return ((DoubleDblLnkNode)node).prev;
+                return ((DoubleDblLnkSeq.Node)node).prev;
             case FLOAT:
-                return ((FloatDblLnkNode)node).prev;
+                return ((FloatDblLnkSeq.Node)node).prev;
             case INT:
-                return ((IntDblLnkNode)node).prev;
+                return ((IntDblLnkSeq.Node)node).prev;
             case LONG:
-                return ((LongDblLnkNode)node).prev;
+                return ((LongDblLnkSeq.Node)node).prev;
             case REF:
-                return ((RefDblLnkNode<E>)node).prev;
+                return ((RefDblLnkSeq.Node<E>)node).prev;
             case SHORT:
-                return ((ShortDblLnkNode)node).prev;
+                return ((ShortDblLnkSeq.Node)node).prev;
             default:
                 throw dataType.invalid();
             }
         }
-        private Object tail(AbstractSeq<E> seq){
+        private Object tail(AbstractOmniCollection<E> seq){
             switch(dataType){
             case BOOLEAN:
                 return ((BooleanDblLnkSeq)seq).tail;
@@ -3584,8 +3576,8 @@ public class DblLnkSeqTest{
                 switch(dataType){
                 case BOOLEAN:{
                     final var expectedArr=(boolean[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(BooleanDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(BooleanDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(BooleanDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(BooleanDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(boolean)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3598,8 +3590,8 @@ public class DblLnkSeqTest{
                 }
                 case BYTE:{
                     final var expectedArr=(byte[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(ByteDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(ByteDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(ByteDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(ByteDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(byte)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3612,8 +3604,8 @@ public class DblLnkSeqTest{
                 }
                 case CHAR:{
                     final var expectedArr=(char[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(CharDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(CharDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(CharDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(CharDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(char)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3626,8 +3618,8 @@ public class DblLnkSeqTest{
                 }
                 case DOUBLE:{
                     final var expectedArr=(double[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(DoubleDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(DoubleDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(DoubleDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(DoubleDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(double)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3640,8 +3632,8 @@ public class DblLnkSeqTest{
                 }
                 case FLOAT:{
                     final var expectedArr=(float[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(FloatDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(FloatDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(FloatDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(FloatDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(float)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3654,8 +3646,8 @@ public class DblLnkSeqTest{
                 }
                 case INT:{
                     final var expectedArr=(int[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(IntDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(IntDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(IntDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(IntDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(int)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3668,8 +3660,8 @@ public class DblLnkSeqTest{
                 }
                 case LONG:{
                     final var expectedArr=(long[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(LongDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(LongDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(LongDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(LongDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(long)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3683,9 +3675,9 @@ public class DblLnkSeqTest{
                 case REF:{
                     final var expectedArr=(Object[])DblLnkSeqMonitor.this.expectedArr;
                     @SuppressWarnings("unchecked")
-                    var expectedCurr=(RefDblLnkNode<E>)this.expectedCurr;
+                    var expectedCurr=(RefDblLnkSeq.Node<E>)this.expectedCurr;
                     @SuppressWarnings("unchecked")
-                    var expectedLastRet=(RefDblLnkNode<E>)this.expectedLastRet;
+                    var expectedLastRet=(RefDblLnkSeq.Node<E>)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertSame(expectedArr[expectedCurrIndex],functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -3698,8 +3690,8 @@ public class DblLnkSeqTest{
                 }
                 case SHORT:{
                     final var expectedArr=(short[])DblLnkSeqMonitor.this.expectedArr;
-                    var expectedCurr=(ShortDblLnkNode)this.expectedCurr;
-                    var expectedLastRet=(ShortDblLnkNode)this.expectedLastRet;
+                    var expectedCurr=(ShortDblLnkSeq.Node)this.expectedCurr;
+                    var expectedLastRet=(ShortDblLnkSeq.Node)this.expectedLastRet;
                     while(expectedCurrIndex < expectedBound){
                         Assertions.assertEquals(expectedArr[expectedCurrIndex],(short)functionItr.next());
                         lastRetIndex=expectedCurrIndex++;
@@ -4503,7 +4495,7 @@ public class DblLnkSeqTest{
                 verifyGetResult(lastRetIndex,result,outputType);
             }
         }
-        private static class SubListMonitor<SUBLIST extends AbstractSeq<E>&OmniList<E>,LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
+        private static class SubListMonitor<SUBLIST extends AbstractOmniCollection<E>&OmniList<E>,LSTDEQ extends AbstractOmniCollection<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
                 implements
                 MonitoredList<SUBLIST>{
             final DblLnkSeqMonitor<LSTDEQ,E> expectedRoot;
@@ -5400,7 +5392,7 @@ public class DblLnkSeqTest{
             }
             @SuppressWarnings("unchecked")
             private void updateSubLists(){
-                Consumer<SubListMonitor<SUBLIST,LSTDEQ,E>> updater=subListMonitor->subListMonitor.expectedSize=((AbstractSeq<E>)subListMonitor.seq).size;
+                Consumer<SubListMonitor<SUBLIST,LSTDEQ,E>> updater=subListMonitor->subListMonitor.expectedSize=((AbstractOmniCollection<E>)subListMonitor.seq).size;
                 final var checked=expectedRoot.checkedType.checked;
                 final var dataType=expectedRoot.dataType;
                 switch(dataType){
@@ -5514,7 +5506,7 @@ public class DblLnkSeqTest{
             private void verifyBooleanClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(BooleanDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof BooleanDblLnkSeq.CheckedList);
@@ -5659,7 +5651,7 @@ public class DblLnkSeqTest{
             private void verifyByteClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(ByteDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof ByteDblLnkSeq.CheckedList);
@@ -5804,7 +5796,7 @@ public class DblLnkSeqTest{
             private void verifyCharClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(CharDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof CharDblLnkSeq.CheckedList);
@@ -5949,7 +5941,7 @@ public class DblLnkSeqTest{
             private void verifyDoubleClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(DoubleDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof DoubleDblLnkSeq.CheckedList);
@@ -6094,7 +6086,7 @@ public class DblLnkSeqTest{
             private void verifyFloatClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(FloatDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof FloatDblLnkSeq.CheckedList);
@@ -6239,7 +6231,7 @@ public class DblLnkSeqTest{
             private void verifyIntClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(IntDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof IntDblLnkSeq.CheckedList);
@@ -6384,7 +6376,7 @@ public class DblLnkSeqTest{
             private void verifyLongClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(LongDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof LongDblLnkSeq.CheckedList);
@@ -6529,7 +6521,7 @@ public class DblLnkSeqTest{
             private void verifyRefClone(Object clone,boolean refIsSame){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 @SuppressWarnings("unchecked")
                 final var cloneCast=(RefDblLnkSeq<E>)clone;
@@ -6722,7 +6714,7 @@ public class DblLnkSeqTest{
             private void verifyShortClone(Object clone){
                 Assertions.assertNotSame(clone,seq);
                 int size;
-                Assertions.assertEquals(size=seq.size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=seq.size,((AbstractOmniCollection<?>)clone).size);
                 final var checked=expectedRoot.checkedType.checked;
                 final var cloneCast=(ShortDblLnkSeq)clone;
                 Assertions.assertEquals(checked,cloneCast instanceof ShortDblLnkSeq.CheckedList);

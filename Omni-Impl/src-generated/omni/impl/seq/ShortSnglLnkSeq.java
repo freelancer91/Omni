@@ -16,16 +16,126 @@ import omni.util.TypeUtil;
 import omni.impl.AbstractShortItr;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
-import omni.impl.ShortSnglLnkNode;
+import omni.impl.AbstractOmniCollection;
 import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
 public abstract class ShortSnglLnkSeq extends 
-AbstractSeq<Short>
+AbstractOmniCollection<Short>
  implements OmniCollection.OfShort,Externalizable{
+  static final class Node{
+    transient short val;
+    transient Node next;
+    Node(short val){
+      this.val=val;
+    }
+    Node(short val,Node next){
+      this.val=val;
+      this.next=next;
+    }
+    public static  int uncheckedToString(Node curr,byte[] buffer){
+      int bufferOffset=1;
+      for(;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+        bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+        if((curr=curr.next)==null){
+          return bufferOffset;
+        }
+      }
+    }
+    public static  void uncheckedToString(Node curr,ToStringUtil.OmniStringBuilderByte builder){
+      for(;;builder.uncheckedAppendCommaAndSpace()){
+        builder.uncheckedAppendShort(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  int uncheckedHashCode(Node curr){
+      int hash=31+(curr.val);
+      for(;(curr=curr.next)!=null;hash=(hash*31)+(curr.val)){}
+      return hash;
+    }
+    public static  void uncheckedForEach(Node curr,Node tail,ShortConsumer action){
+      for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+    }
+    public static  void uncheckedForEach(Node curr,ShortConsumer action){
+      do{
+        action.accept(curr.val);
+      }while((curr=curr.next)!=null);
+    }
+    public static  boolean uncheckedcontains (Node curr
+    ,int val
+    ){
+      for(;val!=(curr.val);){if((curr=curr.next)==null){return false;}}
+      return true;
+    }
+    public static  int uncheckedsearch (Node curr
+    ,int val
+    ){
+      int index=1;
+      for(;val!=(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+      return index;
+    }
+    public static  void uncheckedCopyInto(Node curr,short[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,Object[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,Short[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,double[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(double)(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,float[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(float)(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,long[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(long)(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,int[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(int)(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+  }
   private static final long serialVersionUID=1L;
-  transient ShortSnglLnkNode head;
+  transient Node head;
   private ShortSnglLnkSeq(Collection<? extends Short> that){
     super();
     //TODO optimize
@@ -58,11 +168,11 @@ AbstractSeq<Short>
   }  
   private ShortSnglLnkSeq(){
   }
-  private ShortSnglLnkSeq(ShortSnglLnkNode head,int size){
+  private ShortSnglLnkSeq(Node head,int size){
     super(size);
     this.head=head;
   }
-  private static  void pullSurvivorsDown(ShortSnglLnkNode prev,ShortPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
+  private static  void pullSurvivorsDown(Node prev,ShortPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
     int wordOffset;
     for(long word=survivorSet[wordOffset=0],marker=1L;;){
       var curr=prev.next;
@@ -89,7 +199,7 @@ AbstractSeq<Short>
       prev=curr;
     }
   }
-  private static  int markSurvivors(ShortSnglLnkNode curr,ShortPredicate filter,long[] survivorSet){
+  private static  int markSurvivors(Node curr,ShortPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -105,7 +215,7 @@ AbstractSeq<Short>
       survivorSet[wordOffset++]=word;
     }
   }
-  private static  void pullSurvivorsDown(ShortSnglLnkNode prev,long word,int numSurvivors,int numRemoved){
+  private static  void pullSurvivorsDown(Node prev,long word,int numSurvivors,int numRemoved){
     for(long marker=1L;;marker<<=1){
       var curr=prev.next;
       if((marker&word)==0){
@@ -125,7 +235,7 @@ AbstractSeq<Short>
       prev=curr;
     }
   }
-  private static  long markSurvivors(ShortSnglLnkNode curr,ShortPredicate filter){
+  private static  long markSurvivors(Node curr,ShortPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test(curr.val)){
         word|=marker;
@@ -135,9 +245,9 @@ AbstractSeq<Short>
       }
     }
   }
-  private static  int retainSurvivors(ShortSnglLnkNode prev, final ShortPredicate filter){
+  private static  int retainSurvivors(Node prev, final ShortPredicate filter){
     int numSurvivors=1;
-    outer:for(ShortSnglLnkNode next;(next=prev.next)!=null;++numSurvivors,prev=next){
+    outer:for(Node next;(next=prev.next)!=null;++numSurvivors,prev=next){
       if(filter.test(next.val)){
         do{
           if((next=next.next)==null){
@@ -150,7 +260,7 @@ AbstractSeq<Short>
     }
     return numSurvivors;
   }
-  private static  int retainTrailingSurvivors(ShortSnglLnkNode prev,ShortSnglLnkNode curr,final ShortPredicate filter){
+  private static  int retainTrailingSurvivors(Node prev,Node curr,final ShortPredicate filter){
     int numSurvivors=0;
     outer:for(;;curr=curr.next){
       if(curr==null){
@@ -184,17 +294,17 @@ AbstractSeq<Short>
     this.size=0;
   }
   @Override public String toString(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
       if((size=this.size)<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
-        [size=ShortSnglLnkNode.uncheckedToString(head,buffer)]=(byte)']';
+        [size=Node.uncheckedToString(head,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
         final ToStringUtil.OmniStringBuilderByte builder;
-        ShortSnglLnkNode.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        Node.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
         (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
@@ -203,22 +313,22 @@ AbstractSeq<Short>
     return "[]";
   }
   @Override public void forEach(ShortConsumer action){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      ShortSnglLnkNode.uncheckedForEach(head,action);
+      Node.uncheckedForEach(head,action);
     }
   }
   @Override public void forEach(Consumer<? super Short> action){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      ShortSnglLnkNode.uncheckedForEach(head,action::accept);
+      Node.uncheckedForEach(head,action::accept);
     }
   }
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     final int size;
     T[] arr=arrConstructor.apply(size=this.size);
     if(size!=0){
-      ShortSnglLnkNode.uncheckedCopyInto(head,arr);
+      Node.uncheckedCopyInto(head,arr);
     }
     return arr;
   }
@@ -243,64 +353,64 @@ AbstractSeq<Short>
     return true;
   }
   @Override public <T> T[] toArray(T[] arr){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      ShortSnglLnkNode.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
+      Node.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
     }else if(arr.length!=0){
       arr[0]=null;
     }
     return arr;
   }
   @Override public short[] toShortArray(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final short[] dst;
-      ShortSnglLnkNode.uncheckedCopyInto(head,dst=new short[this.size]);
+      Node.uncheckedCopyInto(head,dst=new short[this.size]);
       return dst;
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
   @Override public Short[] toArray(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final Short[] dst;
-      ShortSnglLnkNode.uncheckedCopyInto(head,dst=new Short[this.size]);
+      Node.uncheckedCopyInto(head,dst=new Short[this.size]);
       return dst;
     }
     return OmniArray.OfShort.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final double[] dst;
-      ShortSnglLnkNode.uncheckedCopyInto(head,dst=new double[this.size]);
+      Node.uncheckedCopyInto(head,dst=new double[this.size]);
       return dst;
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
   @Override public float[] toFloatArray(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final float[] dst;
-      ShortSnglLnkNode.uncheckedCopyInto(head,dst=new float[this.size]);
+      Node.uncheckedCopyInto(head,dst=new float[this.size]);
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
   @Override public long[] toLongArray(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final long[] dst;
-      ShortSnglLnkNode.uncheckedCopyInto(head,dst=new long[this.size]);
+      Node.uncheckedCopyInto(head,dst=new long[this.size]);
       return dst;
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
   @Override public int[] toIntArray(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final int[] dst;
-      ShortSnglLnkNode.uncheckedCopyInto(head,dst=new int[this.size]);
+      Node.uncheckedCopyInto(head,dst=new int[this.size]);
       return dst;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
@@ -308,10 +418,10 @@ AbstractSeq<Short>
     @Override public boolean contains(boolean val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedcontains(head,(short)TypeUtil.castToByte(val));
+            return Node.uncheckedcontains(head,(short)TypeUtil.castToByte(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -321,10 +431,10 @@ AbstractSeq<Short>
       if(val==(short)val)
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedcontains(head,(val));
+            return Node.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -333,12 +443,12 @@ AbstractSeq<Short>
     @Override public boolean contains(long val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
             if((v=(short)val)==val){
-              return ShortSnglLnkNode.uncheckedcontains(head,v);
+              return Node.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -348,13 +458,13 @@ AbstractSeq<Short>
     @Override public boolean contains(float val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
             if(val==(v=(short)val))
             {
-              return ShortSnglLnkNode.uncheckedcontains(head,v);
+              return Node.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -364,13 +474,13 @@ AbstractSeq<Short>
     @Override public boolean contains(double val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
             if(val==(v=(short)val))
             {
-              return ShortSnglLnkNode.uncheckedcontains(head,v);
+              return Node.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -380,7 +490,7 @@ AbstractSeq<Short>
     @Override public boolean contains(Object val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -416,7 +526,7 @@ AbstractSeq<Short>
               }else{
                 break returnFalse;
               }
-              return ShortSnglLnkNode.uncheckedcontains(head,i);
+              return Node.uncheckedcontains(head,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -426,10 +536,10 @@ AbstractSeq<Short>
     @Override public boolean contains(byte val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedcontains(head,(val));
+            return Node.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -439,10 +549,10 @@ AbstractSeq<Short>
       if(val<=Short.MAX_VALUE)
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedcontains(head,(val));
+            return Node.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -451,10 +561,10 @@ AbstractSeq<Short>
     @Override public boolean contains(short val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedcontains(head,(val));
+            return Node.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -463,7 +573,7 @@ AbstractSeq<Short>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(short)TypeUtil.castToByte(val));
@@ -476,7 +586,7 @@ AbstractSeq<Short>
       if(val==(short)val)
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -488,7 +598,7 @@ AbstractSeq<Short>
     @Override public boolean removeVal(long val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
@@ -503,7 +613,7 @@ AbstractSeq<Short>
     @Override public boolean removeVal(float val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
@@ -519,7 +629,7 @@ AbstractSeq<Short>
     @Override public boolean removeVal(double val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
@@ -535,7 +645,7 @@ AbstractSeq<Short>
     @Override public boolean remove(Object val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -581,7 +691,7 @@ AbstractSeq<Short>
     @Override public boolean removeVal(byte val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -594,7 +704,7 @@ AbstractSeq<Short>
       if(val<=Short.MAX_VALUE)
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -606,7 +716,7 @@ AbstractSeq<Short>
     @Override public boolean removeVal(short val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -615,64 +725,64 @@ AbstractSeq<Short>
       }//end val check
       return false;
     }
-  abstract boolean uncheckedremoveVal(ShortSnglLnkNode head,int val);
+  abstract boolean uncheckedremoveVal(Node head,int val);
   @Override public boolean removeIf(ShortPredicate filter){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter);
     }
     return false;
   }
   @Override public boolean removeIf(Predicate<? super Short> filter){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter::test);
     }
     return false;
   }
   public short peekShort(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (short)(head.val);
     }
     return Short.MIN_VALUE;
   }
   public Short peek(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (Short)(head.val);
     }
     return null;
   }
   public double peekDouble(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (double)(head.val);
     }
     return Double.NaN;
   }
   public float peekFloat(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (float)(head.val);
     }
     return Float.NaN;
   }
   public long peekLong(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (long)(head.val);
     }
     return Long.MIN_VALUE;
   }
   public int peekInt(){
-    final ShortSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (int)(head.val);
     }
     return Integer.MIN_VALUE;
   }
-  abstract boolean uncheckedremoveIf(ShortSnglLnkNode head,ShortPredicate filter);
+  abstract boolean uncheckedremoveIf(Node head,ShortPredicate filter);
   public static class CheckedStack extends UncheckedStack{
     private static final long serialVersionUID=1L;
     transient int modCount;
@@ -696,7 +806,7 @@ AbstractSeq<Short>
     }  
     public CheckedStack(){
     }
-    CheckedStack(ShortSnglLnkNode head,int size){
+    CheckedStack(Node head,int size){
       super(head,size);
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
@@ -719,17 +829,17 @@ AbstractSeq<Short>
      }
     }
     @Override public Object clone(){
-      ShortSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final CheckedStack clone;
-        ShortSnglLnkNode newHead;
-        for(clone=new CheckedStack(newHead=new ShortSnglLnkNode(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new ShortSnglLnkNode(head.val)){}
+        Node newHead;
+        for(clone=new CheckedStack(newHead=new Node(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
         return clone;
       }
       return new CheckedStack();
     }
     @Override public short popShort(){
-      ShortSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         this.head=head.next;
@@ -739,22 +849,22 @@ AbstractSeq<Short>
       throw new NoSuchElementException();
     }
     @Override public void forEach(ShortConsumer action){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ShortSnglLnkNode.uncheckedForEach(head,action);
+          Node.uncheckedForEach(head,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void forEach(Consumer<? super Short> action){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ShortSnglLnkNode.uncheckedForEach(head,action::accept);
+          Node.uncheckedForEach(head,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -770,7 +880,7 @@ AbstractSeq<Short>
         }
       });
     }
-    private int removeIfHelper(ShortSnglLnkNode prev,ShortPredicate filter,int numLeft,int modCount){
+    private int removeIfHelper(Node prev,ShortPredicate filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -792,7 +902,7 @@ AbstractSeq<Short>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return 0;
     }
-    @Override boolean uncheckedremoveIf(ShortSnglLnkNode head,ShortPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,ShortPredicate filter){
       final int modCount=this.modCount;
       try{
         int numLeft=this.size;
@@ -826,7 +936,7 @@ AbstractSeq<Short>
       return false;
     }
     @Override public short pollShort(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -837,7 +947,7 @@ AbstractSeq<Short>
       return Short.MIN_VALUE;
     }
     @Override public Short poll(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Short)(head.val);
         this.head=head.next;
@@ -848,7 +958,7 @@ AbstractSeq<Short>
       return null;
     }
     @Override public double pollDouble(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         this.head=head.next;
@@ -859,7 +969,7 @@ AbstractSeq<Short>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
         this.head=head.next;
@@ -870,7 +980,7 @@ AbstractSeq<Short>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
         this.head=head.next;
@@ -881,7 +991,7 @@ AbstractSeq<Short>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
         this.head=head.next;
@@ -891,14 +1001,14 @@ AbstractSeq<Short>
       }
       return Integer.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveVal(ShortSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
       ,int val
     ){
       {
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          ShortSnglLnkNode prev;
+          Node prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -932,7 +1042,7 @@ AbstractSeq<Short>
       }
       @Override public short nextShort(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final ShortSnglLnkNode next;
+        final Node next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -941,9 +1051,9 @@ AbstractSeq<Short>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(final ShortSnglLnkNode expectedNext,ShortConsumer action){
+      @Override void uncheckedForEachRemaining(final Node expectedNext,ShortConsumer action){
         final int modCount=this.modCount;
-        ShortSnglLnkNode prev,curr,next;
+        Node prev,curr,next;
         try{
           curr=this.curr;
           next=expectedNext;
@@ -959,7 +1069,7 @@ AbstractSeq<Short>
         this.next=null;
       }
       @Override public void remove(){
-        final ShortSnglLnkNode prev;
+        final Node prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedStack parent;
           int modCount;
@@ -1001,7 +1111,7 @@ AbstractSeq<Short>
     }  
     public UncheckedStack(){
     }
-    UncheckedStack(ShortSnglLnkNode head,int size){
+    UncheckedStack(Node head,int size){
       super(head,size);
     }
     @Override public void readExternal(ObjectInput in) throws IOException
@@ -1009,26 +1119,26 @@ AbstractSeq<Short>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        ShortSnglLnkNode curr;
-        for(this.head=curr=new ShortSnglLnkNode((short)in.readShort());--size!=0;curr=curr.next=new ShortSnglLnkNode((short)in.readShort())){}
+        Node curr;
+        for(this.head=curr=new Node((short)in.readShort());--size!=0;curr=curr.next=new Node((short)in.readShort())){}
       }
     }
     @Override public void push(short val){
-      this.head=new ShortSnglLnkNode(val,this.head);
+      this.head=new Node(val,this.head);
       ++this.size;
     }
     @Override public Object clone(){
-      ShortSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final UncheckedStack clone;
-        ShortSnglLnkNode newHead;
-        for(clone=new UncheckedStack(newHead=new ShortSnglLnkNode(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new ShortSnglLnkNode(head.val)){}
+        Node newHead;
+        for(clone=new UncheckedStack(newHead=new Node(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
         return clone;
       }
       return new UncheckedStack();
     }
     @Override public short popShort(){
-      ShortSnglLnkNode head;
+      Node head;
       this.head=(head=this.head).next;
       --this.size;
       return head.val;
@@ -1036,10 +1146,10 @@ AbstractSeq<Short>
     @Override public int search(boolean val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedsearch(head,(short)TypeUtil.castToByte(val));
+            return Node.uncheckedsearch(head,(short)TypeUtil.castToByte(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1049,10 +1159,10 @@ AbstractSeq<Short>
       if(val==(short)val)
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedsearch(head,(val));
+            return Node.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1061,12 +1171,12 @@ AbstractSeq<Short>
     @Override public int search(long val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
             if((v=(short)val)==val){
-              return ShortSnglLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1076,13 +1186,13 @@ AbstractSeq<Short>
     @Override public int search(float val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
             if(val==(v=(short)val))
             {
-              return ShortSnglLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1092,13 +1202,13 @@ AbstractSeq<Short>
     @Override public int search(double val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final short v;
             if(val==(v=(short)val))
             {
-              return ShortSnglLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1108,7 +1218,7 @@ AbstractSeq<Short>
     @Override public int search(Object val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -1144,7 +1254,7 @@ AbstractSeq<Short>
               }else{
                 break returnFalse;
               }
-              return ShortSnglLnkNode.uncheckedsearch(head,i);
+              return Node.uncheckedsearch(head,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1155,10 +1265,10 @@ AbstractSeq<Short>
       if(val<=Short.MAX_VALUE)
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedsearch(head,(val));
+            return Node.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1167,17 +1277,17 @@ AbstractSeq<Short>
     @Override public int search(short val){
       {
         {
-          final ShortSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ShortSnglLnkNode.uncheckedsearch(head,(val));
+            return Node.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
       return -1;
     }
     @Override public short pollShort(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -1190,7 +1300,7 @@ AbstractSeq<Short>
       return popShort();
     }
     @Override public Short poll(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Short)(head.val);
         this.head=head.next;
@@ -1200,7 +1310,7 @@ AbstractSeq<Short>
       return null;
     }
     @Override public double pollDouble(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         this.head=head.next;
@@ -1210,7 +1320,7 @@ AbstractSeq<Short>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
         this.head=head.next;
@@ -1220,7 +1330,7 @@ AbstractSeq<Short>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
         this.head=head.next;
@@ -1230,7 +1340,7 @@ AbstractSeq<Short>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
         this.head=head.next;
@@ -1239,7 +1349,7 @@ AbstractSeq<Short>
       }
       return Integer.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveIf(ShortSnglLnkNode head,ShortPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,ShortPredicate filter){
       if(filter.test(head.val)){
         while((head=head.next)!=null){
           if(!filter.test(head.val)){
@@ -1252,7 +1362,7 @@ AbstractSeq<Short>
         this.size=0;
         return true;
       }else{
-        ShortSnglLnkNode prev;
+        Node prev;
         for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(filter.test(head.val)){
             this.size=numSurvivors+retainTrailingSurvivors(prev,head.next,filter);
@@ -1262,14 +1372,14 @@ AbstractSeq<Short>
         return false;
       }
     }
-    @Override boolean uncheckedremoveVal(ShortSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
       ,int val
     ){
       {
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          ShortSnglLnkNode prev;
+          Node prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -1297,7 +1407,7 @@ AbstractSeq<Short>
       @Override public void remove(){
         final UncheckedStack parent;
         --(parent=UncheckedStack.this).size;
-        final ShortSnglLnkNode prev;
+        final Node prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -1331,11 +1441,11 @@ AbstractSeq<Short>
     public CheckedQueue(){
       super();
     }
-    CheckedQueue(ShortSnglLnkNode head,int size,ShortSnglLnkNode tail){
+    CheckedQueue(Node head,int size,Node tail){
       super(head,size,tail);
     }
     @Override public short shortElement(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return head.val;
       }
@@ -1348,7 +1458,7 @@ AbstractSeq<Short>
         final var tail=this.tail;
         out.writeInt(size=this.size);
         if(size!=0){
-          ShortSnglLnkNode curr;
+          Node curr;
           for(curr=this.head;;curr=curr.next){
             out.writeShort(curr.val);
             if(curr==tail){
@@ -1361,22 +1471,22 @@ AbstractSeq<Short>
       }
     }
     @Override public void forEach(ShortConsumer action){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ShortSnglLnkNode.uncheckedForEach(head,tail,action);
+          Node.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void forEach(Consumer<? super Short> action){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ShortSnglLnkNode.uncheckedForEach(head,tail,action::accept);
+          Node.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1401,10 +1511,10 @@ AbstractSeq<Short>
       }
     }
     @Override public Object clone(){
-      ShortSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
-        ShortSnglLnkNode newHead=new ShortSnglLnkNode(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new ShortSnglLnkNode((head=head.next).val)){}
+        Node newHead=new Node(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node((head=head.next).val)){}
         return new CheckedQueue(newHead,this.size,newTail);
       }
       return new CheckedQueue();
@@ -1414,7 +1524,7 @@ AbstractSeq<Short>
       super.push(val);
     }
     @Override public short removeShort(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         if(head==tail){
@@ -1427,7 +1537,7 @@ AbstractSeq<Short>
       throw new NoSuchElementException();
     }
     @Override public short pollShort(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(head==this.tail){
@@ -1441,7 +1551,7 @@ AbstractSeq<Short>
       return Short.MIN_VALUE;
     }
     @Override public Short poll(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Short)(head.val);
         if(head==this.tail){
@@ -1455,7 +1565,7 @@ AbstractSeq<Short>
       return null;
     }
     @Override public double pollDouble(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         if(head==this.tail){
@@ -1469,7 +1579,7 @@ AbstractSeq<Short>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
         if(head==this.tail){
@@ -1483,7 +1593,7 @@ AbstractSeq<Short>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
         if(head==this.tail){
@@ -1497,7 +1607,7 @@ AbstractSeq<Short>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
         if(head==this.tail){
@@ -1510,7 +1620,7 @@ AbstractSeq<Short>
       }
       return Integer.MIN_VALUE;
     }
-    private void pullSurvivorsDown(ShortSnglLnkNode prev,ShortPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node prev,ShortPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1542,7 +1652,7 @@ AbstractSeq<Short>
         prev=curr;
       }
     }
-    private void pullSurvivorsDown(ShortSnglLnkNode prev,long word,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -1566,7 +1676,7 @@ AbstractSeq<Short>
         prev=curr;
       }
     }
-    private int removeIfHelper(ShortSnglLnkNode prev,ShortPredicate filter,int numLeft,int modCount){
+    private int removeIfHelper(Node prev,ShortPredicate filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -1588,7 +1698,7 @@ AbstractSeq<Short>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return 0;
     }
-    @Override boolean uncheckedremoveIf(ShortSnglLnkNode head,ShortPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,ShortPredicate filter){
       final int modCount=this.modCount;
       try{
         int numLeft=this.size;
@@ -1622,7 +1732,7 @@ AbstractSeq<Short>
       }
       return false;
     }
-    @Override boolean uncheckedremoveVal(ShortSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
     ,int val
     ){
       {
@@ -1633,7 +1743,7 @@ AbstractSeq<Short>
           }
           this.head=head.next;
         }else{
-          ShortSnglLnkNode prev;
+          Node prev;
           do{
             if(head==tail){
               return false;
@@ -1670,7 +1780,7 @@ AbstractSeq<Short>
       }
       @Override public short nextShort(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final ShortSnglLnkNode next;
+        final Node next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -1679,9 +1789,9 @@ AbstractSeq<Short>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(final ShortSnglLnkNode expectedNext,ShortConsumer action){
+      @Override void uncheckedForEachRemaining(final Node expectedNext,ShortConsumer action){
         final int modCount=this.modCount;
-        ShortSnglLnkNode prev,curr,next;
+        Node prev,curr,next;
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
@@ -1700,7 +1810,7 @@ AbstractSeq<Short>
         this.next=null;
       }
       @Override public void remove(){
-        final ShortSnglLnkNode prev;
+        final Node prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedQueue parent;
           int modCount;
@@ -1725,7 +1835,7 @@ AbstractSeq<Short>
   }
   public static class UncheckedQueue extends ShortSnglLnkSeq implements OmniQueue.OfShort{
     private static final long serialVersionUID=1L;
-    transient ShortSnglLnkNode tail;
+    transient Node tail;
     public UncheckedQueue(Collection<? extends Short> that){
       super(that);
     }
@@ -1747,7 +1857,7 @@ AbstractSeq<Short>
     public UncheckedQueue(){
       super();
     }
-    UncheckedQueue(ShortSnglLnkNode head,int size,ShortSnglLnkNode tail){
+    UncheckedQueue(Node head,int size,Node tail){
       super(head,size);
       this.tail=tail;
     }
@@ -1756,8 +1866,8 @@ AbstractSeq<Short>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        ShortSnglLnkNode curr;
-        for(this.head=curr=new ShortSnglLnkNode((short)in.readShort());--size!=0;curr=curr.next=new ShortSnglLnkNode((short)in.readShort())){}
+        Node curr;
+        for(this.head=curr=new Node((short)in.readShort());--size!=0;curr=curr.next=new Node((short)in.readShort())){}
         this.tail=curr;
       }
     }
@@ -1767,17 +1877,17 @@ AbstractSeq<Short>
       this.size=0;
     }
     @Override public Object clone(){
-      ShortSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
-        ShortSnglLnkNode newHead=new ShortSnglLnkNode(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new ShortSnglLnkNode((head=head.next).val)){}
+        Node newHead=new Node(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node((head=head.next).val)){}
         return new UncheckedQueue(newHead,this.size,newTail);
       }
       return new UncheckedQueue();
     }
     @Override void push(short val){
-      final var newNode=new ShortSnglLnkNode(val);
-      final ShortSnglLnkNode tail;
+      final var newNode=new Node(val);
+      final Node tail;
       if((tail=this.tail)!=null){
         tail.next=newNode;
       }else{
@@ -1794,7 +1904,7 @@ AbstractSeq<Short>
       return true;
     }
     @Override public short removeShort(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)==tail){
         this.tail=null;
       }
@@ -1803,7 +1913,7 @@ AbstractSeq<Short>
       return head.val;
     }
     @Override public short pollShort(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(head==this.tail){
@@ -1826,7 +1936,7 @@ AbstractSeq<Short>
       return true;
     }
     @Override public Short poll(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Short)(head.val);
         if(head==this.tail){
@@ -1839,7 +1949,7 @@ AbstractSeq<Short>
       return null;
     }
     @Override public double pollDouble(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         if(head==this.tail){
@@ -1852,7 +1962,7 @@ AbstractSeq<Short>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
         if(head==this.tail){
@@ -1865,7 +1975,7 @@ AbstractSeq<Short>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
         if(head==this.tail){
@@ -1878,7 +1988,7 @@ AbstractSeq<Short>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final ShortSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
         if(head==this.tail){
@@ -1890,9 +2000,9 @@ AbstractSeq<Short>
       }
       return Integer.MIN_VALUE;
     }
-    private int removeIfHelper(ShortSnglLnkNode prev,ShortSnglLnkNode tail,ShortPredicate filter){
+    private int removeIfHelper(Node prev,Node tail,ShortPredicate filter){
       int numSurvivors=1;
-      outer:for(ShortSnglLnkNode next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
           do{
             if(next==tail){
@@ -1907,7 +2017,7 @@ AbstractSeq<Short>
       }
       return numSurvivors;
     }
-    private int removeIfHelper(ShortSnglLnkNode prev,ShortSnglLnkNode curr,ShortSnglLnkNode tail,ShortPredicate filter){
+    private int removeIfHelper(Node prev,Node curr,Node tail,ShortPredicate filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -1924,7 +2034,7 @@ AbstractSeq<Short>
       this.tail=prev;
       return numSurvivors;
     }
-    @Override boolean uncheckedremoveIf(ShortSnglLnkNode head,ShortPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,ShortPredicate filter){
       if(filter.test(head.val)){
         for(var tail=this.tail;head!=tail;){
           if(!filter.test((head=head.next).val)){
@@ -1940,7 +2050,7 @@ AbstractSeq<Short>
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final ShortSnglLnkNode prev;
+          final Node prev;
           if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
@@ -1949,7 +2059,7 @@ AbstractSeq<Short>
         return false;
       }
     }
-    @Override boolean uncheckedremoveVal(ShortSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
     ,int val
     ){
       {
@@ -1960,7 +2070,7 @@ AbstractSeq<Short>
           }
           this.head=head.next;
         }else{
-          ShortSnglLnkNode prev;
+          Node prev;
           do{
             if(head==tail){
               return false;
@@ -1991,7 +2101,7 @@ AbstractSeq<Short>
       @Override public void remove(){
         final UncheckedQueue parent;
         --(parent=UncheckedQueue.this).size;
-        final ShortSnglLnkNode prev;
+        final Node prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -2007,19 +2117,19 @@ AbstractSeq<Short>
   private abstract static class AbstractItr
       extends AbstractShortItr
   {
-    transient ShortSnglLnkNode prev;
-    transient ShortSnglLnkNode curr;
-    transient ShortSnglLnkNode next;
+    transient Node prev;
+    transient Node curr;
+    transient Node next;
     AbstractItr(AbstractItr itr){
       this.prev=itr.prev;
       this.curr=itr.curr;
       this.next=itr.next;
     }
-    AbstractItr(ShortSnglLnkNode next){
+    AbstractItr(Node next){
       this.next=next; 
     }
     @Override public short nextShort(){
-      final ShortSnglLnkNode next;
+      final Node next;
       this.next=(next=this.next).next;
       this.prev=this.curr;
       this.curr=next;
@@ -2028,8 +2138,8 @@ AbstractSeq<Short>
     @Override public boolean hasNext(){
       return next!=null;
     }
-    void uncheckedForEachRemaining(ShortSnglLnkNode next,ShortConsumer action){
-      ShortSnglLnkNode prev,curr=this.curr;
+    void uncheckedForEachRemaining(Node next,ShortConsumer action){
+      Node prev,curr=this.curr;
       do{
         action.accept(next.val);
         prev=curr;
@@ -2039,13 +2149,13 @@ AbstractSeq<Short>
       this.next=null;
     }
     @Override public void forEachRemaining(ShortConsumer action){
-      final ShortSnglLnkNode next;
+      final Node next;
       if((next=this.next)!=null){
         uncheckedForEachRemaining(next,action);
       }
     }
     @Override public void forEachRemaining(Consumer<? super Short> action){
-      final ShortSnglLnkNode next;
+      final Node next;
       if((next=this.next)!=null){
         uncheckedForEachRemaining(next,action::accept);
       }

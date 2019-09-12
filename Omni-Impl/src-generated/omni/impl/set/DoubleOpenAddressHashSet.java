@@ -348,16 +348,20 @@ implements OmniSet.OfDouble{
       return true;
     }
     if(val instanceof Set){
-      if(val instanceof DoubleOpenAddressHashSet){
-        return isEqualTo((DoubleOpenAddressHashSet)val);
-      }else if(val instanceof RefOpenAddressHashSet){
-        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-      }else{
-        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      //TODO optimize
+      Set<?> that;
+      if(size==(that=(Set<?>)val).size()){
+        for(final var thatVal:that){
+          if(!(thatVal instanceof Double) || !this.contains((double)thatVal)){
+            return false;
+          }
+        }
+        return true;
       }
     }
     return false;
   }
+  /*
   private static boolean isEqualToHelper(long[] smallTable,long[] bigTable,int bigTableLength,int numInTable){
     for(int tableIndex=0;;++tableIndex){
       final long smallTableVal;
@@ -371,22 +375,19 @@ implements OmniSet.OfDouble{
       }
     }
   }
-  private boolean isEqualTo(DoubleOpenAddressHashSet that){
-    final int size;
-    if((size=this.size)==that.size){
-      if(size==0){
-        return true;
-      }
-      final long[] thisTable,thatTable;
-      final int thisTableLength,thatTableLength;
-      if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
-        return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
-      }else{
-        return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
-      }
+  private boolean isEqualTo(int size,DoubleOpenAddressHashSet that){
+    if(size==that.size){
+          final long[] thisTable,thatTable;
+          final int thisTableLength,thatTableLength;
+          if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+            return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+          }else{
+            return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+          }
     }
     return false;
   }
+  */
   @Override public void forEach(DoubleConsumer action){
     int size;
     if((size=this.size)!=0){
@@ -1094,6 +1095,31 @@ boolean addToTable(long val,int hash){
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
+    @Override public boolean equals(Object val){
+      if(val==this){
+        return true;
+      }
+      if(val instanceof Set){
+        //TODO optimize
+        int modCount=this.modCount;
+        try{
+          Set<?> that;
+          if(size==(that=(Set<?>)val).size()){
+            for(final var thatVal:that){
+              if(!(thatVal instanceof Double) || !this.contains((double)thatVal)){
+                return false;
+              }
+            }
+            return true;
+          }
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+      return false;
+    }
+  /*  
+*/
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }

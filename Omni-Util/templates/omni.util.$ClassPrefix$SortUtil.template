@@ -10,10 +10,8 @@
 package omni.util;
 #IF OfRef
 import java.util.Comparator;
-#ELSEIF OfInt
-import java.util.function.$Comparator$;
 #ELSE
-import omni.function.$Comparator$;
+import omni.function.$TypeNameModifier$Comparator;
 #ENDIF
 
 public final class $ClassPrefix$SortUtil
@@ -24,7 +22,7 @@ public final class $ClassPrefix$SortUtil
   }
 
 #IF OfBoolean
-  public static void uncheckedSort($ArrayType$[] arr,int offset,int bound,$Comparator$ sorter)
+  public static void uncheckedSort($ArrayType$[] arr,int offset,int bound,$TypeNameModifier$Comparator$<? super E>$ sorter)
   {
     final $ArrayType$ lastVal;
     int i;
@@ -142,10 +140,10 @@ while(
     }
   }
 #ELSE
-  #MACRO UnstableComparatorSort<$Comparator$>()
+  #MACRO UnstableComparatorSort<$TypeNameModifier$Comparator$<? super E>$>()
 #MACRODEF UnstableComparatorSort<COMPARATORTYPE>()
   #MACRO SuppressUnchecked()
-  public static $<E>$ void uncheckedUnstableSort($ArrayType$[] arr,int offset,int bound,$Comparator$$<? super E>$ sorter)
+  public static $<E>$ void uncheckedUnstableSort($ArrayType$[] arr,int offset,int bound,$TypeNameModifier$Comparator$<? super E>$ sorter)
   {
      #MACRO MainUnstableSortImpl()
   }
@@ -229,7 +227,7 @@ public static void uncheckedCOMPARATORTYPESort($ArrayType$[] arr,int offset,int 
 }
 #ENDDEF
 
-  #MACRO StableSort<$Comparator$$<? super E>$>()
+  #MACRO StableSort<$TypeNameModifier$Comparator$<? super E>$>()
   #IF OfRef
   #MACRO StableSort<Ascending>()
   #MACRO StableSort<Descending>()
@@ -618,7 +616,7 @@ private static class $ClassPrefix$TimSort$<E>$
 
   #MACRO InsertSort<Ascending>()
   #MACRO InsertSort<Descending>()
-  #MACRO InsertSort<$Comparator$$<? super E>$>()
+  #MACRO InsertSort<$TypeNameModifier$Comparator$<? super E>$>()
 #MACRODEF InsertSort<COMPARATORTYPE>()
 #MACRO SuppressUnchecked()
 #IFSWITCH COMPARATORTYPE==Ascending,Descending
@@ -697,7 +695,7 @@ private static void COMPARATORTYPEcountingSort($ArrayType$[] arr,int begin,int e
 #ENDDEF
     #ENDIF
 
-  #MACRO SentinelInsertSort<$Comparator$$<? super E>$>()
+  #MACRO SentinelInsertSort<$TypeNameModifier$Comparator$<? super E>$>()
   #IFNOT OfByte
   #MACRO SentinelInsertSort<Ascending>()
   #MACRO SentinelInsertSort<Descending>()
@@ -762,8 +760,8 @@ private static $<E>$ void sentinelInsertSort($ArrayType$[] arr,int begin,int end
 }
 #ENDDEF
 
-  #MACRO QuickSort<$Comparator$$<? super E>$,true>()
-  #MACRO QuickSort<$Comparator$$<? super E>$,false>()
+  #MACRO QuickSort<$TypeNameModifier$Comparator$<? super E>$,true>()
+  #MACRO QuickSort<$TypeNameModifier$Comparator$<? super E>$,false>()
   #IFNOT OfByte
   #MACRO QuickSort<Ascending,true>()
   #MACRO QuickSort<Ascending,false>()
@@ -936,8 +934,8 @@ private static $<E>$ void quickSort($ArrayType$[] arr,int begin,int end,COMPARAT
 }
 #ENDDEF
 
-  #MACRO QuickSortDualPivot<$Comparator$$<? super E>$,true>()
-  #MACRO QuickSortDualPivot<$Comparator$$<? super E>$,false>()
+  #MACRO QuickSortDualPivot<$TypeNameModifier$Comparator$<? super E>$,true>()
+  #MACRO QuickSortDualPivot<$TypeNameModifier$Comparator$<? super E>$,false>()
   #IFNOT OfByte
   #MACRO QuickSortDualPivot<Ascending,true>()
   #MACRO QuickSortDualPivot<Ascending,false>()
@@ -1073,8 +1071,8 @@ private static $<E>$ void quickSortDualPivot($ArrayType$[] arr,int begin,int end
 }
 #ENDDEF
 
-  #MACRO QuickSortSinglePivot<$Comparator$$<? super E>$,true>()
-  #MACRO QuickSortSinglePivot<$Comparator$$<? super E>$,false>()
+  #MACRO QuickSortSinglePivot<$TypeNameModifier$Comparator$<? super E>$,true>()
+  #MACRO QuickSortSinglePivot<$TypeNameModifier$Comparator$<? super E>$,false>()
   #IFNOT OfByte
   #MACRO QuickSortSinglePivot<Ascending,true>()
   #MACRO QuickSortSinglePivot<Ascending,false>()
@@ -1188,7 +1186,7 @@ private static $<E>$ void quickSortSinglePivot($ArrayType$[] arr,int begin,int e
 }
 #ENDDEF  
 
-  #MACRO Merge<$Comparator$$<? super E>$>()
+  #MACRO Merge<$TypeNameModifier$Comparator$<? super E>$>()
   #IFNOT OfByte
   #MACRO Merge<Ascending>()
   #MACRO Merge<Descending>()
@@ -1904,7 +1902,7 @@ while(
 (Val1)>(Val2)
   #ENDIF
 #ELSE
-sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))<0
+sorter.compare(($exposedType$)(Val1),($exposedType$)(Val2))<0
 #ENDIF
 #ENDDEF
 
@@ -1922,7 +1920,7 @@ sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))<0
 (Val1)>=(Val2)
   #ENDIF
 #ELSE
-sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))<=0
+sorter.compare(($exposedType$)(Val1),($exposedType$)(Val2))<=0
 #ENDIF
 #ENDDEF
 
@@ -1934,7 +1932,7 @@ sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))<=0
 (Val1)==(Val2)
   #ENDIF
 #ELSE
-sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))==0
+sorter.compare(($exposedType$)(Val1),($exposedType$)(Val2))==0
 #ENDIF
 #ENDDEF
 
@@ -1952,7 +1950,7 @@ sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))==0
 (Val1)<=(Val2)
   #ENDIF
 #ELSE
-sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))>=0
+sorter.compare(($exposedType$)(Val1),($exposedType$)(Val2))>=0
 #ENDIF
 #ENDDEF
 
@@ -1970,7 +1968,7 @@ sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))>=0
 (Val1)<(Val2)
   #ENDIF
 #ELSE
-sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2))>0
+sorter.compare(($exposedType$)(Val1),($exposedType$)(Val2))>0
 #ENDIF
 #ENDDEF
 
@@ -1998,7 +1996,7 @@ Long.signum((Val2)-(Val1))
 Integer.signum((Val2)-(Val1))
   #ENDIF
 #ELSE
-Integer.signum(sorter.$compareMethod$(($exposedType$)(Val1),($exposedType$)(Val2)))
+Integer.signum(sorter.compare(($exposedType$)(Val1),($exposedType$)(Val2)))
 #ENDIF
 #ENDDEF
 

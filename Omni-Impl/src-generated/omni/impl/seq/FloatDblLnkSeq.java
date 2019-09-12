@@ -5,7 +5,6 @@ import java.util.ListIterator;
 import java.util.List;
 import omni.util.FloatSortUtil;
 import omni.api.OmniList;
-import omni.impl.FloatDblLnkNode;
 import java.util.function.Consumer;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
@@ -21,6 +20,7 @@ import omni.function.FloatComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
+import omni.impl.AbstractOmniCollection;
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
@@ -32,14 +32,255 @@ import java.util.NoSuchElementException;
 import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollection;
 import omni.util.ToStringUtil;
+import omni.util.HashUtil;
 public abstract class FloatDblLnkSeq extends 
-AbstractSeq<Float>
+AbstractOmniCollection<Float>
  implements
    FloatSubListDefault
 {
+  static final class Node{
+    transient Node prev;
+    transient float val;
+    transient Node next;
+    Node(float val){
+      this.val=val;
+    }
+    Node(Node prev,float val){
+      this.prev=prev;
+      this.val=val;
+    }
+    Node(float val,Node next){
+      this.val=val;
+      this.next=next;
+    }
+    Node(Node prev,float val,Node next){
+      this.prev=prev;
+      this.val=val;
+      this.next=next;
+    }
+    static  void uncheckedCopyFrom(float[] src,int length,Node dst){
+      for(;;dst=dst.prev)
+      {
+        dst.val=(float)src[--length];
+        if(length==0)
+        {
+          return;
+        }
+      }
+    }
+    static  int uncheckedToString(Node curr,Node tail,byte[] buffer){
+      int bufferOffset=1;
+      for(;;curr=curr.next,buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+        bufferOffset=ToStringUtil.getStringFloat(curr.val,buffer,bufferOffset);
+        if(curr==tail){
+          return bufferOffset;
+        }
+      }
+    }
+    static  void uncheckedToString(Node curr,Node tail,ToStringUtil.OmniStringBuilderByte builder){
+      for(;;curr=curr.next,builder.uncheckedAppendCommaAndSpace()){
+        builder.uncheckedAppendFloat(curr.val);
+        if(curr==tail){
+          return;
+        }
+      }
+    }
+    static  int uncheckedHashCode(Node curr,Node tail){
+      int hash=31+HashUtil.hashFloat(curr.val);
+      while(curr!=tail){
+        hash=(hash*31)+HashUtil.hashFloat((curr=curr.next).val);
+      }
+      return hash;
+    }
+    static  void uncheckedForEachAscending(Node node,int size,FloatConsumer action){
+      for(;;node=node.next){
+        action.accept(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedReplaceAll(Node node,int size,FloatUnaryOperator operator){
+      for(;;node=node.next){
+        node.val=operator.applyAsFloat(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachAscending(Node node,FloatConsumer action){
+      for(;;){
+        action.accept(node.val);
+        if((node=node.next)==null){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachAscending(Node node,Node tail,FloatConsumer action){
+      for(;;node=node.next){
+        action.accept(node.val);
+        if(node==tail){
+          return;
+        }
+      }
+    }
+    static  void uncheckedReplaceAll(Node node,Node tail,FloatUnaryOperator operator){
+      for(;;node=node.next){
+        node.val=operator.applyAsFloat(node.val);
+        if(node==tail){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachDescending(Node node,FloatConsumer action){
+      for(;;){
+        action.accept(node.val);
+        if((node=node.prev)==null){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachDescending(Node node,int size,FloatConsumer action){
+      for(;;node=node.prev){
+        action.accept(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static  void eraseNode(Node node){
+      Node next,prev;
+      (next=node.next).prev=(prev=node.prev);
+      prev.next=next;
+    }
+    static  Node iterateAscending(Node node,int length){
+      if(length!=0){
+        do{
+          node=node.next;
+        }while(--length!=0);
+      }
+      return node;
+    }
+    static  Node iterateDescending(Node node,int length){
+      if(length!=0){
+        do{
+          node=node.prev;
+        }while(--length!=0);
+      }
+      return node;
+    }
+    static  Node uncheckedIterateDescending(Node node,int length){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+      return node;
+    }
+    static  boolean uncheckedcontainsBits(Node head,Node tail
+    ,int bits
+    ){
+      for(;bits!=Float.floatToRawIntBits(head.val);head=head.next){if(head==tail){return false;}}
+      return true;
+    }
+    static  int uncheckedsearchBits(Node head
+    ,int bits
+    ){
+      int index=1;
+      for(;bits!=Float.floatToRawIntBits(head.val);++index){if((head=head.next)==null){return -1;}}
+      return index;
+    }
+    static  int uncheckedindexOfBits(Node head,Node tail
+    ,int bits
+    ){
+      int index=0;
+      for(;bits!=Float.floatToRawIntBits(head.val);++index,head=head.next){if(head==tail){return -1;}}
+      return index;
+    }
+    static  int uncheckedlastIndexOfBits(int length,Node tail
+    ,int bits
+    ){
+      for(;bits!=Float.floatToRawIntBits(tail.val);tail=tail.prev){if(--length==0){return -1;}}
+      return length-1;
+    }
+    static  boolean uncheckedcontains0(Node head,Node tail
+    ){
+      for(;0!=(head.val);head=head.next){if(head==tail){return false;}}
+      return true;
+    }
+    static  int uncheckedsearch0(Node head
+    ){
+      int index=1;
+      for(;0!=(head.val);++index){if((head=head.next)==null){return -1;}}
+      return index;
+    }
+    static  int uncheckedindexOf0(Node head,Node tail
+    ){
+      int index=0;
+      for(;0!=(head.val);++index,head=head.next){if(head==tail){return -1;}}
+      return index;
+    }
+    static  int uncheckedlastIndexOf0(int length,Node tail
+    ){
+      for(;0!=(tail.val);tail=tail.prev){if(--length==0){return -1;}}
+      return length-1;
+    }
+    static  boolean uncheckedcontainsNaN(Node head,Node tail
+    ){
+      for(;!Float.isNaN(head.val);head=head.next){if(head==tail){return false;}}
+      return true;
+    }
+    static  int uncheckedsearchNaN(Node head
+    ){
+      int index=1;
+      for(;!Float.isNaN(head.val);++index){if((head=head.next)==null){return -1;}}
+      return index;
+    }
+    static  int uncheckedindexOfNaN(Node head,Node tail
+    ){
+      int index=0;
+      for(;!Float.isNaN(head.val);++index,head=head.next){if(head==tail){return -1;}}
+      return index;
+    }
+    static  int uncheckedlastIndexOfNaN(int length,Node tail
+    ){
+      for(;!Float.isNaN(tail.val);tail=tail.prev){if(--length==0){return -1;}}
+      return length-1;
+    }
+    static  void uncheckedCopyInto(float[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(Float[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(Object[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(double[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(double)(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+  }
   private static final long serialVersionUID=1L;
-  transient FloatDblLnkNode head;
-  transient FloatDblLnkNode tail;
+  transient Node head;
+  transient Node tail;
   private FloatDblLnkSeq(Collection<? extends Float> that){
     super();
     //TODO optimize
@@ -92,7 +333,7 @@ AbstractSeq<Float>
   }
   private  FloatDblLnkSeq(){
   }
-  private FloatDblLnkSeq(FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+  private FloatDblLnkSeq(Node head,int size,Node tail){
     super(size);
     this.head=head;
     this.tail=tail;
@@ -106,21 +347,21 @@ AbstractSeq<Float>
     addLast(val);
     return true;
   }
-  private void iterateDescendingAndInsert(int dist,FloatDblLnkNode after,FloatDblLnkNode newNode){
-    newNode.next=after=FloatDblLnkNode.iterateDescending(after,dist-2);
-    final FloatDblLnkNode before;
+  private void iterateDescendingAndInsert(int dist,Node after,Node newNode){
+    newNode.next=after=Node.iterateDescending(after,dist-2);
+    final Node before;
     newNode.prev=before=after.prev;
     before.next=newNode;
     after.prev=newNode;
   }
-  private void iterateAscendingAndInsert(int dist,FloatDblLnkNode before,FloatDblLnkNode newNode){
-    newNode.prev=before=FloatDblLnkNode.iterateAscending(before,dist-1);
-    final FloatDblLnkNode after;
+  private void iterateAscendingAndInsert(int dist,Node before,Node newNode){
+    newNode.prev=before=Node.iterateAscending(before,dist-1);
+    final Node after;
     newNode.next=after=before.next;
     before.next=newNode;
     after.prev=newNode;
   }
-  private void insertNode(int index,FloatDblLnkNode newNode){
+  private void insertNode(int index,Node newNode){
     int tailDist;
     if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
@@ -138,7 +379,7 @@ AbstractSeq<Float>
       //the insertion point is closer to the head
       if(index==0){
         //the insertion point IS the head
-        FloatDblLnkNode head;
+        Node head;
         (head=this.head).prev=newNode;
         newNode.next=head;
         this.head=newNode;
@@ -148,7 +389,7 @@ AbstractSeq<Float>
       }
     }
   }
-  private static  int markSurvivors(FloatDblLnkNode curr,int numLeft,FloatPredicate filter,long[] survivorSet){
+  private static  int markSurvivors(Node curr,int numLeft,FloatPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -166,7 +407,7 @@ AbstractSeq<Float>
       survivorSet[wordOffset++]=word;
     }
   }
-  private static  long markSurvivors(FloatDblLnkNode curr,int numLeft,FloatPredicate filter){
+  private static  long markSurvivors(Node curr,int numLeft,FloatPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1,curr=curr.next){
       if(!filter.test(curr.val)){
         word|=marker;
@@ -177,16 +418,16 @@ AbstractSeq<Float>
       }
     }
   }
-  private FloatDblLnkNode getNode(int index,int size){
+  private Node getNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
-      return FloatDblLnkNode.iterateDescending(tail,size-1);
+      return Node.iterateDescending(tail,size-1);
     }else{
       //the node is closer to the head
-      return FloatDblLnkNode.iterateAscending(head,index);
+      return Node.iterateAscending(head,index);
     }
   }
-  private FloatDblLnkNode getItrNode(int index,int size){
+  private Node getItrNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       switch(size){
@@ -195,15 +436,15 @@ AbstractSeq<Float>
       case 1:
         return tail;
       default:
-        return FloatDblLnkNode.uncheckedIterateDescending(tail,size-1);
+        return Node.uncheckedIterateDescending(tail,size-1);
       }
     }else{
       //the node is closer to the head
-      return FloatDblLnkNode.iterateAscending(head,index);
+      return Node.iterateAscending(head,index);
     }
   }
   @Override public float set(int index,float val){
-    FloatDblLnkNode tmp;
+    Node tmp;
     final var ret=(tmp=getNode(index,size)).val;
     tmp.val=val;
     return ret;
@@ -215,21 +456,21 @@ AbstractSeq<Float>
     return getNode(index,size).val;
   }
   @Override public void forEach(FloatConsumer action){
-    final FloatDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      FloatDblLnkNode.uncheckedForEachAscending(head,tail,action);
+      Node.uncheckedForEachAscending(head,tail,action);
     }
   }
   @Override public void forEach(Consumer<? super Float> action){
-    final FloatDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      FloatDblLnkNode.uncheckedForEachAscending(head,tail,action::accept);
+      Node.uncheckedForEachAscending(head,tail,action::accept);
     }
   }
   @Override public <T> T[] toArray(T[] dst){
     final int size;
     if((size=this.size)!=0){
-      FloatDblLnkNode.uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),this.tail,size);
+      Node.uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),this.tail,size);
     }else if(dst.length!=0){
       dst[0]=null;
     }
@@ -239,7 +480,7 @@ AbstractSeq<Float>
     final int size;
     final T[] dst=arrConstructor.apply(size=this.size);
     if(size!=0){
-      FloatDblLnkNode.uncheckedCopyInto(dst,this.tail,size);
+      Node.uncheckedCopyInto(dst,this.tail,size);
     }
     return dst;
   }
@@ -247,7 +488,7 @@ AbstractSeq<Float>
     int size;
     if((size=this.size)!=0){
       final float[] dst;
-      FloatDblLnkNode.uncheckedCopyInto(dst=new float[size],tail,size);
+      Node.uncheckedCopyInto(dst=new float[size],tail,size);
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
@@ -256,7 +497,7 @@ AbstractSeq<Float>
     int size;
     if((size=this.size)!=0){
       final Float[] dst;
-      FloatDblLnkNode.uncheckedCopyInto(dst=new Float[size],tail,size);
+      Node.uncheckedCopyInto(dst=new Float[size],tail,size);
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
@@ -265,21 +506,21 @@ AbstractSeq<Float>
     int size;
     if((size=this.size)!=0){
       final double[] dst;
-      FloatDblLnkNode.uncheckedCopyInto(dst=new double[size],tail,size);
+      Node.uncheckedCopyInto(dst=new double[size],tail,size);
       return dst;
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
   @Override public void replaceAll(FloatUnaryOperator operator){
-    final FloatDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      FloatDblLnkNode.uncheckedReplaceAll(head,tail,operator);
+      Node.uncheckedReplaceAll(head,tail,operator);
     }
   }
   @Override public void replaceAll(UnaryOperator<Float> operator){
-    final FloatDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      FloatDblLnkNode.uncheckedReplaceAll(head,tail,operator::apply);
+      Node.uncheckedReplaceAll(head,tail,operator::apply);
     }
   }
   @Override public void sort(FloatComparator sorter){
@@ -287,14 +528,14 @@ AbstractSeq<Float>
     final int size;
     if((size=this.size)>1){
       final float[] tmp;
-      final FloatDblLnkNode tail;
-      FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
       if(sorter==null){
         FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
       }else{
         FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
       }
-      FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void sort(Comparator<? super Float> sorter){
@@ -302,14 +543,14 @@ AbstractSeq<Float>
     final int size;
     if((size=this.size)>1){
       final float[] tmp;
-      final FloatDblLnkNode tail;
-      FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
       if(sorter==null){
         FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
       }else{
         FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
       }
-      FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableAscendingSort()
@@ -318,10 +559,10 @@ AbstractSeq<Float>
     final int size;
     if((size=this.size)>1){
       final float[] tmp;
-      final FloatDblLnkNode tail;
-      FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
       FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-      FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableDescendingSort()
@@ -330,10 +571,10 @@ AbstractSeq<Float>
     final int size;
     if((size=this.size)>1){
       final float[] tmp;
-      final FloatDblLnkNode tail;
-      FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
       FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
-      FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void unstableSort(FloatComparator sorter){
@@ -341,28 +582,28 @@ AbstractSeq<Float>
     final int size;
     if((size=this.size)>1){
       final float[] tmp;
-      final FloatDblLnkNode tail;
-      FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
       if(sorter==null){
         FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
       }else{
         FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
       }
-      FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public String toString(){
-    final FloatDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
       if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
-        [size=FloatDblLnkNode.uncheckedToString(head,tail,buffer)]=(byte)']';
+        [size=Node.uncheckedToString(head,tail,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
         final ToStringUtil.OmniStringBuilderByte builder;
-        FloatDblLnkNode.uncheckedToString(head,tail,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        Node.uncheckedToString(head,tail,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
         (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
@@ -371,22 +612,22 @@ AbstractSeq<Float>
     return "[]";
   }
   @Override public int hashCode(){
-    final FloatDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      return FloatDblLnkNode.uncheckedHashCode(head,tail);
+      return Node.uncheckedHashCode(head,tail);
     }
     return 1;
   }
   @Override public boolean contains(boolean val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val){
-            return FloatDblLnkNode.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+            return Node.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
           }
-          return FloatDblLnkNode.uncheckedcontains0(head,tail);
+          return Node.uncheckedcontains0(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -395,16 +636,16 @@ AbstractSeq<Float>
   @Override public boolean contains(int val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
             if(TypeUtil.checkCastToFloat(val))
             {
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
             }
           }else{
-            return FloatDblLnkNode.uncheckedcontains0(head,tail);
+            return Node.uncheckedcontains0(head,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -414,15 +655,15 @@ AbstractSeq<Float>
   @Override public boolean contains(long val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
             if(TypeUtil.checkCastToFloat(val)){
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
             }
           }else{
-            return FloatDblLnkNode.uncheckedcontains0(head,tail);
+            return Node.uncheckedcontains0(head,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -432,13 +673,13 @@ AbstractSeq<Float>
   @Override public boolean contains(float val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val==val){
-            return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+          return Node.uncheckedcontainsNaN(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -447,14 +688,14 @@ AbstractSeq<Float>
   @Override public boolean contains(double val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final float v;
           if(val==(v=(float)val)){
-            return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(v));
+            return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(v));
           }else if(v!=v){
-            return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+            return Node.uncheckedcontainsNaN(head,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -464,7 +705,7 @@ AbstractSeq<Float>
   @Override public boolean contains(Object val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           //todo: a pattern-matching switch statement would be great here
@@ -472,16 +713,16 @@ AbstractSeq<Float>
             if(val instanceof Float){
               final float f;
               if((f=(float)val)==f){
-                 return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
+                 return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
               }
-              return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+              return Node.uncheckedcontainsNaN(head,tail);
             }else if(val instanceof Double){
               final double d;
               final float f;
               if((d=(double)val)==(f=(float)d)){
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
+                return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
               }else if(f!=f){
-                return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+                return Node.uncheckedcontainsNaN(head,tail);
               }else{
                 break returnFalse;
               }
@@ -491,35 +732,35 @@ AbstractSeq<Float>
                 if(!TypeUtil.checkCastToFloat(i)){
                   break returnFalse;
                 }
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedcontains0(head,tail);
+              return Node.uncheckedcontains0(head,tail);
             }else if(val instanceof Long){
               final long l;
               if((l=(long)val)!=0){
                 if(!TypeUtil.checkCastToFloat(l)){
                   break returnFalse;
                 }
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(l));
+                return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(l));
               }
-              return FloatDblLnkNode.uncheckedcontains0(head,tail);
+              return Node.uncheckedcontains0(head,tail);
             }else if(val instanceof Short||val instanceof Byte){
               final int i;
               if((i=((Number)val).shortValue())!=0){
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedcontains0(head,tail);
+              return Node.uncheckedcontains0(head,tail);
             }else if(val instanceof Character){
               final int i;
               if((i=(char)val)!=0){
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedcontains0(head,tail);
+              return Node.uncheckedcontains0(head,tail);
             }else if(val instanceof Boolean){
               if((boolean)val){
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+                return Node.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
               }
-              return FloatDblLnkNode.uncheckedcontains0(head,tail);
+              return Node.uncheckedcontains0(head,tail);
             }else{
               break returnFalse;
             }
@@ -532,13 +773,13 @@ AbstractSeq<Float>
   @Override public boolean contains(char val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
-            return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedcontains0(head,tail);
+          return Node.uncheckedcontains0(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -547,13 +788,13 @@ AbstractSeq<Float>
   @Override public boolean contains(short val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
-            return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedcontains0(head,tail);
+          return Node.uncheckedcontains0(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -562,13 +803,13 @@ AbstractSeq<Float>
   @Override public int indexOf(boolean val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val){
-            return FloatDblLnkNode.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+            return Node.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
           }
-          return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+          return Node.uncheckedindexOf0(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -577,16 +818,16 @@ AbstractSeq<Float>
   @Override public int indexOf(int val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
             if(TypeUtil.checkCastToFloat(val))
             {
-              return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
             }
           }else{
-            return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+            return Node.uncheckedindexOf0(head,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -596,15 +837,15 @@ AbstractSeq<Float>
   @Override public int indexOf(long val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
             if(TypeUtil.checkCastToFloat(val)){
-              return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
             }
           }else{
-            return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+            return Node.uncheckedindexOf0(head,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -614,13 +855,13 @@ AbstractSeq<Float>
   @Override public int indexOf(float val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val==val){
-            return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+          return Node.uncheckedindexOfNaN(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -629,14 +870,14 @@ AbstractSeq<Float>
   @Override public int indexOf(double val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final float v;
           if(val==(v=(float)val)){
-            return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(v));
+            return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(v));
           }else if(v!=v){
-            return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+            return Node.uncheckedindexOfNaN(head,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -646,7 +887,7 @@ AbstractSeq<Float>
   @Override public int indexOf(Object val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           //todo: a pattern-matching switch statement would be great here
@@ -654,16 +895,16 @@ AbstractSeq<Float>
             if(val instanceof Float){
               final float f;
               if((f=(float)val)==f){
-                 return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
+                 return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
               }
-              return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+              return Node.uncheckedindexOfNaN(head,tail);
             }else if(val instanceof Double){
               final double d;
               final float f;
               if((d=(double)val)==(f=(float)d)){
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
+                return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
               }else if(f!=f){
-                return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+                return Node.uncheckedindexOfNaN(head,tail);
               }else{
                 break returnFalse;
               }
@@ -673,35 +914,35 @@ AbstractSeq<Float>
                 if(!TypeUtil.checkCastToFloat(i)){
                   break returnFalse;
                 }
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+              return Node.uncheckedindexOf0(head,tail);
             }else if(val instanceof Long){
               final long l;
               if((l=(long)val)!=0){
                 if(!TypeUtil.checkCastToFloat(l)){
                   break returnFalse;
                 }
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(l));
+                return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(l));
               }
-              return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+              return Node.uncheckedindexOf0(head,tail);
             }else if(val instanceof Short||val instanceof Byte){
               final int i;
               if((i=((Number)val).shortValue())!=0){
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+              return Node.uncheckedindexOf0(head,tail);
             }else if(val instanceof Character){
               final int i;
               if((i=(char)val)!=0){
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+              return Node.uncheckedindexOf0(head,tail);
             }else if(val instanceof Boolean){
               if((boolean)val){
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+                return Node.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
               }
-              return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+              return Node.uncheckedindexOf0(head,tail);
             }else{
               break returnFalse;
             }
@@ -714,13 +955,13 @@ AbstractSeq<Float>
   @Override public int indexOf(char val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
-            return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+          return Node.uncheckedindexOf0(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -729,13 +970,13 @@ AbstractSeq<Float>
   @Override public int indexOf(short val){
     {
       {
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           if(val!=0){
-            return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+          return Node.uncheckedindexOf0(head,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -744,13 +985,13 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(boolean val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           if(val){
-            return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
+            return Node.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
           }
-          return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+          return Node.uncheckedlastIndexOf0(size,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -759,16 +1000,16 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(int val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           if(val!=0){
             if(TypeUtil.checkCastToFloat(val))
             {
-              return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
             }
           }else{
-            return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+            return Node.uncheckedlastIndexOf0(size,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -778,15 +1019,15 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(long val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           if(val!=0){
             if(TypeUtil.checkCastToFloat(val)){
-              return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
             }
           }else{
-            return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+            return Node.uncheckedlastIndexOf0(size,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -796,13 +1037,13 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(float val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           if(val==val){
-            return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+          return Node.uncheckedlastIndexOfNaN(size,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -811,14 +1052,14 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(double val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           final float v;
           if(val==(v=(float)val)){
-            return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(v));
+            return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(v));
           }else if(v!=v){
-            return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+            return Node.uncheckedlastIndexOfNaN(size,tail);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -828,7 +1069,7 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(Object val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           //todo: a pattern-matching switch statement would be great here
@@ -836,16 +1077,16 @@ AbstractSeq<Float>
             if(val instanceof Float){
               final float f;
               if((f=(float)val)==f){
-                 return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
+                 return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
               }
-              return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+              return Node.uncheckedlastIndexOfNaN(size,tail);
             }else if(val instanceof Double){
               final double d;
               final float f;
               if((d=(double)val)==(f=(float)d)){
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
+                return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
               }else if(f!=f){
-                return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+                return Node.uncheckedlastIndexOfNaN(size,tail);
               }else{
                 break returnFalse;
               }
@@ -855,35 +1096,35 @@ AbstractSeq<Float>
                 if(!TypeUtil.checkCastToFloat(i)){
                   break returnFalse;
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+              return Node.uncheckedlastIndexOf0(size,tail);
             }else if(val instanceof Long){
               final long l;
               if((l=(long)val)!=0){
                 if(!TypeUtil.checkCastToFloat(l)){
                   break returnFalse;
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(l));
+                return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(l));
               }
-              return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+              return Node.uncheckedlastIndexOf0(size,tail);
             }else if(val instanceof Short||val instanceof Byte){
               final int i;
               if((i=((Number)val).shortValue())!=0){
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+              return Node.uncheckedlastIndexOf0(size,tail);
             }else if(val instanceof Character){
               final int i;
               if((i=(char)val)!=0){
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
+                return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
               }
-              return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+              return Node.uncheckedlastIndexOf0(size,tail);
             }else if(val instanceof Boolean){
               if((boolean)val){
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
+                return Node.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
               }
-              return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+              return Node.uncheckedlastIndexOf0(size,tail);
             }else{
               break returnFalse;
             }
@@ -896,13 +1137,13 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(char val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           if(val!=0){
-            return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+          return Node.uncheckedlastIndexOf0(size,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -911,21 +1152,21 @@ AbstractSeq<Float>
   @Override public int lastIndexOf(short val){
     {
       {
-        final FloatDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           if(val!=0){
-            return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+            return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
           }
-          return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+          return Node.uncheckedlastIndexOf0(size,tail);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
     return -1;
   }
-  private static  int collapseBodyHelper(FloatDblLnkNode newHead,FloatDblLnkNode newTail,FloatPredicate filter){
+  private static  int collapseBodyHelper(Node newHead,Node newTail,FloatPredicate filter){
     int numRemoved=0;
-    outer:for(FloatDblLnkNode prev;(newHead=(prev=newHead).next)!=newTail;){
+    outer:for(Node prev;(newHead=(prev=newHead).next)!=newTail;){
       if(filter.test(newHead.val)){
         do{
           ++numRemoved;
@@ -946,13 +1187,13 @@ AbstractSeq<Float>
     transient final UncheckedList root;
     transient final UncheckedSubList parent;
     transient final int parentOffset;
-    private UncheckedSubList(UncheckedList root,int rootOffset,FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+    private UncheckedSubList(UncheckedList root,int rootOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
       this.parentOffset=rootOffset;
     }
-    private UncheckedSubList(UncheckedSubList parent,int parentOffset,FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+    private UncheckedSubList(UncheckedSubList parent,int parentOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
@@ -977,7 +1218,7 @@ AbstractSeq<Float>
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){
       }
     }
-    private void bubbleUpAppend(FloatDblLnkNode oldTail,FloatDblLnkNode newTail){
+    private void bubbleUpAppend(Node oldTail,Node newTail){
       oldTail.next=newTail;
       this.tail=newTail;
       for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
@@ -988,12 +1229,12 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpAppend(FloatDblLnkNode newTail){
+    private void bubbleUpAppend(Node newTail){
       this.tail=newTail;
       for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
       }
     }
-    private void bubbleUpPrepend(FloatDblLnkNode oldHead,FloatDblLnkNode newHead){
+    private void bubbleUpPrepend(Node oldHead,Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
         ++currList.size;
@@ -1003,12 +1244,12 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpPrepend(FloatDblLnkNode newHead){
+    private void bubbleUpPrepend(Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
       }
     }
-    private void bubbleUpRootInit(FloatDblLnkNode newNode){
+    private void bubbleUpRootInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       for(var parent=this.parent;parent!=null;parent=parent.parent){
@@ -1017,8 +1258,8 @@ AbstractSeq<Float>
         parent.tail=newNode;
       }
     }
-    private void bubbleUpInitHelper(int index,int size,FloatDblLnkNode newNode){
-      FloatDblLnkNode after,before;   
+    private void bubbleUpInitHelper(int index,int size,Node newNode){
+      Node after,before;   
       if((size-=index)<=index){
         before=this.tail;
         if(size==1){
@@ -1031,7 +1272,7 @@ AbstractSeq<Float>
           }
         }else{
           this.bubbleUpIncrementSize();
-          before=(after=FloatDblLnkNode.iterateDescending(before,size-2)).prev;
+          before=(after=Node.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
         }
         before.next=newNode;        
@@ -1047,7 +1288,7 @@ AbstractSeq<Float>
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=FloatDblLnkNode.iterateAscending(after,index-1)).next;
+          after=(before=Node.iterateAscending(after,index-1)).next;
           before.next=newNode;
         }
         after.prev=newNode;
@@ -1055,7 +1296,7 @@ AbstractSeq<Float>
       newNode.next=after;
       newNode.prev=before;
     }
-    private void bubbleUpInit(FloatDblLnkNode newNode){
+    private void bubbleUpInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       UncheckedSubList curr;
@@ -1072,7 +1313,7 @@ AbstractSeq<Float>
     }
     @Override public void add(int index,float val){
       final UncheckedList root;
-      final var newNode=new FloatDblLnkNode(val);
+      final var newNode=new Node(val);
       if(++(root=this.root).size!=1){
         final int currSize;
         if((currSize=++this.size)!=1){
@@ -1091,21 +1332,21 @@ AbstractSeq<Float>
       final UncheckedList root;
       if(++(root=this.root).size!=1){
         if(++this.size!=1){
-          FloatDblLnkNode currTail,after;
+          Node currTail,after;
           if((after=(currTail=this.tail).next)==null){
-            currTail.next=currTail=new FloatDblLnkNode(currTail,val);
+            currTail.next=currTail=new Node(currTail,val);
             bubbleUpAppend(currTail);
             root.tail=currTail;
           }else{
-            bubbleUpAppend(currTail,currTail=new FloatDblLnkNode(currTail,val,after));
+            bubbleUpAppend(currTail,currTail=new Node(currTail,val,after));
             after.prev=currTail;
           }
         }else{
-          bubbleUpInit(new FloatDblLnkNode(val));
+          bubbleUpInit(new Node(val));
         }
       }else{
-        FloatDblLnkNode newNode;
-        bubbleUpRootInit(newNode=new FloatDblLnkNode(val));
+        Node newNode;
+        bubbleUpRootInit(newNode=new Node(val));
         this.size=1;
         root.head=newNode;
         root.tail=newNode;
@@ -1121,7 +1362,7 @@ AbstractSeq<Float>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfFloat){
             return root.isEqualTo(this.head,size,(OmniList.OfFloat)list);
           }else if(list instanceof OmniList.OfRef){
@@ -1133,7 +1374,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    private void bubbleUpPeelHead(FloatDblLnkNode newHead,FloatDblLnkNode oldHead){
+    private void bubbleUpPeelHead(Node newHead,Node oldHead){
       newHead.prev=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.tail!=oldHead){
@@ -1145,14 +1386,14 @@ AbstractSeq<Float>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelHead(FloatDblLnkNode newHead){
+    private void bubbleUpPeelHead(Node newHead){
       var curr=this;
       do{
         curr.head=newHead;
         --curr.size; 
       }while((curr=curr.parent)!=null);
     }
-    private void bubbleUpPeelTail(FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+    private void bubbleUpPeelTail(Node newTail,Node oldTail){
       newTail.next=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.head!=oldTail){
@@ -1164,7 +1405,7 @@ AbstractSeq<Float>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelTail(FloatDblLnkNode newTail){
+    private void bubbleUpPeelTail(Node newTail){
       var curr=this;
       do{
         curr.tail=newTail;
@@ -1183,9 +1424,9 @@ AbstractSeq<Float>
          parent.uncheckedBubbleUpDecrementSize();
        }
     }
-    private void peelTail(FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+    private void peelTail(Node newTail,Node oldTail){
       this.tail=newTail;
-      FloatDblLnkNode after;
+      Node after;
       if((after=oldTail.next)==null){
         final UncheckedSubList parent;
         if((parent=this.parent)!=null){
@@ -1205,8 +1446,8 @@ AbstractSeq<Float>
       }
       newTail.next=after;
     }
-    private void peelTail(FloatDblLnkNode tail){
-      FloatDblLnkNode after,before;
+    private void peelTail(Node tail){
+      Node after,before;
       (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
@@ -1227,8 +1468,8 @@ AbstractSeq<Float>
         }
       }
     }
-    private void removeLastNode(FloatDblLnkNode lastNode){
-      FloatDblLnkNode after,before=lastNode.prev;
+    private void removeLastNode(Node lastNode){
+      Node after,before=lastNode.prev;
       if((after=lastNode.next)==null){
         UncheckedList root;
         (root=this.root).tail=before;
@@ -1281,8 +1522,8 @@ AbstractSeq<Float>
       this.head=null;
       this.tail=null;
     }
-    private void peelHead(FloatDblLnkNode head){
-      FloatDblLnkNode after,before;
+    private void peelHead(Node head){
+      Node after,before;
       (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
@@ -1316,8 +1557,8 @@ AbstractSeq<Float>
             peelTail(tail);
           }
         }else{
-          FloatDblLnkNode before;
-          ret=(before=( tail=FloatDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=( tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
           bubbleUpDecrementSize();
@@ -1328,8 +1569,8 @@ AbstractSeq<Float>
           ret=head.val;
           peelHead(head);
         }else{
-          FloatDblLnkNode after;
-          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
           bubbleUpDecrementSize();
@@ -1339,17 +1580,17 @@ AbstractSeq<Float>
       return ret;
     }
     @Override public boolean removeIf(FloatPredicate filter){
-      final FloatDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
     }
     @Override public boolean removeIf(Predicate<? super Float> filter){
-      final FloatDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
     }
-    private void collapsehead(FloatDblLnkNode oldhead,FloatDblLnkNode tail,FloatPredicate filter
+    private void collapsehead(Node oldhead,Node tail,FloatPredicate filter
     ){
       int numRemoved=1;
-      FloatDblLnkNode newhead;
+      Node newhead;
       outer:
       for(newhead=oldhead.next;;
       ++numRemoved,newhead=newhead.next){ 
@@ -1357,7 +1598,7 @@ AbstractSeq<Float>
           break;
         }
         if(!filter.test(newhead.val)){
-          FloatDblLnkNode prev,curr;
+          Node prev,curr;
           for(curr=(prev=newhead).next;curr!=tail;curr=(prev=curr).next){
             if(filter.test(curr.val)){
               do{
@@ -1379,7 +1620,7 @@ AbstractSeq<Float>
       (root=this.root).size-=numRemoved;
       this.size-=numRemoved;
       this.head=newhead;
-      FloatDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldhead.prev)==null){
         for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
         }
@@ -1396,10 +1637,10 @@ AbstractSeq<Float>
       }
       newhead.prev=tmp;
     }
-    private void collapsetail(FloatDblLnkNode oldtail,FloatDblLnkNode head,FloatPredicate filter
+    private void collapsetail(Node oldtail,Node head,FloatPredicate filter
     ){
       int numRemoved=1;
-      FloatDblLnkNode newtail;
+      Node newtail;
       outer:
       for(newtail=oldtail.prev;;
       ++numRemoved,newtail=newtail.prev){ 
@@ -1407,7 +1648,7 @@ AbstractSeq<Float>
           break;
         }
         if(!filter.test(newtail.val)){
-          FloatDblLnkNode next,curr;
+          Node next,curr;
           for(curr=(next=newtail).prev;curr!=head;curr=(next=curr).prev){
             if(filter.test(curr.val)){
               do{
@@ -1429,7 +1670,7 @@ AbstractSeq<Float>
       (root=this.root).size-=numRemoved;
       this.size-=numRemoved;
       this.tail=newtail;
-      FloatDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldtail.next)==null){
         for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
         }
@@ -1446,10 +1687,10 @@ AbstractSeq<Float>
       }
       newtail.next=tmp;
     }
-    private void bubbleUpCollapseHeadAndTail(FloatDblLnkNode oldHead,FloatDblLnkNode newHead,int numRemoved,FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+    private void bubbleUpCollapseHeadAndTail(Node oldHead,Node newHead,int numRemoved,Node newTail,Node oldTail){
       this.head=newHead;
       this.tail=newTail;
-      final FloatDblLnkNode after,before=oldHead.prev;
+      final Node after,before=oldHead.prev;
       if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
@@ -1522,8 +1763,8 @@ AbstractSeq<Float>
       newHead.prev=before;
       newTail.next=after;
     }
-    private boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
-      FloatDblLnkNode tail;
+    private boolean uncheckedRemoveIf(Node head,FloatPredicate filter){
+      Node tail;
       {
         if(filter.test((tail=this.tail).val)){
           if(tail==head){
@@ -1564,8 +1805,8 @@ AbstractSeq<Float>
         clearAllHelper(size,this.head,this.tail,root);
       }
     }
-    private void clearAllHelper(int size,FloatDblLnkNode head,FloatDblLnkNode tail,UncheckedList root){
-      FloatDblLnkNode before,after=tail.next;
+    private void clearAllHelper(int size,Node head,Node tail,UncheckedList root){
+      Node before,after=tail.next;
       if((before=head.prev)==null){
         //this sublist is not preceded by nodes
         if(after==null){
@@ -1598,7 +1839,7 @@ AbstractSeq<Float>
       for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){
       }
     }
-    private void bubbleUpClearBody(FloatDblLnkNode before,FloatDblLnkNode head,int numRemoved,FloatDblLnkNode tail,FloatDblLnkNode after){
+    private void bubbleUpClearBody(Node before,Node head,int numRemoved,Node tail,Node after){
       for(var curr=parent;curr!=null;
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
@@ -1626,7 +1867,7 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpClearHead(FloatDblLnkNode tail, FloatDblLnkNode after,int numRemoved){
+    private void bubbleUpClearHead(Node tail, Node after,int numRemoved){
       for(var curr=parent;curr!=null;
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.tail!=tail){
@@ -1638,7 +1879,7 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpClearTail(FloatDblLnkNode head, FloatDblLnkNode before,int numRemoved){
+    private void bubbleUpClearTail(Node head, Node before,int numRemoved){
       for(var curr=parent;curr!=null;
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
@@ -1650,13 +1891,13 @@ AbstractSeq<Float>
         }
       }
     }
-    private void collapseHeadAndTail(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+    private void collapseHeadAndTail(Node head,Node tail,FloatPredicate filter
     ){
-      FloatDblLnkNode newHead;
+      Node newHead;
       if((newHead=head.next)!=tail){
         for(int numRemoved=2;;++numRemoved){
           if(!filter.test(newHead.val)){
-            FloatDblLnkNode prev;
+            Node prev;
             outer: for(var curr=(prev=newHead).next;curr!=tail;curr=(prev=curr).next){
               if(filter.test(curr.val)){
                 do{
@@ -1683,9 +1924,9 @@ AbstractSeq<Float>
       (root=this.root).size-=(size=this.size);
       clearAllHelper(size,head,tail,root);
     }
-    private boolean collapseBody(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+    private boolean collapseBody(Node head,Node tail,FloatPredicate filter
     ){
-      for(FloatDblLnkNode prev;(head=(prev=head).next)!=tail;){
+      for(Node prev;(head=(prev=head).next)!=tail;){
         if(filter.test(head.val)){
           int numRemoved=1;
           for(;(head=head.next)!=tail;++numRemoved){
@@ -1707,9 +1948,9 @@ AbstractSeq<Float>
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        FloatDblLnkNode head,newTail;
-        final var newHead=newTail=new FloatDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new FloatDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new UncheckedList(newHead,size,newTail);
       }
       return new UncheckedList();
@@ -1718,8 +1959,8 @@ AbstractSeq<Float>
       extends AbstractFloatItr
     {
       transient final UncheckedSubList parent;
-      transient FloatDblLnkNode curr;
-      private AscendingItr(UncheckedSubList parent,FloatDblLnkNode curr){
+      transient Node curr;
+      private AscendingItr(UncheckedSubList parent,Node curr){
         this.parent=parent;
         this.curr=curr;
       }
@@ -1738,7 +1979,7 @@ AbstractSeq<Float>
         return curr!=null;
       }
       @Override public float nextFloat(){
-        final FloatDblLnkNode curr;
+        final Node curr;
         this.curr=(curr=this.curr)==parent.tail?null:curr.next;
         return curr.val;
       }
@@ -1747,11 +1988,11 @@ AbstractSeq<Float>
         if(--(parent=this.parent).size==0){
           parent.removeLastNode(parent.tail);
         }else{
-          FloatDblLnkNode curr;
+          Node curr;
           if((curr=this.curr)==null){
             parent.peelTail(parent.tail);
           }else{
-            FloatDblLnkNode lastRet;
+            Node lastRet;
             if((lastRet=curr.prev)==parent.head){
               parent.peelHead(lastRet);
             }else{
@@ -1764,23 +2005,23 @@ AbstractSeq<Float>
         --parent.root.size;
       }
       @Override public void forEachRemaining(FloatConsumer action){
-        final FloatDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
-          FloatDblLnkNode.uncheckedForEachAscending(curr,parent.tail,action);
+          Node.uncheckedForEachAscending(curr,parent.tail,action);
           this.curr=null;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Float> action){
-        final FloatDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
-          FloatDblLnkNode.uncheckedForEachAscending(curr,parent.tail,action::accept);
+          Node.uncheckedForEachAscending(curr,parent.tail,action::accept);
           this.curr=null;
         }
       }
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfFloat{
       private transient int currIndex;
-      private transient FloatDblLnkNode lastRet;
+      private transient Node lastRet;
       private BidirectionalItr(BidirectionalItr itr){
         super(itr);
         this.currIndex=itr.currIndex;
@@ -1789,7 +2030,7 @@ AbstractSeq<Float>
       private BidirectionalItr(UncheckedSubList parent){
         super(parent);
       }
-      private BidirectionalItr(UncheckedSubList parent,FloatDblLnkNode curr,int currIndex){
+      private BidirectionalItr(UncheckedSubList parent,Node curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
       }
@@ -1797,14 +2038,14 @@ AbstractSeq<Float>
         return new BidirectionalItr(this);
       }
       @Override public float nextFloat(){
-        final FloatDblLnkNode curr;
+        final Node curr;
         this.lastRet=curr=this.curr;
         this.curr=curr.next;
         ++this.currIndex;
         return curr.val;
       }
       @Override public float previousFloat(){
-        FloatDblLnkNode curr;
+        Node curr;
         this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
         this.curr=curr;
         --this.currIndex;
@@ -1832,44 +2073,44 @@ AbstractSeq<Float>
         ++currIndex;
         if(++(root=(currList=this.parent).root).size!=1){
           if(++currList.size!=1){
-            FloatDblLnkNode after,before;
+            Node after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new FloatDblLnkNode(before,val,after);
+                before.next=before=new Node(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new FloatDblLnkNode(val,after));
+                currList.bubbleUpPrepend(before=new Node(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
-              FloatDblLnkNode newNode;
+              Node newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new FloatDblLnkNode(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new Node(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new FloatDblLnkNode(before,val));
+                currList.bubbleUpAppend(newNode=new Node(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new FloatDblLnkNode(val));
+            currList.bubbleUpInit(new Node(val));
           }
         }else{
-          FloatDblLnkNode newNode;
-          currList.bubbleUpRootInit(newNode=new FloatDblLnkNode(val));
+          Node newNode;
+          currList.bubbleUpRootInit(newNode=new Node(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
         }
       }
       @Override public void remove(){
-        FloatDblLnkNode lastRet,curr;
+        Node lastRet,curr;
         if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
         }else{
@@ -1898,8 +2139,8 @@ AbstractSeq<Float>
         final int bound;
         final UncheckedSubList parent;
         if(this.currIndex<(bound=(parent=this.parent).size)){
-          final FloatDblLnkNode lastRet;
-          FloatDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
+          final Node lastRet;
+          Node.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
           this.lastRet=lastRet;
           this.curr=null;
           this.currIndex=bound;
@@ -1909,8 +2150,8 @@ AbstractSeq<Float>
         final int bound;
         final UncheckedSubList parent;
         if(this.currIndex<(bound=(parent=this.parent).size)){
-          final FloatDblLnkNode lastRet;
-          FloatDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
+          final Node lastRet;
+          Node.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
           this.lastRet=lastRet;
           this.curr=null;
           this.currIndex=bound;
@@ -1930,13 +2171,13 @@ AbstractSeq<Float>
       final int subListSize;
       if((subListSize=toIndex-fromIndex)!=0){
         int tailDist;
-        final FloatDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
-          subListTail=FloatDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?FloatDblLnkNode.iterateDescending(subListTail,subListSize-1):FloatDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=FloatDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?FloatDblLnkNode.iterateAscending(subListHead,subListSize-1):FloatDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -1945,7 +2186,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val){
@@ -1960,7 +2201,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(int val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -1979,7 +2220,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(long val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -1997,7 +2238,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(float val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val==val){
@@ -2012,7 +2253,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(double val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final float v;
@@ -2029,7 +2270,7 @@ AbstractSeq<Float>
     @Override public boolean remove(Object val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -2097,7 +2338,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(char val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -2112,7 +2353,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(short val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -2124,7 +2365,7 @@ AbstractSeq<Float>
       }//end val check
       return false;
     }
-    boolean uncheckedremoveValBits(FloatDblLnkNode head
+    boolean uncheckedremoveValBits(Node head
     ,int bits
     ){
       if(bits==Float.floatToRawIntBits(head.val)){
@@ -2137,7 +2378,7 @@ AbstractSeq<Float>
         return true;
       }else{
         for(final var tail=this.tail;tail!=head;){
-          FloatDblLnkNode prev;
+          Node prev;
           if(bits==Float.floatToRawIntBits((head=(prev=head).next).val)){
             --root.size;
             --this.size;
@@ -2154,7 +2395,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveVal0(FloatDblLnkNode head
+    boolean uncheckedremoveVal0(Node head
     ){
       if(0==(head.val)){
         --root.size;
@@ -2166,7 +2407,7 @@ AbstractSeq<Float>
         return true;
       }else{
         for(final var tail=this.tail;tail!=head;){
-          FloatDblLnkNode prev;
+          Node prev;
           if(0==((head=(prev=head).next).val)){
             --root.size;
             --this.size;
@@ -2183,7 +2424,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveValNaN(FloatDblLnkNode head
+    boolean uncheckedremoveValNaN(Node head
     ){
       if(Float.isNaN(head.val)){
         --root.size;
@@ -2195,7 +2436,7 @@ AbstractSeq<Float>
         return true;
       }else{
         for(final var tail=this.tail;tail!=head;){
-          FloatDblLnkNode prev;
+          Node prev;
           if(Float.isNaN((head=(prev=head).next).val)){
             --root.size;
             --this.size;
@@ -2219,14 +2460,14 @@ AbstractSeq<Float>
     transient final CheckedSubList parent;
     transient final int parentOffset;
     transient int modCount;
-    private CheckedSubList(CheckedList root,int rootOffset,FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+    private CheckedSubList(CheckedList root,int rootOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
       this.parentOffset=rootOffset;
       this.modCount=root.modCount;
     }
-    private CheckedSubList(CheckedSubList parent,int parentOffset,FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+    private CheckedSubList(CheckedSubList parent,int parentOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
@@ -2247,7 +2488,7 @@ AbstractSeq<Float>
       this.parentOffset=parentOffset;
       this.modCount=parent.modCount;
     }
-    boolean uncheckedremoveValBits(FloatDblLnkNode head
+    boolean uncheckedremoveValBits(Node head
     ,int bits
     ){
       int modCount;
@@ -2266,7 +2507,7 @@ AbstractSeq<Float>
           return true;
         }
         for(final var tail=this.tail;head!=tail;){
-          FloatDblLnkNode prev;
+          Node prev;
           if(bits==Float.floatToRawIntBits((head=(prev=head).next).val)){
             root.modCount=++modCount;
             this.modCount=modCount;
@@ -2285,7 +2526,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveVal0(FloatDblLnkNode head
+    boolean uncheckedremoveVal0(Node head
     ){
       int modCount;
       final CheckedList root;
@@ -2303,7 +2544,7 @@ AbstractSeq<Float>
           return true;
         }
         for(final var tail=this.tail;head!=tail;){
-          FloatDblLnkNode prev;
+          Node prev;
           if(0==((head=(prev=head).next).val)){
             root.modCount=++modCount;
             this.modCount=modCount;
@@ -2322,7 +2563,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveValNaN(FloatDblLnkNode head
+    boolean uncheckedremoveValNaN(Node head
     ){
       int modCount;
       final CheckedList root;
@@ -2340,7 +2581,7 @@ AbstractSeq<Float>
           return true;
         }
         for(final var tail=this.tail;head!=tail;){
-          FloatDblLnkNode prev;
+          Node prev;
           if(Float.isNaN((head=(prev=head).next).val)){
             root.modCount=++modCount;
             this.modCount=modCount;
@@ -2379,8 +2620,8 @@ AbstractSeq<Float>
       implements OmniListIterator.OfFloat{
       private transient final CheckedSubList parent;
       private transient int modCount;
-      private transient FloatDblLnkNode curr;
-      private transient FloatDblLnkNode lastRet;
+      private transient Node curr;
+      private transient Node lastRet;
       private transient int currIndex;
       private BidirectionalItr(BidirectionalItr itr){
         this.parent=itr.parent;
@@ -2394,7 +2635,7 @@ AbstractSeq<Float>
         this.modCount=parent.modCount;
         this.curr=parent.head;
       }
-      private BidirectionalItr(CheckedSubList parent,FloatDblLnkNode curr,int currIndex){
+      private BidirectionalItr(CheckedSubList parent,Node curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -2408,7 +2649,7 @@ AbstractSeq<Float>
         CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
         final int currIndex;
         if((currIndex=this.currIndex)<parent.size){
-          FloatDblLnkNode curr;
+          Node curr;
           this.lastRet=curr=this.curr;
           this.curr=curr.next;
           this.currIndex=currIndex+1;
@@ -2421,7 +2662,7 @@ AbstractSeq<Float>
         CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
         final int currIndex;
         if((currIndex=this.currIndex)!=0){
-          FloatDblLnkNode curr;
+          Node curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
           this.curr=curr;
           this.currIndex=currIndex-1;
@@ -2442,7 +2683,7 @@ AbstractSeq<Float>
         return this.currIndex-1;
       }
       @Override public void set(float val){
-        final FloatDblLnkNode lastRet;
+        final Node lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.root.modCount);
           lastRet.val=val;
@@ -2457,7 +2698,7 @@ AbstractSeq<Float>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
-            FloatDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
@@ -2473,7 +2714,7 @@ AbstractSeq<Float>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
-            FloatDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
@@ -2483,7 +2724,7 @@ AbstractSeq<Float>
         }
       }
       @Override public void remove(){
-        FloatDblLnkNode lastRet;
+        Node lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedSubList parent;
           CheckedList root;
@@ -2492,7 +2733,7 @@ AbstractSeq<Float>
           root.modCount=++modCount;
           this.modCount=modCount;
           parent.modCount=modCount;
-          FloatDblLnkNode curr;
+          Node curr;
           if((curr=lastRet.next)==this.curr){
             --currIndex;
           }else{
@@ -2531,37 +2772,37 @@ AbstractSeq<Float>
         ++currIndex;
         if(++root.size!=1){
           if(++currList.size!=1){
-            FloatDblLnkNode after,before;
+            Node after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new FloatDblLnkNode(before,val,after);
+                before.next=before=new Node(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new FloatDblLnkNode(val,after));
+                currList.bubbleUpPrepend(before=new Node(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
-              FloatDblLnkNode newNode;
+              Node newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new FloatDblLnkNode(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new Node(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new FloatDblLnkNode(before,val));
+                currList.bubbleUpAppend(newNode=new Node(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new FloatDblLnkNode(val));
+            currList.bubbleUpInit(new Node(val));
           }
         }else{
-          FloatDblLnkNode newNode;
-          currList.bubbleUpRootInit(newNode=new FloatDblLnkNode(val));
+          Node newNode;
+          currList.bubbleUpRootInit(newNode=new Node(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
@@ -2573,13 +2814,13 @@ AbstractSeq<Float>
       int tailDist;
       final int subListSize;
       if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
-        final FloatDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
-          subListTail=FloatDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?FloatDblLnkNode.iterateDescending(subListTail,subListSize-1):FloatDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=FloatDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?FloatDblLnkNode.iterateAscending(subListHead,subListSize-1):FloatDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -2589,9 +2830,9 @@ AbstractSeq<Float>
       CheckedCollection.checkModCount(modCount,root.modCount);
       final int size;
       if((size=this.size)!=0){
-        FloatDblLnkNode head,newTail;
-        final var newHead=newTail=new FloatDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new FloatDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new CheckedList(newHead,size,newTail);
       }
       return new CheckedList();
@@ -2599,7 +2840,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val){
@@ -2615,7 +2856,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(int val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -2635,7 +2876,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(long val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -2654,7 +2895,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(float val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val==val){
@@ -2670,7 +2911,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(double val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final float v;
@@ -2688,7 +2929,7 @@ AbstractSeq<Float>
     @Override public boolean remove(Object val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -2757,7 +2998,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(char val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -2773,7 +3014,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(short val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -2790,13 +3031,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val){
-              return FloatDblLnkNode.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+              return Node.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
             }
-            return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+            return Node.uncheckedindexOf0(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2806,16 +3047,16 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val))
               {
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+                return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+              return Node.uncheckedindexOf0(head,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2826,15 +3067,15 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val)){
-                return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+                return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+              return Node.uncheckedindexOf0(head,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2845,13 +3086,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val==val){
-              return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+            return Node.uncheckedindexOfNaN(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2861,14 +3102,14 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final float v;
             if(val==(v=(float)val)){
-              return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(v));
+              return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(v));
             }else if(v!=v){
-              return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+              return Node.uncheckedindexOfNaN(head,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2879,7 +3120,7 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -2887,16 +3128,16 @@ AbstractSeq<Float>
               if(val instanceof Float){
                 final float f;
                 if((f=(float)val)==f){
-                   return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
+                   return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
                 }
-                return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+                return Node.uncheckedindexOfNaN(head,tail);
               }else if(val instanceof Double){
                 final double d;
                 final float f;
                 if((d=(double)val)==(f=(float)d)){
-                  return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
+                  return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(f));
                 }else if(f!=f){
-                  return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
+                  return Node.uncheckedindexOfNaN(head,tail);
                 }else{
                   break returnFalse;
                 }
@@ -2906,35 +3147,35 @@ AbstractSeq<Float>
                   if(!TypeUtil.checkCastToFloat(i)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+                return Node.uncheckedindexOf0(head,tail);
               }else if(val instanceof Long){
                 final long l;
                 if((l=(long)val)!=0){
                   if(!TypeUtil.checkCastToFloat(l)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(l));
+                  return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(l));
                 }
-                return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+                return Node.uncheckedindexOf0(head,tail);
               }else if(val instanceof Short||val instanceof Byte){
                 final int i;
                 if((i=((Number)val).shortValue())!=0){
-                  return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+                return Node.uncheckedindexOf0(head,tail);
               }else if(val instanceof Character){
                 final int i;
                 if((i=(char)val)!=0){
-                  return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+                return Node.uncheckedindexOf0(head,tail);
               }else if(val instanceof Boolean){
                 if((boolean)val){
-                  return FloatDblLnkNode.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+                  return Node.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
                 }
-                return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+                return Node.uncheckedindexOf0(head,tail);
               }else{
                 break returnFalse;
               }
@@ -2948,13 +3189,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+            return Node.uncheckedindexOf0(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2964,13 +3205,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedindexOf0(head,tail);
+            return Node.uncheckedindexOf0(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2980,13 +3221,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val){
-              return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
+              return Node.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
             }
-            return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+            return Node.uncheckedlastIndexOf0(size,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2996,16 +3237,16 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val))
               {
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+                return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+              return Node.uncheckedlastIndexOf0(size,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -3016,15 +3257,15 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val)){
-                return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+                return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+              return Node.uncheckedlastIndexOf0(size,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -3035,13 +3276,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val==val){
-              return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+            return Node.uncheckedlastIndexOfNaN(size,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3051,14 +3292,14 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final float v;
             if(val==(v=(float)val)){
-              return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(v));
+              return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(v));
             }else if(v!=v){
-              return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+              return Node.uncheckedlastIndexOfNaN(size,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -3069,7 +3310,7 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -3077,16 +3318,16 @@ AbstractSeq<Float>
               if(val instanceof Float){
                 final float f;
                 if((f=(float)val)==f){
-                   return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
+                   return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+                return Node.uncheckedlastIndexOfNaN(size,tail);
               }else if(val instanceof Double){
                 final double d;
                 final float f;
                 if((d=(double)val)==(f=(float)d)){
-                  return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
+                  return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(f));
                 }else if(f!=f){
-                  return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
+                  return Node.uncheckedlastIndexOfNaN(size,tail);
                 }else{
                   break returnFalse;
                 }
@@ -3096,35 +3337,35 @@ AbstractSeq<Float>
                   if(!TypeUtil.checkCastToFloat(i)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+                return Node.uncheckedlastIndexOf0(size,tail);
               }else if(val instanceof Long){
                 final long l;
                 if((l=(long)val)!=0){
                   if(!TypeUtil.checkCastToFloat(l)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(l));
+                  return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(l));
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+                return Node.uncheckedlastIndexOf0(size,tail);
               }else if(val instanceof Short||val instanceof Byte){
                 final int i;
                 if((i=((Number)val).shortValue())!=0){
-                  return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+                return Node.uncheckedlastIndexOf0(size,tail);
               }else if(val instanceof Character){
                 final int i;
                 if((i=(char)val)!=0){
-                  return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+                return Node.uncheckedlastIndexOf0(size,tail);
               }else if(val instanceof Boolean){
                 if((boolean)val){
-                  return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
+                  return Node.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
                 }
-                return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+                return Node.uncheckedlastIndexOf0(size,tail);
               }else{
                 break returnFalse;
               }
@@ -3138,13 +3379,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+            return Node.uncheckedlastIndexOf0(size,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3154,13 +3395,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
+            return Node.uncheckedlastIndexOf0(size,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3170,13 +3411,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val){
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+              return Node.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
             }
-            return FloatDblLnkNode.uncheckedcontains0(head,tail);
+            return Node.uncheckedcontains0(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3186,16 +3427,16 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val))
               {
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+                return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedcontains0(head,tail);
+              return Node.uncheckedcontains0(head,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -3206,15 +3447,15 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val)){
-                return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+                return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedcontains0(head,tail);
+              return Node.uncheckedcontains0(head,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -3225,13 +3466,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val==val){
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+            return Node.uncheckedcontainsNaN(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3241,14 +3482,14 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final float v;
             if(val==(v=(float)val)){
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(v));
+              return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(v));
             }else if(v!=v){
-              return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+              return Node.uncheckedcontainsNaN(head,tail);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -3259,7 +3500,7 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -3267,16 +3508,16 @@ AbstractSeq<Float>
               if(val instanceof Float){
                 final float f;
                 if((f=(float)val)==f){
-                   return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
+                   return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
                 }
-                return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+                return Node.uncheckedcontainsNaN(head,tail);
               }else if(val instanceof Double){
                 final double d;
                 final float f;
                 if((d=(double)val)==(f=(float)d)){
-                  return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
+                  return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(f));
                 }else if(f!=f){
-                  return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
+                  return Node.uncheckedcontainsNaN(head,tail);
                 }else{
                   break returnFalse;
                 }
@@ -3286,35 +3527,35 @@ AbstractSeq<Float>
                   if(!TypeUtil.checkCastToFloat(i)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedcontains0(head,tail);
+                return Node.uncheckedcontains0(head,tail);
               }else if(val instanceof Long){
                 final long l;
                 if((l=(long)val)!=0){
                   if(!TypeUtil.checkCastToFloat(l)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(l));
+                  return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(l));
                 }
-                return FloatDblLnkNode.uncheckedcontains0(head,tail);
+                return Node.uncheckedcontains0(head,tail);
               }else if(val instanceof Short||val instanceof Byte){
                 final int i;
                 if((i=((Number)val).shortValue())!=0){
-                  return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedcontains0(head,tail);
+                return Node.uncheckedcontains0(head,tail);
               }else if(val instanceof Character){
                 final int i;
                 if((i=(char)val)!=0){
-                  return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
+                  return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedcontains0(head,tail);
+                return Node.uncheckedcontains0(head,tail);
               }else if(val instanceof Boolean){
                 if((boolean)val){
-                  return FloatDblLnkNode.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
+                  return Node.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
                 }
-                return FloatDblLnkNode.uncheckedcontains0(head,tail);
+                return Node.uncheckedcontains0(head,tail);
               }else{
                 break returnFalse;
               }
@@ -3328,13 +3569,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedcontains0(head,tail);
+            return Node.uncheckedcontains0(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3344,13 +3585,13 @@ AbstractSeq<Float>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
+              return Node.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedcontains0(head,tail);
+            return Node.uncheckedcontains0(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3358,11 +3599,11 @@ AbstractSeq<Float>
     }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
-      private transient FloatDblLnkNode head;
-      private transient FloatDblLnkNode tail;
+      private transient Node head;
+      private transient Node tail;
       private transient int size;
       private transient final CheckedList.ModCountChecker modCountChecker;
-      private SerializableSubList(FloatDblLnkNode head,int size,FloatDblLnkNode tail,CheckedList.ModCountChecker modCountChecker){
+      private SerializableSubList(Node head,int size,Node tail,CheckedList.ModCountChecker modCountChecker){
         this.head=head;
         this.tail=tail;
         this.size=size;
@@ -3376,8 +3617,8 @@ AbstractSeq<Float>
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          FloatDblLnkNode curr;
-          for(this.head=curr=new FloatDblLnkNode((float)ois.readFloat());--size!=0;curr=curr.next=new FloatDblLnkNode(curr,(float)ois.readFloat())){}
+          Node curr;
+          for(this.head=curr=new Node((float)ois.readFloat());--size!=0;curr=curr.next=new Node(curr,(float)ois.readFloat())){}
           this.tail=curr;
         }
       }
@@ -3402,7 +3643,7 @@ AbstractSeq<Float>
     private Object writeReplace(){
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
-    private static  FloatDblLnkNode pullSurvivorsDown(FloatDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
+    private static  Node pullSurvivorsDown(Node prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -3431,7 +3672,7 @@ AbstractSeq<Float>
         prev=curr;
       }
     }
-    private static  FloatDblLnkNode pullSurvivorsDown(FloatDblLnkNode prev,long word,int numSurvivors,int numRemoved){
+    private static  Node pullSurvivorsDown(Node prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -3452,7 +3693,7 @@ AbstractSeq<Float>
         prev=curr;
       }
     }
-    private void bubbleUpPeelHead(FloatDblLnkNode newHead,FloatDblLnkNode oldHead){
+    private void bubbleUpPeelHead(Node newHead,Node oldHead){
       newHead.prev=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.tail!=oldHead){
@@ -3465,7 +3706,7 @@ AbstractSeq<Float>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelHead(FloatDblLnkNode newHead){
+    private void bubbleUpPeelHead(Node newHead){
       var curr=this;
       do{
         ++curr.modCount;
@@ -3473,7 +3714,7 @@ AbstractSeq<Float>
         --curr.size; 
       }while((curr=curr.parent)!=null);
     }
-    private void bubbleUpPeelTail(FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+    private void bubbleUpPeelTail(Node newTail,Node oldTail){
       newTail.next=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.head!=oldTail){
@@ -3486,7 +3727,7 @@ AbstractSeq<Float>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelTail(FloatDblLnkNode newTail){
+    private void bubbleUpPeelTail(Node newTail){
       var curr=this;
       do{
         ++curr.modCount;
@@ -3507,9 +3748,9 @@ AbstractSeq<Float>
          parent.uncheckedBubbleUpDecrementSize();
        }
     }
-    private void peelTail(FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+    private void peelTail(Node newTail,Node oldTail){
       this.tail=newTail;
-      FloatDblLnkNode after;
+      Node after;
       if((after=oldTail.next)==null){
         final CheckedSubList parent;
         if((parent=this.parent)!=null){
@@ -3530,8 +3771,8 @@ AbstractSeq<Float>
       }
       newTail.next=after;
     }
-    private void peelTail(FloatDblLnkNode tail){
-      FloatDblLnkNode after,before;
+    private void peelTail(Node tail){
+      Node after,before;
       (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
@@ -3554,8 +3795,8 @@ AbstractSeq<Float>
         }
       }
     }
-    private void removeLastNode(FloatDblLnkNode lastNode){
-      FloatDblLnkNode after,before=lastNode.prev;
+    private void removeLastNode(Node lastNode){
+      Node after,before=lastNode.prev;
       if((after=lastNode.next)==null){
         CheckedList root;
         (root=this.root).tail=before;
@@ -3612,8 +3853,8 @@ AbstractSeq<Float>
       this.head=null;
       this.tail=null;
     }
-    private void peelHead(FloatDblLnkNode head){
-      FloatDblLnkNode after,before;
+    private void peelHead(Node head){
+      Node after,before;
       (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
@@ -3657,8 +3898,8 @@ AbstractSeq<Float>
             peelTail(tail);
           }
         }else{
-          FloatDblLnkNode before;
-          ret=(before=( tail=FloatDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=( tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
           bubbleUpDecrementSize();
@@ -3669,8 +3910,8 @@ AbstractSeq<Float>
           ret=head.val;
           peelHead(head);
         }else{
-          FloatDblLnkNode after;
-          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
           bubbleUpDecrementSize();
@@ -3680,7 +3921,7 @@ AbstractSeq<Float>
       return ret;
     }
     @Override public boolean removeIf(FloatPredicate filter){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return uncheckedRemoveIf(head,filter);
       }else{
@@ -3689,7 +3930,7 @@ AbstractSeq<Float>
       return false;
     }
     @Override public boolean removeIf(Predicate<? super Float> filter){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return uncheckedRemoveIf(head,filter::test);
       }else{
@@ -3697,13 +3938,13 @@ AbstractSeq<Float>
       }
       return false;
     }
-    private void collapsehead(FloatDblLnkNode oldhead,FloatDblLnkNode tail,FloatPredicate filter
+    private void collapsehead(Node oldhead,Node tail,FloatPredicate filter
       ,int size,int modCount
     ){
       int numRemoved;
       int numLeft=size-(numRemoved=1)-1;
       final CheckedList root=this.root;
-      FloatDblLnkNode newhead;
+      Node newhead;
       for(newhead=oldhead.next;;
       --numLeft,
       ++numRemoved,newhead=newhead.next){ 
@@ -3721,7 +3962,7 @@ AbstractSeq<Float>
       root.size-=numRemoved;
       this.size-=numRemoved;
       this.head=newhead;
-      FloatDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldhead.prev)==null){
         for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
             ++parent.modCount;
@@ -3741,13 +3982,13 @@ AbstractSeq<Float>
       }
       newhead.prev=tmp;
     }
-    private void collapsetail(FloatDblLnkNode oldtail,FloatDblLnkNode head,FloatPredicate filter
+    private void collapsetail(Node oldtail,Node head,FloatPredicate filter
       ,int size,int modCount
     ){
       int numRemoved;
       int numLeft=size-(numRemoved=1)-1;
       final CheckedList root=this.root;
-      FloatDblLnkNode newtail;
+      Node newtail;
       for(newtail=oldtail.prev;;
       --numLeft,
       ++numRemoved,newtail=newtail.prev){ 
@@ -3765,7 +4006,7 @@ AbstractSeq<Float>
       root.size-=numRemoved;
       this.size-=numRemoved;
       this.tail=newtail;
-      FloatDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldtail.next)==null){
         for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
             ++parent.modCount;
@@ -3785,10 +4026,10 @@ AbstractSeq<Float>
       }
       newtail.next=tmp;
     }
-    private void bubbleUpCollapseHeadAndTail(FloatDblLnkNode oldHead,FloatDblLnkNode newHead,int numRemoved,FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+    private void bubbleUpCollapseHeadAndTail(Node oldHead,Node newHead,int numRemoved,Node newTail,Node oldTail){
       this.head=newHead;
       this.tail=newTail;
-      final FloatDblLnkNode after,before=oldHead.prev;
+      final Node after,before=oldHead.prev;
       if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
@@ -3871,8 +4112,8 @@ AbstractSeq<Float>
       newHead.prev=before;
       newTail.next=after;
     }
-    private boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
-      FloatDblLnkNode tail;
+    private boolean uncheckedRemoveIf(Node head,FloatPredicate filter){
+      Node tail;
       int modCount=this.modCount;
       int size=this.size;
       try
@@ -3934,8 +4175,8 @@ AbstractSeq<Float>
         clearAllHelper(size,this.head,this.tail,root);
       }
     }
-    private void clearAllHelper(int size,FloatDblLnkNode head,FloatDblLnkNode tail,CheckedList root){
-      FloatDblLnkNode before,after=tail.next;
+    private void clearAllHelper(int size,Node head,Node tail,CheckedList root){
+      Node before,after=tail.next;
       if((before=head.prev)==null){
         //this sublist is not preceded by nodes
         if(after==null){
@@ -3970,7 +4211,7 @@ AbstractSeq<Float>
         ++curr.modCount;
       }
     }
-    private void bubbleUpClearBody(FloatDblLnkNode before,FloatDblLnkNode head,int numRemoved,FloatDblLnkNode tail,FloatDblLnkNode after){
+    private void bubbleUpClearBody(Node before,Node head,int numRemoved,Node tail,Node after){
       for(var curr=parent;curr!=null;
       ++curr.modCount,
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
@@ -4003,7 +4244,7 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpClearHead(FloatDblLnkNode tail, FloatDblLnkNode after,int numRemoved){
+    private void bubbleUpClearHead(Node tail, Node after,int numRemoved){
       for(var curr=parent;curr!=null;
       ++curr.modCount,
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
@@ -4017,7 +4258,7 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpClearTail(FloatDblLnkNode head, FloatDblLnkNode before,int numRemoved){
+    private void bubbleUpClearTail(Node head, Node before,int numRemoved){
       for(var curr=parent;curr!=null;
       ++curr.modCount,
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
@@ -4031,7 +4272,7 @@ AbstractSeq<Float>
         }
       }
     }
-    private static  int collapseBodyHelper(FloatDblLnkNode newHead,FloatDblLnkNode newTail,int numLeft,FloatPredicate filter,CheckedList.ModCountChecker modCountChecker)
+    private static  int collapseBodyHelper(Node newHead,Node newTail,int numLeft,FloatPredicate filter,CheckedList.ModCountChecker modCountChecker)
     {
       if(numLeft!=0){
         int numSurvivors;
@@ -4060,7 +4301,7 @@ AbstractSeq<Float>
       }
       return numLeft;
     }
-    private void collapseHeadAndTail(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+    private void collapseHeadAndTail(Node head,Node tail,FloatPredicate filter
       ,int size,int modCount
     ){
       int numRemoved;
@@ -4098,11 +4339,11 @@ AbstractSeq<Float>
       root.size-=size;
       clearAllHelper(size,head,tail,root);
     }
-    private boolean collapseBody(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+    private boolean collapseBody(Node head,Node tail,FloatPredicate filter
       ,int size,int modCount
     ){
       for(int numLeft=size-2;numLeft!=0;--numLeft){
-        FloatDblLnkNode prev;
+        Node prev;
         if(filter.test((head=(prev=head).next).val)){
           int numRemoved=1;
           var root=this.root;
@@ -4134,7 +4375,7 @@ AbstractSeq<Float>
         ++curr.modCount;
       }
     }
-    private void bubbleUpAppend(FloatDblLnkNode oldTail,FloatDblLnkNode newTail){
+    private void bubbleUpAppend(Node oldTail,Node newTail){
       oldTail.next=newTail;
       this.tail=newTail;
       for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
@@ -4146,13 +4387,13 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpAppend(FloatDblLnkNode newTail){
+    private void bubbleUpAppend(Node newTail){
       this.tail=newTail;
       for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
         ++currList.modCount;
       }
     }
-    private void bubbleUpPrepend(FloatDblLnkNode oldHead,FloatDblLnkNode newHead){
+    private void bubbleUpPrepend(Node oldHead,Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
         ++currList.modCount;
@@ -4163,13 +4404,13 @@ AbstractSeq<Float>
         }
       }
     }
-    private void bubbleUpPrepend(FloatDblLnkNode newHead){
+    private void bubbleUpPrepend(Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
         ++currList.modCount;
       }
     }
-    private void bubbleUpRootInit(FloatDblLnkNode newNode){
+    private void bubbleUpRootInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       for(var parent=this.parent;parent!=null;parent=parent.parent){
@@ -4179,8 +4420,8 @@ AbstractSeq<Float>
         parent.tail=newNode;
       }
     }
-    private void bubbleUpInitHelper(int index,int size,FloatDblLnkNode newNode){
-      FloatDblLnkNode after,before;   
+    private void bubbleUpInitHelper(int index,int size,Node newNode){
+      Node after,before;   
       if((size-=index)<=index){
         before=this.tail;
         if(size==1){
@@ -4193,7 +4434,7 @@ AbstractSeq<Float>
           }
         }else{
           this.bubbleUpIncrementSize();
-          before=(after=FloatDblLnkNode.iterateDescending(before,size-2)).prev;
+          before=(after=Node.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
         }
         before.next=newNode;        
@@ -4209,7 +4450,7 @@ AbstractSeq<Float>
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=FloatDblLnkNode.iterateAscending(after,index-1)).next;
+          after=(before=Node.iterateAscending(after,index-1)).next;
           before.next=newNode;
         }
         after.prev=newNode;
@@ -4217,7 +4458,7 @@ AbstractSeq<Float>
       newNode.next=after;
       newNode.prev=before;
     }
-    private void bubbleUpInit(FloatDblLnkNode newNode){
+    private void bubbleUpInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       CheckedSubList curr;
@@ -4242,7 +4483,7 @@ AbstractSeq<Float>
       CheckedCollection.checkWriteHi(index,currSize=this.size);
       root.modCount=++modCount;
       this.modCount=modCount;
-      final var newNode=new FloatDblLnkNode(val);
+      final var newNode=new Node(val);
       if(++root.size!=1){
         this.size=++currSize;
         if(currSize!=1){    
@@ -4265,21 +4506,21 @@ AbstractSeq<Float>
       this.modCount=modCount;
       if(++root.size!=1){
         if(++this.size!=1){
-          FloatDblLnkNode currTail,after;
+          Node currTail,after;
           if((after=(currTail=this.tail).next)==null){
-            currTail.next=currTail=new FloatDblLnkNode(currTail,val);
+            currTail.next=currTail=new Node(currTail,val);
             bubbleUpAppend(currTail);
             root.tail=currTail;
           }else{
-            bubbleUpAppend(currTail,currTail=new FloatDblLnkNode(currTail,val,after));
+            bubbleUpAppend(currTail,currTail=new Node(currTail,val,after));
             after.prev=currTail;
           }
         }else{
-          bubbleUpInit(new FloatDblLnkNode(val));
+          bubbleUpInit(new Node(val));
         }
       }else{
-        FloatDblLnkNode newNode;
-        bubbleUpRootInit(newNode=new FloatDblLnkNode(val));
+        Node newNode;
+        bubbleUpRootInit(newNode=new Node(val));
         this.size=1;
         root.head=newNode;
         root.tail=newNode;
@@ -4290,7 +4531,7 @@ AbstractSeq<Float>
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      final FloatDblLnkNode node;
+      final Node node;
       final var ret=(node=((FloatDblLnkSeq)this).getNode(index,size)).val;
       node.val=val;
       return ret;
@@ -4318,7 +4559,7 @@ AbstractSeq<Float>
       return this.size==0;
     }
     @Override public void replaceAll(FloatUnaryOperator operator){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)==null){
         CheckedCollection.checkModCount(modCount,root.modCount);
         return;
@@ -4326,7 +4567,7 @@ AbstractSeq<Float>
       final CheckedList root;
       int modCount=this.modCount;
       try{
-        FloatDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
+        Node.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         root.modCount=++modCount;
@@ -4339,9 +4580,9 @@ AbstractSeq<Float>
     @Override public void forEach(FloatConsumer action){
       final int modCount=this.modCount;
       try{
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null){
-          FloatDblLnkNode.uncheckedForEachAscending(head,this.size,action);
+          Node.uncheckedForEachAscending(head,this.size,action);
         }
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4354,13 +4595,13 @@ AbstractSeq<Float>
         int modCount=this.modCount;
         final CheckedList root;
         final float[] tmp;
-        final FloatDblLnkNode tail;
+        final Node tail;
         if(sorter==null){
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
           FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
         }else{
-          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
           try{
             FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
           }catch(ArrayIndexOutOfBoundsException e){
@@ -4372,7 +4613,7 @@ AbstractSeq<Float>
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -4386,13 +4627,13 @@ AbstractSeq<Float>
       final int size;
       if((size=this.size)>1){
         final float[] tmp;
-        final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
         FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
@@ -4404,17 +4645,17 @@ AbstractSeq<Float>
       final int size;
       if((size=this.size)>1){
         final float[] tmp;
-        final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
         FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void replaceAll(UnaryOperator<Float> operator){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)==null){
         CheckedCollection.checkModCount(modCount,root.modCount);
         return;
@@ -4422,7 +4663,7 @@ AbstractSeq<Float>
       final CheckedList root;
       int modCount=this.modCount;
       try{
-        FloatDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
+        Node.uncheckedReplaceAll(head,this.size,operator::apply);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         root.modCount=++modCount;
@@ -4435,9 +4676,9 @@ AbstractSeq<Float>
     @Override public void forEach(Consumer<? super Float> action){
       final int modCount=this.modCount;
       try{
-        final FloatDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null){
-          FloatDblLnkNode.uncheckedForEachAscending(head,this.size,action::accept);
+          Node.uncheckedForEachAscending(head,this.size,action::accept);
         }
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4450,13 +4691,13 @@ AbstractSeq<Float>
         int modCount=this.modCount;
         final CheckedList root;
         final float[] tmp;
-        final FloatDblLnkNode tail;
+        final Node tail;
         if(sorter==null){
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
           FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
         }else{
-          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
           try{
             FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
           }catch(ArrayIndexOutOfBoundsException e){
@@ -4468,7 +4709,7 @@ AbstractSeq<Float>
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -4480,13 +4721,13 @@ AbstractSeq<Float>
         int modCount=this.modCount;
         final CheckedList root;
         final float[] tmp;
-        final FloatDblLnkNode tail;
+        final Node tail;
         if(sorter==null){
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
           FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
         }else{
-          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
           try{
             FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
           }catch(ArrayIndexOutOfBoundsException e){
@@ -4498,7 +4739,7 @@ AbstractSeq<Float>
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -4551,7 +4792,7 @@ AbstractSeq<Float>
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfFloat){
               return root.isEqualTo(this.head,size,(OmniList.OfFloat)list);
             }else if(list instanceof OmniList.OfRef){
@@ -4601,7 +4842,7 @@ AbstractSeq<Float>
     }
     public CheckedList(){
     }
-    CheckedList(FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+    CheckedList(Node head,int size,Node tail){
       super(head,size,tail);
     }
     private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
@@ -4622,7 +4863,7 @@ AbstractSeq<Float>
       }
     }
     @Override public float removeLastFloat(){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=tail.val;
@@ -4638,7 +4879,7 @@ AbstractSeq<Float>
       throw new NoSuchElementException();
     }
     @Override public float popFloat(){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=head.val;
@@ -4677,8 +4918,8 @@ AbstractSeq<Float>
           }
         }else{
           //iterate from the tail
-          FloatDblLnkNode before;
-          ret=(before=(tail=FloatDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=(tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
         }
@@ -4692,8 +4933,8 @@ AbstractSeq<Float>
           head.prev=null;
         }else{
           //iterate from the head
-          FloatDblLnkNode after;
-          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
         }
@@ -4711,29 +4952,29 @@ AbstractSeq<Float>
         var tail=this.tail;
         if(size==1){
           //the insertion point IS the tail
-          tail.next=tail=new FloatDblLnkNode(tail,val);
+          tail.next=tail=new Node(tail,val);
           this.tail=tail;
         }else{
           //iterate from the tail and insert
-          FloatDblLnkNode before;
-          (before=(tail=FloatDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new FloatDblLnkNode(before,val,tail);
+          Node before;
+          (before=(tail=Node.iterateDescending(tail,size-2)).prev).next=before=new Node(before,val,tail);
           tail.prev=before;
         }
       }else{
         //the insertion point is closer to the head
-        FloatDblLnkNode head;
+        Node head;
         if((head=this.head)==null){
           //initialize the list
-          this.head=head=new FloatDblLnkNode(val);
+          this.head=head=new Node(val);
           this.tail=head;
         }else if(index==0){
           //the insertion point IS the head
-          head.prev=head=new FloatDblLnkNode(val,head);
+          head.prev=head=new Node(val,head);
           this.head=head;
         }else{
           //iterate from the head and insert
-          FloatDblLnkNode after;
-          (after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new FloatDblLnkNode(head,val,after);
+          Node after;
+          (after=(head=Node.iterateAscending(head,index-1)).next).prev=after=new Node(head,val,after);
           head.next=after;
         }
       }
@@ -4750,7 +4991,7 @@ AbstractSeq<Float>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      FloatDblLnkNode tmp;
+      Node tmp;
       final var ret=(tmp=((FloatDblLnkSeq)this).getNode(index,size)).val;
       tmp.val=val;
       return ret;
@@ -4768,14 +5009,14 @@ AbstractSeq<Float>
       return ((FloatDblLnkSeq)this).getNode(index,size).val;
     }
     @Override public float getLastFloat(){
-      final FloatDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
          return tail.val;
       }
       throw new NoSuchElementException();
     }
     @Override public float floatElement(){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
          return head.val;
       }
@@ -4792,22 +5033,22 @@ AbstractSeq<Float>
       });
     }
     @Override public void forEach(FloatConsumer action){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          FloatDblLnkNode.uncheckedForEachAscending(head,this.size,action);
+          Node.uncheckedForEachAscending(head,this.size,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void replaceAll(FloatUnaryOperator operator){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          FloatDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
+          Node.uncheckedReplaceAll(head,this.size,operator);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
@@ -4819,8 +5060,8 @@ AbstractSeq<Float>
       final int size;
       if((size=this.size)>1){
         final float[] tmp;
-        final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
         if(sorter==null){
           FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
           ++this.modCount;
@@ -4835,7 +5076,7 @@ AbstractSeq<Float>
           }
           this.modCount=modCount+1;
         }
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableAscendingSort()
@@ -4844,11 +5085,11 @@ AbstractSeq<Float>
       final int size;
       if((size=this.size)>1){
         final float[] tmp;
-        final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
         FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
         this.modCount=modCount+1;
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
@@ -4857,30 +5098,30 @@ AbstractSeq<Float>
       final int size;
       if((size=this.size)>1){
         final float[] tmp;
-        final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
         FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
         this.modCount=modCount+1;
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void forEach(Consumer<? super Float> action){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          FloatDblLnkNode.uncheckedForEachAscending(head,this.size,action::accept);
+          Node.uncheckedForEachAscending(head,this.size,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void replaceAll(UnaryOperator<Float> operator){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          FloatDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
+          Node.uncheckedReplaceAll(head,this.size,operator::apply);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
@@ -4892,8 +5133,8 @@ AbstractSeq<Float>
       final int size;
       if((size=this.size)>1){
         final float[] tmp;
-        final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
         if(sorter==null){
           FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
           ++this.modCount;
@@ -4908,7 +5149,7 @@ AbstractSeq<Float>
           }
           this.modCount=modCount+1;
         }
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void unstableSort(FloatComparator sorter){
@@ -4916,8 +5157,8 @@ AbstractSeq<Float>
       final int size;
       if((size=this.size)>1){
         final float[] tmp;
-        final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
         if(sorter==null){
           FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
           ++this.modCount;
@@ -4932,10 +5173,10 @@ AbstractSeq<Float>
           }
           this.modCount=modCount+1;
         }
-        FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
-    private void pullSurvivorsDown(FloatDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -4971,7 +5212,7 @@ AbstractSeq<Float>
         prev=curr;
       }
     }
-    private void pullSurvivorsDown(FloatDblLnkNode prev,long word,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -4999,7 +5240,7 @@ AbstractSeq<Float>
         prev=curr;
       }
     }
-    private int removeIfHelper(FloatDblLnkNode prev,FloatPredicate filter,int numLeft,int modCount){
+    private int removeIfHelper(Node prev,FloatPredicate filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -5021,7 +5262,7 @@ AbstractSeq<Float>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return 0;
     }
-    @Override boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
+    @Override boolean uncheckedRemoveIf(Node head,FloatPredicate filter){
       final int modCount=this.modCount;
       try{
         int numLeft=this.size;
@@ -5077,9 +5318,9 @@ AbstractSeq<Float>
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        FloatDblLnkNode head,newTail;
-        final var newHead=newTail=new FloatDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new FloatDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new CheckedList(newHead,size,newTail);
       }
       return new CheckedList();
@@ -5090,7 +5331,7 @@ AbstractSeq<Float>
         if((dls=(FloatDblLnkSeq)list) instanceof FloatDblLnkSeq.CheckedSubList){
           final FloatDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(FloatDblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
-          final FloatDblLnkNode thatHead,thisHead;
+          final Node thatHead,thisHead;
           return size==subList.size && ((thatHead=subList.head)==(thisHead=this.head) || UncheckedList.isEqualToHelper(thisHead,thatHead,this.tail));
         }else{
           return size==dls.size && UncheckedList.isEqualToHelper(this.head,dls.head,this.tail);
@@ -5111,14 +5352,14 @@ AbstractSeq<Float>
         return size==(subList=(FloatArrSeq.UncheckedSubList)list).size && SequenceEqualityUtil.isEqualTo(subList.root.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head); 
       }
     }
-    private boolean isEqualTo(FloatDblLnkNode thisHead,int size,OmniList.OfFloat list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.OfFloat list){
       if(list instanceof FloatDblLnkSeq){
         final FloatDblLnkSeq dls;
         if((dls=(FloatDblLnkSeq)list) instanceof FloatDblLnkSeq.CheckedSubList){
           final FloatDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(FloatDblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
         }
-        final FloatDblLnkNode thatHead;
+        final Node thatHead;
         return size==dls.size && ((thatHead=dls.head)==thisHead||UncheckedList.isEqualToHelper(thatHead,thisHead,dls.tail));
       }else if(list instanceof FloatArrSeq.UncheckedList){
         final FloatArrSeq.UncheckedList that;
@@ -5146,7 +5387,7 @@ AbstractSeq<Float>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfFloat){
             return this.isEqualTo(size,(OmniList.OfFloat)list);
           }else if(list instanceof OmniList.OfRef){
@@ -5182,19 +5423,19 @@ AbstractSeq<Float>
       int tailDist;
       final int subListSize;
       if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
-        final FloatDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
-          subListTail=FloatDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?FloatDblLnkNode.iterateDescending(subListTail,subListSize-1):FloatDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=FloatDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?FloatDblLnkNode.iterateAscending(subListHead,subListSize-1):FloatDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
       return new CheckedSubList(this,fromIndex);
     } 
-    boolean uncheckedremoveLastOccurrenceBits(FloatDblLnkNode tail
+    boolean uncheckedremoveLastOccurrenceBits(Node tail
     ,int bits
     ){
       {
@@ -5210,7 +5451,7 @@ AbstractSeq<Float>
           --this.size;
           return true;
         }
-        for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(bits==Float.floatToRawIntBits(tail.val)){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
@@ -5227,7 +5468,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveLastOccurrence0(FloatDblLnkNode tail
+    boolean uncheckedremoveLastOccurrence0(Node tail
     ){
       {
         if(0==(tail.val)){
@@ -5242,7 +5483,7 @@ AbstractSeq<Float>
           --this.size;
           return true;
         }
-        for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(0==(tail.val)){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
@@ -5259,7 +5500,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveLastOccurrenceNaN(FloatDblLnkNode tail
+    boolean uncheckedremoveLastOccurrenceNaN(Node tail
     ){
       {
         if(Float.isNaN(tail.val)){
@@ -5274,7 +5515,7 @@ AbstractSeq<Float>
           --this.size;
           return true;
         }
-        for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(Float.isNaN(tail.val)){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
@@ -5291,7 +5532,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveValBits(FloatDblLnkNode head
+    boolean uncheckedremoveValBits(Node head
     ,int bits
     ){
       {
@@ -5306,7 +5547,7 @@ AbstractSeq<Float>
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(bits==Float.floatToRawIntBits(head.val)){
             ++this.modCount;
             if((head=head.next)==null){
@@ -5323,7 +5564,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveVal0(FloatDblLnkNode head
+    boolean uncheckedremoveVal0(Node head
     ){
       {
         if(0==(head.val)){
@@ -5337,7 +5578,7 @@ AbstractSeq<Float>
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(0==(head.val)){
             ++this.modCount;
             if((head=head.next)==null){
@@ -5354,7 +5595,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveValNaN(FloatDblLnkNode head
+    boolean uncheckedremoveValNaN(Node head
     ){
       {
         if(Float.isNaN(head.val)){
@@ -5368,7 +5609,7 @@ AbstractSeq<Float>
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(Float.isNaN(head.val)){
             ++this.modCount;
             if((head=head.next)==null){
@@ -5386,7 +5627,7 @@ AbstractSeq<Float>
       return false;
     }
     @Override public float pollFloat(){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(head.val);
@@ -5402,7 +5643,7 @@ AbstractSeq<Float>
       return Float.NaN;
     }
     @Override public float pollLastFloat(){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(tail.val);
@@ -5418,7 +5659,7 @@ AbstractSeq<Float>
       return Float.NaN;
     }
     @Override public Float poll(){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(head.val);
@@ -5434,7 +5675,7 @@ AbstractSeq<Float>
       return null;
     }
     @Override public Float pollLast(){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(tail.val);
@@ -5450,7 +5691,7 @@ AbstractSeq<Float>
       return null;
     }
     @Override public double pollDouble(){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(double)(head.val);
@@ -5466,7 +5707,7 @@ AbstractSeq<Float>
       return Double.NaN;
     }
     @Override public double pollLastDouble(){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(double)(tail.val);
@@ -5486,8 +5727,8 @@ AbstractSeq<Float>
     {
       transient final CheckedList parent;
       transient int modCount;
-      transient FloatDblLnkNode curr;
-      transient FloatDblLnkNode lastRet;
+      transient Node curr;
+      transient Node lastRet;
       transient int currIndex;
       private DescendingItr(DescendingItr itr){
         this.parent=itr.parent;
@@ -5502,7 +5743,7 @@ AbstractSeq<Float>
         this.currIndex=parent.size;
         this.curr=parent.tail;
       }
-      private DescendingItr(CheckedList parent,FloatDblLnkNode curr,int currIndex){
+      private DescendingItr(CheckedList parent,Node curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -5516,7 +5757,7 @@ AbstractSeq<Float>
       }
       @Override public float nextFloat(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final FloatDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           this.lastRet=curr;
           this.curr=curr.prev;
@@ -5526,7 +5767,7 @@ AbstractSeq<Float>
         throw new NoSuchElementException();
       }
       @Override public void remove(){
-        FloatDblLnkNode lastRet;
+        Node lastRet;
         if((lastRet=this.lastRet)!=null){
           final CheckedList parent;
           int modCount;
@@ -5544,7 +5785,7 @@ AbstractSeq<Float>
               parent.head=lastRet=lastRet.next;
               lastRet.prev=null;
             }else{
-              FloatDblLnkNode.eraseNode(lastRet);
+              Node.eraseNode(lastRet);
             }
           }
           this.lastRet=null;
@@ -5556,7 +5797,7 @@ AbstractSeq<Float>
         final int modCount=this.modCount;
         final CheckedList parent;
         try{
-          FloatDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
+          Node.uncheckedForEachDescending(this.curr,currIndex,action);
         }finally{
           CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount,currIndex,this.currIndex);
         }
@@ -5584,7 +5825,7 @@ AbstractSeq<Float>
       private BidirectionalItr(CheckedList parent){
         super(parent,parent.head,0);
       }
-      private BidirectionalItr(CheckedList parent,FloatDblLnkNode curr,int currIndex){
+      private BidirectionalItr(CheckedList parent,Node curr,int currIndex){
         super(parent,curr,currIndex);
       }
       @Override public Object clone(){
@@ -5592,7 +5833,7 @@ AbstractSeq<Float>
       }
       @Override public float nextFloat(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final FloatDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           this.lastRet=curr;
           this.curr=curr.next;
@@ -5606,7 +5847,7 @@ AbstractSeq<Float>
         CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
         final int currIndex;
         if((currIndex=this.currIndex)!=0){
-          FloatDblLnkNode curr;
+          Node curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
           this.curr=curr;
           this.currIndex=currIndex-1;
@@ -5624,7 +5865,7 @@ AbstractSeq<Float>
         return this.currIndex-1;
       }
       @Override public void set(float val){
-        final FloatDblLnkNode lastRet;
+        final Node lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.modCount);
           lastRet.val=val;
@@ -5638,36 +5879,36 @@ AbstractSeq<Float>
         CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
         parent.modCount=++modCount;
         this.modCount=modCount;
-        FloatDblLnkNode newNode;
+        Node newNode;
         final int currIndex;
         if((currIndex=++this.currIndex)==++parent.size){
           if(currIndex==1){
-            parent.head=newNode=new FloatDblLnkNode(val);
+            parent.head=newNode=new Node(val);
           }else{
-            (newNode=parent.tail).next=newNode=new FloatDblLnkNode(newNode,val);
+            (newNode=parent.tail).next=newNode=new Node(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new FloatDblLnkNode(val,newNode);
+            (newNode=parent.head).prev=newNode=new Node(val,newNode);
             parent.head=newNode;
           }else{
-            final FloatDblLnkNode tmp;
-            (newNode=curr).prev=newNode=new FloatDblLnkNode(tmp=newNode.prev,val,newNode);
+            final Node tmp;
+            (newNode=curr).prev=newNode=new Node(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }
         this.lastRet=null;
       }
       @Override public void remove(){
-        FloatDblLnkNode lastRet;
+        Node lastRet;
         if((lastRet=this.lastRet)!=null){
           final CheckedList parent;
           int modCount;
           CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
           parent.modCount=++modCount;
           this.modCount=modCount;
-          FloatDblLnkNode curr;
+          Node curr;
           if((curr=lastRet.next)==this.curr){
             --currIndex;
           }else{
@@ -5700,7 +5941,7 @@ AbstractSeq<Float>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
-            FloatDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
@@ -5716,7 +5957,7 @@ AbstractSeq<Float>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
-            FloatDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
@@ -5761,7 +6002,7 @@ AbstractSeq<Float>
     }
     public UncheckedList(){
     }
-    UncheckedList(FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+    UncheckedList(Node head,int size,Node tail){
       super(head,size,tail);
     }
     @Override public void clear(){
@@ -5770,7 +6011,7 @@ AbstractSeq<Float>
       this.tail=null;
     }
     @Override public float removeLastFloat(){
-      FloatDblLnkNode tail;
+      Node tail;
       final var ret=(tail=this.tail).val;{
       if(--size==0){
           this.head=null;
@@ -5783,7 +6024,7 @@ AbstractSeq<Float>
       }
     }
     @Override public float popFloat(){
-      FloatDblLnkNode head;
+      Node head;
       final var ret=(head=this.head).val;{
       if(--size==0){
           this.head=null;
@@ -5815,8 +6056,8 @@ AbstractSeq<Float>
           }
         }else{
           //iterate from the tail
-          FloatDblLnkNode before;
-          ret=(before=(tail=FloatDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=(tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
         }
@@ -5830,8 +6071,8 @@ AbstractSeq<Float>
           head.prev=null;
         }else{
           //iterate from the head
-          FloatDblLnkNode after;
-          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
         }
@@ -5845,49 +6086,49 @@ AbstractSeq<Float>
         var tail=this.tail;
         if(size==1){
           //the insertion point IS the tail
-          tail.next=tail=new FloatDblLnkNode(tail,val);
+          tail.next=tail=new Node(tail,val);
           this.tail=tail;
         }else{
           //iterate from the tail and insert
-          FloatDblLnkNode before;
-          (before=(tail=FloatDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new FloatDblLnkNode(before,val,tail);
+          Node before;
+          (before=(tail=Node.iterateDescending(tail,size-2)).prev).next=before=new Node(before,val,tail);
           tail.prev=before;
         }
       }else{
         //the insertion point is closer to the head
-        FloatDblLnkNode head;
+        Node head;
         if((head=this.head)==null){
           //initialize the list
-          this.head=head=new FloatDblLnkNode(val);
+          this.head=head=new Node(val);
           this.tail=head;
         }else if(index==0){
           //the insertion point IS the head
-          head.prev=head=new FloatDblLnkNode(val,head);
+          head.prev=head=new Node(val,head);
           this.head=head;
         }else{
           //iterate from the head and insert
-          FloatDblLnkNode after;
-          (after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new FloatDblLnkNode(head,val,after);
+          Node after;
+          (after=(head=Node.iterateAscending(head,index-1)).next).prev=after=new Node(head,val,after);
           head.next=after;
         }
       }
     }
     @Override public void addLast(float val){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)==null){
-        this.head=tail=new FloatDblLnkNode(val);
+        this.head=tail=new Node(val);
       }else{
-        tail.next=tail=new FloatDblLnkNode(tail,val);
+        tail.next=tail=new Node(tail,val);
       }
       this.tail=tail;
       ++this.size;
     }
     @Override public void push(float val){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)==null){
-        tail=head=new FloatDblLnkNode(val);
+        tail=head=new Node(val);
       }else{
-        head.prev=head=new FloatDblLnkNode(val,head);
+        head.prev=head=new Node(val,head);
       }
       this.head=head;
       ++this.size;
@@ -5908,22 +6149,22 @@ AbstractSeq<Float>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        FloatDblLnkNode curr;
-        for(this.head=curr=new FloatDblLnkNode((float)in.readFloat());--size!=0;curr=curr.next=new FloatDblLnkNode(curr,(float)in.readFloat())){}
+        Node curr;
+        for(this.head=curr=new Node((float)in.readFloat());--size!=0;curr=curr.next=new Node(curr,(float)in.readFloat())){}
         this.tail=curr;
       }
     }
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        FloatDblLnkNode head,newTail;
-        final var newHead=newTail=new FloatDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new FloatDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new UncheckedList(newHead,size,newTail);
       }
       return new UncheckedList();
     }
-    private static boolean isEqualToHelper(FloatDblLnkNode thisHead,FloatDblLnkNode thatHead,FloatDblLnkNode thisTail){
+    private static boolean isEqualToHelper(Node thisHead,Node thatHead,Node thisTail){
       for(;TypeUtil.floatEquals(thisHead.val,thatHead.val);thisHead=thisHead.next,thatHead=thatHead.next){
         if(thisHead==thisTail){
           return true;
@@ -5938,7 +6179,7 @@ AbstractSeq<Float>
           final FloatDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(FloatDblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
         }
-        final FloatDblLnkNode thatHead,thisHead;
+        final Node thatHead,thisHead;
         return dls.size==size && ((thatHead=dls.head)==(thisHead=this.head)||isEqualToHelper(thisHead,thatHead,this.tail));
       }else if(list instanceof FloatArrSeq.UncheckedList){
         final FloatArrSeq.UncheckedList that;
@@ -5956,14 +6197,14 @@ AbstractSeq<Float>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head);
       }
     }
-    private boolean isEqualTo(FloatDblLnkNode thisHead,int size,OmniList.OfFloat list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.OfFloat list){
       if(list instanceof FloatDblLnkSeq){
         final FloatDblLnkSeq dls;
         if((dls=(FloatDblLnkSeq)list) instanceof FloatDblLnkSeq.CheckedSubList){
           final FloatDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(FloatDblLnkSeq.CheckedSubList)list).modCount,subList.root.modCount);
         }
-        final FloatDblLnkNode thatHead;
+        final Node thatHead;
         return dls.size==size && ((thatHead=dls.head)==thisHead || isEqualToHelper(thatHead,thisHead,dls.tail));
       }else if(list instanceof FloatArrSeq.UncheckedList){
         final FloatArrSeq.UncheckedList that;
@@ -5981,7 +6222,7 @@ AbstractSeq<Float>
         return size==subList.size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(FloatDblLnkNode thisHead,int size,OmniList.OfRef<?> list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.OfRef<?> list){
       //TODO
       if(list instanceof RefArrSeq.UncheckedList){
         final RefArrSeq.UncheckedList<?> that;
@@ -6006,7 +6247,7 @@ AbstractSeq<Float>
         return size==subList.size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
     }
-    private static boolean isEqualTo(ListIterator<?> itr,FloatDblLnkNode head,FloatDblLnkNode tail){ 
+    private static boolean isEqualTo(ListIterator<?> itr,Node head,Node tail){ 
       while(itr.hasNext() && TypeUtil.refEquals(itr.next(),head.val)){
         if(head==tail){
           return !itr.hasNext();
@@ -6025,7 +6266,7 @@ AbstractSeq<Float>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfFloat){
             return this.isEqualTo(size,(OmniList.OfFloat)list);
           }else if(list instanceof OmniList.OfRef){
@@ -6040,7 +6281,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val){
@@ -6055,7 +6296,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(int val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -6074,7 +6315,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(long val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -6092,7 +6333,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(float val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val==val){
@@ -6107,7 +6348,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(double val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final float v;
@@ -6124,7 +6365,7 @@ AbstractSeq<Float>
     @Override public boolean remove(Object val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -6192,7 +6433,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(char val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -6207,7 +6448,7 @@ AbstractSeq<Float>
     @Override public boolean removeVal(short val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
@@ -6219,7 +6460,7 @@ AbstractSeq<Float>
       }//end val check
       return false;
     }
-    boolean uncheckedremoveValBits(FloatDblLnkNode head
+    boolean uncheckedremoveValBits(Node head
     ,int bits
     ){
       {
@@ -6233,7 +6474,7 @@ AbstractSeq<Float>
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(bits==Float.floatToRawIntBits(head.val)){
             if((head=head.next)==null){
               this.tail=prev;
@@ -6249,7 +6490,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveVal0(FloatDblLnkNode head
+    boolean uncheckedremoveVal0(Node head
     ){
       {
         if(0==(head.val)){
@@ -6262,7 +6503,7 @@ AbstractSeq<Float>
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(0==(head.val)){
             if((head=head.next)==null){
               this.tail=prev;
@@ -6278,7 +6519,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveValNaN(FloatDblLnkNode head
+    boolean uncheckedremoveValNaN(Node head
     ){
       {
         if(Float.isNaN(head.val)){
@@ -6291,7 +6532,7 @@ AbstractSeq<Float>
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(Float.isNaN(head.val)){
             if((head=head.next)==null){
               this.tail=prev;
@@ -6323,13 +6564,13 @@ AbstractSeq<Float>
       final int subListSize;
       if((subListSize=toIndex-fromIndex)!=0){
         final int tailDist;
-        final FloatDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
-          subListTail=FloatDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?FloatDblLnkNode.iterateDescending(subListTail,subListSize-1):FloatDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=FloatDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?FloatDblLnkNode.iterateAscending(subListHead,subListSize-1):FloatDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -6359,13 +6600,13 @@ AbstractSeq<Float>
     @Override public int search(boolean val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val){
-              return FloatDblLnkNode.uncheckedsearchBits(head,TypeUtil.FLT_TRUE_BITS);
+              return Node.uncheckedsearchBits(head,TypeUtil.FLT_TRUE_BITS);
             }
-            return FloatDblLnkNode.uncheckedsearch0(head);
+            return Node.uncheckedsearch0(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -6374,16 +6615,16 @@ AbstractSeq<Float>
     @Override public int search(int val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val))
               {
-                return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
+                return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedsearch0(head);
+              return Node.uncheckedsearch0(head);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -6393,15 +6634,15 @@ AbstractSeq<Float>
     @Override public int search(long val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
               if(TypeUtil.checkCastToFloat(val)){
-                return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
+                return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
               }
             }else{
-              return FloatDblLnkNode.uncheckedsearch0(head);
+              return Node.uncheckedsearch0(head);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -6411,13 +6652,13 @@ AbstractSeq<Float>
     @Override public int search(float val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val==val){
-              return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
+              return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedsearchNaN(head);
+            return Node.uncheckedsearchNaN(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -6426,14 +6667,14 @@ AbstractSeq<Float>
     @Override public int search(double val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final float v;
             if(val==(v=(float)val)){
-              return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(v));
+              return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(v));
             }else if(v!=v){
-              return FloatDblLnkNode.uncheckedsearchNaN(head);
+              return Node.uncheckedsearchNaN(head);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -6443,7 +6684,7 @@ AbstractSeq<Float>
     @Override public int search(Object val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -6451,16 +6692,16 @@ AbstractSeq<Float>
               if(val instanceof Float){
                 final float f;
                 if((f=(float)val)==f){
-                   return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(f));
+                   return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(f));
                 }
-                return FloatDblLnkNode.uncheckedsearchNaN(head);
+                return Node.uncheckedsearchNaN(head);
               }else if(val instanceof Double){
                 final double d;
                 final float f;
                 if((d=(double)val)==(f=(float)d)){
-                  return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(f));
+                  return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(f));
                 }else if(f!=f){
-                  return FloatDblLnkNode.uncheckedsearchNaN(head);
+                  return Node.uncheckedsearchNaN(head);
                 }else{
                   break returnFalse;
                 }
@@ -6470,35 +6711,35 @@ AbstractSeq<Float>
                   if(!TypeUtil.checkCastToFloat(i)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(i));
+                  return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedsearch0(head);
+                return Node.uncheckedsearch0(head);
               }else if(val instanceof Long){
                 final long l;
                 if((l=(long)val)!=0){
                   if(!TypeUtil.checkCastToFloat(l)){
                     break returnFalse;
                   }
-                  return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(l));
+                  return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(l));
                 }
-                return FloatDblLnkNode.uncheckedsearch0(head);
+                return Node.uncheckedsearch0(head);
               }else if(val instanceof Short||val instanceof Byte){
                 final int i;
                 if((i=((Number)val).shortValue())!=0){
-                  return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(i));
+                  return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedsearch0(head);
+                return Node.uncheckedsearch0(head);
               }else if(val instanceof Character){
                 final int i;
                 if((i=(char)val)!=0){
-                  return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(i));
+                  return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(i));
                 }
-                return FloatDblLnkNode.uncheckedsearch0(head);
+                return Node.uncheckedsearch0(head);
               }else if(val instanceof Boolean){
                 if((boolean)val){
-                  return FloatDblLnkNode.uncheckedsearchBits(head,TypeUtil.FLT_TRUE_BITS);
+                  return Node.uncheckedsearchBits(head,TypeUtil.FLT_TRUE_BITS);
                 }
-                return FloatDblLnkNode.uncheckedsearch0(head);
+                return Node.uncheckedsearch0(head);
               }else{
                 break returnFalse;
               }
@@ -6511,13 +6752,13 @@ AbstractSeq<Float>
     @Override public int search(char val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
+              return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedsearch0(head);
+            return Node.uncheckedsearch0(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -6526,13 +6767,13 @@ AbstractSeq<Float>
     @Override public int search(short val){
       {
         {
-          final FloatDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             if(val!=0){
-              return FloatDblLnkNode.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
+              return Node.uncheckedsearchBits(head,Float.floatToRawIntBits(val));
             }
-            return FloatDblLnkNode.uncheckedsearch0(head);
+            return Node.uncheckedsearch0(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -6541,7 +6782,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(boolean val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val){
@@ -6556,7 +6797,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(int val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
@@ -6575,7 +6816,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(long val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
@@ -6593,7 +6834,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(float val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val==val){
@@ -6608,7 +6849,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(double val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final float v;
@@ -6625,7 +6866,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(Object val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -6693,7 +6934,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(char val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
@@ -6708,7 +6949,7 @@ AbstractSeq<Float>
     @Override public boolean removeLastOccurrence(short val){
       {
         {
-          final FloatDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             if(val!=0){
@@ -6720,7 +6961,7 @@ AbstractSeq<Float>
       }//end val check
       return false;
     }
-    boolean uncheckedremoveLastOccurrenceBits(FloatDblLnkNode tail
+    boolean uncheckedremoveLastOccurrenceBits(Node tail
     ,int bits
     ){
       {
@@ -6735,7 +6976,7 @@ AbstractSeq<Float>
           --this.size;
           return true;
         }
-        for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(bits==Float.floatToRawIntBits(tail.val)){
             if((tail=tail.prev)==null){
               this.head=next;
@@ -6751,7 +6992,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveLastOccurrence0(FloatDblLnkNode tail
+    boolean uncheckedremoveLastOccurrence0(Node tail
     ){
       {
         if(0==(tail.val)){
@@ -6765,7 +7006,7 @@ AbstractSeq<Float>
           --this.size;
           return true;
         }
-        for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(0==(tail.val)){
             if((tail=tail.prev)==null){
               this.head=next;
@@ -6781,7 +7022,7 @@ AbstractSeq<Float>
       }
       return false;
     }
-    boolean uncheckedremoveLastOccurrenceNaN(FloatDblLnkNode tail
+    boolean uncheckedremoveLastOccurrenceNaN(Node tail
     ){
       {
         if(Float.isNaN(tail.val)){
@@ -6795,7 +7036,7 @@ AbstractSeq<Float>
           --this.size;
           return true;
         }
-        for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(Float.isNaN(tail.val)){
             if((tail=tail.prev)==null){
               this.head=next;
@@ -6860,7 +7101,7 @@ AbstractSeq<Float>
       return getLastFloat();
     }
     @Override public float pollFloat(){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(--this.size==0){
@@ -6875,7 +7116,7 @@ AbstractSeq<Float>
       return Float.NaN;
     }
     @Override public float pollLastFloat(){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(tail.val);
         if(--this.size==0){
@@ -6890,7 +7131,7 @@ AbstractSeq<Float>
       return Float.NaN;
     }
     @Override public Float poll(){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(--this.size==0){
@@ -6905,7 +7146,7 @@ AbstractSeq<Float>
       return null;
     }
     @Override public Float pollLast(){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(tail.val);
         if(--this.size==0){
@@ -6920,7 +7161,7 @@ AbstractSeq<Float>
       return null;
     }
     @Override public double pollDouble(){
-      FloatDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         if(--this.size==0){
@@ -6935,7 +7176,7 @@ AbstractSeq<Float>
       return Double.NaN;
     }
     @Override public double pollLastDouble(){
-      FloatDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(double)(tail.val);
         if(--this.size==0){
@@ -6950,58 +7191,58 @@ AbstractSeq<Float>
       return Double.NaN;
     }
     @Override public float peekFloat(){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (head.val);
       }
       return Float.NaN;
     }
     @Override public float peekLastFloat(){
-      final FloatDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (tail.val);
       }
       return Float.NaN;
     }
     @Override public Float peek(){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (head.val);
       }
       return null;
     }
     @Override public Float peekLast(){
-      final FloatDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (tail.val);
       }
       return null;
     }
     @Override public double peekDouble(){
-      final FloatDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (double)(head.val);
       }
       return Double.NaN;
     }
     @Override public double peekLastDouble(){
-      final FloatDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (double)(tail.val);
       }
       return Double.NaN;
     }
     @Override public boolean removeIf(FloatPredicate filter){
-      final FloatDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
     }
     @Override public boolean removeIf(Predicate<? super Float> filter){
-      final FloatDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
     }
-    private int removeIfHelper(FloatDblLnkNode prev,FloatDblLnkNode tail,FloatPredicate filter){
+    private int removeIfHelper(Node prev,Node tail,FloatPredicate filter){
       int numSurvivors=1;
-      outer:for(FloatDblLnkNode next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
           do{
             if(next==tail){
@@ -7017,7 +7258,7 @@ AbstractSeq<Float>
       }
       return numSurvivors;
     }
-    private int removeIfHelper(FloatDblLnkNode prev,FloatDblLnkNode curr,FloatDblLnkNode tail,FloatPredicate filter){
+    private int removeIfHelper(Node prev,Node curr,Node tail,FloatPredicate filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -7035,7 +7276,7 @@ AbstractSeq<Float>
       this.tail=prev;
       return numSurvivors;
     }
-    boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
+    boolean uncheckedRemoveIf(Node head,FloatPredicate filter){
       if(filter.test(head.val)){
         for(var tail=this.tail;head!=tail;){
           if(!filter.test((head=head.next).val)){
@@ -7052,7 +7293,7 @@ AbstractSeq<Float>
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final FloatDblLnkNode prev;
+          final Node prev;
           if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
@@ -7077,12 +7318,12 @@ AbstractSeq<Float>
           parent.head=null;
           parent.tail=null;
         }else{
-          FloatDblLnkNode curr;
+          Node curr;
           if((curr=this.curr)==null){
             (curr=parent.head.next).prev=null;
             parent.head=curr;
           }else{
-            FloatDblLnkNode lastRet;
+            Node lastRet;
             if((lastRet=curr.next)==parent.tail){
               parent.tail=curr;
               curr.next=null;
@@ -7094,24 +7335,24 @@ AbstractSeq<Float>
         }
       }
       @Override public float nextFloat(){
-        final FloatDblLnkNode curr;
+        final Node curr;
         this.curr=(curr=this.curr).prev;
         return curr.val;
       }
-      @Override void uncheckedForEachRemaining(FloatDblLnkNode curr,FloatConsumer action){
-        FloatDblLnkNode.uncheckedForEachDescending(curr,action);
+      @Override void uncheckedForEachRemaining(Node curr,FloatConsumer action){
+        Node.uncheckedForEachDescending(curr,action);
       }
     }
     private static class AscendingItr
       extends AbstractFloatItr
     {
       transient final UncheckedList parent;
-      transient FloatDblLnkNode curr;
+      transient Node curr;
       private AscendingItr(AscendingItr itr){
         this.parent=itr.parent;
         this.curr=itr.curr;
       }
-      private AscendingItr(UncheckedList parent,FloatDblLnkNode curr){
+      private AscendingItr(UncheckedList parent,Node curr){
         this.parent=parent;
         this.curr=curr;
       }
@@ -7131,12 +7372,12 @@ AbstractSeq<Float>
           parent.head=null;
           parent.tail=null;
         }else{
-          FloatDblLnkNode curr;
+          Node curr;
           if((curr=this.curr)==null){
             (curr=parent.tail.prev).next=null;
             parent.tail=curr;
           }else{
-            FloatDblLnkNode lastRet;
+            Node lastRet;
             if((lastRet=curr.prev)==parent.head){
               parent.head=curr;
               curr.prev=null;
@@ -7148,22 +7389,22 @@ AbstractSeq<Float>
         }
       }
       @Override public float nextFloat(){
-        final FloatDblLnkNode curr;
+        final Node curr;
         this.curr=(curr=this.curr).next;
         return curr.val;
       }
-      void uncheckedForEachRemaining(FloatDblLnkNode curr,FloatConsumer action){
-        FloatDblLnkNode.uncheckedForEachAscending(curr,action);
+      void uncheckedForEachRemaining(Node curr,FloatConsumer action){
+        Node.uncheckedForEachAscending(curr,action);
       }
       @Override public void forEachRemaining(FloatConsumer action){
-        final FloatDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           uncheckedForEachRemaining(curr,action);
           this.curr=null;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Float> action){
-        final FloatDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           uncheckedForEachRemaining(curr,action::accept);
           this.curr=null;
@@ -7172,7 +7413,7 @@ AbstractSeq<Float>
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfFloat{
       private transient int currIndex;
-      private transient FloatDblLnkNode lastRet;
+      private transient Node lastRet;
       private BidirectionalItr(BidirectionalItr itr){
         super(itr);
         this.currIndex=itr.currIndex;
@@ -7181,7 +7422,7 @@ AbstractSeq<Float>
       private BidirectionalItr(UncheckedList parent){
         super(parent);
       }
-      private BidirectionalItr(UncheckedList parent,FloatDblLnkNode curr,int currIndex){
+      private BidirectionalItr(UncheckedList parent,Node curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
       }
@@ -7189,14 +7430,14 @@ AbstractSeq<Float>
         return new BidirectionalItr(this);
       }
       @Override public float nextFloat(){
-        final FloatDblLnkNode curr;
+        final Node curr;
         this.lastRet=curr=this.curr;
         this.curr=curr.next;
         ++this.currIndex;
         return curr.val;
       }
       @Override public float previousFloat(){
-        FloatDblLnkNode curr;
+        Node curr;
         this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
         this.curr=curr;
         --this.currIndex;
@@ -7213,22 +7454,22 @@ AbstractSeq<Float>
       }
       @Override public void add(float val){
         final UncheckedList parent;
-        FloatDblLnkNode newNode;
+        Node newNode;
         final int currIndex;
         if((currIndex=++this.currIndex)==++(parent=this.parent).size){
           if(currIndex==1){
-            parent.head=newNode=new FloatDblLnkNode(val);
+            parent.head=newNode=new Node(val);
           }else{
-            (newNode=parent.tail).next=newNode=new FloatDblLnkNode(newNode,val);
+            (newNode=parent.tail).next=newNode=new Node(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new FloatDblLnkNode(val,newNode);
+            (newNode=parent.head).prev=newNode=new Node(val,newNode);
             parent.head=newNode;
           }else{
-            final FloatDblLnkNode tmp;
-            (newNode=curr).prev=newNode=new FloatDblLnkNode(tmp=newNode.prev,val,newNode);
+            final Node tmp;
+            (newNode=curr).prev=newNode=new Node(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }
@@ -7238,7 +7479,7 @@ AbstractSeq<Float>
         lastRet.val=val;
       }
       @Override public void remove(){
-        FloatDblLnkNode lastRet,curr;
+        Node lastRet,curr;
         if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
         }else{
@@ -7262,8 +7503,8 @@ AbstractSeq<Float>
         }
         this.lastRet=null;
       }
-      @Override void uncheckedForEachRemaining(FloatDblLnkNode curr,FloatConsumer action){
-        FloatDblLnkNode.uncheckedForEachAscending(curr,action);
+      @Override void uncheckedForEachRemaining(Node curr,FloatConsumer action){
+        Node.uncheckedForEachAscending(curr,action);
         final UncheckedList parent;
         this.lastRet=(parent=this.parent).tail;
         this.currIndex=parent.size;

@@ -1,14 +1,5 @@
 #TYPEDEF OfGeneric
 package omni.impl.seq;
-import omni.impl.BooleanDblLnkNode;
-import omni.impl.ByteDblLnkNode;
-import omni.impl.CharDblLnkNode;
-import omni.impl.ShortDblLnkNode;
-import omni.impl.IntDblLnkNode;
-import omni.impl.LongDblLnkNode;
-import omni.impl.FloatDblLnkNode;
-import omni.impl.DoubleDblLnkNode;
-import omni.impl.RefDblLnkNode;
 import omni.util.TypeUtil;
 import java.util.Objects;
 interface SequenceEqualityUtil{
@@ -71,7 +62,7 @@ interface SequenceEqualityUtil{
 }
 
 #MACRODEF DblLnkSeqEqualsDblLnkSeqImpl<CLASSPREFIX>()
-static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,CLASSPREFIXDblLnkNode rhsHead){
+static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,CLASSPREFIXDblLnkSeq.Node rhsHead){
   for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
     if(lhsHead==lhsTail){
       return true;
@@ -79,7 +70,7 @@ static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,CLASS
   }
   return false;
 }
-static boolean isEqualTo(CLASSPREFIXDblLnkNode lhsHead,CLASSPREFIXDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+static boolean isEqualTo(CLASSPREFIXDblLnkSeq.Node lhsHead,CLASSPREFIXDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
   for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
     if(lhsHead==lhsTail){
       return true;
@@ -89,7 +80,7 @@ static boolean isEqualTo(CLASSPREFIXDblLnkNode lhsHead,CLASSPREFIXDblLnkNode lhs
 }
 #ENDDEF
 #MACRODEF ArrSeqEqualsDblLnkSeqImpl<LHSPREFIX,RHSPREFIX>(LHSARRTYPE,RHSTYPEPARAMETER)
-static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,RHSPREFIXDblLnkNodeRHSTYPEPARAMETER rhsHead){
+static boolean isEqualTo(LHSARRTYPE[] lhsArr,int lhsRootOffset,int lhsRootBound,RHSPREFIXDblLnkSeq.NodeRHSTYPEPARAMETER rhsHead){
   for(;
   #MACRO EqualityMacro(lhsArr[lhsRootOffset],rhsHead.val)
   ;rhsHead=rhsHead.next){
@@ -145,7 +136,7 @@ static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,A
   }
   return false;
 }
-static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,CLASSPREFIXDblLnkNodeTYPEPARAMETER dlsHead){
+static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,CLASSPREFIXDblLnkSeq.NodeTYPEPARAMETER dlsHead){
   #IFSWITCH CLASSPREFIX==Boolean
   for(long pbasWord=pbasWords[pbasRootOffset>>6];dlsHead.val^(((pbasWord>>>pbasRootOffset)&1L)==0L);dlsHead=dlsHead.next){
   #ELSEIFSWITCH CLASSPREFIX==Ref

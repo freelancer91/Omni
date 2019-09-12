@@ -16,6 +16,7 @@ import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
 import omni.api.OmniStack;
+import omni.impl.AbstractOmniCollection;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
@@ -1925,7 +1926,7 @@ public class PackedBooleanArrSeqTest{
         void verifyModCount(){
             Assertions.assertEquals(expectedModCount,((PackedBooleanArrSeq.CheckedList)seq).modCount);
         }
-        private static class PackedBooleanArrSubListMonitor<SUBLIST extends AbstractSeq<Boolean>&OmniList.OfBoolean,SEQ extends AbstractSeq<Boolean>&OmniList.OfBoolean&Externalizable>
+        private static class PackedBooleanArrSubListMonitor<SUBLIST extends AbstractOmniCollection<Boolean>&OmniList.OfBoolean,SEQ extends AbstractOmniCollection<Boolean>&OmniList.OfBoolean&Externalizable>
                 implements
                 MonitoredList<SUBLIST>{
             final PackedBooleanArrListMonitor expectedRoot;
@@ -2123,7 +2124,7 @@ public class PackedBooleanArrSeqTest{
             public void updateCollectionState(){
                 expectedRoot.updateCollectionState();
                 Consumer<PackedBooleanArrSubListMonitor<SUBLIST,SEQ>> subListUpdater=subListMonitor->{
-                    subListMonitor.expectedSize=((AbstractSeq<?>)subListMonitor.seq).size;
+                    subListMonitor.expectedSize=((AbstractOmniCollection<?>)subListMonitor.seq).size;
                     subListMonitor.trueCount=subListMonitor.countTrue();
                 };
                 if(expectedRoot.checkedType.checked){
@@ -2186,7 +2187,7 @@ public class PackedBooleanArrSeqTest{
                 expectedRoot.verifyCloneTypeAndModCount(clone);
                 Assertions.assertNotSame(clone,expectedRoot.seq);
                 int size;
-                Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=((AbstractOmniCollection<?>)seq).size,((AbstractOmniCollection<?>)clone).size);
                 final var origArr=((PackedBooleanArrSeq)expectedRoot.seq).words;
                 final var cloneArr=((PackedBooleanArrSeq)clone).words;
                 if(origArr == null){
@@ -2210,7 +2211,7 @@ public class PackedBooleanArrSeqTest{
             @Override
             public void verifyCollectionState(boolean refIsSame){
                 Consumer<PackedBooleanArrSubListMonitor<SUBLIST,SEQ>> subListVerifier=subListMonitor->Assertions
-                        .assertEquals(subListMonitor.expectedSize,((AbstractSeq<?>)subListMonitor.seq).size);
+                        .assertEquals(subListMonitor.expectedSize,((AbstractOmniCollection<?>)subListMonitor.seq).size);
                 if(expectedRoot.checkedType.checked){
                     subListVerifier=subListVerifier.andThen(subListMonitor->{
                         Assertions.assertSame(subListMonitor.getParentSeq(),
@@ -2908,7 +2909,7 @@ public class PackedBooleanArrSeqTest{
                 updateModCount();
             }
             copyListContents();
-            this.expectedSize=((AbstractSeq<?>)seq).size;
+            this.expectedSize=((AbstractOmniCollection<?>)seq).size;
         }
         @Override
         public void updateRemoveIndexState(final int index){
@@ -2986,7 +2987,7 @@ public class PackedBooleanArrSeqTest{
             verifyCloneTypeAndModCount(clone);
             Assertions.assertNotSame(clone,seq);
             int size;
-            Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);
+            Assertions.assertEquals(size=((AbstractOmniCollection<?>)seq).size,((AbstractOmniCollection<?>)clone).size);
             final var origArr=((PackedBooleanArrSeq)seq).words;
             final var cloneArr=((PackedBooleanArrSeq)clone).words;
             if(origArr == null){
@@ -3008,7 +3009,7 @@ public class PackedBooleanArrSeqTest{
         }
         public void verifyCollectionState(boolean refIsSame){
             int expectedSize;
-            Assertions.assertEquals(expectedSize=this.expectedSize,((AbstractSeq<?>)seq).size);
+            Assertions.assertEquals(expectedSize=this.expectedSize,((AbstractOmniCollection<?>)seq).size);
             if(checkedType.checked){
                 verifyModCount();
             }

@@ -326,16 +326,20 @@ implements OmniSet.OfInt{
       return true;
     }
     if(val instanceof Set){
-      if(val instanceof IntOpenAddressHashSet){
-        return isEqualTo((IntOpenAddressHashSet)val);
-      }else if(val instanceof RefOpenAddressHashSet){
-        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-      }else{
-        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      //TODO optimize
+      Set<?> that;
+      if(size==(that=(Set<?>)val).size()){
+        for(final var thatVal:that){
+          if(!(thatVal instanceof Integer) || !this.contains((int)thatVal)){
+            return false;
+          }
+        }
+        return true;
       }
     }
     return false;
   }
+  /*
   private static boolean isEqualToHelper(int[] smallTable,int[] bigTable,int bigTableLength,int numInTable){
     for(int tableIndex=0;;++tableIndex){
       final int smallTableVal;
@@ -349,24 +353,24 @@ implements OmniSet.OfInt{
       }
     }
   }
-  private boolean isEqualTo(IntOpenAddressHashSet that){
-    final int size;
-    if((size=this.size)==that.size){
-      if(size==0){
-        return true;
-      }
+  private boolean isEqualTo(int size,IntOpenAddressHashSet that){
+    if(size==that.size){
       if(this.word0==that.word0 && this.word1==that.word1 && this.word2==that.word2 && this.word3==that.word3){
-        final int[] thisTable,thatTable;
-        final int thisTableLength,thatTableLength;
-        if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
-          return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
-        }else{
-          return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+        if(size!=(size=tableSize)){
+          final int[] thisTable,thatTable;
+          final int thisTableLength,thatTableLength;
+          if((thisTableLength=(thisTable=this.table).length)<=(thatTableLength=(thatTable=that.table).length)){
+            return isEqualToHelper(thisTable,thatTable,thatTableLength-1,size);
+          }else{
+            return isEqualToHelper(thatTable,thisTable,thisTableLength-1,size);
+          }
         }
+        return true;
       }
     }
     return false;
   }
+  */
   @Override public void forEach(IntConsumer action){
     int size;
     if((size=this.size)!=0){
@@ -1714,6 +1718,31 @@ private boolean addToTable(int val){
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
+    @Override public boolean equals(Object val){
+      if(val==this){
+        return true;
+      }
+      if(val instanceof Set){
+        //TODO optimize
+        int modCount=this.modCount;
+        try{
+          Set<?> that;
+          if(size==(that=(Set<?>)val).size()){
+            for(final var thatVal:that){
+              if(!(thatVal instanceof Integer) || !this.contains((int)thatVal)){
+                return false;
+              }
+            }
+            return true;
+          }
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+      return false;
+    }
+  /*  
+*/
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }

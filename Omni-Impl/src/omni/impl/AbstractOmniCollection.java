@@ -1,14 +1,14 @@
-package omni.impl.seq;
+package omni.impl;
 
 import java.io.Serializable;
 import omni.api.OmniCollection;
 
-public abstract class AbstractSeq<E> implements OmniCollection<E>,Serializable,Cloneable{
+public abstract class AbstractOmniCollection<E> implements OmniCollection<E>,Serializable,Cloneable{
   private static final long serialVersionUID=1L;
-  transient int size;
-  AbstractSeq(){
+  public transient int size;
+  protected AbstractOmniCollection(){
   }
-  AbstractSeq(int size){
+  protected AbstractOmniCollection(int size){
     this.size=size;
   }
   @Override public int size() {

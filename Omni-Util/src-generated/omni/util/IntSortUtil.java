@@ -1,12 +1,12 @@
 package omni.util;
-import java.util.function.IntBinaryOperator;
+import omni.function.IntComparator;
 public final class IntSortUtil
 {
   private IntSortUtil()
   {
     super();
   }
-    public static  void uncheckedUnstableSort(int[] arr,int offset,int bound,IntBinaryOperator sorter)
+    public static  void uncheckedUnstableSort(int[] arr,int offset,int bound,IntComparator sorter)
     {
        if((--bound)-offset<286)
        {
@@ -29,14 +29,14 @@ public final class IntSortUtil
              break;
            }
            switch(
-           Integer.signum(sorter.applyAsInt((int)(arr[k]),(int)(arr[k+1])))
+           Integer.signum(sorter.compare((int)(arr[k]),(int)(arr[k+1])))
            )
            {
            case -1:
              for(;;)
              {
                if(++k==bound ||
-               sorter.applyAsInt((int)(arr[k]),(int)(arr[k-1]))<0
+               sorter.compare((int)(arr[k]),(int)(arr[k-1]))<0
                )
                {
                  break;
@@ -47,7 +47,7 @@ public final class IntSortUtil
              for(;;)
              {
                if(++k==bound||
-               sorter.applyAsInt((int)(arr[k-1]),(int)(arr[k]))<0
+               sorter.compare((int)(arr[k-1]),(int)(arr[k]))<0
                )
                {
                  break;
@@ -65,7 +65,7 @@ public final class IntSortUtil
              ++count;
            }
            else if(
-           sorter.applyAsInt((int)(arr[r=run[count]]),(int)(arr[r-1]))<0
+           sorter.compare((int)(arr[r=run[count]]),(int)(arr[r-1]))<0
            && ++count==67)
            {
              quickSortleftmost(arr,offset,bound,sorter);
@@ -213,7 +213,7 @@ public final class IntSortUtil
       }
     }
   }
-  public static  void uncheckedStableSort(int[] arr,int offset,int bound,IntBinaryOperator sorter)
+  public static  void uncheckedStableSort(int[] arr,int offset,int bound,IntComparator sorter)
   {
     int nRemaining;
     if((nRemaining=bound-offset)<32)
@@ -226,7 +226,7 @@ public final class IntSortUtil
   private static class IntTimSort
     extends AbstractTimSort
   {
-    private transient final IntBinaryOperator sorter;
+    private transient final IntComparator sorter;
     private transient final int[] arr;
     private transient int[] tmp;
     private transient int tmpOffset;
@@ -265,7 +265,7 @@ public final class IntSortUtil
       }
       return tmp;
     }
-    private IntTimSort(int[] arr,int nRemaining,IntBinaryOperator sorter,int offset,int bound)
+    private IntTimSort(int[] arr,int nRemaining,IntComparator sorter,int offset,int bound)
     {
       super(nRemaining);
       this.sorter=sorter;
@@ -330,13 +330,13 @@ public final class IntSortUtil
       }
       return stackSize-2;
     }
-    private static  int mergeAtGallopLeft(int key,int[] arr,int base,int len,IntBinaryOperator sorter)
+    private static  int mergeAtGallopLeft(int key,int[] arr,int base,int len,IntComparator sorter)
     {
       //assert len>0;
       int ofs;
       int lastOfs;
       if(
-      sorter.applyAsInt((int)(key),(int)(arr[base+len-1]))>0
+      sorter.compare((int)(key),(int)(arr[base+len-1]))>0
       )
       {
         return len;
@@ -346,7 +346,7 @@ public final class IntSortUtil
       //#MACRO LessThanOrEqualTo(key,arr[base+len-2])
       //)
       if(
-      sorter.applyAsInt((int)(key),(int)(arr[base+len-2]))<=0
+      sorter.compare((int)(key),(int)(arr[base+len-2]))<=0
       )
       {
         lastOfs=-1;
@@ -363,7 +363,7 @@ public final class IntSortUtil
         {
           int m;
           if(
-          sorter.applyAsInt((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>0
+          sorter.compare((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>0
           )
           {
             lastOfs=m+1;
@@ -378,13 +378,13 @@ public final class IntSortUtil
       //assert lastOfs==ofs;
       return ofs;
     }
-    private static  int mergeAtGallopRight(int key,int[] arr,int base,int len,IntBinaryOperator sorter)
+    private static  int mergeAtGallopRight(int key,int[] arr,int base,int len,IntComparator sorter)
     {
       //assert len>0;
       int ofs;
       int lastOfs;
       if(
-      sorter.applyAsInt((int)(key),(int)(arr[base]))<0
+      sorter.compare((int)(key),(int)(arr[base]))<0
       )
       {
         return 0;
@@ -394,7 +394,7 @@ public final class IntSortUtil
       //#MACRO GreaterThanOrEqualTo(key,arr[base+1])
       //)
       if(
-      sorter.applyAsInt((int)(key),(int)(arr[base+1]))>=0
+      sorter.compare((int)(key),(int)(arr[base+1]))>=0
       )
       {
         ofs=len;
@@ -413,7 +413,7 @@ public final class IntSortUtil
         {
           int m;
           if(
-          sorter.applyAsInt((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>=0
+          sorter.compare((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>=0
           )
           {
             lastOfs=m+1;
@@ -479,7 +479,7 @@ public final class IntSortUtil
           //assert len1>1;
           //assert len2>0;
           if(
-          sorter.applyAsInt((int)(arr[cursor2]),(int)(tmp[cursor1]))<0
+          sorter.compare((int)(arr[cursor2]),(int)(tmp[cursor1]))<0
           )
           {
             arr[dest++]=arr[cursor2++];
@@ -611,7 +611,7 @@ public final class IntSortUtil
           //assert len2>1;
           //assert len1>0;
           if(
-          sorter.applyAsInt((int)(tmp[cursor2]),(int)(arr[cursor1]))<0
+          sorter.compare((int)(tmp[cursor2]),(int)(arr[cursor1]))<0
           )
           {
             arr[dest--]=arr[cursor1--];
@@ -710,7 +710,7 @@ public final class IntSortUtil
      *   and the last len-k elements should follow it.
      */
     //TODO split this up into mergeLo and mergeHi versions
-    private static  int gallopLeft(int key,int[] arr,int base,int len,int hint,IntBinaryOperator sorter)
+    private static  int gallopLeft(int key,int[] arr,int base,int len,int hint,IntComparator sorter)
     {
       //assert len>0;
       //assert hint>=0;
@@ -718,12 +718,12 @@ public final class IntSortUtil
       int ofs;
       int lastOfs;
       if(
-      sorter.applyAsInt((int)(key),(int)(arr[base+hint]))>0
+      sorter.compare((int)(key),(int)(arr[base+hint]))>0
       )
       {
         int maxOfs;
         if(2>(maxOfs=len-hint)||
-        sorter.applyAsInt((int)(key),(int)(arr[base+hint+1]))>0
+        sorter.compare((int)(key),(int)(arr[base+hint+1]))>0
         )
         {
           ofs=maxOfs+hint;
@@ -738,7 +738,7 @@ public final class IntSortUtil
       {
         int maxOfs;
         if(2>(maxOfs=hint+1)||
-        sorter.applyAsInt((int)(key),(int)(arr[base+hint-1]))<=0
+        sorter.compare((int)(key),(int)(arr[base+hint-1]))<=0
         )
         {
           lastOfs=hint-maxOfs;
@@ -758,7 +758,7 @@ public final class IntSortUtil
         {
           int m;
           if(
-          sorter.applyAsInt((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>0
+          sorter.compare((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>0
           )
           {
             lastOfs=m+1;
@@ -787,7 +787,7 @@ public final class IntSortUtil
      * @return the int k, 0<=k<=len such that arr[base+k-1]<= key<arr[base+k]
      */
     //TODO split this up into mergeLo and mergeHi versions
-    private static  int gallopRight(int key,int[] arr,int base,int len,int hint,IntBinaryOperator sorter)
+    private static  int gallopRight(int key,int[] arr,int base,int len,int hint,IntComparator sorter)
     {
       //assert len>0;
       //assert hint>=0;
@@ -795,12 +795,12 @@ public final class IntSortUtil
       int ofs;
       int lastOfs;
       if(
-      sorter.applyAsInt((int)(key),(int)(arr[base+hint]))<0
+      sorter.compare((int)(key),(int)(arr[base+hint]))<0
       )
       {
         int maxOfs;
         if(2>(maxOfs=hint+1)||
-        sorter.applyAsInt((int)(key),(int)(arr[base+hint-1]))<0
+        sorter.compare((int)(key),(int)(arr[base+hint-1]))<0
         )
         {
           lastOfs=hint-maxOfs;
@@ -815,7 +815,7 @@ public final class IntSortUtil
       {
         int maxOfs;
         if(2>(maxOfs=len-hint)||
-        sorter.applyAsInt((int)(key),(int)(arr[base+hint+1]))>=0
+        sorter.compare((int)(key),(int)(arr[base+hint+1]))>=0
         )
         {
           ofs=maxOfs+hint;
@@ -835,7 +835,7 @@ public final class IntSortUtil
         {
           int m;
           if(
-          sorter.applyAsInt((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>=0
+          sorter.compare((int)(key),(int)(arr[base+(m=lastOfs+((ofs-lastOfs)>>>1))]))>=0
           )
           {
             lastOfs=m+1;
@@ -851,7 +851,7 @@ public final class IntSortUtil
       return ofs;
     }
     private static  void binarySort(int[] arr,int lo,int hi,int start
-      ,IntBinaryOperator sorter
+      ,IntComparator sorter
     )
     {
       //assert lo<=start;
@@ -868,7 +868,7 @@ public final class IntSortUtil
         {
           int mid;
           if(
-          sorter.applyAsInt((int)(pivot),(int)(arr[mid=(left+right)>>>1]))<0
+          sorter.compare((int)(pivot),(int)(arr[mid=(left+right)>>>1]))<0
           )
           {
             right=mid;
@@ -885,7 +885,7 @@ public final class IntSortUtil
       }
     }
     private static  int countRunAndMakeAscending(int[] arr,int lo,int hi
-      ,IntBinaryOperator sorter
+      ,IntComparator sorter
     )
     {
       //TODO streamline
@@ -896,13 +896,13 @@ public final class IntSortUtil
         return 1;
       }
       if(
-      sorter.applyAsInt((int)(arr[runHi++]),(int)(arr[lo]))<0
+      sorter.compare((int)(arr[runHi++]),(int)(arr[lo]))<0
       )
       {
         if(runHi<hi)
         {
           while(
-          sorter.applyAsInt((int)(arr[runHi]),(int)(arr[runHi-1]))<0
+          sorter.compare((int)(arr[runHi]),(int)(arr[runHi-1]))<0
           )
           {
             if(++runHi==hi)
@@ -918,7 +918,7 @@ public final class IntSortUtil
         if(runHi<hi)
         {
           while(
-          sorter.applyAsInt((int)(arr[runHi]),(int)(arr[runHi-1]))>=0
+          sorter.compare((int)(arr[runHi]),(int)(arr[runHi-1]))>=0
           )
           {
             if(++runHi==hi)
@@ -969,14 +969,14 @@ public final class IntSortUtil
       arr[j+1]=ai;
     }
   }
-  private static  void insertSort(int[] arr,int begin,int end,IntBinaryOperator sorter)
+  private static  void insertSort(int[] arr,int begin,int end,IntComparator sorter)
   {
     for(int i=begin,j=i;i!=end;j=++i)
     {
       final int ai=(int)arr[i+1];
       int aj;
       while(
-      sorter.applyAsInt((int)(ai),(int)(aj=arr[j]))<0
+      sorter.compare((int)(ai),(int)(aj=arr[j]))<0
       )
       {
         arr[j+1]=aj;
@@ -988,7 +988,7 @@ public final class IntSortUtil
       arr[j+1]=ai;
     }
   }
-  private static  void sentinelInsertSort(int[] arr,int begin,int end,IntBinaryOperator sorter)
+  private static  void sentinelInsertSort(int[] arr,int begin,int end,IntComparator sorter)
   {
     do
     {
@@ -998,14 +998,14 @@ public final class IntSortUtil
       }
     }
     while(
-    sorter.applyAsInt((int)(arr[begin]),(int)(arr[++begin]))<=0
+    sorter.compare((int)(arr[begin]),(int)(arr[++begin]))<=0
     )
     ;
     for(int k=begin;++begin<=end;k=++begin)
     {
       int a1,a2;
       if(
-      sorter.applyAsInt((int)(a1=(int)arr[k]),(int)(a2=(int)arr[begin]))<0
+      sorter.compare((int)(a1=(int)arr[k]),(int)(a2=(int)arr[begin]))<0
       )
       {
         a2=a1;
@@ -1013,14 +1013,14 @@ public final class IntSortUtil
       }
       int ak;
       while(
-      sorter.applyAsInt((int)(a1),(int)(ak=(int)arr[--k]))<0
+      sorter.compare((int)(a1),(int)(ak=(int)arr[--k]))<0
       )
       {
         arr[k+2]=ak;
       }
       arr[++k+1]=a1;
       while(
-      sorter.applyAsInt((int)(a2),(int)(ak=(int)arr[--k]))<0
+      sorter.compare((int)(a2),(int)(ak=(int)arr[--k]))<0
       )
       {
         arr[k+1]=ak;
@@ -1030,7 +1030,7 @@ public final class IntSortUtil
     int ae;
     int last=(int)arr[end];
     while(
-    sorter.applyAsInt((int)(last),(int)(ae=(int)arr[--end]))<0
+    sorter.compare((int)(last),(int)(ae=(int)arr[--end]))<0
     )
     {
       arr[end+1]=ae;
@@ -1135,7 +1135,7 @@ public final class IntSortUtil
     }
     arr[end+1]=last;
   }
-  private static  void quickSortleftmost(int[] arr,int begin,int end,IntBinaryOperator sorter)
+  private static  void quickSortleftmost(int[] arr,int begin,int end,IntComparator sorter)
   {
     int length;
     if((length=end-begin+1)<47)
@@ -1146,7 +1146,7 @@ public final class IntSortUtil
     int seventh,e1,e2,e3,e4,e5;
     int val1,val2,val3,val4,val5;
     if(
-    sorter.applyAsInt((int)(val2=(int)arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)]),(int)(val1=(int)arr[e1=e2-seventh]))<0
+    sorter.compare((int)(val2=(int)arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)]),(int)(val1=(int)arr[e1=e2-seventh]))<0
     )
     {
       int tmp=(int)val2;
@@ -1154,13 +1154,13 @@ public final class IntSortUtil
       val1=tmp;
     }
     if(
-    sorter.applyAsInt((int)(val3=(int)arr[e3]),(int)(val2))<0
+    sorter.compare((int)(val3=(int)arr[e3]),(int)(val2))<0
     )
     {
       int tmp=(int)val3;
       val3=val2;
       if(
-      sorter.applyAsInt((int)(tmp),(int)(val1))<0
+      sorter.compare((int)(tmp),(int)(val1))<0
       )
       {
         val2=val1;
@@ -1172,18 +1172,18 @@ public final class IntSortUtil
       }
     }
     if(
-    sorter.applyAsInt((int)(val4=(int)arr[e4=e3+seventh]),(int)(val3))<0
+    sorter.compare((int)(val4=(int)arr[e4=e3+seventh]),(int)(val3))<0
     )
     {
       int tmp=(int)val4;
       val4=val3;
       if(
-      sorter.applyAsInt((int)(tmp),(int)(val2))<0
+      sorter.compare((int)(tmp),(int)(val2))<0
       )
       {
         val3=val2;
         if(
-        sorter.applyAsInt((int)(tmp),(int)(val1))<0
+        sorter.compare((int)(tmp),(int)(val1))<0
         )
         {
           val2=val1;
@@ -1200,23 +1200,23 @@ public final class IntSortUtil
       }
     }
     if(
-    sorter.applyAsInt((int)(val5=(int)arr[e5=e4+seventh]),(int)(val4))<0
+    sorter.compare((int)(val5=(int)arr[e5=e4+seventh]),(int)(val4))<0
     )
     {
       int tmp=(int)val5;
       val5=val4;
       if(
-      sorter.applyAsInt((int)(tmp),(int)(val3))<0
+      sorter.compare((int)(tmp),(int)(val3))<0
       )
       {
         val4=val3;
         if(
-        sorter.applyAsInt((int)(tmp),(int)(val2))<0
+        sorter.compare((int)(tmp),(int)(val2))<0
         )
         {
           val3=val2;
           if(
-          sorter.applyAsInt((int)(tmp),(int)(val1))<0
+          sorter.compare((int)(tmp),(int)(val1))<0
           )
           {
             val2=val1;
@@ -1241,13 +1241,13 @@ public final class IntSortUtil
     arr[e3]=val3;
     arr[e5]=val5;
     if(
-    sorter.applyAsInt((int)(val1),(int)(val2))==0
+    sorter.compare((int)(val1),(int)(val2))==0
     ||
-    sorter.applyAsInt((int)(val2),(int)(val3))==0
+    sorter.compare((int)(val2),(int)(val3))==0
     ||
-    sorter.applyAsInt((int)(val3),(int)(val4))==0
+    sorter.compare((int)(val3),(int)(val4))==0
     ||
-    sorter.applyAsInt((int)(val4),(int)(val5))==0
+    sorter.compare((int)(val4),(int)(val5))==0
     )
     {
       arr[e2]=val2;
@@ -1261,7 +1261,7 @@ public final class IntSortUtil
        quickSortleftmostDualPivot(arr,begin,end,val2,val4,e1,e5,sorter);
     }
   }
-  private static  void quickSort(int[] arr,int begin,int end,IntBinaryOperator sorter)
+  private static  void quickSort(int[] arr,int begin,int end,IntComparator sorter)
   {
     int length;
     if((length=end-begin+1)<47)
@@ -1272,7 +1272,7 @@ public final class IntSortUtil
     int seventh,e1,e2,e3,e4,e5;
     int val1,val2,val3,val4,val5;
     if(
-    sorter.applyAsInt((int)(val2=(int)arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)]),(int)(val1=(int)arr[e1=e2-seventh]))<0
+    sorter.compare((int)(val2=(int)arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)]),(int)(val1=(int)arr[e1=e2-seventh]))<0
     )
     {
       int tmp=(int)val2;
@@ -1280,13 +1280,13 @@ public final class IntSortUtil
       val1=tmp;
     }
     if(
-    sorter.applyAsInt((int)(val3=(int)arr[e3]),(int)(val2))<0
+    sorter.compare((int)(val3=(int)arr[e3]),(int)(val2))<0
     )
     {
       int tmp=(int)val3;
       val3=val2;
       if(
-      sorter.applyAsInt((int)(tmp),(int)(val1))<0
+      sorter.compare((int)(tmp),(int)(val1))<0
       )
       {
         val2=val1;
@@ -1298,18 +1298,18 @@ public final class IntSortUtil
       }
     }
     if(
-    sorter.applyAsInt((int)(val4=(int)arr[e4=e3+seventh]),(int)(val3))<0
+    sorter.compare((int)(val4=(int)arr[e4=e3+seventh]),(int)(val3))<0
     )
     {
       int tmp=(int)val4;
       val4=val3;
       if(
-      sorter.applyAsInt((int)(tmp),(int)(val2))<0
+      sorter.compare((int)(tmp),(int)(val2))<0
       )
       {
         val3=val2;
         if(
-        sorter.applyAsInt((int)(tmp),(int)(val1))<0
+        sorter.compare((int)(tmp),(int)(val1))<0
         )
         {
           val2=val1;
@@ -1326,23 +1326,23 @@ public final class IntSortUtil
       }
     }
     if(
-    sorter.applyAsInt((int)(val5=(int)arr[e5=e4+seventh]),(int)(val4))<0
+    sorter.compare((int)(val5=(int)arr[e5=e4+seventh]),(int)(val4))<0
     )
     {
       int tmp=(int)val5;
       val5=val4;
       if(
-      sorter.applyAsInt((int)(tmp),(int)(val3))<0
+      sorter.compare((int)(tmp),(int)(val3))<0
       )
       {
         val4=val3;
         if(
-        sorter.applyAsInt((int)(tmp),(int)(val2))<0
+        sorter.compare((int)(tmp),(int)(val2))<0
         )
         {
           val3=val2;
           if(
-          sorter.applyAsInt((int)(tmp),(int)(val1))<0
+          sorter.compare((int)(tmp),(int)(val1))<0
           )
           {
             val2=val1;
@@ -1367,13 +1367,13 @@ public final class IntSortUtil
     arr[e3]=val3;
     arr[e5]=val5;
     if(
-    sorter.applyAsInt((int)(val1),(int)(val2))==0
+    sorter.compare((int)(val1),(int)(val2))==0
     ||
-    sorter.applyAsInt((int)(val2),(int)(val3))==0
+    sorter.compare((int)(val2),(int)(val3))==0
     ||
-    sorter.applyAsInt((int)(val3),(int)(val4))==0
+    sorter.compare((int)(val3),(int)(val4))==0
     ||
-    sorter.applyAsInt((int)(val4),(int)(val5))==0
+    sorter.compare((int)(val4),(int)(val5))==0
     )
     {
       arr[e2]=val2;
@@ -1891,17 +1891,17 @@ public final class IntSortUtil
        quickDescendingSortDualPivot(arr,begin,end,val2,val4,e1,e5);
     }
   }
-  private static  void quickSortleftmostDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5,IntBinaryOperator sorter)
+  private static  void quickSortleftmostDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5,IntComparator sorter)
   {
     int less=begin;
     int great=end;
     while(
-    sorter.applyAsInt((int)(arr[++less]),(int)(pivot1))<=0
+    sorter.compare((int)(arr[++less]),(int)(pivot1))<=0
     )
     {
     }
     while(
-    sorter.applyAsInt((int)(arr[--great]),(int)(pivot2))>=0
+    sorter.compare((int)(arr[--great]),(int)(pivot2))>=0
     )
     {
     }
@@ -1909,7 +1909,7 @@ public final class IntSortUtil
     {
       int ak;
       if(
-      sorter.applyAsInt((int)(ak=(int)arr[k]),(int)(pivot1))<0
+      sorter.compare((int)(ak=(int)arr[k]),(int)(pivot1))<0
       )
       {
         arr[k]=arr[less];
@@ -1918,12 +1918,12 @@ public final class IntSortUtil
       }
       else
       if(
-      sorter.applyAsInt((int)(ak),(int)(pivot2))>0
+      sorter.compare((int)(ak),(int)(pivot2))>0
       )
       {
         int ag;
         while(
-        sorter.applyAsInt((int)(ag=(int)arr[great]),(int)(pivot2))>0
+        sorter.compare((int)(ag=(int)arr[great]),(int)(pivot2))>0
         )
         {
           if(--great<k)
@@ -1932,7 +1932,7 @@ public final class IntSortUtil
           }
         }
         if(
-        sorter.applyAsInt((int)(ag),(int)(pivot1))<0
+        sorter.compare((int)(ag),(int)(pivot1))<0
         )
         {
           arr[k]=arr[less];
@@ -1956,13 +1956,13 @@ public final class IntSortUtil
     if(less<e1 && e5<great)
     {
       while(
-      sorter.applyAsInt((int)(arr[less]),(int)(pivot1))==0
+      sorter.compare((int)(arr[less]),(int)(pivot1))==0
       )
       {
         ++less;
       }
       while(
-      sorter.applyAsInt((int)(arr[great]),(int)(pivot2))==0
+      sorter.compare((int)(arr[great]),(int)(pivot2))==0
       )
       {
         --great;
@@ -1971,7 +1971,7 @@ public final class IntSortUtil
       {
         int ak;
         if(
-        sorter.applyAsInt((int)(ak=(int)arr[k]),(int)(pivot1))==0
+        sorter.compare((int)(ak=(int)arr[k]),(int)(pivot1))==0
         )
         {
           arr[k]=arr[less];
@@ -1980,12 +1980,12 @@ public final class IntSortUtil
         }
         else
         if(
-        sorter.applyAsInt((int)(ak),(int)(pivot2))==0
+        sorter.compare((int)(ak),(int)(pivot2))==0
         )
         {
           int ag;
           while(
-          sorter.applyAsInt((int)(ag=(int)arr[great]),(int)(pivot2))==0
+          sorter.compare((int)(ag=(int)arr[great]),(int)(pivot2))==0
           )
           {
             if(--great<k)
@@ -1994,7 +1994,7 @@ public final class IntSortUtil
             }
           }
           if(
-          sorter.applyAsInt((int)(ag),(int)(pivot1))==0
+          sorter.compare((int)(ag),(int)(pivot1))==0
           )
           {
             arr[k]=arr[less];
@@ -2012,17 +2012,17 @@ public final class IntSortUtil
     }
       quickSort(arr,less,great,sorter);
   }
-  private static  void quickSortDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5,IntBinaryOperator sorter)
+  private static  void quickSortDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5,IntComparator sorter)
   {
     int less=begin;
     int great=end;
     while(
-    sorter.applyAsInt((int)(arr[++less]),(int)(pivot1))<=0
+    sorter.compare((int)(arr[++less]),(int)(pivot1))<=0
     )
     {
     }
     while(
-    sorter.applyAsInt((int)(arr[--great]),(int)(pivot2))>=0
+    sorter.compare((int)(arr[--great]),(int)(pivot2))>=0
     )
     {
     }
@@ -2030,7 +2030,7 @@ public final class IntSortUtil
     {
       int ak;
       if(
-      sorter.applyAsInt((int)(ak=(int)arr[k]),(int)(pivot1))<0
+      sorter.compare((int)(ak=(int)arr[k]),(int)(pivot1))<0
       )
       {
         arr[k]=arr[less];
@@ -2039,12 +2039,12 @@ public final class IntSortUtil
       }
       else
       if(
-      sorter.applyAsInt((int)(ak),(int)(pivot2))>0
+      sorter.compare((int)(ak),(int)(pivot2))>0
       )
       {
         int ag;
         while(
-        sorter.applyAsInt((int)(ag=(int)arr[great]),(int)(pivot2))>0
+        sorter.compare((int)(ag=(int)arr[great]),(int)(pivot2))>0
         )
         {
           if(--great<k)
@@ -2053,7 +2053,7 @@ public final class IntSortUtil
           }
         }
         if(
-        sorter.applyAsInt((int)(ag),(int)(pivot1))<0
+        sorter.compare((int)(ag),(int)(pivot1))<0
         )
         {
           arr[k]=arr[less];
@@ -2077,13 +2077,13 @@ public final class IntSortUtil
     if(less<e1 && e5<great)
     {
       while(
-      sorter.applyAsInt((int)(arr[less]),(int)(pivot1))==0
+      sorter.compare((int)(arr[less]),(int)(pivot1))==0
       )
       {
         ++less;
       }
       while(
-      sorter.applyAsInt((int)(arr[great]),(int)(pivot2))==0
+      sorter.compare((int)(arr[great]),(int)(pivot2))==0
       )
       {
         --great;
@@ -2092,7 +2092,7 @@ public final class IntSortUtil
       {
         int ak;
         if(
-        sorter.applyAsInt((int)(ak=(int)arr[k]),(int)(pivot1))==0
+        sorter.compare((int)(ak=(int)arr[k]),(int)(pivot1))==0
         )
         {
           arr[k]=arr[less];
@@ -2101,12 +2101,12 @@ public final class IntSortUtil
         }
         else
         if(
-        sorter.applyAsInt((int)(ak),(int)(pivot2))==0
+        sorter.compare((int)(ak),(int)(pivot2))==0
         )
         {
           int ag;
           while(
-          sorter.applyAsInt((int)(ag=(int)arr[great]),(int)(pivot2))==0
+          sorter.compare((int)(ag=(int)arr[great]),(int)(pivot2))==0
           )
           {
             if(--great<k)
@@ -2115,7 +2115,7 @@ public final class IntSortUtil
             }
           }
           if(
-          sorter.applyAsInt((int)(ag),(int)(pivot1))==0
+          sorter.compare((int)(ag),(int)(pivot1))==0
           )
           {
             arr[k]=arr[less];
@@ -2617,7 +2617,7 @@ public final class IntSortUtil
     }
       quickDescendingSort(arr,less,great);
   }
-  private static  void quickSortleftmostSinglePivot(int[] arr,int begin,int end,int pivot,IntBinaryOperator sorter)
+  private static  void quickSortleftmostSinglePivot(int[] arr,int begin,int end,int pivot,IntComparator sorter)
   {
     int less=begin;
     int great=end;
@@ -2625,7 +2625,7 @@ public final class IntSortUtil
     {
       int ak;
       switch(
-      Integer.signum(sorter.applyAsInt((int)(ak=arr[k]),(int)(pivot)))
+      Integer.signum(sorter.compare((int)(ak=arr[k]),(int)(pivot)))
       )
       {
       case -1:
@@ -2639,7 +2639,7 @@ public final class IntSortUtil
         {
           int ag;
           switch(
-          Integer.signum(sorter.applyAsInt((int)(pivot),(int)(ag=arr[great])))
+          Integer.signum(sorter.compare((int)(pivot),(int)(ag=arr[great])))
           )
           {
             case 0:
@@ -2664,7 +2664,7 @@ public final class IntSortUtil
     }
     quickSort(arr,great+1,end,sorter);
   }
-  private static  void quickSortSinglePivot(int[] arr,int begin,int end,int pivot,IntBinaryOperator sorter)
+  private static  void quickSortSinglePivot(int[] arr,int begin,int end,int pivot,IntComparator sorter)
   {
     int less=begin;
     int great=end;
@@ -2672,7 +2672,7 @@ public final class IntSortUtil
     {
       int ak;
       switch(
-      Integer.signum(sorter.applyAsInt((int)(ak=arr[k]),(int)(pivot)))
+      Integer.signum(sorter.compare((int)(ak=arr[k]),(int)(pivot)))
       )
       {
       case -1:
@@ -2686,7 +2686,7 @@ public final class IntSortUtil
         {
           int ag;
           switch(
-          Integer.signum(sorter.applyAsInt((int)(pivot),(int)(ag=arr[great])))
+          Integer.signum(sorter.compare((int)(pivot),(int)(ag=arr[great])))
           )
           {
             case 0:
@@ -2899,7 +2899,7 @@ public final class IntSortUtil
     }
     quickDescendingSort(arr,great+1,end);
   }
-  private static  void merge(int[] arr,int begin,int end,int[] run,int count,IntBinaryOperator sorter)
+  private static  void merge(int[] arr,int begin,int end,int[] run,int count,IntComparator sorter)
   {
     byte odd=0;
     for(int n=1;(n<<=1)<=count;odd^=1){}
@@ -2931,7 +2931,7 @@ public final class IntSortUtil
         for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
         {
           if(q<hi && (p>=mi ||
-          sorter.applyAsInt((int)(arr[q+ao]),(int)(arr[p+ao]))<0
+          sorter.compare((int)(arr[q+ao]),(int)(arr[p+ao]))<0
           ))
           {
             b[i+bo]=arr[q++ +ao];

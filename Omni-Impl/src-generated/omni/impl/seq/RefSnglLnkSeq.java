@@ -12,16 +12,108 @@ import java.util.function.Predicate;
 import omni.util.OmniPred;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
-import omni.impl.RefSnglLnkNode;
+import omni.impl.AbstractOmniCollection;
 import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
+import java.util.Objects;
 public abstract class RefSnglLnkSeq<E> extends 
-AbstractSeq<E>
+AbstractOmniCollection<E>
  implements OmniCollection.OfRef<E>,Externalizable{
+  static final class Node<E>{
+    transient E val;
+    transient Node<E> next;
+    Node(E val){
+      this.val=val;
+    }
+    Node(E val,Node<E> next){
+      this.val=val;
+      this.next=next;
+    }
+    public static <E> void uncheckedToString(Node<E> curr,Node<E> tail,StringBuilder builder){
+      for(builder.append(curr.val);curr!=tail;builder.append(',').append(' ').append((curr=curr.next).val)){}
+    }
+    public static <E> void uncheckedToString(Node<E> curr,StringBuilder builder){
+      for(;;builder.append(',').append(' ')){
+        builder.append(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static <E> int uncheckedHashCode(Node<E> curr,Node<E> tail){
+      int hash=31+Objects.hashCode(curr.val);
+      while(curr!=tail){
+        hash=(hash*31)+Objects.hashCode((curr=curr.next).val);
+      }
+      return hash;
+    }
+    public static <E> int uncheckedHashCode(Node<E> curr){
+      int hash=31+Objects.hashCode(curr.val);
+      for(;(curr=curr.next)!=null;hash=(hash*31)+Objects.hashCode(curr.val)){}
+      return hash;
+    }
+    public static <E> void uncheckedForEach(Node<E> curr,Node<E> tail,Consumer<? super E> action){
+      for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+    }
+    public static <E> void uncheckedForEach(Node<E> curr,Consumer<? super E> action){
+      do{
+        action.accept(curr.val);
+      }while((curr=curr.next)!=null);
+    }
+    public static <E> boolean uncheckedcontainsNonNull(Node<E> curr,Node<E> tail,Object nonNull){
+      for(;!nonNull.equals(curr.val);curr=curr.next){if(curr==tail){return false;}}
+      return true;
+    }
+    public static <E> boolean uncheckedcontainsNonNull(Node<E> curr
+    ,Object nonNull
+    ){
+      for(;!nonNull.equals(curr.val);){if((curr=curr.next)==null){return false;}}
+      return true;
+    }
+    public static <E> int uncheckedsearchNonNull(Node<E> curr
+    ,Object nonNull
+    ){
+      int index=1;
+      for(;!nonNull.equals(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+      return index;
+    }
+    public static <E> boolean uncheckedcontainsNull(Node<E> curr
+    ){
+      for(;null!=(curr.val);){if((curr=curr.next)==null){return false;}}
+      return true;
+    }
+    public static <E> int uncheckedsearchNull(Node<E> curr
+    ){
+      int index=1;
+      for(;null!=(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+      return index;
+    }
+    public static <E> boolean uncheckedcontains (Node<E> curr
+    ,Predicate<? super E> pred
+    ){
+      for(;!pred.test(curr.val);){if((curr=curr.next)==null){return false;}}
+      return true;
+    }
+    public static <E> int uncheckedsearch (Node<E> curr
+    ,Predicate<? super E> pred
+    ){
+      int index=1;
+      for(;!pred.test(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+      return index;
+    }
+    public static <E> void uncheckedCopyInto(Node<E> curr,Object[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+  }
   private static final long serialVersionUID=1L;
-  transient RefSnglLnkNode<E> head;
+  transient Node<E> head;
   private RefSnglLnkSeq(Collection<? extends E> that){
     super();
     //TODO optimize
@@ -34,11 +126,11 @@ AbstractSeq<E>
   }
   private RefSnglLnkSeq(){
   }
-  private RefSnglLnkSeq(RefSnglLnkNode<E> head,int size){
+  private RefSnglLnkSeq(Node<E> head,int size){
     super(size);
     this.head=head;
   }
-  private static <E> void pullSurvivorsDown(RefSnglLnkNode<E> prev,Predicate<? super E> filter,long[] survivorSet,int numSurvivors,int numRemoved){
+  private static <E> void pullSurvivorsDown(Node<E> prev,Predicate<? super E> filter,long[] survivorSet,int numSurvivors,int numRemoved){
     int wordOffset;
     for(long word=survivorSet[wordOffset=0],marker=1L;;){
       var curr=prev.next;
@@ -65,7 +157,7 @@ AbstractSeq<E>
       prev=curr;
     }
   }
-  private static <E> int markSurvivors(RefSnglLnkNode<E> curr,Predicate<? super E> filter,long[] survivorSet){
+  private static <E> int markSurvivors(Node<E> curr,Predicate<? super E> filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -81,7 +173,7 @@ AbstractSeq<E>
       survivorSet[wordOffset++]=word;
     }
   }
-  private static <E> void pullSurvivorsDown(RefSnglLnkNode<E> prev,long word,int numSurvivors,int numRemoved){
+  private static <E> void pullSurvivorsDown(Node<E> prev,long word,int numSurvivors,int numRemoved){
     for(long marker=1L;;marker<<=1){
       var curr=prev.next;
       if((marker&word)==0){
@@ -101,7 +193,7 @@ AbstractSeq<E>
       prev=curr;
     }
   }
-  private static <E> long markSurvivors(RefSnglLnkNode<E> curr,Predicate<? super E> filter){
+  private static <E> long markSurvivors(Node<E> curr,Predicate<? super E> filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test(curr.val)){
         word|=marker;
@@ -111,9 +203,9 @@ AbstractSeq<E>
       }
     }
   }
-  private static <E> int retainSurvivors(RefSnglLnkNode<E> prev, final Predicate<? super E> filter){
+  private static <E> int retainSurvivors(Node<E> prev, final Predicate<? super E> filter){
     int numSurvivors=1;
-    outer:for(RefSnglLnkNode<E> next;(next=prev.next)!=null;++numSurvivors,prev=next){
+    outer:for(Node<E> next;(next=prev.next)!=null;++numSurvivors,prev=next){
       if(filter.test(next.val)){
         do{
           if((next=next.next)==null){
@@ -126,7 +218,7 @@ AbstractSeq<E>
     }
     return numSurvivors;
   }
-  private static <E> int retainTrailingSurvivors(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> curr,final Predicate<? super E> filter){
+  private static <E> int retainTrailingSurvivors(Node<E> prev,Node<E> curr,final Predicate<? super E> filter){
     int numSurvivors=0;
     outer:for(;;curr=curr.next){
       if(curr==null){
@@ -160,25 +252,25 @@ AbstractSeq<E>
     this.size=0;
   }
   @Override public String toString(){
-    final RefSnglLnkNode<E> head;
+    final Node<E> head;
     if((head=this.head)!=null){
       final StringBuilder builder=new StringBuilder("[");
-      RefSnglLnkNode.uncheckedToString(head,builder);
+      Node.uncheckedToString(head,builder);
       return builder.append(']').toString();
     }
     return "[]";
   }
   @Override public void forEach(Consumer<? super E> action){
-    final RefSnglLnkNode<E> head;
+    final Node<E> head;
     if((head=this.head)!=null){
-      RefSnglLnkNode.uncheckedForEach(head,action);
+      Node.uncheckedForEach(head,action);
     }
   }
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     final int size;
     T[] arr=arrConstructor.apply(size=this.size);
     if(size!=0){
-      RefSnglLnkNode.uncheckedCopyInto(head,arr);
+      Node.uncheckedCopyInto(head,arr);
     }
     return arr;
   }
@@ -188,19 +280,19 @@ AbstractSeq<E>
     return true;
   }
   @Override public <T> T[] toArray(T[] arr){
-    final RefSnglLnkNode<E> head;
+    final Node<E> head;
     if((head=this.head)!=null){
-      RefSnglLnkNode.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
+      Node.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
     }else if(arr.length!=0){
       arr[0]=null;
     }
     return arr;
   }
   @Override public Object[] toArray(){
-    final RefSnglLnkNode<E> head;
+    final Node<E> head;
     if((head=this.head)!=null){
       final Object[] dst;
-      RefSnglLnkNode.uncheckedCopyInto(head,dst=new Object[this.size]);
+      Node.uncheckedCopyInto(head,dst=new Object[this.size]);
       return dst;
     }
     return OmniArray.OfRef.DEFAULT_ARR;
@@ -208,10 +300,10 @@ AbstractSeq<E>
     @Override public boolean contains(boolean val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -220,10 +312,10 @@ AbstractSeq<E>
     @Override public boolean contains(int val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -232,10 +324,10 @@ AbstractSeq<E>
     @Override public boolean contains(long val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -244,10 +336,10 @@ AbstractSeq<E>
     @Override public boolean contains(float val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -256,10 +348,10 @@ AbstractSeq<E>
     @Override public boolean contains(double val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -268,13 +360,13 @@ AbstractSeq<E>
     @Override public boolean contains(Object val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontainsNonNull(head,val);
+              return Node.uncheckedcontainsNonNull(head,val);
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -283,10 +375,10 @@ AbstractSeq<E>
     @Override public boolean contains(byte val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -295,10 +387,10 @@ AbstractSeq<E>
     @Override public boolean contains(char val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -307,10 +399,10 @@ AbstractSeq<E>
     @Override public boolean contains(short val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -319,13 +411,13 @@ AbstractSeq<E>
     @Override public boolean contains(Boolean val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -334,13 +426,13 @@ AbstractSeq<E>
     @Override public boolean contains(Byte val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -349,13 +441,13 @@ AbstractSeq<E>
     @Override public boolean contains(Character val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((char)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -364,13 +456,13 @@ AbstractSeq<E>
     @Override public boolean contains(Short val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((short)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -379,13 +471,13 @@ AbstractSeq<E>
     @Override public boolean contains(Integer val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((int)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -394,13 +486,13 @@ AbstractSeq<E>
     @Override public boolean contains(Long val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((long)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -409,13 +501,13 @@ AbstractSeq<E>
     @Override public boolean contains(Float val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((float)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -424,13 +516,13 @@ AbstractSeq<E>
     @Override public boolean contains(Double val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((double)(val)));
+              return Node.uncheckedcontains(head,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
-            return RefSnglLnkNode.uncheckedcontainsNull(head);
+            return Node.uncheckedcontainsNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -439,7 +531,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -451,7 +543,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(int val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -463,7 +555,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(long val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -475,7 +567,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(float val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -487,7 +579,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(double val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -499,7 +591,7 @@ AbstractSeq<E>
     @Override public boolean remove(Object val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -514,7 +606,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(byte val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -526,7 +618,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(char val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -538,7 +630,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(short val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred(val));
@@ -550,7 +642,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Boolean val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -565,7 +657,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Byte val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -580,7 +672,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Character val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -595,7 +687,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Short val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -610,7 +702,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Integer val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -625,7 +717,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Long val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -640,7 +732,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Float val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -655,7 +747,7 @@ AbstractSeq<E>
     @Override public boolean removeVal(Double val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
@@ -667,24 +759,24 @@ AbstractSeq<E>
       }//end val check
       return false;
     }
-  abstract boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head,Object nonNull);
-  abstract boolean uncheckedremoveValNull(RefSnglLnkNode<E> head);
-  abstract boolean uncheckedremoveVal(RefSnglLnkNode<E> head,Predicate<? super E> pred);
+  abstract boolean uncheckedremoveValNonNull(Node<E> head,Object nonNull);
+  abstract boolean uncheckedremoveValNull(Node<E> head);
+  abstract boolean uncheckedremoveVal(Node<E> head,Predicate<? super E> pred);
   @Override public boolean removeIf(Predicate<? super E> filter){
-    final RefSnglLnkNode<E> head;
+    final Node<E> head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter);
     }
     return false;
   }
   public E peek(){
-    final RefSnglLnkNode<E> head;
+    final Node<E> head;
     if((head=this.head)!=null){
       return (E)(head.val);
     }
     return null;
   }
-  abstract boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter);
+  abstract boolean uncheckedremoveIf(Node<E> head,Predicate<? super E> filter);
   public static class CheckedStack<E> extends UncheckedStack<E>{
     private static final long serialVersionUID=1L;
     transient int modCount;
@@ -696,7 +788,7 @@ AbstractSeq<E>
     }
     public CheckedStack(){
     }
-    CheckedStack(RefSnglLnkNode<E> head,int size){
+    CheckedStack(Node<E> head,int size){
       super(head,size);
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
@@ -719,17 +811,17 @@ AbstractSeq<E>
      }
     }
     @Override public Object clone(){
-      RefSnglLnkNode<E> head;
+      Node<E> head;
       if((head=this.head)!=null){
         final CheckedStack<E> clone;
-        RefSnglLnkNode<E> newHead;
-        for(clone=new CheckedStack<E>(newHead=new RefSnglLnkNode<E>(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new RefSnglLnkNode<E>(head.val)){}
+        Node<E> newHead;
+        for(clone=new CheckedStack<E>(newHead=new Node<E>(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node<E>(head.val)){}
         return clone;
       }
       return new CheckedStack<E>();
     }
     @Override public E pop(){
-      RefSnglLnkNode<E> head;
+      Node<E> head;
       if((head=this.head)!=null){
         ++this.modCount;
         this.head=head.next;
@@ -739,12 +831,12 @@ AbstractSeq<E>
       throw new NoSuchElementException();
     }
     @Override public String toString(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          RefSnglLnkNode.uncheckedToString(head,builder);
+          Node.uncheckedToString(head,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -753,11 +845,11 @@ AbstractSeq<E>
       return "[]";
     }
     @Override public void forEach(Consumer<? super E> action){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          RefSnglLnkNode.uncheckedForEach(head,action);
+          Node.uncheckedForEach(head,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -773,7 +865,7 @@ AbstractSeq<E>
         }
       });
     }
-    private int removeIfHelper(RefSnglLnkNode<E> prev,Predicate<? super E> filter,int numLeft,int modCount){
+    private int removeIfHelper(Node<E> prev,Predicate<? super E> filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -795,7 +887,7 @@ AbstractSeq<E>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return 0;
     }
-    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
+    @Override boolean uncheckedremoveIf(Node<E> head,Predicate<? super E> filter){
       final int modCount=this.modCount;
       try{
         int numLeft=this.size;
@@ -829,7 +921,7 @@ AbstractSeq<E>
       return false;
     }
     @Override public E poll(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -839,7 +931,7 @@ AbstractSeq<E>
       }
       return null;
     }
-    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNonNull(Node<E> head
       ,Object nonNull
     ){
       final int modCount=this.modCount;
@@ -849,7 +941,7 @@ AbstractSeq<E>
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if((head=(prev=head).next)==null){
               CheckedCollection.checkModCount(modCount,this.modCount);
@@ -869,13 +961,13 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNull(Node<E> head
     ){
       {
         if(null==(head.val)){
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -888,14 +980,14 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveVal(Node<E> head
       ,Predicate<? super E> pred
     ){
       {
         if(pred.test(head.val)){
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -909,32 +1001,32 @@ AbstractSeq<E>
       return true;
     }
     @Override public int search(Object val){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return RefSnglLnkNode.uncheckedsearchNonNull(head,val);
+            return Node.uncheckedsearchNonNull(head,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return RefSnglLnkNode.uncheckedsearchNull(head);
+        return Node.uncheckedsearchNull(head);
       }
       return -1;
     }
     @Override public boolean contains(Object val){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return RefSnglLnkNode.uncheckedcontainsNonNull(head,val);
+            return Node.uncheckedcontainsNonNull(head,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return RefSnglLnkNode.uncheckedcontainsNull(head);
+        return Node.uncheckedcontainsNull(head);
       }
       return false;
     }
@@ -959,7 +1051,7 @@ AbstractSeq<E>
       }
       @Override public E next(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final RefSnglLnkNode<E> next;
+        final Node<E> next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -968,9 +1060,9 @@ AbstractSeq<E>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(final RefSnglLnkNode<E> expectedNext,Consumer<? super E> action){
+      @Override void uncheckedForEachRemaining(final Node<E> expectedNext,Consumer<? super E> action){
         final int modCount=this.modCount;
-        RefSnglLnkNode<E> prev,curr,next;
+        Node<E> prev,curr,next;
         try{
           curr=this.curr;
           next=expectedNext;
@@ -986,7 +1078,7 @@ AbstractSeq<E>
         this.next=null;
       }
       @Override public void remove(){
-        final RefSnglLnkNode<E> prev;
+        final Node<E> prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedStack<E> parent;
           int modCount;
@@ -1016,7 +1108,7 @@ AbstractSeq<E>
     }
     public UncheckedStack(){
     }
-    UncheckedStack(RefSnglLnkNode<E> head,int size){
+    UncheckedStack(Node<E> head,int size){
       super(head,size);
     }
     @SuppressWarnings("unchecked")
@@ -1026,26 +1118,26 @@ AbstractSeq<E>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        RefSnglLnkNode<E> curr;
-        for(this.head=curr=new RefSnglLnkNode<E>((E)in.readObject());--size!=0;curr=curr.next=new RefSnglLnkNode<E>((E)in.readObject())){}
+        Node<E> curr;
+        for(this.head=curr=new Node<E>((E)in.readObject());--size!=0;curr=curr.next=new Node<E>((E)in.readObject())){}
       }
     }
     @Override public void push(E val){
-      this.head=new RefSnglLnkNode<E>(val,this.head);
+      this.head=new Node<E>(val,this.head);
       ++this.size;
     }
     @Override public Object clone(){
-      RefSnglLnkNode<E> head;
+      Node<E> head;
       if((head=this.head)!=null){
         final UncheckedStack<E> clone;
-        RefSnglLnkNode<E> newHead;
-        for(clone=new UncheckedStack<E>(newHead=new RefSnglLnkNode<E>(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new RefSnglLnkNode<E>(head.val)){}
+        Node<E> newHead;
+        for(clone=new UncheckedStack<E>(newHead=new Node<E>(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node<E>(head.val)){}
         return clone;
       }
       return new UncheckedStack<E>();
     }
     @Override public E pop(){
-      RefSnglLnkNode<E> head;
+      Node<E> head;
       this.head=(head=this.head).next;
       --this.size;
       return head.val;
@@ -1053,10 +1145,10 @@ AbstractSeq<E>
     @Override public int search(boolean val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1065,10 +1157,10 @@ AbstractSeq<E>
     @Override public int search(int val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1077,10 +1169,10 @@ AbstractSeq<E>
     @Override public int search(long val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1089,10 +1181,10 @@ AbstractSeq<E>
     @Override public int search(float val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1101,10 +1193,10 @@ AbstractSeq<E>
     @Override public int search(double val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1113,13 +1205,13 @@ AbstractSeq<E>
     @Override public int search(Object val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearchNonNull(head,val);
+              return Node.uncheckedsearchNonNull(head,val);
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1128,10 +1220,10 @@ AbstractSeq<E>
     @Override public int search(byte val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1140,10 +1232,10 @@ AbstractSeq<E>
     @Override public int search(char val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1152,10 +1244,10 @@ AbstractSeq<E>
     @Override public int search(short val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
-            return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
+            return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1164,13 +1256,13 @@ AbstractSeq<E>
     @Override public int search(Boolean val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1179,13 +1271,13 @@ AbstractSeq<E>
     @Override public int search(Byte val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1194,13 +1286,13 @@ AbstractSeq<E>
     @Override public int search(Character val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((char)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1209,13 +1301,13 @@ AbstractSeq<E>
     @Override public int search(Short val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((short)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1224,13 +1316,13 @@ AbstractSeq<E>
     @Override public int search(Integer val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((int)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1239,13 +1331,13 @@ AbstractSeq<E>
     @Override public int search(Long val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((long)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1254,13 +1346,13 @@ AbstractSeq<E>
     @Override public int search(Float val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((float)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1269,20 +1361,20 @@ AbstractSeq<E>
     @Override public int search(Double val){
       {
         {
-          final RefSnglLnkNode<E> head;
+          final Node<E> head;
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefSnglLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((double)(val)));
+              return Node.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
-            return RefSnglLnkNode.uncheckedsearchNull(head);
+            return Node.uncheckedsearchNull(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
       return -1;
     }
     @Override public E poll(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -1291,7 +1383,7 @@ AbstractSeq<E>
       }
       return null;
     }
-    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
+    @Override boolean uncheckedremoveIf(Node<E> head,Predicate<? super E> filter){
       if(filter.test(head.val)){
         while((head=head.next)!=null){
           if(!filter.test(head.val)){
@@ -1304,7 +1396,7 @@ AbstractSeq<E>
         this.size=0;
         return true;
       }else{
-        RefSnglLnkNode<E> prev;
+        Node<E> prev;
         for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(filter.test(head.val)){
             this.size=numSurvivors+retainTrailingSurvivors(prev,head.next,filter);
@@ -1314,14 +1406,14 @@ AbstractSeq<E>
         return false;
       }
     }
-    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNonNull(Node<E> head
       ,Object nonNull
     ){
       {
         if(nonNull.equals(head.val)){
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -1333,13 +1425,13 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNull(Node<E> head
     ){
       {
         if(null==(head.val)){
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -1351,14 +1443,14 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveVal(Node<E> head
       ,Predicate<? super E> pred
     ){
       {
         if(pred.test(head.val)){
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -1386,7 +1478,7 @@ AbstractSeq<E>
       @Override public void remove(){
         final UncheckedStack<E> parent;
         --(parent=UncheckedStack.this).size;
-        final RefSnglLnkNode<E> prev;
+        final Node<E> prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -1408,11 +1500,11 @@ AbstractSeq<E>
     public CheckedQueue(){
       super();
     }
-    CheckedQueue(RefSnglLnkNode<E> head,int size,RefSnglLnkNode<E> tail){
+    CheckedQueue(Node<E> head,int size,Node<E> tail){
       super(head,size,tail);
     }
     @Override public E element(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         return head.val;
       }
@@ -1425,7 +1517,7 @@ AbstractSeq<E>
         final var tail=this.tail;
         out.writeInt(size=this.size);
         if(size!=0){
-          RefSnglLnkNode<E> curr;
+          Node<E> curr;
           for(curr=this.head;;curr=curr.next){
             out.writeObject(curr.val);
             if(curr==tail){
@@ -1438,12 +1530,12 @@ AbstractSeq<E>
       }
     }
     @Override public String toString(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          RefSnglLnkNode.uncheckedToString(head,tail,builder);
+          Node.uncheckedToString(head,tail,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1452,11 +1544,11 @@ AbstractSeq<E>
       return "[]";
     }
     @Override public void forEach(Consumer<? super E> action){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          RefSnglLnkNode.uncheckedForEach(head,tail,action);
+          Node.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1481,10 +1573,10 @@ AbstractSeq<E>
       }
     }
     @Override public Object clone(){
-      RefSnglLnkNode<E> head;
+      Node<E> head;
       if((head=this.head)!=null){
-        RefSnglLnkNode<E> newHead=new RefSnglLnkNode<E>(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new RefSnglLnkNode<E>((head=head.next).val)){}
+        Node<E> newHead=new Node<E>(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node<E>((head=head.next).val)){}
         return new CheckedQueue<E>(newHead,this.size,newTail);
       }
       return new CheckedQueue<E>();
@@ -1494,7 +1586,7 @@ AbstractSeq<E>
       super.push(val);
     }
     @Override public E remove(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         ++this.modCount;
         if(head==tail){
@@ -1507,7 +1599,7 @@ AbstractSeq<E>
       throw new NoSuchElementException();
     }
     @Override public E poll(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(head==this.tail){
@@ -1520,7 +1612,7 @@ AbstractSeq<E>
       }
       return null;
     }
-    private void pullSurvivorsDown(RefSnglLnkNode<E> prev,Predicate<? super E> filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node<E> prev,Predicate<? super E> filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1552,7 +1644,7 @@ AbstractSeq<E>
         prev=curr;
       }
     }
-    private void pullSurvivorsDown(RefSnglLnkNode<E> prev,long word,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node<E> prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -1576,7 +1668,7 @@ AbstractSeq<E>
         prev=curr;
       }
     }
-    private int removeIfHelper(RefSnglLnkNode<E> prev,Predicate<? super E> filter,int numLeft,int modCount){
+    private int removeIfHelper(Node<E> prev,Predicate<? super E> filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -1598,7 +1690,7 @@ AbstractSeq<E>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return 0;
     }
-    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
+    @Override boolean uncheckedremoveIf(Node<E> head,Predicate<? super E> filter){
       final int modCount=this.modCount;
       try{
         int numLeft=this.size;
@@ -1632,7 +1724,7 @@ AbstractSeq<E>
       }
       return false;
     }
-    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNonNull(Node<E> head
     ,Object nonNull
     ){
       final int modCount=this.modCount;
@@ -1646,7 +1738,7 @@ AbstractSeq<E>
           }
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if(head==tail){
               CheckedCollection.checkModCount(modCount,this.modCount);
@@ -1669,7 +1761,7 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNull(Node<E> head
     ){
       {
         final var tail=this.tail;
@@ -1679,7 +1771,7 @@ AbstractSeq<E>
           }
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if(head==tail){
               return false;
@@ -1695,7 +1787,7 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveVal(Node<E> head
     ,Predicate<? super E> pred
     ){
       {
@@ -1706,7 +1798,7 @@ AbstractSeq<E>
           }
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if(head==tail){
               return false;
@@ -1723,17 +1815,17 @@ AbstractSeq<E>
       return true;
     }
     @Override public boolean contains(Object val){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return RefSnglLnkNode.uncheckedcontainsNonNull(head,tail,val);
+            return Node.uncheckedcontainsNonNull(head,tail,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return RefSnglLnkNode.uncheckedcontainsNull(head);
+        return Node.uncheckedcontainsNull(head);
       }
       return false;
     }
@@ -1758,7 +1850,7 @@ AbstractSeq<E>
       }
       @Override public E next(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final RefSnglLnkNode<E> next;
+        final Node<E> next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -1767,9 +1859,9 @@ AbstractSeq<E>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(final RefSnglLnkNode<E> expectedNext,Consumer<? super E> action){
+      @Override void uncheckedForEachRemaining(final Node<E> expectedNext,Consumer<? super E> action){
         final int modCount=this.modCount;
-        RefSnglLnkNode<E> prev,curr,next;
+        Node<E> prev,curr,next;
         final CheckedQueue<E> parent;
         final var tail=(parent=this.parent).tail;
         try{
@@ -1788,7 +1880,7 @@ AbstractSeq<E>
         this.next=null;
       }
       @Override public void remove(){
-        final RefSnglLnkNode<E> prev;
+        final Node<E> prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedQueue<E> parent;
           int modCount;
@@ -1813,7 +1905,7 @@ AbstractSeq<E>
   }
   public static class UncheckedQueue<E> extends RefSnglLnkSeq<E> implements OmniQueue.OfRef<E>{
     private static final long serialVersionUID=1L;
-    transient RefSnglLnkNode<E> tail;
+    transient Node<E> tail;
     public UncheckedQueue(Collection<? extends E> that){
       super(that);
     }
@@ -1823,7 +1915,7 @@ AbstractSeq<E>
     public UncheckedQueue(){
       super();
     }
-    UncheckedQueue(RefSnglLnkNode<E> head,int size,RefSnglLnkNode<E> tail){
+    UncheckedQueue(Node<E> head,int size,Node<E> tail){
       super(head,size);
       this.tail=tail;
     }
@@ -1834,8 +1926,8 @@ AbstractSeq<E>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        RefSnglLnkNode<E> curr;
-        for(this.head=curr=new RefSnglLnkNode<E>((E)in.readObject());--size!=0;curr=curr.next=new RefSnglLnkNode<E>((E)in.readObject())){}
+        Node<E> curr;
+        for(this.head=curr=new Node<E>((E)in.readObject());--size!=0;curr=curr.next=new Node<E>((E)in.readObject())){}
         this.tail=curr;
       }
     }
@@ -1845,17 +1937,17 @@ AbstractSeq<E>
       this.size=0;
     }
     @Override public Object clone(){
-      RefSnglLnkNode<E> head;
+      Node<E> head;
       if((head=this.head)!=null){
-        RefSnglLnkNode<E> newHead=new RefSnglLnkNode<E>(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new RefSnglLnkNode<E>((head=head.next).val)){}
+        Node<E> newHead=new Node<E>(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node<E>((head=head.next).val)){}
         return new UncheckedQueue<E>(newHead,this.size,newTail);
       }
       return new UncheckedQueue<E>();
     }
     @Override void push(E val){
-      final var newNode=new RefSnglLnkNode<E>(val);
-      final RefSnglLnkNode<E> tail;
+      final var newNode=new Node<E>(val);
+      final Node<E> tail;
       if((tail=this.tail)!=null){
         tail.next=newNode;
       }else{
@@ -1872,7 +1964,7 @@ AbstractSeq<E>
       return true;
     }
     @Override public E remove(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)==tail){
         this.tail=null;
       }
@@ -1881,7 +1973,7 @@ AbstractSeq<E>
       return head.val;
     }
     @Override public E poll(){
-      final RefSnglLnkNode<E> head;
+      final Node<E> head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(head==this.tail){
@@ -1893,9 +1985,9 @@ AbstractSeq<E>
       }
       return null;
     }
-    private int removeIfHelper(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> tail,Predicate<? super E> filter){
+    private int removeIfHelper(Node<E> prev,Node<E> tail,Predicate<? super E> filter){
       int numSurvivors=1;
-      outer:for(RefSnglLnkNode<E> next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node<E> next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
           do{
             if(next==tail){
@@ -1910,7 +2002,7 @@ AbstractSeq<E>
       }
       return numSurvivors;
     }
-    private int removeIfHelper(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> curr,RefSnglLnkNode<E> tail,Predicate<? super E> filter){
+    private int removeIfHelper(Node<E> prev,Node<E> curr,Node<E> tail,Predicate<? super E> filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -1927,7 +2019,7 @@ AbstractSeq<E>
       this.tail=prev;
       return numSurvivors;
     }
-    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
+    @Override boolean uncheckedremoveIf(Node<E> head,Predicate<? super E> filter){
       if(filter.test(head.val)){
         for(var tail=this.tail;head!=tail;){
           if(!filter.test((head=head.next).val)){
@@ -1943,7 +2035,7 @@ AbstractSeq<E>
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final RefSnglLnkNode<E> prev;
+          final Node<E> prev;
           if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
@@ -1952,7 +2044,7 @@ AbstractSeq<E>
         return false;
       }
     }
-    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNonNull(Node<E> head
     ,Object nonNull
     ){
       {
@@ -1963,7 +2055,7 @@ AbstractSeq<E>
           }
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if(head==tail){
               return false;
@@ -1978,7 +2070,7 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveValNull(Node<E> head
     ){
       {
         final var tail=this.tail;
@@ -1988,7 +2080,7 @@ AbstractSeq<E>
           }
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if(head==tail){
               return false;
@@ -2003,7 +2095,7 @@ AbstractSeq<E>
       --this.size;
       return true;
     }
-    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
+    @Override boolean uncheckedremoveVal(Node<E> head
     ,Predicate<? super E> pred
     ){
       {
@@ -2014,7 +2106,7 @@ AbstractSeq<E>
           }
           this.head=head.next;
         }else{
-          RefSnglLnkNode<E> prev;
+          Node<E> prev;
           do{
             if(head==tail){
               return false;
@@ -2045,7 +2137,7 @@ AbstractSeq<E>
       @Override public void remove(){
         final UncheckedQueue<E> parent;
         --(parent=UncheckedQueue.this).size;
-        final RefSnglLnkNode<E> prev;
+        final Node<E> prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -2061,20 +2153,20 @@ AbstractSeq<E>
   private abstract static class AbstractItr<E>
       implements OmniIterator.OfRef<E>
   {
-    transient RefSnglLnkNode<E> prev;
-    transient RefSnglLnkNode<E> curr;
-    transient RefSnglLnkNode<E> next;
+    transient Node<E> prev;
+    transient Node<E> curr;
+    transient Node<E> next;
     AbstractItr(AbstractItr<E> itr){
       this.prev=itr.prev;
       this.curr=itr.curr;
       this.next=itr.next;
     }
-    AbstractItr(RefSnglLnkNode<E> next){
+    AbstractItr(Node<E> next){
       this.next=next; 
     }
     @Override public abstract Object clone();
     @Override public E next(){
-      final RefSnglLnkNode<E> next;
+      final Node<E> next;
       this.next=(next=this.next).next;
       this.prev=this.curr;
       this.curr=next;
@@ -2083,8 +2175,8 @@ AbstractSeq<E>
     @Override public boolean hasNext(){
       return next!=null;
     }
-    void uncheckedForEachRemaining(RefSnglLnkNode<E> next,Consumer<? super E> action){
-      RefSnglLnkNode<E> prev,curr=this.curr;
+    void uncheckedForEachRemaining(Node<E> next,Consumer<? super E> action){
+      Node<E> prev,curr=this.curr;
       do{
         action.accept(next.val);
         prev=curr;
@@ -2094,7 +2186,7 @@ AbstractSeq<E>
       this.next=null;
     }
     @Override public void forEachRemaining(Consumer<? super E> action){
-      final RefSnglLnkNode<E> next;
+      final Node<E> next;
       if((next=this.next)!=null){
         uncheckedForEachRemaining(next,action);
       }

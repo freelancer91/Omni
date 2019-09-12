@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 public class CodeGeneratorMain{
+    private static final boolean CLEAN_BUILD=false;
     private static final Pattern FQT_PATTERN
     =Pattern.compile("([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*");
     private static final Map<Path,Path> TEMPLATE_AND_SOURCE_FOLDERS=new HashMap<>();
@@ -41,7 +42,7 @@ public class CodeGeneratorMain{
                     final String fileName=file.getFileName().toString();
                     if(fileName.endsWith(".template")){
                         final Path semaphoreFile=file.resolveSibling("."+fileName+".semaphore");
-                        if(Files.exists(semaphoreFile)){
+                        if(!CLEAN_BUILD && Files.exists(semaphoreFile)){
                             final FileTime lastModified=Files.getLastModifiedTime(file);
                             final List<String> semaphoreLines=Files.readAllLines(semaphoreFile);
                             if(semaphoreLines.size()>0){

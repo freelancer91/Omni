@@ -14,8 +14,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfBoolean(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Boolean"));
-        defVars.add(new DefVar("DNode","BooleanDblLnkNode"));
-        defVars.add(new DefVar("SNode","BooleanSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","BooleanDblLnkNode"));
+        //defVars.add(new DefVar("SNode","BooleanSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Boolean"));
         defVars.add(new DefVar("TypeNameModifier","Boolean"));
@@ -38,18 +38,16 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","false"));
         defVars.add(new DefVar("hashCodeMethod","Boolean.hashCode"));
         defVars.add(new DefVar("elementMethod","booleanElement"));
-        defVars.add(new DefVar("Comparator","BooleanComparator"));
         defVars.add(new DefVar("UnaryOperator","BooleanPredicate"));
         defVars.add(new DefVar("applyMethod","test"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","boolean"));
         return defVars;
     }
     private static List<DefVar> getOfByte(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Byte"));
-        defVars.add(new DefVar("DNode","ByteDblLnkNode"));
-        defVars.add(new DefVar("SNode","ByteSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","ByteDblLnkNode"));
+        //defVars.add(new DefVar("SNode","ByteSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Byte"));
         defVars.add(new DefVar("TypeNameModifier","Byte"));
@@ -71,18 +69,16 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","Byte.MIN_VALUE"));
         defVars.add(new DefVar("hashCodeMethod",""));
         defVars.add(new DefVar("elementMethod","byteElement"));
-        defVars.add(new DefVar("Comparator","ByteComparator"));
         defVars.add(new DefVar("UnaryOperator","ByteUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsByte"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","byte"));
         return defVars;
     }
     private static List<DefVar> getOfChar(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Character"));
-        defVars.add(new DefVar("DNode","CharDblLnkNode"));
-        defVars.add(new DefVar("SNode","CharSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","CharDblLnkNode"));
+        //defVars.add(new DefVar("SNode","CharSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Character"));
         defVars.add(new DefVar("TypeNameModifier","Char"));
@@ -103,10 +99,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","Character.MIN_VALUE"));
         defVars.add(new DefVar("hashCodeMethod",""));
         defVars.add(new DefVar("elementMethod","charElement"));
-        defVars.add(new DefVar("Comparator","CharComparator"));
         defVars.add(new DefVar("UnaryOperator","CharUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsChar"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","char"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
@@ -115,8 +109,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfDouble(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Double"));
-        defVars.add(new DefVar("DNode","DoubleDblLnkNode"));
-        defVars.add(new DefVar("SNode","DoubleSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","DoubleDblLnkNode"));
+        //defVars.add(new DefVar("SNode","DoubleSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Double"));
         defVars.add(new DefVar("TypeNameModifier","Double"));
@@ -135,10 +129,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","Double.NaN"));
         defVars.add(new DefVar("hashCodeMethod","HashUtil.hashDouble"));
         defVars.add(new DefVar("elementMethod","doubleElement"));
-        defVars.add(new DefVar("Comparator","DoubleComparator"));
         defVars.add(new DefVar("UnaryOperator","DoubleUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsDouble"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","double"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","0x7ffc000000000000L"));
@@ -149,8 +141,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfFloat(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Float"));
-        defVars.add(new DefVar("DNode","FloatDblLnkNode"));
-        defVars.add(new DefVar("SNode","FloatSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","FloatDblLnkNode"));
+        //defVars.add(new DefVar("SNode","FloatSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Float"));
         defVars.add(new DefVar("TypeNameModifier","Float"));
@@ -170,10 +162,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","Float.NaN"));
         defVars.add(new DefVar("hashCodeMethod","HashUtil.hashFloat"));
         defVars.add(new DefVar("elementMethod","floatElement"));
-        defVars.add(new DefVar("Comparator","FloatComparator"));
         defVars.add(new DefVar("UnaryOperator","FloatUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsFloat"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","float"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","0x7fe00000"));
@@ -184,8 +174,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfInt(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Integer"));
-        defVars.add(new DefVar("DNode","IntDblLnkNode"));
-        defVars.add(new DefVar("SNode","IntSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","IntDblLnkNode"));
+        //defVars.add(new DefVar("SNode","IntSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Integer"));
         defVars.add(new DefVar("TypeNameModifier","Int"));
@@ -205,10 +195,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","Integer.MIN_VALUE"));
         defVars.add(new DefVar("hashCodeMethod",""));
         defVars.add(new DefVar("elementMethod","intElement"));
-        defVars.add(new DefVar("Comparator","IntBinaryOperator"));
         defVars.add(new DefVar("UnaryOperator","IntUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsInt"));
-        defVars.add(new DefVar("compareMethod","applyAsInt"));
         defVars.add(new DefVar("comparableType","int"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
@@ -217,8 +205,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfLong(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Long"));
-        defVars.add(new DefVar("DNode","LongDblLnkNode"));
-        defVars.add(new DefVar("SNode","LongSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","LongDblLnkNode"));
+        //defVars.add(new DefVar("SNode","LongSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Long"));
         defVars.add(new DefVar("TypeNameModifier","Long"));
@@ -237,10 +225,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","Long.MIN_VALUE"));
         defVars.add(new DefVar("hashCodeMethod","Long.hashCode"));
         defVars.add(new DefVar("elementMethod","longElement"));
-        defVars.add(new DefVar("Comparator","LongComparator"));
         defVars.add(new DefVar("UnaryOperator","LongUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsLong"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","long"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
@@ -248,22 +234,20 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfString(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("<E>","<String>"));
         defVars.add(new DefVar("BoxedExposed","String"));
         defVars.add(new DefVar("ArrayType","String"));
         defVars.add(new DefVar("BoxedType","String"));
-        defVars.add(new DefVar("compareMethod","compare"));
-        defVars.add(new DefVar("Comparator","Comparator"));
         defVars.add(new DefVar("TypeNameModifier",""));
         defVars.add(new DefVar("defaultVal","null"));
         return defVars;
     }
     private static List<DefVar> getOfInteger(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("<E>","<Integer>"));
         defVars.add(new DefVar("BoxedExposed","Integer"));
         defVars.add(new DefVar("ArrayType","Integer"));
         defVars.add(new DefVar("BoxedType","Integer"));
-        defVars.add(new DefVar("compareMethod","compare"));
-        defVars.add(new DefVar("Comparator","Comparator"));
         defVars.add(new DefVar("TypeNameModifier",""));
         defVars.add(new DefVar("defaultVal","null"));
         return defVars;
@@ -271,8 +255,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfRef(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","E"));
-        defVars.add(new DefVar("DNode","RefDblLnkNode"));
-        defVars.add(new DefVar("SNode","RefSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","RefDblLnkNode"));
+        //defVars.add(new DefVar("SNode","RefSnglLnkNode"));
         defVars.add(new DefVar("<E>","<E>"));
         defVars.add(new DefVar("BoxedType","E"));
         defVars.add(new DefVar("TypeNameModifier",""));
@@ -287,10 +271,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","null"));
         defVars.add(new DefVar("hashCodeMethod","Objects.hashCode"));
         defVars.add(new DefVar("elementMethod","element"));
-        defVars.add(new DefVar("Comparator","Comparator"));
         defVars.add(new DefVar("UnaryOperator","UnaryOperator"));
         defVars.add(new DefVar("applyMethod","apply"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","Comparable<E>"));
         defVars.add(new DefVar("queryParameterType","Object"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","null"));
@@ -300,8 +282,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfShort(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Short"));
-        defVars.add(new DefVar("DNode","ShortDblLnkNode"));
-        defVars.add(new DefVar("SNode","ShortSnglLnkNode"));
+        //defVars.add(new DefVar("DNode","ShortDblLnkNode"));
+        //defVars.add(new DefVar("SNode","ShortSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
         defVars.add(new DefVar("BoxedType","Short"));
         defVars.add(new DefVar("TypeNameModifier","Short"));
@@ -322,10 +304,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("defaultVal","Short.MIN_VALUE"));
         defVars.add(new DefVar("hashCodeMethod",""));
         defVars.add(new DefVar("elementMethod","shortElement"));
-        defVars.add(new DefVar("Comparator","ShortComparator"));
         defVars.add(new DefVar("UnaryOperator","ShortUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsShort"));
-        defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","short"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));

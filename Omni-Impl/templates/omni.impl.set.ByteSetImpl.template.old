@@ -1,3 +1,4 @@
+#TYPEDEF OfByte
 package omni.impl.set;
 import java.util.Collection;
 import omni.api.OmniCollection;
@@ -10,7 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import omni.api.OmniSet;
+import omni.api.OmniNavigableSet;
 import omni.api.OmniIterator;
 import omni.function.ByteConsumer;
 import omni.function.BytePredicate;
@@ -18,7 +19,7 @@ import omni.impl.AbstractByteItr;
 import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
-public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
+public class ByteSetImpl implements OmniNavigableSet.OfByte,Cloneable,Externalizable{
   private static final long serialVersionUID=1L;
   transient long word0;
   transient long word1;
@@ -39,12 +40,12 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     this.word2=that.word2;
     this.word3=that.word3;
   }
-  public ByteSetImpl(Collection<? extends Byte> that){
+  public ByteSetImpl(Collection<? extends $BoxedExposed$> that){
     super();
     //TODO optimize
     this.addAll(that);
   }
-  public ByteSetImpl(OmniCollection.OfRef<? extends Byte> that){
+  public ByteSetImpl(OmniCollection.OfRef<? extends $BoxedExposed$> that){
     super();
     //TODO optimize
     this.addAll(that);
@@ -59,7 +60,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     //TODO optimize
     this.addAll(that);
   }
-  public ByteSetImpl(OmniCollection.ByteOutput<?> that){
+  public ByteSetImpl(OmniCollection.$ClassPrefix$Output<?> that){
     super();
     //TODO optimize
     this.addAll(that);
@@ -136,21 +137,36 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
     return 0;
   }
+  /*
   private boolean isEqualTo(ByteSetImpl thatSet){
     return this.word0==thatSet.word0 && this.word1==thatSet.word1 && this.word2==thatSet.word2 && this.word3==thatSet.word3;
   }
+  */
   @Override public boolean equals(Object val){
     if(val==this){
       return true;
     }
     if(val instanceof Set){
-      if(val instanceof ByteSetImpl){
-        return isEqualTo((ByteSetImpl)val);
-      }else if(val instanceof RefOpenAddressHashSet){
-        return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
-      }else{
-        return SetCommonImpl.isEqualTo((Set<?>)val,this);
+      //TODO optimize
+      final Set<?> that;
+      if(this.size()==(that=(Set<?>)val).size()){
+        for(var thatVal:that){
+          if(!(thatVal instanceof Byte) || !this.contains((byte)thatVal)){
+            return false;
+          }
+        }
+        return true;
+      
       }
+      //if(val instanceof ByteSetImpl){
+      //  return this.isEqualTo((ByteSetImpl)val);
+      //}else if(val instanceof RefOpenAddressHashSet){
+      //  return SetCommonImpl.isEqualTo(this,(RefOpenAddressHashSet<?>)val);
+      //}else if(val instanceof OmniSet){
+      //  return this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0 && ((OmniSet<?>)val).isEmpty();
+      //}else{
+      //  return SetCommonImpl.isEqualTo(this,(Set<?>)val);
+      //}
     }
     return false;
   }
@@ -203,28 +219,31 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
     return false;
   }
+#MACRODEF WordContains(WORDNUM,MASK)
+return (this.wordWORDNUM&(MASK))!=0;
+#ENDDEF
   @Override public boolean contains(boolean val){
-    return (this.word2&(val?2L:1L))!=0;
+    #MACRO WordContains(2,val?2L:1L)
   }
   @Override public boolean contains(byte val){
     long mask=1L << val;
     switch(val >> 6){
     case -2:
-      return (this.word0&(mask))!=0;
+      #MACRO WordContains(0,mask)
     case -1:
-      return (this.word1&(mask))!=0;
+      #MACRO WordContains(1,mask)
     case 0:
-      return (this.word2&(mask))!=0;
+      #MACRO WordContains(2,mask)
     default:
-      return (this.word3&(mask))!=0;
+      #MACRO WordContains(3,mask)
     }
   }
   @Override public boolean contains(char val){
     switch(val>>6){
     case 0:
-      return (this.word2&(1L<<val))!=0;
+      #MACRO WordContains(2,1L<<val)
     case 1:
-      return (this.word3&(1L<<val))!=0;
+      #MACRO WordContains(3,1L<<val)
     default:
       return false;
     }
@@ -232,13 +251,13 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public boolean contains(int val){
     switch(val >> 6){
     case -2:
-      return (this.word0&(1L<<val))!=0;
+      #MACRO WordContains(0,1L<<val)
     case -1:
-      return (this.word1&(1L<<val))!=0;
+      #MACRO WordContains(1,1L<<val)
     case 0:
-      return (this.word2&(1L<<val))!=0;
+      #MACRO WordContains(2,1L<<val)
     case 1:
-      return (this.word3&(1L<<val))!=0;
+      #MACRO WordContains(3,1L<<val)
     default:
       return false;
     }
@@ -297,21 +316,24 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public boolean removeVal(char val){
     return uncheckedRemoveChar(val);
   }
+#MACRODEF RemoveFromWord(WORDNUM,MASK)
+return (word=this.wordWORDNUM) != (this.wordWORDNUM=word & (MASK));
+#ENDDEF
   private boolean uncheckedRemoveBoolean(boolean val) {
     long word;
-    return (word=this.word2) != (this.word2=word & (val?~2L:~1L));
+    #MACRO RemoveFromWord(2,val?~2L:~1L)
   }
   private boolean uncheckedRemoveInt(int val){
     long word;
     switch(val >> 6){
     case -2:
-      return (word=this.word0) != (this.word0=word & (~(1L<<val)));
+      #MACRO RemoveFromWord(0,~(1L<<val))
     case -1:
-      return (word=this.word1) != (this.word1=word & (~(1L<<val)));
+      #MACRO RemoveFromWord(1,~(1L<<val))
     case 0:
-      return (word=this.word2) != (this.word2=word & (~(1L<<val)));
+      #MACRO RemoveFromWord(2,~(1L<<val))
     case 1:
-      return (word=this.word3) != (this.word3=word & (~(1L<<val)));
+      #MACRO RemoveFromWord(3,~(1L<<val))
     default:
       return false;
     }
@@ -320,9 +342,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     long word;
     switch(val>>6){
     case 0:
-      return (word=this.word2) != (this.word2=word & (~(1L<<val)));
+      #MACRO RemoveFromWord(2,~(1L<<val))
     case 1:
-      return (word=this.word3) != (this.word3=word & (~(1L<<val)));
+      #MACRO RemoveFromWord(3,~(1L<<val))
     default:
       return false;
     }
@@ -348,292 +370,57 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   @Override public int size(){
     return SetCommonImpl.size(word0,word1,word2,word3);
   }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,Object[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(byte)(valBound);
-        if(dstOffset == 0){
-          break;
-        }
+ 
+  
+#MACRODEF ToArrayHelper<ARRTYPE>(CAST,DEFAULTARR,MODIFIER)
+private static int processWordCopyToArray(long word,int valOffset,int valBound,ARRTYPE[] dst,int dstOffset){
+  do{
+    if((word & 1L << --valBound) != 0L){
+      dst[--dstOffset]=CAST(valBound);
+      if(dstOffset == 0){
+        break;
       }
-    }while(valBound != valOffset);
-    return dstOffset;
-  }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,Object[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(byte)(valBound);
-              if(size == 0){
-                  break;
-              }
+    }
+  }while(valBound != valOffset);
+  return dstOffset;
+}
+private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,ARRTYPE[] arr) {
+  if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
+    if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
+      if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
+        for(int valBound=-65;;--valBound){
+          if((word0 & 1L << valBound) != 0L){
+            arr[--size]=CAST(valBound);
+            if(size == 0){
+                break;
             }
           }
         }
       }
     }
   }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,Byte[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(byte)(valBound);
-        if(dstOffset == 0){
-          break;
-        }
-      }
-    }while(valBound != valOffset);
-    return dstOffset;
+}
+#IFNOTSWITCH ARRTYPE==Object
+@Override public ARRTYPE[] toMODIFIERArray(){
+  long word0,word1,word2,word3;
+  int size;
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+      ARRTYPE[] dst;
+      toArrayHelper(word0,word1,word2,word3,size,dst=new ARRTYPE[size]);
+      return dst;
   }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,Byte[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(byte)(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  @Override public Byte[] toArray(){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-        Byte[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new Byte[size]);
-        return dst;
-    }
-    return OmniArray.OfByte.DEFAULT_BOXED_ARR;
-  }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,byte[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(byte)(valBound);
-        if(dstOffset == 0){
-          break;
-        }
-      }
-    }while(valBound != valOffset);
-    return dstOffset;
-  }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,byte[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(byte)(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  @Override public byte[] toByteArray(){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-        byte[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new byte[size]);
-        return dst;
-    }
-    return OmniArray.OfByte.DEFAULT_ARR;
-  }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,short[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(short)(valBound);
-        if(dstOffset == 0){
-          break;
-        }
-      }
-    }while(valBound != valOffset);
-    return dstOffset;
-  }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,short[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(short)(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  @Override public short[] toShortArray(){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-        short[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new short[size]);
-        return dst;
-    }
-    return OmniArray.OfShort.DEFAULT_ARR;
-  }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,int[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(valBound);
-        if(dstOffset == 0){
-          break;
-        }
-      }
-    }while(valBound != valOffset);
-    return dstOffset;
-  }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,int[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  @Override public int[] toIntArray(){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-        int[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new int[size]);
-        return dst;
-    }
-    return OmniArray.OfInt.DEFAULT_ARR;
-  }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,long[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(valBound);
-        if(dstOffset == 0){
-          break;
-        }
-      }
-    }while(valBound != valOffset);
-    return dstOffset;
-  }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,long[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  @Override public long[] toLongArray(){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-        long[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new long[size]);
-        return dst;
-    }
-    return OmniArray.OfLong.DEFAULT_ARR;
-  }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,float[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(valBound);
-        if(dstOffset == 0){
-          break;
-        }
-      }
-    }while(valBound != valOffset);
-    return dstOffset;
-  }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,float[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  @Override public float[] toFloatArray(){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-        float[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new float[size]);
-        return dst;
-    }
-    return OmniArray.OfFloat.DEFAULT_ARR;
-  }
-  private static int processWordCopyToArray(long word,int valOffset,int valBound,double[] dst,int dstOffset){
-    do{
-      if((word & 1L << --valBound) != 0L){
-        dst[--dstOffset]=(valBound);
-        if(dstOffset == 0){
-          break;
-        }
-      }
-    }while(valBound != valOffset);
-    return dstOffset;
-  }
-  private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,double[] arr) {
-    if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
-      if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
-        if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          for(int valBound=-65;;--valBound){
-            if((word0 & 1L << valBound) != 0L){
-              arr[--size]=(valBound);
-              if(size == 0){
-                  break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  @Override public double[] toDoubleArray(){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-        double[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new double[size]);
-        return dst;
-    }
-    return OmniArray.OfDouble.DEFAULT_ARR;
-  }
+  return DEFAULTARR;
+}
+#ENDIF
+#ENDDEF
+  #MACRO ToArrayHelper<Object>((byte),OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+  #MACRO ToArrayHelper<Byte>((byte),OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+  #MACRO ToArrayHelper<byte>((byte),OmniArray.OfByte.DEFAULT_ARR,Byte)
+  #MACRO ToArrayHelper<short>((short),OmniArray.OfShort.DEFAULT_ARR,Short)
+  #MACRO ToArrayHelper<int>(,OmniArray.OfInt.DEFAULT_ARR,Int)
+  #MACRO ToArrayHelper<long>(,OmniArray.OfLong.DEFAULT_ARR,Long)
+  #MACRO ToArrayHelper<float>(,OmniArray.OfFloat.DEFAULT_ARR,Float)
+  #MACRO ToArrayHelper<double>(,OmniArray.OfDouble.DEFAULT_ARR,Double)
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     long word0,word1,word2,word3;
     int size;
@@ -653,21 +440,24 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
     return dst;
   }
+#MACRODEF AddToWord(WORDNUM,MASK)
+return (word=this.wordWORDNUM) != (this.wordWORDNUM=word | (MASK));
+#ENDDEF
   @Override public boolean add(boolean val){
     long word;
-    return (word=this.word2) != (this.word2=word | (val?2L:1L));
+    #MACRO AddToWord(2,val?2L:1L)
   }
   @Override public boolean add(byte val){
     long word,mask=1L << val;
     switch(val >> 6){
     case -2:
-      return (word=this.word0) != (this.word0=word | (mask));
+      #MACRO AddToWord(0,mask)
     case -1:
-      return (word=this.word1) != (this.word1=word | (mask));
+      #MACRO AddToWord(1,mask)
     case 0:
-      return (word=this.word2) != (this.word2=word | (mask));
+      #MACRO AddToWord(2,mask)
     default:
-      return (word=this.word3) != (this.word3=word | (mask));
+      #MACRO AddToWord(3,mask)
     }
   }
   @Override public boolean add(Byte val){
@@ -700,62 +490,42 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
       }
     }
   }
-  @Override public void forEach(ByteConsumer action){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-      forEachHelper(word0,word1,word2,word3,size,action);
-    }
+  #MACRO forEach(ByteConsumer,action)
+  #MACRO forEach(Consumer<? super Byte>,action::accept)
+#MACRODEF forEach(CONSUMER,ACTION)
+@Override public void forEach(CONSUMER action){
+  long word0,word1,word2,word3;
+  int size;
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
+    forEachHelper(word0,word1,word2,word3,size,ACTION);
   }
-  @Override public void forEach(Consumer<? super Byte> action){
-    long word0,word1,word2,word3;
-    int size;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-      forEachHelper(word0,word1,word2,word3,size,action::accept);
-    }
-  }
-  private static long processWordRemoveIf(long word,int valOffset,BytePredicate filter){
-    long marker=1L;
-    for(;;){
-      if((word & marker) != 0){
-        if(filter.test((byte)valOffset)){
-          word&=~marker;
-        }
+}
+#ENDDEF
+  #MACRO removeIf(BytePredicate)
+  #MACRO removeIf(Predicate<? super Byte>)
+#MACRODEF removeIf(PREDICATE)
+private static long processWordRemoveIf(long word,int valOffset,PREDICATE filter){
+  long marker=1L;
+  for(;;){
+    if((word & marker) != 0){
+      if(filter.test((byte)valOffset)){
+        word&=~marker;
       }
-      if((marker<<=1) == 0){
-        return word;
-      }
-      ++valOffset;
     }
-  }
-  @Override public boolean removeIf(BytePredicate filter){
-    long word;
-    return (word=this.word0) != (this.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter))
-      | (word=this.word1) != (this.word1=processWordRemoveIf(word,-64,filter))
-      | (word=this.word2) != (this.word2=processWordRemoveIf(word,0,filter))
-      | (word=this.word3) != (this.word3=processWordRemoveIf(word,64,filter));
-  }
-  private static long processWordRemoveIf(long word,int valOffset,Predicate<? super Byte> filter){
-    long marker=1L;
-    for(;;){
-      if((word & marker) != 0){
-        if(filter.test((byte)valOffset)){
-          word&=~marker;
-        }
-      }
-      if((marker<<=1) == 0){
-        return word;
-      }
-      ++valOffset;
+    if((marker<<=1) == 0){
+      return word;
     }
+    ++valOffset;
   }
-  @Override public boolean removeIf(Predicate<? super Byte> filter){
-    long word;
-    return (word=this.word0) != (this.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter))
-      | (word=this.word1) != (this.word1=processWordRemoveIf(word,-64,filter))
-      | (word=this.word2) != (this.word2=processWordRemoveIf(word,0,filter))
-      | (word=this.word3) != (this.word3=processWordRemoveIf(word,64,filter));
-  }
+}
+@Override public boolean removeIf(PREDICATE filter){
+  long word;
+  return (word=this.word0) != (this.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter))
+    | (word=this.word1) != (this.word1=processWordRemoveIf(word,-64,filter))
+    | (word=this.word2) != (this.word2=processWordRemoveIf(word,0,filter))
+    | (word=this.word3) != (this.word3=processWordRemoveIf(word,64,filter));
+}
+#ENDDEF
   private static class Itr extends AbstractByteItr{
     private final ByteSetImpl root;
     private int valOffset;
@@ -816,64 +586,39 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         }
         return ret;
     }
-    private static void forEachRemainingHelper(long word,int valOffset,ByteConsumer action){
-      for(long marker=1L << valOffset;;++valOffset){
-        if((word & marker) != 0){
-          action.accept((byte)valOffset);
-        }
-        if((marker<<=1) == 0){
-          break;
-        }
-      }
+    #MACRO forEachRemaining(ByteConsumer)
+    #MACRO forEachRemaining(Consumer<? super Byte>)
+#MACRODEF forEachRemaining(CONSUMER)
+private static void forEachRemainingHelper(long word,int valOffset,CONSUMER action){
+  for(long marker=1L << valOffset;;++valOffset){
+    if((word & marker) != 0){
+      action.accept((byte)valOffset);
     }
-    @Override public void forEachRemaining(ByteConsumer action){
-      var root=this.root;
-      int valOffset;
-      switch((valOffset=this.valOffset) >> 6){
-        case -2:
-          forEachRemainingHelper(root.word0,valOffset,action);
-          valOffset=-64;
-        case -1:
-          forEachRemainingHelper(root.word1,valOffset,action);
-          valOffset=0;
-        case 0:
-          forEachRemainingHelper(root.word2,valOffset,action);
-          valOffset=64;
-        case 1:
-          forEachRemainingHelper(root.word3,valOffset,action);
-          this.valOffset=128;
-        default:
-      }
+    if((marker<<=1) == 0){
+      break;
     }
-    private static void forEachRemainingHelper(long word,int valOffset,Consumer<? super Byte> action){
-      for(long marker=1L << valOffset;;++valOffset){
-        if((word & marker) != 0){
-          action.accept((byte)valOffset);
-        }
-        if((marker<<=1) == 0){
-          break;
-        }
-      }
-    }
-    @Override public void forEachRemaining(Consumer<? super Byte> action){
-      var root=this.root;
-      int valOffset;
-      switch((valOffset=this.valOffset) >> 6){
-        case -2:
-          forEachRemainingHelper(root.word0,valOffset,action);
-          valOffset=-64;
-        case -1:
-          forEachRemainingHelper(root.word1,valOffset,action);
-          valOffset=0;
-        case 0:
-          forEachRemainingHelper(root.word2,valOffset,action);
-          valOffset=64;
-        case 1:
-          forEachRemainingHelper(root.word3,valOffset,action);
-          this.valOffset=128;
-        default:
-      }
-    }
+  }
+}
+@Override public void forEachRemaining(CONSUMER action){
+  var root=this.root;
+  int valOffset;
+  switch((valOffset=this.valOffset) >> 6){
+    case -2:
+      forEachRemainingHelper(root.word0,valOffset,action);
+      valOffset=-64;
+    case -1:
+      forEachRemainingHelper(root.word1,valOffset,action);
+      valOffset=0;
+    case 0:
+      forEachRemainingHelper(root.word2,valOffset,action);
+      valOffset=64;
+    case 1:
+      forEachRemainingHelper(root.word3,valOffset,action);
+      this.valOffset=128;
+    default:
+  }
+}
+#ENDDEF
     @Override public void remove(){
       final var root=this.root;
       long word;
@@ -912,10 +657,10 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     public Checked(){
       super();
     }
-    public Checked(Collection<? extends Byte> that){
+    public Checked(Collection<? extends $BoxedExposed$> that){
       super(that);
     }
-    public Checked(OmniCollection.OfRef<? extends Byte> that){
+    public Checked(OmniCollection.OfRef<? extends $BoxedExposed$> that){
       super(that);
     }
     public Checked(OmniCollection.OfByte that){
@@ -924,7 +669,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     public Checked(OmniCollection.OfBoolean that){
       super(that);
     }
-    public Checked(OmniCollection.ByteOutput<?> that){
+    public Checked(OmniCollection.$ClassPrefix$Output<?> that){
       super(that);
     }
     Checked(long word0,long word1,long word2,long word3){
@@ -939,6 +684,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
       super(that.word0,that.word1,that.word2,that.word3);
       this.size=that.size;
     }
+    
     @Override public Object clone() {
       return new Checked(this);
     }
@@ -969,16 +715,48 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         return true;
       }
       if(val instanceof Set){
+        //TODO optimize
+        int modCount=this.modCount;
+        try{
+          final Set<?> that;
+          if(size==(that=(Set<?>)val).size()){
+            for(var thatVal:that){
+              if(!(thatVal instanceof Byte) || !this.contains((byte)thatVal)){
+                return false;
+              }
+            }
+            return true;
+          
+          }
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        /*
+        final int size;
+        if((size=this.size)==0){
+          return ((Set<?>)val).isEmpty();
+        }
         if(val instanceof ByteSetImpl){
           return super.isEqualTo((ByteSetImpl)val);
         }else if(val instanceof RefOpenAddressHashSet){
-          return SetCommonImpl.isEqualTo((RefOpenAddressHashSet<?>)val,this);
+          final RefOpenAddressHashSet<?> roahs;
+          return size==(roahs=(RefOpenAddressHashSet<?>)val).size && SetCommonImpl.isEqualTo(size,this,roahs.table);
+        }else if(val instanceof OmniSet){
+          return this.size==0 && ((OmniSet<?>)val).isEmpty();
         }else{
-          return SetCommonImpl.isEqualTo((Set<?>)val,this);
+          final int modCount=this.modCount;
+          try{
+              return SetCommonImpl.isEqualTo(size,this,(Set<?>)val);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        
         }
+        */
       }
       return false;
     }
+   
     @Override public void readExternal(ObjectInput in) throws IOException{
       this.size=SetCommonImpl.size(word0=in.readLong(),word1=in.readLong(),word2=in.readLong(),word3=in.readLong());
     }
@@ -1038,62 +816,23 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
       }
       return false;
     }
-    @Override public boolean removeVal(boolean val){
-      if(super.uncheckedRemoveBoolean(val)) {
-        ++this.modCount;
-        --this.size;
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(byte val){
-      if(super.uncheckedRemoveByte(val)) {
-        ++this.modCount;
-        --this.size;
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(char val){
-      if(super.uncheckedRemoveChar(val)) {
-        ++this.modCount;
-        --this.size;
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(int val){
-      if(super.uncheckedRemoveInt(val)) {
-        ++this.modCount;
-        --this.size;
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(long val){
-      if(super.removeVal(val)) {
-        ++this.modCount;
-        --this.size;
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(float val){
-      if(super.removeVal(val)) {
-        ++this.modCount;
-        --this.size;
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(double val){
-      if(super.removeVal(val)) {
-        ++this.modCount;
-        --this.size;
-        return true;
-      }
-      return false;
-    }
+#MACRODEF CheckedRemoveVal(INPUTTYPE,SUPERMETHODCALL)
+@Override public boolean removeVal(INPUTTYPE val){
+  if(super.SUPERMETHODCALL(val)) {
+    ++this.modCount;
+    --this.size;
+    return true;
+  }
+  return false;
+}
+#ENDDEF
+    #MACRO CheckedRemoveVal(boolean,uncheckedRemoveBoolean)
+    #MACRO CheckedRemoveVal(byte,uncheckedRemoveByte)
+    #MACRO CheckedRemoveVal(char,uncheckedRemoveChar)
+    #MACRO CheckedRemoveVal(int,uncheckedRemoveInt)
+    #MACRO CheckedRemoveVal(long,removeVal)
+    #MACRO CheckedRemoveVal(float,removeVal)
+    #MACRO CheckedRemoveVal(double,removeVal)
     @Override public boolean isEmpty(){
       return this.size==0;
     }
@@ -1123,96 +862,63 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
       }
       return dst;
     }
-    @Override public boolean add(boolean val){
-      if(super.add(val)) {
-        ++this.modCount;
-        ++this.size;
-        return true;
-      }
-      return false;
+    #MACRO CheckedAdd(boolean)
+    #MACRO CheckedAdd(byte)
+#MACRODEF CheckedAdd(INPUTTYPE)
+@Override public boolean add(INPUTTYPE val){
+  if(super.add(val)) {
+    ++this.modCount;
+    ++this.size;
+    return true;
+  }
+  return false;
+}
+#ENDDEF
+    #MACRO CheckedforEach(ByteConsumer,action)
+    #MACRO CheckedforEach(Consumer<? super Byte>,action::accept)
+#MACRODEF CheckedforEach(CONSUMER,ACTION)
+@Override public void forEach(CONSUMER action){
+  int size;
+  if((size=this.size)!=0) {
+    int modCount=this.modCount;
+    try {
+      forEachHelper(word0,word1,word2,word3,size,ACTION);
+    }finally {
+      CheckedCollection.checkModCount(modCount,this.modCount);
     }
-    @Override public boolean add(byte val){
-      if(super.add(val)) {
-        ++this.modCount;
-        ++this.size;
-        return true;
-      }
-      return false;
+  }
+}
+#ENDDEF
+    #MACRO CheckedremoveIf(BytePredicate)
+    #MACRO CheckedremoveIf(Predicate<? super Byte>)
+#MACRODEF CheckedremoveIf(PREDICATE)
+@Override public boolean removeIf(PREDICATE filter){
+  int size;
+  if((size=this.size)!=0) {
+    int modCount=this.modCount;
+    long word,newWord0,newWord1,newWord2,newWord3;
+    int numRemoved;
+    try {
+      numRemoved=Long.bitCount((word=this.word0)^(newWord0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)))
+        +Long.bitCount((word=this.word1)^(newWord1=processWordRemoveIf(word,-64,filter)))
+        +Long.bitCount((word=this.word2)^(newWord2=processWordRemoveIf(word,0,filter)))
+        +Long.bitCount((word=this.word3)^(newWord3=processWordRemoveIf(word,64,filter)));
+    }finally {
+      CheckedCollection.checkModCount(modCount,this.modCount);
     }
-    @Override public void forEach(ByteConsumer action){
-      int size;
-      if((size=this.size)!=0) {
-        int modCount=this.modCount;
-        try {
-          forEachHelper(word0,word1,word2,word3,size,action);
-        }finally {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
+    if(numRemoved!=0) {
+      this.word0=newWord0;
+      this.word1=newWord1;
+      this.word2=newWord2;
+      this.word3=newWord3;
+      this.size=size-numRemoved;
+      this.modCount=modCount+1;
+      return true;
     }
-    @Override public void forEach(Consumer<? super Byte> action){
-      int size;
-      if((size=this.size)!=0) {
-        int modCount=this.modCount;
-        try {
-          forEachHelper(word0,word1,word2,word3,size,action::accept);
-        }finally {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-    }
-    @Override public boolean removeIf(BytePredicate filter){
-      int size;
-      if((size=this.size)!=0) {
-        int modCount=this.modCount;
-        long word,newWord0,newWord1,newWord2,newWord3;
-        int numRemoved;
-        try {
-          numRemoved=Long.bitCount((word=this.word0)^(newWord0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)))
-            +Long.bitCount((word=this.word1)^(newWord1=processWordRemoveIf(word,-64,filter)))
-            +Long.bitCount((word=this.word2)^(newWord2=processWordRemoveIf(word,0,filter)))
-            +Long.bitCount((word=this.word3)^(newWord3=processWordRemoveIf(word,64,filter)));
-        }finally {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-        if(numRemoved!=0) {
-          this.word0=newWord0;
-          this.word1=newWord1;
-          this.word2=newWord2;
-          this.word3=newWord3;
-          this.size=size-numRemoved;
-          this.modCount=modCount+1;
-          return true;
-        }
-      }
-      return false;
-    }
-    @Override public boolean removeIf(Predicate<? super Byte> filter){
-      int size;
-      if((size=this.size)!=0) {
-        int modCount=this.modCount;
-        long word,newWord0,newWord1,newWord2,newWord3;
-        int numRemoved;
-        try {
-          numRemoved=Long.bitCount((word=this.word0)^(newWord0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)))
-            +Long.bitCount((word=this.word1)^(newWord1=processWordRemoveIf(word,-64,filter)))
-            +Long.bitCount((word=this.word2)^(newWord2=processWordRemoveIf(word,0,filter)))
-            +Long.bitCount((word=this.word3)^(newWord3=processWordRemoveIf(word,64,filter)));
-        }finally {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-        if(numRemoved!=0) {
-          this.word0=newWord0;
-          this.word1=newWord1;
-          this.word2=newWord2;
-          this.word3=newWord3;
-          this.size=size-numRemoved;
-          this.modCount=modCount+1;
-          return true;
-        }
-      }
-      return false;
-    }
+  }
+  return false;
+}
+#ENDDEF
     @Override public OmniIterator.OfByte iterator(){
       return new Itr(this);
     }
@@ -1323,18 +1029,16 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
           this.valOffset=128;
           this.lastRet=lastRet;
       }
-      @Override public void forEachRemaining(ByteConsumer action){
-        int valOffset;
-        if((valOffset=this.valOffset) != 128){
-          forEachRemainingHelper(valOffset,action);
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        int valOffset;
-        if((valOffset=this.valOffset) != 128){
-          forEachRemainingHelper(valOffset,action::accept);
-        }
-      }
+      #MACRO CheckedforEachRemaining(ByteConsumer,action)
+      #MACRO CheckedforEachRemaining(Consumer<? super Byte>,action::accept)
+#MACRODEF CheckedforEachRemaining(CONSUMER,ACTION)
+@Override public void forEachRemaining(CONSUMER action){
+  int valOffset;
+  if((valOffset=this.valOffset) != 128){
+    forEachRemainingHelper(valOffset,ACTION);
+  }
+}
+#ENDDEF
       @Override public void remove(){
         int lastRet;
         if((lastRet=this.lastRet) != -129){
@@ -1365,68 +1069,23 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         throw new IllegalStateException();
       }
     }
-    @Override public Byte[] toArray(){
-      int size;
-      if((size=this.size) != 0){
-        Byte[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new Byte[size]);
-        return dst;
-      }
-      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
-    }
-    @Override public byte[] toByteArray(){
-      int size;
-      if((size=this.size) != 0){
-        byte[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new byte[size]);
-        return dst;
-      }
-      return OmniArray.OfByte.DEFAULT_ARR;
-    }
-    @Override public short[] toShortArray(){
-      int size;
-      if((size=this.size) != 0){
-        short[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new short[size]);
-        return dst;
-      }
-      return OmniArray.OfShort.DEFAULT_ARR;
-    }
-    @Override public int[] toIntArray(){
-      int size;
-      if((size=this.size) != 0){
-        int[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new int[size]);
-        return dst;
-      }
-      return OmniArray.OfInt.DEFAULT_ARR;
-    }
-    @Override public long[] toLongArray(){
-      int size;
-      if((size=this.size) != 0){
-        long[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new long[size]);
-        return dst;
-      }
-      return OmniArray.OfLong.DEFAULT_ARR;
-    }
-    @Override public float[] toFloatArray(){
-      int size;
-      if((size=this.size) != 0){
-        float[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new float[size]);
-        return dst;
-      }
-      return OmniArray.OfFloat.DEFAULT_ARR;
-    }
-    @Override public double[] toDoubleArray(){
-      int size;
-      if((size=this.size) != 0){
-        double[] dst;
-        toArrayHelper(word0,word1,word2,word3,size,dst=new double[size]);
-        return dst;
-      }
-      return OmniArray.OfDouble.DEFAULT_ARR;
-    }
+    #MACRO CheckedToArray(Byte,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+    #MACRO CheckedToArray(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
+    #MACRO CheckedToArray(short,OmniArray.OfShort.DEFAULT_ARR,Short)
+    #MACRO CheckedToArray(int,OmniArray.OfInt.DEFAULT_ARR,Int)
+    #MACRO CheckedToArray(long,OmniArray.OfLong.DEFAULT_ARR,Long)
+    #MACRO CheckedToArray(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
+    #MACRO CheckedToArray(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
+#MACRODEF CheckedToArray(ARRTYPE,DEFAULTARR,MODIFIER)
+@Override public ARRTYPE[] toMODIFIERArray(){
+  int size;
+  if((size=this.size) != 0){
+    ARRTYPE[] dst;
+    toArrayHelper(word0,word1,word2,word3,size,dst=new ARRTYPE[size]);
+    return dst;
+  }
+  return DEFAULTARR;
+}
+#ENDDEF
   }
 }

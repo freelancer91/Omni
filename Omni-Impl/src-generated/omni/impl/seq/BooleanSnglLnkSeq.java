@@ -16,16 +16,150 @@ import omni.util.TypeUtil;
 import omni.impl.AbstractBooleanItr;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
-import omni.impl.BooleanSnglLnkNode;
+import omni.impl.AbstractOmniCollection;
 import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
 public abstract class BooleanSnglLnkSeq extends 
-AbstractSeq<Boolean>
+AbstractOmniCollection<Boolean>
  implements OmniCollection.OfBoolean,Externalizable{
+  static final class Node{
+    transient boolean val;
+    transient Node next;
+    Node(boolean val){
+      this.val=val;
+    }
+    Node(boolean val,Node next){
+      this.val=val;
+      this.next=next;
+    }
+    public static  int uncheckedToString(Node curr,byte[] buffer){
+      int bufferOffset=1;
+      for(;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+        bufferOffset=ToStringUtil.getStringBoolean(curr.val,buffer,bufferOffset);
+        if((curr=curr.next)==null){
+          return bufferOffset;
+        }
+      }
+    }
+    public static  void uncheckedToString(Node curr,ToStringUtil.OmniStringBuilderByte builder){
+      for(;;builder.uncheckedAppendCommaAndSpace()){
+        builder.uncheckedAppendBoolean(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  int uncheckedHashCode(Node curr){
+      int hash=31+Boolean.hashCode(curr.val);
+      for(;(curr=curr.next)!=null;hash=(hash*31)+Boolean.hashCode(curr.val)){}
+      return hash;
+    }
+    public static  void uncheckedForEach(Node curr,Node tail,BooleanConsumer action){
+      for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+    }
+    public static  void uncheckedForEach(Node curr,BooleanConsumer action){
+      do{
+        action.accept(curr.val);
+      }while((curr=curr.next)!=null);
+    }
+    public static  boolean uncheckedcontains (Node curr
+    ,boolean val
+    ){
+      for(;val!=(curr.val);){if((curr=curr.next)==null){return false;}}
+      return true;
+    }
+    public static  int uncheckedsearch (Node curr
+    ,boolean val
+    ){
+      int index=1;
+      for(;val!=(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+      return index;
+    }
+    public static  void uncheckedCopyInto(Node curr,boolean[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,Object[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,Boolean[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,double[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=TypeUtil.castToDouble(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,float[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=TypeUtil.castToFloat(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,long[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=TypeUtil.castToLong(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,int[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(int)TypeUtil.castToByte(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,short[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=(short)TypeUtil.castToByte(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,byte[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=TypeUtil.castToByte(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    public static  void uncheckedCopyInto(Node curr,char[] dst){
+      for(int dstOffset=0;;++dstOffset){
+        dst[dstOffset]=TypeUtil.castToChar(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+  }
   private static final long serialVersionUID=1L;
-  transient BooleanSnglLnkNode head;
+  transient Node head;
   private BooleanSnglLnkSeq(Collection<? extends Boolean> that){
     super();
     //TODO optimize
@@ -43,13 +177,13 @@ AbstractSeq<Boolean>
   }
   private BooleanSnglLnkSeq(){
   }
-  private BooleanSnglLnkSeq(BooleanSnglLnkNode head,int size){
+  private BooleanSnglLnkSeq(Node head,int size){
     super(size);
     this.head=head;
   }
-  private static  int retainSurvivors(BooleanSnglLnkNode prev,final boolean retainThis){
+  private static  int retainSurvivors(Node prev,final boolean retainThis){
     int numSurvivors=1;
-    outer:for(BooleanSnglLnkNode next;(next=prev.next)!=null;++numSurvivors,prev=next){
+    outer:for(Node next;(next=prev.next)!=null;++numSurvivors,prev=next){
       if(next.val^retainThis){
         do{
           if((next=next.next)==null){
@@ -62,7 +196,7 @@ AbstractSeq<Boolean>
     }
     return numSurvivors;
   }
-  private static  int retainTrailingSurvivors(BooleanSnglLnkNode prev,BooleanSnglLnkNode curr,final boolean retainThis){
+  private static  int retainTrailingSurvivors(Node prev,Node curr,final boolean retainThis){
     int numSurvivors=0;
     outer:for(;;curr=curr.next){
       if(curr==null){
@@ -106,17 +240,17 @@ AbstractSeq<Boolean>
     this.size=0;
   }
   @Override public String toString(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
       if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
-        [size=BooleanSnglLnkNode.uncheckedToString(head,buffer)]=(byte)']';
+        [size=Node.uncheckedToString(head,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
         final ToStringUtil.OmniStringBuilderByte builder;
-        BooleanSnglLnkNode.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        Node.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
         (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
@@ -125,22 +259,22 @@ AbstractSeq<Boolean>
     return "[]";
   }
   @Override public void forEach(BooleanConsumer action){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      BooleanSnglLnkNode.uncheckedForEach(head,action);
+      Node.uncheckedForEach(head,action);
     }
   }
   @Override public void forEach(Consumer<? super Boolean> action){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      BooleanSnglLnkNode.uncheckedForEach(head,action::accept);
+      Node.uncheckedForEach(head,action::accept);
     }
   }
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     final int size;
     T[] arr=arrConstructor.apply(size=this.size);
     if(size!=0){
-      BooleanSnglLnkNode.uncheckedCopyInto(head,arr);
+      Node.uncheckedCopyInto(head,arr);
     }
     return arr;
   }
@@ -157,91 +291,91 @@ AbstractSeq<Boolean>
     return true;
   }
   @Override public <T> T[] toArray(T[] arr){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      BooleanSnglLnkNode.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
+      Node.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
     }else if(arr.length!=0){
       arr[0]=null;
     }
     return arr;
   }
   @Override public boolean[] toBooleanArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final boolean[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new boolean[this.size]);
+      Node.uncheckedCopyInto(head,dst=new boolean[this.size]);
       return dst;
     }
     return OmniArray.OfBoolean.DEFAULT_ARR;
   }
   @Override public Boolean[] toArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final Boolean[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new Boolean[this.size]);
+      Node.uncheckedCopyInto(head,dst=new Boolean[this.size]);
       return dst;
     }
     return OmniArray.OfBoolean.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final double[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new double[this.size]);
+      Node.uncheckedCopyInto(head,dst=new double[this.size]);
       return dst;
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
   @Override public float[] toFloatArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final float[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new float[this.size]);
+      Node.uncheckedCopyInto(head,dst=new float[this.size]);
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
   @Override public long[] toLongArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final long[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new long[this.size]);
+      Node.uncheckedCopyInto(head,dst=new long[this.size]);
       return dst;
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
   @Override public int[] toIntArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final int[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new int[this.size]);
+      Node.uncheckedCopyInto(head,dst=new int[this.size]);
       return dst;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
   }
   @Override public short[] toShortArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final short[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new short[this.size]);
+      Node.uncheckedCopyInto(head,dst=new short[this.size]);
       return dst;
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
   @Override public byte[] toByteArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final byte[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new byte[this.size]);
+      Node.uncheckedCopyInto(head,dst=new byte[this.size]);
       return dst;
     }
     return OmniArray.OfByte.DEFAULT_ARR;
   }
   @Override public char[] toCharArray(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       final char[] dst;
-      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new char[this.size]);
+      Node.uncheckedCopyInto(head,dst=new char[this.size]);
       return dst;
     }
     return OmniArray.OfChar.DEFAULT_ARR;
@@ -249,10 +383,10 @@ AbstractSeq<Boolean>
     @Override public boolean contains(boolean val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return BooleanSnglLnkNode.uncheckedcontains(head,(val));
+            return Node.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -261,7 +395,7 @@ AbstractSeq<Boolean>
     @Override public boolean contains(int val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -275,7 +409,7 @@ AbstractSeq<Boolean>
               case 1:
                 v=true;
               }
-              return BooleanSnglLnkNode.uncheckedcontains(head,v);
+              return Node.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -285,7 +419,7 @@ AbstractSeq<Boolean>
     @Override public boolean contains(long val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -297,7 +431,7 @@ AbstractSeq<Boolean>
               }else{
                 break returnFalse;
               }
-              return BooleanSnglLnkNode.uncheckedcontains(head,v);
+              return Node.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -307,7 +441,7 @@ AbstractSeq<Boolean>
     @Override public boolean contains(float val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -322,7 +456,7 @@ AbstractSeq<Boolean>
                 case TypeUtil.FLT_TRUE_BITS:
                   v=true;
               }
-              return BooleanSnglLnkNode.uncheckedcontains(head,v);
+              return Node.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -332,7 +466,7 @@ AbstractSeq<Boolean>
     @Override public boolean contains(double val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -345,7 +479,7 @@ AbstractSeq<Boolean>
               }else{
                 break returnFalse;
               }
-              return BooleanSnglLnkNode.uncheckedcontains(head,v);
+              return Node.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -355,7 +489,7 @@ AbstractSeq<Boolean>
     @Override public boolean contains(Object val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -415,7 +549,7 @@ AbstractSeq<Boolean>
               }else{
                 break returnFalse;
               }
-              return BooleanSnglLnkNode.uncheckedcontains(head,b);
+              return Node.uncheckedcontains(head,b);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -425,7 +559,7 @@ AbstractSeq<Boolean>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -437,7 +571,7 @@ AbstractSeq<Boolean>
     @Override public boolean removeVal(int val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -461,7 +595,7 @@ AbstractSeq<Boolean>
     @Override public boolean removeVal(long val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -483,7 +617,7 @@ AbstractSeq<Boolean>
     @Override public boolean removeVal(float val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -508,7 +642,7 @@ AbstractSeq<Boolean>
     @Override public boolean removeVal(double val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -531,7 +665,7 @@ AbstractSeq<Boolean>
     @Override public boolean remove(Object val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -598,85 +732,85 @@ AbstractSeq<Boolean>
       }//end val check
       return false;
     }
-  abstract boolean uncheckedremoveVal(BooleanSnglLnkNode head,boolean val);
+  abstract boolean uncheckedremoveVal(Node head,boolean val);
   @Override public boolean removeIf(BooleanPredicate filter){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter);
     }
     return false;
   }
   @Override public boolean removeIf(Predicate<? super Boolean> filter){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter::test);
     }
     return false;
   }
   public boolean peekBoolean(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (boolean)(head.val);
     }
     return false;
   }
   public Boolean peek(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (Boolean)(head.val);
     }
     return null;
   }
   public double peekDouble(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return TypeUtil.castToDouble(head.val);
     }
     return Double.NaN;
   }
   public float peekFloat(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return TypeUtil.castToFloat(head.val);
     }
     return Float.NaN;
   }
   public long peekLong(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return TypeUtil.castToLong(head.val);
     }
     return Long.MIN_VALUE;
   }
   public int peekInt(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (int)TypeUtil.castToByte(head.val);
     }
     return Integer.MIN_VALUE;
   }
   public short peekShort(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return (short)TypeUtil.castToByte(head.val);
     }
     return Short.MIN_VALUE;
   }
   public byte peekByte(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return TypeUtil.castToByte(head.val);
     }
     return Byte.MIN_VALUE;
   }
   public char peekChar(){
-    final BooleanSnglLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       return TypeUtil.castToChar(head.val);
     }
     return Character.MIN_VALUE;
   }
-  abstract boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter);
+  abstract boolean uncheckedremoveIf(Node head,BooleanPredicate filter);
   public static class CheckedStack extends UncheckedStack{
     private static final long serialVersionUID=1L;
     transient int modCount;
@@ -691,7 +825,7 @@ AbstractSeq<Boolean>
     }
     public CheckedStack(){
     }
-    CheckedStack(BooleanSnglLnkNode head,int size){
+    CheckedStack(Node head,int size){
       super(head,size);
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
@@ -714,17 +848,17 @@ AbstractSeq<Boolean>
      }
     }
     @Override public Object clone(){
-      BooleanSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final CheckedStack clone;
-        BooleanSnglLnkNode newHead;
-        for(clone=new CheckedStack(newHead=new BooleanSnglLnkNode(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new BooleanSnglLnkNode(head.val)){}
+        Node newHead;
+        for(clone=new CheckedStack(newHead=new Node(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
         return clone;
       }
       return new CheckedStack();
     }
     @Override public boolean popBoolean(){
-      BooleanSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         this.head=head.next;
@@ -734,22 +868,22 @@ AbstractSeq<Boolean>
       throw new NoSuchElementException();
     }
     @Override public void forEach(BooleanConsumer action){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          BooleanSnglLnkNode.uncheckedForEach(head,action);
+          Node.uncheckedForEach(head,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void forEach(Consumer<? super Boolean> action){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          BooleanSnglLnkNode.uncheckedForEach(head,action::accept);
+          Node.uncheckedForEach(head,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -765,7 +899,7 @@ AbstractSeq<Boolean>
         }
       });
     }
-    @Override boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,BooleanPredicate filter){
       final int modCount=this.modCount;
       try{
         boolean firstVal;
@@ -788,7 +922,7 @@ AbstractSeq<Boolean>
           this.size=0;
           return true;
         }else{
-          BooleanSnglLnkNode prev;
+          Node prev;
           for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
             if(head.val^firstVal){
               if(filter.test(!firstVal)){
@@ -810,7 +944,7 @@ AbstractSeq<Boolean>
       return false;
     }
     @Override public boolean pollBoolean(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -821,7 +955,7 @@ AbstractSeq<Boolean>
       return false;
     }
     @Override public Boolean poll(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Boolean)(head.val);
         this.head=head.next;
@@ -832,7 +966,7 @@ AbstractSeq<Boolean>
       return null;
     }
     @Override public double pollDouble(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToDouble(head.val);
         this.head=head.next;
@@ -843,7 +977,7 @@ AbstractSeq<Boolean>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToFloat(head.val);
         this.head=head.next;
@@ -854,7 +988,7 @@ AbstractSeq<Boolean>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToLong(head.val);
         this.head=head.next;
@@ -865,7 +999,7 @@ AbstractSeq<Boolean>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -876,7 +1010,7 @@ AbstractSeq<Boolean>
       return Integer.MIN_VALUE;
     }
     @Override public short pollShort(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(short)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -887,7 +1021,7 @@ AbstractSeq<Boolean>
       return Short.MIN_VALUE;
     }
     @Override public byte pollByte(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -898,7 +1032,7 @@ AbstractSeq<Boolean>
       return Byte.MIN_VALUE;
     }
     @Override public char pollChar(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToChar(head.val);
         this.head=head.next;
@@ -908,14 +1042,14 @@ AbstractSeq<Boolean>
       }
       return Character.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveVal(BooleanSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
       ,boolean val
     ){
       {
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          BooleanSnglLnkNode prev;
+          Node prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -949,7 +1083,7 @@ AbstractSeq<Boolean>
       }
       @Override public boolean nextBoolean(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final BooleanSnglLnkNode next;
+        final Node next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -958,9 +1092,9 @@ AbstractSeq<Boolean>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(final BooleanSnglLnkNode expectedNext,BooleanConsumer action){
+      @Override void uncheckedForEachRemaining(final Node expectedNext,BooleanConsumer action){
         final int modCount=this.modCount;
-        BooleanSnglLnkNode prev,curr,next;
+        Node prev,curr,next;
         try{
           curr=this.curr;
           next=expectedNext;
@@ -976,7 +1110,7 @@ AbstractSeq<Boolean>
         this.next=null;
       }
       @Override public void remove(){
-        final BooleanSnglLnkNode prev;
+        final Node prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedStack parent;
           int modCount;
@@ -1009,7 +1143,7 @@ AbstractSeq<Boolean>
     }
     public UncheckedStack(){
     }
-    UncheckedStack(BooleanSnglLnkNode head,int size){
+    UncheckedStack(Node head,int size){
       super(head,size);
     }
     @Override public void readExternal(ObjectInput in) throws IOException
@@ -1017,9 +1151,9 @@ AbstractSeq<Boolean>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        BooleanSnglLnkNode curr;
+        Node curr;
         int word,marker;
-        for(this.head=curr=new BooleanSnglLnkNode(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new BooleanSnglLnkNode((word&marker)!=0)){
+        for(this.head=curr=new Node(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new Node((word&marker)!=0)){
           if((marker<<=1)==(1<<8)){
             word=in.readUnsignedByte();
             marker=1;
@@ -1028,21 +1162,21 @@ AbstractSeq<Boolean>
       }
     }
     @Override public void push(boolean val){
-      this.head=new BooleanSnglLnkNode(val,this.head);
+      this.head=new Node(val,this.head);
       ++this.size;
     }
     @Override public Object clone(){
-      BooleanSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final UncheckedStack clone;
-        BooleanSnglLnkNode newHead;
-        for(clone=new UncheckedStack(newHead=new BooleanSnglLnkNode(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new BooleanSnglLnkNode(head.val)){}
+        Node newHead;
+        for(clone=new UncheckedStack(newHead=new Node(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
         return clone;
       }
       return new UncheckedStack();
     }
     @Override public boolean popBoolean(){
-      BooleanSnglLnkNode head;
+      Node head;
       this.head=(head=this.head).next;
       --this.size;
       return head.val;
@@ -1050,10 +1184,10 @@ AbstractSeq<Boolean>
     @Override public int search(boolean val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return BooleanSnglLnkNode.uncheckedsearch(head,(val));
+            return Node.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1062,7 +1196,7 @@ AbstractSeq<Boolean>
     @Override public int search(int val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -1076,7 +1210,7 @@ AbstractSeq<Boolean>
               case 1:
                 v=true;
               }
-              return BooleanSnglLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1086,7 +1220,7 @@ AbstractSeq<Boolean>
     @Override public int search(long val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -1098,7 +1232,7 @@ AbstractSeq<Boolean>
               }else{
                 break returnFalse;
               }
-              return BooleanSnglLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1108,7 +1242,7 @@ AbstractSeq<Boolean>
     @Override public int search(float val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -1123,7 +1257,7 @@ AbstractSeq<Boolean>
                 case TypeUtil.FLT_TRUE_BITS:
                   v=true;
               }
-              return BooleanSnglLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1133,7 +1267,7 @@ AbstractSeq<Boolean>
     @Override public int search(double val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;){
@@ -1146,7 +1280,7 @@ AbstractSeq<Boolean>
               }else{
                 break returnFalse;
               }
-              return BooleanSnglLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1156,7 +1290,7 @@ AbstractSeq<Boolean>
     @Override public int search(Object val){
       {
         {
-          final BooleanSnglLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -1216,7 +1350,7 @@ AbstractSeq<Boolean>
               }else{
                 break returnFalse;
               }
-              return BooleanSnglLnkNode.uncheckedsearch(head,b);
+              return Node.uncheckedsearch(head,b);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1224,7 +1358,7 @@ AbstractSeq<Boolean>
       return -1;
     }
     @Override public boolean pollBoolean(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -1237,7 +1371,7 @@ AbstractSeq<Boolean>
       return popBoolean();
     }
     @Override public Boolean poll(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Boolean)(head.val);
         this.head=head.next;
@@ -1247,7 +1381,7 @@ AbstractSeq<Boolean>
       return null;
     }
     @Override public double pollDouble(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToDouble(head.val);
         this.head=head.next;
@@ -1257,7 +1391,7 @@ AbstractSeq<Boolean>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToFloat(head.val);
         this.head=head.next;
@@ -1267,7 +1401,7 @@ AbstractSeq<Boolean>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToLong(head.val);
         this.head=head.next;
@@ -1277,7 +1411,7 @@ AbstractSeq<Boolean>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -1287,7 +1421,7 @@ AbstractSeq<Boolean>
       return Integer.MIN_VALUE;
     }
     @Override public short pollShort(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(short)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -1297,7 +1431,7 @@ AbstractSeq<Boolean>
       return Short.MIN_VALUE;
     }
     @Override public byte pollByte(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -1307,7 +1441,7 @@ AbstractSeq<Boolean>
       return Byte.MIN_VALUE;
     }
     @Override public char pollChar(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToChar(head.val);
         this.head=head.next;
@@ -1316,7 +1450,7 @@ AbstractSeq<Boolean>
       }
       return Character.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,BooleanPredicate filter){
       boolean firstVal;
       if(filter.test(firstVal=head.val)){
         while((head=head.next)!=null){
@@ -1333,7 +1467,7 @@ AbstractSeq<Boolean>
         this.size=0;
         return true;
       }else{
-        BooleanSnglLnkNode prev;
+        Node prev;
         for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(head.val^firstVal){
             if(filter.test(!firstVal)){
@@ -1346,14 +1480,14 @@ AbstractSeq<Boolean>
         return false;
       }
     }
-    @Override boolean uncheckedremoveVal(BooleanSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
       ,boolean val
     ){
       {
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          BooleanSnglLnkNode prev;
+          Node prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
@@ -1381,7 +1515,7 @@ AbstractSeq<Boolean>
       @Override public void remove(){
         final UncheckedStack parent;
         --(parent=UncheckedStack.this).size;
-        final BooleanSnglLnkNode prev;
+        final Node prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -1406,11 +1540,11 @@ AbstractSeq<Boolean>
     public CheckedQueue(){
       super();
     }
-    CheckedQueue(BooleanSnglLnkNode head,int size,BooleanSnglLnkNode tail){
+    CheckedQueue(Node head,int size,Node tail){
       super(head,size,tail);
     }
     @Override public boolean booleanElement(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return head.val;
       }
@@ -1423,7 +1557,7 @@ AbstractSeq<Boolean>
         final var tail=this.tail;
         out.writeInt(size=this.size);
         if(size!=0){
-          BooleanSnglLnkNode curr;
+          Node curr;
           for(int word=TypeUtil.castToByte((curr=this.head).val),marker=1;;){
             if(curr==tail){
               out.writeByte(word);
@@ -1443,22 +1577,22 @@ AbstractSeq<Boolean>
       }
     }
     @Override public void forEach(BooleanConsumer action){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          BooleanSnglLnkNode.uncheckedForEach(head,tail,action);
+          Node.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void forEach(Consumer<? super Boolean> action){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          BooleanSnglLnkNode.uncheckedForEach(head,tail,action::accept);
+          Node.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1483,10 +1617,10 @@ AbstractSeq<Boolean>
       }
     }
     @Override public Object clone(){
-      BooleanSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
-        BooleanSnglLnkNode newHead=new BooleanSnglLnkNode(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new BooleanSnglLnkNode((head=head.next).val)){}
+        Node newHead=new Node(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node((head=head.next).val)){}
         return new CheckedQueue(newHead,this.size,newTail);
       }
       return new CheckedQueue();
@@ -1496,7 +1630,7 @@ AbstractSeq<Boolean>
       super.push(val);
     }
     @Override public boolean removeBoolean(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         if(head==tail){
@@ -1509,7 +1643,7 @@ AbstractSeq<Boolean>
       throw new NoSuchElementException();
     }
     @Override public boolean pollBoolean(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(head==this.tail){
@@ -1523,7 +1657,7 @@ AbstractSeq<Boolean>
       return false;
     }
     @Override public Boolean poll(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Boolean)(head.val);
         if(head==this.tail){
@@ -1537,7 +1671,7 @@ AbstractSeq<Boolean>
       return null;
     }
     @Override public double pollDouble(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToDouble(head.val);
         if(head==this.tail){
@@ -1551,7 +1685,7 @@ AbstractSeq<Boolean>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToFloat(head.val);
         if(head==this.tail){
@@ -1565,7 +1699,7 @@ AbstractSeq<Boolean>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToLong(head.val);
         if(head==this.tail){
@@ -1579,7 +1713,7 @@ AbstractSeq<Boolean>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)TypeUtil.castToByte(head.val);
         if(head==this.tail){
@@ -1593,7 +1727,7 @@ AbstractSeq<Boolean>
       return Integer.MIN_VALUE;
     }
     @Override public short pollShort(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(short)TypeUtil.castToByte(head.val);
         if(head==this.tail){
@@ -1607,7 +1741,7 @@ AbstractSeq<Boolean>
       return Short.MIN_VALUE;
     }
     @Override public byte pollByte(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToByte(head.val);
         if(head==this.tail){
@@ -1621,7 +1755,7 @@ AbstractSeq<Boolean>
       return Byte.MIN_VALUE;
     }
     @Override public char pollChar(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToChar(head.val);
         if(head==this.tail){
@@ -1634,9 +1768,9 @@ AbstractSeq<Boolean>
       }
       return Character.MIN_VALUE;
     }
-    private int removeIfHelper(BooleanSnglLnkNode prev,BooleanSnglLnkNode tail,boolean retainThis){
+    private int removeIfHelper(Node prev,Node tail,boolean retainThis){
       int numSurvivors=1;
-      outer:for(BooleanSnglLnkNode next;prev!=tail;prev=next,++numSurvivors){
+      outer:for(Node next;prev!=tail;prev=next,++numSurvivors){
         if((next=prev.next).val^retainThis){
           do{
             if(next==tail){
@@ -1650,7 +1784,7 @@ AbstractSeq<Boolean>
       }
       return numSurvivors;
     }
-    private int removeIfHelper(BooleanSnglLnkNode prev,BooleanSnglLnkNode head,BooleanSnglLnkNode tail,boolean retainThis){
+    private int removeIfHelper(Node prev,Node head,Node tail,boolean retainThis){
       int numSurvivors=0;
       outer:for(;;){
         if(head==tail){
@@ -1671,7 +1805,7 @@ AbstractSeq<Boolean>
       }
       return numSurvivors;
     }
-    @Override boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,BooleanPredicate filter){
       final int modCount=this.modCount;
       try{
         final var tail=this.tail;
@@ -1697,7 +1831,7 @@ AbstractSeq<Boolean>
           return true;
         }else{
           for(int numSurvivors=1;head!=tail;++numSurvivors){
-            BooleanSnglLnkNode prev;
+            Node prev;
             if((head=(prev=head).next).val^firstVal){
               if(filter.test(!firstVal)){
                 CheckedCollection.checkModCount(modCount,this.modCount);
@@ -1717,7 +1851,7 @@ AbstractSeq<Boolean>
       }
       return false;
     }
-    @Override boolean uncheckedremoveVal(BooleanSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
     ,boolean val
     ){
       {
@@ -1728,7 +1862,7 @@ AbstractSeq<Boolean>
           }
           this.head=head.next;
         }else{
-          BooleanSnglLnkNode prev;
+          Node prev;
           do{
             if(head==tail){
               return false;
@@ -1765,7 +1899,7 @@ AbstractSeq<Boolean>
       }
       @Override public boolean nextBoolean(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final BooleanSnglLnkNode next;
+        final Node next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -1774,9 +1908,9 @@ AbstractSeq<Boolean>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(final BooleanSnglLnkNode expectedNext,BooleanConsumer action){
+      @Override void uncheckedForEachRemaining(final Node expectedNext,BooleanConsumer action){
         final int modCount=this.modCount;
-        BooleanSnglLnkNode prev,curr,next;
+        Node prev,curr,next;
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
@@ -1795,7 +1929,7 @@ AbstractSeq<Boolean>
         this.next=null;
       }
       @Override public void remove(){
-        final BooleanSnglLnkNode prev;
+        final Node prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedQueue parent;
           int modCount;
@@ -1820,7 +1954,7 @@ AbstractSeq<Boolean>
   }
   public static class UncheckedQueue extends BooleanSnglLnkSeq implements OmniQueue.OfBoolean{
     private static final long serialVersionUID=1L;
-    transient BooleanSnglLnkNode tail;
+    transient Node tail;
     public UncheckedQueue(Collection<? extends Boolean> that){
       super(that);
     }
@@ -1833,7 +1967,7 @@ AbstractSeq<Boolean>
     public UncheckedQueue(){
       super();
     }
-    UncheckedQueue(BooleanSnglLnkNode head,int size,BooleanSnglLnkNode tail){
+    UncheckedQueue(Node head,int size,Node tail){
       super(head,size);
       this.tail=tail;
     }
@@ -1842,9 +1976,9 @@ AbstractSeq<Boolean>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        BooleanSnglLnkNode curr;
+        Node curr;
         int word,marker;
-        for(this.head=curr=new BooleanSnglLnkNode(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new BooleanSnglLnkNode((word&marker)!=0)){
+        for(this.head=curr=new Node(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new Node((word&marker)!=0)){
           if((marker<<=1)==(1<<8)){
             word=in.readUnsignedByte();
             marker=1;
@@ -1859,17 +1993,17 @@ AbstractSeq<Boolean>
       this.size=0;
     }
     @Override public Object clone(){
-      BooleanSnglLnkNode head;
+      Node head;
       if((head=this.head)!=null){
-        BooleanSnglLnkNode newHead=new BooleanSnglLnkNode(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new BooleanSnglLnkNode((head=head.next).val)){}
+        Node newHead=new Node(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node((head=head.next).val)){}
         return new UncheckedQueue(newHead,this.size,newTail);
       }
       return new UncheckedQueue();
     }
     @Override void push(boolean val){
-      final var newNode=new BooleanSnglLnkNode(val);
-      final BooleanSnglLnkNode tail;
+      final var newNode=new Node(val);
+      final Node tail;
       if((tail=this.tail)!=null){
         tail.next=newNode;
       }else{
@@ -1886,7 +2020,7 @@ AbstractSeq<Boolean>
       return true;
     }
     @Override public boolean removeBoolean(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)==tail){
         this.tail=null;
       }
@@ -1895,7 +2029,7 @@ AbstractSeq<Boolean>
       return head.val;
     }
     @Override public boolean pollBoolean(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(head==this.tail){
@@ -1918,7 +2052,7 @@ AbstractSeq<Boolean>
       return true;
     }
     @Override public Boolean poll(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(Boolean)(head.val);
         if(head==this.tail){
@@ -1931,7 +2065,7 @@ AbstractSeq<Boolean>
       return null;
     }
     @Override public double pollDouble(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToDouble(head.val);
         if(head==this.tail){
@@ -1944,7 +2078,7 @@ AbstractSeq<Boolean>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToFloat(head.val);
         if(head==this.tail){
@@ -1957,7 +2091,7 @@ AbstractSeq<Boolean>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToLong(head.val);
         if(head==this.tail){
@@ -1970,7 +2104,7 @@ AbstractSeq<Boolean>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(int)TypeUtil.castToByte(head.val);
         if(head==this.tail){
@@ -1983,7 +2117,7 @@ AbstractSeq<Boolean>
       return Integer.MIN_VALUE;
     }
     @Override public short pollShort(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=(short)TypeUtil.castToByte(head.val);
         if(head==this.tail){
@@ -1996,7 +2130,7 @@ AbstractSeq<Boolean>
       return Short.MIN_VALUE;
     }
     @Override public byte pollByte(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToByte(head.val);
         if(head==this.tail){
@@ -2009,7 +2143,7 @@ AbstractSeq<Boolean>
       return Byte.MIN_VALUE;
     }
     @Override public char pollChar(){
-      final BooleanSnglLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToChar(head.val);
         if(head==this.tail){
@@ -2021,9 +2155,9 @@ AbstractSeq<Boolean>
       }
       return Character.MIN_VALUE;
     }
-    private int removeIfHelper(BooleanSnglLnkNode prev,BooleanSnglLnkNode tail,boolean retainThis){
+    private int removeIfHelper(Node prev,Node tail,boolean retainThis){
       int numSurvivors=1;
-      outer:for(BooleanSnglLnkNode next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node next;prev!=tail;++numSurvivors,prev=next){
         if((next=prev.next).val^retainThis){
           do{
             if(next==tail){
@@ -2038,7 +2172,7 @@ AbstractSeq<Boolean>
       }
       return numSurvivors;
     }
-    private int removeIfHelper(BooleanSnglLnkNode prev,BooleanSnglLnkNode curr,BooleanSnglLnkNode tail,boolean retainThis){
+    private int removeIfHelper(Node prev,Node curr,Node tail,boolean retainThis){
       int numSurvivors=0;
       while(curr!=tail) {
         if((curr=curr.next).val==retainThis){
@@ -2055,7 +2189,7 @@ AbstractSeq<Boolean>
       this.tail=prev;
       return numSurvivors;
     }
-    @Override boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter){
+    @Override boolean uncheckedremoveIf(Node head,BooleanPredicate filter){
       boolean firstVal;
       if(filter.test(firstVal=head.val)){
         for(var tail=this.tail;head!=tail;){
@@ -2075,7 +2209,7 @@ AbstractSeq<Boolean>
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final BooleanSnglLnkNode prev;
+          final Node prev;
           if((head=(prev=head).next).val^firstVal){
             if(filter.test(!firstVal)){
               this.size=numSurvivors+removeIfHelper(prev,head,tail,firstVal);
@@ -2087,7 +2221,7 @@ AbstractSeq<Boolean>
         return false;
       }
     }
-    @Override boolean uncheckedremoveVal(BooleanSnglLnkNode head
+    @Override boolean uncheckedremoveVal(Node head
     ,boolean val
     ){
       {
@@ -2098,7 +2232,7 @@ AbstractSeq<Boolean>
           }
           this.head=head.next;
         }else{
-          BooleanSnglLnkNode prev;
+          Node prev;
           do{
             if(head==tail){
               return false;
@@ -2129,7 +2263,7 @@ AbstractSeq<Boolean>
       @Override public void remove(){
         final UncheckedQueue parent;
         --(parent=UncheckedQueue.this).size;
-        final BooleanSnglLnkNode prev;
+        final Node prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -2145,19 +2279,19 @@ AbstractSeq<Boolean>
   private abstract static class AbstractItr
       extends AbstractBooleanItr
   {
-    transient BooleanSnglLnkNode prev;
-    transient BooleanSnglLnkNode curr;
-    transient BooleanSnglLnkNode next;
+    transient Node prev;
+    transient Node curr;
+    transient Node next;
     AbstractItr(AbstractItr itr){
       this.prev=itr.prev;
       this.curr=itr.curr;
       this.next=itr.next;
     }
-    AbstractItr(BooleanSnglLnkNode next){
+    AbstractItr(Node next){
       this.next=next; 
     }
     @Override public boolean nextBoolean(){
-      final BooleanSnglLnkNode next;
+      final Node next;
       this.next=(next=this.next).next;
       this.prev=this.curr;
       this.curr=next;
@@ -2166,8 +2300,8 @@ AbstractSeq<Boolean>
     @Override public boolean hasNext(){
       return next!=null;
     }
-    void uncheckedForEachRemaining(BooleanSnglLnkNode next,BooleanConsumer action){
-      BooleanSnglLnkNode prev,curr=this.curr;
+    void uncheckedForEachRemaining(Node next,BooleanConsumer action){
+      Node prev,curr=this.curr;
       do{
         action.accept(next.val);
         prev=curr;
@@ -2177,13 +2311,13 @@ AbstractSeq<Boolean>
       this.next=null;
     }
     @Override public void forEachRemaining(BooleanConsumer action){
-      final BooleanSnglLnkNode next;
+      final Node next;
       if((next=this.next)!=null){
         uncheckedForEachRemaining(next,action);
       }
     }
     @Override public void forEachRemaining(Consumer<? super Boolean> action){
-      final BooleanSnglLnkNode next;
+      final Node next;
       if((next=this.next)!=null){
         uncheckedForEachRemaining(next,action::accept);
       }

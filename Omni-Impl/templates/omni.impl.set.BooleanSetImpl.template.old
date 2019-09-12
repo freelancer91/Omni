@@ -12,14 +12,14 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.api.OmniIterator;
-import omni.api.OmniSet;
+import omni.api.OmniNavigableSet;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.impl.AbstractBooleanItr;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
 import java.util.Set;
-public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizable{
+public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Externalizable{
   private static final long serialVersionUID=1L;
   transient int state;
   public BooleanSetImpl(){
@@ -40,6 +40,141 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
     //TODO optimize
     this.addAll(that);
   }
+  #MACRO PollFirstAndLast(,Boolean,Boolean.TRUE,Boolean.FALSE,null)
+  #MACRO PollFirstAndLast(Boolean,boolean,true,false,false)
+  #MACRO PollFirstAndLast(Byte,byte,(byte)1,(byte)0,Byte.MIN_VALUE)
+  #MACRO PollFirstAndLast(Char,char,(char)1,(char)0,Character.MIN_VALUE)
+  #MACRO PollFirstAndLast(Short,short,(short)1,(short)0,Short.MIN_VALUE)
+  #MACRO PollFirstAndLast(Int,int,1,0,Integer.MIN_VALUE)
+  #MACRO PollFirstAndLast(Long,long,1L,0L,Long.MIN_VALUE)
+  #MACRO PollFirstAndLast(Float,float,1F,0F,Float.NaN)
+  #MACRO PollFirstAndLast(Double,double,1D,0D,Double.NaN)
+  
+  @Override
+  public boolean booleanCeiling(boolean val){  
+    switch(this.state){
+      case 0b00:
+      case 0b01:
+        return false;
+      case 0b10:
+        return true;
+      default:
+        return val;
+    }
+  }
+  @Override
+  public boolean booleanFloor(boolean val){
+    return val&&((this.state)&0b10)!=0;
+  }
+  @Override
+  public Boolean ceiling(boolean val){
+    switch(this.state){
+     case 0b01:
+      if(!val){
+        return Boolean.FALSE;
+      }
+    case 0b00:
+      return null;
+    case 0b10:
+      return BOOLEAN.TRUE;
+    default:
+      return val;
+    }
+  }
+  @Override
+  public Boolean floor(boolean val){
+    switch(this.state){
+      case 0b01:
+        return Boolean.FALSE;
+      case 0b10:
+        if(val){
+          return Boolean.TRUE;
+        }
+      case 0b00:
+        return null;
+      default:
+        return val;
+    }
+  }
+  @Override
+  public OmniIterator.OfBoolean descendingIterator(){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  @Override
+  public OmniNavigableSet.OfBoolean descendingSet(){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  @Override
+  public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  @Override
+  public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  @Override
+  public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  @Override
+  public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  @Override
+  public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toExclusive){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  @Override
+  public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    //TODO
+    throw omni.util.NotYetImplementedException.getNYI();
+  }
+  
+  
+  
+  
+#MACRODEF PollFirstAndLast(TYPENAMEMODIFIER,RETTYPE,TRUEVAL,FALSEVAL,DEFAULTVAL)
+@Override
+public RETTYPE pollFirstTYPENAMEMODIFIER(){
+  switch(this.state){
+  case 0b00:
+    return DEFAULTVAL;
+  case 0b01:
+    this.state=0b00;
+    break;
+  case 0b10:
+    this.state=0b00;
+    return TRUEVAL;
+  default:
+    this.state=0b10;
+  }
+  return FALSEVAL;
+}
+@Override
+public RETTYPE pollLastTYPENAMEMODIFIER(){
+  switch(this.state){
+  case 0b00:
+    return DEFAULTVAL;
+  case 0b01:
+    this.state=0b00;
+    return FALSEVAL;
+  case 0b10:
+    this.state=0b00;
+    break;
+  default:
+    this.state=0b01;
+  }
+  return TRUEVAL;
+}
+#ENDDEF
+  
   BooleanSetImpl(int state){
     this.state=state;
   }
@@ -79,6 +214,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       return 1231 + 1237;
     }
   }
+  /*
   private boolean isEqualTo(Set<?> that){
     switch(this.state) {
     case 0b00:
@@ -133,14 +269,15 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       return !(thatSet instanceof OmniSet) && thatSet.size()==2 && thatSet.contains(Boolean.FALSE) && thatSet.contains(Boolean.TRUE);
     }
   }
+  */
   @Override public boolean equals(Object val){
     if(val==this){
       return true;
     }
     if(val instanceof Set){
       //TODO optimize
-      for(final var val:((Set<?>)val)){
-        if(!(val instanceof Boolean) || !this.contains((boolean)val)){
+      for(final var thatVal:((Set<?>)val)){
+        if(!(thatVal instanceof Boolean) || !this.contains((boolean)thatVal)){
           return false;
         }
       }

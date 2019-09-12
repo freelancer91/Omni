@@ -5,7 +5,6 @@ import java.util.ListIterator;
 import java.util.List;
 import omni.util.ByteSortUtil;
 import omni.api.OmniList;
-import omni.impl.ByteDblLnkNode;
 import java.util.function.Consumer;
 import omni.function.ByteConsumer;
 import omni.function.BytePredicate;
@@ -21,6 +20,7 @@ import omni.function.ByteComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
+import omni.impl.AbstractOmniCollection;
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
@@ -33,13 +33,241 @@ import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollection;
 import omni.util.ToStringUtil;
 public abstract class ByteDblLnkSeq extends 
-AbstractSeq<Byte>
+AbstractOmniCollection<Byte>
  implements
    ByteSubListDefault
 {
+  static final class Node{
+    transient Node prev;
+    transient byte val;
+    transient Node next;
+    Node(byte val){
+      this.val=val;
+    }
+    Node(Node prev,byte val){
+      this.prev=prev;
+      this.val=val;
+    }
+    Node(byte val,Node next){
+      this.val=val;
+      this.next=next;
+    }
+    Node(Node prev,byte val,Node next){
+      this.prev=prev;
+      this.val=val;
+      this.next=next;
+    }
+    static  void uncheckedCopyFrom(byte[] src,int length,Node dst){
+      for(;;dst=dst.prev)
+      {
+        dst.val=(byte)src[--length];
+        if(length==0)
+        {
+          return;
+        }
+      }
+    }
+    static  int uncheckedToString(Node curr,Node tail,byte[] buffer){
+      int bufferOffset=1;
+      for(;;curr=curr.next,buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+        bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+        if(curr==tail){
+          return bufferOffset;
+        }
+      }
+    }
+    static  void uncheckedToString(Node curr,Node tail,ToStringUtil.OmniStringBuilderByte builder){
+      for(;;curr=curr.next,builder.uncheckedAppendCommaAndSpace()){
+        builder.uncheckedAppendShort(curr.val);
+        if(curr==tail){
+          return;
+        }
+      }
+    }
+    static  int uncheckedHashCode(Node curr,Node tail){
+      int hash=31+(curr.val);
+      while(curr!=tail){
+        hash=(hash*31)+((curr=curr.next).val);
+      }
+      return hash;
+    }
+    static  void uncheckedForEachAscending(Node node,int size,ByteConsumer action){
+      for(;;node=node.next){
+        action.accept(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedReplaceAll(Node node,int size,ByteUnaryOperator operator){
+      for(;;node=node.next){
+        node.val=operator.applyAsByte(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachAscending(Node node,ByteConsumer action){
+      for(;;){
+        action.accept(node.val);
+        if((node=node.next)==null){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachAscending(Node node,Node tail,ByteConsumer action){
+      for(;;node=node.next){
+        action.accept(node.val);
+        if(node==tail){
+          return;
+        }
+      }
+    }
+    static  void uncheckedReplaceAll(Node node,Node tail,ByteUnaryOperator operator){
+      for(;;node=node.next){
+        node.val=operator.applyAsByte(node.val);
+        if(node==tail){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachDescending(Node node,ByteConsumer action){
+      for(;;){
+        action.accept(node.val);
+        if((node=node.prev)==null){
+          return;
+        }
+      }
+    }
+    static  void uncheckedForEachDescending(Node node,int size,ByteConsumer action){
+      for(;;node=node.prev){
+        action.accept(node.val);
+        if(--size==0){
+          return;
+        }
+      }
+    }
+    static  void eraseNode(Node node){
+      Node next,prev;
+      (next=node.next).prev=(prev=node.prev);
+      prev.next=next;
+    }
+    static  Node iterateAscending(Node node,int length){
+      if(length!=0){
+        do{
+          node=node.next;
+        }while(--length!=0);
+      }
+      return node;
+    }
+    static  Node iterateDescending(Node node,int length){
+      if(length!=0){
+        do{
+          node=node.prev;
+        }while(--length!=0);
+      }
+      return node;
+    }
+    static  Node uncheckedIterateDescending(Node node,int length){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+      return node;
+    }
+    static  boolean uncheckedcontains (Node head,Node tail
+    ,int val
+    ){
+      for(;val!=(head.val);head=head.next){if(head==tail){return false;}}
+      return true;
+    }
+    static  int uncheckedsearch (Node head
+    ,int val
+    ){
+      int index=1;
+      for(;val!=(head.val);++index){if((head=head.next)==null){return -1;}}
+      return index;
+    }
+    static  int uncheckedindexOf (Node head,Node tail
+    ,int val
+    ){
+      int index=0;
+      for(;val!=(head.val);++index,head=head.next){if(head==tail){return -1;}}
+      return index;
+    }
+    static  int uncheckedlastIndexOf (int length,Node tail
+    ,int val
+    ){
+      for(;val!=(tail.val);tail=tail.prev){if(--length==0){return -1;}}
+      return length-1;
+    }
+    static  void uncheckedCopyInto(byte[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(Byte[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(Object[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(double[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(double)(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(float[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(float)(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(long[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(long)(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(int[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(int)(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+    static  void uncheckedCopyInto(short[] dst,Node curr,int length){
+      for(;;curr=curr.prev){
+        dst[--length]=(short)(curr.val);
+        if(length==0){
+          return;
+        }
+      }
+    }
+  }
   private static final long serialVersionUID=1L;
-  transient ByteDblLnkNode head;
-  transient ByteDblLnkNode tail;
+  transient Node head;
+  transient Node tail;
   private ByteDblLnkSeq(Collection<? extends Byte> that){
     super();
     //TODO optimize
@@ -67,7 +295,7 @@ AbstractSeq<Byte>
   }
   private  ByteDblLnkSeq(){
   }
-  private ByteDblLnkSeq(ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+  private ByteDblLnkSeq(Node head,int size,Node tail){
     super(size);
     this.head=head;
     this.tail=tail;
@@ -81,21 +309,21 @@ AbstractSeq<Byte>
     addLast(val);
     return true;
   }
-  private void iterateDescendingAndInsert(int dist,ByteDblLnkNode after,ByteDblLnkNode newNode){
-    newNode.next=after=ByteDblLnkNode.iterateDescending(after,dist-2);
-    final ByteDblLnkNode before;
+  private void iterateDescendingAndInsert(int dist,Node after,Node newNode){
+    newNode.next=after=Node.iterateDescending(after,dist-2);
+    final Node before;
     newNode.prev=before=after.prev;
     before.next=newNode;
     after.prev=newNode;
   }
-  private void iterateAscendingAndInsert(int dist,ByteDblLnkNode before,ByteDblLnkNode newNode){
-    newNode.prev=before=ByteDblLnkNode.iterateAscending(before,dist-1);
-    final ByteDblLnkNode after;
+  private void iterateAscendingAndInsert(int dist,Node before,Node newNode){
+    newNode.prev=before=Node.iterateAscending(before,dist-1);
+    final Node after;
     newNode.next=after=before.next;
     before.next=newNode;
     after.prev=newNode;
   }
-  private void insertNode(int index,ByteDblLnkNode newNode){
+  private void insertNode(int index,Node newNode){
     int tailDist;
     if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
@@ -113,7 +341,7 @@ AbstractSeq<Byte>
       //the insertion point is closer to the head
       if(index==0){
         //the insertion point IS the head
-        ByteDblLnkNode head;
+        Node head;
         (head=this.head).prev=newNode;
         newNode.next=head;
         this.head=newNode;
@@ -123,7 +351,7 @@ AbstractSeq<Byte>
       }
     }
   }
-  private static  int markSurvivors(ByteDblLnkNode curr,int numLeft,BytePredicate filter,long[] survivorSet){
+  private static  int markSurvivors(Node curr,int numLeft,BytePredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -141,7 +369,7 @@ AbstractSeq<Byte>
       survivorSet[wordOffset++]=word;
     }
   }
-  private static  long markSurvivors(ByteDblLnkNode curr,int numLeft,BytePredicate filter){
+  private static  long markSurvivors(Node curr,int numLeft,BytePredicate filter){
     for(long word=0L,marker=1L;;marker<<=1,curr=curr.next){
       if(!filter.test(curr.val)){
         word|=marker;
@@ -152,16 +380,16 @@ AbstractSeq<Byte>
       }
     }
   }
-  private ByteDblLnkNode getNode(int index,int size){
+  private Node getNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
-      return ByteDblLnkNode.iterateDescending(tail,size-1);
+      return Node.iterateDescending(tail,size-1);
     }else{
       //the node is closer to the head
-      return ByteDblLnkNode.iterateAscending(head,index);
+      return Node.iterateAscending(head,index);
     }
   }
-  private ByteDblLnkNode getItrNode(int index,int size){
+  private Node getItrNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       switch(size){
@@ -170,15 +398,15 @@ AbstractSeq<Byte>
       case 1:
         return tail;
       default:
-        return ByteDblLnkNode.uncheckedIterateDescending(tail,size-1);
+        return Node.uncheckedIterateDescending(tail,size-1);
       }
     }else{
       //the node is closer to the head
-      return ByteDblLnkNode.iterateAscending(head,index);
+      return Node.iterateAscending(head,index);
     }
   }
   @Override public byte set(int index,byte val){
-    ByteDblLnkNode tmp;
+    Node tmp;
     final var ret=(tmp=getNode(index,size)).val;
     tmp.val=val;
     return ret;
@@ -190,21 +418,21 @@ AbstractSeq<Byte>
     return getNode(index,size).val;
   }
   @Override public void forEach(ByteConsumer action){
-    final ByteDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      ByteDblLnkNode.uncheckedForEachAscending(head,tail,action);
+      Node.uncheckedForEachAscending(head,tail,action);
     }
   }
   @Override public void forEach(Consumer<? super Byte> action){
-    final ByteDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      ByteDblLnkNode.uncheckedForEachAscending(head,tail,action::accept);
+      Node.uncheckedForEachAscending(head,tail,action::accept);
     }
   }
   @Override public <T> T[] toArray(T[] dst){
     final int size;
     if((size=this.size)!=0){
-      ByteDblLnkNode.uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),this.tail,size);
+      Node.uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),this.tail,size);
     }else if(dst.length!=0){
       dst[0]=null;
     }
@@ -214,7 +442,7 @@ AbstractSeq<Byte>
     final int size;
     final T[] dst=arrConstructor.apply(size=this.size);
     if(size!=0){
-      ByteDblLnkNode.uncheckedCopyInto(dst,this.tail,size);
+      Node.uncheckedCopyInto(dst,this.tail,size);
     }
     return dst;
   }
@@ -222,7 +450,7 @@ AbstractSeq<Byte>
     int size;
     if((size=this.size)!=0){
       final byte[] dst;
-      ByteDblLnkNode.uncheckedCopyInto(dst=new byte[size],tail,size);
+      Node.uncheckedCopyInto(dst=new byte[size],tail,size);
       return dst;
     }
     return OmniArray.OfByte.DEFAULT_ARR;
@@ -231,7 +459,7 @@ AbstractSeq<Byte>
     int size;
     if((size=this.size)!=0){
       final Byte[] dst;
-      ByteDblLnkNode.uncheckedCopyInto(dst=new Byte[size],tail,size);
+      Node.uncheckedCopyInto(dst=new Byte[size],tail,size);
       return dst;
     }
     return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -240,7 +468,7 @@ AbstractSeq<Byte>
     int size;
     if((size=this.size)!=0){
       final double[] dst;
-      ByteDblLnkNode.uncheckedCopyInto(dst=new double[size],tail,size);
+      Node.uncheckedCopyInto(dst=new double[size],tail,size);
       return dst;
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
@@ -249,7 +477,7 @@ AbstractSeq<Byte>
     int size;
     if((size=this.size)!=0){
       final float[] dst;
-      ByteDblLnkNode.uncheckedCopyInto(dst=new float[size],tail,size);
+      Node.uncheckedCopyInto(dst=new float[size],tail,size);
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
@@ -258,7 +486,7 @@ AbstractSeq<Byte>
     int size;
     if((size=this.size)!=0){
       final long[] dst;
-      ByteDblLnkNode.uncheckedCopyInto(dst=new long[size],tail,size);
+      Node.uncheckedCopyInto(dst=new long[size],tail,size);
       return dst;
     }
     return OmniArray.OfLong.DEFAULT_ARR;
@@ -267,7 +495,7 @@ AbstractSeq<Byte>
     int size;
     if((size=this.size)!=0){
       final int[] dst;
-      ByteDblLnkNode.uncheckedCopyInto(dst=new int[size],tail,size);
+      Node.uncheckedCopyInto(dst=new int[size],tail,size);
       return dst;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
@@ -276,21 +504,21 @@ AbstractSeq<Byte>
     int size;
     if((size=this.size)!=0){
       final short[] dst;
-      ByteDblLnkNode.uncheckedCopyInto(dst=new short[size],tail,size);
+      Node.uncheckedCopyInto(dst=new short[size],tail,size);
       return dst;
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
   @Override public void replaceAll(ByteUnaryOperator operator){
-    final ByteDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      ByteDblLnkNode.uncheckedReplaceAll(head,tail,operator);
+      Node.uncheckedReplaceAll(head,tail,operator);
     }
   }
   @Override public void replaceAll(UnaryOperator<Byte> operator){
-    final ByteDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      ByteDblLnkNode.uncheckedReplaceAll(head,tail,operator::apply);
+      Node.uncheckedReplaceAll(head,tail,operator::apply);
     }
   }
   @Override public void sort(ByteComparator sorter){
@@ -298,14 +526,14 @@ AbstractSeq<Byte>
     final int size;
     if((size=this.size)>1){
       final byte[] tmp;
-      final ByteDblLnkNode tail;
-      ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
       if(sorter==null){
         ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
       }else{
         ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
       }
-      ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void sort(Comparator<? super Byte> sorter){
@@ -313,14 +541,14 @@ AbstractSeq<Byte>
     final int size;
     if((size=this.size)>1){
       final byte[] tmp;
-      final ByteDblLnkNode tail;
-      ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
       if(sorter==null){
         ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
       }else{
         ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
       }
-      ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableAscendingSort()
@@ -329,10 +557,10 @@ AbstractSeq<Byte>
     final int size;
     if((size=this.size)>1){
       final byte[] tmp;
-      final ByteDblLnkNode tail;
-      ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
       ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-      ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableDescendingSort()
@@ -341,10 +569,10 @@ AbstractSeq<Byte>
     final int size;
     if((size=this.size)>1){
       final byte[] tmp;
-      final ByteDblLnkNode tail;
-      ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
       ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
-      ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void unstableSort(ByteComparator sorter){
@@ -352,28 +580,28 @@ AbstractSeq<Byte>
     final int size;
     if((size=this.size)>1){
       final byte[] tmp;
-      final ByteDblLnkNode tail;
-      ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+      final Node tail;
+      Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
       if(sorter==null){
         ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
       }else{
         ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
       }
-      ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      Node.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public String toString(){
-    final ByteDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
       if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
-        [size=ByteDblLnkNode.uncheckedToString(head,tail,buffer)]=(byte)']';
+        [size=Node.uncheckedToString(head,tail,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
         final ToStringUtil.OmniStringBuilderByte builder;
-        ByteDblLnkNode.uncheckedToString(head,tail,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        Node.uncheckedToString(head,tail,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
         (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
@@ -382,19 +610,19 @@ AbstractSeq<Byte>
     return "[]";
   }
   @Override public int hashCode(){
-    final ByteDblLnkNode head;
+    final Node head;
     if((head=this.head)!=null){
-      return ByteDblLnkNode.uncheckedHashCode(head,tail);
+      return Node.uncheckedHashCode(head,tail);
     }
     return 1;
   }
   @Override public boolean contains(boolean val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedcontains(head,tail,TypeUtil.castToByte(val));
+          return Node.uncheckedcontains(head,tail,TypeUtil.castToByte(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -404,10 +632,10 @@ AbstractSeq<Byte>
     if(val==(byte)val)
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+          return Node.uncheckedcontains(head,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -416,12 +644,12 @@ AbstractSeq<Byte>
   @Override public boolean contains(long val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final byte v;
           if((v=(byte)val)==val){
-            return ByteDblLnkNode.uncheckedcontains(head,tail,v);
+            return Node.uncheckedcontains(head,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -431,13 +659,13 @@ AbstractSeq<Byte>
   @Override public boolean contains(float val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final byte v;
           if(val==(v=(byte)val))
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,v);
+            return Node.uncheckedcontains(head,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -447,13 +675,13 @@ AbstractSeq<Byte>
   @Override public boolean contains(double val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final byte v;
           if(val==(v=(byte)val))
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,v);
+            return Node.uncheckedcontains(head,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -463,7 +691,7 @@ AbstractSeq<Byte>
   @Override public boolean contains(Object val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           //todo: a pattern-matching switch statement would be great here
@@ -499,7 +727,7 @@ AbstractSeq<Byte>
             }else{
               break returnFalse;
             }
-            return ByteDblLnkNode.uncheckedcontains(head,tail,i);
+            return Node.uncheckedcontains(head,tail,i);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -509,10 +737,10 @@ AbstractSeq<Byte>
   @Override public boolean contains(byte val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+          return Node.uncheckedcontains(head,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -522,10 +750,10 @@ AbstractSeq<Byte>
     if(val<=Byte.MAX_VALUE)
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+          return Node.uncheckedcontains(head,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -534,10 +762,10 @@ AbstractSeq<Byte>
   @Override public int indexOf(boolean val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedindexOf(head,tail,TypeUtil.castToByte(val));
+          return Node.uncheckedindexOf(head,tail,TypeUtil.castToByte(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -547,10 +775,10 @@ AbstractSeq<Byte>
     if(val==(byte)val)
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return Node.uncheckedindexOf(head,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -559,12 +787,12 @@ AbstractSeq<Byte>
   @Override public int indexOf(long val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final byte v;
           if((v=(byte)val)==val){
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,v);
+            return Node.uncheckedindexOf(head,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -574,13 +802,13 @@ AbstractSeq<Byte>
   @Override public int indexOf(float val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final byte v;
           if(val==(v=(byte)val))
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,v);
+            return Node.uncheckedindexOf(head,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -590,13 +818,13 @@ AbstractSeq<Byte>
   @Override public int indexOf(double val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           final byte v;
           if(val==(v=(byte)val))
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,v);
+            return Node.uncheckedindexOf(head,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -606,7 +834,7 @@ AbstractSeq<Byte>
   @Override public int indexOf(Object val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
           //todo: a pattern-matching switch statement would be great here
@@ -642,7 +870,7 @@ AbstractSeq<Byte>
             }else{
               break returnFalse;
             }
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,i);
+            return Node.uncheckedindexOf(head,tail,i);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -652,10 +880,10 @@ AbstractSeq<Byte>
   @Override public int indexOf(byte val){
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return Node.uncheckedindexOf(head,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -665,10 +893,10 @@ AbstractSeq<Byte>
     if(val<=Byte.MAX_VALUE)
     {
       {
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return Node.uncheckedindexOf(head,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -677,10 +905,10 @@ AbstractSeq<Byte>
   @Override public int lastIndexOf(boolean val){
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
-          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,TypeUtil.castToByte(val));
+          return Node.uncheckedlastIndexOf(size,tail,TypeUtil.castToByte(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -690,10 +918,10 @@ AbstractSeq<Byte>
     if(val==(byte)val)
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
-          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return Node.uncheckedlastIndexOf(size,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -702,12 +930,12 @@ AbstractSeq<Byte>
   @Override public int lastIndexOf(long val){
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           final byte v;
           if((v=(byte)val)==val){
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+            return Node.uncheckedlastIndexOf(size,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -717,13 +945,13 @@ AbstractSeq<Byte>
   @Override public int lastIndexOf(float val){
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           final byte v;
           if(val==(v=(byte)val))
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+            return Node.uncheckedlastIndexOf(size,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -733,13 +961,13 @@ AbstractSeq<Byte>
   @Override public int lastIndexOf(double val){
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           final byte v;
           if(val==(v=(byte)val))
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+            return Node.uncheckedlastIndexOf(size,tail,v);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -749,7 +977,7 @@ AbstractSeq<Byte>
   @Override public int lastIndexOf(Object val){
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
           //todo: a pattern-matching switch statement would be great here
@@ -785,7 +1013,7 @@ AbstractSeq<Byte>
             }else{
               break returnFalse;
             }
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,i);
+            return Node.uncheckedlastIndexOf(size,tail,i);
           }
         } //end size check
       } //end checked sublist try modcount
@@ -795,10 +1023,10 @@ AbstractSeq<Byte>
   @Override public int lastIndexOf(byte val){
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
-          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return Node.uncheckedlastIndexOf(size,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -808,18 +1036,18 @@ AbstractSeq<Byte>
     if(val<=Byte.MAX_VALUE)
     {
       {
-        final ByteDblLnkNode tail;
+        final Node tail;
         if((tail=this.tail)!=null)
         {
-          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return Node.uncheckedlastIndexOf(size,tail,(val));
         } //end size check
       } //end checked sublist try modcount
     }//end val check
     return -1;
   }
-  private static  int collapseBodyHelper(ByteDblLnkNode newHead,ByteDblLnkNode newTail,BytePredicate filter){
+  private static  int collapseBodyHelper(Node newHead,Node newTail,BytePredicate filter){
     int numRemoved=0;
-    outer:for(ByteDblLnkNode prev;(newHead=(prev=newHead).next)!=newTail;){
+    outer:for(Node prev;(newHead=(prev=newHead).next)!=newTail;){
       if(filter.test(newHead.val)){
         do{
           ++numRemoved;
@@ -840,13 +1068,13 @@ AbstractSeq<Byte>
     transient final UncheckedList root;
     transient final UncheckedSubList parent;
     transient final int parentOffset;
-    private UncheckedSubList(UncheckedList root,int rootOffset,ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+    private UncheckedSubList(UncheckedList root,int rootOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
       this.parentOffset=rootOffset;
     }
-    private UncheckedSubList(UncheckedSubList parent,int parentOffset,ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+    private UncheckedSubList(UncheckedSubList parent,int parentOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
@@ -871,7 +1099,7 @@ AbstractSeq<Byte>
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){
       }
     }
-    private void bubbleUpAppend(ByteDblLnkNode oldTail,ByteDblLnkNode newTail){
+    private void bubbleUpAppend(Node oldTail,Node newTail){
       oldTail.next=newTail;
       this.tail=newTail;
       for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
@@ -882,12 +1110,12 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpAppend(ByteDblLnkNode newTail){
+    private void bubbleUpAppend(Node newTail){
       this.tail=newTail;
       for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
       }
     }
-    private void bubbleUpPrepend(ByteDblLnkNode oldHead,ByteDblLnkNode newHead){
+    private void bubbleUpPrepend(Node oldHead,Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
         ++currList.size;
@@ -897,12 +1125,12 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpPrepend(ByteDblLnkNode newHead){
+    private void bubbleUpPrepend(Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
       }
     }
-    private void bubbleUpRootInit(ByteDblLnkNode newNode){
+    private void bubbleUpRootInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       for(var parent=this.parent;parent!=null;parent=parent.parent){
@@ -911,8 +1139,8 @@ AbstractSeq<Byte>
         parent.tail=newNode;
       }
     }
-    private void bubbleUpInitHelper(int index,int size,ByteDblLnkNode newNode){
-      ByteDblLnkNode after,before;   
+    private void bubbleUpInitHelper(int index,int size,Node newNode){
+      Node after,before;   
       if((size-=index)<=index){
         before=this.tail;
         if(size==1){
@@ -925,7 +1153,7 @@ AbstractSeq<Byte>
           }
         }else{
           this.bubbleUpIncrementSize();
-          before=(after=ByteDblLnkNode.iterateDescending(before,size-2)).prev;
+          before=(after=Node.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
         }
         before.next=newNode;        
@@ -941,7 +1169,7 @@ AbstractSeq<Byte>
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=ByteDblLnkNode.iterateAscending(after,index-1)).next;
+          after=(before=Node.iterateAscending(after,index-1)).next;
           before.next=newNode;
         }
         after.prev=newNode;
@@ -949,7 +1177,7 @@ AbstractSeq<Byte>
       newNode.next=after;
       newNode.prev=before;
     }
-    private void bubbleUpInit(ByteDblLnkNode newNode){
+    private void bubbleUpInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       UncheckedSubList curr;
@@ -966,7 +1194,7 @@ AbstractSeq<Byte>
     }
     @Override public void add(int index,byte val){
       final UncheckedList root;
-      final var newNode=new ByteDblLnkNode(val);
+      final var newNode=new Node(val);
       if(++(root=this.root).size!=1){
         final int currSize;
         if((currSize=++this.size)!=1){
@@ -985,21 +1213,21 @@ AbstractSeq<Byte>
       final UncheckedList root;
       if(++(root=this.root).size!=1){
         if(++this.size!=1){
-          ByteDblLnkNode currTail,after;
+          Node currTail,after;
           if((after=(currTail=this.tail).next)==null){
-            currTail.next=currTail=new ByteDblLnkNode(currTail,val);
+            currTail.next=currTail=new Node(currTail,val);
             bubbleUpAppend(currTail);
             root.tail=currTail;
           }else{
-            bubbleUpAppend(currTail,currTail=new ByteDblLnkNode(currTail,val,after));
+            bubbleUpAppend(currTail,currTail=new Node(currTail,val,after));
             after.prev=currTail;
           }
         }else{
-          bubbleUpInit(new ByteDblLnkNode(val));
+          bubbleUpInit(new Node(val));
         }
       }else{
-        ByteDblLnkNode newNode;
-        bubbleUpRootInit(newNode=new ByteDblLnkNode(val));
+        Node newNode;
+        bubbleUpRootInit(newNode=new Node(val));
         this.size=1;
         root.head=newNode;
         root.tail=newNode;
@@ -1015,7 +1243,7 @@ AbstractSeq<Byte>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfByte){
             return root.isEqualTo(this.head,size,(OmniList.OfByte)list);
           }else if(list instanceof OmniList.OfRef){
@@ -1027,7 +1255,7 @@ AbstractSeq<Byte>
       }
       return false;
     }
-    private void bubbleUpPeelHead(ByteDblLnkNode newHead,ByteDblLnkNode oldHead){
+    private void bubbleUpPeelHead(Node newHead,Node oldHead){
       newHead.prev=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.tail!=oldHead){
@@ -1039,14 +1267,14 @@ AbstractSeq<Byte>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelHead(ByteDblLnkNode newHead){
+    private void bubbleUpPeelHead(Node newHead){
       var curr=this;
       do{
         curr.head=newHead;
         --curr.size; 
       }while((curr=curr.parent)!=null);
     }
-    private void bubbleUpPeelTail(ByteDblLnkNode newTail,ByteDblLnkNode oldTail){
+    private void bubbleUpPeelTail(Node newTail,Node oldTail){
       newTail.next=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.head!=oldTail){
@@ -1058,7 +1286,7 @@ AbstractSeq<Byte>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelTail(ByteDblLnkNode newTail){
+    private void bubbleUpPeelTail(Node newTail){
       var curr=this;
       do{
         curr.tail=newTail;
@@ -1077,9 +1305,9 @@ AbstractSeq<Byte>
          parent.uncheckedBubbleUpDecrementSize();
        }
     }
-    private void peelTail(ByteDblLnkNode newTail,ByteDblLnkNode oldTail){
+    private void peelTail(Node newTail,Node oldTail){
       this.tail=newTail;
-      ByteDblLnkNode after;
+      Node after;
       if((after=oldTail.next)==null){
         final UncheckedSubList parent;
         if((parent=this.parent)!=null){
@@ -1099,8 +1327,8 @@ AbstractSeq<Byte>
       }
       newTail.next=after;
     }
-    private void peelTail(ByteDblLnkNode tail){
-      ByteDblLnkNode after,before;
+    private void peelTail(Node tail){
+      Node after,before;
       (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
@@ -1121,8 +1349,8 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void removeLastNode(ByteDblLnkNode lastNode){
-      ByteDblLnkNode after,before=lastNode.prev;
+    private void removeLastNode(Node lastNode){
+      Node after,before=lastNode.prev;
       if((after=lastNode.next)==null){
         UncheckedList root;
         (root=this.root).tail=before;
@@ -1175,8 +1403,8 @@ AbstractSeq<Byte>
       this.head=null;
       this.tail=null;
     }
-    private void peelHead(ByteDblLnkNode head){
-      ByteDblLnkNode after,before;
+    private void peelHead(Node head){
+      Node after,before;
       (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
@@ -1210,8 +1438,8 @@ AbstractSeq<Byte>
             peelTail(tail);
           }
         }else{
-          ByteDblLnkNode before;
-          ret=(before=( tail=ByteDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=( tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
           bubbleUpDecrementSize();
@@ -1222,8 +1450,8 @@ AbstractSeq<Byte>
           ret=head.val;
           peelHead(head);
         }else{
-          ByteDblLnkNode after;
-          ret=(after=(head=ByteDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
           bubbleUpDecrementSize();
@@ -1233,17 +1461,17 @@ AbstractSeq<Byte>
       return ret;
     }
     @Override public boolean removeIf(BytePredicate filter){
-      final ByteDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
     }
     @Override public boolean removeIf(Predicate<? super Byte> filter){
-      final ByteDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
     }
-    private void collapsehead(ByteDblLnkNode oldhead,ByteDblLnkNode tail,BytePredicate filter
+    private void collapsehead(Node oldhead,Node tail,BytePredicate filter
     ){
       int numRemoved=1;
-      ByteDblLnkNode newhead;
+      Node newhead;
       outer:
       for(newhead=oldhead.next;;
       ++numRemoved,newhead=newhead.next){ 
@@ -1251,7 +1479,7 @@ AbstractSeq<Byte>
           break;
         }
         if(!filter.test(newhead.val)){
-          ByteDblLnkNode prev,curr;
+          Node prev,curr;
           for(curr=(prev=newhead).next;curr!=tail;curr=(prev=curr).next){
             if(filter.test(curr.val)){
               do{
@@ -1273,7 +1501,7 @@ AbstractSeq<Byte>
       (root=this.root).size-=numRemoved;
       this.size-=numRemoved;
       this.head=newhead;
-      ByteDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldhead.prev)==null){
         for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
         }
@@ -1290,10 +1518,10 @@ AbstractSeq<Byte>
       }
       newhead.prev=tmp;
     }
-    private void collapsetail(ByteDblLnkNode oldtail,ByteDblLnkNode head,BytePredicate filter
+    private void collapsetail(Node oldtail,Node head,BytePredicate filter
     ){
       int numRemoved=1;
-      ByteDblLnkNode newtail;
+      Node newtail;
       outer:
       for(newtail=oldtail.prev;;
       ++numRemoved,newtail=newtail.prev){ 
@@ -1301,7 +1529,7 @@ AbstractSeq<Byte>
           break;
         }
         if(!filter.test(newtail.val)){
-          ByteDblLnkNode next,curr;
+          Node next,curr;
           for(curr=(next=newtail).prev;curr!=head;curr=(next=curr).prev){
             if(filter.test(curr.val)){
               do{
@@ -1323,7 +1551,7 @@ AbstractSeq<Byte>
       (root=this.root).size-=numRemoved;
       this.size-=numRemoved;
       this.tail=newtail;
-      ByteDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldtail.next)==null){
         for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
         }
@@ -1340,10 +1568,10 @@ AbstractSeq<Byte>
       }
       newtail.next=tmp;
     }
-    private void bubbleUpCollapseHeadAndTail(ByteDblLnkNode oldHead,ByteDblLnkNode newHead,int numRemoved,ByteDblLnkNode newTail,ByteDblLnkNode oldTail){
+    private void bubbleUpCollapseHeadAndTail(Node oldHead,Node newHead,int numRemoved,Node newTail,Node oldTail){
       this.head=newHead;
       this.tail=newTail;
-      final ByteDblLnkNode after,before=oldHead.prev;
+      final Node after,before=oldHead.prev;
       if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
@@ -1416,8 +1644,8 @@ AbstractSeq<Byte>
       newHead.prev=before;
       newTail.next=after;
     }
-    private boolean uncheckedRemoveIf(ByteDblLnkNode head,BytePredicate filter){
-      ByteDblLnkNode tail;
+    private boolean uncheckedRemoveIf(Node head,BytePredicate filter){
+      Node tail;
       {
         if(filter.test((tail=this.tail).val)){
           if(tail==head){
@@ -1458,8 +1686,8 @@ AbstractSeq<Byte>
         clearAllHelper(size,this.head,this.tail,root);
       }
     }
-    private void clearAllHelper(int size,ByteDblLnkNode head,ByteDblLnkNode tail,UncheckedList root){
-      ByteDblLnkNode before,after=tail.next;
+    private void clearAllHelper(int size,Node head,Node tail,UncheckedList root){
+      Node before,after=tail.next;
       if((before=head.prev)==null){
         //this sublist is not preceded by nodes
         if(after==null){
@@ -1492,7 +1720,7 @@ AbstractSeq<Byte>
       for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){
       }
     }
-    private void bubbleUpClearBody(ByteDblLnkNode before,ByteDblLnkNode head,int numRemoved,ByteDblLnkNode tail,ByteDblLnkNode after){
+    private void bubbleUpClearBody(Node before,Node head,int numRemoved,Node tail,Node after){
       for(var curr=parent;curr!=null;
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
@@ -1520,7 +1748,7 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpClearHead(ByteDblLnkNode tail, ByteDblLnkNode after,int numRemoved){
+    private void bubbleUpClearHead(Node tail, Node after,int numRemoved){
       for(var curr=parent;curr!=null;
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.tail!=tail){
@@ -1532,7 +1760,7 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpClearTail(ByteDblLnkNode head, ByteDblLnkNode before,int numRemoved){
+    private void bubbleUpClearTail(Node head, Node before,int numRemoved){
       for(var curr=parent;curr!=null;
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
@@ -1544,13 +1772,13 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void collapseHeadAndTail(ByteDblLnkNode head,ByteDblLnkNode tail,BytePredicate filter
+    private void collapseHeadAndTail(Node head,Node tail,BytePredicate filter
     ){
-      ByteDblLnkNode newHead;
+      Node newHead;
       if((newHead=head.next)!=tail){
         for(int numRemoved=2;;++numRemoved){
           if(!filter.test(newHead.val)){
-            ByteDblLnkNode prev;
+            Node prev;
             outer: for(var curr=(prev=newHead).next;curr!=tail;curr=(prev=curr).next){
               if(filter.test(curr.val)){
                 do{
@@ -1577,9 +1805,9 @@ AbstractSeq<Byte>
       (root=this.root).size-=(size=this.size);
       clearAllHelper(size,head,tail,root);
     }
-    private boolean collapseBody(ByteDblLnkNode head,ByteDblLnkNode tail,BytePredicate filter
+    private boolean collapseBody(Node head,Node tail,BytePredicate filter
     ){
-      for(ByteDblLnkNode prev;(head=(prev=head).next)!=tail;){
+      for(Node prev;(head=(prev=head).next)!=tail;){
         if(filter.test(head.val)){
           int numRemoved=1;
           for(;(head=head.next)!=tail;++numRemoved){
@@ -1601,9 +1829,9 @@ AbstractSeq<Byte>
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        ByteDblLnkNode head,newTail;
-        final var newHead=newTail=new ByteDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new ByteDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new UncheckedList(newHead,size,newTail);
       }
       return new UncheckedList();
@@ -1612,8 +1840,8 @@ AbstractSeq<Byte>
       extends AbstractByteItr
     {
       transient final UncheckedSubList parent;
-      transient ByteDblLnkNode curr;
-      private AscendingItr(UncheckedSubList parent,ByteDblLnkNode curr){
+      transient Node curr;
+      private AscendingItr(UncheckedSubList parent,Node curr){
         this.parent=parent;
         this.curr=curr;
       }
@@ -1632,7 +1860,7 @@ AbstractSeq<Byte>
         return curr!=null;
       }
       @Override public byte nextByte(){
-        final ByteDblLnkNode curr;
+        final Node curr;
         this.curr=(curr=this.curr)==parent.tail?null:curr.next;
         return curr.val;
       }
@@ -1641,11 +1869,11 @@ AbstractSeq<Byte>
         if(--(parent=this.parent).size==0){
           parent.removeLastNode(parent.tail);
         }else{
-          ByteDblLnkNode curr;
+          Node curr;
           if((curr=this.curr)==null){
             parent.peelTail(parent.tail);
           }else{
-            ByteDblLnkNode lastRet;
+            Node lastRet;
             if((lastRet=curr.prev)==parent.head){
               parent.peelHead(lastRet);
             }else{
@@ -1658,23 +1886,23 @@ AbstractSeq<Byte>
         --parent.root.size;
       }
       @Override public void forEachRemaining(ByteConsumer action){
-        final ByteDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
-          ByteDblLnkNode.uncheckedForEachAscending(curr,parent.tail,action);
+          Node.uncheckedForEachAscending(curr,parent.tail,action);
           this.curr=null;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final ByteDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
-          ByteDblLnkNode.uncheckedForEachAscending(curr,parent.tail,action::accept);
+          Node.uncheckedForEachAscending(curr,parent.tail,action::accept);
           this.curr=null;
         }
       }
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfByte{
       private transient int currIndex;
-      private transient ByteDblLnkNode lastRet;
+      private transient Node lastRet;
       private BidirectionalItr(BidirectionalItr itr){
         super(itr);
         this.currIndex=itr.currIndex;
@@ -1683,7 +1911,7 @@ AbstractSeq<Byte>
       private BidirectionalItr(UncheckedSubList parent){
         super(parent);
       }
-      private BidirectionalItr(UncheckedSubList parent,ByteDblLnkNode curr,int currIndex){
+      private BidirectionalItr(UncheckedSubList parent,Node curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
       }
@@ -1691,14 +1919,14 @@ AbstractSeq<Byte>
         return new BidirectionalItr(this);
       }
       @Override public byte nextByte(){
-        final ByteDblLnkNode curr;
+        final Node curr;
         this.lastRet=curr=this.curr;
         this.curr=curr.next;
         ++this.currIndex;
         return curr.val;
       }
       @Override public byte previousByte(){
-        ByteDblLnkNode curr;
+        Node curr;
         this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
         this.curr=curr;
         --this.currIndex;
@@ -1726,44 +1954,44 @@ AbstractSeq<Byte>
         ++currIndex;
         if(++(root=(currList=this.parent).root).size!=1){
           if(++currList.size!=1){
-            ByteDblLnkNode after,before;
+            Node after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new ByteDblLnkNode(before,val,after);
+                before.next=before=new Node(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new ByteDblLnkNode(val,after));
+                currList.bubbleUpPrepend(before=new Node(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
-              ByteDblLnkNode newNode;
+              Node newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new ByteDblLnkNode(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new Node(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new ByteDblLnkNode(before,val));
+                currList.bubbleUpAppend(newNode=new Node(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new ByteDblLnkNode(val));
+            currList.bubbleUpInit(new Node(val));
           }
         }else{
-          ByteDblLnkNode newNode;
-          currList.bubbleUpRootInit(newNode=new ByteDblLnkNode(val));
+          Node newNode;
+          currList.bubbleUpRootInit(newNode=new Node(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
         }
       }
       @Override public void remove(){
-        ByteDblLnkNode lastRet,curr;
+        Node lastRet,curr;
         if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
         }else{
@@ -1792,8 +2020,8 @@ AbstractSeq<Byte>
         final int bound;
         final UncheckedSubList parent;
         if(this.currIndex<(bound=(parent=this.parent).size)){
-          final ByteDblLnkNode lastRet;
-          ByteDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
+          final Node lastRet;
+          Node.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
           this.lastRet=lastRet;
           this.curr=null;
           this.currIndex=bound;
@@ -1803,8 +2031,8 @@ AbstractSeq<Byte>
         final int bound;
         final UncheckedSubList parent;
         if(this.currIndex<(bound=(parent=this.parent).size)){
-          final ByteDblLnkNode lastRet;
-          ByteDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
+          final Node lastRet;
+          Node.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
           this.lastRet=lastRet;
           this.curr=null;
           this.currIndex=bound;
@@ -1824,13 +2052,13 @@ AbstractSeq<Byte>
       final int subListSize;
       if((subListSize=toIndex-fromIndex)!=0){
         int tailDist;
-        final ByteDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
-          subListTail=ByteDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?ByteDblLnkNode.iterateDescending(subListTail,subListSize-1):ByteDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=ByteDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?ByteDblLnkNode.iterateAscending(subListHead,subListSize-1):ByteDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -1839,7 +2067,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,TypeUtil.castToByte(val));
@@ -1852,7 +2080,7 @@ AbstractSeq<Byte>
       if(val==(byte)val)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -1864,7 +2092,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(long val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -1879,7 +2107,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(float val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -1895,7 +2123,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(double val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -1911,7 +2139,7 @@ AbstractSeq<Byte>
     @Override public boolean remove(Object val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -1957,7 +2185,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(byte val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -1970,7 +2198,7 @@ AbstractSeq<Byte>
       if(val<=Byte.MAX_VALUE)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -1979,7 +2207,7 @@ AbstractSeq<Byte>
       }//end val check
       return false;
     }
-    boolean uncheckedremoveVal(ByteDblLnkNode head
+    boolean uncheckedremoveVal(Node head
     ,int val
     ){
       if(val==(head.val)){
@@ -1992,7 +2220,7 @@ AbstractSeq<Byte>
         return true;
       }else{
         for(final var tail=this.tail;tail!=head;){
-          ByteDblLnkNode prev;
+          Node prev;
           if(val==((head=(prev=head).next).val)){
             --root.size;
             --this.size;
@@ -2016,14 +2244,14 @@ AbstractSeq<Byte>
     transient final CheckedSubList parent;
     transient final int parentOffset;
     transient int modCount;
-    private CheckedSubList(CheckedList root,int rootOffset,ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+    private CheckedSubList(CheckedList root,int rootOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
       this.parentOffset=rootOffset;
       this.modCount=root.modCount;
     }
-    private CheckedSubList(CheckedSubList parent,int parentOffset,ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+    private CheckedSubList(CheckedSubList parent,int parentOffset,Node head,int size,Node tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
@@ -2044,7 +2272,7 @@ AbstractSeq<Byte>
       this.parentOffset=parentOffset;
       this.modCount=parent.modCount;
     }
-    boolean uncheckedremoveVal(ByteDblLnkNode head
+    boolean uncheckedremoveVal(Node head
     ,int val
     ){
       int modCount;
@@ -2063,7 +2291,7 @@ AbstractSeq<Byte>
           return true;
         }
         for(final var tail=this.tail;head!=tail;){
-          ByteDblLnkNode prev;
+          Node prev;
           if(val==((head=(prev=head).next).val)){
             root.modCount=++modCount;
             this.modCount=modCount;
@@ -2102,8 +2330,8 @@ AbstractSeq<Byte>
       implements OmniListIterator.OfByte{
       private transient final CheckedSubList parent;
       private transient int modCount;
-      private transient ByteDblLnkNode curr;
-      private transient ByteDblLnkNode lastRet;
+      private transient Node curr;
+      private transient Node lastRet;
       private transient int currIndex;
       private BidirectionalItr(BidirectionalItr itr){
         this.parent=itr.parent;
@@ -2117,7 +2345,7 @@ AbstractSeq<Byte>
         this.modCount=parent.modCount;
         this.curr=parent.head;
       }
-      private BidirectionalItr(CheckedSubList parent,ByteDblLnkNode curr,int currIndex){
+      private BidirectionalItr(CheckedSubList parent,Node curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -2131,7 +2359,7 @@ AbstractSeq<Byte>
         CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
         final int currIndex;
         if((currIndex=this.currIndex)<parent.size){
-          ByteDblLnkNode curr;
+          Node curr;
           this.lastRet=curr=this.curr;
           this.curr=curr.next;
           this.currIndex=currIndex+1;
@@ -2144,7 +2372,7 @@ AbstractSeq<Byte>
         CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
         final int currIndex;
         if((currIndex=this.currIndex)!=0){
-          ByteDblLnkNode curr;
+          Node curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
           this.curr=curr;
           this.currIndex=currIndex-1;
@@ -2165,7 +2393,7 @@ AbstractSeq<Byte>
         return this.currIndex-1;
       }
       @Override public void set(byte val){
-        final ByteDblLnkNode lastRet;
+        final Node lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.root.modCount);
           lastRet.val=val;
@@ -2180,7 +2408,7 @@ AbstractSeq<Byte>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
-            ByteDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
@@ -2196,7 +2424,7 @@ AbstractSeq<Byte>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
-            ByteDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
@@ -2206,7 +2434,7 @@ AbstractSeq<Byte>
         }
       }
       @Override public void remove(){
-        ByteDblLnkNode lastRet;
+        Node lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedSubList parent;
           CheckedList root;
@@ -2215,7 +2443,7 @@ AbstractSeq<Byte>
           root.modCount=++modCount;
           this.modCount=modCount;
           parent.modCount=modCount;
-          ByteDblLnkNode curr;
+          Node curr;
           if((curr=lastRet.next)==this.curr){
             --currIndex;
           }else{
@@ -2254,37 +2482,37 @@ AbstractSeq<Byte>
         ++currIndex;
         if(++root.size!=1){
           if(++currList.size!=1){
-            ByteDblLnkNode after,before;
+            Node after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new ByteDblLnkNode(before,val,after);
+                before.next=before=new Node(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new ByteDblLnkNode(val,after));
+                currList.bubbleUpPrepend(before=new Node(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
-              ByteDblLnkNode newNode;
+              Node newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new ByteDblLnkNode(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new Node(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new ByteDblLnkNode(before,val));
+                currList.bubbleUpAppend(newNode=new Node(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new ByteDblLnkNode(val));
+            currList.bubbleUpInit(new Node(val));
           }
         }else{
-          ByteDblLnkNode newNode;
-          currList.bubbleUpRootInit(newNode=new ByteDblLnkNode(val));
+          Node newNode;
+          currList.bubbleUpRootInit(newNode=new Node(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
@@ -2296,13 +2524,13 @@ AbstractSeq<Byte>
       int tailDist;
       final int subListSize;
       if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
-        final ByteDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
-          subListTail=ByteDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?ByteDblLnkNode.iterateDescending(subListTail,subListSize-1):ByteDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=ByteDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?ByteDblLnkNode.iterateAscending(subListHead,subListSize-1):ByteDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -2312,9 +2540,9 @@ AbstractSeq<Byte>
       CheckedCollection.checkModCount(modCount,root.modCount);
       final int size;
       if((size=this.size)!=0){
-        ByteDblLnkNode head,newTail;
-        final var newHead=newTail=new ByteDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new ByteDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new CheckedList(newHead,size,newTail);
       }
       return new CheckedList();
@@ -2322,7 +2550,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,TypeUtil.castToByte(val));
@@ -2336,7 +2564,7 @@ AbstractSeq<Byte>
       if(val==(byte)val)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -2349,7 +2577,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(long val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -2365,7 +2593,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(float val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -2382,7 +2610,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(double val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -2399,7 +2627,7 @@ AbstractSeq<Byte>
     @Override public boolean remove(Object val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -2446,7 +2674,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(byte val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -2460,7 +2688,7 @@ AbstractSeq<Byte>
       if(val<=Byte.MAX_VALUE)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -2474,10 +2702,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,TypeUtil.castToByte(val));
+            return Node.uncheckedindexOf(head,tail,TypeUtil.castToByte(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2488,10 +2716,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return Node.uncheckedindexOf(head,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2501,12 +2729,12 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if((v=(byte)val)==val){
-              return ByteDblLnkNode.uncheckedindexOf(head,tail,v);
+              return Node.uncheckedindexOf(head,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2517,13 +2745,13 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedindexOf(head,tail,v);
+              return Node.uncheckedindexOf(head,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2534,13 +2762,13 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedindexOf(head,tail,v);
+              return Node.uncheckedindexOf(head,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2551,7 +2779,7 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -2587,7 +2815,7 @@ AbstractSeq<Byte>
               }else{
                 break returnFalse;
               }
-              return ByteDblLnkNode.uncheckedindexOf(head,tail,i);
+              return Node.uncheckedindexOf(head,tail,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2598,10 +2826,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return Node.uncheckedindexOf(head,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2612,10 +2840,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return Node.uncheckedindexOf(head,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2625,10 +2853,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,TypeUtil.castToByte(val));
+            return Node.uncheckedlastIndexOf(size,tail,TypeUtil.castToByte(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2639,10 +2867,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return Node.uncheckedlastIndexOf(size,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2652,12 +2880,12 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final byte v;
             if((v=(byte)val)==val){
-              return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+              return Node.uncheckedlastIndexOf(size,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2668,13 +2896,13 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+              return Node.uncheckedlastIndexOf(size,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2685,13 +2913,13 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+              return Node.uncheckedlastIndexOf(size,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2702,7 +2930,7 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -2738,7 +2966,7 @@ AbstractSeq<Byte>
               }else{
                 break returnFalse;
               }
-              return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,i);
+              return Node.uncheckedlastIndexOf(size,tail,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2749,10 +2977,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return Node.uncheckedlastIndexOf(size,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2763,10 +2991,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return Node.uncheckedlastIndexOf(size,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2776,10 +3004,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,TypeUtil.castToByte(val));
+            return Node.uncheckedcontains(head,tail,TypeUtil.castToByte(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2790,10 +3018,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+            return Node.uncheckedcontains(head,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2803,12 +3031,12 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if((v=(byte)val)==val){
-              return ByteDblLnkNode.uncheckedcontains(head,tail,v);
+              return Node.uncheckedcontains(head,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2819,13 +3047,13 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedcontains(head,tail,v);
+              return Node.uncheckedcontains(head,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2836,13 +3064,13 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedcontains(head,tail,v);
+              return Node.uncheckedcontains(head,tail,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2853,7 +3081,7 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -2889,7 +3117,7 @@ AbstractSeq<Byte>
               }else{
                 break returnFalse;
               }
-              return ByteDblLnkNode.uncheckedcontains(head,tail,i);
+              return Node.uncheckedcontains(head,tail,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -2900,10 +3128,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+            return Node.uncheckedcontains(head,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2914,10 +3142,10 @@ AbstractSeq<Byte>
       {
         CheckedCollection.checkModCount(modCount,root.modCount);
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+            return Node.uncheckedcontains(head,tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2925,11 +3153,11 @@ AbstractSeq<Byte>
     }
     private static class SerializableSubList implements Serializable{
       private static final long serialVersionUID=1L;
-      private transient ByteDblLnkNode head;
-      private transient ByteDblLnkNode tail;
+      private transient Node head;
+      private transient Node tail;
       private transient int size;
       private transient final CheckedList.ModCountChecker modCountChecker;
-      private SerializableSubList(ByteDblLnkNode head,int size,ByteDblLnkNode tail,CheckedList.ModCountChecker modCountChecker){
+      private SerializableSubList(Node head,int size,Node tail,CheckedList.ModCountChecker modCountChecker){
         this.head=head;
         this.tail=tail;
         this.size=size;
@@ -2943,8 +3171,8 @@ AbstractSeq<Byte>
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          ByteDblLnkNode curr;
-          for(this.head=curr=new ByteDblLnkNode((byte)ois.readByte());--size!=0;curr=curr.next=new ByteDblLnkNode(curr,(byte)ois.readByte())){}
+          Node curr;
+          for(this.head=curr=new Node((byte)ois.readByte());--size!=0;curr=curr.next=new Node(curr,(byte)ois.readByte())){}
           this.tail=curr;
         }
       }
@@ -2969,7 +3197,7 @@ AbstractSeq<Byte>
     private Object writeReplace(){
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
-    private static  ByteDblLnkNode pullSurvivorsDown(ByteDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
+    private static  Node pullSurvivorsDown(Node prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -2998,7 +3226,7 @@ AbstractSeq<Byte>
         prev=curr;
       }
     }
-    private static  ByteDblLnkNode pullSurvivorsDown(ByteDblLnkNode prev,long word,int numSurvivors,int numRemoved){
+    private static  Node pullSurvivorsDown(Node prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -3019,7 +3247,7 @@ AbstractSeq<Byte>
         prev=curr;
       }
     }
-    private void bubbleUpPeelHead(ByteDblLnkNode newHead,ByteDblLnkNode oldHead){
+    private void bubbleUpPeelHead(Node newHead,Node oldHead){
       newHead.prev=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.tail!=oldHead){
@@ -3032,7 +3260,7 @@ AbstractSeq<Byte>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelHead(ByteDblLnkNode newHead){
+    private void bubbleUpPeelHead(Node newHead){
       var curr=this;
       do{
         ++curr.modCount;
@@ -3040,7 +3268,7 @@ AbstractSeq<Byte>
         --curr.size; 
       }while((curr=curr.parent)!=null);
     }
-    private void bubbleUpPeelTail(ByteDblLnkNode newTail,ByteDblLnkNode oldTail){
+    private void bubbleUpPeelTail(Node newTail,Node oldTail){
       newTail.next=null;
       for(var curr=parent;curr!=null;curr=curr.parent){
         if(curr.head!=oldTail){
@@ -3053,7 +3281,7 @@ AbstractSeq<Byte>
         curr.tail=null;
       }
     }
-    private void bubbleUpPeelTail(ByteDblLnkNode newTail){
+    private void bubbleUpPeelTail(Node newTail){
       var curr=this;
       do{
         ++curr.modCount;
@@ -3074,9 +3302,9 @@ AbstractSeq<Byte>
          parent.uncheckedBubbleUpDecrementSize();
        }
     }
-    private void peelTail(ByteDblLnkNode newTail,ByteDblLnkNode oldTail){
+    private void peelTail(Node newTail,Node oldTail){
       this.tail=newTail;
-      ByteDblLnkNode after;
+      Node after;
       if((after=oldTail.next)==null){
         final CheckedSubList parent;
         if((parent=this.parent)!=null){
@@ -3097,8 +3325,8 @@ AbstractSeq<Byte>
       }
       newTail.next=after;
     }
-    private void peelTail(ByteDblLnkNode tail){
-      ByteDblLnkNode after,before;
+    private void peelTail(Node tail){
+      Node after,before;
       (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
@@ -3121,8 +3349,8 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void removeLastNode(ByteDblLnkNode lastNode){
-      ByteDblLnkNode after,before=lastNode.prev;
+    private void removeLastNode(Node lastNode){
+      Node after,before=lastNode.prev;
       if((after=lastNode.next)==null){
         CheckedList root;
         (root=this.root).tail=before;
@@ -3179,8 +3407,8 @@ AbstractSeq<Byte>
       this.head=null;
       this.tail=null;
     }
-    private void peelHead(ByteDblLnkNode head){
-      ByteDblLnkNode after,before;
+    private void peelHead(Node head){
+      Node after,before;
       (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
@@ -3224,8 +3452,8 @@ AbstractSeq<Byte>
             peelTail(tail);
           }
         }else{
-          ByteDblLnkNode before;
-          ret=(before=( tail=ByteDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=( tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
           bubbleUpDecrementSize();
@@ -3236,8 +3464,8 @@ AbstractSeq<Byte>
           ret=head.val;
           peelHead(head);
         }else{
-          ByteDblLnkNode after;
-          ret=(after=(head=ByteDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
           bubbleUpDecrementSize();
@@ -3247,7 +3475,7 @@ AbstractSeq<Byte>
       return ret;
     }
     @Override public boolean removeIf(BytePredicate filter){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return uncheckedRemoveIf(head,filter);
       }else{
@@ -3256,7 +3484,7 @@ AbstractSeq<Byte>
       return false;
     }
     @Override public boolean removeIf(Predicate<? super Byte> filter){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return uncheckedRemoveIf(head,filter::test);
       }else{
@@ -3264,13 +3492,13 @@ AbstractSeq<Byte>
       }
       return false;
     }
-    private void collapsehead(ByteDblLnkNode oldhead,ByteDblLnkNode tail,BytePredicate filter
+    private void collapsehead(Node oldhead,Node tail,BytePredicate filter
       ,int size,int modCount
     ){
       int numRemoved;
       int numLeft=size-(numRemoved=1)-1;
       final CheckedList root=this.root;
-      ByteDblLnkNode newhead;
+      Node newhead;
       for(newhead=oldhead.next;;
       --numLeft,
       ++numRemoved,newhead=newhead.next){ 
@@ -3288,7 +3516,7 @@ AbstractSeq<Byte>
       root.size-=numRemoved;
       this.size-=numRemoved;
       this.head=newhead;
-      ByteDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldhead.prev)==null){
         for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
             ++parent.modCount;
@@ -3308,13 +3536,13 @@ AbstractSeq<Byte>
       }
       newhead.prev=tmp;
     }
-    private void collapsetail(ByteDblLnkNode oldtail,ByteDblLnkNode head,BytePredicate filter
+    private void collapsetail(Node oldtail,Node head,BytePredicate filter
       ,int size,int modCount
     ){
       int numRemoved;
       int numLeft=size-(numRemoved=1)-1;
       final CheckedList root=this.root;
-      ByteDblLnkNode newtail;
+      Node newtail;
       for(newtail=oldtail.prev;;
       --numLeft,
       ++numRemoved,newtail=newtail.prev){ 
@@ -3332,7 +3560,7 @@ AbstractSeq<Byte>
       root.size-=numRemoved;
       this.size-=numRemoved;
       this.tail=newtail;
-      ByteDblLnkNode tmp;
+      Node tmp;
       if((tmp=oldtail.next)==null){
         for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
             ++parent.modCount;
@@ -3352,10 +3580,10 @@ AbstractSeq<Byte>
       }
       newtail.next=tmp;
     }
-    private void bubbleUpCollapseHeadAndTail(ByteDblLnkNode oldHead,ByteDblLnkNode newHead,int numRemoved,ByteDblLnkNode newTail,ByteDblLnkNode oldTail){
+    private void bubbleUpCollapseHeadAndTail(Node oldHead,Node newHead,int numRemoved,Node newTail,Node oldTail){
       this.head=newHead;
       this.tail=newTail;
-      final ByteDblLnkNode after,before=oldHead.prev;
+      final Node after,before=oldHead.prev;
       if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
@@ -3438,8 +3666,8 @@ AbstractSeq<Byte>
       newHead.prev=before;
       newTail.next=after;
     }
-    private boolean uncheckedRemoveIf(ByteDblLnkNode head,BytePredicate filter){
-      ByteDblLnkNode tail;
+    private boolean uncheckedRemoveIf(Node head,BytePredicate filter){
+      Node tail;
       int modCount=this.modCount;
       int size=this.size;
       try
@@ -3501,8 +3729,8 @@ AbstractSeq<Byte>
         clearAllHelper(size,this.head,this.tail,root);
       }
     }
-    private void clearAllHelper(int size,ByteDblLnkNode head,ByteDblLnkNode tail,CheckedList root){
-      ByteDblLnkNode before,after=tail.next;
+    private void clearAllHelper(int size,Node head,Node tail,CheckedList root){
+      Node before,after=tail.next;
       if((before=head.prev)==null){
         //this sublist is not preceded by nodes
         if(after==null){
@@ -3537,7 +3765,7 @@ AbstractSeq<Byte>
         ++curr.modCount;
       }
     }
-    private void bubbleUpClearBody(ByteDblLnkNode before,ByteDblLnkNode head,int numRemoved,ByteDblLnkNode tail,ByteDblLnkNode after){
+    private void bubbleUpClearBody(Node before,Node head,int numRemoved,Node tail,Node after){
       for(var curr=parent;curr!=null;
       ++curr.modCount,
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
@@ -3570,7 +3798,7 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpClearHead(ByteDblLnkNode tail, ByteDblLnkNode after,int numRemoved){
+    private void bubbleUpClearHead(Node tail, Node after,int numRemoved){
       for(var curr=parent;curr!=null;
       ++curr.modCount,
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
@@ -3584,7 +3812,7 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpClearTail(ByteDblLnkNode head, ByteDblLnkNode before,int numRemoved){
+    private void bubbleUpClearTail(Node head, Node before,int numRemoved){
       for(var curr=parent;curr!=null;
       ++curr.modCount,
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
@@ -3598,7 +3826,7 @@ AbstractSeq<Byte>
         }
       }
     }
-    private static  int collapseBodyHelper(ByteDblLnkNode newHead,ByteDblLnkNode newTail,int numLeft,BytePredicate filter,CheckedList.ModCountChecker modCountChecker)
+    private static  int collapseBodyHelper(Node newHead,Node newTail,int numLeft,BytePredicate filter,CheckedList.ModCountChecker modCountChecker)
     {
       if(numLeft!=0){
         int numSurvivors;
@@ -3627,7 +3855,7 @@ AbstractSeq<Byte>
       }
       return numLeft;
     }
-    private void collapseHeadAndTail(ByteDblLnkNode head,ByteDblLnkNode tail,BytePredicate filter
+    private void collapseHeadAndTail(Node head,Node tail,BytePredicate filter
       ,int size,int modCount
     ){
       int numRemoved;
@@ -3665,11 +3893,11 @@ AbstractSeq<Byte>
       root.size-=size;
       clearAllHelper(size,head,tail,root);
     }
-    private boolean collapseBody(ByteDblLnkNode head,ByteDblLnkNode tail,BytePredicate filter
+    private boolean collapseBody(Node head,Node tail,BytePredicate filter
       ,int size,int modCount
     ){
       for(int numLeft=size-2;numLeft!=0;--numLeft){
-        ByteDblLnkNode prev;
+        Node prev;
         if(filter.test((head=(prev=head).next).val)){
           int numRemoved=1;
           var root=this.root;
@@ -3701,7 +3929,7 @@ AbstractSeq<Byte>
         ++curr.modCount;
       }
     }
-    private void bubbleUpAppend(ByteDblLnkNode oldTail,ByteDblLnkNode newTail){
+    private void bubbleUpAppend(Node oldTail,Node newTail){
       oldTail.next=newTail;
       this.tail=newTail;
       for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
@@ -3713,13 +3941,13 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpAppend(ByteDblLnkNode newTail){
+    private void bubbleUpAppend(Node newTail){
       this.tail=newTail;
       for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
         ++currList.modCount;
       }
     }
-    private void bubbleUpPrepend(ByteDblLnkNode oldHead,ByteDblLnkNode newHead){
+    private void bubbleUpPrepend(Node oldHead,Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
         ++currList.modCount;
@@ -3730,13 +3958,13 @@ AbstractSeq<Byte>
         }
       }
     }
-    private void bubbleUpPrepend(ByteDblLnkNode newHead){
+    private void bubbleUpPrepend(Node newHead){
       this.head=newHead;
       for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
         ++currList.modCount;
       }
     }
-    private void bubbleUpRootInit(ByteDblLnkNode newNode){
+    private void bubbleUpRootInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       for(var parent=this.parent;parent!=null;parent=parent.parent){
@@ -3746,8 +3974,8 @@ AbstractSeq<Byte>
         parent.tail=newNode;
       }
     }
-    private void bubbleUpInitHelper(int index,int size,ByteDblLnkNode newNode){
-      ByteDblLnkNode after,before;   
+    private void bubbleUpInitHelper(int index,int size,Node newNode){
+      Node after,before;   
       if((size-=index)<=index){
         before=this.tail;
         if(size==1){
@@ -3760,7 +3988,7 @@ AbstractSeq<Byte>
           }
         }else{
           this.bubbleUpIncrementSize();
-          before=(after=ByteDblLnkNode.iterateDescending(before,size-2)).prev;
+          before=(after=Node.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
         }
         before.next=newNode;        
@@ -3776,7 +4004,7 @@ AbstractSeq<Byte>
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=ByteDblLnkNode.iterateAscending(after,index-1)).next;
+          after=(before=Node.iterateAscending(after,index-1)).next;
           before.next=newNode;
         }
         after.prev=newNode;
@@ -3784,7 +4012,7 @@ AbstractSeq<Byte>
       newNode.next=after;
       newNode.prev=before;
     }
-    private void bubbleUpInit(ByteDblLnkNode newNode){
+    private void bubbleUpInit(Node newNode){
       this.head=newNode;
       this.tail=newNode;
       CheckedSubList curr;
@@ -3809,7 +4037,7 @@ AbstractSeq<Byte>
       CheckedCollection.checkWriteHi(index,currSize=this.size);
       root.modCount=++modCount;
       this.modCount=modCount;
-      final var newNode=new ByteDblLnkNode(val);
+      final var newNode=new Node(val);
       if(++root.size!=1){
         this.size=++currSize;
         if(currSize!=1){    
@@ -3832,21 +4060,21 @@ AbstractSeq<Byte>
       this.modCount=modCount;
       if(++root.size!=1){
         if(++this.size!=1){
-          ByteDblLnkNode currTail,after;
+          Node currTail,after;
           if((after=(currTail=this.tail).next)==null){
-            currTail.next=currTail=new ByteDblLnkNode(currTail,val);
+            currTail.next=currTail=new Node(currTail,val);
             bubbleUpAppend(currTail);
             root.tail=currTail;
           }else{
-            bubbleUpAppend(currTail,currTail=new ByteDblLnkNode(currTail,val,after));
+            bubbleUpAppend(currTail,currTail=new Node(currTail,val,after));
             after.prev=currTail;
           }
         }else{
-          bubbleUpInit(new ByteDblLnkNode(val));
+          bubbleUpInit(new Node(val));
         }
       }else{
-        ByteDblLnkNode newNode;
-        bubbleUpRootInit(newNode=new ByteDblLnkNode(val));
+        Node newNode;
+        bubbleUpRootInit(newNode=new Node(val));
         this.size=1;
         root.head=newNode;
         root.tail=newNode;
@@ -3857,7 +4085,7 @@ AbstractSeq<Byte>
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      final ByteDblLnkNode node;
+      final Node node;
       final var ret=(node=((ByteDblLnkSeq)this).getNode(index,size)).val;
       node.val=val;
       return ret;
@@ -3885,7 +4113,7 @@ AbstractSeq<Byte>
       return this.size==0;
     }
     @Override public void replaceAll(ByteUnaryOperator operator){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)==null){
         CheckedCollection.checkModCount(modCount,root.modCount);
         return;
@@ -3893,7 +4121,7 @@ AbstractSeq<Byte>
       final CheckedList root;
       int modCount=this.modCount;
       try{
-        ByteDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
+        Node.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         root.modCount=++modCount;
@@ -3906,9 +4134,9 @@ AbstractSeq<Byte>
     @Override public void forEach(ByteConsumer action){
       final int modCount=this.modCount;
       try{
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null){
-          ByteDblLnkNode.uncheckedForEachAscending(head,this.size,action);
+          Node.uncheckedForEachAscending(head,this.size,action);
         }
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
@@ -3921,13 +4149,13 @@ AbstractSeq<Byte>
         int modCount=this.modCount;
         final CheckedList root;
         final byte[] tmp;
-        final ByteDblLnkNode tail;
+        final Node tail;
         if(sorter==null){
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
           ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
         }else{
-          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
           try{
             ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
           }catch(ArrayIndexOutOfBoundsException e){
@@ -3939,7 +4167,7 @@ AbstractSeq<Byte>
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -3953,13 +4181,13 @@ AbstractSeq<Byte>
       final int size;
       if((size=this.size)>1){
         final byte[] tmp;
-        final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
         ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
@@ -3971,17 +4199,17 @@ AbstractSeq<Byte>
       final int size;
       if((size=this.size)>1){
         final byte[] tmp;
-        final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
         ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void replaceAll(UnaryOperator<Byte> operator){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)==null){
         CheckedCollection.checkModCount(modCount,root.modCount);
         return;
@@ -3989,7 +4217,7 @@ AbstractSeq<Byte>
       final CheckedList root;
       int modCount=this.modCount;
       try{
-        ByteDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
+        Node.uncheckedReplaceAll(head,this.size,operator::apply);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         root.modCount=++modCount;
@@ -4002,9 +4230,9 @@ AbstractSeq<Byte>
     @Override public void forEach(Consumer<? super Byte> action){
       final int modCount=this.modCount;
       try{
-        final ByteDblLnkNode head;
+        final Node head;
         if((head=this.head)!=null){
-          ByteDblLnkNode.uncheckedForEachAscending(head,this.size,action::accept);
+          Node.uncheckedForEachAscending(head,this.size,action::accept);
         }
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4017,13 +4245,13 @@ AbstractSeq<Byte>
         int modCount=this.modCount;
         final CheckedList root;
         final byte[] tmp;
-        final ByteDblLnkNode tail;
+        final Node tail;
         if(sorter==null){
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
           ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
         }else{
-          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
           try{
             ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
           }catch(ArrayIndexOutOfBoundsException e){
@@ -4035,7 +4263,7 @@ AbstractSeq<Byte>
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -4047,13 +4275,13 @@ AbstractSeq<Byte>
         int modCount=this.modCount;
         final CheckedList root;
         final byte[] tmp;
-        final ByteDblLnkNode tail;
+        final Node tail;
         if(sorter==null){
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
           ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
         }else{
-          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
           try{
             ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
           }catch(ArrayIndexOutOfBoundsException e){
@@ -4065,7 +4293,7 @@ AbstractSeq<Byte>
         root.modCount=++modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
         this.modCount=modCount;
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -4134,7 +4362,7 @@ AbstractSeq<Byte>
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfByte){
               return root.isEqualTo(this.head,size,(OmniList.OfByte)list);
             }else if(list instanceof OmniList.OfRef){
@@ -4169,7 +4397,7 @@ AbstractSeq<Byte>
     }
     public CheckedList(){
     }
-    CheckedList(ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+    CheckedList(Node head,int size,Node tail){
       super(head,size,tail);
     }
     private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
@@ -4190,7 +4418,7 @@ AbstractSeq<Byte>
       }
     }
     @Override public byte removeLastByte(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=tail.val;
@@ -4206,7 +4434,7 @@ AbstractSeq<Byte>
       throw new NoSuchElementException();
     }
     @Override public byte popByte(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=head.val;
@@ -4245,8 +4473,8 @@ AbstractSeq<Byte>
           }
         }else{
           //iterate from the tail
-          ByteDblLnkNode before;
-          ret=(before=(tail=ByteDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=(tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
         }
@@ -4260,8 +4488,8 @@ AbstractSeq<Byte>
           head.prev=null;
         }else{
           //iterate from the head
-          ByteDblLnkNode after;
-          ret=(after=(head=ByteDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
         }
@@ -4279,29 +4507,29 @@ AbstractSeq<Byte>
         var tail=this.tail;
         if(size==1){
           //the insertion point IS the tail
-          tail.next=tail=new ByteDblLnkNode(tail,val);
+          tail.next=tail=new Node(tail,val);
           this.tail=tail;
         }else{
           //iterate from the tail and insert
-          ByteDblLnkNode before;
-          (before=(tail=ByteDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new ByteDblLnkNode(before,val,tail);
+          Node before;
+          (before=(tail=Node.iterateDescending(tail,size-2)).prev).next=before=new Node(before,val,tail);
           tail.prev=before;
         }
       }else{
         //the insertion point is closer to the head
-        ByteDblLnkNode head;
+        Node head;
         if((head=this.head)==null){
           //initialize the list
-          this.head=head=new ByteDblLnkNode(val);
+          this.head=head=new Node(val);
           this.tail=head;
         }else if(index==0){
           //the insertion point IS the head
-          head.prev=head=new ByteDblLnkNode(val,head);
+          head.prev=head=new Node(val,head);
           this.head=head;
         }else{
           //iterate from the head and insert
-          ByteDblLnkNode after;
-          (after=(head=ByteDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new ByteDblLnkNode(head,val,after);
+          Node after;
+          (after=(head=Node.iterateAscending(head,index-1)).next).prev=after=new Node(head,val,after);
           head.next=after;
         }
       }
@@ -4318,7 +4546,7 @@ AbstractSeq<Byte>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      ByteDblLnkNode tmp;
+      Node tmp;
       final var ret=(tmp=((ByteDblLnkSeq)this).getNode(index,size)).val;
       tmp.val=val;
       return ret;
@@ -4336,14 +4564,14 @@ AbstractSeq<Byte>
       return ((ByteDblLnkSeq)this).getNode(index,size).val;
     }
     @Override public byte getLastByte(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
          return tail.val;
       }
       throw new NoSuchElementException();
     }
     @Override public byte byteElement(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
          return head.val;
       }
@@ -4360,22 +4588,22 @@ AbstractSeq<Byte>
       });
     }
     @Override public void forEach(ByteConsumer action){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ByteDblLnkNode.uncheckedForEachAscending(head,this.size,action);
+          Node.uncheckedForEachAscending(head,this.size,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void replaceAll(ByteUnaryOperator operator){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ByteDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
+          Node.uncheckedReplaceAll(head,this.size,operator);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
@@ -4387,8 +4615,8 @@ AbstractSeq<Byte>
       final int size;
       if((size=this.size)>1){
         final byte[] tmp;
-        final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
         if(sorter==null){
           ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
           ++this.modCount;
@@ -4403,7 +4631,7 @@ AbstractSeq<Byte>
           }
           this.modCount=modCount+1;
         }
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableAscendingSort()
@@ -4412,11 +4640,11 @@ AbstractSeq<Byte>
       final int size;
       if((size=this.size)>1){
         final byte[] tmp;
-        final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
         ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
         this.modCount=modCount+1;
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
@@ -4425,30 +4653,30 @@ AbstractSeq<Byte>
       final int size;
       if((size=this.size)>1){
         final byte[] tmp;
-        final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
         ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
         this.modCount=modCount+1;
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void forEach(Consumer<? super Byte> action){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ByteDblLnkNode.uncheckedForEachAscending(head,this.size,action::accept);
+          Node.uncheckedForEachAscending(head,this.size,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void replaceAll(UnaryOperator<Byte> operator){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ByteDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
+          Node.uncheckedReplaceAll(head,this.size,operator::apply);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
@@ -4460,8 +4688,8 @@ AbstractSeq<Byte>
       final int size;
       if((size=this.size)>1){
         final byte[] tmp;
-        final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
         if(sorter==null){
           ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
           ++this.modCount;
@@ -4476,7 +4704,7 @@ AbstractSeq<Byte>
           }
           this.modCount=modCount+1;
         }
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void unstableSort(ByteComparator sorter){
@@ -4484,8 +4712,8 @@ AbstractSeq<Byte>
       final int size;
       if((size=this.size)>1){
         final byte[] tmp;
-        final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+        final Node tail;
+        Node.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
         if(sorter==null){
           ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
           ++this.modCount;
@@ -4500,10 +4728,10 @@ AbstractSeq<Byte>
           }
           this.modCount=modCount+1;
         }
-        ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+        Node.uncheckedCopyFrom(tmp,size,tail);
       }
     }
-    private void pullSurvivorsDown(ByteDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -4539,7 +4767,7 @@ AbstractSeq<Byte>
         prev=curr;
       }
     }
-    private void pullSurvivorsDown(ByteDblLnkNode prev,long word,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -4567,7 +4795,7 @@ AbstractSeq<Byte>
         prev=curr;
       }
     }
-    private int removeIfHelper(ByteDblLnkNode prev,BytePredicate filter,int numLeft,int modCount){
+    private int removeIfHelper(Node prev,BytePredicate filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -4589,7 +4817,7 @@ AbstractSeq<Byte>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return 0;
     }
-    @Override boolean uncheckedRemoveIf(ByteDblLnkNode head,BytePredicate filter){
+    @Override boolean uncheckedRemoveIf(Node head,BytePredicate filter){
       final int modCount=this.modCount;
       try{
         int numLeft=this.size;
@@ -4645,9 +4873,9 @@ AbstractSeq<Byte>
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        ByteDblLnkNode head,newTail;
-        final var newHead=newTail=new ByteDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new ByteDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new CheckedList(newHead,size,newTail);
       }
       return new CheckedList();
@@ -4658,7 +4886,7 @@ AbstractSeq<Byte>
         if((dls=(ByteDblLnkSeq)list) instanceof ByteDblLnkSeq.CheckedSubList){
           final ByteDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(ByteDblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
-          final ByteDblLnkNode thatHead,thisHead;
+          final Node thatHead,thisHead;
           return size==subList.size && ((thatHead=subList.head)==(thisHead=this.head) || UncheckedList.isEqualToHelper(thisHead,thatHead,this.tail));
         }else{
           return size==dls.size && UncheckedList.isEqualToHelper(this.head,dls.head,this.tail);
@@ -4679,14 +4907,14 @@ AbstractSeq<Byte>
         return size==(subList=(ByteArrSeq.UncheckedSubList)list).size && SequenceEqualityUtil.isEqualTo(subList.root.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head); 
       }
     }
-    private boolean isEqualTo(ByteDblLnkNode thisHead,int size,OmniList.OfByte list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.OfByte list){
       if(list instanceof ByteDblLnkSeq){
         final ByteDblLnkSeq dls;
         if((dls=(ByteDblLnkSeq)list) instanceof ByteDblLnkSeq.CheckedSubList){
           final ByteDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(ByteDblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
         }
-        final ByteDblLnkNode thatHead;
+        final Node thatHead;
         return size==dls.size && ((thatHead=dls.head)==thisHead||UncheckedList.isEqualToHelper(thatHead,thisHead,dls.tail));
       }else if(list instanceof ByteArrSeq.UncheckedList){
         final ByteArrSeq.UncheckedList that;
@@ -4714,7 +4942,7 @@ AbstractSeq<Byte>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfByte){
             return this.isEqualTo(size,(OmniList.OfByte)list);
           }else if(list instanceof OmniList.OfRef){
@@ -4750,19 +4978,19 @@ AbstractSeq<Byte>
       int tailDist;
       final int subListSize;
       if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
-        final ByteDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
-          subListTail=ByteDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?ByteDblLnkNode.iterateDescending(subListTail,subListSize-1):ByteDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=ByteDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?ByteDblLnkNode.iterateAscending(subListHead,subListSize-1):ByteDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
       return new CheckedSubList(this,fromIndex);
     } 
-    boolean uncheckedremoveLastOccurrence(ByteDblLnkNode tail
+    boolean uncheckedremoveLastOccurrence(Node tail
     ,int val
     ){
       {
@@ -4778,7 +5006,7 @@ AbstractSeq<Byte>
           --this.size;
           return true;
         }
-        for(ByteDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(val==(tail.val)){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
@@ -4795,7 +5023,7 @@ AbstractSeq<Byte>
       }
       return false;
     }
-    boolean uncheckedremoveVal(ByteDblLnkNode head
+    boolean uncheckedremoveVal(Node head
     ,int val
     ){
       {
@@ -4810,7 +5038,7 @@ AbstractSeq<Byte>
           }
           return true;
         }
-        for(ByteDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(val==(head.val)){
             ++this.modCount;
             if((head=head.next)==null){
@@ -4828,7 +5056,7 @@ AbstractSeq<Byte>
       return false;
     }
     @Override public byte pollByte(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(head.val);
@@ -4844,7 +5072,7 @@ AbstractSeq<Byte>
       return Byte.MIN_VALUE;
     }
     @Override public byte pollLastByte(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(tail.val);
@@ -4860,7 +5088,7 @@ AbstractSeq<Byte>
       return Byte.MIN_VALUE;
     }
     @Override public Byte poll(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(head.val);
@@ -4876,7 +5104,7 @@ AbstractSeq<Byte>
       return null;
     }
     @Override public Byte pollLast(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(tail.val);
@@ -4892,7 +5120,7 @@ AbstractSeq<Byte>
       return null;
     }
     @Override public double pollDouble(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(double)(head.val);
@@ -4908,7 +5136,7 @@ AbstractSeq<Byte>
       return Double.NaN;
     }
     @Override public double pollLastDouble(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(double)(tail.val);
@@ -4924,7 +5152,7 @@ AbstractSeq<Byte>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(float)(head.val);
@@ -4940,7 +5168,7 @@ AbstractSeq<Byte>
       return Float.NaN;
     }
     @Override public float pollLastFloat(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(float)(tail.val);
@@ -4956,7 +5184,7 @@ AbstractSeq<Byte>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(long)(head.val);
@@ -4972,7 +5200,7 @@ AbstractSeq<Byte>
       return Long.MIN_VALUE;
     }
     @Override public long pollLastLong(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(long)(tail.val);
@@ -4988,7 +5216,7 @@ AbstractSeq<Byte>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(int)(head.val);
@@ -5004,7 +5232,7 @@ AbstractSeq<Byte>
       return Integer.MIN_VALUE;
     }
     @Override public int pollLastInt(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(int)(tail.val);
@@ -5020,7 +5248,7 @@ AbstractSeq<Byte>
       return Integer.MIN_VALUE;
     }
     @Override public short pollShort(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         ++this.modCount;
         final var ret=(short)(head.val);
@@ -5036,7 +5264,7 @@ AbstractSeq<Byte>
       return Short.MIN_VALUE;
     }
     @Override public short pollLastShort(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
         final var ret=(short)(tail.val);
@@ -5056,8 +5284,8 @@ AbstractSeq<Byte>
     {
       transient final CheckedList parent;
       transient int modCount;
-      transient ByteDblLnkNode curr;
-      transient ByteDblLnkNode lastRet;
+      transient Node curr;
+      transient Node lastRet;
       transient int currIndex;
       private DescendingItr(DescendingItr itr){
         this.parent=itr.parent;
@@ -5072,7 +5300,7 @@ AbstractSeq<Byte>
         this.currIndex=parent.size;
         this.curr=parent.tail;
       }
-      private DescendingItr(CheckedList parent,ByteDblLnkNode curr,int currIndex){
+      private DescendingItr(CheckedList parent,Node curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -5086,7 +5314,7 @@ AbstractSeq<Byte>
       }
       @Override public byte nextByte(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final ByteDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           this.lastRet=curr;
           this.curr=curr.prev;
@@ -5096,7 +5324,7 @@ AbstractSeq<Byte>
         throw new NoSuchElementException();
       }
       @Override public void remove(){
-        ByteDblLnkNode lastRet;
+        Node lastRet;
         if((lastRet=this.lastRet)!=null){
           final CheckedList parent;
           int modCount;
@@ -5114,7 +5342,7 @@ AbstractSeq<Byte>
               parent.head=lastRet=lastRet.next;
               lastRet.prev=null;
             }else{
-              ByteDblLnkNode.eraseNode(lastRet);
+              Node.eraseNode(lastRet);
             }
           }
           this.lastRet=null;
@@ -5126,7 +5354,7 @@ AbstractSeq<Byte>
         final int modCount=this.modCount;
         final CheckedList parent;
         try{
-          ByteDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
+          Node.uncheckedForEachDescending(this.curr,currIndex,action);
         }finally{
           CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount,currIndex,this.currIndex);
         }
@@ -5154,7 +5382,7 @@ AbstractSeq<Byte>
       private BidirectionalItr(CheckedList parent){
         super(parent,parent.head,0);
       }
-      private BidirectionalItr(CheckedList parent,ByteDblLnkNode curr,int currIndex){
+      private BidirectionalItr(CheckedList parent,Node curr,int currIndex){
         super(parent,curr,currIndex);
       }
       @Override public Object clone(){
@@ -5162,7 +5390,7 @@ AbstractSeq<Byte>
       }
       @Override public byte nextByte(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final ByteDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           this.lastRet=curr;
           this.curr=curr.next;
@@ -5176,7 +5404,7 @@ AbstractSeq<Byte>
         CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
         final int currIndex;
         if((currIndex=this.currIndex)!=0){
-          ByteDblLnkNode curr;
+          Node curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
           this.curr=curr;
           this.currIndex=currIndex-1;
@@ -5194,7 +5422,7 @@ AbstractSeq<Byte>
         return this.currIndex-1;
       }
       @Override public void set(byte val){
-        final ByteDblLnkNode lastRet;
+        final Node lastRet;
         if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.modCount);
           lastRet.val=val;
@@ -5208,36 +5436,36 @@ AbstractSeq<Byte>
         CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
         parent.modCount=++modCount;
         this.modCount=modCount;
-        ByteDblLnkNode newNode;
+        Node newNode;
         final int currIndex;
         if((currIndex=++this.currIndex)==++parent.size){
           if(currIndex==1){
-            parent.head=newNode=new ByteDblLnkNode(val);
+            parent.head=newNode=new Node(val);
           }else{
-            (newNode=parent.tail).next=newNode=new ByteDblLnkNode(newNode,val);
+            (newNode=parent.tail).next=newNode=new Node(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new ByteDblLnkNode(val,newNode);
+            (newNode=parent.head).prev=newNode=new Node(val,newNode);
             parent.head=newNode;
           }else{
-            final ByteDblLnkNode tmp;
-            (newNode=curr).prev=newNode=new ByteDblLnkNode(tmp=newNode.prev,val,newNode);
+            final Node tmp;
+            (newNode=curr).prev=newNode=new Node(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }
         this.lastRet=null;
       }
       @Override public void remove(){
-        ByteDblLnkNode lastRet;
+        Node lastRet;
         if((lastRet=this.lastRet)!=null){
           final CheckedList parent;
           int modCount;
           CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
           parent.modCount=++modCount;
           this.modCount=modCount;
-          ByteDblLnkNode curr;
+          Node curr;
           if((curr=lastRet.next)==this.curr){
             --currIndex;
           }else{
@@ -5270,7 +5498,7 @@ AbstractSeq<Byte>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
-            ByteDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
@@ -5286,7 +5514,7 @@ AbstractSeq<Byte>
         if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
-            ByteDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+            Node.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
@@ -5316,7 +5544,7 @@ AbstractSeq<Byte>
     }
     public UncheckedList(){
     }
-    UncheckedList(ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+    UncheckedList(Node head,int size,Node tail){
       super(head,size,tail);
     }
     @Override public void clear(){
@@ -5325,7 +5553,7 @@ AbstractSeq<Byte>
       this.tail=null;
     }
     @Override public byte removeLastByte(){
-      ByteDblLnkNode tail;
+      Node tail;
       final var ret=(tail=this.tail).val;{
       if(--size==0){
           this.head=null;
@@ -5338,7 +5566,7 @@ AbstractSeq<Byte>
       }
     }
     @Override public byte popByte(){
-      ByteDblLnkNode head;
+      Node head;
       final var ret=(head=this.head).val;{
       if(--size==0){
           this.head=null;
@@ -5370,8 +5598,8 @@ AbstractSeq<Byte>
           }
         }else{
           //iterate from the tail
-          ByteDblLnkNode before;
-          ret=(before=(tail=ByteDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          Node before;
+          ret=(before=(tail=Node.iterateDescending(tail,size-1)).prev).val;
           (before=before.prev).next=tail;
           tail.prev=before;
         }
@@ -5385,8 +5613,8 @@ AbstractSeq<Byte>
           head.prev=null;
         }else{
           //iterate from the head
-          ByteDblLnkNode after;
-          ret=(after=(head=ByteDblLnkNode.iterateAscending(head,index-1)).next).val;
+          Node after;
+          ret=(after=(head=Node.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
         }
@@ -5400,49 +5628,49 @@ AbstractSeq<Byte>
         var tail=this.tail;
         if(size==1){
           //the insertion point IS the tail
-          tail.next=tail=new ByteDblLnkNode(tail,val);
+          tail.next=tail=new Node(tail,val);
           this.tail=tail;
         }else{
           //iterate from the tail and insert
-          ByteDblLnkNode before;
-          (before=(tail=ByteDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new ByteDblLnkNode(before,val,tail);
+          Node before;
+          (before=(tail=Node.iterateDescending(tail,size-2)).prev).next=before=new Node(before,val,tail);
           tail.prev=before;
         }
       }else{
         //the insertion point is closer to the head
-        ByteDblLnkNode head;
+        Node head;
         if((head=this.head)==null){
           //initialize the list
-          this.head=head=new ByteDblLnkNode(val);
+          this.head=head=new Node(val);
           this.tail=head;
         }else if(index==0){
           //the insertion point IS the head
-          head.prev=head=new ByteDblLnkNode(val,head);
+          head.prev=head=new Node(val,head);
           this.head=head;
         }else{
           //iterate from the head and insert
-          ByteDblLnkNode after;
-          (after=(head=ByteDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new ByteDblLnkNode(head,val,after);
+          Node after;
+          (after=(head=Node.iterateAscending(head,index-1)).next).prev=after=new Node(head,val,after);
           head.next=after;
         }
       }
     }
     @Override public void addLast(byte val){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)==null){
-        this.head=tail=new ByteDblLnkNode(val);
+        this.head=tail=new Node(val);
       }else{
-        tail.next=tail=new ByteDblLnkNode(tail,val);
+        tail.next=tail=new Node(tail,val);
       }
       this.tail=tail;
       ++this.size;
     }
     @Override public void push(byte val){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)==null){
-        tail=head=new ByteDblLnkNode(val);
+        tail=head=new Node(val);
       }else{
-        head.prev=head=new ByteDblLnkNode(val,head);
+        head.prev=head=new Node(val,head);
       }
       this.head=head;
       ++this.size;
@@ -5463,22 +5691,22 @@ AbstractSeq<Byte>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        ByteDblLnkNode curr;
-        for(this.head=curr=new ByteDblLnkNode((byte)in.readByte());--size!=0;curr=curr.next=new ByteDblLnkNode(curr,(byte)in.readByte())){}
+        Node curr;
+        for(this.head=curr=new Node((byte)in.readByte());--size!=0;curr=curr.next=new Node(curr,(byte)in.readByte())){}
         this.tail=curr;
       }
     }
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        ByteDblLnkNode head,newTail;
-        final var newHead=newTail=new ByteDblLnkNode((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new ByteDblLnkNode(newTail,(head=head.next).val),++i){}
+        Node head,newTail;
+        final var newHead=newTail=new Node((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new Node(newTail,(head=head.next).val),++i){}
         return new UncheckedList(newHead,size,newTail);
       }
       return new UncheckedList();
     }
-    private static boolean isEqualToHelper(ByteDblLnkNode thisHead,ByteDblLnkNode thatHead,ByteDblLnkNode thisTail){
+    private static boolean isEqualToHelper(Node thisHead,Node thatHead,Node thisTail){
       for(;thisHead.val==thatHead.val;thisHead=thisHead.next,thatHead=thatHead.next){
         if(thisHead==thisTail){
           return true;
@@ -5493,7 +5721,7 @@ AbstractSeq<Byte>
           final ByteDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(ByteDblLnkSeq.CheckedSubList)dls).modCount,subList.root.modCount);
         }
-        final ByteDblLnkNode thatHead,thisHead;
+        final Node thatHead,thisHead;
         return dls.size==size && ((thatHead=dls.head)==(thisHead=this.head)||isEqualToHelper(thisHead,thatHead,this.tail));
       }else if(list instanceof ByteArrSeq.UncheckedList){
         final ByteArrSeq.UncheckedList that;
@@ -5511,14 +5739,14 @@ AbstractSeq<Byte>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,this.head);
       }
     }
-    private boolean isEqualTo(ByteDblLnkNode thisHead,int size,OmniList.OfByte list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.OfByte list){
       if(list instanceof ByteDblLnkSeq){
         final ByteDblLnkSeq dls;
         if((dls=(ByteDblLnkSeq)list) instanceof ByteDblLnkSeq.CheckedSubList){
           final ByteDblLnkSeq.CheckedSubList subList;
           CheckedCollection.checkModCount((subList=(ByteDblLnkSeq.CheckedSubList)list).modCount,subList.root.modCount);
         }
-        final ByteDblLnkNode thatHead;
+        final Node thatHead;
         return dls.size==size && ((thatHead=dls.head)==thisHead || isEqualToHelper(thatHead,thisHead,dls.tail));
       }else if(list instanceof ByteArrSeq.UncheckedList){
         final ByteArrSeq.UncheckedList that;
@@ -5536,7 +5764,7 @@ AbstractSeq<Byte>
         return size==subList.size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(ByteDblLnkNode thisHead,int size,OmniList.OfRef<?> list){
+    private boolean isEqualTo(Node thisHead,int size,OmniList.OfRef<?> list){
       //TODO
       if(list instanceof RefArrSeq.UncheckedList){
         final RefArrSeq.UncheckedList<?> that;
@@ -5561,7 +5789,7 @@ AbstractSeq<Byte>
         return size==subList.size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
     }
-    private static boolean isEqualTo(ListIterator<?> itr,ByteDblLnkNode head,ByteDblLnkNode tail){ 
+    private static boolean isEqualTo(ListIterator<?> itr,Node head,Node tail){ 
       while(itr.hasNext() && TypeUtil.refEquals(itr.next(),head.val)){
         if(head==tail){
           return !itr.hasNext();
@@ -5580,7 +5808,7 @@ AbstractSeq<Byte>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfByte){
             return this.isEqualTo(size,(OmniList.OfByte)list);
           }else if(list instanceof OmniList.OfRef){
@@ -5595,7 +5823,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(boolean val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,TypeUtil.castToByte(val));
@@ -5608,7 +5836,7 @@ AbstractSeq<Byte>
       if(val==(byte)val)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -5620,7 +5848,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(long val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -5635,7 +5863,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(float val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -5651,7 +5879,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(double val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
@@ -5667,7 +5895,7 @@ AbstractSeq<Byte>
     @Override public boolean remove(Object val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -5713,7 +5941,7 @@ AbstractSeq<Byte>
     @Override public boolean removeVal(byte val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -5726,7 +5954,7 @@ AbstractSeq<Byte>
       if(val<=Byte.MAX_VALUE)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -5735,7 +5963,7 @@ AbstractSeq<Byte>
       }//end val check
       return false;
     }
-    boolean uncheckedremoveVal(ByteDblLnkNode head
+    boolean uncheckedremoveVal(Node head
     ,int val
     ){
       {
@@ -5749,7 +5977,7 @@ AbstractSeq<Byte>
           }
           return true;
         }
-        for(ByteDblLnkNode prev;(head=(prev=head).next)!=null;){
+        for(Node prev;(head=(prev=head).next)!=null;){
           if(val==(head.val)){
             if((head=head.next)==null){
               this.tail=prev;
@@ -5781,13 +6009,13 @@ AbstractSeq<Byte>
       final int subListSize;
       if((subListSize=toIndex-fromIndex)!=0){
         final int tailDist;
-        final ByteDblLnkNode subListHead,subListTail;
+        final Node subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
-          subListTail=ByteDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?ByteDblLnkNode.iterateDescending(subListTail,subListSize-1):ByteDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=Node.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?Node.iterateDescending(subListTail,subListSize-1):Node.iterateAscending(this.head,fromIndex);
         }else{
-          subListHead=ByteDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?ByteDblLnkNode.iterateAscending(subListHead,subListSize-1):ByteDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=Node.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?Node.iterateAscending(subListHead,subListSize-1):Node.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -5817,10 +6045,10 @@ AbstractSeq<Byte>
     @Override public int search(boolean val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedsearch(head,TypeUtil.castToByte(val));
+            return Node.uncheckedsearch(head,TypeUtil.castToByte(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5830,10 +6058,10 @@ AbstractSeq<Byte>
       if(val==(byte)val)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedsearch(head,(val));
+            return Node.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5842,12 +6070,12 @@ AbstractSeq<Byte>
     @Override public int search(long val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if((v=(byte)val)==val){
-              return ByteDblLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -5857,13 +6085,13 @@ AbstractSeq<Byte>
     @Override public int search(float val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -5873,13 +6101,13 @@ AbstractSeq<Byte>
     @Override public int search(double val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             final byte v;
             if(val==(v=(byte)val))
             {
-              return ByteDblLnkNode.uncheckedsearch(head,v);
+              return Node.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -5889,7 +6117,7 @@ AbstractSeq<Byte>
     @Override public int search(Object val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -5925,7 +6153,7 @@ AbstractSeq<Byte>
               }else{
                 break returnFalse;
               }
-              return ByteDblLnkNode.uncheckedsearch(head,i);
+              return Node.uncheckedsearch(head,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -5935,10 +6163,10 @@ AbstractSeq<Byte>
     @Override public int search(byte val){
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedsearch(head,(val));
+            return Node.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5948,10 +6176,10 @@ AbstractSeq<Byte>
       if(val<=Byte.MAX_VALUE)
       {
         {
-          final ByteDblLnkNode head;
+          final Node head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedsearch(head,(val));
+            return Node.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5960,7 +6188,7 @@ AbstractSeq<Byte>
     @Override public boolean removeLastOccurrence(boolean val){
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             return uncheckedremoveLastOccurrence(tail,TypeUtil.castToByte(val));
@@ -5973,7 +6201,7 @@ AbstractSeq<Byte>
       if(val==(byte)val)
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             return uncheckedremoveLastOccurrence(tail,(val));
@@ -5985,7 +6213,7 @@ AbstractSeq<Byte>
     @Override public boolean removeLastOccurrence(long val){
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final byte v;
@@ -6000,7 +6228,7 @@ AbstractSeq<Byte>
     @Override public boolean removeLastOccurrence(float val){
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final byte v;
@@ -6016,7 +6244,7 @@ AbstractSeq<Byte>
     @Override public boolean removeLastOccurrence(double val){
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             final byte v;
@@ -6032,7 +6260,7 @@ AbstractSeq<Byte>
     @Override public boolean removeLastOccurrence(Object val){
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             //todo: a pattern-matching switch statement would be great here
@@ -6078,7 +6306,7 @@ AbstractSeq<Byte>
     @Override public boolean removeLastOccurrence(byte val){
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             return uncheckedremoveLastOccurrence(tail,(val));
@@ -6091,7 +6319,7 @@ AbstractSeq<Byte>
       if(val<=Byte.MAX_VALUE)
       {
         {
-          final ByteDblLnkNode tail;
+          final Node tail;
           if((tail=this.tail)!=null)
           {
             return uncheckedremoveLastOccurrence(tail,(val));
@@ -6100,7 +6328,7 @@ AbstractSeq<Byte>
       }//end val check
       return false;
     }
-    boolean uncheckedremoveLastOccurrence(ByteDblLnkNode tail
+    boolean uncheckedremoveLastOccurrence(Node tail
     ,int val
     ){
       {
@@ -6115,7 +6343,7 @@ AbstractSeq<Byte>
           --this.size;
           return true;
         }
-        for(ByteDblLnkNode next;(tail=(next=tail).prev)!=null;){
+        for(Node next;(tail=(next=tail).prev)!=null;){
           if(val==(tail.val)){
             if((tail=tail.prev)==null){
               this.head=next;
@@ -6180,7 +6408,7 @@ AbstractSeq<Byte>
       return getLastByte();
     }
     @Override public byte pollByte(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(--this.size==0){
@@ -6195,7 +6423,7 @@ AbstractSeq<Byte>
       return Byte.MIN_VALUE;
     }
     @Override public byte pollLastByte(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(tail.val);
         if(--this.size==0){
@@ -6210,7 +6438,7 @@ AbstractSeq<Byte>
       return Byte.MIN_VALUE;
     }
     @Override public Byte poll(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         if(--this.size==0){
@@ -6225,7 +6453,7 @@ AbstractSeq<Byte>
       return null;
     }
     @Override public Byte pollLast(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(tail.val);
         if(--this.size==0){
@@ -6240,7 +6468,7 @@ AbstractSeq<Byte>
       return null;
     }
     @Override public double pollDouble(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         if(--this.size==0){
@@ -6255,7 +6483,7 @@ AbstractSeq<Byte>
       return Double.NaN;
     }
     @Override public double pollLastDouble(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(double)(tail.val);
         if(--this.size==0){
@@ -6270,7 +6498,7 @@ AbstractSeq<Byte>
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
         if(--this.size==0){
@@ -6285,7 +6513,7 @@ AbstractSeq<Byte>
       return Float.NaN;
     }
     @Override public float pollLastFloat(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(float)(tail.val);
         if(--this.size==0){
@@ -6300,7 +6528,7 @@ AbstractSeq<Byte>
       return Float.NaN;
     }
     @Override public long pollLong(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
         if(--this.size==0){
@@ -6315,7 +6543,7 @@ AbstractSeq<Byte>
       return Long.MIN_VALUE;
     }
     @Override public long pollLastLong(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(long)(tail.val);
         if(--this.size==0){
@@ -6330,7 +6558,7 @@ AbstractSeq<Byte>
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
         if(--this.size==0){
@@ -6345,7 +6573,7 @@ AbstractSeq<Byte>
       return Integer.MIN_VALUE;
     }
     @Override public int pollLastInt(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(int)(tail.val);
         if(--this.size==0){
@@ -6360,7 +6588,7 @@ AbstractSeq<Byte>
       return Integer.MIN_VALUE;
     }
     @Override public short pollShort(){
-      ByteDblLnkNode head;
+      Node head;
       if((head=this.head)!=null){
         final var ret=(short)(head.val);
         if(--this.size==0){
@@ -6375,7 +6603,7 @@ AbstractSeq<Byte>
       return Short.MIN_VALUE;
     }
     @Override public short pollLastShort(){
-      ByteDblLnkNode tail;
+      Node tail;
       if((tail=this.tail)!=null){
         final var ret=(short)(tail.val);
         if(--this.size==0){
@@ -6390,114 +6618,114 @@ AbstractSeq<Byte>
       return Short.MIN_VALUE;
     }
     @Override public byte peekByte(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (head.val);
       }
       return Byte.MIN_VALUE;
     }
     @Override public byte peekLastByte(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (tail.val);
       }
       return Byte.MIN_VALUE;
     }
     @Override public Byte peek(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (head.val);
       }
       return null;
     }
     @Override public Byte peekLast(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (tail.val);
       }
       return null;
     }
     @Override public double peekDouble(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (double)(head.val);
       }
       return Double.NaN;
     }
     @Override public double peekLastDouble(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (double)(tail.val);
       }
       return Double.NaN;
     }
     @Override public float peekFloat(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (float)(head.val);
       }
       return Float.NaN;
     }
     @Override public float peekLastFloat(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (float)(tail.val);
       }
       return Float.NaN;
     }
     @Override public long peekLong(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (long)(head.val);
       }
       return Long.MIN_VALUE;
     }
     @Override public long peekLastLong(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (long)(tail.val);
       }
       return Long.MIN_VALUE;
     }
     @Override public int peekInt(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (int)(head.val);
       }
       return Integer.MIN_VALUE;
     }
     @Override public int peekLastInt(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (int)(tail.val);
       }
       return Integer.MIN_VALUE;
     }
     @Override public short peekShort(){
-      final ByteDblLnkNode head;
+      final Node head;
       if((head=this.head)!=null){
         return (short)(head.val);
       }
       return Short.MIN_VALUE;
     }
     @Override public short peekLastShort(){
-      final ByteDblLnkNode tail;
+      final Node tail;
       if((tail=this.tail)!=null){
         return (short)(tail.val);
       }
       return Short.MIN_VALUE;
     }
     @Override public boolean removeIf(BytePredicate filter){
-      final ByteDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
     }
     @Override public boolean removeIf(Predicate<? super Byte> filter){
-      final ByteDblLnkNode head;
+      final Node head;
       return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
     }
-    private int removeIfHelper(ByteDblLnkNode prev,ByteDblLnkNode tail,BytePredicate filter){
+    private int removeIfHelper(Node prev,Node tail,BytePredicate filter){
       int numSurvivors=1;
-      outer:for(ByteDblLnkNode next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
           do{
             if(next==tail){
@@ -6513,7 +6741,7 @@ AbstractSeq<Byte>
       }
       return numSurvivors;
     }
-    private int removeIfHelper(ByteDblLnkNode prev,ByteDblLnkNode curr,ByteDblLnkNode tail,BytePredicate filter){
+    private int removeIfHelper(Node prev,Node curr,Node tail,BytePredicate filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -6531,7 +6759,7 @@ AbstractSeq<Byte>
       this.tail=prev;
       return numSurvivors;
     }
-    boolean uncheckedRemoveIf(ByteDblLnkNode head,BytePredicate filter){
+    boolean uncheckedRemoveIf(Node head,BytePredicate filter){
       if(filter.test(head.val)){
         for(var tail=this.tail;head!=tail;){
           if(!filter.test((head=head.next).val)){
@@ -6548,7 +6776,7 @@ AbstractSeq<Byte>
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final ByteDblLnkNode prev;
+          final Node prev;
           if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
@@ -6573,12 +6801,12 @@ AbstractSeq<Byte>
           parent.head=null;
           parent.tail=null;
         }else{
-          ByteDblLnkNode curr;
+          Node curr;
           if((curr=this.curr)==null){
             (curr=parent.head.next).prev=null;
             parent.head=curr;
           }else{
-            ByteDblLnkNode lastRet;
+            Node lastRet;
             if((lastRet=curr.next)==parent.tail){
               parent.tail=curr;
               curr.next=null;
@@ -6590,24 +6818,24 @@ AbstractSeq<Byte>
         }
       }
       @Override public byte nextByte(){
-        final ByteDblLnkNode curr;
+        final Node curr;
         this.curr=(curr=this.curr).prev;
         return curr.val;
       }
-      @Override void uncheckedForEachRemaining(ByteDblLnkNode curr,ByteConsumer action){
-        ByteDblLnkNode.uncheckedForEachDescending(curr,action);
+      @Override void uncheckedForEachRemaining(Node curr,ByteConsumer action){
+        Node.uncheckedForEachDescending(curr,action);
       }
     }
     private static class AscendingItr
       extends AbstractByteItr
     {
       transient final UncheckedList parent;
-      transient ByteDblLnkNode curr;
+      transient Node curr;
       private AscendingItr(AscendingItr itr){
         this.parent=itr.parent;
         this.curr=itr.curr;
       }
-      private AscendingItr(UncheckedList parent,ByteDblLnkNode curr){
+      private AscendingItr(UncheckedList parent,Node curr){
         this.parent=parent;
         this.curr=curr;
       }
@@ -6627,12 +6855,12 @@ AbstractSeq<Byte>
           parent.head=null;
           parent.tail=null;
         }else{
-          ByteDblLnkNode curr;
+          Node curr;
           if((curr=this.curr)==null){
             (curr=parent.tail.prev).next=null;
             parent.tail=curr;
           }else{
-            ByteDblLnkNode lastRet;
+            Node lastRet;
             if((lastRet=curr.prev)==parent.head){
               parent.head=curr;
               curr.prev=null;
@@ -6644,22 +6872,22 @@ AbstractSeq<Byte>
         }
       }
       @Override public byte nextByte(){
-        final ByteDblLnkNode curr;
+        final Node curr;
         this.curr=(curr=this.curr).next;
         return curr.val;
       }
-      void uncheckedForEachRemaining(ByteDblLnkNode curr,ByteConsumer action){
-        ByteDblLnkNode.uncheckedForEachAscending(curr,action);
+      void uncheckedForEachRemaining(Node curr,ByteConsumer action){
+        Node.uncheckedForEachAscending(curr,action);
       }
       @Override public void forEachRemaining(ByteConsumer action){
-        final ByteDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           uncheckedForEachRemaining(curr,action);
           this.curr=null;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final ByteDblLnkNode curr;
+        final Node curr;
         if((curr=this.curr)!=null){
           uncheckedForEachRemaining(curr,action::accept);
           this.curr=null;
@@ -6668,7 +6896,7 @@ AbstractSeq<Byte>
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfByte{
       private transient int currIndex;
-      private transient ByteDblLnkNode lastRet;
+      private transient Node lastRet;
       private BidirectionalItr(BidirectionalItr itr){
         super(itr);
         this.currIndex=itr.currIndex;
@@ -6677,7 +6905,7 @@ AbstractSeq<Byte>
       private BidirectionalItr(UncheckedList parent){
         super(parent);
       }
-      private BidirectionalItr(UncheckedList parent,ByteDblLnkNode curr,int currIndex){
+      private BidirectionalItr(UncheckedList parent,Node curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
       }
@@ -6685,14 +6913,14 @@ AbstractSeq<Byte>
         return new BidirectionalItr(this);
       }
       @Override public byte nextByte(){
-        final ByteDblLnkNode curr;
+        final Node curr;
         this.lastRet=curr=this.curr;
         this.curr=curr.next;
         ++this.currIndex;
         return curr.val;
       }
       @Override public byte previousByte(){
-        ByteDblLnkNode curr;
+        Node curr;
         this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
         this.curr=curr;
         --this.currIndex;
@@ -6709,22 +6937,22 @@ AbstractSeq<Byte>
       }
       @Override public void add(byte val){
         final UncheckedList parent;
-        ByteDblLnkNode newNode;
+        Node newNode;
         final int currIndex;
         if((currIndex=++this.currIndex)==++(parent=this.parent).size){
           if(currIndex==1){
-            parent.head=newNode=new ByteDblLnkNode(val);
+            parent.head=newNode=new Node(val);
           }else{
-            (newNode=parent.tail).next=newNode=new ByteDblLnkNode(newNode,val);
+            (newNode=parent.tail).next=newNode=new Node(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new ByteDblLnkNode(val,newNode);
+            (newNode=parent.head).prev=newNode=new Node(val,newNode);
             parent.head=newNode;
           }else{
-            final ByteDblLnkNode tmp;
-            (newNode=curr).prev=newNode=new ByteDblLnkNode(tmp=newNode.prev,val,newNode);
+            final Node tmp;
+            (newNode=curr).prev=newNode=new Node(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }
@@ -6734,7 +6962,7 @@ AbstractSeq<Byte>
         lastRet.val=val;
       }
       @Override public void remove(){
-        ByteDblLnkNode lastRet,curr;
+        Node lastRet,curr;
         if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
         }else{
@@ -6758,8 +6986,8 @@ AbstractSeq<Byte>
         }
         this.lastRet=null;
       }
-      @Override void uncheckedForEachRemaining(ByteDblLnkNode curr,ByteConsumer action){
-        ByteDblLnkNode.uncheckedForEachAscending(curr,action);
+      @Override void uncheckedForEachRemaining(Node curr,ByteConsumer action){
+        Node.uncheckedForEachAscending(curr,action);
         final UncheckedList parent;
         this.lastRet=(parent=this.parent).tail;
         this.currIndex=parent.size;

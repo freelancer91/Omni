@@ -10,17 +10,11 @@ import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.api.OmniQueue;
 import omni.api.OmniStack;
-import omni.impl.BooleanSnglLnkNode;
-import omni.impl.ByteSnglLnkNode;
-import omni.impl.CharSnglLnkNode;
+import omni.impl.AbstractOmniCollection;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
-import omni.impl.DoubleSnglLnkNode;
-import omni.impl.FloatSnglLnkNode;
 import omni.impl.FunctionCallType;
-import omni.impl.IntSnglLnkNode;
 import omni.impl.IteratorType;
-import omni.impl.LongSnglLnkNode;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
@@ -30,13 +24,11 @@ import omni.impl.MonitoredSequence;
 import omni.impl.MonitoredStack;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
-import omni.impl.RefSnglLnkNode;
-import omni.impl.ShortSnglLnkNode;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 public class SnglLnkSeqTest{
-  private static abstract class AbstractSnglLnkSeqMonitor<SEQ extends AbstractSeq<?>&Externalizable>
+  private static abstract class AbstractSnglLnkSeqMonitor<SEQ extends AbstractOmniCollection<?>&Externalizable>
       extends AbstractSequenceMonitor<SEQ>{
     abstract class AbstractItrMonitor implements MonitoredCollection.MonitoredIterator<OmniIterator<?>,SEQ>{
       final OmniIterator<?> itr;
@@ -88,7 +80,7 @@ public class SnglLnkSeqTest{
         Object prev;
         switch(dataType){
         case BOOLEAN:{
-          var next=(BooleanSnglLnkNode)expectedNext;
+          var next=(BooleanSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(boolean)itr.next());
             prev=curr;
@@ -97,7 +89,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case BYTE:{
-          var next=(ByteSnglLnkNode)expectedNext;
+          var next=(ByteSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(byte)itr.next());
             prev=curr;
@@ -106,7 +98,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case CHAR:{
-          var next=(CharSnglLnkNode)expectedNext;
+          var next=(CharSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(char)itr.next());
             prev=curr;
@@ -115,7 +107,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case DOUBLE:{
-          var next=(DoubleSnglLnkNode)expectedNext;
+          var next=(DoubleSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(double)itr.next());
             prev=curr;
@@ -124,7 +116,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case FLOAT:{
-          var next=(FloatSnglLnkNode)expectedNext;
+          var next=(FloatSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(float)itr.next());
             prev=curr;
@@ -133,7 +125,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case INT:{
-          var next=(IntSnglLnkNode)expectedNext;
+          var next=(IntSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(int)itr.next());
             prev=curr;
@@ -142,7 +134,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case LONG:{
-          var next=(LongSnglLnkNode)expectedNext;
+          var next=(LongSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(long)itr.next());
             prev=curr;
@@ -151,7 +143,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case REF:{
-          var next=(RefSnglLnkNode<?>)expectedNext;
+          var next=(RefSnglLnkSeq.Node<?>)expectedNext;
           do{
             Assertions.assertSame(next.val,itr.next());
             prev=curr;
@@ -160,7 +152,7 @@ public class SnglLnkSeqTest{
           break;
         }
         case SHORT:{
-          var next=(ShortSnglLnkNode)expectedNext;
+          var next=(ShortSnglLnkSeq.Node)expectedNext;
           do{
             Assertions.assertEquals(next.val,(short)itr.next());
             prev=curr;
@@ -358,23 +350,23 @@ public class SnglLnkSeqTest{
     private Object getNext(Object node){
       switch(dataType){
       case BOOLEAN:
-        return ((BooleanSnglLnkNode)node).next;
+        return ((BooleanSnglLnkSeq.Node)node).next;
       case BYTE:
-        return ((ByteSnglLnkNode)node).next;
+        return ((ByteSnglLnkSeq.Node)node).next;
       case CHAR:
-        return ((CharSnglLnkNode)node).next;
+        return ((CharSnglLnkSeq.Node)node).next;
       case DOUBLE:
-        return ((DoubleSnglLnkNode)node).next;
+        return ((DoubleSnglLnkSeq.Node)node).next;
       case FLOAT:
-        return ((FloatSnglLnkNode)node).next;
+        return ((FloatSnglLnkSeq.Node)node).next;
       case INT:
-        return ((IntSnglLnkNode)node).next;
+        return ((IntSnglLnkSeq.Node)node).next;
       case LONG:
-        return ((LongSnglLnkNode)node).next;
+        return ((LongSnglLnkSeq.Node)node).next;
       case REF:
-        return ((RefSnglLnkNode<?>)node).next;
+        return ((RefSnglLnkSeq.Node<?>)node).next;
       case SHORT:
-        return ((ShortSnglLnkNode)node).next;
+        return ((ShortSnglLnkSeq.Node)node).next;
       default:
         throw dataType.invalid();
       }
@@ -653,7 +645,7 @@ public class SnglLnkSeqTest{
     void callAndVerifyResult(MONITOR monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
         QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen,double position,int seqSize);
   }
-  private static class SnglLnkQueueMonitor<SEQ extends AbstractSeq<E>&Externalizable&OmniQueue<E>,E>
+  private static class SnglLnkQueueMonitor<SEQ extends AbstractOmniCollection<E>&Externalizable&OmniQueue<E>,E>
       extends AbstractSnglLnkSeqMonitor<SEQ> implements MonitoredQueue<SEQ>{
     class ItrMonitor extends AbstractSnglLnkSeqMonitor<SEQ>.AbstractItrMonitor{
       ItrMonitor(){
@@ -1712,7 +1704,7 @@ public class SnglLnkSeqTest{
         }
     }
   }
-  private static class SnglLnkStackMonitor<SEQ extends AbstractSeq<E>&Externalizable&OmniStack<E>,E>
+  private static class SnglLnkStackMonitor<SEQ extends AbstractOmniCollection<E>&Externalizable&OmniStack<E>,E>
       extends AbstractSnglLnkSeqMonitor<SEQ> implements MonitoredStack<SEQ>{
     class ItrMonitor extends AbstractSnglLnkSeqMonitor<SEQ>.AbstractItrMonitor{
       ItrMonitor(){
@@ -2963,9 +2955,9 @@ public class SnglLnkSeqTest{
       final int threadSpan=(int)Math.ceil((double)seqSize / (double)numWorkers) - 1;
       switch(collectionType){
       case BOOLEAN:{
-        final var wayPoints=new BooleanSnglLnkNode[numWorkers + 1];
+        final var wayPoints=new BooleanSnglLnkSeq.Node[numWorkers + 1];
         for(int i=0;i < wayPoints.length;++i){
-          wayPoints[i]=new BooleanSnglLnkNode(true);
+          wayPoints[i]=new BooleanSnglLnkSeq.Node(true);
         }
         for(int i=0;i < numWorkers;){
           final var threadHead=wayPoints[i];
@@ -2973,7 +2965,7 @@ public class SnglLnkSeqTest{
           TestExecutorService.submitTest(()->{
             var curr=threadTail;
             for(int j=threadSpan;--j >= 0;){
-              curr=new BooleanSnglLnkNode(true,curr);
+              curr=new BooleanSnglLnkSeq.Node(true,curr);
             }
             threadHead.next=curr;
           });
@@ -2988,9 +2980,9 @@ public class SnglLnkSeqTest{
         break;
       }
       case BYTE:{
-        final var wayPoints=new ByteSnglLnkNode[numWorkers + 1];
+        final var wayPoints=new ByteSnglLnkSeq.Node[numWorkers + 1];
         for(int i=0;i < wayPoints.length;++i){
-          wayPoints[i]=new ByteSnglLnkNode((byte)0);
+          wayPoints[i]=new ByteSnglLnkSeq.Node((byte)0);
         }
         for(int i=0;i < numWorkers;){
           final var threadHead=wayPoints[i];
@@ -2998,7 +2990,7 @@ public class SnglLnkSeqTest{
           TestExecutorService.submitTest(()->{
             var curr=threadTail;
             for(int j=threadSpan;--j >= 0;){
-              curr=new ByteSnglLnkNode((byte)0,curr);
+              curr=new ByteSnglLnkSeq.Node((byte)0,curr);
             }
             threadHead.next=curr;
           });
@@ -3013,9 +3005,9 @@ public class SnglLnkSeqTest{
         break;
       }
       case SHORT:{
-        final var wayPoints=new ShortSnglLnkNode[numWorkers + 1];
+        final var wayPoints=new ShortSnglLnkSeq.Node[numWorkers + 1];
         for(int i=0;i < wayPoints.length;++i){
-          wayPoints[i]=new ShortSnglLnkNode((short)0);
+          wayPoints[i]=new ShortSnglLnkSeq.Node((short)0);
         }
         for(int i=0;i < numWorkers;){
           final var threadHead=wayPoints[i];
@@ -3023,7 +3015,7 @@ public class SnglLnkSeqTest{
           TestExecutorService.submitTest(()->{
             var curr=threadTail;
             for(int j=threadSpan;--j >= 0;){
-              curr=new ShortSnglLnkNode((short)0,curr);
+              curr=new ShortSnglLnkSeq.Node((short)0,curr);
             }
             threadHead.next=curr;
           });
@@ -3038,9 +3030,9 @@ public class SnglLnkSeqTest{
         break;
       }
       case INT:{
-        final var wayPoints=new IntSnglLnkNode[numWorkers + 1];
+        final var wayPoints=new IntSnglLnkSeq.Node[numWorkers + 1];
         for(int i=0;i < wayPoints.length;++i){
-          wayPoints[i]=new IntSnglLnkNode(0);
+          wayPoints[i]=new IntSnglLnkSeq.Node(0);
         }
         for(int i=0;i < numWorkers;){
           final var threadHead=wayPoints[i];
@@ -3048,7 +3040,7 @@ public class SnglLnkSeqTest{
           TestExecutorService.submitTest(()->{
             var curr=threadTail;
             for(int j=threadSpan;--j >= 0;){
-              curr=new IntSnglLnkNode(0,curr);
+              curr=new IntSnglLnkSeq.Node(0,curr);
             }
             threadHead.next=curr;
           });
@@ -3063,9 +3055,9 @@ public class SnglLnkSeqTest{
         break;
       }
       case LONG:{
-        final var wayPoints=new LongSnglLnkNode[numWorkers + 1];
+        final var wayPoints=new LongSnglLnkSeq.Node[numWorkers + 1];
         for(int i=0;i < wayPoints.length;++i){
-          wayPoints[i]=new LongSnglLnkNode(0L);
+          wayPoints[i]=new LongSnglLnkSeq.Node(0L);
         }
         for(int i=0;i < numWorkers;){
           final var threadHead=wayPoints[i];
@@ -3073,7 +3065,7 @@ public class SnglLnkSeqTest{
           TestExecutorService.submitTest(()->{
             var curr=threadTail;
             for(int j=threadSpan;--j >= 0;){
-              curr=new LongSnglLnkNode(0L,curr);
+              curr=new LongSnglLnkSeq.Node(0L,curr);
             }
             threadHead.next=curr;
           });
@@ -3088,9 +3080,9 @@ public class SnglLnkSeqTest{
         break;
       }
       case FLOAT:{
-        final var wayPoints=new FloatSnglLnkNode[numWorkers + 1];
+        final var wayPoints=new FloatSnglLnkSeq.Node[numWorkers + 1];
         for(int i=0;i < wayPoints.length;++i){
-          wayPoints[i]=new FloatSnglLnkNode(0F);
+          wayPoints[i]=new FloatSnglLnkSeq.Node(0F);
         }
         for(int i=0;i < numWorkers;){
           final var threadHead=wayPoints[i];
@@ -3098,7 +3090,7 @@ public class SnglLnkSeqTest{
           TestExecutorService.submitTest(()->{
             var curr=threadTail;
             for(int j=threadSpan;--j >= 0;){
-              curr=new FloatSnglLnkNode(0F,curr);
+              curr=new FloatSnglLnkSeq.Node(0F,curr);
             }
             threadHead.next=curr;
           });

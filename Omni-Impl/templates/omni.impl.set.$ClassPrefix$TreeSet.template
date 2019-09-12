@@ -1,0 +1,110 @@
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.set;
+import java.util.function.IntFunction;
+import omni.api.OmniSet;
+import omni.impl.AbstractOmniCollection;
+import omni.api.OmniIterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$TypeNameModifier$Consumer;
+import java.util.function.$TypeNameModifier$Predicate;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Consumer;
+import omni.function.$TypeNameModifier$Predicate;
+#ENDIF
+
+/**
+ * TODO make not abstract
+ */
+public abstract class  $ClassPrefix$TreeSet$<E>$
+#IF OfRef
+extends AbstractOmniCollection$<E>$
+#ELSE
+extends AbstractOmniCollection<$BoxedType$>
+#ENDIF
+implements OmniSet.Of$ClassPrefix$$<E>${
+  
+  private static final long serialVersionUID=1L;
+  static class Node$<E>${
+    transient $exposedType$ val;
+    transient Node$<E>$ left;
+    transient Node$<E>$ right;
+    transient Node$<E>$ parent;
+    transient boolean color;
+    Node($exposedType$ val){
+      this.val=val;
+    }
+  }
+  transient Node$<E>$ root;
+  
+  $ClassPrefix$TreeSet(){
+    super();
+  }
+  public Object clone(){
+    #MACRO throwNYI();
+  }
+  public String toString(){
+    #MACRO throwNYI();
+  }
+  public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+    #MACRO throwNYI();
+  }
+  public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
+    #MACRO throwNYI();
+  }
+#IFNOT OfRef
+  public void forEach(Consumer<? super $BoxedType$> action){
+    #MACRO throwNYI();
+  }
+#ENDIF
+  public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
+    #MACRO throwNYI();
+  }
+#IFNOT OfRef
+  public boolean removeIf(Predicate<? super $BoxedType$> filter){
+    #MACRO throwNYI();
+  }
+#ENDIF
+  #MACRO ToArray($ArrayType$,$TypeNameModifier$)   
+#IFNOT OfRef
+  #MACRO ToArray($BoxedType$,)   
+  #IFNOT OfDouble
+  #MACRO ToArray(double,Double)   
+    #IFNOT OfFloat
+  #MACRO ToArray(float,Float)   
+      #IFNOT OfLong
+  #MACRO ToArray(long,Long)   
+        #IFNOT OfInt
+  #MACRO ToArray(int,Int)     
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    #MACRO throwNYI();
+  }
+  public <T> T[] toArray(T[] dst){
+    #MACRO throwNYI();
+  }
+  public void clear(){
+    #MACRO throwNYI();
+  }
+  
+}
+#MACRODEF ToArray(ARRTYPE,TYPENAMEMODIFIER)
+public ARRTYPE[] toTYPENAMEMODIFIERArray(){
+  #MACRO throwNYI();
+} 
+#ENDDEF
+#MACRODEF throwNYI()
+//TODO
+throw new omni.util.NotYetImplementedException();
+#ENDDEF

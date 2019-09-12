@@ -1,31 +1,31 @@
 package omni.util;
-import java.util.function.IntBinaryOperator;
-public enum intComparators implements IntBinaryOperator
+import omni.function.IntComparator;
+public enum intComparators implements IntComparator
 {
   Ascending
   {
-    public int applyAsInt(int val1,int val2)
+    public int compare(int val1,int val2)
     {
       return Integer.compare(val1,val2);
     }
   },
   Descending
   {
-    public int applyAsInt(int val1,int val2)
+    public int compare(int val1,int val2)
     {
       return -Integer.compare(val1,val2);
     }
   },
   Unsorted
   {
-    public int applyAsInt(int val1,int val2)
+    public int compare(int val1,int val2)
     {
       return 0;
     }
   },
   Unstable
   {
-    public int applyAsInt(int val1,int val2)
+    public int compare(int val1,int val2)
     {
       //even comes first
       if((val1&0b1)==0)

@@ -1,13 +1,4 @@
 package omni.impl.seq;
-import omni.impl.BooleanDblLnkNode;
-import omni.impl.ByteDblLnkNode;
-import omni.impl.CharDblLnkNode;
-import omni.impl.ShortDblLnkNode;
-import omni.impl.IntDblLnkNode;
-import omni.impl.LongDblLnkNode;
-import omni.impl.FloatDblLnkNode;
-import omni.impl.DoubleDblLnkNode;
-import omni.impl.RefDblLnkNode;
 import omni.util.TypeUtil;
 import java.util.Objects;
 interface SequenceEqualityUtil{
@@ -33,7 +24,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,BooleanDblLnkNode dlsHead){
+  static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,BooleanDblLnkSeq.Node dlsHead){
     for(long pbasWord=pbasWords[pbasRootOffset>>6];dlsHead.val^(((pbasWord>>>pbasRootOffset)&1L)==0L);dlsHead=dlsHead.next){
       if(++pbasRootOffset==pbasRootBound){
         return true;
@@ -66,7 +57,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,RefDblLnkNode<?> dlsHead){
+  static boolean isEqualTo(int pbasRootOffset,long[] pbasWords,int pbasRootBound,RefDblLnkSeq.Node<?> dlsHead){
     for(long pbasWord=pbasWords[pbasRootOffset>>6];TypeUtil.refEquals(dlsHead.val,(((pbasWord>>>pbasRootOffset)&1L)!=0L));dlsHead=dlsHead.next){
       if(++pbasRootOffset==pbasRootBound){
         return true;
@@ -237,7 +228,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(boolean[] lhsArr,int lhsRootOffset,int lhsRootBound,BooleanDblLnkNode rhsHead){
+  static boolean isEqualTo(boolean[] lhsArr,int lhsRootOffset,int lhsRootBound,BooleanDblLnkSeq.Node rhsHead){
     for(;
     (lhsArr[lhsRootOffset])==(rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -247,7 +238,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(boolean[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(boolean[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset])
     ;rhsHead=rhsHead.next){
@@ -257,7 +248,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(byte[] lhsArr,int lhsRootOffset,int lhsRootBound,ByteDblLnkNode rhsHead){
+  static boolean isEqualTo(byte[] lhsArr,int lhsRootOffset,int lhsRootBound,ByteDblLnkSeq.Node rhsHead){
     for(;
     (lhsArr[lhsRootOffset])==(rhsHead.val)  
     ;rhsHead=rhsHead.next){
@@ -267,7 +258,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(byte[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(byte[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset])   
     ;rhsHead=rhsHead.next){
@@ -277,7 +268,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(char[] lhsArr,int lhsRootOffset,int lhsRootBound,CharDblLnkNode rhsHead){
+  static boolean isEqualTo(char[] lhsArr,int lhsRootOffset,int lhsRootBound,CharDblLnkSeq.Node rhsHead){
     for(;
     (lhsArr[lhsRootOffset])==(rhsHead.val) 
     ;rhsHead=rhsHead.next){
@@ -287,7 +278,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(char[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(char[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset])   
     ;rhsHead=rhsHead.next){
@@ -297,7 +288,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(short[] lhsArr,int lhsRootOffset,int lhsRootBound,ShortDblLnkNode rhsHead){
+  static boolean isEqualTo(short[] lhsArr,int lhsRootOffset,int lhsRootBound,ShortDblLnkSeq.Node rhsHead){
     for(;
     (lhsArr[lhsRootOffset])==(rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -307,7 +298,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(short[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(short[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset])   
     ;rhsHead=rhsHead.next){
@@ -317,7 +308,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(int[] lhsArr,int lhsRootOffset,int lhsRootBound,IntDblLnkNode rhsHead){
+  static boolean isEqualTo(int[] lhsArr,int lhsRootOffset,int lhsRootBound,IntDblLnkSeq.Node rhsHead){
     for(;
     (lhsArr[lhsRootOffset])==(rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -327,7 +318,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(int[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(int[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset])   
     ;rhsHead=rhsHead.next){
@@ -337,7 +328,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(long[] lhsArr,int lhsRootOffset,int lhsRootBound,LongDblLnkNode rhsHead){
+  static boolean isEqualTo(long[] lhsArr,int lhsRootOffset,int lhsRootBound,LongDblLnkSeq.Node rhsHead){
     for(;
     (lhsArr[lhsRootOffset])==(rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -347,7 +338,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(long[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(long[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset])   
     ;rhsHead=rhsHead.next){
@@ -357,7 +348,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(float[] lhsArr,int lhsRootOffset,int lhsRootBound,FloatDblLnkNode rhsHead){
+  static boolean isEqualTo(float[] lhsArr,int lhsRootOffset,int lhsRootBound,FloatDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.floatEquals(rhsHead.val,lhsArr[lhsRootOffset])
     ;rhsHead=rhsHead.next){
@@ -367,7 +358,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(float[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(float[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset])
     ;rhsHead=rhsHead.next){
@@ -377,7 +368,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(double[] lhsArr,int lhsRootOffset,int lhsRootBound,DoubleDblLnkNode rhsHead){
+  static boolean isEqualTo(double[] lhsArr,int lhsRootOffset,int lhsRootBound,DoubleDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.doubleEquals(rhsHead.val,lhsArr[lhsRootOffset])
     ;rhsHead=rhsHead.next){
@@ -387,7 +378,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(double[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(double[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     TypeUtil.refEquals(rhsHead.val,lhsArr[lhsRootOffset]) 
     ;rhsHead=rhsHead.next){
@@ -397,7 +388,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,RefDblLnkSeq.Node<?> rhsHead){
     for(;
     Objects.equals(rhsHead.val,lhsArr[lhsRootOffset])
     ;rhsHead=rhsHead.next){
@@ -407,7 +398,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,BooleanDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,BooleanDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -417,7 +408,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,ByteDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,ByteDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -427,7 +418,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,CharDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,CharDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -437,7 +428,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,ShortDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,ShortDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -447,7 +438,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,IntDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,IntDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -457,7 +448,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,LongDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,LongDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -467,7 +458,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,FloatDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,FloatDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -477,7 +468,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,DoubleDblLnkNode rhsHead){
+  static boolean isEqualTo(Object[] lhsArr,int lhsRootOffset,int lhsRootBound,DoubleDblLnkSeq.Node rhsHead){
     for(;
     TypeUtil.refEquals(lhsArr[lhsRootOffset],rhsHead.val)
     ;rhsHead=rhsHead.next){
@@ -487,7 +478,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,BooleanDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,BooleanDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -495,7 +486,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(BooleanDblLnkNode lhsHead,BooleanDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(BooleanDblLnkSeq.Node lhsHead,BooleanDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -503,7 +494,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,ByteDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,ByteDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -511,7 +502,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(ByteDblLnkNode lhsHead,ByteDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(ByteDblLnkSeq.Node lhsHead,ByteDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -519,7 +510,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,CharDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,CharDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -527,7 +518,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(CharDblLnkNode lhsHead,CharDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(CharDblLnkSeq.Node lhsHead,CharDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -535,7 +526,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,ShortDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,ShortDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -543,7 +534,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(ShortDblLnkNode lhsHead,ShortDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(ShortDblLnkSeq.Node lhsHead,ShortDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -551,7 +542,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,IntDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,IntDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -559,7 +550,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(IntDblLnkNode lhsHead,IntDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(IntDblLnkSeq.Node lhsHead,IntDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -567,7 +558,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,LongDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,LongDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -575,7 +566,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(LongDblLnkNode lhsHead,LongDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(LongDblLnkSeq.Node lhsHead,LongDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -583,7 +574,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,FloatDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,FloatDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -591,7 +582,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(FloatDblLnkNode lhsHead,FloatDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(FloatDblLnkSeq.Node lhsHead,FloatDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -599,7 +590,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(RefDblLnkNode<?> lhsHead,RefDblLnkNode<?> lhsTail,DoubleDblLnkNode rhsHead){
+  static boolean isEqualTo(RefDblLnkSeq.Node<?> lhsHead,RefDblLnkSeq.Node<?> lhsTail,DoubleDblLnkSeq.Node rhsHead){
     for(;TypeUtil.refEquals(lhsHead.val,rhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;
@@ -607,7 +598,7 @@ interface SequenceEqualityUtil{
     }
     return false;
   }
-  static boolean isEqualTo(DoubleDblLnkNode lhsHead,DoubleDblLnkNode lhsTail,RefDblLnkNode<?> rhsHead){
+  static boolean isEqualTo(DoubleDblLnkSeq.Node lhsHead,DoubleDblLnkSeq.Node lhsTail,RefDblLnkSeq.Node<?> rhsHead){
     for(;TypeUtil.refEquals(rhsHead.val,lhsHead.val);lhsHead=lhsHead.next,rhsHead=rhsHead.next){
       if(lhsHead==lhsTail){
         return true;

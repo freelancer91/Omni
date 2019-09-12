@@ -1250,14 +1250,14 @@ ERROR unknown type $ClassPrefix$
       
       //TODO optimize
       Set<?> that;
-      if(size==(that=set.size())){
-        for(final var val:thatVal){
+      if(size==(that=(Set<?>)val).size()){
+        for(final var thatVal:that){
 #IF OfRef
-          if(!this.contains(val)){
+          if(!this.contains(thatVal)){
             return false;
           }
 #ELSE
-          if(!(val instanceof $BoxedType$) || !this.contains(($exposedType$)val)){
+          if(!(thatVal instanceof $BoxedType$) || !this.contains(($exposedType$)thatVal)){
             return false;
           }
 #ENDIF
@@ -4045,14 +4045,14 @@ return (this.wordWORDNUM & (MASK))!=0;
         int modCount=this.modCount;
         try{
           Set<?> that;
-          if(size==(that=set.size())){
-            for(final var val:thatVal){
+          if(size==(that=(Set<?>)val).size()){
+            for(final var thatVal:that){
 #IF OfRef
-              if(!this.contains(val)){
+              if(!this.contains(thatVal)){
                 return false;
               }
 #ELSE
-              if(!(val instanceof $BoxedType$) || !this.contains(($exposedType$)val)){
+              if(!(thatVal instanceof $BoxedType$) || !this.contains(($exposedType$)thatVal)){
                 return false;
               }
 #ENDIF

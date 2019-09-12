@@ -1,7 +1,6 @@
 package omni.util;
 import java.util.Comparator;
-public enum StringComparators implements Comparator
-<String>
+public enum StringComparators implements Comparator<String>
 {
   Ascending
   {

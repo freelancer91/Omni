@@ -36,20 +36,150 @@ import omni.impl.Abstract$TypeNameModifier$Itr;
 #ENDIF
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
-import omni.impl.$SNode$;
+import omni.impl.AbstractOmniCollection;
 import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
+#IF OfDouble,OfFloat
+import omni.util.HashUtil;
+#ENDIF
+#IF OfRef
+import java.util.Objects;
+#ENDIF
 public abstract class $ClassPrefix$SnglLnkSeq$<E>$ extends 
 #IF OfRef
-AbstractSeq$<E>$
+AbstractOmniCollection$<E>$
 #ELSE
-AbstractSeq<$BoxedType$>
+AbstractOmniCollection<$BoxedType$>
 #ENDIF
  implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable{
+  static final class Node$<E>${
+    transient $exposedType$ val;
+    transient Node$<E>$ next;
+    Node($exposedType$ val){
+      this.val=val;
+    }
+    Node($exposedType$ val,Node$<E>$ next){
+      this.val=val;
+      this.next=next;
+    }
+#IF OfRef,OfDouble
+  #IF OfRef
+    public static $<E>$ void uncheckedToString(Node$<E>$ curr,Node$<E>$ tail,StringBuilder builder){
+      for(builder.append(curr.val);curr!=tail;builder.append(',').append(' ').append((curr=curr.next).val)){}
+    }
+  #ENDIF
+    public static $<E>$ void uncheckedToString(Node$<E>$ curr,StringBuilder builder){
+      for(;;builder.append(',').append(' ')){
+        builder.append(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+#ELSEIF OfChar
+    public static $<E>$ void uncheckedToString(Node$<E>$ curr,char[] buffer){
+      int bufferOffset=1;
+      for(;;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
+        buffer[bufferOffset]=curr.val;
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+#ELSE
+    public static $<E>$ int uncheckedToString(Node$<E>$ curr,byte[] buffer){
+      int bufferOffset=1;
+      for(;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+#IF OfByte
+        bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+#ELSE
+        bufferOffset=ToStringUtil.getString$TypeNameModifier$(curr.val,buffer,bufferOffset);
+#ENDIF
+        if((curr=curr.next)==null){
+          return bufferOffset;
+        }
+      }
+    }
+    public static $<E>$ void uncheckedToString(Node$<E>$ curr,ToStringUtil.OmniStringBuilderByte builder){
+      for(;;builder.uncheckedAppendCommaAndSpace()){
+#IF OfByte
+        builder.uncheckedAppendShort(curr.val);
+#ELSE
+        builder.uncheckedAppend$TypeNameModifier$(curr.val);
+#ENDIF
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+#ENDIF
+#IF OfRef
+    public static $<E>$ int uncheckedHashCode(Node$<E>$ curr,Node$<E>$ tail){
+      int hash=31+$hashCodeMethod$(curr.val);
+      while(curr!=tail){
+        hash=(hash*31)+$hashCodeMethod$((curr=curr.next).val);
+      }
+      return hash;
+    }
+#ENDIF
+    public static $<E>$ int uncheckedHashCode(Node$<E>$ curr){
+      int hash=31+$hashCodeMethod$(curr.val);
+      for(;(curr=curr.next)!=null;hash=(hash*31)+$hashCodeMethod$(curr.val)){}
+      return hash;
+    }
+    public static $<E>$ void uncheckedForEach(Node$<E>$ curr,Node$<E>$ tail,$TypeNameModifier$Consumer$<? super E>$ action){
+      for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+    }
+    public static $<E>$ void uncheckedForEach(Node$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+      do{
+        action.accept(curr.val);
+      }while((curr=curr.next)!=null);
+    }
+#IF OfRef
+    public static $<E>$ boolean uncheckedcontainsNonNull(Node$<E>$ curr,Node$<E>$ tail,Object nonNull){
+      for(;!nonNull.equals(curr.val);curr=curr.next){if(curr==tail){return false;}}
+      return true;
+    }
+    #MACRO NodeQuery<NonNull>(!nonNull.equals)
+    #MACRO NodeQuery<Null>(null!=)
+    #MACRO NodeQuery< >(!pred.test)
+#ELSEIF OfDouble,OfFloat
+    #MACRO NodeQuery<Bits>(bits!=$convertToBits$)
+    #MACRO NodeQuery<0>(0!=)
+    #MACRO NodeQuery<NaN>(!$BoxedType$.isNaN)
+#ELSE
+    #MACRO NodeQuery< >(val!=)
+#ENDIF
+    #MACRO UncheckedToArrayImpl($ArrayType$,)
+#IFNOT OfRef
+    #MACRO UncheckedToArrayImpl(Object,)
+    #MACRO UncheckedToArrayImpl($BoxedType$,)
+  #IFNOT OfDouble
+    #MACRO UncheckedToArrayImpl(double,$castToDouble$)
+    #IFNOT OfFloat
+    #MACRO UncheckedToArrayImpl(float,$castToFloat$)
+      #IFNOT OfLong
+    #MACRO UncheckedToArrayImpl(long,$castToLong$)
+        #IFNOT OfInt
+    #MACRO UncheckedToArrayImpl(int,$castToInt$)
+          #IFNOT OfShort,OfChar
+    #MACRO UncheckedToArrayImpl(short,$castToShort$)
+            #IFNOT OfByte
+    #MACRO UncheckedToArrayImpl(byte,$castToByte$)
+    #MACRO UncheckedToArrayImpl(char,$castToChar$)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  }
+ 
   private static final long serialVersionUID=1L;
-  transient $SNode$$<E>$ head;
+  transient Node$<E>$ head;
   private $ClassPrefix$SnglLnkSeq(Collection<? extends $BoxedExposed$> that){
     super();
     //TODO optimize
@@ -125,14 +255,14 @@ AbstractSeq<$BoxedType$>
 #ENDIF
   private $ClassPrefix$SnglLnkSeq(){
   }
-  private $ClassPrefix$SnglLnkSeq($SNode$$<E>$ head,int size){
+  private $ClassPrefix$SnglLnkSeq(Node$<E>$ head,int size){
     super(size);
     this.head=head;
   }
 #IF OfBoolean
-  private static $<E>$ int retainSurvivors($SNode$$<E>$ prev,final boolean retainThis){
+  private static $<E>$ int retainSurvivors(Node$<E>$ prev,final boolean retainThis){
     int numSurvivors=1;
-    outer:for($SNode$$<E>$ next;(next=prev.next)!=null;++numSurvivors,prev=next){
+    outer:for(Node$<E>$ next;(next=prev.next)!=null;++numSurvivors,prev=next){
       if(next.val^retainThis){
         do{
           if((next=next.next)==null){
@@ -145,7 +275,7 @@ AbstractSeq<$BoxedType$>
     }
     return numSurvivors;
   }
-  private static $<E>$ int retainTrailingSurvivors($SNode$$<E>$ prev,$SNode$$<E>$ curr,final boolean retainThis){
+  private static $<E>$ int retainTrailingSurvivors(Node$<E>$ prev,Node$<E>$ curr,final boolean retainThis){
     int numSurvivors=0;
     outer:for(;;curr=curr.next){
       if(curr==null){
@@ -165,7 +295,7 @@ AbstractSeq<$BoxedType$>
     return numSurvivors;
   }
 #ELSE
-  private static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
+  private static $<E>$ void pullSurvivorsDown(Node$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
     int wordOffset;
     for(long word=survivorSet[wordOffset=0],marker=1L;;){
       var curr=prev.next;
@@ -192,7 +322,7 @@ AbstractSeq<$BoxedType$>
       prev=curr;
     }
   }
-  private static $<E>$ int markSurvivors($SNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
+  private static $<E>$ int markSurvivors(Node$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -208,7 +338,7 @@ AbstractSeq<$BoxedType$>
       survivorSet[wordOffset++]=word;
     }
   }
-  private static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,long word,int numSurvivors,int numRemoved){
+  private static $<E>$ void pullSurvivorsDown(Node$<E>$ prev,long word,int numSurvivors,int numRemoved){
     for(long marker=1L;;marker<<=1){
       var curr=prev.next;
       if((marker&word)==0){
@@ -228,7 +358,7 @@ AbstractSeq<$BoxedType$>
       prev=curr;
     }
   }
-  private static $<E>$ long markSurvivors($SNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter){
+  private static $<E>$ long markSurvivors(Node$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test(curr.val)){
         word|=marker;
@@ -238,9 +368,9 @@ AbstractSeq<$BoxedType$>
       }
     }
   }
-  private static $<E>$ int retainSurvivors($SNode$$<E>$ prev, final $TypeNameModifier$Predicate$<? super E>$ filter){
+  private static $<E>$ int retainSurvivors(Node$<E>$ prev, final $TypeNameModifier$Predicate$<? super E>$ filter){
     int numSurvivors=1;
-    outer:for($SNode$$<E>$ next;(next=prev.next)!=null;++numSurvivors,prev=next){
+    outer:for(Node$<E>$ next;(next=prev.next)!=null;++numSurvivors,prev=next){
       if(filter.test(next.val)){
         do{
           if((next=next.next)==null){
@@ -253,7 +383,7 @@ AbstractSeq<$BoxedType$>
     }
     return numSurvivors;
   }
-  private static $<E>$ int retainTrailingSurvivors($SNode$$<E>$ prev,$SNode$$<E>$ curr,final $TypeNameModifier$Predicate$<? super E>$ filter){
+  private static $<E>$ int retainTrailingSurvivors(Node$<E>$ prev,Node$<E>$ curr,final $TypeNameModifier$Predicate$<? super E>$ filter){
     int numSurvivors=0;
     outer:for(;;curr=curr.next){
       if(curr==null){
@@ -308,17 +438,17 @@ AbstractSeq<$BoxedType$>
     this.size=0;
   }
   @Override public String toString(){
-    final $SNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
 #IF OfDouble,OfRef
       final StringBuilder builder=new StringBuilder("[");
-      $SNode$.uncheckedToString(head,builder);
+      Node.uncheckedToString(head,builder);
       return builder.append(']').toString();
 #ELSE
       int size;
   #IF OfChar
       final char[] buffer;
-      $SNode$.uncheckedToString(head,buffer=new char[size=this.size*3]);
+      Node.uncheckedToString(head,buffer=new char[size=this.size*3]);
       buffer[0]='[';
       buffer[size-1]=']';
       return new String(buffer,0,size);
@@ -337,12 +467,12 @@ AbstractSeq<$BoxedType$>
     #ELSEIF OfFloat
       if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
     #ENDIF
-        [size=$SNode$.uncheckedToString(head,buffer)]=(byte)']';
+        [size=Node.uncheckedToString(head,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
         final ToStringUtil.OmniStringBuilderByte builder;
-        $SNode$.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        Node.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
         (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
@@ -353,16 +483,16 @@ AbstractSeq<$BoxedType$>
     return "[]";
   }
   @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
-    final $SNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      $SNode$.uncheckedForEach(head,action);
+      Node.uncheckedForEach(head,action);
     }
   }
 #IFNOT OfRef
   @Override public void forEach(Consumer<? super $BoxedType$> action){
-    final $SNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      $SNode$.uncheckedForEach(head,action::accept);
+      Node.uncheckedForEach(head,action::accept);
     }
   }
 #ENDIF
@@ -370,7 +500,7 @@ AbstractSeq<$BoxedType$>
     final int size;
     T[] arr=arrConstructor.apply(size=this.size);
     if(size!=0){
-      $SNode$.uncheckedCopyInto(head,arr);
+      Node.uncheckedCopyInto(head,arr);
     }
     return arr;
   }
@@ -405,9 +535,9 @@ AbstractSeq<$BoxedType$>
   #ENDIF
 #ENDIF
   @Override public <T> T[] toArray(T[] arr){
-    final $SNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
-      $SNode$.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
+      Node.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
     }else if(arr.length!=0){
       arr[0]=null;
     }
@@ -439,18 +569,18 @@ AbstractSeq<$BoxedType$>
   #MACRO QueryMethods<Root,contains>()
   #MACRO QueryMethods<Root,removeVal>()
 #IF OfRef
-  abstract boolean uncheckedremoveValNonNull($SNode$$<E>$ head,Object nonNull);
-  abstract boolean uncheckedremoveValNull($SNode$$<E>$ head);
-  abstract boolean uncheckedremoveVal($SNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ pred);
+  abstract boolean uncheckedremoveValNonNull(Node$<E>$ head,Object nonNull);
+  abstract boolean uncheckedremoveValNull(Node$<E>$ head);
+  abstract boolean uncheckedremoveVal(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ pred);
 #ELSEIF OfFloat,OfDouble
-  abstract boolean uncheckedremoveValBits($SNode$$<E>$ head,$queryParameterType$ bits);
-  abstract boolean uncheckedremoveVal0($SNode$$<E>$ head);
-  abstract boolean uncheckedremoveValNaN($SNode$$<E>$ head);
+  abstract boolean uncheckedremoveValBits(Node$<E>$ head,$queryParameterType$ bits);
+  abstract boolean uncheckedremoveVal0(Node$<E>$ head);
+  abstract boolean uncheckedremoveValNaN(Node$<E>$ head);
 #ELSE
-  abstract boolean uncheckedremoveVal($SNode$$<E>$ head,$queryParameterType$ val);
+  abstract boolean uncheckedremoveVal(Node$<E>$ head,$queryParameterType$ val);
 #ENDIF
   @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
-    final $SNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter);
     }
@@ -458,7 +588,7 @@ AbstractSeq<$BoxedType$>
   }
 #IFNOT OfRef
   @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
-    final $SNode$$<E>$ head;
+    final Node$<E>$ head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter::test);
     }
@@ -488,7 +618,7 @@ AbstractSeq<$BoxedType$>
     #ENDIF
   #ENDIF
 #ENDIF
-  abstract boolean uncheckedremoveIf($SNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter);
+  abstract boolean uncheckedremoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter);
   public static class CheckedStack$<E>$ extends UncheckedStack$<E>${
     private static final long serialVersionUID=1L;
     transient int modCount;
@@ -545,7 +675,7 @@ AbstractSeq<$BoxedType$>
 #ENDIF
     public CheckedStack(){
     }
-    CheckedStack($SNode$$<E>$ head,int size){
+    CheckedStack(Node$<E>$ head,int size){
       super(head,size);
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
@@ -568,17 +698,17 @@ AbstractSeq<$BoxedType$>
      }
     }
     @Override public Object clone(){
-      $SNode$$<E>$ head;
+      Node$<E>$ head;
       if((head=this.head)!=null){
         final CheckedStack$<E>$ clone;
-        $SNode$$<E>$ newHead;
-        for(clone=new CheckedStack$<E>$(newHead=new $SNode$$<E>$(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new $SNode$$<E>$(head.val)){}
+        Node$<E>$ newHead;
+        for(clone=new CheckedStack$<E>$(newHead=new Node$<E>$(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node$<E>$(head.val)){}
         return clone;
       }
       return new CheckedStack$<E>$();
     }
     @Override public $exposedType$ pop$TypeNameModifier$(){
-      $SNode$$<E>$ head;
+      Node$<E>$ head;
       if((head=this.head)!=null){
         ++this.modCount;
         this.head=head.next;
@@ -589,12 +719,12 @@ AbstractSeq<$BoxedType$>
     }
 #IF OfRef
     @Override public String toString(){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedToString(head,builder);
+          Node.uncheckedToString(head,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -604,11 +734,11 @@ AbstractSeq<$BoxedType$>
     }
 #ENDIF    
     @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedForEach(head,action);
+          Node.uncheckedForEach(head,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -616,11 +746,11 @@ AbstractSeq<$BoxedType$>
     }
 #IFNOT OfRef
     @Override public void forEach(Consumer<? super $BoxedType$> action){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedForEach(head,action::accept);
+          Node.uncheckedForEach(head,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -638,7 +768,7 @@ AbstractSeq<$BoxedType$>
       });
     }
 #IFNOT OfBoolean
-    private int removeIfHelper($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
+    private int removeIfHelper(Node$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -661,7 +791,7 @@ AbstractSeq<$BoxedType$>
       return 0;
     }
 #ENDIF
-    @Override boolean uncheckedremoveIf($SNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+    @Override boolean uncheckedremoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
       final int modCount=this.modCount;
       try{
 #IF OfBoolean
@@ -685,7 +815,7 @@ AbstractSeq<$BoxedType$>
           this.size=0;
           return true;
         }else{
-          $SNode$$<E>$ prev;
+          Node$<E>$ prev;
           for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
             if(head.val^firstVal){
               if(filter.test(!firstVal)){
@@ -767,32 +897,32 @@ AbstractSeq<$BoxedType$>
 #ENDIF
 #IF OfRef
     @Override public int search(Object val){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $SNode$.uncheckedsearchNonNull(head,val);
+            return Node.uncheckedsearchNonNull(head,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return $SNode$.uncheckedsearchNull(head);
+        return Node.uncheckedsearchNull(head);
       }
       return -1;
     }
     @Override public boolean contains(Object val){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $SNode$.uncheckedcontainsNonNull(head,val);
+            return Node.uncheckedcontainsNonNull(head,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return $SNode$.uncheckedcontainsNull(head);
+        return Node.uncheckedcontainsNull(head);
       }
       return false;
     }
@@ -818,7 +948,7 @@ AbstractSeq<$BoxedType$>
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final $SNode$$<E>$ next;
+        final Node$<E>$ next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -827,9 +957,9 @@ AbstractSeq<$BoxedType$>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(final $SNode$$<E>$ expectedNext,$TypeNameModifier$Consumer$<? super E>$ action){
+      @Override void uncheckedForEachRemaining(final Node$<E>$ expectedNext,$TypeNameModifier$Consumer$<? super E>$ action){
         final int modCount=this.modCount;
-        $SNode$$<E>$ prev,curr,next;
+        Node$<E>$ prev,curr,next;
         try{
           curr=this.curr;
           next=expectedNext;
@@ -845,7 +975,7 @@ AbstractSeq<$BoxedType$>
         this.next=null;
       }
       @Override public void remove(){
-        final $SNode$$<E>$ prev;
+        final Node$<E>$ prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedStack$<E>$ parent;
           int modCount;
@@ -920,7 +1050,7 @@ AbstractSeq<$BoxedType$>
 #ENDIF
     public UncheckedStack(){
     }
-    UncheckedStack($SNode$$<E>$ head,int size){
+    UncheckedStack(Node$<E>$ head,int size){
       super(head,size);
     }
 #IF OfRef
@@ -934,38 +1064,38 @@ AbstractSeq<$BoxedType$>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        $SNode$$<E>$ curr;
+        Node$<E>$ curr;
 #IF OfBoolean
         int word,marker;
-        for(this.head=curr=new $SNode$(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $SNode$$<E>$((word&marker)!=0)){
+        for(this.head=curr=new Node(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new Node$<E>$((word&marker)!=0)){
           if((marker<<=1)==(1<<8)){
             word=in.readUnsignedByte();
             marker=1;
           }
         }
 #ELSEIF OfRef
-        for(this.head=curr=new $SNode$$<E>$(($exposedType$)in.readObject());--size!=0;curr=curr.next=new $SNode$$<E>$(($exposedType$)in.readObject())){}
+        for(this.head=curr=new Node$<E>$(($exposedType$)in.readObject());--size!=0;curr=curr.next=new Node$<E>$(($exposedType$)in.readObject())){}
 #ELSE
-        for(this.head=curr=new $SNode$$<E>$(($exposedType$)in.read$TypeNameModifier$());--size!=0;curr=curr.next=new $SNode$$<E>$(($exposedType$)in.read$TypeNameModifier$())){}
+        for(this.head=curr=new Node$<E>$(($exposedType$)in.read$TypeNameModifier$());--size!=0;curr=curr.next=new Node$<E>$(($exposedType$)in.read$TypeNameModifier$())){}
 #ENDIF
       }
     }
     @Override public void push($exposedType$ val){
-      this.head=new $SNode$$<E>$(val,this.head);
+      this.head=new Node$<E>$(val,this.head);
       ++this.size;
     }
     @Override public Object clone(){
-      $SNode$$<E>$ head;
+      Node$<E>$ head;
       if((head=this.head)!=null){
         final UncheckedStack$<E>$ clone;
-        $SNode$$<E>$ newHead;
-        for(clone=new UncheckedStack$<E>$(newHead=new $SNode$$<E>$(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new $SNode$$<E>$(head.val)){}
+        Node$<E>$ newHead;
+        for(clone=new UncheckedStack$<E>$(newHead=new Node$<E>$(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new Node$<E>$(head.val)){}
         return clone;
       }
       return new UncheckedStack$<E>$();
     }
     @Override public $exposedType$ pop$TypeNameModifier$(){
-      $SNode$$<E>$ head;
+      Node$<E>$ head;
       this.head=(head=this.head).next;
       --this.size;
       return head.val;
@@ -997,7 +1127,7 @@ AbstractSeq<$BoxedType$>
     #ENDIF
   #ENDIF
 #ENDIF
-    @Override boolean uncheckedremoveIf($SNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+    @Override boolean uncheckedremoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
 #IF OfBoolean
       boolean firstVal;
       if(filter.test(firstVal=head.val)){
@@ -1015,7 +1145,7 @@ AbstractSeq<$BoxedType$>
         this.size=0;
         return true;
       }else{
-        $SNode$$<E>$ prev;
+        Node$<E>$ prev;
         for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(head.val^firstVal){
             if(filter.test(!firstVal)){
@@ -1040,7 +1170,7 @@ AbstractSeq<$BoxedType$>
         this.size=0;
         return true;
       }else{
-        $SNode$$<E>$ prev;
+        Node$<E>$ prev;
         for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(filter.test(head.val)){
             this.size=numSurvivors+retainTrailingSurvivors(prev,head.next,filter);
@@ -1078,7 +1208,7 @@ AbstractSeq<$BoxedType$>
       @Override public void remove(){
         final UncheckedStack$<E>$ parent;
         --(parent=UncheckedStack.this).size;
-        final $SNode$$<E>$ prev;
+        final Node$<E>$ prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -1145,11 +1275,11 @@ AbstractSeq<$BoxedType$>
     public CheckedQueue(){
       super();
     }
-    CheckedQueue($SNode$$<E>$ head,int size,$SNode$$<E>$ tail){
+    CheckedQueue(Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size,tail);
     }
     @Override public $exposedType$ $elementMethod$(){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         return head.val;
       }
@@ -1162,7 +1292,7 @@ AbstractSeq<$BoxedType$>
         final var tail=this.tail;
         out.writeInt(size=this.size);
         if(size!=0){
-          $SNode$$<E>$ curr;
+          Node$<E>$ curr;
     #IF OfBoolean
           for(int word=TypeUtil.castToByte((curr=this.head).val),marker=1;;){
             if(curr==tail){
@@ -1196,12 +1326,12 @@ AbstractSeq<$BoxedType$>
     }
 #IF OfRef
     @Override public String toString(){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedToString(head,tail,builder);
+          Node.uncheckedToString(head,tail,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1211,11 +1341,11 @@ AbstractSeq<$BoxedType$>
     }
 #ENDIF    
     @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedForEach(head,tail,action);
+          Node.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1223,11 +1353,11 @@ AbstractSeq<$BoxedType$>
     }
   #IFNOT OfRef
     @Override public void forEach(Consumer<? super $BoxedType$> action){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedForEach(head,tail,action::accept);
+          Node.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1253,10 +1383,10 @@ AbstractSeq<$BoxedType$>
       }
     }
     @Override public Object clone(){
-      $SNode$$<E>$ head;
+      Node$<E>$ head;
       if((head=this.head)!=null){
-        $SNode$$<E>$ newHead=new $SNode$$<E>$(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new $SNode$$<E>$((head=head.next).val)){}
+        Node$<E>$ newHead=new Node$<E>$(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node$<E>$((head=head.next).val)){}
         return new CheckedQueue$<E>$(newHead,this.size,newTail);
       }
       return new CheckedQueue$<E>$();
@@ -1266,7 +1396,7 @@ AbstractSeq<$BoxedType$>
       super.push(val);
     }
     @Override public $exposedType$ remove$TypeNameModifier$(){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         ++this.modCount;
         if(head==tail){
@@ -1302,9 +1432,9 @@ AbstractSeq<$BoxedType$>
   #ENDIF
 #ENDIF
 #IF OfBoolean
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ tail,boolean retainThis){
       int numSurvivors=1;
-      outer:for($SNode$$<E>$ next;prev!=tail;prev=next,++numSurvivors){
+      outer:for(Node$<E>$ next;prev!=tail;prev=next,++numSurvivors){
         if((next=prev.next).val^retainThis){
           do{
             if(next==tail){
@@ -1318,7 +1448,7 @@ AbstractSeq<$BoxedType$>
       }
       return numSurvivors;
     }
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ head,$SNode$$<E>$ tail,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ head,Node$<E>$ tail,boolean retainThis){
       int numSurvivors=0;
       outer:for(;;){
         if(head==tail){
@@ -1340,7 +1470,7 @@ AbstractSeq<$BoxedType$>
       return numSurvivors;
     }
 #ELSE
-    private void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1372,7 +1502,7 @@ AbstractSeq<$BoxedType$>
         prev=curr;
       }
     }
-    private void pullSurvivorsDown($SNode$$<E>$ prev,long word,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(Node$<E>$ prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
@@ -1396,7 +1526,7 @@ AbstractSeq<$BoxedType$>
         prev=curr;
       }
     }
-    private int removeIfHelper($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
+    private int removeIfHelper(Node$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
@@ -1419,7 +1549,7 @@ AbstractSeq<$BoxedType$>
       return 0;
     }
 #ENDIF
-    @Override boolean uncheckedremoveIf($SNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+    @Override boolean uncheckedremoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
       final int modCount=this.modCount;
       try{
 #IF OfBoolean
@@ -1446,7 +1576,7 @@ AbstractSeq<$BoxedType$>
           return true;
         }else{
           for(int numSurvivors=1;head!=tail;++numSurvivors){
-            $SNode$$<E>$ prev;
+            Node$<E>$ prev;
             if((head=(prev=head).next).val^firstVal){
               if(filter.test(!firstVal)){
                 CheckedCollection.checkModCount(modCount,this.modCount);
@@ -1505,17 +1635,17 @@ AbstractSeq<$BoxedType$>
 #ENDIF
 #IF OfRef
     @Override public boolean contains(Object val){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $SNode$.uncheckedcontainsNonNull(head,tail,val);
+            return Node.uncheckedcontainsNonNull(head,tail,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
         }
-        return $SNode$.uncheckedcontainsNull(head);
+        return Node.uncheckedcontainsNull(head);
       }
       return false;
     }
@@ -1541,7 +1671,7 @@ AbstractSeq<$BoxedType$>
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final $SNode$$<E>$ next;
+        final Node$<E>$ next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -1551,9 +1681,9 @@ AbstractSeq<$BoxedType$>
         throw new NoSuchElementException();
       }
       
-      @Override void uncheckedForEachRemaining(final $SNode$$<E>$ expectedNext,$TypeNameModifier$Consumer$<? super E>$ action){
+      @Override void uncheckedForEachRemaining(final Node$<E>$ expectedNext,$TypeNameModifier$Consumer$<? super E>$ action){
         final int modCount=this.modCount;
-        $SNode$$<E>$ prev,curr,next;
+        Node$<E>$ prev,curr,next;
         final CheckedQueue$<E>$ parent;
         final var tail=(parent=this.parent).tail;
         try{
@@ -1572,7 +1702,7 @@ AbstractSeq<$BoxedType$>
         this.next=null;
       }
       @Override public void remove(){
-        final $SNode$$<E>$ prev;
+        final Node$<E>$ prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedQueue$<E>$ parent;
           int modCount;
@@ -1597,7 +1727,7 @@ AbstractSeq<$BoxedType$>
   }
   public static class UncheckedQueue$<E>$ extends $ClassPrefix$SnglLnkSeq$<E>$ implements OmniQueue.Of$ClassPrefix$$<E>${
     private static final long serialVersionUID=1L;
-    transient $SNode$$<E>$ tail;
+    transient Node$<E>$ tail;
     public UncheckedQueue(Collection<? extends $BoxedExposed$> that){
       super(that);
     }
@@ -1652,7 +1782,7 @@ AbstractSeq<$BoxedType$>
     public UncheckedQueue(){
       super();
     }
-    UncheckedQueue($SNode$$<E>$ head,int size,$SNode$$<E>$ tail){
+    UncheckedQueue(Node$<E>$ head,int size,Node$<E>$ tail){
       super(head,size);
       this.tail=tail;
     }
@@ -1667,19 +1797,19 @@ AbstractSeq<$BoxedType$>
       int size;
       this.size=size=in.readInt();
       if(size!=0){
-        $SNode$$<E>$ curr;
+        Node$<E>$ curr;
 #IF OfBoolean
         int word,marker;
-        for(this.head=curr=new $SNode$(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $SNode$$<E>$((word&marker)!=0)){
+        for(this.head=curr=new Node(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new Node$<E>$((word&marker)!=0)){
           if((marker<<=1)==(1<<8)){
             word=in.readUnsignedByte();
             marker=1;
           }
         }
 #ELSEIF OfRef
-        for(this.head=curr=new $SNode$$<E>$(($exposedType$)in.readObject());--size!=0;curr=curr.next=new $SNode$$<E>$(($exposedType$)in.readObject())){}
+        for(this.head=curr=new Node$<E>$(($exposedType$)in.readObject());--size!=0;curr=curr.next=new Node$<E>$(($exposedType$)in.readObject())){}
 #ELSE
-        for(this.head=curr=new $SNode$$<E>$(($exposedType$)in.read$TypeNameModifier$());--size!=0;curr=curr.next=new $SNode$$<E>$(($exposedType$)in.read$TypeNameModifier$())){}
+        for(this.head=curr=new Node$<E>$(($exposedType$)in.read$TypeNameModifier$());--size!=0;curr=curr.next=new Node$<E>$(($exposedType$)in.read$TypeNameModifier$())){}
 #ENDIF
         this.tail=curr;
       }
@@ -1690,17 +1820,17 @@ AbstractSeq<$BoxedType$>
       this.size=0;
     }
     @Override public Object clone(){
-      $SNode$$<E>$ head;
+      Node$<E>$ head;
       if((head=this.head)!=null){
-        $SNode$$<E>$ newHead=new $SNode$$<E>$(head.val),newTail=newHead;
-        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new $SNode$$<E>$((head=head.next).val)){}
+        Node$<E>$ newHead=new Node$<E>$(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new Node$<E>$((head=head.next).val)){}
         return new UncheckedQueue$<E>$(newHead,this.size,newTail);
       }
       return new UncheckedQueue$<E>$();
     }
     @Override void push($exposedType$ val){
-      final var newNode=new $SNode$$<E>$(val);
-      final $SNode$$<E>$ tail;
+      final var newNode=new Node$<E>$(val);
+      final Node$<E>$ tail;
       if((tail=this.tail)!=null){
         tail.next=newNode;
       }else{
@@ -1717,7 +1847,7 @@ AbstractSeq<$BoxedType$>
       return true;
     }
     @Override public $exposedType$ remove$TypeNameModifier$(){
-      final $SNode$$<E>$ head;
+      final Node$<E>$ head;
       if((head=this.head)==tail){
         this.tail=null;
       }
@@ -1759,9 +1889,9 @@ AbstractSeq<$BoxedType$>
   #ENDIF
 #ENDIF
 #IF OfBoolean
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ tail,boolean retainThis){
       int numSurvivors=1;
-      outer:for($SNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node$<E>$ next;prev!=tail;++numSurvivors,prev=next){
         if((next=prev.next).val^retainThis){
           do{
             if(next==tail){
@@ -1776,7 +1906,7 @@ AbstractSeq<$BoxedType$>
       }
       return numSurvivors;
     }
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ curr,$SNode$$<E>$ tail,boolean retainThis){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ curr,Node$<E>$ tail,boolean retainThis){
       int numSurvivors=0;
       while(curr!=tail) {
         if((curr=curr.next).val==retainThis){
@@ -1794,9 +1924,9 @@ AbstractSeq<$BoxedType$>
       return numSurvivors;
     }
 #ELSE
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
       int numSurvivors=1;
-      outer:for($SNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
+      outer:for(Node$<E>$ next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
           do{
             if(next==tail){
@@ -1811,7 +1941,7 @@ AbstractSeq<$BoxedType$>
       }
       return numSurvivors;
     }
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ curr,$SNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    private int removeIfHelper(Node$<E>$ prev,Node$<E>$ curr,Node$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -1829,7 +1959,7 @@ AbstractSeq<$BoxedType$>
       return numSurvivors;
     }
 #ENDIF
-    @Override boolean uncheckedremoveIf($SNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+    @Override boolean uncheckedremoveIf(Node$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
 #IF OfBoolean
       boolean firstVal;
       if(filter.test(firstVal=head.val)){
@@ -1850,7 +1980,7 @@ AbstractSeq<$BoxedType$>
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final $SNode$$<E>$ prev;
+          final Node$<E>$ prev;
           if((head=(prev=head).next).val^firstVal){
             if(filter.test(!firstVal)){
               this.size=numSurvivors+removeIfHelper(prev,head,tail,firstVal);
@@ -1877,7 +2007,7 @@ AbstractSeq<$BoxedType$>
       }else{
         int numSurvivors=1;
         for(final var tail=this.tail;head!=tail;++numSurvivors){
-          final $SNode$$<E>$ prev;
+          final Node$<E>$ prev;
           if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
@@ -1914,7 +2044,7 @@ AbstractSeq<$BoxedType$>
       @Override public void remove(){
         final UncheckedQueue$<E>$ parent;
         --(parent=UncheckedQueue.this).size;
-        final $SNode$$<E>$ prev;
+        final Node$<E>$ prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
@@ -1934,22 +2064,22 @@ AbstractSeq<$BoxedType$>
       extends Abstract$TypeNameModifier$Itr$<E>$
 #ENDIF
   {
-    transient $SNode$$<E>$ prev;
-    transient $SNode$$<E>$ curr;
-    transient $SNode$$<E>$ next;
+    transient Node$<E>$ prev;
+    transient Node$<E>$ curr;
+    transient Node$<E>$ next;
     AbstractItr(AbstractItr$<E>$ itr){
       this.prev=itr.prev;
       this.curr=itr.curr;
       this.next=itr.next;
     }
-    AbstractItr($SNode$$<E>$ next){
+    AbstractItr(Node$<E>$ next){
       this.next=next; 
     }
 #IF OfRef
     @Override public abstract Object clone();
 #ENDIF
     @Override public $exposedType$ next$TypeNameModifier$(){
-      final $SNode$$<E>$ next;
+      final Node$<E>$ next;
       this.next=(next=this.next).next;
       this.prev=this.curr;
       this.curr=next;
@@ -1958,8 +2088,8 @@ AbstractSeq<$BoxedType$>
     @Override public boolean hasNext(){
       return next!=null;
     }
-    void uncheckedForEachRemaining($SNode$$<E>$ next,$TypeNameModifier$Consumer$<? super E>$ action){
-      $SNode$$<E>$ prev,curr=this.curr;
+    void uncheckedForEachRemaining(Node$<E>$ next,$TypeNameModifier$Consumer$<? super E>$ action){
+      Node$<E>$ prev,curr=this.curr;
       do{
         action.accept(next.val);
         prev=curr;
@@ -1969,14 +2099,14 @@ AbstractSeq<$BoxedType$>
       this.next=null;
     }
     @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-      final $SNode$$<E>$ next;
+      final Node$<E>$ next;
       if((next=this.next)!=null){
         uncheckedForEachRemaining(next,action);
       }
     }
 #IFNOT OfRef
     @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-      final $SNode$$<E>$ next;
+      final Node$<E>$ next;
       if((next=this.next)!=null){
         uncheckedForEachRemaining(next,action::accept);
       }
@@ -1984,6 +2114,31 @@ AbstractSeq<$BoxedType$>
 #ENDIF
   }
 }
+#MACRODEF UncheckedToArrayImpl(DSTARR,CAST)
+public static $<E>$ void uncheckedCopyInto(Node$<E>$ curr,DSTARR[] dst){
+  for(int dstOffset=0;;++dstOffset){
+    dst[dstOffset]=CAST(curr.val);
+    if((curr=curr.next)==null){
+      return;
+    }
+  }
+}
+#ENDDEF
+#MACRODEF NodeQuery<SUFFIX>(TEST)
+public static $<E>$ boolean uncheckedcontainsSUFFIX(Node$<E>$ curr
+#MACRO UncheckedQueryParam()
+){
+  for(;TEST(curr.val);){if((curr=curr.next)==null){return false;}}
+  return true;
+}
+public static $<E>$ int uncheckedsearchSUFFIX(Node$<E>$ curr
+#MACRO UncheckedQueryParam()
+){
+  int index=1;
+  for(;TEST(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+  return index;
+}
+#ENDDEF
 #MACRODEF add(INPUTTYPE,CAST)
 @Override public boolean add(INPUTTYPE val){
   push(CAST(val));
@@ -1992,7 +2147,7 @@ AbstractSeq<$BoxedType$>
 #ENDDEF
 #MACRODEF peek(RETTYPE,SUFFIX,DEFAULTVAL,CAST)
 public RETTYPE peekSUFFIX(){
-  final $SNode$$<E>$ head;
+  final Node$<E>$ head;
   if((head=this.head)!=null){
     return CAST(head.val);
   }
@@ -2001,7 +2156,7 @@ public RETTYPE peekSUFFIX(){
 #ENDDEF
 #MACRODEF QueuePoll<CHECKED>(RETTYPE,SUFFIX,DEFAULTVAL,CAST)
 @Override public RETTYPE pollSUFFIX(){
-  final $SNode$$<E>$ head;
+  final Node$<E>$ head;
   if((head=this.head)!=null){
     final var ret=CAST(head.val);
     if(head==this.tail){
@@ -2019,7 +2174,7 @@ public RETTYPE peekSUFFIX(){
 #ENDDEF
 #MACRODEF StackPoll<CHECKED>(RETTYPE,SUFFIX,DEFAULTVAL,CAST)
 @Override public RETTYPE pollSUFFIX(){
-  final $SNode$$<E>$ head;
+  final Node$<E>$ head;
   if((head=this.head)!=null){
     final var ret=CAST(head.val);
     this.head=head.next;
@@ -2032,6 +2187,7 @@ public RETTYPE peekSUFFIX(){
   return DEFAULTVAL;
 }
 #ENDDEF
+
 #MACRODEF UncheckedQueryParam()
 #IFSWITCH SUFFIX==NonNull
 ,Object nonNull
@@ -2047,7 +2203,7 @@ public RETTYPE peekSUFFIX(){
 #ENDIF
 #ENDDEF
 #MACRODEF QueueUncheckedRemoveVal<CHECKED,SUFFIX>(POSTEST,NEGTEST)
-@Override boolean uncheckedremoveValSUFFIX($SNode$$<E>$ head
+@Override boolean uncheckedremoveValSUFFIX(Node$<E>$ head
 #MACRO UncheckedQueryParam()
 ){
 #IFSWITCH CHECKED==true
@@ -2069,7 +2225,7 @@ public RETTYPE peekSUFFIX(){
       }
       this.head=head.next;
     }else{
-      $SNode$$<E>$ prev;
+      Node$<E>$ prev;
       do{
         if(head==tail){
 #IFSWITCH CHECKED==true
@@ -2106,7 +2262,7 @@ public RETTYPE peekSUFFIX(){
 }
 #ENDDEF
 #MACRODEF StackUncheckedRemoveVal<CHECKED,SUFFIX>(POSTEST,NEGTEST)
-@Override boolean uncheckedremoveValSUFFIX($SNode$$<E>$ head
+@Override boolean uncheckedremoveValSUFFIX(Node$<E>$ head
   #MACRO UncheckedQueryParam()
 ){
 #IFSWITCH CHECKED==true
@@ -2124,7 +2280,7 @@ public RETTYPE peekSUFFIX(){
 #ENDIF
       this.head=head.next;
     }else{
-      $SNode$$<E>$ prev;
+      Node$<E>$ prev;
       do{
         if((head=(prev=head).next)==null){
 #IFSWITCH CHECKED==true
@@ -2159,10 +2315,10 @@ public RETTYPE peekSUFFIX(){
 #ENDDEF
 #MACRODEF ToArrayImpl(DSTARR,DEFAULTARR,CLASSPREFIX)
 @Override public DSTARR[] toCLASSPREFIXArray(){
-  final $SNode$$<E>$ head;
+  final Node$<E>$ head;
   if((head=this.head)!=null){
     final DSTARR[] dst;
-    $SNode$.uncheckedCopyInto(head,dst=new DSTARR[this.size]);
+    Node.uncheckedCopyInto(head,dst=new DSTARR[this.size]);
     return dst;
   }
   return DEFAULTARR;
@@ -2240,7 +2396,7 @@ ERROR unknown method name METHODNAME
 #ENDIF
 #ENDDEF
 #MACRODEF SizeCheck()
-final $SNode$$<E>$ head;
+final Node$<E>$ head;
 if((head=this.head)!=null)
 #ENDDEF
 #MACRODEF ReturnUncheckedQueryBits(VAL)
@@ -2248,7 +2404,7 @@ if((head=this.head)!=null)
 ERROR ReturnUncheckedQueryBits(VAL) is only valid for Float and Double
 #ENDIF
 #IFSWITCH METHODNAME==contains,search
-return $SNode$.uncheckedMETHODNAMEBits(head,VAL);
+return Node.uncheckedMETHODNAMEBits(head,VAL);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMEBits(head,VAL);
 #ELSE
@@ -2260,7 +2416,7 @@ ERROR unknown method name METHODNAME
 ERROR ReturnUncheckedQuery0() is only valid for Float and Double
 #ENDIF
 #IFSWITCH METHODNAME==contains,search
-return $SNode$.uncheckedMETHODNAME0(head);
+return Node.uncheckedMETHODNAME0(head);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAME0(head);
 #ELSE
@@ -2272,7 +2428,7 @@ ERROR unknown method name METHODNAME
 ERROR ReturnUncheckedQueryNaN() is only valid for Float and Double
 #ENDIF
 #IFSWITCH METHODNAME==contains,search
-return $SNode$.uncheckedMETHODNAMENaN(head);
+return Node.uncheckedMETHODNAMENaN(head);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMENaN(head);
 #ELSE
@@ -2284,7 +2440,7 @@ ERROR unknown method name METHODNAME
 ERROR ReturnUncheckedQuery(VAL) is not valid for $ClassPrefix$
 #ENDIF
 #IFSWITCH METHODNAME==contains,search
-return $SNode$.uncheckedMETHODNAME(head,VAL);
+return Node.uncheckedMETHODNAME(head,VAL);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAME(head,VAL);
 #ELSE
@@ -2296,7 +2452,7 @@ ERROR unknown method name METHODNAME
 ERROR ReturnUncheckedQueryNonNull(VAL) is not valid for $ClassPrefix$
 #ENDIF
 #IFSWITCH METHODNAME==contains,search
-return $SNode$.uncheckedMETHODNAMENonNull(head,VAL);
+return Node.uncheckedMETHODNAMENonNull(head,VAL);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMENonNull(head,VAL);
 #ELSE
@@ -2308,7 +2464,7 @@ ERROR unknown method name METHODNAME
 ERROR ReturnUncheckedQueryNull() is not valid for $ClassPrefix$
 #ENDIF
 #IFSWITCH METHODNAME==contains,search
-return $SNode$.uncheckedMETHODNAMENull(head);
+return Node.uncheckedMETHODNAMENull(head);
 #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedMETHODNAMENull(head);
 #ELSE

@@ -19,6 +19,7 @@ import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
 import omni.api.OmniStack;
+import omni.impl.AbstractOmniCollection;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
@@ -105,7 +106,7 @@ public class ArrSeqTest{
         }
         return initCapacity;
     }
-    static MonitoredList<? extends AbstractSeq<?>> getMonitoredList(SequenceInitParams initParams,
+    static MonitoredList<? extends AbstractOmniCollection<?>> getMonitoredList(SequenceInitParams initParams,
             int initCapacity){
         switch(initParams.structType){
         case ArrList:
@@ -139,7 +140,7 @@ public class ArrSeqTest{
             throw initParams.structType.invalid();
         }
     }
-    private static MonitoredSequence<? extends AbstractSeq<?>> getMonitoredSequence(SequenceInitParams initParams,
+    private static MonitoredSequence<? extends AbstractOmniCollection<?>> getMonitoredSequence(SequenceInitParams initParams,
             int initCapacity){
         if(initParams.structType == StructType.ArrStack){
             return new ArrStackMonitor<>(initParams,initCapacity);
@@ -505,7 +506,7 @@ public class ArrSeqTest{
     }
     @Test
     public void testindexOf_val(){
-        final QueryTest<MonitoredList<? extends AbstractSeq<?>>> test=(monitor,queryVal,inputType,castType,modification,
+        final QueryTest<MonitoredList<? extends AbstractOmniCollection<?>>> test=(monitor,queryVal,inputType,castType,modification,
                 monitoredObjectGen,position,seqSize)->{
             if(monitoredObjectGen == null){
                 int expectedIndex;
@@ -799,7 +800,7 @@ public class ArrSeqTest{
     }
     @Test
     public void testlastIndexOf_val(){
-        final QueryTest<MonitoredList<? extends AbstractSeq<?>>> test=(monitor,queryVal,inputType,castType,modification,
+        final QueryTest<MonitoredList<? extends AbstractOmniCollection<?>>> test=(monitor,queryVal,inputType,castType,modification,
                 monitoredObjectGen,position,seqSize)->{
             if(monitoredObjectGen == null){
                 int expectedIndex;
@@ -1472,7 +1473,7 @@ public class ArrSeqTest{
     public void testremoveVal_val(){
         final QueryTest<?> test=new QueryTest<>(){
             @Override
-            public void callAndVerifyResult(MonitoredSequence<? extends AbstractSeq<?>> monitor,QueryVal queryVal,
+            public void callAndVerifyResult(MonitoredSequence<? extends AbstractOmniCollection<?>> monitor,QueryVal queryVal,
                     DataType inputType,QueryCastType castType,QueryValModification modification,
                     MonitoredObjectGen monitoredObjectGen,double position,int seqSize){
                 if(monitoredObjectGen == null){
@@ -1493,7 +1494,7 @@ public class ArrSeqTest{
     }
     @Test
     public void testreplaceAll_UnaryOperator(){
-        final MonitoredFunctionTest<MonitoredList<? extends AbstractSeq<?>>> test=(monitor,functionGen,functionCallType,
+        final MonitoredFunctionTest<MonitoredList<? extends AbstractOmniCollection<?>>> test=(monitor,functionGen,functionCallType,
                 illegalMod,randSeed)->{
             if(illegalMod.expectedException == null){
                 if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -1940,7 +1941,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testunstableSort_Comparator");
     }
-    private static class ArrListMonitor<SEQ extends AbstractSeq<E>&OmniList<E>&Externalizable,E>
+    private static class ArrListMonitor<SEQ extends AbstractOmniCollection<E>&OmniList<E>&Externalizable,E>
             extends
             AbstractArrSeqMonitor<SEQ>
             implements
@@ -2408,7 +2409,7 @@ public class ArrSeqTest{
             }
             Assertions.assertEquals(expectedModCount,actualModCount);
         }
-        private static class ArrSubListMonitor<SUBLIST extends AbstractSeq<E>&OmniList<E>,SEQ extends AbstractSeq<E>&OmniList<E>&Externalizable,E>
+        private static class ArrSubListMonitor<SUBLIST extends AbstractOmniCollection<E>&OmniList<E>,SEQ extends AbstractOmniCollection<E>&OmniList<E>&Externalizable,E>
                 implements
                 MonitoredList<SUBLIST>{
             final ArrListMonitor<SEQ,E> expectedRoot;
@@ -2666,7 +2667,7 @@ public class ArrSeqTest{
             }
             @Override
             public void updateCollectionState(){
-                Consumer<ArrSubListMonitor<SUBLIST,SEQ,E>> subListUpdater=subListMonitor->subListMonitor.expectedSize=((AbstractSeq<?>)subListMonitor.seq).size;
+                Consumer<ArrSubListMonitor<SUBLIST,SEQ,E>> subListUpdater=subListMonitor->subListMonitor.expectedSize=((AbstractOmniCollection<?>)subListMonitor.seq).size;
                 if(expectedRoot.checkedType.checked){
                     final var dataType=expectedRoot.dataType;
                     switch(dataType){
@@ -2757,7 +2758,7 @@ public class ArrSeqTest{
                 expectedRoot.verifyCloneTypeAndModCount(clone);
                 Assertions.assertNotSame(clone,expectedRoot.seq);
                 int size;
-                Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=((AbstractOmniCollection<?>)seq).size,((AbstractOmniCollection<?>)clone).size);
                 final var dataType=expectedRoot.dataType;
                 switch(dataType){
                 case BOOLEAN:{
@@ -2920,7 +2921,7 @@ public class ArrSeqTest{
             @Override
             public void verifyCollectionState(boolean refIsSame){
                 Consumer<ArrSubListMonitor<SUBLIST,SEQ,E>> subListVerifier=subListMonitor->Assertions
-                        .assertEquals(subListMonitor.expectedSize,((AbstractSeq<?>)subListMonitor.seq).size);
+                        .assertEquals(subListMonitor.expectedSize,((AbstractOmniCollection<?>)subListMonitor.seq).size);
                 final var dataType=expectedRoot.dataType;
                 final var checked=expectedRoot.checkedType.checked;
                 switch(dataType){
@@ -3155,7 +3156,7 @@ public class ArrSeqTest{
                 expectedRoot.verifyCloneTypeAndModCount(clone);
                 Assertions.assertNotSame(clone,expectedRoot.seq);
                 int size;
-                Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);
+                Assertions.assertEquals(size=((AbstractOmniCollection<?>)seq).size,((AbstractOmniCollection<?>)clone).size);
                 final var origArr=((RefArrSeq<?>)expectedRoot.seq).arr;
                 final var cloneArr=((RefArrSeq<?>)clone).arr;
                 if(origArr == OmniArray.OfRef.DEFAULT_ARR){
@@ -4535,7 +4536,7 @@ public class ArrSeqTest{
             }
         }
     }
-    private static abstract class AbstractArrSeqMonitor<SEQ extends AbstractSeq<?>&Externalizable>
+    private static abstract class AbstractArrSeqMonitor<SEQ extends AbstractOmniCollection<?>&Externalizable>
             extends
             AbstractSequenceMonitor<SEQ>{      
         AbstractArrSeqMonitor(CheckedType checkedType,DataType dataType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
@@ -4807,7 +4808,7 @@ public class ArrSeqTest{
             verifyCloneTypeAndModCount(clone);
             Assertions.assertNotSame(clone,seq);
             int size;
-            Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);
+            Assertions.assertEquals(size=((AbstractOmniCollection<?>)seq).size,((AbstractOmniCollection<?>)clone).size);
             switch(dataType){
             case BOOLEAN:{
                 final var origArr=((BooleanArrSeq)seq).arr;
@@ -4936,7 +4937,7 @@ public class ArrSeqTest{
         }
         public void verifyCollectionState(boolean refIsSame){
             int expectedSize;
-            Assertions.assertEquals(expectedSize=this.expectedSize,((AbstractSeq<?>)seq).size);
+            Assertions.assertEquals(expectedSize=this.expectedSize,((AbstractOmniCollection<?>)seq).size);
             if(checkedType.checked){
                 verifyModCount();
             }
@@ -5088,7 +5089,7 @@ public class ArrSeqTest{
             verifyCloneTypeAndModCount(readCol);
             Assertions.assertNotSame(readCol,seq);
             int size;
-            Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)readCol).size);
+            Assertions.assertEquals(size=((AbstractOmniCollection<?>)seq).size,((AbstractOmniCollection<?>)readCol).size);
             final var origArr=((RefArrSeq<?>)seq).arr;
             final var cloneArr=((RefArrSeq<?>)readCol).arr;
             if(origArr == OmniArray.OfRef.DEFAULT_ARR){
@@ -5110,7 +5111,7 @@ public class ArrSeqTest{
         abstract void verifyModCount();
     }
     
-    private static class ArrStackMonitor<SEQ extends AbstractSeq<E>&OmniStack<E>&Externalizable,E>
+    private static class ArrStackMonitor<SEQ extends AbstractOmniCollection<E>&OmniStack<E>&Externalizable,E>
             extends
             AbstractArrSeqMonitor<SEQ>
             implements
@@ -6209,7 +6210,7 @@ public class ArrSeqTest{
         }
     }
     private static interface BasicTest{
-        void runTest(MonitoredSequence<? extends AbstractSeq<?>> monitor);
+        void runTest(MonitoredSequence<? extends AbstractOmniCollection<?>> monitor);
         private void runAllTests(String testName){
             for(final var initParams:ALL_STRUCT_INIT_PARAMS){
                 for(final var illegalMod:initParams.structType.validPreMods){
@@ -6235,7 +6236,7 @@ public class ArrSeqTest{
             TestExecutorService.completeAllTests(testName);
         }
     }
-    private static interface MonitoredFunctionTest<MONITOR extends MonitoredSequence<? extends AbstractSeq<?>>>{
+    private static interface MonitoredFunctionTest<MONITOR extends MonitoredSequence<? extends AbstractOmniCollection<?>>>{
         void runTest(MONITOR monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
                 IllegalModification illegalMod,long randSeed);
         @SuppressWarnings("unchecked")
@@ -6277,7 +6278,7 @@ public class ArrSeqTest{
             TestExecutorService.completeAllTests(testName);
         }
     }
-    private static interface QueryTest<MONITOR extends MonitoredSequence<? extends AbstractSeq<?>>>{
+    private static interface QueryTest<MONITOR extends MonitoredSequence<? extends AbstractOmniCollection<?>>>{
         void callAndVerifyResult(MONITOR monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
                 QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen,double position,
                 int seqSize);

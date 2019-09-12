@@ -14,13 +14,14 @@ import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
+import omni.impl.AbstractOmniCollection;
 import java.util.ListIterator;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
 import omni.util.TypeUtil;
 import java.util.ConcurrentModificationException;
 import java.util.function.IntUnaryOperator;
-import java.util.function.IntBinaryOperator;
+import omni.function.IntComparator;
 import java.util.function.IntPredicate;
 import java.util.function.IntConsumer;
 import omni.util.ToStringUtil;
@@ -34,7 +35,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.RandomAccess;
 public abstract class IntArrSeq extends 
-AbstractSeq<Integer>
+AbstractOmniCollection<Integer>
  implements OmniCollection.OfInt,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
@@ -1204,7 +1205,7 @@ AbstractSeq<Integer>
           return ((List<?>)val).isEmpty();
         }
         final List<?> list;
-        if((list=(List<?>)val) instanceof AbstractSeq){
+        if((list=(List<?>)val) instanceof AbstractOmniCollection){
           if(list instanceof OmniList.OfInt){
             return this.isEqualTo(size,(OmniList.OfInt)list);
           }else if(list instanceof OmniList.OfRef){
@@ -1683,7 +1684,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void sort(IntBinaryOperator sorter)
+    public void sort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)>1){
@@ -1729,7 +1730,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void unstableSort(IntBinaryOperator sorter)
+    public void unstableSort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)>1){
@@ -1745,7 +1746,7 @@ AbstractSeq<Integer>
     }
   }
     static class UncheckedSubList
-      extends AbstractSeq<Integer>
+      extends AbstractOmniCollection<Integer>
       implements IntSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -1817,7 +1818,7 @@ AbstractSeq<Integer>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfInt){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfInt)list);
             }else if(list instanceof OmniList.OfRef){
@@ -2710,7 +2711,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void sort(IntBinaryOperator sorter)
+    public void sort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)>1){
@@ -2761,7 +2762,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void unstableSort(IntBinaryOperator sorter)
+    public void unstableSort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)>1){
@@ -3206,7 +3207,7 @@ AbstractSeq<Integer>
            return ((List<?>)val).isEmpty();
          }
          final List<?> list;
-         if((list=(List<?>)val) instanceof AbstractSeq){
+         if((list=(List<?>)val) instanceof AbstractOmniCollection){
            if(list instanceof OmniList.OfInt){
              return this.isEqualTo(size,(OmniList.OfInt)list);
            }else if(list instanceof OmniList.OfRef){
@@ -3515,7 +3516,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void sort(IntBinaryOperator sorter)
+    public void sort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)>1){
@@ -3587,7 +3588,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void unstableSort(IntBinaryOperator sorter)
+    public void unstableSort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)>1){
@@ -3612,7 +3613,7 @@ AbstractSeq<Integer>
     }
   }
     static class CheckedSubList
-      extends AbstractSeq<Integer>
+      extends AbstractOmniCollection<Integer>
       implements IntSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -3698,7 +3699,7 @@ AbstractSeq<Integer>
             return ((List<?>)val).isEmpty();
           }
           final List<?> list;
-          if((list=(List<?>)val) instanceof AbstractSeq){
+          if((list=(List<?>)val) instanceof AbstractOmniCollection){
             if(list instanceof OmniList.OfInt){
               return root.isEqualTo(this.rootOffset,size,(OmniList.OfInt)list);
             }else if(list instanceof OmniList.OfRef){
@@ -4870,7 +4871,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void sort(IntBinaryOperator sorter)
+    public void sort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)<2){
@@ -4990,7 +4991,7 @@ AbstractSeq<Integer>
       }
     }
     @Override
-    public void unstableSort(IntBinaryOperator sorter)
+    public void unstableSort(IntComparator sorter)
     {
       final int size;
       if((size=this.size)<2){

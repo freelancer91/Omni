@@ -27,6 +27,7 @@ import omni.function.BooleanComparator;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.impl.AbstractBooleanItr;
+import omni.impl.AbstractOmniCollection;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtil;
@@ -698,7 +699,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
               return ((List<?>)val).isEmpty();
             }
             final List<?> list;
-            if((list=(List<?>)val) instanceof AbstractSeq) {
+            if((list=(List<?>)val) instanceof AbstractOmniCollection) {
               if(list instanceof OmniList.OfBoolean) {
                   return this.isEqualTo(size,(OmniList.OfBoolean)list);
               }else if(list instanceof OmniList.OfRef) {
@@ -1365,7 +1366,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
     }
-    public static class CheckedSubList extends AbstractSeq<Boolean>
+    public static class CheckedSubList extends AbstractOmniCollection<Boolean>
             implements
             BooleanSubListDefault,
             Cloneable,
@@ -1710,7 +1711,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 return ((List<?>)val).isEmpty();
               }
               final List<?> list;
-              if((list=(List<?>)val) instanceof AbstractSeq) {
+              if((list=(List<?>)val) instanceof AbstractOmniCollection) {
                 if(list instanceof OmniList.OfBoolean) {
                     return root.isEqualTo(this.rootOffset,size,(OmniList.OfBoolean)list);
                 }else if(list instanceof OmniList.OfRef) {
@@ -3775,7 +3776,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 return ((List<?>)val).isEmpty();
               }
               final List<?> list;
-              if((list=(List<?>)val) instanceof AbstractSeq) {
+              if((list=(List<?>)val) instanceof AbstractOmniCollection) {
                   if(list instanceof OmniList.OfBoolean) {
                       return isEqualTo(size,(OmniList.OfBoolean)list);
                   }else if(list instanceof OmniList.OfRef) {
@@ -4847,7 +4848,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
     }
-    public static class UncheckedSubList extends AbstractSeq<Boolean>
+    public static class UncheckedSubList extends AbstractOmniCollection<Boolean>
             implements
             BooleanSubListDefault,
             Cloneable,
@@ -5141,7 +5142,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
               return ((List<?>)val).isEmpty();
             }
             final List<?> list;
-            if((list=(List<?>)val) instanceof AbstractSeq) {
+            if((list=(List<?>)val) instanceof AbstractOmniCollection) {
                 if(list instanceof OmniList.OfBoolean) {
                     return isEqualTo(size,(OmniList.OfBoolean)list);
                 }else if(list instanceof OmniList.OfRef) {
