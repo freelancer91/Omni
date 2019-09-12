@@ -15,6 +15,7 @@ import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.util.NotYetImplementedException;
 import omni.util.OmniArray;
+import omni.util.TypeUtil;
 
 public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Serializable{
     public static BooleanSetImpl newUncheckedAscending() {
@@ -29,14 +30,8 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
     public static BooleanSetImpl newCheckedDescending() {
         return new BooleanSetImpl(0b1100);
     }
-    
-    
-    
     transient int state;
-    
-    private BooleanSetImpl(){
-    }
-    
+    private BooleanSetImpl(){}
     private BooleanSetImpl(int state){
         this.state=state;
     }
@@ -780,415 +775,7 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
     public OmniNavigableSet.OfBoolean descendingSet(){
         return new ReverseView(this);
     }
-    private static class ReverseView implements OmniNavigableSet.OfBoolean,Serializable,Cloneable{
-        private static final long serialVersionUID=1L;
-        private final BooleanSetImpl root;
-        
-        private ReverseView(BooleanSetImpl root){
-            this.root=root;
-        }
-        
-        //TODO read and write
-        
-        @Override
-        public void forEach(Consumer<? super Boolean> action) {
-            //TODO
-        }
-        @Override
-        public boolean removeIf(Predicate<? super Boolean> filter) {
-            return root.removeIf(filter);
-        }
-        
-        @Override
-        public Object clone() {
-            //TODO
-            return null;
-        }
-        
-        @Override
-        public byte pollFirstByte(){
-            return root.pollLastByte();
-        }
-
-        @Override
-        public byte pollLastByte(){
-            return root.pollFirstByte();
-        }
-
-        @Override
-        public short pollFirstShort(){
-            return root.pollLastShort();
-        }
-
-        @Override
-        public short pollLastShort(){
-            return root.pollFirstShort();
-        }
-
-        @Override
-        public int pollFirstInt(){
-            return root.pollLastInt();
-        }
-
-        @Override
-        public int pollLastInt(){
-            return root.pollFirstInt();
-        }
-
-        @Override
-        public long pollFirstLong(){
-            return root.pollLastLong();
-        }
-
-        @Override
-        public long pollLastLong(){
-            return root.pollFirstLong();
-        }
-
-        @Override
-        public float pollFirstFloat(){
-            return root.pollLastFloat();
-        }
-
-        @Override
-        public float pollLastFloat(){
-            return root.pollFirstFloat();
-        }
-
-        @Override
-        public double pollFirstDouble(){
-            return root.pollLastDouble();
-        }
-
-        @Override
-        public double pollLastDouble(){
-            return root.pollFirstDouble();
-        }
-
-        @Override
-        public void clear(){
-            root.clear();
-        }
-
-        @Override
-        public boolean contains(Object val){
-            return root.contains(val);
-        }
-        @Override
-        public boolean remove(Object val){
-            return root.remove(val);
-        }
-
-        @Override
-        public boolean contains(boolean val){
-            return root.contains(val);
-            }
-
     
-
-        @Override
-        public boolean contains(int val){
-            return root.contains(val);
-            }
-
-        @Override
-        public boolean contains(long val){
-            return root.contains(val);
-            }
-
-        @Override
-        public boolean contains(float val){
-            return root.contains(val);
-            }
-
-        @Override
-        public boolean contains(double val){
-            return root.contains(val);
-            }
-
-     
-
-
-
-        @Override
-        public boolean removeVal(boolean val){
-            return root.removeVal(val);
-        }
-
-      
-
-        @Override
-        public boolean removeVal(int val){
-            return root.removeVal(val);
-            }
-
-        @Override
-        public boolean removeVal(long val){
-            return root.removeVal(val);
-            }
-
-        @Override
-        public boolean removeVal(float val){
-            return root.removeVal(val);
-            }
-
-        @Override
-        public boolean removeVal(double val){
-            return root.removeVal(val);
-            }
-
-     
-        @Override
-        public boolean isEmpty(){
-            return root.isEmpty();
-        }
-
-        @Override
-        public int size(){
-            return root.size();
-        }
-
-        @Override
-        public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public <T> T[] toArray(T[] dst){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public boolean add(Boolean e){
-            return root.add((boolean)e);
-        }
-
-      
-
-        @Override
-        public Boolean pollFirst(){
-            return root.pollLast();
-        }
-
-        @Override
-        public Boolean pollLast(){
-            return root.pollFirst();
-        }
-
-       
-
-        @Override
-        public double[] toDoubleArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-     
-
-        @Override
-        public float[] toFloatArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-       
-
-        @Override
-        public long[] toLongArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-       
-
-        @Override
-        public int[] toIntArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-    
-
-        @Override
-        public short[] toShortArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-      
-
-        @Override
-        public byte[] toByteArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public char pollFirstChar(){
-            return root.pollLastChar();
-        }
-
-        @Override
-        public char pollLastChar(){
-            return root.pollFirstChar();
-        }
-
-       
-
-        @Override
-        public char[] toCharArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public BooleanComparator comparator(){
-            return comparatorHelper((root.state&0b0100)!=0);
-        }
-
-        @Override
-        public boolean firstBoolean(){
-            return root.lastBoolean();
-        }
-
-        @Override
-        public boolean lastBoolean(){
-            return root.firstBoolean();
-        }
-
-
-        @Override
-        public boolean add(boolean val){
-            return root.add(val);
-        }
-
-        @Override
-        public void forEach(BooleanConsumer action){
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public boolean removeIf(BooleanPredicate filter){
-            return root.removeIf(filter);
-        }
-
-        @Override
-        public Boolean[] toArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public boolean[] toBooleanArray(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public OmniIterator.OfBoolean iterator(){
-            return root.descendingIterator();
-        }
-
-        @Override
-        public OmniIterator.OfBoolean descendingIterator(){
-            return root.iterator();
-        }
-
-        @Override
-        public OmniNavigableSet.OfBoolean descendingSet(){
-            return root;
-        }
-
-        @Override
-        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public boolean pollFirstBoolean(){
-            return root.pollLastBoolean();
-        }
-
-        @Override
-        public boolean pollLastBoolean(){
-            return root.pollFirstBoolean();
-        }
-
-        @Override
-        public Boolean lower(boolean val){
-            return root.higher(val);
-        }
-
-        @Override
-        public Boolean floor(boolean val){
-            return root.ceiling(val);
-        }
-
-        @Override
-        public Boolean ceiling(boolean val){
-            return root.floor(val);
-        }
-
-        @Override
-        public Boolean higher(boolean val){
-            return root.lower(val);
-        }
-
-        @Override
-        public boolean lowerBoolean(boolean val){
-            return root.higherBoolean(val);
-        }
-
-        @Override
-        public boolean booleanFloor(boolean val){
-            return root.booleanCeiling(val);
-        }
-
-        @Override
-        public boolean booleanCeiling(boolean val){
-            return root.booleanFloor(val);
-        }
-
-        @Override
-        public boolean higherBoolean(boolean val){
-            return root.lowerBoolean(val);
-        }
-        
-    }
     @Override
     public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
         //TODO
@@ -1209,6 +796,8 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
         //TODO
         throw new NotYetImplementedException();
     }
+    
+    
     @Override
     public Boolean[] toArray() {
         switch(this.state&0b111) {
@@ -1435,39 +1024,136 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
     public void clear(){
         this.state&=0b1100;
     }
+    
     @Override
     public boolean contains(Object val){
-        // TODO Auto-generated method stub
+      switch(state&0b11) {
+      case 0b01:
+        return containsFalseState(val);
+      case 0b10:
+        return containsTrueState(val);
+      case 0b11:
+        return containsFullState(val);
+      default:
         return false;
+      }
+    }
+    private boolean containsFullState(Object val) {
+      if(val instanceof Boolean) {
+        return true;
+      }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+        return (((Number)val).intValue()&0xfffffffe)==0;
+      }else if(val instanceof Float){
+        switch(Float.floatToRawIntBits((float)val)) {
+        case 0:
+        case Integer.MIN_VALUE:
+        case TypeUtil.FLT_TRUE_BITS:
+          return true;
+        default:
+        }
+      }else if(val instanceof Double){
+        final long bits;
+        return ((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE|| bits==TypeUtil.DBL_TRUE_BITS);
+      }else if(val instanceof Long){
+        return (((long)val)&0xfffffffffffffffeL)==0L;
+      }else if(val instanceof Character){
+        return (((char)val)&0xfffffffe)==0;
+      }
+      return false;
+    }
+    private boolean containsTrueState(Object val){
+      if(val instanceof Boolean) {
+        return (boolean)val;
+      }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+        return ((Number)val).intValue()==1;
+      }else if(val instanceof Float){
+        return ((float)val)==1F;
+      }else if(val instanceof Double){
+        return ((double)val)==1D;
+      }else if(val instanceof Long){
+        return ((long)val)==1L;
+      }else if(val instanceof Character){
+        return ((char)val)==1;
+      }
+      return false;
+    }
+    private boolean containsFalseState(Object val){
+      if(val instanceof Boolean) {
+        return !(boolean)val;
+      }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+        return ((Number)val).intValue()==0;
+      }else if(val instanceof Float){
+        return ((float)val)==0F;
+      }else if(val instanceof Double){
+        return ((double)val)==0D;
+      }else if(val instanceof Long){
+        return ((long)val)==0L;
+      }else if(val instanceof Character){
+        return ((char)val)==0;
+      }
+      return false;
     }
     @Override
     public boolean contains(boolean val){
-        // TODO Auto-generated method stub
-        return false;
+      return (this.state&(val?0b10:0b01))!=0;
     }
-
     @Override
     public boolean contains(int val){
-        // TODO Auto-generated method stub
+      switch(val) {
+      case 0:
+        return (this.state&0b01)!=0;
+      case 1:
+        return (this.state&0b10)!=0;
+      default:
         return false;
+      }
     }
     @Override
     public boolean contains(long val){
-        // TODO Auto-generated method stub
+      switch(state&0b11) {
+      case 0b01:
+        return val==0L;
+      case 0b10:
+        return val==1L;
+      case 0b11:
+        return (val&0xfffffffffffffffeL)==0L;
+      default:
         return false;
+      }
     }
     @Override
     public boolean contains(float val){
-        // TODO Auto-generated method stub
+      switch(state&0b11) {
+      case 0b01:
+        return val==0F;
+      case 0b10:
+        return val==1F;
+      case 0b11:
+        switch(Float.floatToRawIntBits(val)) {
+        case 0:
+        case Integer.MIN_VALUE:
+        case TypeUtil.FLT_TRUE_BITS:
+          return true;
+        default:
+        }
+      default:
         return false;
+      }
     }
     @Override
     public boolean contains(double val){
-        // TODO Auto-generated method stub
+      switch(state&0b11) {
+      case 0b01:
+        return val==0D;
+      case 0b10:
+        return val==1D;
+      case 0b11:
+        final long bits;
+        return ((bits=Double.doubleToRawLongBits(val))==0L||bits==Long.MIN_VALUE || bits==TypeUtil.DBL_TRUE_BITS);
+      default:
         return false;
+      }
     }
-    
-    
     @Override
     public boolean remove(Object val){
         // TODO Auto-generated method stub
@@ -1478,7 +1164,6 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
         // TODO Auto-generated method stub
         return false;
     }
-   
     @Override
     public boolean removeVal(int val){
         // TODO Auto-generated method stub
@@ -1499,7 +1184,6 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
         // TODO Auto-generated method stub
         return false;
     }
-    
     @Override
     public boolean isEmpty(){
         return (this.state&0b11)==0;
@@ -1560,10 +1244,7 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
     @Override
     public boolean add(Boolean e){
         return this.add((boolean)e);
-    }
-   
-    
-   
+    }   
     @Override
     public boolean firstBoolean(){
         switch(state) {
@@ -1606,7 +1287,6 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
             throw new NoSuchElementException();
         }
     }
-
     @Override
     public boolean add(boolean val){
        int state;
@@ -1646,5 +1326,787 @@ public class BooleanSetImpl implements OmniNavigableSet.OfBoolean,Cloneable,Seri
         // TODO Auto-generated method stub
         return null;
     }
+    private static class FalseView implements OmniNavigableSet.OfBoolean,Serializable,Cloneable{
+      
+    }
+    private static class TrueView implements OmniNavigableSet.OfBoolean,Serializable,Cloneable{
+      
+    }
+    private static class EmptyView implements OmniNavigableSet.OfBoolean,Serializable,Cloneable{
 
+      @Override public byte pollFirstByte(){
+        return Byte.MIN_VALUE;
+      }
+
+      @Override public byte pollLastByte(){
+        return Byte.MIN_VALUE;
+        }
+
+      @Override public short pollFirstShort(){
+        return Short.MIN_VALUE;
+        }
+
+      @Override public short pollLastShort(){
+        return Short.MIN_VALUE;
+        }
+
+      @Override public int pollFirstInt(){
+        return Integer.MIN_VALUE;
+        }
+
+      @Override public int pollLastInt(){
+        return Integer.MIN_VALUE;
+        }
+
+      @Override public long pollFirstLong(){
+        return Long.MIN_VALUE;
+      }
+
+      @Override public long pollLastLong(){
+        return Long.MIN_VALUE;
+        }
+
+      @Override public float pollFirstFloat(){
+        return Float.NaN;
+      }
+
+      @Override public float pollLastFloat(){
+        return Float.NaN;
+        }
+
+      @Override public double pollFirstDouble(){
+        return Double.NaN;
+      }
+
+      @Override public double pollLastDouble(){
+        return Double.NaN;
+        }
+
+      @Override public void clear(){
+        //nothing to do
+      }
+
+      @Override public boolean contains(Object val){
+        return false;
+      }
+
+      @Override public boolean contains(boolean val){
+        return false;
+        }
+
+
+
+      @Override public boolean contains(int val){
+        return false;
+        }
+
+      @Override public boolean contains(long val){
+        return false;
+        }
+
+      @Override public boolean contains(float val){
+        return false;
+        }
+
+      @Override public boolean contains(double val){
+        return false;
+        }
+
+    
+
+      @Override public boolean remove(Object val){
+        return false;
+      }
+
+      @Override public boolean removeVal(boolean val){
+        return false;
+        }
+
+   
+
+      @Override public boolean removeVal(int val){
+        return false;
+        }
+
+      @Override public boolean removeVal(long val){
+        return false;
+        }
+
+      @Override public boolean removeVal(float val){
+        return false;
+        }
+
+      @Override public boolean removeVal(double val){
+        return false;
+        }
+
+      @Override public boolean isEmpty(){
+        return true;
+      }
+
+      @Override public int size(){
+        return 0;
+      }
+
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        return arrConstructor.apply(0);
+      }
+
+      @Override public <T> T[] toArray(T[] dst){
+        if(dst.length!=0) {
+          dst[0]=null;
+        }
+        return dst;
+      }
+
+      @Override public boolean add(Boolean e){
+        throw new IllegalArgumentException("The value "+e+" is outside the range of this sub-set");
+      }
+
+      @Override public Boolean first(){
+        throw new NoSuchElementException();
+      }
+
+      @Override public Boolean last(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public Boolean pollFirst(){
+        return null;
+      }
+
+      @Override public Boolean pollLast(){
+        return null;
+        }
+
+      @Override public double firstDouble(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public double lastDouble(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public double[] toDoubleArray(){
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+
+      @Override public float firstFloat(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public float lastFloat(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public float[] toFloatArray(){
+        return OmniArray.OfFloat.DEFAULT_ARR;
+        }
+
+      @Override public long firstLong(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public long lastLong(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public long[] toLongArray(){
+        return OmniArray.OfLong.DEFAULT_ARR;
+        }
+
+      @Override public int firstInt(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public int lastInt(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public int[] toIntArray(){
+        return OmniArray.OfInt.DEFAULT_ARR;
+        }
+
+      @Override public short firstShort(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public short lastShort(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public short[] toShortArray(){
+        return OmniArray.OfShort.DEFAULT_ARR;
+        }
+
+      @Override public byte firstByte(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public byte lastByte(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public byte[] toByteArray(){
+        return OmniArray.OfByte.DEFAULT_ARR;
+        }
+
+      @Override public char pollFirstChar(){
+        return Character.MIN_VALUE;
+      }
+
+      @Override public char pollLastChar(){
+        return Character.MIN_VALUE;
+        }
+
+      @Override public char firstChar(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public char lastChar(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public char[] toCharArray(){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public BooleanComparator comparator(){
+        return Boolean::compare;
+      }
+
+      @Override public boolean firstBoolean(){
+        throw new NoSuchElementException();
+        }
+
+      @Override public boolean lastBoolean(){
+        throw new NoSuchElementException();
+        }
+
+
+      @Override public boolean add(boolean val){
+        throw new IllegalArgumentException("The value "+val+" is outside the range of this sub-set");
+        }
+
+      @Override public void forEach(BooleanConsumer action){
+        //nothing to do
+      }
+
+      @Override public boolean removeIf(BooleanPredicate filter){
+        return false;
+      }
+
+      @Override public Boolean[] toArray(){
+        return OmniArray.OfBoolean.DEFAULT_BOXED_ARR;
+      }
+
+      @Override public boolean[] toBooleanArray(){
+        return OmniArray.OfBoolean.DEFAULT_ARR;
+      }
+
+      @Override public OmniIterator.OfBoolean iterator(){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,
+          boolean toInclusive){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public boolean pollFirstBoolean(){
+        return false;
+      }
+
+      @Override public boolean pollLastBoolean(){
+        return false;
+        }
+
+      @Override public Boolean lower(boolean val){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public Boolean floor(boolean val){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public Boolean ceiling(boolean val){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public Boolean higher(boolean val){
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override public boolean lowerBoolean(boolean val){
+        // TODO Auto-generated method stub
+        return false;
+      }
+
+      @Override public boolean booleanFloor(boolean val){
+        // TODO Auto-generated method stub
+        return false;
+      }
+
+      @Override public boolean booleanCeiling(boolean val){
+        // TODO Auto-generated method stub
+        return false;
+      }
+
+      @Override public boolean higherBoolean(boolean val){
+        // TODO Auto-generated method stub
+        return false;
+      }
+      
+    }
+    private static class ReverseView implements OmniNavigableSet.OfBoolean,Serializable,Cloneable{
+      private static final long serialVersionUID=1L;
+      private final BooleanSetImpl root;
+      
+      private ReverseView(BooleanSetImpl root){
+          this.root=root;
+      }
+      
+      //TODO read and write
+      
+      @Override
+      public void forEach(Consumer<? super Boolean> action) {
+          //TODO
+      }
+      @Override
+      public boolean removeIf(Predicate<? super Boolean> filter) {
+          return root.removeIf(filter);
+      }
+      
+      @Override
+      public Object clone() {
+          //TODO
+          return null;
+      }
+      
+      @Override
+      public byte pollFirstByte(){
+          return root.pollLastByte();
+      }
+
+      @Override
+      public byte pollLastByte(){
+          return root.pollFirstByte();
+      }
+
+      @Override
+      public short pollFirstShort(){
+          return root.pollLastShort();
+      }
+
+      @Override
+      public short pollLastShort(){
+          return root.pollFirstShort();
+      }
+
+      @Override
+      public int pollFirstInt(){
+          return root.pollLastInt();
+      }
+
+      @Override
+      public int pollLastInt(){
+          return root.pollFirstInt();
+      }
+
+      @Override
+      public long pollFirstLong(){
+          return root.pollLastLong();
+      }
+
+      @Override
+      public long pollLastLong(){
+          return root.pollFirstLong();
+      }
+
+      @Override
+      public float pollFirstFloat(){
+          return root.pollLastFloat();
+      }
+
+      @Override
+      public float pollLastFloat(){
+          return root.pollFirstFloat();
+      }
+
+      @Override
+      public double pollFirstDouble(){
+          return root.pollLastDouble();
+      }
+
+      @Override
+      public double pollLastDouble(){
+          return root.pollFirstDouble();
+      }
+
+      @Override
+      public void clear(){
+          root.clear();
+      }
+
+      @Override
+      public boolean contains(Object val){
+          return root.contains(val);
+      }
+      @Override
+      public boolean remove(Object val){
+          return root.remove(val);
+      }
+
+      @Override
+      public boolean contains(boolean val){
+          return root.contains(val);
+          }
+
+  
+
+      @Override
+      public boolean contains(int val){
+          return root.contains(val);
+          }
+
+      @Override
+      public boolean contains(long val){
+          return root.contains(val);
+          }
+
+      @Override
+      public boolean contains(float val){
+          return root.contains(val);
+          }
+
+      @Override
+      public boolean contains(double val){
+          return root.contains(val);
+          }
+
+   
+
+
+
+      @Override
+      public boolean removeVal(boolean val){
+          return root.removeVal(val);
+      }
+
+    
+
+      @Override
+      public boolean removeVal(int val){
+          return root.removeVal(val);
+          }
+
+      @Override
+      public boolean removeVal(long val){
+          return root.removeVal(val);
+          }
+
+      @Override
+      public boolean removeVal(float val){
+          return root.removeVal(val);
+          }
+
+      @Override
+      public boolean removeVal(double val){
+          return root.removeVal(val);
+          }
+
+   
+      @Override
+      public boolean isEmpty(){
+          return root.isEmpty();
+      }
+
+      @Override
+      public int size(){
+          return root.size();
+      }
+
+      @Override
+      public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public <T> T[] toArray(T[] dst){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public boolean add(Boolean e){
+          return root.add((boolean)e);
+      }
+
+    
+
+      @Override
+      public Boolean pollFirst(){
+          return root.pollLast();
+      }
+
+      @Override
+      public Boolean pollLast(){
+          return root.pollFirst();
+      }
+
+     
+
+      @Override
+      public double[] toDoubleArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+   
+
+      @Override
+      public float[] toFloatArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+     
+
+      @Override
+      public long[] toLongArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+     
+
+      @Override
+      public int[] toIntArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+  
+
+      @Override
+      public short[] toShortArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+    
+
+      @Override
+      public byte[] toByteArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public char pollFirstChar(){
+          return root.pollLastChar();
+      }
+
+      @Override
+      public char pollLastChar(){
+          return root.pollFirstChar();
+      }
+
+     
+
+      @Override
+      public char[] toCharArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public BooleanComparator comparator(){
+          return comparatorHelper((root.state&0b0100)!=0);
+      }
+
+      @Override
+      public boolean firstBoolean(){
+          return root.lastBoolean();
+      }
+
+      @Override
+      public boolean lastBoolean(){
+          return root.firstBoolean();
+      }
+
+
+      @Override
+      public boolean add(boolean val){
+          return root.add(val);
+      }
+
+      @Override
+      public void forEach(BooleanConsumer action){
+          // TODO Auto-generated method stub
+          
+      }
+
+      @Override
+      public boolean removeIf(BooleanPredicate filter){
+          return root.removeIf(filter);
+      }
+
+      @Override
+      public Boolean[] toArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public boolean[] toBooleanArray(){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public OmniIterator.OfBoolean iterator(){
+          return root.descendingIterator();
+      }
+
+      @Override
+      public OmniIterator.OfBoolean descendingIterator(){
+          return root.iterator();
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean descendingSet(){
+          return root;
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+          // TODO Auto-generated method stub
+          return null;
+      }
+
+      @Override
+      public boolean pollFirstBoolean(){
+          return root.pollLastBoolean();
+      }
+
+      @Override
+      public boolean pollLastBoolean(){
+          return root.pollFirstBoolean();
+      }
+
+      @Override
+      public Boolean lower(boolean val){
+          return root.higher(val);
+      }
+
+      @Override
+      public Boolean floor(boolean val){
+          return root.ceiling(val);
+      }
+
+      @Override
+      public Boolean ceiling(boolean val){
+          return root.floor(val);
+      }
+
+      @Override
+      public Boolean higher(boolean val){
+          return root.lower(val);
+      }
+
+      @Override
+      public boolean lowerBoolean(boolean val){
+          return root.higherBoolean(val);
+      }
+
+      @Override
+      public boolean booleanFloor(boolean val){
+          return root.booleanCeiling(val);
+      }
+
+      @Override
+      public boolean booleanCeiling(boolean val){
+          return root.booleanFloor(val);
+      }
+
+      @Override
+      public boolean higherBoolean(boolean val){
+          return root.lowerBoolean(val);
+      }
+      
+  }
 }
