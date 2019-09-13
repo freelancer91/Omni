@@ -21,7 +21,7 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.OfRef<E> headSet(E toElement);
     OmniNavigableSet.OfRef<E> tailSet(E fromElement);
   }
-  public abstract interface DoubleOutput<E> extends OmniNavigableSet<E>,OmniSortedSet.DoubleOutput<E>{
+  public abstract interface DoubleOutput<E> extends OmniNavigableSet<E>,OmniSet.DoubleOutput<E>{
     OmniIterator.DoubleOutput<E> iterator();
     OmniIterator.DoubleOutput<E> descendingIterator();
     OmniNavigableSet.DoubleOutput<E> descendingSet();
@@ -33,8 +33,12 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.DoubleOutput<E> tailSet(E fromElement);
     double pollFirstDouble();
     double pollLastDouble();
+    double lowerDouble(double val);
+    double higherDouble(double val);
+    double doubleCeiling(double val);
+    double doubleFloor(double val);
   }
-  public abstract interface FloatOutput<E> extends OmniNavigableSet.DoubleOutput<E>,OmniSortedSet.FloatOutput<E>{
+  public abstract interface FloatOutput<E> extends OmniNavigableSet.DoubleOutput<E>,OmniSet.FloatOutput<E>{
     OmniIterator.FloatOutput<E> iterator();
     OmniIterator.FloatOutput<E> descendingIterator();
     OmniNavigableSet.FloatOutput<E> descendingSet();
@@ -46,8 +50,12 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.FloatOutput<E> tailSet(E fromElement);
     float pollFirstFloat();
     float pollLastFloat();
+    float lowerFloat(float val);
+    float higherFloat(float val);
+    float floatCeiling(float val);
+    float floatFloor(float val);
   }
-  public abstract interface LongOutput<E> extends OmniNavigableSet.FloatOutput<E>,OmniSortedSet.LongOutput<E>{
+  public abstract interface LongOutput<E> extends OmniNavigableSet.FloatOutput<E>,OmniSet.LongOutput<E>{
     OmniIterator.LongOutput<E> iterator();
     OmniIterator.LongOutput<E> descendingIterator();
     OmniNavigableSet.LongOutput<E> descendingSet();
@@ -59,8 +67,12 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.LongOutput<E> tailSet(E fromElement);
     long pollFirstLong();
     long pollLastLong();
+    long lowerLong(long val);
+    long higherLong(long val);
+    long longCeiling(long val);
+    long longFloor(long val);
   }
-  public abstract interface IntOutput<E> extends OmniNavigableSet.LongOutput<E>,OmniSortedSet.IntOutput<E>{
+  public abstract interface IntOutput<E> extends OmniNavigableSet.LongOutput<E>,OmniSet.IntOutput<E>{
     OmniIterator.IntOutput<E> iterator();
     OmniIterator.IntOutput<E> descendingIterator();
     OmniNavigableSet.IntOutput<E> descendingSet();
@@ -72,8 +84,12 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.IntOutput<E> tailSet(E fromElement);
     int pollFirstInt();
     int pollLastInt();
+    int lowerInt(int val);
+    int higherInt(int val);
+    int intCeiling(int val);
+    int intFloor(int val);
   }
-  public abstract interface ShortOutput<E> extends OmniNavigableSet.IntOutput<E>,OmniSortedSet.ShortOutput<E>{
+  public abstract interface ShortOutput<E> extends OmniNavigableSet.IntOutput<E>,OmniSet.ShortOutput<E>{
     OmniIterator.ShortOutput<E> iterator();
     OmniIterator.ShortOutput<E> descendingIterator();
     OmniNavigableSet.ShortOutput<E> descendingSet();
@@ -85,8 +101,12 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.ShortOutput<E> tailSet(E fromElement);
     short pollFirstShort();
     short pollLastShort();
+    short lowerShort(short val);
+    short higherShort(short val);
+    short shortCeiling(short val);
+    short shortFloor(short val);
   }
-  public abstract interface CharOutput<E> extends OmniNavigableSet.IntOutput<E>,OmniSortedSet.CharOutput<E>{
+  public abstract interface CharOutput<E> extends OmniNavigableSet.IntOutput<E>,OmniSet.CharOutput<E>{
     OmniIterator.CharOutput<E> iterator();
     OmniIterator.CharOutput<E> descendingIterator();
     OmniNavigableSet.CharOutput<E> descendingSet();
@@ -98,8 +118,12 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.CharOutput<E> tailSet(E fromElement);
     char pollFirstChar();
     char pollLastChar();
+    char lowerChar(char val);
+    char higherChar(char val);
+    char charCeiling(char val);
+    char charFloor(char val);
   }
-  public abstract interface ByteOutput<E> extends OmniNavigableSet.ShortOutput<E>,OmniSortedSet.ByteOutput<E>{
+  public abstract interface ByteOutput<E> extends OmniNavigableSet.ShortOutput<E>,OmniSet.ByteOutput<E>{
     OmniIterator.ByteOutput<E> iterator();
     OmniIterator.ByteOutput<E> descendingIterator();
     OmniNavigableSet.ByteOutput<E> descendingSet();
@@ -111,6 +135,10 @@ public abstract interface OmniNavigableSet<E> extends OmniSortedSet<E>,Navigable
     OmniNavigableSet.ByteOutput<E> tailSet(E fromElement);
     byte pollFirstByte();
     byte pollLastByte();
+    byte lowerByte(byte val);
+    byte higherByte(byte val);
+    byte byteCeiling(byte val);
+    byte byteFloor(byte val);
   }
   public abstract interface OfBoolean
     extends OmniNavigableSet.ByteOutput<Boolean>,OmniNavigableSet.CharOutput<Boolean>,OmniSortedSet.OfBoolean{

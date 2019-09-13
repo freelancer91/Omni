@@ -21,55 +21,26 @@ public abstract interface OmniSortedSet<E> extends OmniSet<E>,SortedSet<E>{
     OmniSortedSet.OfRef<E> headSet(E toElement);
     OmniSortedSet.OfRef<E> tailSet(E fromElement);
   }
-  public abstract interface DoubleOutput<E> extends OmniSortedSet<E>,OmniSet.DoubleOutput<E>{
-    OmniSortedSet.DoubleOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.DoubleOutput<E> headSet(E toElement);
-    OmniSortedSet.DoubleOutput<E> tailSet(E fromElement);
-    double firstDouble();
-    double lastDouble();
-  }
-  public abstract interface FloatOutput<E> extends OmniSortedSet.DoubleOutput<E>,OmniSet.FloatOutput<E>{
-    OmniSortedSet.FloatOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.FloatOutput<E> headSet(E toElement);
-    OmniSortedSet.FloatOutput<E> tailSet(E fromElement);
-    float firstFloat();
-    float lastFloat();
-  }
-  public abstract interface LongOutput<E> extends OmniSortedSet.FloatOutput<E>,OmniSet.LongOutput<E>{
-    OmniSortedSet.LongOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.LongOutput<E> headSet(E toElement);
-    OmniSortedSet.LongOutput<E> tailSet(E fromElement);
-    long firstLong();
-    long lastLong();
-  }
-  public abstract interface IntOutput<E> extends OmniSortedSet.LongOutput<E>,OmniSet.IntOutput<E>{
-    OmniSortedSet.IntOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.IntOutput<E> headSet(E toElement);
-    OmniSortedSet.IntOutput<E> tailSet(E fromElement);
-    int firstInt();
-    int lastInt();
-  }
-  public abstract interface CharOutput<E> extends OmniSortedSet.IntOutput<E>,OmniSet.CharOutput<E>{
-    OmniSortedSet.CharOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.CharOutput<E> headSet(E toElement);
-    OmniSortedSet.CharOutput<E> tailSet(E fromElement);
-    char firstChar();
-    char lastChar();
-  }
-  public abstract interface ShortOutput<E> extends OmniSortedSet.IntOutput<E>,OmniSet.ShortOutput<E>{
-    OmniSortedSet.ShortOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.ShortOutput<E> headSet(E toElement);
-    OmniSortedSet.ShortOutput<E> tailSet(E fromElement);
-    short firstShort();
-    short lastShort();
-  }
-  public abstract interface ByteOutput<E> extends OmniSortedSet.ShortOutput<E>,OmniSet.ByteOutput<E>{
-    OmniSortedSet.ByteOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.ByteOutput<E> headSet(E toElement);
-    OmniSortedSet.ByteOutput<E> tailSet(E fromElement);
-    byte firstByte();
-    byte lastByte();
-  }
+#MACRODEF OutputInterface<CLASSPREFIX>(EXPOSEDTYPE,EXTENDS)
+#IFSWITCH CLASSPREFIX==Double
+public abstract interface CLASSPREFIXOutput<E> extends OmniSortedSet<E>,OmniSet.CLASSPREFIXOutput<E>{
+#ELSE
+public abstract interface CLASSPREFIXOutput<E> extends OmniSortedSet.EXTENDSOutput<E>,OmniSet.CLASSPREFIXOutput<E>{
+#ENDIF
+  OmniSortedSet.CLASSPREFIXOutput<E> subSet(E fromElement,E toElement);
+  OmniSortedSet.CLASSPREFIXOutput<E> headSet(E toElement);
+  OmniSortedSet.CLASSPREFIXOutput<E> tailSet(E fromElement);
+  EXPOSEDTYPE firstCLASSPREFIX();
+  EXPOSEDTYPE lastCLASSPREFIX();
+}
+#ENDDEF
+  #MACRO OutputInterface<Double>(double,)
+  #MACRO OutputInterface<Float>(float,Double)
+  #MACRO OutputInterface<Long>(long,Float)
+  #MACRO OutputInterface<Int>(int,Long)
+  #MACRO OutputInterface<Short>(short,Int)
+  #MACRO OutputInterface<Char>(char,Int)
+  #MACRO OutputInterface<Byte>(byte,Short)
   #MACRO PrimitiveSubInterface<Boolean>(Boolean,boolean)
   #MACRO PrimitiveSubInterface<Byte>(Byte,byte)
   #MACRO PrimitiveSubInterface<Char>(Character,char)

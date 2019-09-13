@@ -1245,32 +1245,32 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
     }
   }
   public abstract interface DoubleOutput<E> extends OmniCollection<E>{
-    public abstract double[] toDoubleArray();
-    public abstract OmniIterator.DoubleOutput<E> iterator(); 
+    double[] toDoubleArray();
+    OmniIterator.DoubleOutput<E> iterator(); 
   }
-  public abstract interface FloatOutput<E> extends DoubleOutput<E>{
-    public abstract float[] toFloatArray();
-    public abstract OmniIterator.FloatOutput<E> iterator(); 
+  public abstract interface FloatOutput<E> extends OmniCollection.DoubleOutput<E>{
+    float[] toFloatArray();
+    OmniIterator.FloatOutput<E> iterator(); 
   }
-  public abstract interface LongOutput<E> extends FloatOutput<E>{
-    public abstract long[] toLongArray();
-    public abstract OmniIterator.LongOutput<E> iterator(); 
+  public abstract interface LongOutput<E> extends OmniCollection.FloatOutput<E>{
+    long[] toLongArray();
+    OmniIterator.LongOutput<E> iterator(); 
   }
-  public abstract interface IntOutput<E> extends LongOutput<E>{
-    public abstract int[] toIntArray();
-    public abstract OmniIterator.IntOutput<E> iterator(); 
+  public abstract interface IntOutput<E> extends OmniCollection.LongOutput<E>{
+    int[] toIntArray();
+    OmniIterator.IntOutput<E> iterator(); 
   }
-  public abstract interface ShortOutput<E> extends IntOutput<E>{
-    public abstract short[] toShortArray();
-    public abstract OmniIterator.ShortOutput<E> iterator(); 
+  public abstract interface ShortOutput<E> extends OmniCollection.IntOutput<E>{
+    short[] toShortArray();
+    OmniIterator.ShortOutput<E> iterator(); 
   }
-  public abstract interface CharOutput<E> extends IntOutput<E>{
-    public abstract char[] toCharArray();
-    public abstract OmniIterator.CharOutput<E> iterator(); 
+  public abstract interface CharOutput<E> extends OmniCollection.IntOutput<E>{
+    char[] toCharArray();
+    OmniIterator.CharOutput<E> iterator(); 
   }
-  public abstract interface ByteOutput<E> extends ShortOutput<E>{
-    public abstract byte[] toByteArray();
-    public abstract OmniIterator.ByteOutput<E> iterator(); 
+  public abstract interface ByteOutput<E> extends OmniCollection.ShortOutput<E>{
+    byte[] toByteArray();
+    OmniIterator.ByteOutput<E> iterator(); 
   }
   public abstract interface BooleanInput<E> extends OmniCollection<E>{
     public abstract boolean add(boolean val);

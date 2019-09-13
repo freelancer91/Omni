@@ -109,34 +109,16 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
-  public abstract interface DoubleOutput<E> extends OmniCollection<E>{
-    public abstract double[] toDoubleArray();
-    public abstract OmniIterator.DoubleOutput<E> iterator(); 
-  }
-  public abstract interface FloatOutput<E> extends DoubleOutput<E>{
-    public abstract float[] toFloatArray();
-    public abstract OmniIterator.FloatOutput<E> iterator(); 
-  }
-  public abstract interface LongOutput<E> extends FloatOutput<E>{
-    public abstract long[] toLongArray();
-    public abstract OmniIterator.LongOutput<E> iterator(); 
-  }
-  public abstract interface IntOutput<E> extends LongOutput<E>{
-    public abstract int[] toIntArray();
-    public abstract OmniIterator.IntOutput<E> iterator(); 
-  }
-  public abstract interface ShortOutput<E> extends IntOutput<E>{
-    public abstract short[] toShortArray();
-    public abstract OmniIterator.ShortOutput<E> iterator(); 
-  }
-  public abstract interface CharOutput<E> extends IntOutput<E>{
-    public abstract char[] toCharArray();
-    public abstract OmniIterator.CharOutput<E> iterator(); 
-  }
-  public abstract interface ByteOutput<E> extends ShortOutput<E>{
-    public abstract byte[] toByteArray();
-    public abstract OmniIterator.ByteOutput<E> iterator(); 
-  }
+
+
+  #MACRO OutputSubInterface<Double>(double,)
+  #MACRO OutputSubInterface<Float>(float,Double)
+  #MACRO OutputSubInterface<Long>(long,Float)
+  #MACRO OutputSubInterface<Int>(int,Long)
+  #MACRO OutputSubInterface<Short>(short,Int)
+  #MACRO OutputSubInterface<Char>(char,Int)
+  #MACRO OutputSubInterface<Byte>(byte,Short)
+  
   public abstract interface BooleanInput<E> extends OmniCollection<E>{
     public abstract boolean add(boolean val);
     public abstract boolean add(Boolean val);
@@ -172,7 +154,41 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
     public abstract boolean add(Float val);
     public abstract boolean addAll(OmniCollection.OfFloat that);
   }
+
   
+  public abstract interface OfRef<E> extends OmniCollection<E>,Iterable<E>
+  {
+    /*
+    @Override
+    public default DataType getDataType(){
+      return DataType.REF;
+    }
+    */
+    @SuppressWarnings("unchecked")
+    public default boolean addAll(OmniCollection.OfRef<? extends E> that){
+    //TODO implement in lower classes and remove this
+      var changed=false;
+      for(var thatVal:that.toArray()){
+        changed|=this.add((E)thatVal);
+      }
+      return changed;
+    }
+    public abstract boolean add(E val);
+    public abstract void forEach(Consumer<? super E> action);
+    public abstract OmniIterator.OfRef<E> iterator();
+    public abstract boolean removeIf(Predicate<? super E> filter);
+  }
+}
+#MACRODEF OutputSubInterface<CLASSPREFIX>(EXPOSEDTYPE,EXTENDS)
+#IFSWITCH CLASSPREFIX==Double
+public abstract interface CLASSPREFIXOutput<E> extends OmniCollection<E>{
+#ELSE
+public abstract interface CLASSPREFIXOutput<E> extends OmniCollection.EXTENDSOutput<E>{
+#ENDIF
+  EXPOSEDTYPE[] toCLASSPREFIXArray();
+  OmniIterator.CLASSPREFIXOutput<E> iterator(); 
+}
+#ENDDEF  
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
 public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<BOXEDTYPE>
 #IFSWITCH ARRTYPE==boolean
@@ -183,8 +199,6 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
 ,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
- 
-
   /*
   @Override
   public default DataType getDataType(){
@@ -480,31 +494,6 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,Iterable<
   
 }
 #ENDDEF
-  
-  public abstract interface OfRef<E> extends OmniCollection<E>,Iterable<E>
-  {
-    /*
-    @Override
-    public default DataType getDataType(){
-      return DataType.REF;
-    }
-    */
-    @SuppressWarnings("unchecked")
-    public default boolean addAll(OmniCollection.OfRef<? extends E> that){
-    //TODO implement in lower classes and remove this
-      var changed=false;
-      for(var thatVal:that.toArray()){
-        changed|=this.add((E)thatVal);
-      }
-      return changed;
-    }
-    public abstract boolean add(E val);
-    public abstract void forEach(Consumer<? super E> action);
-    public abstract OmniIterator.OfRef<E> iterator();
-    public abstract boolean removeIf(Predicate<? super E> filter);
-  }
-}
-
 
 
 #MACRODEF ContainsMethodDefault<INPUTTYPE>()

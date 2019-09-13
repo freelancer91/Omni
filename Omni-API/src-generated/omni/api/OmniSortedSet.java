@@ -46,19 +46,19 @@ public abstract interface OmniSortedSet<E> extends OmniSet<E>,SortedSet<E>{
     int firstInt();
     int lastInt();
   }
-  public abstract interface CharOutput<E> extends OmniSortedSet.IntOutput<E>,OmniSet.CharOutput<E>{
-    OmniSortedSet.CharOutput<E> subSet(E fromElement,E toElement);
-    OmniSortedSet.CharOutput<E> headSet(E toElement);
-    OmniSortedSet.CharOutput<E> tailSet(E fromElement);
-    char firstChar();
-    char lastChar();
-  }
   public abstract interface ShortOutput<E> extends OmniSortedSet.IntOutput<E>,OmniSet.ShortOutput<E>{
     OmniSortedSet.ShortOutput<E> subSet(E fromElement,E toElement);
     OmniSortedSet.ShortOutput<E> headSet(E toElement);
     OmniSortedSet.ShortOutput<E> tailSet(E fromElement);
     short firstShort();
     short lastShort();
+  }
+  public abstract interface CharOutput<E> extends OmniSortedSet.IntOutput<E>,OmniSet.CharOutput<E>{
+    OmniSortedSet.CharOutput<E> subSet(E fromElement,E toElement);
+    OmniSortedSet.CharOutput<E> headSet(E toElement);
+    OmniSortedSet.CharOutput<E> tailSet(E fromElement);
+    char firstChar();
+    char lastChar();
   }
   public abstract interface ByteOutput<E> extends OmniSortedSet.ShortOutput<E>,OmniSet.ByteOutput<E>{
     OmniSortedSet.ByteOutput<E> subSet(E fromElement,E toElement);
