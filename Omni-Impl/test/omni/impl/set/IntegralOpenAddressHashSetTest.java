@@ -823,6 +823,16 @@ public class IntegralOpenAddressHashSetTest{
     private static class IntegralOpenAddressHashSetMonitor
     implements
     MonitoredSet<AbstractIntegralTypeOpenAddressHashSet<?>>{
+      private Object verifyClone(){
+        final Object clone;
+        try{
+            clone=set.clone();
+        }finally{
+            verifyCollectionState();
+        }
+        verifyClone(clone);
+        return clone;
+      }
         @Override public MonitoredIterator<? extends OmniIterator<?>,AbstractIntegralTypeOpenAddressHashSet<?>> getMonitoredIterator(IteratorType itrType){
             if(itrType!=IteratorType.AscendingItr) {
                 throw itrType.invalid();

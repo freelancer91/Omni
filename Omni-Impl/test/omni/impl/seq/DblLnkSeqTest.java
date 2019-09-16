@@ -2060,6 +2060,7 @@ public class DblLnkSeqTest{
             super(initParams.checkedType,initParams.collectionType,initCapacity);
             updateCollectionState();
         }
+       
         @Override
         public void copyListContents(){
             switch(dataType){

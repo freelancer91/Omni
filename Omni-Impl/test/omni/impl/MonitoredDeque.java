@@ -12,6 +12,16 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         }
         return itrMonitor;
     }
+    default Object verifyClone(){
+      final Object clone;
+      try{
+          clone=getCollection().clone();
+      }finally{
+          verifyCollectionState();
+      }
+      verifyClone(clone);
+      return clone;
+  }
     void updateRemoveValState(Object inputVal,DataType inputType);
     default boolean verifyRemoveFirstOccurrence(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification) {

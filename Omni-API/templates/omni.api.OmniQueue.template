@@ -6,6 +6,7 @@ import java.util.Queue;
 //TODO extends java.util.Queue
 public abstract interface OmniQueue<E> extends OmniCollection<E>,PeekAndPollIfc<E>,Queue<E>
 {
+  
   /*
   @Override
   default boolean containsAll(Collection<?> that){
@@ -35,7 +36,7 @@ public abstract interface OmniQueue<E> extends OmniCollection<E>,PeekAndPollIfc<
   #MACRO PrimitiveSubInterface<long,Long,Long>()
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
-  //public abstract Object clone();
+  public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniQueue<E>,OmniCollection.OfPrimitive<E>
   {
     public abstract boolean offer(boolean val);

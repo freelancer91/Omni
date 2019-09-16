@@ -20,1380 +20,155 @@ import omni.api.OmniSet;
 import java.util.NoSuchElementException;
 import omni.impl.AbstractBooleanItr;
 import java.util.ConcurrentModificationException;
-public class BooleanSetImpl extends AbstractBooleanSet implements OmniNavigableSet.OfBoolean,Serializable,Cloneable{
-  private static final long serialVersionUID=1L;
+public abstract class BooleanSetImpl extends AbstractBooleanSet implementsSerializable,Cloneable{
   transient int state;
-  public BooleanSetImpl(){
-    super();
+  #MACRO Constructors<BooleanSetImpl>()
+  @Override public void clear(){
+    this.state=0b00;
   }
-  public BooleanSetImpl(BooleanSetImpl that){
-    super();
-    state=that.state;
-  }
-  public BooleanSetImpl(Collection<? extends Boolean> that){
-    super();
-    // TODO optimize
-    this.addAll(that);
-  }
-  public BooleanSetImpl(OmniCollection.OfBoolean that){
-    super();
-    // TODO optimize
-    this.addAll(that);
-  }
-  public BooleanSetImpl(OmniCollection.OfRef<? extends Boolean> that){
-    super();
-    // TODO optimize
-    this.addAll(that);
-  }
-  BooleanSetImpl(int state){
-    this.state=state;
+  @Override public boolean isEmpty(){
+    return this.state==0b00;
   }
   @Override public int size(){
-    switch(state){
-      case 0b11:
-        return 2;
-      case 0b10:
+    switch(this.state){
+      case 0b00:
+        return 0;
       case 0b01:
+      case 0b10:
         return 1;
       default:
-        return 0;
+        return 2;
     }
   }
-  #MACRO ToStringImpl<false>(state)
   @Override public int hashCode(){
-    switch(state){
-    case 0b01:
-      return 1237;
-    case 0b10:
-      return 1231;
-    case 0b11:
-      return 1231+1237;
-    default:
-      return 0;
+    switch(this.state){
+      case 0b00:
+        return 0;
+      case 0b01:
+        return 1237;
+      case 0b10:
+        return 1231:
+      default:
+        return 1231+1237;
     }
   }
   @Override public boolean equals(Object val){
+    if(val==this){
+      return true;
+    }
+    if(val instanceof Set){
+      switch(this.state){
+        case 0b00:
+          return ((Set<?>)val).isEmpty();
+        case 0b01:
+          return equalsFalseState((Set<?>)val);
+        case 0b10:
+          return equalsTrueState((Set<?>)val);
+        default:
+          return equalsFullState((Set<?>)val);
+      }
+    }
+    return false;
+  }
+  private static boolean equalsFullState(Set<?> val){
     //TODO optimize
-    final Set<?> set;
-    return val==this || (val instanceof Set && (((set=(Set<?>)val).size()==this.size())&&(set instanceof AbstractBooleanSet||set instanceof OmniSet.OfRef || !(set instanceof OmniSet))&&set.containsAll(this)));
-  }
-  @Override public boolean isEmpty(){
-    return state==0;
-  }
-  @Override public Object clone(){
-    return new BooleanSetImpl(state);
-  }
-  @Override public void clear(){
-    state=0;
-  }
-  @Override public BooleanComparator comparator(){
-    return Boolean::compare;
-  }
-  #MACRO UncheckedForEach(state,BooleanConsumer,0b01,0b10,false,true)
-  #MACRO UncheckedForEach(state,Consumer<? super Boolean>,0b01,0b10,Boolean.FALSE,Boolean.TRUE)
-  #MACRO UncheckedRemoveIf(BooleanPredicate,false,true)
-  #MACRO UncheckedRemoveIf(Predicate<? super Boolean>,Boolean.FALSE,Boolean.TRUE)
-  #MACRO ToArrayMethod<Boolean>(state,,0b01,0b10,Boolean.FALSE,Boolean.TRUE)
-  #MACRO ToArrayMethod<boolean>(state,Boolean,0b01,0b10,false,true)
-  #MACRO ToArrayMethod<byte>(state,Byte,0b01,0b10,0,1)
-  #MACRO ToArrayMethod<char>(state,Char,0b01,0b10,0,1)
-  #MACRO ToArrayMethod<short>(state,Short,0b01,0b10,0,1)
-  #MACRO ToArrayMethod<int>(state,Int,0b01,0b10,0,1)
-  #MACRO ToArrayMethod<long>(state,Long,0b01,0b10,0L,1L)
-  #MACRO ToArrayMethod<float>(state,Float,0b01,0b10,0F,1F)
-  #MACRO ToArrayMethod<double>(state,Double,0b01,0b10,0D,1D)
-  #MACRO AccessMethods<boolean,Ascending,false>(booleanCeiling,booleanFloor,Boolean,boolean,false,0b01,0b10,false,true)
-  #MACRO AccessMethods<Boolean,Ascending,false>(ceiling,floor,,boolean,null,0b01,0b10,Boolean.FALSE,Boolean.TRUE)
-  #MACRO AccessMethods<char,Ascending,false>(charCeiling,charFloor,Char,char,Character.MIN_VALUE,0b01,0b10,0,1)
-  #MACRO AccessMethods<byte,Ascending,false>(byteCeiling,byteFloor,Byte,byte,Byte.MIN_VALUE,0b01,0b10,0,1)
-  #MACRO AccessMethods<short,Ascending,false>(shortCeiling,shortFloor,Short,short,Short.MIN_VALUE,0b01,0b10,0,1)
-  #MACRO AccessMethods<int,Ascending,false>(intCeiling,intFloor,Int,int,Integer.MIN_VALUE,0b01,0b10,0,1)
-  #MACRO AccessMethods<long,Ascending,false>(longCeiling,longFloor,Long,long,Long.MIN_VALUE,0b01,0b10,0L,1L)
-  #MACRO AccessMethods<float,Ascending,false>(floatCeiling,floatFloor,Float,float,Float.NaN,0b01,0b10,0F,1F)
-  #MACRO AccessMethods<double,Ascending,false>(doubleCeiling,doubleFloor,Double,double,Double.NaN,0b01,0b10,0D,1D)
-  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusve,boolean toElement,boolean toInclusive){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniIterator.OfBoolean descendingIterator(){
-    return new UncheckedDescendingItr(this);
-  }
-  @Override public OmniIterator.OfBoolean iterator(){
-    return new UncheckedAscendingItr(this);
-  }
-  @Override public OmniNavigableSet.OfBoolean descendingSet(){
-    return new ReverseView(this);
-  }
-  #MACRO UncheckedAbstractSuperClassMethods<Ascending>(False,0b01)
-  #MACRO UncheckedAbstractSuperClassMethods<Ascending>(True,0b10)
-  private void readObject(ObjectInputStream ois) throws IOException{
-    state=ois.readUnsignedByte();
-  }
-  private void writeObject(ObjectOutputStream oos) throws IOException{
-    oos.writeByte(state);
-  }
-  public static class Descending extends BooleanSetImpl{
-    private static final long serialVersionUID=1L;
-    public Descending(){
-      super();
-    }
-    public Descending(BooleanSetImpl that){
-      super(that);
-    }
-    public Descending(Collection<? extends Boolean> that){
-      super(that);
-    }
-    public Descending(OmniCollection.OfBoolean that){
-      super(that);
-    }
-    public Descending(OmniCollection.OfRef<? extends Boolean> that){
-      super(that);
-    }
-    Descending(int state){
-      super(state);
-    }
-    #MACRO ToStringImpl<true>(state)
-    @Override public Object clone(){
-      return new Descending(state);
-    }
-    private static int reverseCompare(boolean val1,boolean val2){
-      if(val1==val2){
-        return 0;
-      }
-      if(val1){
-        return -1;
-      }
-      return 1;
-    }
-    @Override public BooleanComparator comparator(){
-      return Descending::reverseCompare;
-    }
-    #MACRO UncheckedForEach(state,BooleanConsumer,0b10,0b01,true,false)
-    #MACRO UncheckedForEach(state,Consumer<? super Boolean>,0b10,0b01,Boolean.TRUE,Boolean.FALSE)
-    #MACRO ToArrayMethod<Boolean>(state,,0b10,0b01,Boolean.TRUE,Boolean.FALSE)
-    #MACRO ToArrayMethod<boolean>(state,Boolean,0b10,0b01,true,false)
-    #MACRO ToArrayMethod<byte>(state,Byte,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<char>(state,Char,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<short>(state,Short,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<int>(state,Int,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<long>(state,Long,0b10,0b01,1L,0L)
-    #MACRO ToArrayMethod<float>(state,Float,0b10,0b01,1F,0F)
-    #MACRO ToArrayMethod<double>(state,Double,0b10,0b01,1D,0D)
-    #MACRO AccessMethods<boolean,Descending,false>(booleanCeiling,booleanFloor,Boolean,boolean,false,0b10,0b01,true,false)
-    #MACRO AccessMethods<Boolean,Descending,false>(ceiling,floor,,boolean,null,0b10,0b01,Boolean.TRUE,Boolean.FALSE)
-    #MACRO AccessMethods<char,Descending,false>(charCeiling,charFloor,Char,char,Character.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<byte,Descending,false>(byteCeiling,byteFloor,Byte,byte,Byte.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<short,Descending,false>(shortCeiling,shortFloor,Short,short,Short.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<int,Descending,false>(intCeiling,intFloor,Int,int,Integer.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<long,Descending,false>(longCeiling,longFloor,Long,long,Long.MIN_VALUE,0b10,0b01,1L,0L)
-    #MACRO AccessMethods<float,Descending,false>(floatCeiling,floatFloor,Float,float,Float.NaN,0b10,0b01,1F,0F)
-    #MACRO AccessMethods<double,Descending,false>(doubleCeiling,doubleFloor,Double,double,Double.NaN,0b10,0b01,1D,0D)
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusve,boolean toElement,boolean toInclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniIterator.OfBoolean descendingIterator(){
-      return new UncheckedAscendingItr(this);
-    }
-    @Override public OmniIterator.OfBoolean iterator(){
-      return new UncheckedDescendingItr(this);
-    }
-    @Override public OmniNavigableSet.OfBoolean descendingSet(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-  }
-  public static class Checked extends BooleanSetImpl{
-    private static final long serialVersionUID=1L;
-    public Checked(){
-      super();
-    }
-    public Checked(BooleanSetImpl that){
-      super(that);
-    }
-    public Checked(Collection<? extends Boolean> that){
-      super(that);
-    }
-    public Checked(OmniCollection.OfBoolean that){
-      super(that);
-    }
-    public Checked(OmniCollection.OfRef<? extends Boolean> that){
-      super(that);
-    }
-    Checked(int state){
-      super(state);
-    }
-    @Override public Object clone(){
-      return new Checked(state);
-    }
-    #MACRO AccessMethods<boolean,Ascending,true>(booleanCeiling,booleanFloor,Boolean,boolean,false,0b01,0b10,false,true)
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusve,boolean toElement,boolean toInclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniIterator.OfBoolean descendingIterator(){
-      return new CheckedDescendingItr(this);
-    }
-    @Override public OmniIterator.OfBoolean iterator(){
-      return new CheckedAscendingItr(this);
-    }
-    @Override public OmniNavigableSet.OfBoolean descendingSet(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-  }
-  public static class CheckedDescending extends Descending{
-    private static final long serialVersionUID=1L;
-    public CheckedDescending(){
-      super();
-    }
-    public CheckedDescending(BooleanSetImpl that){
-      super(that);
-    }
-    public CheckedDescending(Collection<? extends Boolean> that){
-      super(that);
-    }
-    public CheckedDescending(OmniCollection.OfBoolean that){
-      super(that);
-    }
-    public CheckedDescending(OmniCollection.OfRef<? extends Boolean> that){
-      super(that);
-    }
-    CheckedDescending(int state){
-      super(state);
-    }
-    @Override public Object clone(){
-      return new CheckedDescending(state);
-    }
-    #MACRO AccessMethods<boolean,Descending,true>(booleanCeiling,booleanFloor,Boolean,boolean,false,0b10,0b01,true,false)
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusve,boolean toElement,boolean toInclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniIterator.OfBoolean descendingIterator(){
-      return new CheckedAscendingItr(this);
-    }
-    @Override public OmniIterator.OfBoolean iterator(){
-      return new CheckedDescendingItr(this);
-    }
-    @Override public OmniNavigableSet.OfBoolean descendingSet(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-  }
-  private static class ReverseView extends AbstractBooleanSet implements OmniNavigableSet.OfBoolean,Cloneable,Serializable{
-    private static final long serialVersionUID=1L;
-    transient final BooleanSetImpl root;
-    private ReverseView(BooleanSetImpl root){
-      this.root=root;
-    }
-    @Override public boolean isEmpty(){
-      return root.isEmpty();
-    }
-    @Override public int size(){
-      return root.size();
-    }
-    @Override public void clear(){
-      root.state=0;
-    }
-    @Override public Object clone(){
-      return new Descending(root.state);
-    }
-    @Override public boolean removeIf(BooleanPredicate filter){
-      return root.removeIf(filter);
-    }
-    @Override public boolean removeIf(Predicate<? super Boolean> filter){
-      return root.removeIf(filter);
-    }
-    #MACRO ToStringImpl<true>(root.state)
-    @Override public BooleanComparator comparator(){
-      return Descending::reverseCompare;
-    }
-    #MACRO UncheckedForEach(root.state,BooleanConsumer,0b10,0b01,true,false)
-    #MACRO UncheckedForEach(root.state,Consumer<? super Boolean>,0b10,0b01,Boolean.TRUE,Boolean.FALSE)
-    #MACRO ToArrayMethod<Boolean>(root.state,,0b10,0b01,Boolean.TRUE,Boolean.FALSE)
-    #MACRO ToArrayMethod<boolean>(root.state,Boolean,0b10,0b01,true,false)
-    #MACRO ToArrayMethod<byte>(root.state,Byte,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<char>(root.state,Char,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<short>(root.state,Short,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<int>(root.state,Int,0b10,0b01,1,0)
-    #MACRO ToArrayMethod<long>(root.state,Long,0b10,0b01,1L,0L)
-    #MACRO ToArrayMethod<float>(root.state,Float,0b10,0b01,1F,0F)
-    #MACRO ToArrayMethod<double>(root.state,Double,0b10,0b01,1D,0D)
-    #MACRO AccessMethods<boolean,Reverse,false>(booleanCeiling,booleanFloor,Boolean,boolean,false,0b10,0b01,true,false)
-    #MACRO AccessMethods<Boolean,Reverse,false>(ceiling,floor,,boolean,null,0b10,0b01,Boolean.TRUE,Boolean.FALSE)
-    #MACRO AccessMethods<char,Reverse,false>(charCeiling,charFloor,Char,char,Character.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<byte,Reverse,false>(byteCeiling,byteFloor,Byte,byte,Byte.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<short,Reverse,false>(shortCeiling,shortFloor,Short,short,Short.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<int,Reverse,false>(intCeiling,intFloor,Int,int,Integer.MIN_VALUE,0b10,0b01,1,0)
-    #MACRO AccessMethods<long,Reverse,false>(longCeiling,longFloor,Long,long,Long.MIN_VALUE,0b10,0b01,1L,0L)
-    #MACRO AccessMethods<float,Reverse,false>(floatCeiling,floatFloor,Float,float,Float.NaN,0b10,0b01,1F,0F)
-    #MACRO AccessMethods<double,Reverse,false>(doubleCeiling,doubleFloor,Double,double,Double.NaN,0b10,0b01,1D,0D)
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusve,boolean toElement,boolean toInclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniIterator.OfBoolean descendingIterator(){
-      return new UncheckedAscendingItr(root);
-    }
-    @Override public OmniIterator.OfBoolean iterator(){
-      return new UncheckedDescendingItr(root);
-    }
-    @Override public OmniNavigableSet.OfBoolean descendingSet(){
-      return root;
-    }
-    #MACRO UncheckedAbstractSuperClassMethods<Reverse>(False,0b01)
-    #MACRO UncheckedAbstractSuperClassMethods<Reverse>(True,0b10)
-    private Object writeReplace(){
-      return new Descending(root.state);
-    }
-  }
-  private static class CheckedAscendingItr extends AbstractBooleanItr{
-    transient final BooleanSetImpl root;
-    transient int itrState;
-    private CheckedAscendingItr(BooleanSetImpl root){
-        this.root=root;
-        itrState=root.state;
-    }
-    private CheckedAscendingItr(CheckedAscendingItr itr){
-        root=itr.root;
-        itrState=itr.itrState;
-    }
-    @Override
-    public Object clone(){
-        return new CheckedAscendingItr(this);
-    }
-    @Override
-    public void forEachRemaining(BooleanConsumer action){
-        switch(root.state << 4 | itrState){
-        case 0b010001: // false remains, so iterate over it and set the lastRet flag to false
-            action.accept(false);
-            itrState=0b0100;
-            break;
-        case 0b110011: // true and false remain, so iterate over them and set the lastRet flag to true
-            action.accept(false);
-        case 0b100010: // true remains, so iterate over it and set the lastRet flag to true
-        case 0b110110: // we have already iterated over false, true remains, so iterate over it and set
-                       // the lastRet flag to true
-            action.accept(true);
-            itrState=0b1000;
-        case 0b000000:
-        case 0b010000:
-        case 0b010100:
-        case 0b101000:
-        case 0b111000:
-            // iteration has ended
-            break;
-        default:
-            // all other states are either impossible or indicate concurrent modification
-            throw new ConcurrentModificationException();
-        }
-    }
-    @Override
-    public void forEachRemaining(Consumer<? super Boolean> action){
-        switch(root.state << 4 | itrState){
-        case 0b010001: // false remains, so iterate over it and set the lastRet flag to false
-            action.accept(Boolean.FALSE);
-            itrState=0b0100;
-            break;
-        case 0b110011: // true and false remain, so iterate over them and set the lastRet flag to true
-            action.accept(Boolean.FALSE);
-        case 0b100010: // true remains, so iterate over it and set the lastRet flag to true
-        case 0b110110: // we have already iterated over false, true remains, so iterate over it and set
-                       // the lastRet flag to true
-            action.accept(Boolean.TRUE);
-            itrState=0b1000;
-        case 0b000000:
-        case 0b010000:
-        case 0b010100:
-        case 0b101000:
-        case 0b111000:
-            // iteration has ended
-            break;
-        default:
-            // all other states are either impossible or indicate concurrent modification
-            throw new ConcurrentModificationException();
-        }
-    }
-    @Override
-    public boolean hasNext(){
-        return (itrState & 0b11) != 0;
-    }
-    @Override
-    public boolean nextBoolean(){
-        switch(root.state << 4 | itrState){
-        case 0b000000:
-        case 0b010000:
-        case 0b010100:
-        case 0b101000:
-        case 0b111000:
-            // iteration has ended
-            throw new NoSuchElementException();
-        default:
-            // all other states are either impossible or indicate concurrent modification
-            throw new ConcurrentModificationException();
-        case 0b100010: // true remains, so return true
-        case 0b110110: // we have already iterated over false, true remains, so return true
-            itrState=0b1000;
-            return true;
-        case 0b010001: // false remains, so return false
-            itrState=0b0100;
-            break;
-        case 0b110011: // true and false remain, so return false
-            itrState=0b0110;
-        }
-        return false;
-    }
-    @Override
-    public void remove(){
-        final BooleanSetImpl root;
-        switch((root=this.root).state << 4 | itrState){
-        case 0b000100: // expected root to contain false
-        case 0b000110: // expected root to be full
-        case 0b001000: // expected root to contain true
-        case 0b010110: // expected root to be full
-        case 0b011000: // expected root to contain true
-        case 0b100100: // expected root to contain only false
-        case 0b100110: // expected root to be full
-        case 0b110100: // expected root to contain only false
-            throw new ConcurrentModificationException();
-        default:
-            // all other states are impossible or indicate improper iteration
-            throw new IllegalStateException();
-        case 0b110110: // iterator still has true left, we just returned false, so remove false
-            root.state=0b10;
-            itrState=0b0010;
-            return;
-        case 0b010100: // iterator depleted, just returned false, so remove false
-        case 0b101000: // iterator depleted, just returned true, so remove true
-            root.state=0b00;
-            break;
-        case 0b111000: // iterator depleted, we just returned true, so remove true
-            root.state=0b01;
-        }
-        itrState=0b0000;
-        return;
-    }
-  }
-  private static class CheckedDescendingItr extends CheckedAscendingItr{
-    private CheckedDescendingItr(BooleanSetImpl root){
-        super(root);
-    }
-    private CheckedDescendingItr(CheckedAscendingItr itr){
-        super(itr);
-    }
-    @Override
-    public Object clone(){
-        return new CheckedDescendingItr(this);
-    }
-    @Override
-    public void forEachRemaining(BooleanConsumer action){
-        switch(root.state << 4 | itrState){
-        case 0b100010: // true remains, so iterate over it and set the lastRet flag to true
-            action.accept(true);
-            itrState=0b1000;
-            break;
-        case 0b110011: // true and false remain, so iterate over them and set the lastRet flag to false
-            action.accept(true);
-        case 0b010001: // false remains, so iterate over it and set the lastRet flag to false
-        case 0b111001: // we have already iterated over true, false remains, so iterate over it and set
-                       // the lastRet flag to false
-            action.accept(false);
-            itrState=0b0100;
-        case 0b000000:
-        case 0b010100:
-        case 0b100000:
-        case 0b101000:
-        case 0b110100:
-            // iteration has ended
-            break;
-        default:
-            // all other states are either impossible or indicate concurrent modification
-            throw new ConcurrentModificationException();
-        }
-    }
-    @Override
-    public void forEachRemaining(Consumer<? super Boolean> action){
-        switch(root.state << 4 | itrState){
-        case 0b100010: // true remains, so iterate over it and set the lastRet flag to true
-            action.accept(Boolean.TRUE);
-            itrState=0b1000;
-            break;
-        case 0b110011: // true and false remain, so iterate over them and set the lastRet flag to false
-            action.accept(Boolean.TRUE);
-        case 0b010001: // false remains, so iterate over it and set the lastRet flag to false
-        case 0b111001: // we have already iterated over true, false remains, so iterate over it and set
-                       // the lastRet flag to false
-            action.accept(Boolean.FALSE);
-            itrState=0b0100;
-        case 0b000000:
-        case 0b010100:
-        case 0b100000:
-        case 0b101000:
-        case 0b110100:
-            // iteration has ended
-            break;
-        default:
-            // all other states are either impossible or indicate concurrent modification
-            throw new ConcurrentModificationException();
-        }
-    }
-    @Override
-    public boolean nextBoolean(){
-        switch(root.state << 4 | itrState){
-        case 0b000000:
-        case 0b010100:
-        case 0b100000:
-        case 0b101000:
-        case 0b110100:
-            // iteration has ended
-            throw new NoSuchElementException();
-        default:
-            // all other states are either impossible or indicate concurrent modification
-            throw new ConcurrentModificationException();
-        case 0b010001: // false remains, so return false
-        case 0b111001: // we have already iterated over true, false remains, so return false
-            itrState=0b0100;
-            return false;
-        case 0b100010: // true remains, so return true
-            itrState=0b1000;
-            break;
-        case 0b110011: // true and false remain, so return true;
-            itrState=0b1001;
-        }
-        return true;
-    }
-    @Override
-    public void remove(){
-        final BooleanSetImpl root;
-        switch((root=this.root).state << 4 | itrState){
-        case 0b000100: // expected root to contain false
-        case 0b001000: // expected root to contain true
-        case 0b001001: // expected root to be full
-        case 0b011000: // expected root to contain only true
-        case 0b011001: // expected root to be full
-        case 0b100100: // expected root to contain false
-        case 0b101001: // expected root to be full
-        case 0b111000: // expected root to contain only true
-            throw new ConcurrentModificationException();
-        default:
-            // all other states are impossible or indicate improper iteration
-            throw new IllegalStateException();
-        case 0b111001: // iterator still has false left, we just returned true, so remove true
-            root.state=0b01;
-            itrState=0b0001;
-            return;
-        case 0b010100: // iterator depleted, just returned false, so remove false
-        case 0b101000: // iterator depleted, just returned true, so remove true
-            root.state=0b00;
-            break;
-        case 0b110100: // iterator depleted, we just returned false, so remove false
-            root.state=0b10;
-        }
-        itrState=0b0000;
-        return;
-    }
-  }
-  private static class UncheckedAscendingItr extends AbstractBooleanItr{
-    transient final BooleanSetImpl root;
-    transient int itrState;
-    private UncheckedAscendingItr(BooleanSetImpl root){
-        this.root=root;
-        itrState=root.state;
-    }
-    private UncheckedAscendingItr(UncheckedAscendingItr itr){
-        root=itr.root;
-        itrState=itr.itrState;
-    }
-    @Override
-    public Object clone(){
-        return new UncheckedAscendingItr(this);
-    }
-    @Override
-    public void forEachRemaining(BooleanConsumer action){
-        switch(itrState){
-        case 0b11:
-            action.accept(false);
-        case 0b10:
-            action.accept(true);
-            break;
-        case 0b01:
-            action.accept(false);
-        default:
-        }
-        itrState=0b00;
-    }
-    @Override
-    public void forEachRemaining(Consumer<? super Boolean> action){
-        switch(itrState){
-        case 0b11:
-            action.accept(Boolean.FALSE);
-        case 0b10:
-            action.accept(Boolean.TRUE);
-            break;
-        case 0b01:
-            action.accept(Boolean.FALSE);
-        default:
-        }
-        itrState=0b00;
-    }
-    @Override
-    public boolean hasNext(){
-        return itrState != 0;
-    }
-    @Override
-    public boolean nextBoolean(){
-        switch(itrState){
-        case 0b10:
-            itrState=0b00;
-            return true;
-        case 0b11:
-            itrState=0b10;
-            break;
-        default:
-            itrState=0b00;
-        }
-        return false;
-    }
-    @Override
-    public void remove(){
-        final BooleanSetImpl root;
-        switch(itrState & (root=this.root).state << 2){
-        case 0b1100:
-            root.state=0b01;
-            break;
-        case 0b1110:
-            root.state=0b10;
-            break;
-        default:
-            root.state=0b00;
-        }
-    }
-  }
-  private static class UncheckedDescendingItr extends UncheckedAscendingItr{
-    private UncheckedDescendingItr(BooleanSetImpl root){
-        super(root);
-    }
-    private UncheckedDescendingItr(UncheckedDescendingItr itr){
-        super(itr);
-    }
-    @Override
-    public Object clone(){
-        return new UncheckedDescendingItr(this);
-    }
-    @Override
-    public void forEachRemaining(BooleanConsumer action){
-        switch(itrState){
-        case 0b11:
-            action.accept(true);
-        case 0b01:
-            action.accept(false);
-            break;
-        case 0b10:
-            action.accept(true);
-        default:
-        }
-        itrState=0b00;
-    }
-    @Override
-    public void forEachRemaining(Consumer<? super Boolean> action){
-        switch(itrState){
-        case 0b11:
-            action.accept(Boolean.TRUE);
-        case 0b01:
-            action.accept(Boolean.FALSE);
-            break;
-        case 0b10:
-            action.accept(Boolean.TRUE);
-        default:
-        }
-        itrState=0b00;
-    }
-    @Override
-    public boolean nextBoolean(){
-        switch(itrState){
-        default:
-            itrState=0b00;
-            return false;
-        case 0b11:
-            itrState=0b01;
-            break;
-        case 0b10:
-            itrState=0b00;
-        }
-        return true;
-    }
-    @Override
-    public void remove(){
-        final BooleanSetImpl root;
-        switch(itrState & (root=this.root).state << 2){
-        case 0b1100:
-            root.state=0b10;
-            break;
-        case 0b1101:
-            root.state=0b01;
-            break;
-        default:
-            root.state=0b00;
-        }
-    }
-  }
-}
-#MACRODEF ToStringImpl<REVERSE>(STATE)
-@Override public String toString(){
-  switch(STATE){
-    case 0b00:
-      return "[true]";
-    case 0b01:
-      return "[false]";
-    case 0b11:
-  #IFSWITCH REVERSE==true
-    return "[true, false]";
-  #ELSE
-    return "[false, true]";
-  #ENDIF
-    default:
-      return "[]";
-  }
-}
-#ENDDEF
-#MACRODEF AccessMethods<RETTYPE,VIEW,Checked>(CEILINGNAME,FLOORNAME,CLASSPREFIX,INPUTTYPE,DEFAULT_VAL,LOWSTATE,HIGHSTATE,LOWVAL,HIGHVAL)
-#IFSWITCH RETTYPE==boolean
-@Override public RETTYPE firstCLASSPREFIX(){
-  #IFSWITCH VIEW==Descending
-  return super.lastCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Reverse
-  return root.lastCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH Checked==true
-  switch(state){
-    case 0b10:
-      return true;
-    case 0b00:
-      throw new NoSuchElementException();
-    default:
-      return false;
-  }
-    #ELSE
-  return state==0b10;
-    #ENDIF
-  #ENDIF
-}
-@Override public RETTYPE lastCLASSPREFIX(){
-  #IFSWITCH VIEW==Descending
-  return super.firstCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Reverse
-  return root.firstCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH Checked==true
-  switch(state){
-    case 0b01:
-      return false;
-    case 0b00:
-      throw new NoSuchElementException();
-    default:
-      return true;
-  }
-    #ELSE
-  return state!=0b01;
-    #ENDIF
-  #ENDIF
-}
-#ENDIF
-#IFNOTSWITCH Checked==true
-@Override public RETTYPE pollFirstCLASSPREFIX(){
-  #IFSWITCH VIEW==Descending
-  return super.pollLastCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Reverse
-  return root.pollLastCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH RETTYPE==boolean,char
-  switch(state){
-    case HIGHSTATE:
-      state=0b00;
-      return HIGHVAL;
-    case LOWSTATE:
-      state=0b00;
-      break;
-    case 0b11:
-      state=HIGHSTATE;
-    default:
-  }
-  return DEFAULT_VAL;
-    #ELSE
-  switch(state){
-    default:
-      return DEFAULT_VAL;
-    case HIGHSTATE:
-      state=0b00;
-      return HIGHVAL;
-    case LOWSTATE:
-      state=0b00;
-      break;
-    case 0b11:
-      state=LOWSTATE;
-  }
-  return LOWVAL;
-    #ENDIF
-  #ENDIF  
-}
-@Override public RETTYPE pollLastCLASSPREFIX(){
-  #IFSWITCH VIEW==Descending
-  return super.pollFirstCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Reverse
-  return root.pollFirstCLASSPREFIX();
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH RETTYPE==boolean,char
-  switch(state){
-    case 0b01:
-      state=0b00;
-    default:
-      return DEFAULT_VAL;
-    case 0b11:
-      state=0b01;
-      break;
-    case 0b10:
-      state=0b00;
-  }
-  return HIGHVAL;
-    #ELSE
-  switch(state){
-    default:
-      return DEFAULT_VAL;
-    case LOWSTATE:
-      state=0b00;
-      return LOWVAL;
-    case HIGHSTATE:
-      state=0b00;
-      break;
-    case 0b11:
-      state=HIGHSTATE;
-  }
-  return HIGHVAL;
-    #ENDIF
-  #ENDIF  
-}
-@Override public RETTYPE CEILINGNAME(INPUTTYPE val){
-  #IFSWITCH VIEW==Descending
-  return super.FLOORNAME(val);
-  #ELSEIFSWITCH VIEW==Reverse
-  return root.FLOORNAME(val);
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH RETTYPE==boolean
-  switch(state){
-  case 0b11:
-    return val;
-  case HIGHSTATE:
-    return HIGHVAL;
-  default:
-    return DEFAULT_VAL;
-  }
-    #ELSEIFSWITCH RETTYPE==Boolean
-  switch(state){
-    case 0b11:
-    case HIGHSTATE:
-      return HIGHVAL;
-    case LOWSTATE:
-      if(!val){
-          return LOWVAL;
-      }
-    default:
-  }
-  return DEFAULT_VAL;
-    #ELSEIFSWITCH RETTYPE==char
-  switch(state){
-    case 0b11:
-        if(val==HIGHVAL){
-            return HIGHVAL;
-        }
-        break;
-    case HIGHSTATE:
-        if(val<=HIGHVAL){
-            return HIGHVAL;
-        }
-        break;
-    default:
-  }
-  return DEFAULT_VAL;
-    #ELSEIFSWITCH RETTYPE==float,double
-  switch(state){
-    case 0b11:
-        if(val <= LOWVAL){
-            return LOWVAL;
-        }
-    case HIGHSTATE:
-        if(val <= HIGHVAL){
-            return HIGHVAL;
-        }
-        break;
-    case LOWSTATE:
-        if(val <= LOWVAL){
-            return LOWVAL;
-        }
-    default:
-  }
-  return DEFAULT_VAL;
-    #ELSE
-  switch(state){
-    case 0b11:
-      #IFSWITCH RETTYPE==long
-        switch(Long.signum(val - HIGHVAL)){
-      #ELSE
-        switch(Integer.signum(val - HIGHVAL)){
-      #ENDIF
-        case -1:
-            return LOWVAL;
-        case 0:
-            return HIGHVAL;
-        default:
-        }
-        break;
-    case HIGHSTATE:
-        if(val <= HIGHVAL){
-            return HIGHVAL;
-        }
-        break;
-    case LOWSTATE:
-        if(val < HIGHVAL){
-            return LOWVAL;
-        }
-    default:
-  }
-  return DEFAULT_VAL;
-    #ENDIF
-  
-  #ENDIF
-}
-@Override public RETTYPE FLOORNAME(INPUTTYPE val){
-  #IFSWITCH VIEW==Descending
-  return super.CEILINGNAME(val);
-  #ELSEIFSWITCH VIEW==Reverse
-  return root.CEILINGNAME(val);
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH RETTYPE==boolean
-  return val&&(state&HIGHSTATE)!=0;
-    #ELSEIFSWITCH RETTYPE==Boolean
-  switch(state){
-    case 0b11:
-      return val;
-    case LOWSTATE:
-      return LOWVAL;
-    case HIGHSTATE:
-      if(val){
-          return HIGHVAL;
-      }
-    default:
-  }
-  return DEFAULT_VAL;
-    #ELSEIFSWITCH RETTYPE==char
-  if(val>=HIGHVAL&&(state&HIGHSTATE)!=0){
-      return HIGHVAL;
-  }
-  return DEFAULT_VAL;
-    #ELSEIFSWITCH RETTYPE==float,double
-  switch(state){
-    case 0b11:
-        if(val >= HIGHVAL){
-            return HIGHVAL;
-        }
-    case LOWSTATE:
-        if(val >= LOWVAL){
-            return LOWVAL;
-        }
-        break;
-    case HIGHSTATE:
-        if(val >= HIGHVAL){
-            return HIGHVAL;
-        }
-    default:
-  }
-  return DEFAULT_VAL;
-    #ELSE
-  switch(state){
-    case 0b11:
-      #IFSWITCH RETTYPE==long
-        switch(Long.signum(val)){
-      #ELSE
-        switch(Integer.signum(val)){
-      #ENDIF
-        case 1:
-            return HIGHVAL;
-        case 0:
-            return LOWVAL;
-        default:
-        }
-        break;
-    case LOWSTATE:
-        if(val >= LOWVAL){
-            return LOWVAL;
-        }
-        break;
-    case HIGHSTATE:
-        if(val >= HIGHVAL){
-            return HIGHVAL;
-        }
-    default:
-  }
-  return DEFAULT_VAL;
-    #ENDIF
-  #ENDIF
-}
-@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
-  #IFSWITCH VIEW==Descending
-  return super.higherCLASSPREFIX(val);
-  #ELSEIFSWITCH VIEW==Reverse
-  return root.higherCLASSPREFIX(val);
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH RETTYPE==boolean
-  return false;
-    #ELSE
-      #IFSWITCH RETTYPE==Boolean
-  if(val&&(state&LOWSTATE)!=0){
-    return LOWVAL;
-  }
-      #ELSEIFSWITCH RETTYPE==char
-  if(val>HIGHVAL&&(state&HIGHSTATE)!=0){
-    return HIGHVAL;
-  }  
-      #ELSE
-  switch(state){
-        #IFSWITCH RETTYPE==float,double
-    case HIGHSTATE:
-      if(val>HIGHVAL){
-        return HIGHVAL;
-      }
-      break;
-    case 0b11:
-      if(val>HIGHVAL){
-        return HIGHVAL;
-      }
-        #ELSE
-    case 0b11:
-          #IFSWITCH RETTYPE==long
-      switch(Long.signum(val - HIGHVAL)){  
-          #ELSE
-      switch(Integer.signum(val - HIGHVAL)){    
-          #ENDIF
-      case 1:
-        return HIGHVAL;
-      case 0:
-        return LOWVAL;
-      default: 
-      }
-      break;
-    case HIGHSTATE:
-      if(val>HIGHVAL){
-        return HIGHVAL;
-      }
-      break;
-        #ENDIF
-    case LOWSTATE:
-      if(val>LOWVAL){
-        return LOWVAL;
-      }
-    default:
-  } 
-      #ENDIF
-  return DEFAULT_VAL;
-    #ENDIF
-  #ENDIF
-}
-@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
-  #IFSWITCH VIEW==Descending
-    #IFSWITCH RETTYPE==boolean
-  return false;
-    #ELSE
-  return super.lowerCLASSPREFIX(val);
-    #ENDIF
-  #ELSEIFSWITCH VIEW==Reverse
-    #IFSWITCH RETTYPE==boolean
-  return false;
-    #ELSE
-  return root.lowerCLASSPREFIX(val);
-    #ENDIF
-  #ELSEIFSWITCH VIEW==Ascending
-    #IFSWITCH RETTYPE==boolean
-  return !val&&(state&HIGHSTATE)!=0;
-    #ELSE
-      #IFSWITCH RETTYPE==Boolean,char
-        #IFSWITCH RETTYPE==Boolean
-  if(!val&&(state&HIGHSTATE)!=0){   
-        #ELSE
-  if(val==LOWVAL&&(state&HIGHSTATE)!=0){
-        #ENDIF
-    return HIGHVAL;
-  }
-      #ELSE
-  switch(state){
-    case 0b11:
-        #IFSWITCH RETTYPE==float,double
-      if(val<LOWVAL){
-        return LOWVAL;
-      }
-        #ELSE
-          #IFSWITCH RETTYPE==long
-      switch(Long.signum(val)){
-          #ELSE
-      switch(Integer.signum(val)){
-          #ENDIF
-        case -1:
-          return LOWVAL;
-        case 0:
-          return HIGHVAL;
-        default:
-      }
-      break;
-        #ENDIF
-    case HIGHSTATE:
-      if(val<HIGHVAL){
-        return HIGHVAL;
-      }
-      break;
-    case LOWSTATE:
-      if(val<LOWVAL){
-        return LOWVAL;
-      }
-    default:
-  }
-      #ENDIF
-  return DEFAULT_VAL;
-    #ENDIF
-  #ENDIF
-}
-#ENDIF
-#ENDDEF
-#MACRODEF ToArrayMethod<ARRTYPE>(SETSTATE,CLASSPREFIX,LOWSTATE,HIGHSTATE,LOWVAL,HIGHVAL)
-#IFSWITCH ARRTYPE==Boolean
-@SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-  final T[] arr;
-  switch(SETSTATE){
-    case LOWSTATE:
-      (arr=arrConstructor.apply(1))[0]=(T)LOWVAL;
-      break;
-    case HIGHSTATE:
-      (arr=arrConstructor.apply(1))[0]=(T)HIGHVAL;
-      break;
-    case 0b11:
-      (arr=arrConstructor.apply(2))[0]=(T)LOWVAL;
-      arr[1]=(T)HIGHVAL;
-    default:
-      return arrConstructor.apply(0);
-  }
-  return arr;
-}
-@SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
-  switch(SETSTATE){
-    case LOWSTATE:
-      (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)LOWVAL;
-      break;
-    case HIGHSTATE:
-      (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)HIGHVAL;
-      break;
-    case 0b11:
-      (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)LOWVAL;
-      dst[1]=(T)HIGHVAL;
-      break;
-    default:
-      if(dst.length!=0){
-        dst[0]=null;
-      }
-  }
-  return dst;
-}
-#ENDIF
-@Override public ARRTYPE[] toCLASSPREFIXArray(){
-  switch(SETSTATE){
-    case LOWSTATE:
-      return new ARRTYPE[]{LOWVAL};
-    case HIGHSTATE:
-      return new ARRTYPE[]{HIGHVAL};
-    case 0b11:
-      return new ARRTYPE[]{LOWVAL,HIGHVAL};
-    default:
-#IFSWITCH ARRTYPE==Boolean
-      return OmniArray.OfBoolean.DEFAULT_BOXED_ARR;
-#ELSE
-      return OmniArray.OfCLASSPREFIX.DEFAULT_ARR;
-#ENDIF
-  }
-}
-#ENDDEF
-#MACRODEF UncheckedAbstractSuperClassMethods<VIEW>(NAME,MASK)
-@Override boolean addNAME(){
-#IFSWITCH VIEW==Ascending
-  final int state;
-  if(((state=this.state)&(MASK))!=0){
-    this.state=state|(MASK);
-    return true;
-  }
-  return false;
-#ELSEIFSWITCH VIEW==Reverse
-  return root.addNAME();
-#ENDIF
-}
-@Override boolean containsNAME(){
-#IFSWITCH VIEW==Ascending
-  return (state&(MASK))!=0;
-#ELSEIFSWITCH VIEW==Reverse
-  return root.containsNAME();
-#ENDIF
-}
-@Override boolean removeNAME(){
-#IFSWITCH VIEW==Ascending
-  final int state;
-  if(((state=this.state)&(MASK))!=0){
-    this.state=state&(~(MASK));
-    return true;
-  }
-  return false;
-#ELSEIFSWITCH VIEW==Reverse
-  return root.removeNAME();
-#ENDIF
-}
-#ENDDEF
-#MACRODEF UncheckedForEach(SETSTATE,CONSUMER,LOWSTATE,HIGHSTATE,LOWVAL,HIGHVAL)
-@Override public void forEach(CONSUMER action){
-  switch(SETSTATE){
-    case LOWSTATE:
-      action.accept(LOWVAL);
-      break;
-    case 0b11:
-      action.accept(LOWVAL);
-    case HIGHSTATE:
-      action.accept(HIGHVAL);
-    default:
-  }
-}
-#ENDDEF
-#MACRODEF UncheckedRemoveIf(PREDICATE,FALSEVAL,TRUEVAL)
-@Override public boolean removeIf(PREDICATE filter){
-  switch(state){
-    case 0b01:
-      if(filter.test(FALSEVAL)){
-        break;
-      }
-      return false;
-    case 0b10:
-      if(filter.test(TRUEVAL)){
-        break;
-      }
-      return false;
-    case 0b11:
-      if(filter.test(FALSEVAL)){
-        if(filter.test(TRUEVAL)){
-          break;
-        }else{
-          state=0b10;
+    if(val.size()==2){
+      if(val instanceof OmniSet){
+        if(val instanceof AbstractBooleanSet){
           return true;
+        }else if(val instanceof OmniSet.OfRef){
+          final OmniSet.OfRef<?> that;
+          return (that=(OmniSet.OfRef<?>)val).contains(false) && that.contains(true);
         }
-      }else if(filter.test(TRUEVAL)){
-        state=0b01;
-        return true;
+      }else{
+        return val.contains(Boolean.FALSE) && val.contains(Boolean.TRUE);
       }
-    default:
-      return false;
+    }
+    return false;
   }
-  state=0b00;
-  return true;
+  private static boolean equalsTrueState(Set<?> val){
+    //TODO optimize
+    if(val.size()==1){
+      if(val instanceof OmniSet){
+        if(val instanceof AbstractBooleanSet){
+          return ((AbstractBooleanSet)val).containsTrue();
+        }else if(val instanceof OmniSet.OfRef){
+          return ((OmniSet.OfRef<?>)val).contains(true);
+        }
+      }else{
+        return val.contains(Boolean.TRUE);
+      }
+    }
+    return false;
+  }
+  private static boolean equalsFalseState(Set<?> val){
+    //TODO optimize
+    if(val.size()==1){
+      if(val instanceof OmniSet){
+        if(val instanceof AbstractBooleanSet){
+          return ((AbstractBooleanSet)val).containsFalse();
+        }else if(val instanceof OmniSet.OfRef){
+          return ((OmniSet.OfRef<?>)val).contains(false);
+        }
+      }else{
+        return val.contains(Boolean.FALSE);
+      }
+    }
+    return false;
+  }
+  
+  
+ 
+}
+
+#MACRODEF Constructors<NAME>()
+private static final long serialVersionUID=1L;
+public NAME(){
+  super();
+}
+public NAME(BooleanSetImpl that){
+#IFSWITCH NAME==BooleanSetImpl
+  this.state=that.state;
+#ELSE
+  super(that);
+#ENDIF
+}
+public NAME(OmniCollection.OfBoolean that){
+#IFSWITCH NAME==BooleanSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+public NAME(OmniCollection.OfRef<? extends Boolean> that){
+#IFSWITCH NAME==BooleanSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+public NAME(Collection<? extends Boolean> that){
+#IFSWITCH NAME==BooleanSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+NAME(int state){
+#IFSWITCH NAME==BooleanSetImpl
+  super();
+  this.state=state;
+#ELSE
+  super(state);
+#ENDIF
+}
+@Override public Object clone(){
+  return new NAME(this.state);
 }
 #ENDDEF

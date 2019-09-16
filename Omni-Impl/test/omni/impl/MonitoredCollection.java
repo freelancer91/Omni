@@ -262,16 +262,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         throw modType.invalid();
     }
 
-    default Object verifyClone(){
-        final Object clone;
-        try{
-            clone=getCollection().clone();
-        }finally{
-            verifyCollectionState();
-        }
-        verifyClone(clone);
-        return clone;
-    }
+    
     @SuppressWarnings("unchecked")
     default void verifyForEach(MonitoredFunctionGen functionGen,
             FunctionCallType functionCallType,long randSeed){

@@ -1426,7 +1426,7 @@ if(length!=0) {
       Assertions.assertNotSame(expectedArr,arr);
     }
 
-    @Override public void verifyClone(Object clone){
+    public void verifyClone(Object clone){
         Assertions.assertNotSame(clone,seq);
         final var cloneCast=(PackedBooleanArrDeq)clone;
         Assertions.assertEquals(checkedType.checked,cloneCast instanceof PackedBooleanArrDeq.Checked);
@@ -1454,7 +1454,6 @@ if(length!=0) {
         }
         Assertions.assertFalse(thisItr.hasNext());
       }
-
 
 
     @Override public void verifyGetResult(int expectedCursor,Object output,DataType outputType){

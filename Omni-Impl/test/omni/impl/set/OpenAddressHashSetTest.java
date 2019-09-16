@@ -1379,6 +1379,16 @@ public class OpenAddressHashSetTest{
         int expectedModCount;
         int expectedTableLength;
         Object expectedTable;
+        private Object verifyClone(){
+          final Object clone;
+          try{
+              clone=set.clone();
+          }finally{
+              verifyCollectionState();
+          }
+          verifyClone(clone);
+          return clone;
+        }
         OpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType){
             switch(dataType){
             case FLOAT:

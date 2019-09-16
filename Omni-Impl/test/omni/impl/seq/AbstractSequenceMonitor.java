@@ -41,6 +41,16 @@ abstract class AbstractSequenceMonitor<SEQ extends AbstractOmniCollection<?> & E
     this.seq=initSeq(initCap);
     updateCollectionState();
   }
+  public Object verifyClone(){
+    final Object clone;
+    try{
+        clone=seq.clone();
+    }finally{
+        verifyCollectionState();
+    }
+    verifyClone(clone);
+    return clone;
+  }
   @Override public void repairModCount() {
       //nothing to do
   }

@@ -24,7 +24,7 @@ import java.util.Collection;
 public abstract interface OmniList<E> extends OmniCollection<E>,List<E>
 {
   
-
+  public abstract Object clone();
   @Override
   default boolean containsAll(Collection<?> that){
     //TODO implement in lower classes and remove this

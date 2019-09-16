@@ -3,7 +3,16 @@ package omni.impl;
 import omni.api.OmniStack;
 public interface MonitoredStack<STK extends OmniStack<?>>extends MonitoredSequence<STK>{
   
-   
+  default Object verifyClone(){
+    final Object clone;
+    try{
+        clone=getCollection().clone();
+    }finally{
+        verifyCollectionState();
+    }
+    verifyClone(clone);
+    return clone;
+}
     
     void verifyPush(Object inputVal,DataType inputType,FunctionCallType functionCallType);
     Object verifyPop(DataType outputType);

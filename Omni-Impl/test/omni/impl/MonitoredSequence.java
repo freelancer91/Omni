@@ -15,7 +15,7 @@ public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends Monito
     }
     Object removeFirst();
    
-    
+    Object verifyClone();
     @Override
     @SuppressWarnings("unchecked")
     default boolean add(int val) {

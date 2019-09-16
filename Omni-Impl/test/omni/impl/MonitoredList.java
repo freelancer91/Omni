@@ -37,6 +37,16 @@ MonitoredSequence<LST>{
         }
         return result;
     }
+    default Object verifyClone(){
+      final Object clone;
+      try{
+          clone=getCollection().clone();
+      }finally{
+          verifyCollectionState();
+      }
+      verifyClone(clone);
+      return clone;
+  }
     default void verifyAdd(int index,Object inputVal,DataType inputType,FunctionCallType functionCallType){
         var collection=getCollection();
         try{

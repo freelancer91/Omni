@@ -4,7 +4,6 @@ import omni.api.OmniSet;
 import omni.util.TypeUtil;
 
 abstract class AbstractBooleanSet implements OmniSet.OfBoolean{
-  public abstract Object clone();
   abstract boolean containsTrue();
   abstract boolean containsFalse();
   abstract boolean removeTrue();

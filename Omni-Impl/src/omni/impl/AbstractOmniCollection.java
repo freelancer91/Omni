@@ -17,9 +17,8 @@ public abstract class AbstractOmniCollection<E> implements OmniCollection<E>,Ser
   @Override public boolean isEmpty() {
     return this.size==0;
   }
-  @Override public abstract Object clone();
   @Override public abstract String toString();
-  
+  @Override public abstract Object clone();
   
   
   

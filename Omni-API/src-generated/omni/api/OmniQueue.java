@@ -543,7 +543,7 @@ public abstract interface OmniQueue<E> extends OmniCollection<E>,PeekAndPollIfc<
       return offer((double)val.floatValue());
     }
   }
-  //public abstract Object clone();
+  public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniQueue<E>,OmniCollection.OfPrimitive<E>
   {
     public abstract boolean offer(boolean val);

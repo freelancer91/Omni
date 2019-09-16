@@ -20,7 +20,7 @@ import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import java.util.Collection;
 //TODO integration into Java Collection library
-public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
+public abstract interface OmniCollection<E> extends Collection<E>
 {
   /**
    * TODO hopefully they will add pattern-matching switch statements to make this irrelevant
@@ -110,7 +110,6 @@ public abstract interface OmniCollection<E> extends Collection<E>,Cloneable
   public abstract Object[] toArray();
   public abstract <T> T[] toArray(IntFunction<T[]> arrConstructor);
   public abstract <T> T[] toArray(T[] dst);
-  public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniCollection<E>
   {
     public abstract boolean addAll(OmniCollection.OfBoolean that);
