@@ -19,9 +19,10 @@ import java.util.Set;
 import omni.api.OmniSet;
 import java.util.NoSuchElementException;
 import omni.impl.AbstractBooleanItr;
-import omni.api.OmniSortedSet;
+import omni.api.OmniNavigableSet;
 import java.util.ConcurrentModificationException;
 public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,Cloneable{
+  //TODO reconsider the subset implementation
   transient int state;
   private static final AbstractBooleanItr EMPTY_ITR=new AbstractBooleanItr(){
     @Override public Object clone(){
@@ -44,10 +45,13 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     }
     return 1;
   }
+  @Override public OmniNavigableSet.OfBoolean descendingSet(){
+    return new Descending(this);
+  }
   #MACRO Constructors<BooleanSetImpl>()
   #MACRO Comparator<Ascending>()
   #MACRO ToString<this,Ascending,Full>()
-  
+  #MACRO AccessMethods<this,Full,Ascending>()
   #MACRO EqualsMethod<this,Full>()
   #MACRO SizeClearHashCodeIsEmpty<this,Full>()
   #MACRO ForEach<this,Full,Ascending>(BooleanConsumer,true,false)
@@ -64,8 +68,15 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     }
     return new UncheckedAscendingFullItr(this,state);
   }
+  @Override public OmniIterator.OfBoolean descendingIterator(){
+    final int state;
+    if((state=this.state)==0b00){
+      return EMPTY_ITR;
+    }
+    return new UncheckedDescendingFullItr(this,state);
+  }
   #MACRO FirstAndLastBoolean<this,Ascending,False,Full>()
-  @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+  @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
     if(fromElement){
       return new UncheckedTrueView(this);
     }else{
@@ -76,22 +87,142 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
     }
   }
-  @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
     if(toElement){
       return this;
     }else{
       return new UncheckedFalseView(this);
     }
   }
-  @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
     if(fromElement){
       return new UncheckedTrueView(this);
     }else{
       return this;
     }
   }
+  @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+    if(fromInclusive){
+      if(toInclusive){
+        if(fromElement){
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }else{
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }
+      }else{
+        if(fromElement){
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }else{
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }
+      }
+    }else{
+      if(toInclusive){
+        if(fromElement){
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }else{
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }
+      }else{
+        if(fromElement){
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }else{
+          if(toElement){
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }else{
+            //TODO
+            throw new omni.util.NotYetImplementedException();
+          }
+        }
+      }
+    }
+  }
+  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+    if(inclusive){
+      if(fromElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }else{
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+    }else{
+      if(fromElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }else{
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+    }
+  }
+  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+    if(inclusive){
+      if(toElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }else{
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+    }else{
+      if(toElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }else{
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+    }
+  }
   public static class Checked extends BooleanSetImpl{
     #MACRO Constructors<Checked>()
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new Descending.Checked(this);
+    }
     @Override public OmniIterator.OfBoolean iterator(){
       final int state;
       if((state=this.state)==0b00){
@@ -99,8 +230,15 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new CheckedAscendingFullItr(this,state);
     }
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final int state;
+      if((state=this.state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new CheckedDescendingFullItr(this,state);
+    }
     #MACRO FirstAndLastBoolean<this,Ascending,True,Full>()
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
       if(fromElement){
         if(toElement){
           return new UncheckedTrueView.Checked(this);
@@ -115,18 +253,133 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
       }
     }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
       if(toElement){
         return this;
       }else{
         return new UncheckedFalseView.Checked(this);
       }
     }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
       if(fromElement){
         return new UncheckedTrueView.Checked(this);
       }else{
         return this;
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      if(fromInclusive){
+        if(toInclusive){
+          if(fromElement){
+            if(toElement){
+              return UncheckedTrueView.Checked(this);
+            }else{
+              throw new IllegalArgumentException("falseElement>toElement");
+            }
+          }else{
+            if(toElement){
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }else{
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }
+          }
+        }else{
+          if(fromElement){
+            if(toElement){
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }else{
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }
+          }else{
+            if(toElement){
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }else{
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }
+          }
+        }
+      }else{
+        if(toInclusive){
+          if(fromElement){
+            if(toElement){
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }else{
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }
+          }else{
+            if(toElement){
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }else{
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }
+          }
+        }else{
+          if(fromElement){
+            if(toElement){
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }else{
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }
+          }else{
+            if(toElement){
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }else{
+              //TODO
+              throw new omni.util.NotYetImplementedException();
+            }
+          }
+        }
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      if(inclusive){
+        if(fromElement){
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }else{
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }
+      }else{
+        if(fromElement){
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }else{
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      if(inclusive){
+        if(fromElement){
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }else{
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }
+      }else{
+        if(fromElement){
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }else{
+          //TODO
+          throw omni.util.NotYetImplementedException();
+        }
       }
     }
   }
@@ -137,6 +390,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     #MACRO ForEach<this,Full,Descending>(BooleanConsumer,true,false)
     #MACRO ForEach<this,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO ToArray<this,Descending,Full>()
+    #MACRO AccessMethods<this,Full,Descending>()
     @Override public OmniIterator.OfBoolean iterator(){
       final int state;
       if((state=this.state)==0b00){
@@ -144,8 +398,54 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedDescendingFullItr(this,state);
     }
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final int state;
+      if((state=this.state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedAscendingFullItr(this,state);
+    }
     #MACRO FirstAndLastBoolean<this,Descending,False,Full>()
-    #MACRO SubSetMethods<this,Full,Descending,False>()
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      if(fromElement){
+        if(toElement){
+          return new UncheckedTrueView.Descending(this);
+        }else{
+          return this;
+        }
+      }else{
+        return new UncheckedFalseView.Descending(this);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      if(fromElement){
+        return this;
+      }else{
+        return new UncheckedFalseView.Descending(this);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      if(toElement){
+        return new UncheckedTrueView.Descending(this);
+      }else{
+        return this;
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new BooleanSetImpl(this);
+    }
     public static class Checked extends Descending{
        #MACRO Constructors<Checked>()
        @Override public OmniIterator.OfBoolean iterator(){
@@ -155,8 +455,58 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
          }
          return new CheckedDescendingFullItr(this,state);
        }
+       @Override public OmniNavigableSet.OfBoolean descendingSet(){
+         return new BooleanSetImpl.Checked(this);
+       }
+       @Override public OmniIterator.OfBoolean descendingIterator(){
+         final int state;
+         if((state=this.state)==0b00){
+           return EMPTY_ITR;
+         }
+         return new CheckedAscendingFullItr(this,state);
+       }
        #MACRO FirstAndLastBoolean<this,Descending,True,Full>()
-       #MACRO SubSetMethods<this,Full,Descending,True>()
+       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement){
+          if(toElement){
+            return new UncheckedTrueView.Checked.Descending(this);
+          }else{
+            return this;
+          }
+        }else{
+          if(toElement){
+            throw new IllegalArgumentException("falseElement>trueElement");
+          }else{
+            return new UncheckedFalseView.Checked.Descending(this);
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          return this;
+        }else{
+          return new UncheckedFalseView.Checked.Descending(this);
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          return new UncheckedTrueView.Checked.Descending(this);
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
     }
   }
   private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -237,12 +587,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     private Object writeReplace(){
       return new Descending(root.state);
     }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return root;
+    }
     #MACRO Comparator<Descending>()
     #MACRO ToArray<root,Descending,Full>()
     #MACRO ForEach<root,Full,Descending>(BooleanConsumer,true,false)
     #MACRO ForEach<root,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Descending,False,Full>()
     #MACRO ToString<root,Descending,Full>()
+    #MACRO AccessMethods<root,Full,Descending>()
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
       final int rootState;
@@ -251,11 +605,58 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedDescendingFullItr(root,rootState);
     }
-    #MACRO SubSetMethods<root,Full,Descending,False>()
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      final int rootState;
+      if((rootState=(root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedAscendingFullItr(root,rootState);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      if(fromElement){
+        if(toElement){
+          return new UncheckedTrueView.Descending(root);
+        }else{
+          return this;
+        }
+      }else{
+        return new UncheckedFalseView.Descending(root);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      if(fromElement){
+        return this;
+      }else{
+        return new UncheckedFalseView.Descending(root);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      if(toElement){
+        return new UncheckedTrueView.Descending(root);
+      }else{
+        return this;
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     private static class Checked extends DescendingView{
       private static final long serialVersionUID=1L;
       private Checked(BooleanSetImpl root){
         super(root);
+      }
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return root;
       }
       @Override public Object clone(){
         return new Descending.Checked(root.state);
@@ -272,7 +673,55 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedDescendingFullItr(root,rootState);
       }
-      #MACRO SubSetMethods<root,Full,Descending,True>()
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        final BooleanSetImpl root;
+        final int rootState;
+        if((rootState=(root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedAscendingFullItr(root,rootState);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement){
+          if(toElement){
+            return new UncheckedTrueView.Checked.Descending(root);
+          }else{
+            return this;
+          }
+        }else{
+          if(toElement){
+            throw new IllegalArgumentException("falseElement>trueElement");
+          }else{
+            return new UncheckedFalseView.Checked.Descending(root);
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          return this;
+        }else{
+          return new UncheckedFalseView.Checked.Descending(root);
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          return new UncheckedTrueView.Checked.Descending(root);
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
     }
   }
   
@@ -292,7 +741,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     #MACRO ForEach<root,Full,Ascending>(BooleanConsumer,true,false)
     #MACRO ForEach<root,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Ascending,False,Full>()
-    
+    #MACRO AccessMethods<root,Full,Ascending>()
     #MACRO ToString<root,Ascending,Full>()
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
@@ -302,11 +751,61 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedAscendingFullItr(root,rootState);
     }
-    #MACRO SubSetMethods<root,Full,Ascending,False>()
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      final int rootState;
+      if((rootState=(root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedDescendingFullItr(root,rootState);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      if(fromElement){
+        return new UncheckedTrueView(root);
+      }else{
+        if(toElement){
+          return this;
+        }else{
+          return new UncheckedFalseView(root);
+        }
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      if(fromElement){
+        return new UncheckedTrueView(root);
+      }else{
+        return this;
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      if(toElement){
+        return this;
+      }else{
+        return new UncheckedFalseView(root);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return root;
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     private static class Checked extends AscendingView{
       private static final long serialVersionUID=1L;
       private Checked(BooleanSetImpl root){
         super(root);
+      }
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return root;
       }
       @Override public Object clone(){
         return new BooleanSetImpl.Checked(root.state);
@@ -323,15 +822,89 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedAscendingFullItr(root,rootState);
       }
-      #MACRO SubSetMethods<root,Full,Ascending,True>()
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        final BooleanSetImpl root;
+        final int rootState;
+        if((rootState=(root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedDescendingFullItr(root,rootState);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement){
+          if(toElement){
+            return new UncheckedTrueView.Checked(root);
+          }else{
+            throw new IllegalArgumentException("falseElement>trueElement");
+          }
+        }else{
+          if(toElement){
+            return this;
+          }else{
+            return new UncheckedFalseView.Checked(root);
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          return new UncheckedTrueView.Checked(root);
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          return this;
+        }else{
+          return new UncheckedFalseView.Checked(root);
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
     }
   }
-  private static class UncheckedTrueView extends AbstractBooleanSet{
+  private static abstract class AbstractSingleView extends AbstractBooleanSet{
     transient final BooleanSetImpl root;
-    private UncheckedTrueView(BooleanSetImpl root){
+    private AbstractSingleView(BooleanSetImpl root){
       this.root=root;
     }
     #MACRO Comparator<Ascending>()
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }  
+  }
+  private static class UncheckedTrueView extends AbstractSingleView{
+    private UncheckedTrueView(BooleanSetImpl root){
+      super(root);
+    }
     #MACRO AddRemoveContains<root,True,True>(10)
     #MACRO AddRemoveContains<root,True,False>(01)
     #MACRO RemoveIf<root,True>(BooleanPredicate,true,false)
@@ -343,6 +916,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     #MACRO ForEach<root,True,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Ascending,False,True>()
     #MACRO ToString<root,Ascending,True>()
+    #MACRO AccessMethods<root,True,Ascending>()
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
       if(((root=this.root).state)==0b00){
@@ -350,14 +924,49 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedTrueItr(root,0b1);
     }
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      if(((root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedTrueItr(root,0b1);
+    }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new UncheckedTrueView.Descending(root);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }  
     private static class Descending extends UncheckedTrueView{
       private Descending(BooleanSetImpl root){
         super(root);
       }
       #MACRO Comparator<Descending>()
-      #MACRO SubSetMethods<root,True,Descending,False>()
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return new UncheckedTrueView(root);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }  
     }
-    #MACRO SubSetMethods<root,True,Ascending,False>()
     private static class Checked extends UncheckedTrueView{
       private Checked(BooleanSetImpl root){
         super(root);
@@ -370,22 +979,64 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedTrueItr(root,0b10);
       }
-      #MACRO SubSetMethods<root,True,Ascending,True>()
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }  
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return new UncheckedTrueView.Checked.Descending(root);
+      }
       private static class Descending extends Checked{
         private Descending(BooleanSetImpl root){
           super(root);
         }
         #MACRO Comparator<Descending>()
-        #MACRO SubSetMethods<root,True,Descending,True>()
+        @Override public OmniNavigableSet.OfBoolean descendingSet(){
+          return new UncheckedTrueView.Checked(root);
+        }
+        @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }  
       }
     }
   }
-  private static class UncheckedFalseView extends AbstractBooleanSet{
-    transient final BooleanSetImpl root;
+  private static class UncheckedFalseView extends AbstractSingleView{
     private UncheckedFalseView(BooleanSetImpl root){
-      this.root=root;
+      super(root);
     }
-    #MACRO Comparator<Ascending>()
     #MACRO AddRemoveContains<root,False,True>(10)
     #MACRO AddRemoveContains<root,False,False>(01)
     #MACRO RemoveIf<root,False>(BooleanPredicate,true,false)
@@ -397,6 +1048,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     #MACRO ForEach<root,False,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Ascending,False,False>()
     #MACRO ToString<root,Ascending,False>()
+    #MACRO AccessMethods<root,False,Ascending>()
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
       if(((root=this.root).state)==0b00){
@@ -404,19 +1056,57 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedFalseItr(root,0b1);
     }
-    #MACRO SubSetMethods<root,False,Ascending,False>()
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      if(((root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedFalseItr(root,0b1);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }  
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new UncheckedFalseView.Descending(root);
+    }
     private static class Descending extends UncheckedFalseView{
       private Descending(BooleanSetImpl root){
         super(root);
       }
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return new UncheckedFalseView(root);
+      }
       #MACRO Comparator<Descending>()
-      #MACRO SubSetMethods<root,False,Descending,False>()
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }  
     }
     private static class Checked extends UncheckedFalseView{
       private Checked(BooleanSetImpl root){
         super(root);
       }
       #MACRO FirstAndLastBoolean<root,Ascending,True,False>()
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+          return new UncheckedFalseView.Checked.Descending(root);
+        }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
         if(((root=this.root).state)==0b00){
@@ -424,20 +1114,66 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedFalseItr(root,0b10);
       }
-      #MACRO SubSetMethods<root,False,Ascending,True>()
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        final BooleanSetImpl root;
+        if(((root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedFalseItr(root,0b10);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        //TODO
+        throw omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }  
       private static class Descending extends Checked{
         private Descending(BooleanSetImpl root){
           super(root);
         }
         #MACRO Comparator<Descending>()
-        #MACRO SubSetMethods<root,False,Descending,True>()
-        
+        @Override public OmniNavigableSet.OfBoolean descendingSet(){
+          return new UncheckedFalseView.Checked(root);
+        }
+        @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
     }
   }
   private static final EmptyView ASCENDING_EMPTY_VIEW=new EmptyView();
   private static final EmptyView DESCENDING_EMPTY_VIEW=new EmptyView(){
     #MACRO Comparator<Descending>()
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return ASCENDING_EMPTY_VIEW;
+    }
   };
   private static class EmptyView extends AbstractBooleanSet{
     #MACRO AddRemoveContains<root,Empty,True>(10)
@@ -451,13 +1187,42 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     #MACRO ForEach<root,Empty,Ascending>(BooleanConsumer,true,false)
     #MACRO ForEach<root,Empty,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Ascending,False,Empty>()
-    
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return DESCENDING_EMPTY_VIEW;
+    }
     #MACRO ToString<root,Ascending,Empty>()
+    #MACRO AccessMethods<root,Empty,Ascending>()
     @Override public OmniIterator.OfBoolean iterator(){
       return EMPTY_ITR;
     }
-    #MACRO SubSetMethods<root,Empty,Ascending,False>()
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      return EMPTY_ITR;
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement, boolean toElement){
+      //TODO
+      throw omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      //TODO
+      throw omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      //TODO
+      throw omni.util.NotYetImplementedException();
+    }
     
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw omni.util.NotYetImplementedException();
+    }
   }
   
 
@@ -606,8 +1371,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       return new CheckedTrueItr(root,itrState);
     }
     @Override public boolean hasNext(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return itrState==0b10;
     }
     #MACRO ItrNext<True,Ascending,True>()
     #MACRO ItrRemove<True,Ascending,True>()
@@ -634,21 +1398,51 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
   }
   
 }
-#MACRODEF SubSetMethods<SOURCE,VIEW,DIRECTION,CHECKED>()
-@Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+#MACRODEF AccessMethodsHelper<RETTYPE>(TRUEVAL,FALSEVAL,CLASSPREFIX,INPUTTYPE,DEFAULTVAL)
+#IFSWITCH RETTYPE==Boolean
+@Override public RETTYPE ceiling(INPUTTYPE val){
+#ELSE
+@Override public RETTYPE INPUTTYPECeiling(INPUTTYPE val){
+#ENDIF
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
-@Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+#IFSWITCH RETTYPE==Boolean
+@Override public RETTYPE floor(INPUTTYPE val){
+#ELSE
+@Override public RETTYPE INPUTTYPEFloor(INPUTTYPE val){
+#ENDIF
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
-@Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public RETTYPE pollFirstCLASSPREFIX(){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public RETTYPE pollLastCLASSPREFIX(){
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
 #ENDDEF
-
+#MACRODEF AccessMethods<SOURCE,VIEW,DIRECTION>()
+#MACRO AccessMethodsHelper<Boolean>(Boolean.TRUE,Boolean.FALSE,,boolean,null)
+#MACRO AccessMethodsHelper<boolean>(true,false,Boolean,boolean,false)
+#MACRO AccessMethodsHelper<byte>((byte)1,(byte)0,Byte,byte,Byte.MIN_VALUE)
+#MACRO AccessMethodsHelper<char>((char)1,(char)0,Char,char,Character.MIN_VALUE)
+#MACRO AccessMethodsHelper<short>((short)1,(short)0,Short,short,Short.MIN_VALUE)
+#MACRO AccessMethodsHelper<int>(1,0,Int,int,Integer.MIN_VALUE)
+#MACRO AccessMethodsHelper<long>(1L,0L,Long,long,Long.MIN_VALUE)
+#MACRO AccessMethodsHelper<float>(1F,0F,Float,float,Float.NaN)
+#MACRO AccessMethodsHelper<double>(1D,0D,Double,double,Double.NaN)
+#ENDDEF
 #MACRODEF FirstAndLastBoolean<SOURCE,DIRECTION,CHECKED,VIEW>()
 @Override public boolean firstBoolean(){
 #IFSWITCH VIEW==Full
@@ -837,7 +1631,10 @@ ERROR unknown view VIEW
 }
 #ENDDEF
 #MACRODEF ToArray<SOURCE,DIRECTION,VIEW>()
-@SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
+#IFNOTSWITCH VIEW==Empty
+@SuppressWarnings("unchecked")
+#ENDIF
+@Override public <T> T[] toArray(T[] dst){
 #IFSWITCH VIEW==Full
   switch(SOURCE.state){
   case 0b11:
@@ -862,23 +1659,35 @@ ERROR unknown direction DIRECTION
       dst[0]=null;
     }
   }
-  return dst;
 #ELSEIFSWITCH VIEW==True
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  if((SOURCE.state&0b10)==0){
+    if(dst.length!=0){
+      dst[0]=null;
+    }
+  }else{
+    (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)Boolean.TRUE;
+  }
 #ELSEIFSWITCH VIEW==False
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  if((SOURCE.state&0b01)==0){
+    if(dst.length!=0){
+      dst[0]=null;
+    }
+  }else{
+    (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)Boolean.FALSE;
+  }
 #ELSEIFSWITCH VIEW==Empty
   if(dst.length!=0){
     dst[0]=null;
   }
-  return dst;
 #ELSE
 ERROR unknown view VIEW
 #ENDIF
+  return dst;
 }
-@SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+#IFNOTSWITCH VIEW==Empty
+@SuppressWarnings("unchecked")
+#ENDIF
+@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
 #IFSWITCH VIEW==Full
   final T[] dst;
   switch(SOURCE.state){
@@ -904,11 +1713,21 @@ ERROR unknown direction DIRECTION
   }
   return dst;
 #ELSEIFSWITCH VIEW==True
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  if((SOURCE.state&0b10)==0){
+    return arrConstructor.apply(0);
+  }else{
+    final T[] dst;
+    (dst=arrConstructor.apply(1))[0]=(T)Boolean.TRUE;
+    return dst;
+  }
 #ELSEIFSWITCH VIEW==False
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  if((SOURCE.state&0b01)==0){
+    return arrConstructor.apply(0);
+  }else{
+    final T[] dst;
+    (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
+    return dst;
+  }
 #ELSEIFSWITCH VIEW==Empty
   return arrConstructor.apply(0);
 #ELSE
@@ -978,14 +1797,35 @@ ERROR unknown source SOURCE
   }
   return false;
 #ELSEIFSWITCH VIEW==True
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  #IFSWITCH NAME==True
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&(STATE))==0){
+    SOURCE.state=state+STATE;
+    return true;
+  }
+  return false;
+  #ELSEIFSWITCH NAME==False
+  throw new IllegalArgumentException("out of bounds");
+  #ELSE
+ERROR unknown name NAME
+  #ENDIF
 #ELSEIFSWITCH VIEW==False
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  #IFSWITCH NAME==True
+  throw new IllegalArgumentException("out of bounds");
+  #ELSEIFSWITCH NAME==False
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&(STATE))==0){
+    SOURCE.state=state+STATE;
+    return true;
+  }
+  return false;
+  #ELSE
+ERROR unknown name NAME
+  #ENDIF
 #ELSEIFSWITCH VIEW==Empty
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  throw new IllegalArgumentException("out of bounds");
 #ELSE
 ERROR unknown view VIEW
 #ENDIF
@@ -994,14 +1834,23 @@ ERROR unknown view VIEW
 #IFSWITCH VIEW==Full
   return (SOURCE.state&0bSTATE)!=0;
 #ELSEIFSWITCH VIEW==True
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  #IFSWITCH NAME==True
+  return (SOURCE.state&0bSTATE)!=0;
+  #ELSEIFSWITCH NAME==False
+  return false;
+  #ELSE
+ERROR unknown name NAME
+  #ENDIF
 #ELSEIFSWITCH VIEW==False
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  #IFSWITCH NAME==True
+  return false;
+  #ELSEIFSWITCH NAME==False
+  return (SOURCE.state&0bSTATE)!=0;
+  #ELSE
+ERROR unknown name NAME
+  #ENDIF
 #ELSEIFSWITCH VIEW==Empty
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  return false;
 #ELSE
 ERROR unknown view VIEW
 #ENDIF
@@ -1022,14 +1871,35 @@ ERROR unknown source SOURCE
   }
   return false;
 #ELSEIFSWITCH VIEW==True
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  #IFSWITCH NAME==True
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&(STATE))!=0){
+    SOURCE.state=state-STATE;
+    return true;
+  }
+  return false;
+  #ELSEIFSWITCH NAME==False
+  return false;
+  #ELSE
+ERROR unknown name NAME
+  #ENDIF
 #ELSEIFSWITCH VIEW==False
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  #IFSWITCH NAME==True
+  return false;
+  #ELSEIFSWITCH NAME==False
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&(STATE))!=0){
+    SOURCE.state=state-STATE;
+    return true;
+  }
+  return false;
+  #ELSE
+ERROR unknown name NAME
+  #ENDIF
 #ELSEIFSWITCH VIEW==Empty
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+  return false;
 #ELSE
 ERROR unknown view VIEW
 #ENDIF

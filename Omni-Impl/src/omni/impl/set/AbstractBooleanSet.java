@@ -1,27 +1,15 @@
 package omni.impl.set;
 
-import omni.api.OmniSortedSet;
+import omni.api.OmniNavigableSet;
 import omni.util.TypeUtil;
 
-abstract class AbstractBooleanSet implements OmniSortedSet.OfBoolean{
+abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
   abstract boolean containsTrue();
   abstract boolean containsFalse();
   abstract boolean removeTrue();
   abstract boolean removeFalse();
   abstract boolean addTrue();
   abstract boolean addFalse();
-  @Override public OmniSortedSet.OfBoolean subSet(Boolean fromElement,Boolean toElement){
-      //TODO remove
-      return subSet((boolean)fromElement,(boolean)toElement);
-    }
-    @Override public OmniSortedSet.OfBoolean headSet(Boolean toElement){
-      //TODO remove
-      return headSet((boolean)toElement);
-    }
-    @Override public OmniSortedSet.OfBoolean tailSet(Boolean fromElement){
-      //TODO remove
-      return tailSet((boolean)fromElement);
-    }
   @Override public boolean contains(Object val){
     containsTrue:for(;;) {
       containsFalse:for(;;) {

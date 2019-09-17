@@ -18,7 +18,7 @@ import java.util.Set;
 import omni.api.OmniSet;
 import java.util.NoSuchElementException;
 import omni.impl.AbstractBooleanItr;
-import omni.api.OmniSortedSet;
+import omni.api.OmniNavigableSet;
 import java.util.ConcurrentModificationException;
 public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,Cloneable{
   transient int state;
@@ -50,6 +50,9 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       return -1;
     }
     return 1;
+  }
+  @Override public OmniNavigableSet.OfBoolean descendingSet(){
+    return new Descending(this);
   }
   private static final long serialVersionUID=1L;
   public BooleanSetImpl(){
@@ -94,6 +97,222 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       default:
         return "[false, true]";
     }
+  }
+  @Override public Boolean ceiling(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Boolean floor(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Boolean lower(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Boolean higher(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Boolean pollFirst(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Boolean pollLast(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean booleanCeiling(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean booleanFloor(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean lowerBoolean(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean higherBoolean(boolean val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean pollFirstBoolean(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean pollLastBoolean(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public byte byteCeiling(byte val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public byte byteFloor(byte val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public byte lowerByte(byte val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public byte higherByte(byte val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public byte pollFirstByte(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public byte pollLastByte(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public char charCeiling(char val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public char charFloor(char val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public char lowerChar(char val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public char higherChar(char val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public char pollFirstChar(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public char pollLastChar(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public short shortCeiling(short val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public short shortFloor(short val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public short lowerShort(short val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public short higherShort(short val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public short pollFirstShort(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public short pollLastShort(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int intCeiling(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int intFloor(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int lowerInt(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int higherInt(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int pollFirstInt(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int pollLastInt(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long longCeiling(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long longFloor(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long lowerLong(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long higherLong(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long pollFirstLong(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long pollLastLong(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float floatCeiling(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float floatFloor(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float lowerFloat(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float higherFloat(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float pollFirstFloat(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float pollLastFloat(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double doubleCeiling(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double doubleFloor(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double lowerDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double higherDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double pollFirstDouble(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double pollLastDouble(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
   @Override public boolean equals(Object val){
   if(val==this){
@@ -264,7 +483,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     }
     return false;
   }
-  @SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
+  @SuppressWarnings("unchecked")
+  @Override public <T> T[] toArray(T[] dst){
     switch(this.state){
     case 0b11:
       (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)Boolean.FALSE;
@@ -283,7 +503,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     }
     return dst;
   }
-  @SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+  @SuppressWarnings("unchecked")
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     final T[] dst;
     switch(this.state){
     case 0b11:
@@ -416,6 +637,13 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     }
     return new UncheckedAscendingFullItr(this,state);
   }
+  @Override public OmniIterator.OfBoolean descendingIterator(){
+    final int state;
+    if((state=this.state)==0b00){
+      return EMPTY_ITR;
+    }
+    return new UncheckedDescendingFullItr(this,state);
+  }
   @Override public boolean firstBoolean(){
     if(this.state==0b10){
       return true;
@@ -428,7 +656,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     }
     return true;
   }
-  @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+  @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
     if(fromElement){
       return new UncheckedTrueView(this);
     }else{
@@ -439,19 +667,31 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
     }
   }
-  @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
     if(toElement){
       return this;
     }else{
       return new UncheckedFalseView(this);
     }
   }
-  @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
     if(fromElement){
       return new UncheckedTrueView(this);
     }else{
       return this;
     }
+  }
+  @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
   public static class Checked extends BooleanSetImpl{
     private static final long serialVersionUID=1L;
@@ -476,12 +716,22 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     @Override public Object clone(){
       return new Checked(this.state);
     }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new Descending.Checked(this);
+    }
     @Override public OmniIterator.OfBoolean iterator(){
       final int state;
       if((state=this.state)==0b00){
         return EMPTY_ITR;
       }
       return new CheckedAscendingFullItr(this,state);
+    }
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final int state;
+      if((state=this.state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new CheckedDescendingFullItr(this,state);
     }
     @Override public boolean firstBoolean(){
       switch(this.state){
@@ -503,7 +753,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
           return true;
       }
     }
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
       if(fromElement){
         if(toElement){
           return new UncheckedTrueView.Checked(this);
@@ -518,19 +768,31 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
       }
     }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
       if(toElement){
         return this;
       }else{
         return new UncheckedFalseView.Checked(this);
       }
     }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
       if(fromElement){
         return new UncheckedTrueView.Checked(this);
       }else{
         return this;
       }
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
     }
   }
   public static class Descending extends BooleanSetImpl{
@@ -595,7 +857,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         default:
       }
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(T[] dst){
       switch(this.state){
       case 0b11:
         (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)Boolean.TRUE;
@@ -614,7 +877,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return dst;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final T[] dst;
       switch(this.state){
       case 0b11:
@@ -740,12 +1004,235 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
           return new double[]{1D,0D};
       }
     }
+    @Override public Boolean ceiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean floor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean lower(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean higher(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollFirst(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollLast(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanCeiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanFloor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean lowerBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean higherBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollFirstBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollLastBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteCeiling(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteFloor(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte lowerByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte higherByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollFirstByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollLastByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charCeiling(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charFloor(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char lowerChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char higherChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollFirstChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollLastChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortCeiling(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortFloor(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short lowerShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short higherShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollFirstShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollLastShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intCeiling(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intFloor(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int lowerInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int higherInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollFirstInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollLastInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longCeiling(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longFloor(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long lowerLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long higherLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollFirstLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollLastLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatCeiling(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatFloor(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float lowerFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float higherFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollFirstFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollLastFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleCeiling(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleFloor(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double lowerDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double higherDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollFirstDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollLastDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     @Override public OmniIterator.OfBoolean iterator(){
       final int state;
       if((state=this.state)==0b00){
         return EMPTY_ITR;
       }
       return new UncheckedDescendingFullItr(this,state);
+    }
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final int state;
+      if((state=this.state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedAscendingFullItr(this,state);
     }
     @Override public boolean firstBoolean(){
       if(this.state==0b01){
@@ -759,17 +1246,45 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return false;
     }
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      if(fromElement){
+        if(toElement){
+          return new UncheckedTrueView.Descending(this);
+        }else{
+          return this;
+        }
+      }else{
+        return new UncheckedFalseView.Descending(this);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      if(fromElement){
+        return this;
+      }else{
+        return new UncheckedFalseView.Descending(this);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      if(toElement){
+        return new UncheckedTrueView.Descending(this);
+      }else{
+        return this;
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new BooleanSetImpl(this);
     }
     public static class Checked extends Descending{
        private static final long serialVersionUID=1L;
@@ -801,6 +1316,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
          }
          return new CheckedDescendingFullItr(this,state);
        }
+       @Override public OmniNavigableSet.OfBoolean descendingSet(){
+         return new BooleanSetImpl.Checked(this);
+       }
+       @Override public OmniIterator.OfBoolean descendingIterator(){
+         final int state;
+         if((state=this.state)==0b00){
+           return EMPTY_ITR;
+         }
+         return new CheckedAscendingFullItr(this,state);
+       }
        @Override public boolean firstBoolean(){
          switch(this.state){
            case 0b00:
@@ -821,18 +1346,47 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
              return false;
          }
        }
-       @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-         //TODO
-         throw new omni.util.NotYetImplementedException();
-       }
-       @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
-         //TODO
-         throw new omni.util.NotYetImplementedException();
-       }
-       @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
-         //TODO
-         throw new omni.util.NotYetImplementedException();
-       }
+       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement){
+          if(toElement){
+            return new UncheckedTrueView.Checked.Descending(this);
+          }else{
+            return this;
+          }
+        }else{
+          if(toElement){
+            throw new IllegalArgumentException("falseElement>trueElement");
+          }else{
+            return new UncheckedFalseView.Checked.Descending(this);
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          return this;
+        }else{
+          return new UncheckedFalseView.Checked.Descending(this);
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          return new UncheckedTrueView.Checked.Descending(this);
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
     }
   }
   private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -1056,10 +1610,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     private Object writeReplace(){
       return new Descending(root.state);
     }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return root;
+    }
     @Override public BooleanComparator comparator(){
       return BooleanSetImpl::reverseCompare;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(T[] dst){
       switch(root.state){
       case 0b11:
         (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)Boolean.TRUE;
@@ -1078,7 +1636,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return dst;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final T[] dst;
       switch(root.state){
       case 0b11:
@@ -1252,6 +1811,222 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
           return "[true, false]";
       }
     }
+    @Override public Boolean ceiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean floor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean lower(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean higher(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollFirst(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollLast(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanCeiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanFloor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean lowerBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean higherBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollFirstBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollLastBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteCeiling(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteFloor(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte lowerByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte higherByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollFirstByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollLastByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charCeiling(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charFloor(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char lowerChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char higherChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollFirstChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollLastChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortCeiling(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortFloor(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short lowerShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short higherShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollFirstShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollLastShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intCeiling(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intFloor(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int lowerInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int higherInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollFirstInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollLastInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longCeiling(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longFloor(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long lowerLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long higherLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollFirstLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollLastLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatCeiling(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatFloor(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float lowerFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float higherFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollFirstFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollLastFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleCeiling(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleFloor(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double lowerDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double higherDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollFirstDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollLastDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
       final int rootState;
@@ -1260,15 +2035,48 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedDescendingFullItr(root,rootState);
     }
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      final int rootState;
+      if((rootState=(root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedAscendingFullItr(root,rootState);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      if(fromElement){
+        if(toElement){
+          return new UncheckedTrueView.Descending(root);
+        }else{
+          return this;
+        }
+      }else{
+        return new UncheckedFalseView.Descending(root);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      if(fromElement){
+        return this;
+      }else{
+        return new UncheckedFalseView.Descending(root);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      if(toElement){
+        return new UncheckedTrueView.Descending(root);
+      }else{
+        return this;
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -1276,6 +2084,9 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       private static final long serialVersionUID=1L;
       private Checked(BooleanSetImpl root){
         super(root);
+      }
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return root;
       }
       @Override public Object clone(){
         return new Descending.Checked(root.state);
@@ -1311,15 +2122,52 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedDescendingFullItr(root,rootState);
       }
-      @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        final BooleanSetImpl root;
+        final int rootState;
+        if((rootState=(root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedAscendingFullItr(root,rootState);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement){
+          if(toElement){
+            return new UncheckedTrueView.Checked.Descending(root);
+          }else{
+            return this;
+          }
+        }else{
+          if(toElement){
+            throw new IllegalArgumentException("falseElement>trueElement");
+          }else{
+            return new UncheckedFalseView.Checked.Descending(root);
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          return this;
+        }else{
+          return new UncheckedFalseView.Checked.Descending(root);
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          return new UncheckedTrueView.Checked.Descending(root);
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
@@ -1339,7 +2187,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     @Override public BooleanComparator comparator(){
       return Boolean::compare;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(T[] dst){
       switch(root.state){
       case 0b11:
         (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)Boolean.FALSE;
@@ -1358,7 +2207,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return dst;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final T[] dst;
       switch(root.state){
       case 0b11:
@@ -1520,6 +2370,222 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return true;
     }
+    @Override public Boolean ceiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean floor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean lower(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean higher(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollFirst(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollLast(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanCeiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanFloor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean lowerBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean higherBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollFirstBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollLastBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteCeiling(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteFloor(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte lowerByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte higherByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollFirstByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollLastByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charCeiling(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charFloor(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char lowerChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char higherChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollFirstChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollLastChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortCeiling(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortFloor(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short lowerShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short higherShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollFirstShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollLastShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intCeiling(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intFloor(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int lowerInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int higherInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollFirstInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollLastInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longCeiling(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longFloor(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long lowerLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long higherLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollFirstLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollLastLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatCeiling(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatFloor(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float lowerFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float higherFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollFirstFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollLastFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleCeiling(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleFloor(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double lowerDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double higherDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollFirstDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollLastDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     @Override public String toString(){
       switch(root.state){
         case 0b00:
@@ -1540,15 +2606,51 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedAscendingFullItr(root,rootState);
     }
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      final int rootState;
+      if((rootState=(root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedDescendingFullItr(root,rootState);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      if(fromElement){
+        return new UncheckedTrueView(root);
+      }else{
+        if(toElement){
+          return this;
+        }else{
+          return new UncheckedFalseView(root);
+        }
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      if(fromElement){
+        return new UncheckedTrueView(root);
+      }else{
+        return this;
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      if(toElement){
+        return this;
+      }else{
+        return new UncheckedFalseView(root);
+      }
+    }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return root;
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -1556,6 +2658,9 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       private static final long serialVersionUID=1L;
       private Checked(BooleanSetImpl root){
         super(root);
+      }
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return root;
       }
       @Override public Object clone(){
         return new BooleanSetImpl.Checked(root.state);
@@ -1591,51 +2696,120 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedAscendingFullItr(root,rootState);
       }
-      @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        final BooleanSetImpl root;
+        final int rootState;
+        if((rootState=(root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedDescendingFullItr(root,rootState);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement){
+          if(toElement){
+            return new UncheckedTrueView.Checked(root);
+          }else{
+            throw new IllegalArgumentException("falseElement>trueElement");
+          }
+        }else{
+          if(toElement){
+            return this;
+          }else{
+            return new UncheckedFalseView.Checked(root);
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          return new UncheckedTrueView.Checked(root);
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          return this;
+        }else{
+          return new UncheckedFalseView.Checked(root);
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
     }
   }
-  private static class UncheckedTrueView extends AbstractBooleanSet{
+  private static abstract class AbstractSingleView extends AbstractBooleanSet{
     transient final BooleanSetImpl root;
-    private UncheckedTrueView(BooleanSetImpl root){
+    private AbstractSingleView(BooleanSetImpl root){
       this.root=root;
     }
     @Override public BooleanComparator comparator(){
       return Boolean::compare;
     }
-    @Override boolean addTrue(){
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }  
+  }
+  private static class UncheckedTrueView extends AbstractSingleView{
+    private UncheckedTrueView(BooleanSetImpl root){
+      super(root);
+    }
+    @Override boolean addTrue(){
+      final BooleanSetImpl root;
+      final int state;
+      if(((state=(root=this.root).state)&(10))==0){
+        root.state=state+10;
+        return true;
+      }
+      return false;
     }
     @Override boolean containsTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return (root.state&0b10)!=0;
     }
     @Override boolean removeTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final BooleanSetImpl root;
+      final int state;
+      if(((state=(root=this.root).state)&(10))!=0){
+        root.state=state-10;
+        return true;
+      }
+      return false;
     }
     @Override boolean addFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      throw new IllegalArgumentException("out of bounds");
     }
     @Override boolean containsFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override boolean removeFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override public boolean removeIf(BooleanPredicate filter){
       final BooleanSetImpl root;
@@ -1682,13 +2856,26 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return false;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(T[] dst){
+      if((root.state&0b10)==0){
+        if(dst.length!=0){
+          dst[0]=null;
+        }
+      }else{
+        (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)Boolean.TRUE;
+      }
+      return dst;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      if((root.state&0b10)==0){
+        return arrConstructor.apply(0);
+      }else{
+        final T[] dst;
+        (dst=arrConstructor.apply(1))[0]=(T)Boolean.TRUE;
+        return dst;
+      }
     }
     @Override public Boolean[] toArray(){
       if((root.state&0b10)!=0){
@@ -1766,6 +2953,222 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return "[]";
     }
+    @Override public Boolean ceiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean floor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean lower(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean higher(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollFirst(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollLast(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanCeiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanFloor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean lowerBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean higherBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollFirstBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollLastBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteCeiling(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteFloor(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte lowerByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte higherByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollFirstByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollLastByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charCeiling(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charFloor(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char lowerChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char higherChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollFirstChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollLastChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortCeiling(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortFloor(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short lowerShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short higherShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollFirstShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollLastShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intCeiling(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intFloor(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int lowerInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int higherInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollFirstInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollLastInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longCeiling(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longFloor(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long lowerLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long higherLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollFirstLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollLastLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatCeiling(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatFloor(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float lowerFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float higherFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollFirstFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollLastFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleCeiling(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleFloor(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double lowerDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double higherDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollFirstDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollLastDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
       if(((root=this.root).state)==0b00){
@@ -1773,6 +3176,28 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedTrueItr(root,0b1);
     }
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      if(((root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedTrueItr(root,0b1);
+    }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new UncheckedTrueView.Descending(root);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }  
     private static class Descending extends UncheckedTrueView{
       private Descending(BooleanSetImpl root){
         super(root);
@@ -1780,30 +3205,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       @Override public BooleanComparator comparator(){
         return BooleanSetImpl::reverseCompare;
       }
-      @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return new UncheckedTrueView(root);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
-      }
-    }
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      }  
     }
     private static class Checked extends UncheckedTrueView{
       private Checked(BooleanSetImpl root){
@@ -1828,17 +3244,48 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedTrueItr(root,0b10);
       }
-      @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        final BooleanSetImpl root;
+        if(((root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedTrueItr(root,0b10);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement && toElement){
+          return this;
+        }else{
+          throw new IllegalArgumentException("out of bounds");
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          return this;
+        }else{
+          throw new IllegalArgumentException("out of bounds");
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          return this;
+        }else{
+          throw new IllegalArgumentException("out of bounds");
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
+      }  
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return new UncheckedTrueView.Checked.Descending(root);
       }
       private static class Descending extends Checked{
         private Descending(BooleanSetImpl root){
@@ -1847,52 +3294,57 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         @Override public BooleanComparator comparator(){
           return BooleanSetImpl::reverseCompare;
         }
-        @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        @Override public OmniNavigableSet.OfBoolean descendingSet(){
+          return new UncheckedTrueView.Checked(root);
+        }
+        @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
           //TODO
           throw new omni.util.NotYetImplementedException();
         }
-        @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+        @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
           //TODO
           throw new omni.util.NotYetImplementedException();
         }
-        @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+        @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
           //TODO
           throw new omni.util.NotYetImplementedException();
-        }
+        }  
       }
     }
   }
-  private static class UncheckedFalseView extends AbstractBooleanSet{
-    transient final BooleanSetImpl root;
+  private static class UncheckedFalseView extends AbstractSingleView{
     private UncheckedFalseView(BooleanSetImpl root){
-      this.root=root;
-    }
-    @Override public BooleanComparator comparator(){
-      return Boolean::compare;
+      super(root);
     }
     @Override boolean addTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      throw new IllegalArgumentException("out of bounds");
     }
     @Override boolean containsTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override boolean removeTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override boolean addFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final BooleanSetImpl root;
+      final int state;
+      if(((state=(root=this.root).state)&(01))==0){
+        root.state=state+01;
+        return true;
+      }
+      return false;
     }
     @Override boolean containsFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return (root.state&0b01)!=0;
     }
     @Override boolean removeFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final BooleanSetImpl root;
+      final int state;
+      if(((state=(root=this.root).state)&(01))!=0){
+        root.state=state-01;
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeIf(BooleanPredicate filter){
       final BooleanSetImpl root;
@@ -1939,13 +3391,26 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return false;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(T[] dst){
+      if((root.state&0b01)==0){
+        if(dst.length!=0){
+          dst[0]=null;
+        }
+      }else{
+        (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)Boolean.FALSE;
+      }
+      return dst;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @SuppressWarnings("unchecked")
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      if((root.state&0b01)==0){
+        return arrConstructor.apply(0);
+      }else{
+        final T[] dst;
+        (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
+        return dst;
+      }
     }
     @Override public Boolean[] toArray(){
       if((root.state&0b01)!=0){
@@ -2023,6 +3488,222 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return "[]";
     }
+    @Override public Boolean ceiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean floor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean lower(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean higher(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollFirst(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollLast(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanCeiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanFloor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean lowerBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean higherBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollFirstBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollLastBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteCeiling(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteFloor(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte lowerByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte higherByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollFirstByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollLastByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charCeiling(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charFloor(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char lowerChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char higherChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollFirstChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollLastChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortCeiling(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortFloor(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short lowerShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short higherShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollFirstShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollLastShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intCeiling(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intFloor(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int lowerInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int higherInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollFirstInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollLastInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longCeiling(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longFloor(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long lowerLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long higherLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollFirstLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollLastLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatCeiling(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatFloor(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float lowerFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float higherFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollFirstFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollLastFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleCeiling(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleFloor(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double lowerDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double higherDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollFirstDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollLastDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
       if(((root=this.root).state)==0b00){
@@ -2030,37 +3711,50 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
       return new UncheckedFalseItr(root,0b1);
     }
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      final BooleanSetImpl root;
+      if(((root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedFalseItr(root,0b1);
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }  
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return new UncheckedFalseView.Descending(root);
     }
     private static class Descending extends UncheckedFalseView{
       private Descending(BooleanSetImpl root){
         super(root);
       }
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+        return new UncheckedFalseView(root);
+      }
       @Override public BooleanComparator comparator(){
         return BooleanSetImpl::reverseCompare;
       }
-      @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
-      }
+      }  
     }
     private static class Checked extends UncheckedFalseView{
       private Checked(BooleanSetImpl root){
@@ -2078,6 +3772,9 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return false;
       }
+      @Override public OmniNavigableSet.OfBoolean descendingSet(){
+          return new UncheckedFalseView.Checked.Descending(root);
+        }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
         if(((root=this.root).state)==0b00){
@@ -2085,18 +3782,46 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedFalseItr(root,0b10);
       }
-      @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      @Override public OmniIterator.OfBoolean descendingIterator(){
+        final BooleanSetImpl root;
+        if(((root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedFalseItr(root,0b10);
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        if(fromElement || toElement){
+          throw new IllegalArgumentException("out of bounds");
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+        if(fromElement){
+          throw new IllegalArgumentException("out of bounds");
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+        if(toElement){
+          throw new IllegalArgumentException("out of bounds");
+        }else{
+          return this;
+        }
+      }
+      @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+      @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
       }
-      @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+      @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
         //TODO
         throw new omni.util.NotYetImplementedException();
-      }
+      }  
       private static class Descending extends Checked{
         private Descending(BooleanSetImpl root){
           super(root);
@@ -2104,15 +3829,18 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         @Override public BooleanComparator comparator(){
           return BooleanSetImpl::reverseCompare;
         }
-        @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+        @Override public OmniNavigableSet.OfBoolean descendingSet(){
+          return new UncheckedFalseView.Checked(root);
+        }
+        @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
           //TODO
           throw new omni.util.NotYetImplementedException();
         }
-        @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+        @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
           //TODO
           throw new omni.util.NotYetImplementedException();
         }
-        @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+        @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
           //TODO
           throw new omni.util.NotYetImplementedException();
         }
@@ -2124,31 +3852,28 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     @Override public BooleanComparator comparator(){
       return BooleanSetImpl::reverseCompare;
     }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return ASCENDING_EMPTY_VIEW;
+    }
   };
   private static class EmptyView extends AbstractBooleanSet{
     @Override boolean addTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      throw new IllegalArgumentException("out of bounds");
     }
     @Override boolean containsTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override boolean removeTrue(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override boolean addFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      throw new IllegalArgumentException("out of bounds");
     }
     @Override boolean containsFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override boolean removeFalse(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return false;
     }
     @Override public boolean removeIf(BooleanPredicate filter){
       return false;
@@ -2180,13 +3905,13 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     @Override public BooleanComparator comparator(){
       return Boolean::compare;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
+    @Override public <T> T[] toArray(T[] dst){
       if(dst.length!=0){
         dst[0]=null;
       }
       return dst;
     }
-    @SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       return arrConstructor.apply(0);
     }
     @Override public Boolean[] toArray(){
@@ -2228,23 +3953,260 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     @Override public boolean lastBoolean(){
       throw new NoSuchElementException();
     }
+    @Override public OmniNavigableSet.OfBoolean descendingSet(){
+      return DESCENDING_EMPTY_VIEW;
+    }
     @Override public String toString(){
       return "[]";
+    }
+    @Override public Boolean ceiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean floor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean lower(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean higher(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollFirst(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Boolean pollLast(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanCeiling(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean booleanFloor(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean lowerBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean higherBoolean(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollFirstBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean pollLastBoolean(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteCeiling(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte byteFloor(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte lowerByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte higherByte(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollFirstByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte pollLastByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charCeiling(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char charFloor(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char lowerChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char higherChar(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollFirstChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char pollLastChar(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortCeiling(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short shortFloor(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short lowerShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short higherShort(short val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollFirstShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short pollLastShort(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intCeiling(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int intFloor(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int lowerInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int higherInt(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollFirstInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int pollLastInt(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longCeiling(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long longFloor(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long lowerLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long higherLong(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollFirstLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long pollLastLong(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatCeiling(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float floatFloor(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float lowerFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float higherFloat(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollFirstFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float pollLastFloat(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleCeiling(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double doubleFloor(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double lowerDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double higherDouble(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollFirstDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double pollLastDouble(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
     }
     @Override public OmniIterator.OfBoolean iterator(){
       return EMPTY_ITR;
     }
-    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @Override public OmniIterator.OfBoolean descendingIterator(){
+      return EMPTY_ITR;
     }
-    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement, boolean toElement){
+      throw new IllegalArgumentException("out of bounds");
     }
-    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+      throw new IllegalArgumentException("out of bounds");
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+      throw new IllegalArgumentException("out of bounds");
+    }
+    @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+      if(fromInclusive||toInclusive){
+        throw new IllegalArgumentException("out of bounds");
+      }
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+      if(inclusive){
+        throw new IllegalArgumentException("out of bounds");
+      }
+      return this;
+    }
+    @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+      if(inclusive){
+        throw new IllegalArgumentException("out of bounds");
+      }
+      return this;
     }
   }
   private static class UncheckedAscendingFullItr extends AbstractBooleanItr{
@@ -2676,8 +4638,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       return new CheckedTrueItr(root,itrState);
     }
     @Override public boolean hasNext(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return itrState==0b10;
     }
     @Override public boolean nextBoolean(){
       switch((itrState<<1)|(root.state>>>1)){
