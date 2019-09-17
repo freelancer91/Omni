@@ -19,56 +19,151 @@ import java.util.Set;
 import omni.api.OmniSet;
 import java.util.NoSuchElementException;
 import omni.impl.AbstractBooleanItr;
+import omni.api.OmniSortedSet;
 import java.util.ConcurrentModificationException;
-public abstract class BooleanSetImpl extends AbstractBooleanSet implementsSerializable,Cloneable{
+public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,Cloneable{
   transient int state;
+  private static final AbstractBooleanItr EMPTY_ITR=new AbstractBooleanItr(){
+    @Override public Object clone(){
+      return this;
+    }
+    @Override public boolean hasNext(){
+      return false;
+    }
+    #MACRO ItrNext<True,Ascending,Empty>()
+    #MACRO ItrRemove<True,Ascending,Empty>()
+    #MACRO ForEachRemaining<True,Ascending,Empty>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<True,Ascending,Empty>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  };
+  private static int reverseCompare(boolean val1,boolean val2){
+    if(val1==val2){
+      return 0;
+    }
+    if(val1){
+      return -1;
+    }
+    return 1;
+  }
   #MACRO Constructors<BooleanSetImpl>()
-  @Override public void clear(){
-    this.state=0b00;
-  }
-  @Override public boolean isEmpty(){
-    return this.state==0b00;
-  }
-  @Override public int size(){
-    switch(this.state){
-      case 0b00:
-        return 0;
-      case 0b01:
-      case 0b10:
-        return 1;
-      default:
-        return 2;
+  #MACRO Comparator<Ascending>()
+  #MACRO ToString<this,Ascending,Full>()
+  
+  #MACRO EqualsMethod<this,Full>()
+  #MACRO SizeClearHashCodeIsEmpty<this,Full>()
+  #MACRO ForEach<this,Full,Ascending>(BooleanConsumer,true,false)
+  #MACRO ForEach<this,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  #MACRO RemoveIf<this,Full>(BooleanPredicate,true,false)
+  #MACRO RemoveIf<this,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  #MACRO AddRemoveContains<this,Full,True>(10)
+  #MACRO AddRemoveContains<this,Full,False>(01)
+  #MACRO ToArray<this,Ascending,Full>()
+  @Override public OmniIterator.OfBoolean iterator(){
+    final int state;
+    if((state=this.state)==0b00){
+      return EMPTY_ITR;
     }
+    return new UncheckedAscendingFullItr(this,state);
   }
-  @Override public int hashCode(){
-    switch(this.state){
-      case 0b00:
-        return 0;
-      case 0b01:
-        return 1237;
-      case 0b10:
-        return 1231:
-      default:
-        return 1231+1237;
-    }
-  }
-  @Override public boolean equals(Object val){
-    if(val==this){
-      return true;
-    }
-    if(val instanceof Set){
-      switch(this.state){
-        case 0b00:
-          return ((Set<?>)val).isEmpty();
-        case 0b01:
-          return equalsFalseState((Set<?>)val);
-        case 0b10:
-          return equalsTrueState((Set<?>)val);
-        default:
-          return equalsFullState((Set<?>)val);
+  #MACRO FirstAndLastBoolean<this,Ascending,False,Full>()
+  @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+    if(fromElement){
+      return new UncheckedTrueView(this);
+    }else{
+      if(toElement){
+        return this;
+      }else{
+        return new UncheckedFalseView(this);
       }
     }
-    return false;
+  }
+  @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+    if(toElement){
+      return this;
+    }else{
+      return new UncheckedFalseView(this);
+    }
+  }
+  @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+    if(fromElement){
+      return new UncheckedTrueView(this);
+    }else{
+      return this;
+    }
+  }
+  public static class Checked extends BooleanSetImpl{
+    #MACRO Constructors<Checked>()
+    @Override public OmniIterator.OfBoolean iterator(){
+      final int state;
+      if((state=this.state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new CheckedAscendingFullItr(this,state);
+    }
+    #MACRO FirstAndLastBoolean<this,Ascending,True,Full>()
+    @Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+      if(fromElement){
+        if(toElement){
+          return new UncheckedTrueView.Checked(this);
+        }else{
+          throw new IllegalArgumentException("fromElement>toElement");
+        }
+      }else{
+        if(toElement){
+          return this;
+        }else{
+          return new UncheckedFalseView.Checked(this);
+        }
+      }
+    }
+    @Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+      if(toElement){
+        return this;
+      }else{
+        return new UncheckedFalseView.Checked(this);
+      }
+    }
+    @Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+      if(fromElement){
+        return new UncheckedTrueView.Checked(this);
+      }else{
+        return this;
+      }
+    }
+  }
+  public static class Descending extends BooleanSetImpl{
+    #MACRO Constructors<Descending>()
+    #MACRO Comparator<Descending>()
+    #MACRO ToString<this,Descending,Full>()
+    #MACRO ForEach<this,Full,Descending>(BooleanConsumer,true,false)
+    #MACRO ForEach<this,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO ToArray<this,Descending,Full>()
+    @Override public OmniIterator.OfBoolean iterator(){
+      final int state;
+      if((state=this.state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedDescendingFullItr(this,state);
+    }
+    #MACRO FirstAndLastBoolean<this,Descending,False,Full>()
+    #MACRO SubSetMethods<this,Full,Descending,False>()
+    public static class Checked extends Descending{
+       #MACRO Constructors<Checked>()
+       @Override public OmniIterator.OfBoolean iterator(){
+         final int state;
+         if((state=this.state)==0b00){
+           return EMPTY_ITR;
+         }
+         return new CheckedDescendingFullItr(this,state);
+       }
+       #MACRO FirstAndLastBoolean<this,Descending,True,Full>()
+       #MACRO SubSetMethods<this,Full,Descending,True>()
+    }
+  }
+  private void writeObject(ObjectOutputStream oos) throws IOException{
+    oos.writeByte(this.state);
+  }
+  private void readObject(ObjectInputStream ois) throws IOException{
+    this.state=ois.readUnsignedByte();
   }
   private static boolean equalsFullState(Set<?> val){
     //TODO optimize
@@ -117,10 +212,1419 @@ public abstract class BooleanSetImpl extends AbstractBooleanSet implementsSerial
     return false;
   }
   
-  
- 
-}
+  private static abstract class AbstractFullView extends AbstractBooleanSet implements Serializable,Cloneable{
+    private static final long serialVersionUID=1L;
+    transient final BooleanSetImpl root;
+    private AbstractFullView(BooleanSetImpl root){
+      this.root=root;
+    }
+    #MACRO AddRemoveContains<root,Full,True>(10)
+    #MACRO AddRemoveContains<root,Full,False>(01)
+    #MACRO RemoveIf<root,Full>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<root,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO SizeClearHashCodeIsEmpty<root,Full>()
+    #MACRO EqualsMethod<root,Full>()
+  }
 
+  private static class DescendingView extends AbstractFullView{
+    private static final long serialVersionUID=1L;
+    private DescendingView(BooleanSetImpl root){
+      super(root);
+    }
+    @Override public Object clone(){
+      return new Descending(root.state);
+    }
+    private Object writeReplace(){
+      return new Descending(root.state);
+    }
+    #MACRO Comparator<Descending>()
+    #MACRO ToArray<root,Descending,Full>()
+    #MACRO ForEach<root,Full,Descending>(BooleanConsumer,true,false)
+    #MACRO ForEach<root,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO FirstAndLastBoolean<root,Descending,False,Full>()
+    #MACRO ToString<root,Descending,Full>()
+    @Override public OmniIterator.OfBoolean iterator(){
+      final BooleanSetImpl root;
+      final int rootState;
+      if((rootState=(root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedDescendingFullItr(root,rootState);
+    }
+    #MACRO SubSetMethods<root,Full,Descending,False>()
+    private static class Checked extends DescendingView{
+      private static final long serialVersionUID=1L;
+      private Checked(BooleanSetImpl root){
+        super(root);
+      }
+      @Override public Object clone(){
+        return new Descending.Checked(root.state);
+      }
+      private Object writeReplace(){
+        return new Descending.Checked(root.state);
+      }
+      #MACRO FirstAndLastBoolean<root,Descending,True,Full>()
+      @Override public OmniIterator.OfBoolean iterator(){
+        final BooleanSetImpl root;
+        final int rootState;
+        if((rootState=(root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedDescendingFullItr(root,rootState);
+      }
+      #MACRO SubSetMethods<root,Full,Descending,True>()
+    }
+  }
+  
+  private static class AscendingView extends AbstractFullView{
+    private static final long serialVersionUID=1L;
+    private AscendingView(BooleanSetImpl root){
+      super(root);
+    }
+    @Override public Object clone(){
+      return new BooleanSetImpl(root.state);
+    }
+    private Object writeReplace(){
+      return new BooleanSetImpl(root.state);
+    }
+    #MACRO Comparator<Ascending>()
+    #MACRO ToArray<root,Ascending,Full>()
+    #MACRO ForEach<root,Full,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<root,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO FirstAndLastBoolean<root,Ascending,False,Full>()
+    
+    #MACRO ToString<root,Ascending,Full>()
+    @Override public OmniIterator.OfBoolean iterator(){
+      final BooleanSetImpl root;
+      final int rootState;
+      if((rootState=(root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedAscendingFullItr(root,rootState);
+    }
+    #MACRO SubSetMethods<root,Full,Ascending,False>()
+    private static class Checked extends AscendingView{
+      private static final long serialVersionUID=1L;
+      private Checked(BooleanSetImpl root){
+        super(root);
+      }
+      @Override public Object clone(){
+        return new BooleanSetImpl.Checked(root.state);
+      }
+      private Object writeReplace(){
+        return new BooleanSetImpl.Checked(root.state);
+      }
+      #MACRO FirstAndLastBoolean<root,Ascending,True,Full>()
+      @Override public OmniIterator.OfBoolean iterator(){
+        final BooleanSetImpl root;
+        final int rootState;
+        if((rootState=(root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedAscendingFullItr(root,rootState);
+      }
+      #MACRO SubSetMethods<root,Full,Ascending,True>()
+    }
+  }
+  private static class UncheckedTrueView extends AbstractBooleanSet{
+    transient final BooleanSetImpl root;
+    private UncheckedTrueView(BooleanSetImpl root){
+      this.root=root;
+    }
+    #MACRO Comparator<Ascending>()
+    #MACRO AddRemoveContains<root,True,True>(10)
+    #MACRO AddRemoveContains<root,True,False>(01)
+    #MACRO RemoveIf<root,True>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<root,True>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO SizeClearHashCodeIsEmpty<root,True>()
+    #MACRO EqualsMethod<root,True>()
+    #MACRO ToArray<root,Ascending,True>()
+    #MACRO ForEach<root,True,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<root,True,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO FirstAndLastBoolean<root,Ascending,False,True>()
+    #MACRO ToString<root,Ascending,True>()
+    @Override public OmniIterator.OfBoolean iterator(){
+      final BooleanSetImpl root;
+      if(((root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedTrueItr(root,0b1);
+    }
+    private static class Descending extends UncheckedTrueView{
+      private Descending(BooleanSetImpl root){
+        super(root);
+      }
+      #MACRO Comparator<Descending>()
+      #MACRO SubSetMethods<root,True,Descending,False>()
+    }
+    #MACRO SubSetMethods<root,True,Ascending,False>()
+    private static class Checked extends UncheckedTrueView{
+      private Checked(BooleanSetImpl root){
+        super(root);
+      }
+      #MACRO FirstAndLastBoolean<root,Ascending,True,True>()
+      @Override public OmniIterator.OfBoolean iterator(){
+        final BooleanSetImpl root;
+        if(((root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedTrueItr(root,0b10);
+      }
+      #MACRO SubSetMethods<root,True,Ascending,True>()
+      private static class Descending extends Checked{
+        private Descending(BooleanSetImpl root){
+          super(root);
+        }
+        #MACRO Comparator<Descending>()
+        #MACRO SubSetMethods<root,True,Descending,True>()
+      }
+    }
+  }
+  private static class UncheckedFalseView extends AbstractBooleanSet{
+    transient final BooleanSetImpl root;
+    private UncheckedFalseView(BooleanSetImpl root){
+      this.root=root;
+    }
+    #MACRO Comparator<Ascending>()
+    #MACRO AddRemoveContains<root,False,True>(10)
+    #MACRO AddRemoveContains<root,False,False>(01)
+    #MACRO RemoveIf<root,False>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<root,False>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO SizeClearHashCodeIsEmpty<root,False>()
+    #MACRO EqualsMethod<root,False>()
+    #MACRO ToArray<root,Ascending,False>()
+    #MACRO ForEach<root,False,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<root,False,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO FirstAndLastBoolean<root,Ascending,False,False>()
+    #MACRO ToString<root,Ascending,False>()
+    @Override public OmniIterator.OfBoolean iterator(){
+      final BooleanSetImpl root;
+      if(((root=this.root).state)==0b00){
+        return EMPTY_ITR;
+      }
+      return new UncheckedFalseItr(root,0b1);
+    }
+    #MACRO SubSetMethods<root,False,Ascending,False>()
+    private static class Descending extends UncheckedFalseView{
+      private Descending(BooleanSetImpl root){
+        super(root);
+      }
+      #MACRO Comparator<Descending>()
+      #MACRO SubSetMethods<root,False,Descending,False>()
+    }
+    private static class Checked extends UncheckedFalseView{
+      private Checked(BooleanSetImpl root){
+        super(root);
+      }
+      #MACRO FirstAndLastBoolean<root,Ascending,True,False>()
+      @Override public OmniIterator.OfBoolean iterator(){
+        final BooleanSetImpl root;
+        if(((root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedFalseItr(root,0b10);
+      }
+      #MACRO SubSetMethods<root,False,Ascending,True>()
+      private static class Descending extends Checked{
+        private Descending(BooleanSetImpl root){
+          super(root);
+        }
+        #MACRO Comparator<Descending>()
+        #MACRO SubSetMethods<root,False,Descending,True>()
+        
+      }
+    }
+  }
+  private static final EmptyView ASCENDING_EMPTY_VIEW=new EmptyView();
+  private static final EmptyView DESCENDING_EMPTY_VIEW=new EmptyView(){
+    #MACRO Comparator<Descending>()
+  };
+  private static class EmptyView extends AbstractBooleanSet{
+    #MACRO AddRemoveContains<root,Empty,True>(10)
+    #MACRO AddRemoveContains<root,Empty,False>(01)
+    #MACRO RemoveIf<root,Empty>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<root,Empty>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO SizeClearHashCodeIsEmpty<root,Empty>()
+    #MACRO EqualsMethod<root,Empty>()
+    #MACRO Comparator<Ascending>()
+    #MACRO ToArray<root,Ascending,Empty>()
+    #MACRO ForEach<root,Empty,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<root,Empty,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO FirstAndLastBoolean<root,Ascending,False,Empty>()
+    
+    #MACRO ToString<root,Ascending,Empty>()
+    @Override public OmniIterator.OfBoolean iterator(){
+      return EMPTY_ITR;
+    }
+    #MACRO SubSetMethods<root,Empty,Ascending,False>()
+    
+  }
+  
+
+
+  private static class UncheckedAscendingFullItr extends AbstractBooleanItr{
+    // valid itrStates
+    // state | previously returned | next return | nextBoolean post-state | remove                                                  | forEachRemaining | expected root state
+    // 0b00  | true OR false       | undefined   | undefined              | if root contains true, remove true, else remove false   | do nothing       | 0b01 OR 0b10 OR 0b11
+    // 0b01  | undefined           | false       | 0b00                   | undefined                                               | false            | 0b01
+    // 0b10  | assumed false       | true        | 0b00                   | remove false                                            | true             | 0b11
+    // 0b11  | undefined           | false       | 0b10                   | undefined                                               | false,true       | 0b11
+
+    transient final BooleanSetImpl root;
+    transient int itrState;
+    private UncheckedAscendingFullItr(BooleanSetImpl root,int itrState){
+      this.root=root;
+      this.itrState=itrState;
+    }
+    @Override public Object clone(){
+      return new UncheckedAscendingFullItr(root,itrState);
+    }
+    @Override public boolean hasNext(){
+      return itrState!=0;
+    }
+
+    #MACRO ItrNext<False,Ascending,Full>()
+    #MACRO ItrRemove<False,Ascending,Full>()
+    #MACRO ForEachRemaining<False,Ascending,Full>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<False,Ascending,Full>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+
+  private static class CheckedAscendingFullItr extends UncheckedAscendingFullItr{
+    // valid itrStates
+    // state | previously returned | next return | nextBoolean post-state | remove       | remove post-state | forEachRemaining | forEachRemaining post-state | expected root state
+    // 0b000 | false               | true        | 0b110                  | remove false | 0b010             | true             | 0b110                       | 0b11
+    // 0b001 | undefined           | false       | 0b100                  | throw ISE    | 0b001             | false            | 0b100                       | 0b01
+    // 0b010 | undefined           | true        | 0b110                  | throw ISE    | 0b010             | true             | 0b110                       | 0b10
+    // 0b011 | undefined           | false       | 0b000                  | throw ISE    | 0b011             | false,true       | 0b110                       | 0b11
+    // 0b100 | false               | throw NSE   | 0b100                  | remove false | 0b101             | do nothing       | 0b100                       | 0b01
+    // 0b101 | undefined           | throw NSE   | 0b101                  | throw ISE    | 0b101             | do nothing       | 0b101                       | 0b00 OR 0b01
+    // 0b110 | true                | throw NSE   | 0b110                  | remove true  | 0b101             | do nothing       | 0b110                       | 0b10 OR 0b11
+
+    private CheckedAscendingFullItr(BooleanSetImpl root,int itrState){
+      super(root,itrState);
+    }
+    @Override public Object clone(){
+      return new CheckedAscendingFullItr(root,itrState);
+    }
+    @Override public boolean hasNext(){
+      return itrState<0b100;
+    }
+    #MACRO ItrNext<True,Ascending,Full>()
+    #MACRO ItrRemove<True,Ascending,Full>()
+    #MACRO ForEachRemaining<True,Ascending,Full>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<True,Ascending,Full>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+  private static class UncheckedDescendingFullItr extends UncheckedAscendingFullItr{
+    // valid itrStates
+    // state | previously returned | next return | nextBoolean post-state | remove                                                 | forEachRemaining | expected root state
+    // 0b00  | true OR false       | undefined   | undefined              | if root contains false, remove false, else remove true | do nothing       | 0b01 OR 0b10 OR 0b11
+    // 0b01  | assumed true        | false       | 0b00                   | remove true                                            | false            | 0b11
+    // 0b10  | undefined           | true        | 0b00                   | undefined                                              | true             | 0b10
+    // 0b11  | undefined           | true        | 0b01                   | undefined                                              | true,false       | 0b11
+  
+    private UncheckedDescendingFullItr(BooleanSetImpl root,int itrState){
+      super(root,itrState);
+    }
+    @Override public Object clone(){
+      return new UncheckedDescendingFullItr(root,itrState);
+    }
+    #MACRO ItrNext<False,Descending,Full>()
+    #MACRO ItrRemove<False,Descending,Full>()
+    #MACRO ForEachRemaining<False,Descending,Full>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<False,Descending,Full>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+
+  private static class CheckedDescendingFullItr extends CheckedAscendingFullItr{
+    // valid itrStates
+    // state | previously returned | next return | nextBoolean post-state | remove       | remove post-state | forEachRemaining | forEachRemaining post-state | expected root state
+    // 0b000 | true                | false       | 0b100                  | remove true  | 0b001             | false            | 0b100                       | 0b11
+    // 0b001 | undefined           | false       | 0b100                  | throw ISE    | 0b001             | false            | 0b100                       | 0b01
+    // 0b010 | undefined           | true        | 0b110                  | throw ISE    | 0b010             | true             | 0b110                       | 0b10
+    // 0b011 | undefined           | true        | 0b000                  | throw ISE    | 0b011             | true,false       | 0b100                       | 0b11
+    // 0b100 | false               | throw NSE   | 0b100                  | remove false | 0b101             | do nothing       | 0b100                       | 0b01 OR 0b11
+    // 0b101 | undefined           | throw NSE   | 0b101                  | throw ISE    | 0b101             | do nothing       | 0b101                       | 0b00 OR 0b10
+    // 0b110 | true                | throw NSE   | 0b110                  | remove true  | 0b101             | do nothing       | 0b110                       | 0b10
+
+    private CheckedDescendingFullItr(BooleanSetImpl root,int itrState){
+      super(root,itrState);
+    }
+    @Override public Object clone(){
+      return new CheckedDescendingFullItr(root,itrState);
+    }
+    #MACRO ItrNext<True,Descending,Full>()
+    #MACRO ItrRemove<True,Descending,Full>()
+    #MACRO ForEachRemaining<True,Descending,Full>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<True,Descending,Full>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+
+  private static class UncheckedTrueItr extends UncheckedAscendingFullItr{
+    // valid itrStates
+    // state | previously returned | next return | nextBoolean post-state | remove      | forEachRemaining | expected root state
+    // 0b0   | true                | undefined   | undefined              | remove true | do nothing       | 0b10 OR 0b01 OR 0b11 OR 0b00
+    // 0b1   | undefined           | true        | 0b0                    | undefined   | true             | 0b10 OR 0b11
+
+    private UncheckedTrueItr(BooleanSetImpl root,int itrState){
+      super(root,itrState);
+    }
+    @Override public Object clone(){
+      return new UncheckedTrueItr(root,itrState);
+    }
+    #MACRO ItrNext<False,Ascending,True>()
+    #MACRO ItrRemove<False,Ascending,True>()
+    #MACRO ForEachRemaining<False,Ascending,True>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<False,Ascending,True>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+  private static class UncheckedFalseItr extends UncheckedTrueItr{
+    // valid itrStates
+    // state | previously returned | next return | nextBoolean post-state | remove      | forEachRemaining | expected root state
+    // 0b0   | false               | undefined   | undefined              | remove false| do nothing       | 0b10 OR 0b01 OR 0b11 OR 0b00
+    // 0b1   | undefined           | false       | 0b0                    | undefined   | false            | 0b01 OR 0b11
+    
+    private UncheckedFalseItr(BooleanSetImpl root,int itrState){
+      super(root,itrState);
+    }
+    @Override public Object clone(){
+      return new UncheckedFalseItr(root,itrState);
+    }
+    #MACRO ItrNext<False,Ascending,False>()
+    #MACRO ItrRemove<False,Ascending,False>()
+    #MACRO ForEachRemaining<False,Ascending,False>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<False,Ascending,False>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+
+  private static class CheckedTrueItr extends UncheckedAscendingFullItr{
+    // valid itrStates
+    // state | previously returned | next return | nextBoolean post-state | remove      | remove post-state | forEachRemaining | forEachRemaining post-state | expected root state
+    // 0b00  | undefined           | throw NSE   | 0b00                   | throw ISE   | 0b00              | do nothing       | 0b00                        | 0b00 OR 0b01
+    // 0b01  | true                | throw NSE   | 0b01                   | remove true | 0b00              | do nothing       | 0b01                        | 0b10 OR 0b11
+    // 0b10  | undefined           | return true | 0b01                   | throw ISE   | 0b10              | true             | 0b01                        | 0b10 OR 0b11
+    
+    private CheckedTrueItr(BooleanSetImpl root,int itrState){
+      super(root,itrState);
+    }
+    @Override public Object clone(){
+      return new CheckedTrueItr(root,itrState);
+    }
+    @Override public boolean hasNext(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    #MACRO ItrNext<True,Ascending,True>()
+    #MACRO ItrRemove<True,Ascending,True>()
+    #MACRO ForEachRemaining<True,Ascending,True>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<True,Ascending,True>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+  private static class CheckedFalseItr extends CheckedTrueItr{
+    // valid itrStates
+    // state | previously returned | next return  | nextBoolean post-state | remove       | remove post-state | forEachRemaining | forEachRemaining post-state | expected root state
+    // 0b00  | undefined           | throw NSE    | 0b00                   | throw ISE    | 0b00              | do nothing       | 0b00                        | 0b00 OR 0b10
+    // 0b01  | false               | throw NSE    | 0b01                   | remove false | 0b00              | do nothing       | 0b01                        | 0b01 OR 0b11
+    // 0b10  | undefined           | return false | 0b01                   | throw ISE    | 0b10              | false            | 0b01                        | 0b01 OR 0b11
+    
+    private CheckedFalseItr(BooleanSetImpl root,int itrState){
+      super(root,itrState);
+    }
+    @Override public Object clone(){
+      return new CheckedFalseItr(root,itrState);
+    }
+    #MACRO ItrNext<True,Ascending,False>()
+    #MACRO ItrRemove<True,Ascending,False>()
+    #MACRO ForEachRemaining<True,Ascending,False>(BooleanConsumer,true,false)
+    #MACRO ForEachRemaining<True,Ascending,False>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  }
+  
+}
+#MACRODEF SubSetMethods<SOURCE,VIEW,DIRECTION,CHECKED>()
+@Override public OmniSortedSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public OmniSortedSet.OfBoolean headSet(boolean toElement){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public OmniSortedSet.OfBoolean tailSet(boolean fromElement){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#ENDDEF
+
+#MACRODEF FirstAndLastBoolean<SOURCE,DIRECTION,CHECKED,VIEW>()
+@Override public boolean firstBoolean(){
+#IFSWITCH VIEW==Full
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED==True
+  switch(SOURCE.state){
+    case 0b00:
+      throw new NoSuchElementException();
+    case 0b10:
+      return true;
+    default:
+      return false;
+  }
+    #ELSEIFSWITCH CHECKED==False
+  if(SOURCE.state==0b10){
+    return true;
+  }
+  return false;
+    #ELSE
+ERROR unknown checked type CHECKED
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED==True
+  switch(SOURCE.state){
+    case 0b00:
+      throw new NoSuchElementException();
+    case 0b01:
+      return false;
+    default:
+      return true;
+  }
+    #ELSEIFSWITCH CHECKED==False
+  if(SOURCE.state==0b01){
+    return false;
+  }
+  return true;
+    #ELSE
+ERROR unknown checked type CHECKED
+    #ENDIF
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH CHECKED==True
+  if((SOURCE.state&0b10)==0){
+    throw new NoSuchElementException();
+  }
+  return true;
+  #ELSEIFSWITCH CHECKED==False
+  return true;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH CHECKED==True
+  if((SOURCE.state&0b01)==0){
+    throw new NoSuchElementException();
+  }
+  return false;
+  #ELSEIFSWITCH CHECKED==False
+  return false;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==Empty
+  throw new NoSuchElementException();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+@Override public boolean lastBoolean(){
+#IFSWITCH VIEW==Full
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED==True
+  switch(SOURCE.state){
+    case 0b00:
+      throw new NoSuchElementException();
+    case 0b01:
+      return false;
+    default:
+      return true;
+  }
+    #ELSEIFSWITCH CHECKED==False
+  if(SOURCE.state==0b01){
+    return false;
+  }
+  return true;
+    #ELSE
+ERROR unknown checked type CHECKED
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED==True
+  switch(SOURCE.state){
+    case 0b00:
+      throw new NoSuchElementException();
+    case 0b10:
+      return true;
+    default:
+      return false;
+  }
+    #ELSEIFSWITCH CHECKED==False
+  if(SOURCE.state==0b10){
+    return true;
+  }
+  return false;
+    #ELSE
+ERROR unknown checked type CHECKED
+    #ENDIF
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH CHECKED==True
+  if((SOURCE.state&0b10)==0){
+    throw new NoSuchElementException();
+  }
+  return true;
+  #ELSEIFSWITCH CHECKED==False
+  return true;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH CHECKED==True
+  if((SOURCE.state&0b01)==0){
+    throw new NoSuchElementException();
+  }
+  return false;
+  #ELSEIFSWITCH CHECKED==False
+  return false;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==Empty
+  throw new NoSuchElementException();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF Comparator<DIRECTION>()
+@Override public BooleanComparator comparator(){
+#IFSWITCH DIRECTION==Ascending
+  return Boolean::compare;
+#ELSEIFSWITCH DIRECTION==Descending
+  return BooleanSetImpl::reverseCompare;
+#ELSE
+ERROR unknown direction DIRECTION
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ToString<SOURCE,DIRECTION,VIEW>()
+@Override public String toString(){
+#IFSWITCH VIEW==Full
+  switch(SOURCE.state){
+    case 0b00:
+      return "[]";
+    case 0b01:
+      return "[false]";
+    case 0b10:
+      return "[true]";
+    default:
+  #IFSWITCH DIRECTION==Ascending
+      return "[false, true]";
+  #ELSEIFSWITCH DIRECTION==Descending
+      return "[true, false]";
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+  }
+#ELSEIFSWITCH VIEW==True
+  if((SOURCE.state&0b10)!=0){
+    return "[true]";
+  }
+  return "[]";
+#ELSEIFSWITCH VIEW==False
+  if((SOURCE.state&0b01)!=0){
+    return "[false]";
+  }
+  return "[]";
+#ELSEIFSWITCH VIEW==Empty
+  return "[]";
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ToArray<SOURCE,DIRECTION,VIEW>()
+@SuppressWarnings("unchecked")@Override public <T> T[] toArray(T[] dst){
+#IFSWITCH VIEW==Full
+  switch(SOURCE.state){
+  case 0b11:
+  #IFSWITCH DIRECTION==Ascending
+    (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)Boolean.FALSE;
+    dst[1]=(T)Boolean.TRUE;
+  #ELSEIFSWITCH DIRECTION==Descending
+    (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)Boolean.TRUE;
+    dst[1]=(T)Boolean.FALSE;
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+    break;
+  case 0b10:
+    (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)Boolean.TRUE;
+    break;
+  case 0b01:
+    (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)Boolean.FALSE;
+    break;
+  default:
+    if(dst.length!=0){
+      dst[0]=null;
+    }
+  }
+  return dst;
+#ELSEIFSWITCH VIEW==True
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==False
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==Empty
+  if(dst.length!=0){
+    dst[0]=null;
+  }
+  return dst;
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+@SuppressWarnings("unchecked")@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+#IFSWITCH VIEW==Full
+  final T[] dst;
+  switch(SOURCE.state){
+  case 0b11:
+  #IFSWITCH DIRECTION==Ascending
+    (dst=arrConstructor.apply(2))[0]=(T)Boolean.FALSE;
+    dst[1]=(T)Boolean.TRUE;
+  #ELSEIFSWITCH DIRECTION==Descending
+    (dst=arrConstructor.apply(2))[0]=(T)Boolean.TRUE;
+    dst[1]=(T)Boolean.FALSE;
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+    break;
+  case 0b10:
+    (dst=arrConstructor.apply(1))[0]=(T)Boolean.TRUE;
+    break;
+  case 0b01:
+    (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
+    break;
+  default:
+    return arrConstructor.apply(0);
+  }
+  return dst;
+#ELSEIFSWITCH VIEW==True
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==False
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==Empty
+  return arrConstructor.apply(0);
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#MACRO ToArrayHelper(,Boolean.TRUE,Boolean.FALSE,Boolean,OmniArray.OfBoolean.DEFAULT_BOXED_ARR)
+#MACRO ToArrayHelper(Boolean,true,false,boolean,OmniArray.OfBoolean.DEFAULT_ARR)
+#MACRO ToArrayHelper(Byte,(byte)1,(byte)0,byte,OmniArray.OfByte.DEFAULT_ARR)
+#MACRO ToArrayHelper(Char,(char)1,(char)0,char,OmniArray.OfChar.DEFAULT_ARR)
+#MACRO ToArrayHelper(Short,(short)1,(short)0,short,OmniArray.OfShort.DEFAULT_ARR)
+#MACRO ToArrayHelper(Int,1,0,int,OmniArray.OfInt.DEFAULT_ARR)
+#MACRO ToArrayHelper(Long,1L,0L,long,OmniArray.OfLong.DEFAULT_ARR)
+#MACRO ToArrayHelper(Float,1F,0F,float,OmniArray.OfFloat.DEFAULT_ARR)
+#MACRO ToArrayHelper(Double,1D,0D,double,OmniArray.OfDouble.DEFAULT_ARR)
+#ENDDEF
+#MACRODEF ToArrayHelper(CLASSPREFIX,TRUEVAL,FALSEVAL,RETTYPE,DEFAULTARR)
+@Override public RETTYPE[] toCLASSPREFIXArray(){
+#IFSWITCH VIEW==Full
+  switch(SOURCE.state){
+    case 0b00:
+      return DEFAULTARR;
+    case 0b01:
+      return new RETTYPE[]{FALSEVAL};
+    case 0b10:
+      return new RETTYPE[]{TRUEVAL};
+    default:
+  #IFSWITCH DIRECTION==Ascending
+      return new RETTYPE[]{FALSEVAL,TRUEVAL};
+  #ELSEIFSWITCH DIRECTION==Descending
+      return new RETTYPE[]{TRUEVAL,FALSEVAL};
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+  }
+#ELSEIFSWITCH VIEW==True
+  if((SOURCE.state&0b10)!=0){
+    return new RETTYPE[]{TRUEVAL};
+  }
+  return DEFAULTARR;
+#ELSEIFSWITCH VIEW==False
+  if((SOURCE.state&0b01)!=0){
+    return new RETTYPE[]{FALSEVAL};
+  }
+  return DEFAULTARR;
+#ELSEIFSWITCH VIEW==Empty
+  return DEFAULTARR;
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF AddRemoveContains<SOURCE,VIEW,NAME>(STATE)
+@Override boolean addNAME(){
+#IFSWITCH VIEW==Full
+  final int state;
+  #IFSWITCH SOURCE==this
+  if(((state=SOURCE.state)&0bSTATE)==0){
+  #ELSEIFSWITCH SOURCE==root
+  final BooleanSetImpl SOURCE;
+  if(((state=(SOURCE=this.SOURCE).state)&0bSTATE)==0){
+  #ELSE
+ERROR unknown source SOURCE
+  #ENDIF
+    SOURCE.state=state+0bSTATE;
+    return true;
+  }
+  return false;
+#ELSEIFSWITCH VIEW==True
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==False
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==Empty
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+@Override boolean containsNAME(){
+#IFSWITCH VIEW==Full
+  return (SOURCE.state&0bSTATE)!=0;
+#ELSEIFSWITCH VIEW==True
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==False
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==Empty
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+@Override boolean removeNAME(){
+#IFSWITCH VIEW==Full
+  final int state;
+  #IFSWITCH SOURCE==this
+  if(((state=SOURCE.state)&0bSTATE)!=0){
+  #ELSEIFSWITCH SOURCE==root
+  final BooleanSetImpl SOURCE;
+  if(((state=(SOURCE=this.SOURCE).state)&0bSTATE)!=0){
+  #ELSE
+ERROR unknown source SOURCE
+  #ENDIF
+    SOURCE.state=state-0bSTATE;
+    return true;
+  }
+  return false;
+#ELSEIFSWITCH VIEW==True
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==False
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSEIFSWITCH VIEW==Empty
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+
+
+
+#MACRODEF RemoveIf<SOURCE,VIEW>(PREDICATE,TRUEVAL,FALSEVAL)
+@Override public boolean removeIf(PREDICATE filter){
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==root
+  final BooleanSetImpl SOURCE;
+  switch((SOURCE=this.SOURCE).state){
+  #ELSEIFSWITCH SOURCE==this
+  switch(SOURCE.state){
+  #ELSE
+ERROR unknown source
+  #ENDIF
+    case 0b11:
+      if(filter.test(FALSEVAL)){
+        if(filter.test(TRUEVAL)){
+          break;
+        }else{
+          SOURCE.state=0b10;
+          return true;
+        }
+      }else if(filter.test(TRUEVAL)){
+        SOURCE.state=0b01;
+        return true;
+      }
+      return false;
+    case 0b10:
+      if(filter.test(TRUEVAL)){
+        break;
+      }
+      return false;
+    case 0b01:
+      if(filter.test(FALSEVAL)){
+        break;
+      }
+    default:
+      return false;
+  }
+  SOURCE.state=0b00;
+  return true;
+#ELSEIFSWITCH VIEW==True
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b10)!=0 && filter.test(TRUEVAL)){
+    SOURCE.state=state-0b10;
+    return true;
+  }
+  return false;
+#ELSEIFSWITCH VIEW==False
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b01)!=0 && filter.test(FALSEVAL)){
+    SOURCE.state=state-0b01;
+    return true;
+  }
+  return false;
+#ELSEIFSWITCH VIEW==Empty
+  return false;
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ForEach<SOURCE,VIEW,DIRECTION>(CONSUMER,TRUEVAL,FALSEVAL)
+@Override public void forEach(CONSUMER action){
+#IFSWITCH VIEW==Full
+  switch(SOURCE.state){
+    case 0b11:
+  #IFSWITCH DIRECTION==Ascending
+      action.accept(FALSEVAL);
+    case 0b10:
+      action.accept(TRUEVAL);
+      break;
+    case 0b01:
+      action.accept(FALSEVAL);
+  #ELSEIFSWITCH DIRECTION==Descending
+      action.accept(TRUEVAL);
+    case 0b01:
+      action.accept(FALSEVAL);
+      break;
+    case 0b10:
+      action.accept(TRUEVAL);
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+    default:
+  }
+#ELSEIFSWITCH VIEW==True
+  if((SOURCE.state&0b10)!=0){
+    action.accept(TRUEVAL);
+  }
+#ELSEIFSWITCH VIEW==False
+  if((SOURCE.state&0b01)!=0){
+    action.accept(FALSEVAL);
+  }
+#ELSEIFSWITCH VIEW==Empty
+  //nothing to do
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ItrRemove<CHECKED,DIRECTION,VIEW>()
+@Override public void remove(){
+#IFSWITCH VIEW==Full
+  #IFSWITCH CHECKED==True
+    #IFSWITCH DIRECTION==Ascending
+      final BooleanSetImpl root;
+      switch((itrState<<2)|((root=this.root).state)){
+      case 0b00000:
+      case 0b00001:
+      case 0b00010:
+      case 0b10010:
+      case 0b10011:
+      case 0b11000:
+      case 0b11001:
+      case 0b10000:
+        throw new ConcurrentModificationException();
+      default:
+        throw new IllegalStateException();
+      case 0b00011:
+        root.state=0b10;
+        itrState=0b010;
+        return;
+      case 0b10001:
+      case 0b11010:
+        root.state=0b00;
+        break;
+      case 0b11011:
+        root.state=0b01;
+      }
+      itrState=0b101;
+    #ELSEIFSWITCH DIRECTION==Descending
+final BooleanSetImpl root;
+      switch((itrState<<2)|((root=this.root).state)){
+      case 0b00000:
+      case 0b00001:
+      case 0b00010:
+      case 0b10000:
+      case 0b10010:
+      case 0b11000:
+      case 0b11001:
+      case 0b11011:
+        throw new ConcurrentModificationException();
+      default:
+        throw new IllegalStateException();
+      case 0b00011:
+        root.state=0b01;
+        itrState=0b001;
+        return;
+      case 0b10001:
+      case 0b11010:
+        root.state=0b00;
+        break;
+      case 0b10011:
+        root.state=0b10;
+      }
+      itrState=0b101;
+    #ELSE
+ERROR unknown direction DIRECTION    
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==False
+  if(itrState==0){
+    final BooleanSetImpl root;
+    final int rootState;
+    #IFSWITCH DIRECTION==Ascending
+    (root=this.root).state=(rootState=root.state)-((rootState&0b10)==0?0b01:0b10);
+  }else{
+    root.state=0b10;
+    #ELSEIFSWITCH DIRECTION==Descending
+    (root=this.root).state=(rootState=root.state)-((rootState&0b01)==0?0b10:0b01);
+  }else{
+    root.state=0b01;
+    #ELSE
+ERROR unknown direction DIRECTION
+    #ENDIF
+  }
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH CHECKED==True
+  final BooleanSetImpl root;
+  final int rootState;
+  switch((itrState<<1)|((rootState=(root=this.root).state)>>>1)){
+  default:
+    throw new IllegalStateException();
+  case 0b010:
+    throw new ConcurrentModificationException();
+  case 0b011:
+    root.state=rootState-0b10;
+    itrState=0b00;
+  }
+  #ELSEIFSWITCH CHECKED==False
+  root.state&=0b01;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH CHECKED==True
+  final BooleanSetImpl root;
+  final int rootState;
+  switch((itrState<<1)|((rootState=(root=this.root).state)&1)){
+  default:
+    throw new IllegalStateException();
+  case 0b010:
+    throw new ConcurrentModificationException();
+  case 0b011:
+    root.state=rootState-0b01;
+    itrState=0b00;
+  }
+  #ELSEIFSWITCH CHECKED==False
+  root.state&=0b10;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==Empty
+  throw new IllegalStateException();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ForEachRemaining<CHECKED,DIRECTION,VIEW>(CONSUMER,TRUEVAL,FALSEVAL)
+@Override public void forEachRemaining(CONSUMER action){
+#IFSWITCH VIEW==Full
+  #IFSWITCH CHECKED==True
+    #IFSWITCH DIRECTION==Ascending
+  switch((itrState<<2)|root.state){
+  default:
+    throw new ConcurrentModificationException();
+  case 0b00101:
+    action.accept(FALSEVAL);
+    itrState=0b100;
+    break;
+  case 0b01111:
+    action.accept(FALSEVAL);
+  case 0b00011:
+  case 0b01010:
+    action.accept(TRUEVAL);
+    itrState=0b110;
+  case 0b10001:
+  case 0b10100:
+  case 0b10101:
+  case 0b11010:
+  case 0b11011:
+  }
+    #ELSEIFSWITCH DIRECTION==Descending
+  switch((itrState<<2)|root.state){
+  default:
+    throw new ConcurrentModificationException();
+  case 0b01010:
+    action.accept(TRUEVAL);
+    itrState=0b110;
+    break;
+  case 0b01111:
+    action.accept(TRUEVAL);
+  case 0b00011:
+  case 0b00101:
+    action.accept(FALSEVAL);
+    itrState=0b100;
+  case 0b10001:
+  case 0b10011:
+  case 0b10100:
+  case 0b10110:
+  case 0b11010:
+  }
+    #ELSE
+ERROR unknown direction DIRECTION
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==False
+  switch(itrState){
+    default:
+      return;
+    case 0b11:
+    #IFSWITCH DIRECTION==Ascending
+      action.accept(FALSEVAL);
+    case 0b10:
+      action.accept(TRUEVAL);
+      break;
+    case 0b01:
+      action.accept(FALSEVAL);
+    #ELSEIFSWITCH DIRECTION==Descending
+      action.accept(TRUEVAL);
+    case 0b01:
+      action.accept(FALSEVAL);
+      break;
+    case 0b10:
+      action.accept(TRUEVAL);
+    #ELSE
+ERROR unknown direction DIRECTION
+    #ENDIF
+  }
+  this.itrState=0b00;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH CHECKED==True
+  switch((itrState<<1)|(root.state>>>1)){
+  default:
+    throw new ConcurrentModificationException();
+  case 0b101:
+    action.accept(TRUEVAL);
+    itrState=0b01;
+  case 0b000:
+  case 0b011:
+  }
+  #ELSEIFSWITCH CHECKED==False
+  if(itrState==0b1){
+    action.accept(TRUEVAL);
+    itrState=0b0;
+  }
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH CHECKED==True
+  switch((itrState<<1)|(root.state&0b01)){
+  default:
+    throw new ConcurrentModificationException();
+  case 0b101:
+    action.accept(FALSEVAL);
+    itrState=0b01;
+  case 0b000:
+  case 0b011:
+  }
+  #ELSEIFSWITCH CHECKED==False
+  if(itrState==0b1){
+    action.accept(FALSEVAL);
+    itrState=0b0;
+  }
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==Empty
+  //nothing to do
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ItrNext<CHECKED,DIRECTION,VIEW>()
+@Override public boolean nextBoolean(){
+#IFSWITCH VIEW==Full
+  #IFSWITCH CHECKED==True
+    #IFSWITCH DIRECTION==Ascending
+  switch((this.itrState<<2)|(root.state)){
+    case 0b10001:
+    case 0b10100:
+    case 0b10101:
+    case 0b11010:
+    case 0b11011:
+      throw new NoSuchElementException();
+    default:
+      throw new ConcurrentModificationException();
+    case 0b00011:
+    case 0b01010:
+      this.itrState=0b110;
+      return true;
+    case 0b00101:
+      this.itrState=0b100;
+      break;
+    case 0b01111:
+      this.itrState=0b000;
+  }
+  return false;
+    #ELSEIFSWITCH DIRECTION==Descending
+  switch((this.itrState<<2)|(root.state)){
+    case 0b10001:
+    case 0b10011:
+    case 0b10100:
+    case 0b10110:
+    case 0b11010:
+      throw new NoSuchElementException();
+    default:
+      throw new ConcurrentModificationException();
+    case 0b00011:
+    case 0b00101:
+      this.itrState=0b100;
+      return false;
+    case 0b01010:
+      this.itrState=0b110;
+      break;
+    case 0b01111:
+      this.itrState=0b000;
+  }
+  return true;
+    #ELSE
+ERROR unknown direction DIRECTION
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==False
+    #IFSWITCH DIRECTION==Ascending
+  switch(this.itrState){
+    case 0b11:
+      this.itrState=0b10;
+      break;
+    case 0b10:
+      this.itrState=0b00;
+      return true;
+    default:
+      this.itrState=0b00;
+  } 
+  return false;
+    #ELSEIFSWITCH DIRECTION==Descending
+  switch(this.itrState){
+    case 0b11:
+      this.itrState=0b01;
+      break;
+    case 0b01:
+      this.itrState=0b00;
+      return false;
+    default:
+      this.itrState=0b00;
+      break;
+  } 
+  return true;
+    #ELSE
+ERROR unknown direction DIRECTION
+    #ENDIF
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH CHECKED==True
+  switch((itrState<<1)|(root.state>>>1)){
+  case 0b000:
+  case 0b011:
+    throw new NoSuchElementException();
+  default:
+    throw new ConcurrentModificationException();
+  case 0b101:
+  }
+  itrState=0b01;
+  return true;
+  #ELSEIFSWITCH CHECKED==False
+  itrState=0b0;
+  return true;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH CHECKED==True
+  switch((itrState<<1)|(root.state&0b01)){
+  case 0b000:
+  case 0b011:
+    throw new NoSuchElementException();
+  default:
+    throw new ConcurrentModificationException();
+  case 0b101:
+  }
+  itrState=0b01;
+  return false;
+  #ELSEIFSWITCH CHECKED==False
+  itrState=0b0;
+  return false;
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+#ELSEIFSWITCH VIEW==Empty
+  throw new NoSuchElementException();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF SizeClearHashCodeIsEmpty<SOURCE,VIEW>()
+@Override public int size(){
+#IFSWITCH VIEW==Full
+  switch(SOURCE.state){
+    case 0b00:
+      return 0;
+    case 0b01:
+    case 0b10:
+      return 1;
+    default:
+      return 2;
+  }
+#ELSEIFSWITCH VIEW==True
+  return SOURCE.state>>>1;
+#ELSEIFSWITCH VIEW==False
+  return SOURCE.state&0b01;
+#ELSEIFSWITCH VIEW==Empty
+  return 0;
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+@Override public void clear(){
+#IFSWITCH VIEW==Full
+  SOURCE.state=0b00;
+#ELSEIFSWITCH VIEW==True
+  SOURCE.state&=0b01;
+#ELSEIFSWITCH VIEW==False
+  SOURCE.state&=0b10;
+#ELSEIFSWITCH VIEW==Empty
+  //nothing to do
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+@Override public int hashCode(){
+#IFSWITCH VIEW==Full
+  switch(SOURCE.state){
+    case 0b00:
+      return 0;
+    case 0b01:
+      return 1237;
+    case 0b10:
+      return 1231;
+    default:
+      return 1231+1237;
+  }
+#ELSEIFSWITCH VIEW==True
+  if((SOURCE.state&0b10)==0){
+    return 0;
+  }
+  return 1231;
+#ELSEIFSWITCH VIEW==False
+  if((SOURCE.state&0b01)==0){
+    return 0;
+  }
+  return 1237;
+#ELSEIFSWITCH VIEW==Empty
+  return 0;
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+@Override public boolean isEmpty(){
+#IFSWITCH VIEW==Full
+  return SOURCE.state==0b00;
+#ELSEIFSWITCH VIEW==True
+  return (SOURCE.state&0b10)==0;
+#ELSEIFSWITCH VIEW==False
+  return (SOURCE.state&0b01)==0;
+#ELSEIFSWITCH VIEW==Empty
+  return true;
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+}
+#ENDDEF
+#MACRODEF EqualsMethod<SOURCE,VIEW>()
+@Override public boolean equals(Object val){
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+if(val==this){
+  #ELSEIFSWITCH SOURCE==root
+if(val==this||val==root){
+  #ELSE
+ERROR unknown source SOURCE
+  #ENDIF
+#ELSE
+if(val==this){
+#ENDIF
+    return true;
+  }
+  if(val instanceof Set){
+#IFSWITCH VIEW==Full
+    switch(SOURCE.state){
+      case 0b00:
+        return ((Set<?>)val).isEmpty();
+      case 0b01:
+        return equalsFalseState((Set<?>)val);
+      case 0b10:
+        return equalsTrueState((Set<?>)val);
+      default:
+        return equalsFullState((Set<?>)val);
+    }
+#ELSEIFSWITCH VIEW==True
+    if(((root.state)&0b01)==0){
+      return ((Set<?>)val).isEmpty();
+    }
+    return equalsTrueState((Set<?>)val);
+#ELSEIFSWITCH VIEW==False
+    if(((root.state)&0b01)==0){
+      return ((Set<?>)val).isEmpty();
+    }
+    return equalsFalseState((Set<?>)val);
+#ELSEIFSWITCH VIEW==Empty
+    return ((Set<?>)val).isEmpty();
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+  }
+  return false;
+}
+#ENDDEF
 #MACRODEF Constructors<NAME>()
 private static final long serialVersionUID=1L;
 public NAME(){
