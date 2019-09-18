@@ -1,6 +1,7 @@
 package omni.impl.set;
 
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
@@ -264,17 +265,68 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
           //nothing to do
       }
     };
-  protected static enum EmptyView implements OmniNavigableSet.OfBoolean{
-      CheckedAscendingHead(Boolean::compare){
+    protected static final AscendingEmptyView CHECKED_EMPTY_ASCENDING_HEAD =new AscendingEmptyView(){
+
+
+      @Override
+      public OmniNavigableSet.OfBoolean descendingSet(){
+        return CHECKED_EMPTY_DESCENDING_TAIL;  
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+          if(fromInclusive && !fromElement&& !toElement  && !toInclusive) {
+              return this;
+          }
+          throw new IllegalArgumentException("out of bounds");
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+          if(!toElement&&!inclusive) {
+              return this;
+          }
+          throw new IllegalArgumentException("out of bounds");
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+          if(inclusive && !fromElement) {
+              return this;
+          }
+          throw new IllegalArgumentException("out of bounds");
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+          throw new IllegalArgumentException("out of bounds");
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+          throw new IllegalArgumentException("out of bounds");
+      }
+
+      @Override
+      public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+          if(!fromElement) {
+              return this;
+          }
+          throw new IllegalArgumentException("out of bounds");
+      }
+
+      
+    };
+    protected static final DescendingEmptyView CHECKED_EMPTY_DESCENDING_HEAD =new DescendingEmptyView(){
 
         @Override
         public OmniNavigableSet.OfBoolean descendingSet(){
-            return CheckedDescendingTail;
+          return CHECKED_EMPTY_ASCENDING_TAIL;  
         }
 
         @Override
         public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-            if(fromInclusive && !fromElement&& !toElement  && !toInclusive) {
+            if(fromElement && toElement && fromInclusive && !toInclusive) {
                 return this;
             }
             throw new IllegalArgumentException("out of bounds");
@@ -282,7 +334,7 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
 
         @Override
         public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-            if(!toElement&&!inclusive) {
+            if(toElement && !inclusive) {
                 return this;
             }
             throw new IllegalArgumentException("out of bounds");
@@ -290,7 +342,7 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
 
         @Override
         public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-            if(inclusive && !fromElement) {
+            if(fromElement && inclusive) {
                 return this;
             }
             throw new IllegalArgumentException("out of bounds");
@@ -308,362 +360,284 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
 
         @Override
         public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+            if(fromElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+    };
+    protected static final AscendingEmptyView CHECKED_EMPTY_ASCENDING_MIDDLE =new AscendingEmptyView(){
+
+        @Override
+        public OmniNavigableSet.OfBoolean descendingSet(){
+          return CHECKED_EMPTY_DESCENDING_MIDDLE;  
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+            if(fromElement==fromInclusive && toElement^toInclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+            if(toElement^inclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+            if(fromElement==inclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+            if(fromElement && !toElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+            if(!toElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+            if(fromElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+    };
+    protected static final DescendingEmptyView CHECKED_EMPTY_DESCENDING_MIDDLE =new DescendingEmptyView(){
+        @Override
+        public OmniNavigableSet.OfBoolean descendingSet(){
+          return CHECKED_EMPTY_ASCENDING_MIDDLE;  
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+            if(fromElement^fromInclusive && toElement==toInclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+            if(toElement == inclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+            if(fromElement^inclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+            if(toElement && !fromElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+            if(toElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
+
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
             if(!fromElement) {
                 return this;
             }
             throw new IllegalArgumentException("out of bounds");
         }
 
-        
-      },
-      CheckedDescendingHead(BooleanComparator::descendingCompare){
-          @Override
-          public OmniNavigableSet.OfBoolean descendingSet(){
-              return CheckedAscendingTail;
-          }
+    };
+    protected static final AscendingEmptyView CHECKED_EMPTY_ASCENDING_TAIL =new AscendingEmptyView(){
+        @Override
+        public OmniNavigableSet.OfBoolean descendingSet(){
+          return CHECKED_EMPTY_DESCENDING_HEAD;  
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-              if(fromElement && toElement && fromInclusive && !toInclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+            if(fromElement && toElement && toInclusive && !fromInclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-              if(toElement && !inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+            if(toElement && inclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-              if(fromElement && inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+            if(fromElement && !inclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+            if(toElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-              if(fromElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-      },
-      CheckedAscendingMiddle(Boolean::compare){
-          @Override
-          public OmniNavigableSet.OfBoolean descendingSet(){
-              return CheckedDescendingMiddle;
-          }
+    };
+    protected static final DescendingEmptyView CHECKED_EMPTY_DESCENDING_TAIL =new DescendingEmptyView(){
 
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-              if(fromElement==fromInclusive && toElement^toInclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean descendingSet(){
+          return CHECKED_EMPTY_ASCENDING_HEAD;  
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-              if(toElement^inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+            if(toInclusive && !fromElement && !toElement && !fromInclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-              if(fromElement==inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+            if(inclusive && !toElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-              if(fromElement && !toElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+            if(!fromElement && !inclusive) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-              if(!toElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-              if(fromElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+            if(!toElement) {
+                return this;
+            }
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-      },
-      CheckedDescendingMiddle(BooleanComparator::descendingCompare){
-          @Override
-          public OmniNavigableSet.OfBoolean descendingSet(){
-              return CheckedAscendingMiddle;
-          }
+        @Override
+        public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+            throw new IllegalArgumentException("out of bounds");
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-              if(fromElement^fromInclusive && toElement==toInclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+    };
+    protected static final AscendingEmptyView UNCHECKED_EMPTY_ASCENDING =new AscendingEmptyView(){
+        @Override
+        public OmniNavigableSet.OfBoolean descendingSet(){
+            return UNCHECKED_EMPTY_DESCENDING;
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-              if(toElement == inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+    };
+    protected static final DescendingEmptyView UNCHECKED_EMPTY_DESCENDING =new DescendingEmptyView(){
+        @Override
+        public OmniNavigableSet.OfBoolean descendingSet(){
+            return UNCHECKED_EMPTY_ASCENDING;
+        }
 
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-              if(fromElement^inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
+    };
+    
+  protected static abstract class AscendingEmptyView extends EmptyView{
+    @Override public BooleanComparator comparator() {
+      return Boolean::compare;
+    }
+  }
+  protected static abstract class DescendingEmptyView extends EmptyView{
+    @Override public BooleanComparator comparator() {
+      return BooleanComparator::descendingCompare;
+    }
+  }
+  protected static abstract class EmptyView implements OmniNavigableSet.OfBoolean,Cloneable{
 
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-              if(toElement && !fromElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-              if(toElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-              if(!fromElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-      },
-      CheckedAscendingTail(Boolean::compare){
-          @Override
-          public OmniNavigableSet.OfBoolean descendingSet(){
-              return CheckedDescendingHead;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-              if(fromElement && toElement && toInclusive && !fromInclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-              if(toElement && inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-              if(fromElement && !inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-              if(toElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-      },
-      CheckedDescendingTail(BooleanComparator::descendingCompare){
-          @Override
-          public OmniNavigableSet.OfBoolean descendingSet(){
-              return CheckedAscendingHead;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-              if(toInclusive && !fromElement && !toElement && !fromInclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-              if(inclusive && !toElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-              if(!fromElement && !inclusive) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-              if(!toElement) {
-                  return this;
-              }
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-              throw new IllegalArgumentException("out of bounds");
-          }
-
-      },
-      UncheckedAscending(Boolean::compare){
-          @Override
-          public OmniNavigableSet.OfBoolean descendingSet(){
-              return UncheckedDescending;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-              return this;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-              return this;
-
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-              return this;
-
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-              return this;
-
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-              return this;
-
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-              return this;
-
-          }
-
-      },
-      UncheckedDescending(BooleanComparator::descendingCompare){
-          @Override
-          public OmniNavigableSet.OfBoolean descendingSet(){
-              return UncheckedAscending;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-              return this;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-              return this;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-              return this;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-              return this;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-              return this;
-          }
-
-          @Override
-          public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-              return this;
-          }
-      };
-      
-      private final BooleanComparator comparator;
-      EmptyView(BooleanComparator comparator){
-        this.comparator=comparator;
+      @Override
+      public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
+          return this;
+      }
+  
+      @Override
+      public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+          return this;
+      }
+  
+      @Override
+      public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+          return this;
+      }
+  
+      @Override
+      public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+          return this;
+      }
+  
+      @Override
+      public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+          return this;
+      }
+  
+      @Override
+      public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+          return this;
       }
       @Override public OmniIterator.OfBoolean descendingIterator(){
         return EMPTY_ITR;
       }
       @Override public OmniIterator.OfBoolean iterator(){
         return EMPTY_ITR;
-      }
-      @Override public BooleanComparator comparator(){
-        return this.comparator;
       }
       @Override public boolean contains(Object val){
         return false;
@@ -824,9 +798,6 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
       @Override public boolean lastBoolean() {
           throw new NoSuchElementException();
       }
-      
-      
-      
       @Override public boolean higherBoolean(boolean val){
           return false;
         }
@@ -881,12 +852,7 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
         @Override public double lowerDouble(double val){
           return Double.NaN;
         }
-        
-        
-        
-        
-        
-        
+
         @Override public boolean pollLastBoolean(){
             return false;
           }
@@ -941,5 +907,23 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
           @Override public double pollFirstDouble(){
             return Double.NaN;
           }
+        @Override public String toString() {
+          return "[]";
+        }
+        @Override public int hashCode() {
+          return 0;
+        }
+        @Override public boolean equals(Object val) {
+          if(val==this) {
+            return true;
+          }
+          if(val instanceof Set) {
+            return ((Set<?>)val).isEmpty();
+          }
+          return false;
+        }
+    @Override public Object clone() {
+      return this;
     }
+  }
 }

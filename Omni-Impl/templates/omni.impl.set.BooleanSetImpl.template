@@ -692,6 +692,13 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
 #ELSE
 @Override public RETTYPE INPUTTYPECeiling(INPUTTYPE val){
 #ENDIF
+#IFSWITCH VIEW==Full
+
+#ELSEIFSWITCH VIEW==True
+
+#ELSEIFSWITCH VIEW==False
+
+#ENDIF
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
@@ -721,6 +728,17 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
 }
 #ENDDEF
 #MACRODEF AccessMethods<SOURCE,VIEW,DIRECTION>()
+#IFNOTSWITCH SOURCE==this,root
+ERROR unknown source SOURCE
+#ENDIF
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
+#ENDIF
+#IFSWITCH VIEW==True,False
+  #IFNOTSWITCH SOURCE==root
+ERROR the view VIEW cannot be matched with the source SOURCE
+  #ENDIF
+#ENDIF
 #MACRO AccessMethodsHelper<Boolean>(Boolean.TRUE,Boolean.FALSE,,boolean,null)
 #MACRO AccessMethodsHelper<boolean>(true,false,Boolean,boolean,false)
 #MACRO AccessMethodsHelper<byte>((byte)1,(byte)0,Byte,byte,Byte.MIN_VALUE)
@@ -732,6 +750,20 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
 #MACRO AccessMethodsHelper<double>(1D,0D,Double,double,Double.NaN)
 #ENDDEF
 #MACRODEF FirstAndLastBoolean<SOURCE,DIRECTION,CHECKED,VIEW>()
+#IFNOTSWITCH SOURCE==root,this
+ERROR unknown source SOURCE
+#ENDIF
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
+#ENDIF
+#IFNOTSWITCH CHECKED==True,False
+ERROR unknown checked type CHECKED
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR the source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public boolean firstBoolean(){
 #IFSWITCH VIEW==Full
   #IFSWITCH DIRECTION==Ascending
@@ -749,8 +781,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     return true;
   }
   return false;
-    #ELSE
-ERROR unknown checked type CHECKED
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
     #IFSWITCH CHECKED==True
@@ -767,11 +797,7 @@ ERROR unknown checked type CHECKED
     return false;
   }
   return true;
-    #ELSE
-ERROR unknown checked type CHECKED
     #ENDIF
-  #ELSE
-ERROR unknown direction DIRECTION
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH CHECKED==True
@@ -781,8 +807,6 @@ ERROR unknown direction DIRECTION
   return true;
   #ELSEIFSWITCH CHECKED==False
   return true;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH CHECKED==True
@@ -792,13 +816,7 @@ ERROR unknown checked type CHECKED
   return false;
   #ELSEIFSWITCH CHECKED==False
   return false;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
-#ELSEIFSWITCH VIEW==Empty
-  throw new NoSuchElementException();
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 @Override public boolean lastBoolean(){
@@ -818,8 +836,6 @@ ERROR unknown view VIEW
     return false;
   }
   return true;
-    #ELSE
-ERROR unknown checked type CHECKED
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
     #IFSWITCH CHECKED==True
@@ -836,11 +852,7 @@ ERROR unknown checked type CHECKED
     return true;
   }
   return false;
-    #ELSE
-ERROR unknown checked type CHECKED
     #ENDIF
-  #ELSE
-ERROR unknown direction DIRECTION
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH CHECKED==True
@@ -850,8 +862,6 @@ ERROR unknown direction DIRECTION
   return true;
   #ELSEIFSWITCH CHECKED==False
   return true;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH CHECKED==True
@@ -861,13 +871,7 @@ ERROR unknown checked type CHECKED
   return false;
   #ELSEIFSWITCH CHECKED==False
   return false;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
-#ELSEIFSWITCH VIEW==Empty
-  throw new NoSuchElementException();
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
@@ -877,12 +881,24 @@ ERROR unknown view VIEW
   return Boolean::compare;
 #ELSEIFSWITCH DIRECTION==Descending
   return BooleanComparator::descendingCompare;
-#ELSE
-ERROR unknown direction DIRECTION
 #ENDIF
 }
 #ENDDEF
 #MACRODEF ToString<SOURCE,DIRECTION,VIEW>()
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
+#ENDIF
+#IFNOTSWITCH SOURCE==this,root
+ERROR unknown source SOURCE
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR the source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+  #IFNOTSWITCH DIRECTION==Ascending
+ERROR the direction DIRECTION cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public String toString(){
 #IFSWITCH VIEW==Full
   switch(SOURCE.state){
@@ -897,8 +913,6 @@ ERROR unknown direction DIRECTION
       return "[false, true]";
   #ELSEIFSWITCH DIRECTION==Descending
       return "[true, false]";
-  #ELSE
-ERROR unknown direction DIRECTION
   #ENDIF
   }
 #ELSEIFSWITCH VIEW==True
@@ -911,17 +925,25 @@ ERROR unknown direction DIRECTION
     return "[false]";
   }
   return "[]";
-#ELSEIFSWITCH VIEW==Empty
-  return "[]";
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 #MACRODEF ToArray<SOURCE,DIRECTION,VIEW>()
-#IFNOTSWITCH VIEW==Empty
-@SuppressWarnings("unchecked")
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
 #ENDIF
+#IFNOTSWITCH SOURCE==this,root
+ERROR unknown source SOURCE
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR the source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+  #IFNOTSWITCH DIRECTION==Ascending
+ERROR the direction DIRECTION cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
+@SuppressWarnings("unchecked")
 @Override public <T> T[] toArray(T[] dst){
 #IFSWITCH VIEW==Full
   switch(SOURCE.state){
@@ -932,8 +954,6 @@ ERROR unknown view VIEW
   #ELSEIFSWITCH DIRECTION==Descending
     (dst=OmniArray.uncheckedArrResize(2,dst))[0]=(T)Boolean.TRUE;
     dst[1]=(T)Boolean.FALSE;
-  #ELSE
-ERROR unknown direction DIRECTION
   #ENDIF
     break;
   case 0b10:
@@ -963,18 +983,10 @@ ERROR unknown direction DIRECTION
   }else{
     (dst=OmniArray.uncheckedArrResize(1,dst))[0]=(T)Boolean.FALSE;
   }
-#ELSEIFSWITCH VIEW==Empty
-  if(dst.length!=0){
-    dst[0]=null;
-  }
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
   return dst;
 }
-#IFNOTSWITCH VIEW==Empty
 @SuppressWarnings("unchecked")
-#ENDIF
 @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
 #IFSWITCH VIEW==Full
   final T[] dst;
@@ -986,8 +998,6 @@ ERROR unknown view VIEW
   #ELSEIFSWITCH DIRECTION==Descending
     (dst=arrConstructor.apply(2))[0]=(T)Boolean.TRUE;
     dst[1]=(T)Boolean.FALSE;
-  #ELSE
-ERROR unknown direction DIRECTION
   #ENDIF
     break;
   case 0b10:
@@ -1016,10 +1026,6 @@ ERROR unknown direction DIRECTION
     (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
     return dst;
   }
-#ELSEIFSWITCH VIEW==Empty
-  return arrConstructor.apply(0);
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #MACRO ToArrayHelper(,Boolean.TRUE,Boolean.FALSE,Boolean,OmniArray.OfBoolean.DEFAULT_BOXED_ARR)
@@ -1047,8 +1053,6 @@ ERROR unknown view VIEW
       return new RETTYPE[]{FALSEVAL,TRUEVAL};
   #ELSEIFSWITCH DIRECTION==Descending
       return new RETTYPE[]{TRUEVAL,FALSEVAL};
-  #ELSE
-ERROR unknown direction DIRECTION
   #ENDIF
   }
 #ELSEIFSWITCH VIEW==True
@@ -1061,14 +1065,21 @@ ERROR unknown direction DIRECTION
     return new RETTYPE[]{FALSEVAL};
   }
   return DEFAULTARR;
-#ELSEIFSWITCH VIEW==Empty
-  return DEFAULTARR;
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 #MACRODEF AddRemoveContains<SOURCE,VIEW,NAME>(STATE)
+#IFNOTSWITCH SOURCE==this,root
+ERROR unknown source SOURCE
+#ENDIF
+#IFNOTSWITCH NAME==True,False
+ERROR unknown name NAME
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR the source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override boolean addNAME(){
 #IFSWITCH VIEW==Full
   final int state;
@@ -1077,8 +1088,6 @@ ERROR unknown view VIEW
   #ELSEIFSWITCH SOURCE==root
   final BooleanSetImpl SOURCE;
   if(((state=(SOURCE=this.SOURCE).state)&0bSTATE)==0){
-  #ELSE
-ERROR unknown source SOURCE
   #ENDIF
     SOURCE.state=state+0bSTATE;
     return true;
@@ -1095,8 +1104,6 @@ ERROR unknown source SOURCE
   return false;
   #ELSEIFSWITCH NAME==False
   throw new IllegalArgumentException("out of bounds");
-  #ELSE
-ERROR unknown name NAME
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH NAME==True
@@ -1109,13 +1116,7 @@ ERROR unknown name NAME
     return true;
   }
   return false;
-  #ELSE
-ERROR unknown name NAME
   #ENDIF
-#ELSEIFSWITCH VIEW==Empty
-  throw new IllegalArgumentException("out of bounds");
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 @Override boolean containsNAME(){
@@ -1151,8 +1152,6 @@ ERROR unknown view VIEW
   #ELSEIFSWITCH SOURCE==root
   final BooleanSetImpl SOURCE;
   if(((state=(SOURCE=this.SOURCE).state)&0bSTATE)!=0){
-  #ELSE
-ERROR unknown source SOURCE
   #ENDIF
     SOURCE.state=state-0bSTATE;
     return true;
@@ -1169,8 +1168,6 @@ ERROR unknown source SOURCE
   return false;
   #ELSEIFSWITCH NAME==False
   return false;
-  #ELSE
-ERROR unknown name NAME
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH NAME==True
@@ -1183,51 +1180,47 @@ ERROR unknown name NAME
     return true;
   }
   return false;
-  #ELSE
-ERROR unknown name NAME
   #ENDIF
-#ELSEIFSWITCH VIEW==Empty
-  return false;
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 
 
-#MACRODEF SubSetMethods<SOURCE,VIEW,DIRECTION,CHECKED>()
-@Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-#IFNOTSWITCH VIEW==Full,True,False
-ERROR unknown view VIEW
-#ENDIF
+#MACRODEF SubSetMethods<SOURCE,VIEW,DIRECTION,CHECKED_TYPE>()
 #IFNOTSWITCH SOURCE==this,root
 ERROR unknown source SOURCE
 #ENDIF
 #IFNOTSWITCH DIRECTION==Ascending,Descending
 ERROR unknown direction DIRECTION
 #ENDIF
-#IFNOTSWITCH CHECKED==True,False
-ERROR unknown checked type CHECKED
+#IFNOTSWITCH CHECKED_TYPE==True,False
+ERROR unknown checked type CHECKED_TYPE
 #ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR the source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
+@Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
 #IFSWITCH VIEW==Full
   #IFSWITCH DIRECTION==Ascending
-    #IFSWITCH CHECKED==True
+    #IFSWITCH CHECKED_TYPE==True
   if(fromElement){
     if(toElement){
       if(fromInclusive){
         if(toInclusive){
           return new UncheckedTrueView.Checked(SOURCE);
         }else{
-          return EmptyView.CheckedAscendingMiddle;
+          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
         }
       }else{
         if(toInclusive){
-          return EmptyView.CheckedAscendingTail;
+          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
         }
       }
     }else{
       if(fromInclusive && toInclusive){
-        return EmptyView.CheckedAscendingMiddle;
+        return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
       }
     }
   }else{
@@ -1242,7 +1235,7 @@ ERROR unknown checked type CHECKED
         if(toInclusive){
           return new UncheckedTrueView.Checked(SOURCE);
         }else{
-          return EmptyView.CheckedAscendingMiddle;
+          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
         }
       }
     }else{
@@ -1250,17 +1243,17 @@ ERROR unknown checked type CHECKED
         if(toInclusive){
           return new UncheckedFalseView.Checked(SOURCE);
         }else{
-          return EmptyView.CheckedAscendingHead;
+          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
         }
       }else{
         if(toInclusive){
-          return EmptyView.CheckedAscendingMiddle;
+          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
         }
       }
     }
   }
   throw new IllegalArgumentException("out of bounds");
-    #ELSEIFSWITCH CHECKED==False
+    #ELSEIFSWITCH CHECKED_TYPE==False
   if(fromElement){
     if(toElement && fromInclusive && toInclusive){
       return new UncheckedTrueView(SOURCE);
@@ -1284,59 +1277,13 @@ ERROR unknown checked type CHECKED
       }
     }
   }
-  return EmptyView.UncheckedAscending;
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
-    #IFSWITCH CHECKED==True
-  if(fromElement){
-    if(toElement){
-      if(fromInclusive){
-        if(toInclusive){
-          return new UncheckedTrueView.Checked.Descending(SOURCE);
-        }else{
-          return EmptyView.CheckedDescendingHead;
-        }
-      }else{
-        if(toInclusive){
-          return EmptyView.CheckedDescendingMiddle;
-        }
-      }
-    }else{
-      if(fromInclusive){
-        if(toInclusive){
-          return this;
-        }else{
-          return new UncheckedTrueView.Checked.Descending(SOURCE);
-        }
-      }else{
-        if(toInclusive){
-          return new UncheckedFalseView.Checked.Descending(SOURCE);
-        }else{
-          return EmptyView.CheckedDescendingMiddle;
-        }
-      }
-    }
-  }else{
-    if(toElement){
-      if(fromInclusive && toInclusive){
-        return EmptyView.CheckedDescendingMiddle;
-      }
-    }else{
-      if(fromInclusive){
-        if(toInclusive){
-          return new UncheckedFalseView.Checked.Descending(SOURCE);
-        }else{
-          return EmptyView.CheckedDescendingMiddle;
-        }
-      }else{
-        if(toInclusive){
-          return EmptyView.CheckedDescendingTail;
-        }
-      }
-    }
-  }
+    #IFSWITCH CHECKED_TYPE==True
+  
   throw new IllegalArgumentException("out of bounds");  
-    #ELSEIFSWITCH CHECKED==False
+    #ELSEIFSWITCH CHECKED_TYPE==False
   if(fromElement){
     if(toElement){
       if(fromInclusive && toInclusive){
@@ -1360,42 +1307,28 @@ ERROR unknown checked type CHECKED
        return new UncheckedFalseView.Descending(SOURCE);
      }
   }
-  return EmptyView.UncheckedDescending;
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
     #ENDIF
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH DIRECTION==Ascending
-    #IFSWITCH CHECKED==True
-    
-    
-    
-    //TODO
+    #IFSWITCH CHECKED_TYPE==True
+//TODO
       throw new omni.util.NotYetImplementedException();
-      
-      
-      
-    #ELSEIFSWITCH CHECKED==False
-    
-    
-    
-    //TODO
+    #ELSEIFSWITCH CHECKED_TYPE==False
+//TODO
       throw new omni.util.NotYetImplementedException();
-      
-      
-      
-      
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
-    #IFSWITCH CHECKED==True
-    
-    
+    #IFSWITCH CHECKED_TYPE==True
+
     
     //TODO
       throw new omni.util.NotYetImplementedException();
       
       
       
-    #ELSEIFSWITCH CHECKED==False
+    #ELSEIFSWITCH CHECKED_TYPE==False
     
     
     
@@ -1408,7 +1341,7 @@ ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH DIRECTION==Ascending
-    #IFSWITCH CHECKED==True
+    #IFSWITCH CHECKED_TYPE==True
     
     
     
@@ -1418,7 +1351,7 @@ ERROR unknown checked type CHECKED
       
       
       
-    #ELSEIFSWITCH CHECKED==False
+    #ELSEIFSWITCH CHECKED_TYPE==False
     
     
     
@@ -1429,7 +1362,7 @@ ERROR unknown checked type CHECKED
       
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
-    #IFSWITCH CHECKED==True
+    #IFSWITCH CHECKED_TYPE==True
     
     
     
@@ -1438,7 +1371,7 @@ ERROR unknown checked type CHECKED
       
       
       
-    #ELSEIFSWITCH CHECKED==False
+    #ELSEIFSWITCH CHECKED_TYPE==False
     
     
     
@@ -1453,6 +1386,14 @@ ERROR unknown checked type CHECKED
 }
 #ENDDEF
 #MACRODEF RemoveIf<SOURCE,VIEW>(PREDICATE,TRUEVAL,FALSEVAL)
+#IFNOTSWITCH SOURCE==root,this
+ERROR unknown source SOURCE
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public boolean removeIf(PREDICATE filter){
 #IFSWITCH VIEW==Full
   #IFSWITCH SOURCE==root
@@ -1460,8 +1401,6 @@ ERROR unknown checked type CHECKED
   switch((SOURCE=this.SOURCE).state){
   #ELSEIFSWITCH SOURCE==this
   switch(SOURCE.state){
-  #ELSE
-ERROR unknown source
   #ENDIF
     case 0b11:
       if(filter.test(FALSEVAL)){
@@ -1506,14 +1445,27 @@ ERROR unknown source
     return true;
   }
   return false;
-#ELSEIFSWITCH VIEW==Empty
-  return false;
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 #MACRODEF ForEach<SOURCE,VIEW,DIRECTION>(CONSUMER,TRUEVAL,FALSEVAL)
+#IFNOTSWITCH VIEW==Full,True,False
+ERROR unknown view VIEW
+#ENDIF
+#IFNOTSWITCH SOURCE==root,this
+ERROR unknown source SOURCE
+#ENDIF
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR the source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+  #IFNOTSWITCH DIRECTION==Ascending
+ERROR the direction DIRECTION cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public void forEach(CONSUMER action){
 #IFSWITCH VIEW==Full
   switch(SOURCE.state){
@@ -1532,8 +1484,6 @@ ERROR unknown view VIEW
       break;
     case 0b10:
       action.accept(TRUEVAL);
-  #ELSE
-ERROR unknown direction DIRECTION
   #ENDIF
     default:
   }
@@ -1545,14 +1495,24 @@ ERROR unknown direction DIRECTION
   if((SOURCE.state&0b01)!=0){
     action.accept(FALSEVAL);
   }
-#ELSEIFSWITCH VIEW==Empty
-  //nothing to do
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 #MACRODEF ItrRemove<CHECKED,DIRECTION,VIEW>()
+#IFNOTSWITCH VIEW==Full,True,False
+ERROR unknown view VIEW
+#ENDIF
+#IFNOTSWITCH CHECKED==True,False
+ERROR unknown checked type CHECKED
+#ENDIF
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH DIRECTION==Ascending
+ERROR the direction DIRECTION cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public void remove(){
 #IFSWITCH VIEW==Full
   #IFSWITCH CHECKED==True
@@ -1608,8 +1568,6 @@ final BooleanSetImpl root;
         root.state=0b10;
       }
       itrState=0b101;
-    #ELSE
-ERROR unknown direction DIRECTION    
     #ENDIF
   #ELSEIFSWITCH CHECKED==False
   if(itrState==0){
@@ -1623,12 +1581,8 @@ ERROR unknown direction DIRECTION
     (root=this.root).state=(rootState=root.state)-((rootState&0b01)==0?0b10:0b01);
   }else{
     root.state=0b01;
-    #ELSE
-ERROR unknown direction DIRECTION
     #ENDIF
   }
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH CHECKED==True
@@ -1645,8 +1599,6 @@ ERROR unknown checked type CHECKED
   }
   #ELSEIFSWITCH CHECKED==False
   root.state&=0b01;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH CHECKED==True
@@ -1663,17 +1615,25 @@ ERROR unknown checked type CHECKED
   }
   #ELSEIFSWITCH CHECKED==False
   root.state&=0b10;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
-#ELSEIFSWITCH VIEW==Empty
-  throw new IllegalStateException();
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 #MACRODEF ForEachRemaining<CHECKED,DIRECTION,VIEW>(CONSUMER,TRUEVAL,FALSEVAL)
+#IFNOTSWITCH VIEW==Full,True,False
+ERROR unknown view VIEW
+#ENDIF
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
+#ENDIF
+#IFNOTSWITCH CHECKED==True,False
+ERROR unknown checked type CHECKED
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH DIRECTION==Ascending
+ERROR the direction DIRECTION cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public void forEachRemaining(CONSUMER action){
 #IFSWITCH VIEW==Full
   #IFSWITCH CHECKED==True
@@ -1717,8 +1677,6 @@ ERROR unknown view VIEW
   case 0b10110:
   case 0b11010:
   }
-    #ELSE
-ERROR unknown direction DIRECTION
     #ENDIF
   #ELSEIFSWITCH CHECKED==False
   switch(itrState){
@@ -1739,13 +1697,9 @@ ERROR unknown direction DIRECTION
       break;
     case 0b10:
       action.accept(TRUEVAL);
-    #ELSE
-ERROR unknown direction DIRECTION
     #ENDIF
   }
   this.itrState=0b00;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH CHECKED==True
@@ -1763,8 +1717,6 @@ ERROR unknown checked type CHECKED
     action.accept(TRUEVAL);
     itrState=0b0;
   }
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH CHECKED==True
@@ -1782,17 +1734,22 @@ ERROR unknown checked type CHECKED
     action.accept(FALSEVAL);
     itrState=0b0;
   }
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
-#ELSEIFSWITCH VIEW==Empty
-  //nothing to do
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 #MACRODEF ItrNext<CHECKED,DIRECTION,VIEW>()
+#IFNOTSWITCH DIRECTION==Ascending,Descending
+ERROR unknown direction DIRECTION
+#ENDIF
+#IFNOTSWITCH CHECKED==True,False
+ERROR unknown checked type CHECKED
+#ENDIF
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH DIRECTION==Ascending
+ERROR the direction DIRECTION cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public boolean nextBoolean(){
 #IFSWITCH VIEW==Full
   #IFSWITCH CHECKED==True
@@ -1838,8 +1795,6 @@ ERROR unknown view VIEW
       this.itrState=0b000;
   }
   return true;
-    #ELSE
-ERROR unknown direction DIRECTION
     #ENDIF
   #ELSEIFSWITCH CHECKED==False
     #IFSWITCH DIRECTION==Ascending
@@ -1867,11 +1822,7 @@ ERROR unknown direction DIRECTION
       break;
   } 
   return true;
-    #ELSE
-ERROR unknown direction DIRECTION
     #ENDIF
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH CHECKED==True
@@ -1888,8 +1839,6 @@ ERROR unknown checked type CHECKED
   #ELSEIFSWITCH CHECKED==False
   itrState=0b0;
   return true;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH CHECKED==True
@@ -1906,17 +1855,16 @@ ERROR unknown checked type CHECKED
   #ELSEIFSWITCH CHECKED==False
   itrState=0b0;
   return false;
-  #ELSE
-ERROR unknown checked type CHECKED
   #ENDIF
-#ELSEIFSWITCH VIEW==Empty
-  throw new NoSuchElementException();
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 #ENDDEF
 #MACRODEF SizeClearHashCodeIsEmpty<SOURCE,VIEW>()
+#IFNOTSWITCH VIEW==Full
+  #IFNOTSWITCH SOURCE==root
+ERROR the source SOURCE cannot be matched with the view VIEW
+  #ENDIF
+#ENDIF
 @Override public int size(){
 #IFSWITCH VIEW==Full
   switch(SOURCE.state){
@@ -1932,10 +1880,6 @@ ERROR unknown view VIEW
   return SOURCE.state>>>1;
 #ELSEIFSWITCH VIEW==False
   return SOURCE.state&0b01;
-#ELSEIFSWITCH VIEW==Empty
-  return 0;
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 @Override public void clear(){
@@ -1945,10 +1889,6 @@ ERROR unknown view VIEW
   SOURCE.state&=0b01;
 #ELSEIFSWITCH VIEW==False
   SOURCE.state&=0b10;
-#ELSEIFSWITCH VIEW==Empty
-  //nothing to do
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 @Override public int hashCode(){
@@ -1973,10 +1913,6 @@ ERROR unknown view VIEW
     return 0;
   }
   return 1237;
-#ELSEIFSWITCH VIEW==Empty
-  return 0;
-#ELSE
-ERROR unknown view VIEW
 #ENDIF
 }
 @Override public boolean isEmpty(){

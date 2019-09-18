@@ -652,7 +652,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
       }
     }
-    return EmptyView.UncheckedAscending;
+    return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
   }
   public static class Checked extends BooleanSetImpl{
     private static final long serialVersionUID=1L;
@@ -721,16 +721,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
             if(toInclusive){
               return new UncheckedTrueView.Checked(this);
             }else{
-              return EmptyView.CheckedAscendingMiddle;
+              return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
             }
           }else{
             if(toInclusive){
-              return EmptyView.CheckedAscendingTail;
+              return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
             }
           }
         }else{
           if(fromInclusive && toInclusive){
-            return EmptyView.CheckedAscendingMiddle;
+            return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
           }
         }
       }else{
@@ -745,7 +745,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
             if(toInclusive){
               return new UncheckedTrueView.Checked(this);
             }else{
-              return EmptyView.CheckedAscendingMiddle;
+              return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
             }
           }
         }else{
@@ -753,11 +753,11 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
             if(toInclusive){
               return new UncheckedFalseView.Checked(this);
             }else{
-              return EmptyView.CheckedAscendingHead;
+              return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
             }
           }else{
             if(toInclusive){
-              return EmptyView.CheckedAscendingMiddle;
+              return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
             }
           }
         }
@@ -1243,7 +1243,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
            return new UncheckedFalseView.Descending(this);
          }
       }
-      return EmptyView.UncheckedDescending;
+      return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
     }
     public static class Checked extends Descending{
       private static final long serialVersionUID=1L;
@@ -1306,53 +1306,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
       }
       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-        if(fromElement){
-          if(toElement){
-            if(fromInclusive){
-              if(toInclusive){
-                return new UncheckedTrueView.Checked.Descending(this);
-              }else{
-                return EmptyView.CheckedDescendingHead;
-              }
-            }else{
-              if(toInclusive){
-                return EmptyView.CheckedDescendingMiddle;
-              }
-            }
-          }else{
-            if(fromInclusive){
-              if(toInclusive){
-                return this;
-              }else{
-                return new UncheckedTrueView.Checked.Descending(this);
-              }
-            }else{
-              if(toInclusive){
-                return new UncheckedFalseView.Checked.Descending(this);
-              }else{
-                return EmptyView.CheckedDescendingMiddle;
-              }
-            }
-          }
-        }else{
-          if(toElement){
-            if(fromInclusive && toInclusive){
-              return EmptyView.CheckedDescendingMiddle;
-            }
-          }else{
-            if(fromInclusive){
-              if(toInclusive){
-                return new UncheckedFalseView.Checked.Descending(this);
-              }else{
-                return EmptyView.CheckedDescendingMiddle;
-              }
-            }else{
-              if(toInclusive){
-                return EmptyView.CheckedDescendingTail;
-              }
-            }
-          }
-        }
         throw new IllegalArgumentException("out of bounds");  
       }
     }
@@ -2035,7 +1988,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
            return new UncheckedFalseView.Descending(root);
          }
       }
-      return EmptyView.UncheckedDescending;
+      return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
     }
     private static class Checked extends DescendingView{
       private static final long serialVersionUID=1L;
@@ -2088,53 +2041,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         return new CheckedAscendingFullItr(root,rootState);
       }
       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-        if(fromElement){
-          if(toElement){
-            if(fromInclusive){
-              if(toInclusive){
-                return new UncheckedTrueView.Checked.Descending(root);
-              }else{
-                return EmptyView.CheckedDescendingHead;
-              }
-            }else{
-              if(toInclusive){
-                return EmptyView.CheckedDescendingMiddle;
-              }
-            }
-          }else{
-            if(fromInclusive){
-              if(toInclusive){
-                return this;
-              }else{
-                return new UncheckedTrueView.Checked.Descending(root);
-              }
-            }else{
-              if(toInclusive){
-                return new UncheckedFalseView.Checked.Descending(root);
-              }else{
-                return EmptyView.CheckedDescendingMiddle;
-              }
-            }
-          }
-        }else{
-          if(toElement){
-            if(fromInclusive && toInclusive){
-              return EmptyView.CheckedDescendingMiddle;
-            }
-          }else{
-            if(fromInclusive){
-              if(toInclusive){
-                return new UncheckedFalseView.Checked.Descending(root);
-              }else{
-                return EmptyView.CheckedDescendingMiddle;
-              }
-            }else{
-              if(toInclusive){
-                return EmptyView.CheckedDescendingTail;
-              }
-            }
-          }
-        }
         throw new IllegalArgumentException("out of bounds");  
       }
     }
@@ -2607,7 +2513,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
           }
         }
       }
-      return EmptyView.UncheckedAscending;
+      return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     }
     private static class Checked extends AscendingView{
       private static final long serialVersionUID=1L;
@@ -2666,16 +2572,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
               if(toInclusive){
                 return new UncheckedTrueView.Checked(root);
               }else{
-                return EmptyView.CheckedAscendingMiddle;
+                return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
               }
             }else{
               if(toInclusive){
-                return EmptyView.CheckedAscendingTail;
+                return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
               }
             }
           }else{
             if(fromInclusive && toInclusive){
-              return EmptyView.CheckedAscendingMiddle;
+              return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
             }
           }
         }else{
@@ -2690,7 +2596,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
               if(toInclusive){
                 return new UncheckedTrueView.Checked(root);
               }else{
-                return EmptyView.CheckedAscendingMiddle;
+                return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
               }
             }
           }else{
@@ -2698,11 +2604,11 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
               if(toInclusive){
                 return new UncheckedFalseView.Checked(root);
               }else{
-                return EmptyView.CheckedAscendingHead;
+                return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
               }
             }else{
               if(toInclusive){
-                return EmptyView.CheckedAscendingMiddle;
+                return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
               }
             }
           }
@@ -3130,7 +3036,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       return new UncheckedTrueView.Descending(root);
     }
     @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-        //TODO
+    //TODO
           throw new omni.util.NotYetImplementedException();
     }
     private static class Descending extends UncheckedTrueView{
@@ -3179,7 +3085,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         return new UncheckedTrueView.Checked.Descending(root);
       }
       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
-          //TODO
+      //TODO
             throw new omni.util.NotYetImplementedException();
       }
       private static class Descending extends Checked{
