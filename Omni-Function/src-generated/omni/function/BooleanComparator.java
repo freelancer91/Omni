@@ -7,6 +7,15 @@ public interface BooleanComparator extends Comparator<Boolean>
   public default int compare(final Boolean val1,final Boolean val2){
     return compare((boolean)val1,(boolean)val2);
   }
+  public static int descendingCompare(boolean val1,boolean val2){
+    if(val1==val2){
+      return 0;
+    }
+    if(val1){
+      return -1;
+    }
+    return 1;
+  }
   //TODO override reversed()
   //TODO override thenComparing(Comparator<? super T> other)
   //TODO override thenComparing(Function<? super T,? extends U> keyExtractor,Comparator<? super U> keyComparator);
