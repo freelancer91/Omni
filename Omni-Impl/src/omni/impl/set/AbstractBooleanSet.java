@@ -15,6 +15,73 @@ import omni.util.OmniArray;
 import omni.util.TypeUtil;
 
 abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
+/*
+                           Subset behavior
+                       |      ASCENDING      |     DESCENDING      |
+if(fromElement){       |                     |                     |
+  if(toElement){       |                     |                     |
+    if(fromInclusive){ |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |     [0]   F [1] T   |   F [1] T   [0]     |
+      }else{           |                     |                     |
+                       |     [0] F T [1]     | F T [1]     [0]     |
+      }                |                     |                     |
+    }else{             |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |     [0]     [1] F T |     [1] F T [0]     |
+      }else{           |                     |                     |
+                       |     [0]   T [1] F   |   T [1] F   [0]     |
+      }                |                     |                     |
+    }                  |                     |                     |
+  }else{               |                     |                     |
+    if(fromInclusive){ |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |     [0] F T [1]     |   F [1]     [0] T   |
+      }else{           |                     |                     |
+                       |   T [0] F   [1]     |   F [1] T   [0]     |
+      }                |                     |                     |
+    }else{             |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |     [0] T   [1] F   |     [1]   F [0] T   |
+      }else{           |                     |                     |
+                       |   T [0]     [1] F   |     [1] F T [0]     |
+      }                |                     |                     |
+    }                  |                     |                     |
+  }                    |                     |                     |
+}else{                 |                     |                     |
+  if(toElement){       |                     |                     |
+    if(fromInclusive){ |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |   F [0]     [1] T   |     [1] F T [0]     |
+      }else{           |                     |                     |
+                       |   F [0] T   [1]     |   T [1] F   [0]     |
+      }                |                     |                     |
+    }else{             |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |     [0] F   [1] T   |     [1] T   [0] F   |
+      }else{           |                     |                     |
+                       |     [0] F T [1]     |   T [1]     [0] F   |
+      }                |                     |                     |
+    }                  |                     |                     |
+  }else{               |                     |                     |
+    if(fromInclusive){ |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |   F [0] T   [1]     |     [1]   F [0] T   |
+      }else{           |                     |                     |
+                       | F T [0]     [1]     |     [1] F T [0]     |
+      }                |                     |                     |
+    }else{             |                     |                     |
+      if(toInclusive){ |                     |                     |
+                       |     [0] F T [1]     |     [1]     [0] F T |
+      }else{           |                     |                     |
+                       |   T [0] F   [1]     |     [1]   T [0] F   |
+      }                |                     |                     |
+    }                  |                     |                     |
+  }                    |                     |                     |
+}                      |                     |                     |
+ */
+    
+    
   abstract boolean containsTrue();
   abstract boolean containsFalse();
   abstract boolean removeTrue();
@@ -265,6 +332,12 @@ abstract class AbstractBooleanSet implements OmniNavigableSet.OfBoolean{
           //nothing to do
       }
     };
+    
+    //TODO verify subSet(boolean,boolean)
+    //TODO verify headSet(boolean,boolean)
+    //TODO verify headSet(boolean)
+    //TODO verify tailSet(boolean,boolean)
+    //TODO verify tailSet(boolean)
     protected static final AscendingEmptyView CHECKED_EMPTY_ASCENDING_HEAD =new AscendingEmptyView(){
 
 

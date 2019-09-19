@@ -1204,182 +1204,262 @@ ERROR the source SOURCE cannot be matched with the view VIEW
 @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
 #IFSWITCH VIEW==Full
   #IFSWITCH DIRECTION==Ascending
+  //                     Truth table
+  // fromElem |  toElem  | fromIncl |  toIncl  | result 
+  //    T     |    T     |    T     |    F     | empty middle
+  //    T     |    F     |    T     |    T     | empty middle
+  //    F     |    T     |    F     |    F     | empty middle
+  //    F     |    F     |    F     |    T     | empty middle
+  //    T     |    T     |    T     |    T     | true view
+  //    F     |    T     |    F     |    T     | true view
+  //    T     |    F     |    T     |    F     | invalid
+  //    F     |    F     |    F     |    F     | invalid
+  //    F     |    T     |    T     |    F     | false view
+  //    F     |    F     |    T     |    T     | false view
+  //    T     |    T     |    F     |    F     | invalid
+  //    T     |    F     |    F     |    T     | invalid
+  //    T     |    T     |    F     |    T     | empty tail
+  //    F     |    T     |    T     |    T     | this
+  //    F     |    F     |    T     |    F     | empty head
+  //    T     |    F     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
-  if(fromElement){
-    if(toElement){
-      if(fromInclusive){
-        if(toInclusive){
-          return new UncheckedTrueView.Checked(SOURCE);
-        }else{
-          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
-        }
-      }else{
-        if(toInclusive){
-          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
-        }
-      }
-    }else{
-      if(fromInclusive && toInclusive){
-        return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
-      }
+  if(fromElement==fromInclusive){
+    if(toElement^toInclusive){
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    }else if(toElement){
+      return new UncheckedTrueView.Checked(SOURCE);
+    }
+  }else if(toElement^toInclusive){
+    if(fromInclusive){
+      return new UncheckedFalseView.Checked(SOURCE);
     }
   }else{
     if(toElement){
-      if(fromInclusive){
-        if(toInclusive){
-          return this;
-        }else{
-          return new UncheckedFalseView.Checked(SOURCE);
-        }
+      if(fromElement){
+        return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
       }else{
-        if(toInclusive){
-          return new UncheckedTrueView.Checked(SOURCE);
-        }else{
-          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
-        }
+        return this;
       }
-    }else{
-      if(fromInclusive){
-        if(toInclusive){
-          return new UncheckedFalseView.Checked(SOURCE);
-        }else{
-          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
-        }
-      }else{
-        if(toInclusive){
-          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
-        }
-      }
+    }else if(fromElement){
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
     }
   }
   throw new IllegalArgumentException("out of bounds");
     #ELSEIFSWITCH CHECKED_TYPE==False
-  if(fromElement){
-    if(toElement && fromInclusive && toInclusive){
-      return new UncheckedTrueView(SOURCE);
+  if(fromElement==fromInclusive){
+    if(toElement && toInclusive){
+      return new UncheckedTrueView.Checked(SOURCE);
     }
-  }else{
-    if(toElement){
-      if(fromInclusive){
-        if(toInclusive){
-          return this;
-        }else{
-          return new UncheckedFalseView(SOURCE);
-        }
-      }else{
-        if(toInclusive){
-          return new UncheckedTrueView(SOURCE);
-        }
-      }
-    }else{
-      if(fromInclusive && toInclusive){
-        return new UncheckedFalseView(SOURCE);
-      }
+  }else if(toElement^toInclusive){
+    if(fromInclusive){
+      return new UncheckedFalseView.Checked(SOURCE);
     }
+  }else if(toElement && !fromElement){
+    return this;
   }
   return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
+  //                     Truth table
+  // fromElem |  toElem  | fromIncl |  toIncl  | result
+  //    T     |    F     |    F     |    F     | empty middle
+  //    F     |    T     |    T     |    T     | empty middle
+  //    T     |    T     |    F     |    T     | empty middle
+  //    F     |    F     |    T     |    F     | empty middle
+  //    T     |    F     |    F     |    T     | false view
+  //    F     |    F     |    T     |    T     | false view
+  //    T     |    T     |    F     |    F     | invalid
+  //    F     |    T     |    T     |    F     | invalid
+  //    T     |    T     |    T     |    T     | true view
+  //    T     |    F     |    T     |    F     | true view
+  //    F     |    T     |    F     |    T     | invalid
+  //    F     |    F     |    F     |    F     | invalid
+  //    T     |    T     |    T     |    F     | empty head
+  //    T     |    F     |    T     |    T     | this
+  //    F     |    F     |    F     |    T     | empty tail
+  //    F     |    T     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
-  
+  if(fromElement^fromInclusive){
+    if(toElement==toInclusive){
+      return AbstractBooleanSet.CHECKED_DESCENDING_MIDDLE;
+    }else if(toInclusive){
+      return new UncheckedFalseView.Checked.Descending(SOURCE);
+    }
+  }else if(toElement==toInclusive){
+    if(fromElement){
+      return new UncheckedTrueView.Checked.Descending(SOURCE);
+    }
+  }else if(fromInclusive){
+    if(toElement){
+      return AbstractBooleanSet.CHECKED_DESCENDING_HEAD;
+    }else{
+      return this;
+    }
+  }else if(toInclusive){
+    return AbstractBooleanSet.CHECKED_DESCENDING_TAIL;
+  }
   throw new IllegalArgumentException("out of bounds");  
     #ELSEIFSWITCH CHECKED_TYPE==False
-  if(fromElement){
-    if(toElement){
-      if(fromInclusive && toInclusive){
-        return new UncheckedTrueView.Descending(SOURCE);
-      }
-    }else{
-      if(fromInclusive){
-        if(toInclusive){
-          return this;
-        }else{
-          return new UncheckedTrueView.Descending(SOURCE);
-        }
-      }else{
-        if(toInclusive){
-          return new UncheckedFalseView.Descending(SOURCE);
-        }
-      }
+  if(fromElement^fromInclusive){
+    if(toInclusive && !toElement){
+      return new UncheckedFalseView.Checked.Descending(SOURCE);
     }
-  }else{
-     if(!toElement && fromInclusive && toInclusive){
-       return new UncheckedFalseView.Descending(SOURCE);
-     }
+  }else if(fromElement){
+    if(toElement==toInclusive){
+      return new UncheckedTrueView.Checked.Descending(SOURCE);
+    }else if(toInclusive){
+      return this;
+    }
   }
   return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
     #ENDIF
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH DIRECTION==Ascending
+  //                     Truth table
+  // fromElem |  toElem  | fromIncl |  toIncl  | result
+  //    T     |    T     |    T     |    F     | empty middle
+  //    T     |    F     |    T     |    T     | empty middle
+  //    F     |    T     |    F     |    F     | empty middle
+  //    F     |    F     |    F     |    T     | empty middle
+  //    T     |    T     |    T     |    T     | this
+  //    F     |    T     |    F     |    T     | this
+  //    T     |    F     |    T     |    F     | invalid
+  //    F     |    F     |    F     |    F     | invalid
+  //    T     |    T     |    F     |    T     | empty tail
+  //    T     |    T     |    F     |    F     | invalid
+  //    T     |    F     |    F     |    T     | invalid
+  //    T     |    F     |    F     |    F     | invalid
+  //    F     |    T     |    T     |    T     | invalid
+  //    F     |    T     |    T     |    F     | invalid
+  //    F     |    F     |    T     |    T     | invalid
+  //    F     |    F     |    T     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
-//TODO
-      throw new omni.util.NotYetImplementedException();
+  if(fromElement==fromInclusive){
+    if(toElement^toInclusive){
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    }else if(toElement){
+      return this;
+    }
+  }else if(fromElement && toElement && toInclusive){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
+  }
+  throw new IllegalArgumentException("out of bounds");
     #ELSEIFSWITCH CHECKED_TYPE==False
-//TODO
-      throw new omni.util.NotYetImplementedException();
+  if(toElement && toInclusive && fromElement==fromInclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
+  //                     Truth table
+  // fromElem |  toElem  | fromIncl |  toIncl  | result
+  //    T     |    T     |    F     |    T     | empty middle
+  //    T     |    F     |    F     |    F     | empty middle
+  //    F     |    T     |    T     |    T     | empty middle
+  //    F     |    F     |    T     |    F     | empty middle
+  //    T     |    T     |    T     |    T     | this
+  //    T     |    F     |    T     |    F     | this
+  //    F     |    T     |    F     |    T     | invalid
+  //    F     |    F     |    F     |    F     | invalid
+  //    T     |    T     |    T     |    F     | empty head
+  //    T     |    T     |    F     |    F     | invalid
+  //    T     |    F     |    F     |    T     | invalid
+  //    F     |    T     |    T     |    F     | invalid
+  //    F     |    F     |    T     |    T     | invalid
+  //    T     |    F     |    T     |    T     | invalid
+  //    F     |    T     |    F     |    F     | invalid
+  //    F     |    F     |    F     |    T     | invalid
     #IFSWITCH CHECKED_TYPE==True
-
-    
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-      
-      
-      
+  if(toElement==toInclusive){
+    if(fromElement^fromInclusive){
+      return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+    }else if(fromElement){
+      return this;
+    }
+  }else if(toElement && fromElement && fromInclusive){
+    return AbstractBooleanSEt.CHECKED_EMPTY_DESCENDING_HEAD;
+  }
+  throw new IllegalArgumentException("out of bounds");
     #ELSEIFSWITCH CHECKED_TYPE==False
-    
-    
-    
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-      
-      
-      
+  if(fromElement && fromInclusive && toElement==toInclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
     #ENDIF
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH DIRECTION==Ascending
+  //                     Truth table
+  // fromElem |  toElem  | fromIncl |  toIncl  | result
+  //    T     |    T     |    T     |    F     | empty middle
+  //    T     |    F     |    T     |    T     | empty middle
+  //    F     |    T     |    F     |    F     | empty middle
+  //    F     |    F     |    F     |    T     | empty middle
+  //    F     |    T     |    T     |    F     | this
+  //    F     |    F     |    T     |    T     | this
+  //    T     |    T     |    F     |    F     | invalid
+  //    T     |    F     |    F     |    T     | invalid
+  //    F     |    F     |    T     |    F     | empty head
+  //    T     |    T     |    F     |    T     | invalid
+  //    T     |    T     |    T     |    T     | invalid
+  //    T     |    F     |    T     |    F     | invalid
+  //    T     |    F     |    F     |    F     | invalid
+  //    F     |    T     |    T     |    T     | invalid
+  //    F     |    T     |    F     |    T     | invalid
+  //    F     |    F     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
-    
-    
-    
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-      
-      
-      
-      
+  if(toElement ^ toInclusive){
+    if(fromElement==fromInclusive){
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    }else if(fromInclusive){
+      return this;
+    }
+  }else if(!toInclusive && fromInclusive && && !fromElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
+  }
+  throw new IllegalArgumentException("out of bounds");
     #ELSEIFSWITCH CHECKED_TYPE==False
-    
-    
-    
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-      
-      
-      
+  if(fromInclusive && !fromElement && toElement^toInclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
+  //                     Truth table
+  // fromElem |  toElem  | fromIncl |  toIncl  | result
+  //    T     |    T     |    F     |    T     | empty middle
+  //    T     |    F     |    F     |    F     | empty middle
+  //    F     |    T     |    T     |    T     | empty middle
+  //    F     |    F     |    T     |    F     | empty middle
+  //    T     |    F     |    F     |    T     | this
+  //    F     |    F     |    T     |    T     | this
+  //    F     |    T     |    T     |    F     | invalid
+  //    T     |    T     |    F     |    F     | invalid
+  //    F     |    F     |    F     |    T     | empty tail
+  //    T     |    T     |    T     |    F     | invalid
+  //    T     |    F     |    T     |    T     | invalid
+  //    T     |    T     |    T     |    T     | invalid
+  //    T     |    F     |    T     |    F     | invalid
+  //    F     |    T     |    F     |    T     | invalid
+  //    F     |    T     |    F     |    F     | invalid
+  //    F     |    F     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
-    
-    
-    
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-      
-      
-      
+  if(fromElement^fromInclusive){
+    if(toElement==toInclusive){
+      return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+    }else if(toInclusive){
+      return this;
+    }
+  }else if(!fromElement && toInclusive && !toElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL;
+  }
+  throw new IllegalArgumentException("out of bounds");
     #ELSEIFSWITCH CHECKED_TYPE==False
-    
-    
-    
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-      
-      
-      
+  if(toInclusive && !toElement && fromElement^fromInclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;    
     #ENDIF
   #ENDIF
 #ENDIF
