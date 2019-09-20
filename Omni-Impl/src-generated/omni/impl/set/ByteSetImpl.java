@@ -1,4 +1,3 @@
-#TYPEDEF OfByte
 package omni.impl.set;
 import omni.api.OmniSet;
 import java.io.Externalizable;
@@ -22,31 +21,19 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   transient long word1;
   transient long word2;
   transient long word3;
-  
-
-  
-  
-  
-
   @Override public boolean add(Byte val){
     return this.add((byte)val);
   }
   public abstract static class Checked extends ByteSetImpl{
     transient int modCountAndSize;
         //TODO make not abstract
-    
     public abstract static class Descending extends Checked{
         //TODO make not abstract
-    
     }
-    
   }
   public abstract static class Descending extends ByteSetImpl{
       //TODO make not abstract
-  
   }
-  
-  
   private abstract static class UncheckedFullView implements OmniSet.OfByte,Cloneable,Serializable{
     transient final ByteSetImpl root;
         //TODO make not abstract
@@ -62,16 +49,12 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
         super(root);
       }
     }
-   
-  
   }
-  
   private abstract static class AbstractUncheckedSubSet implements OmniSet.OfByte{
     transient final ByteSetImpl root;
     transient final AbstractUncheckedSubSet parent;
     transient final int boundInfo;
     transient int size;
-      
     private AbstractUncheckedSubSet(ByteSetImpl root,int boundInfo,int size){
       this.root=root;
       this.parent=null;
@@ -88,17 +71,14 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
       return this.add((byte)val);
     }
   }
-  
   private abstract static class UncheckedHeadView extends AbstractUncheckedSubSet{
       //TODO make not abstract
-  
     private UncheckedHeadView(ByteSetImpl root,int boundInfo,int size){
       super(root,boundInfo,size);
     }
     private UncheckedHeadView(AbstractUncheckedSubSet parent,int boundInfo,int size){
       super(parent,boundInfo,size);
     }
-   
     private abstract static class Descending extends UncheckedHeadView{
         //TODO make not abstract
       private Descending(ByteSetImpl root,int boundInfo,int size){
@@ -111,14 +91,12 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   }
   private abstract static class UncheckedTailView extends AbstractUncheckedSubSet{
       //TODO make not abstract
-  
     private UncheckedTailView(ByteSetImpl root,int boundInfo,int size){
       super(root,boundInfo,size);
     }
     private UncheckedTailView(AbstractUncheckedSubSet parent,int boundInfo,int size){
       super(parent,boundInfo,size);
     }
-    
     private abstract static class Descending extends UncheckedTailView{
         //TODO make not abstract
       private Descending(ByteSetImpl root,int boundInfo,int size){
@@ -131,14 +109,12 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   }
   private abstract static class UncheckedBodyView extends AbstractUncheckedSubSet{
       //TODO make not abstract
-  
     private UncheckedBodyView(ByteSetImpl root,int boundInfo,int size){
       super(root,boundInfo,size);
     }
     private UncheckedBodyView(AbstractUncheckedSubSet parent,int boundInfo,int size){
       super(parent,boundInfo,size);
     }
-    
     private abstract static class Descending extends UncheckedBodyView{
         //TODO make not abstract
       private Descending(ByteSetImpl root,int boundInfo,int size){
@@ -151,7 +127,6 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   }
   private abstract static class CheckedFullView implements OmniSet.OfByte,Cloneable,Serializable{
       //TODO make not abstract
-  
     transient final ByteSetImpl.Checked root;
     private CheckedFullView(final ByteSetImpl.Checked root){
       this.root=root;
@@ -159,7 +134,6 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
     @Override public boolean add(Byte val){
       return this.add((byte)val);
     }
-    
     private abstract static class Descending extends CheckedFullView{
         //TODO make not abstract
       private Descending(final ByteSetImpl.Checked root){
@@ -188,7 +162,6 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
       return this.add((byte)val);
     }
   }
-  
   private abstract static class CheckedHeadView extends AbstractCheckedSubSet{
       //TODO make not abstract
     private CheckedHeadView(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -197,7 +170,6 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
     private CheckedHeadView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
     }
-    
     private static abstract class Descending extends CheckedHeadView{
       //TODO make not abstract
       private Descending(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -216,7 +188,6 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
     private CheckedTailView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
     }
-    
     private static abstract class Descending extends CheckedTailView{
       //TODO make not abstract
       private Descending(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -235,9 +206,148 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
     private CheckedBodyView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
     }
-    #MACRO DirectionlessMethods<Body,root,Checked>()
-    #MACRO DirectionedMethods<Body,root,Checked,Ascending>()
-    
+    @Override public boolean contains(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean contains(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean contains(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean contains(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean contains(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean contains(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean contains(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean contains(Object val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeVal(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeVal(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeVal(char val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeVal(int val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeVal(long val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeVal(float val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeVal(double val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean remove(Object val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public void clear(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean isEmpty(){
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,root.modCountAndSize>>>9);
+      return (modCountAndSize&0x1FF)==0;
+    }
+    @Override public int size(){
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,root.modCountAndSize>>>9);
+      return (modCountAndSize&0x1FF);
+    }
+    @Override public boolean add(boolean val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean add(byte val){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeIf(BytePredicate filter){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public boolean removeIf(Predicate<? super Byte> filter){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public void forEach(ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public void forEach(Consumer<? super Byte> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfByte iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Byte[] toArray(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public byte[] toByteArray(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short[] toShortArray(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int[] toIntArray(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long[] toLongArray(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float[] toFloatArray(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double[] toDoubleArray(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(T[] dst){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     private static class Descending extends CheckedBodyView{
       //TODO make not abstract
       private Descending(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -246,240 +356,54 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
       private Descending(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
         super(parent,boundInfo,modCountAndSize);
       }
-      #MACRO DirectionedMethods<Body,root,Checked,Descending>()
-    }
-  }
-}
-#MACRODEF DirectionedMethods<VIEW,SOURCE,CHECKED,DIRECTION>()
-#MACRO ForEachHelper(ByteConsumer,action)
-#MACRO ForEachHelper(Consumer<? super Byte>,action::accept)
-@Override public OmniIterator.OfByte iterator(){
-  #MACRO NYI()
-}
-#MACRO ToArrayHelper<Byte>(,DEFAULT_BOXED_ARR)
-#MACRO ToArrayHelper<byte>(Byte,DEFAULT_ARR)
-#MACRO ToArrayHelper<short>(Short,DEFAULT_ARR)
-#MACRO ToArrayHelper<int>(Int,DEFAULT_ARR)
-#MACRO ToArrayHelper<long>(Long,DEFAULT_ARR)
-#MACRO ToArrayHelper<float>(Float,DEFAULT_ARR)
-#MACRO ToArrayHelper<double>(Double,DEFAULT_ARR)
-@Override public <T> T[] toArray(T[] dst){
-  #MACRO NYI()
-}
-@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-  #MACRO NYI()
-}
-#ENDDEF
-#MACRODEF DirectionlessMethods<VIEW,SOURCE,CHECKED>()
-@Override public boolean contains(boolean val){
-  #MACRO NYI()
-}
-@Override public boolean contains(byte val){
-  #MACRO NYI()
-}
-@Override public boolean contains(char val){
-  #MACRO NYI()
-}
-@Override public boolean contains(int val){
-  #MACRO NYI()
-}
-@Override public boolean contains(long val){
-  #MACRO NYI()
-}
-@Override public boolean contains(float val){
-  #MACRO NYI()
-}
-@Override public boolean contains(double val){
-  #MACRO NYI()
-}
-@Override public boolean contains(Object val){
-  #MACRO NYI()
-}
-
-@Override public boolean removeVal(boolean val){
-  #MACRO NYI()
-}
-@Override public boolean removeVal(byte val){
-  #MACRO NYI()
-}
-@Override public boolean removeVal(char val){
-  #MACRO NYI()
-}
-@Override public boolean removeVal(int val){
-  #MACRO NYI()
-}
-@Override public boolean removeVal(long val){
-  #MACRO NYI()
-}
-@Override public boolean removeVal(float val){
-  #MACRO NYI()
-}
-@Override public boolean removeVal(double val){
-  #MACRO NYI()
-}
-@Override public boolean remove(Object val){
-  #MACRO NYI()
-}
-@Override public void clear(){
-#IFSWITCH VIEW==Full
-  #IFSWITCH CHECKED==Checked
-  final int modCountAndSize;
-    #IFSWITCH SOURCE==this
-  if(((modCountAndSize=SOURCE.modCountAndSize)&0x1ff)!=0){
-    #ELSEIFSWITCH SOURCE==root
-  final ByteSetImpl.Checked SOURCE;
-  if(((modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize)&0x1ff)!=0){  
-    #ENDIF
-    SOURCE.modCountAndSize=(modCountAndSize+(1<<9))&0xfffffe00;
-  }
-  #ELSE
-    #IFSWITCH SOURCE==this
-  SOURCE.word0=0;
-  SOURCE.word1=0;
-  SOURCE.word2=0;
-  SOURCE.word3=0; 
-    #ELSEIFSWITCH SOURCE==root
-  final ByteSetImpl SOURCE;
-  (SOURCE=this.SOURCE).word0=0;
-  SOURCE.word1=0;
-  SOURCE.word2=0;
-  SOURCE.word3=0;  
-    #ENDIF
-  #ENDIF
-#ELSEIFSWITCH VIEW==Head
-  #IFSWITCH CHECKED==Checked
-  final ByteSetImpl.Checked SOURCE;
-  int modCountAndSize;
-  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&0xfffffe00,((SOURCE=this.SOURCE).modCountAndSize)&0xfffffe00);
-  if(((modCountAndSize&=0x1ff))!=0){
-    SOURCE.modCountAndSize+=(modCountAndSize=(1<<9)-modCountAndSize)
-    var curr=this;
-    do{
-      curr.modCountAndSize+=modCountAndSize;
-    }while((curr=curr.parent)!=null);
-
-  #ELSE
-  final int size;
-  if((size=this.size)!=0){
-    this.size=0;
-    for(var parent=this.parent;parent!=null;parent=parent.parent){
-      parent.size-=size;
-    }
-  #ENDIF
-    goToEnd:for(;;){
-      goToWord0:for(;;){
-        goToWord1:for(;;){
-          final int boundInfo;
-          switch((boundInfo=this.boundInfo)>>6){
-          case -2:
-            SOURCE.word0&=(-1L<<boundInfo);
-            break goToEnd;
-          case -1:
-            SOURCE.word1&=(-1L<<boundInfo);
-            break goToWord0;
-          case 0:
-            SOURCE.word2&=(-1L<<boundInfo);
-            break goToWord1;
-          default:
-            SOURCE.word3&=(-1L<<boundInfo);
-          }
-          SOURCE.word2=0;
-          break;
-        }
-        SOURCE.word1=0;
-        break;
+      @Override public void forEach(ByteConsumer action){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
       }
-      SOURCE.word0=0;
-      break;
+      @Override public void forEach(Consumer<? super Byte> action){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public Byte[] toArray(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public byte[] toByteArray(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public short[] toShortArray(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public int[] toIntArray(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public long[] toLongArray(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public float[] toFloatArray(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public double[] toDoubleArray(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
     }
   }
-#ELSEIFSWITCH VIEW==Tail
-  #IFSWITCH CHECKED==Checked
-  #MACRO NYI();
-  #ELSE
-  #MACRO NYI();
-  #ENDIF
-#ELSEIFSWITCH VIEW==Body
-  #IFSWITCH CHECKED==Checked
-  #MACRO NYI();
-  #ELSE
-  #MACRO NYI();
-  #ENDIF
-#ENDIF
 }
-@Override public boolean isEmpty(){
-#IFSWITCH VIEW==Full
-  #IFSWITCH CHECKED==Checked
-  return (SOURCE.modCountAndSize&0x1FF)==0;
-  #ELSE
-  return SOURCE.size==0;
-  #ENDIF
-#ELSEIFSWITCH VIEW==Head,Tail,Body
-  #IFSWITCH CHECKED==Checked
-  final int modCountAndSize;
-  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,root.modCountAndSize>>>9);
-  return (modCountAndSize&0x1FF)==0;
-  #ELSE
-  return this.size==0;
-  #ENDIF
-#ENDIF
-}
-@Override public int size(){
-#IFSWITCH VIEW==Full
-  #IFSWITCH CHECKED==Checked
-  return (SOURCE.modCountAndSize&0x1FF);
-  #ELSE
-  return SOURCE.size;
-  #ENDIF
-#ELSEIFSWITCH VIEW==Head,Tail,Body
-  #IFSWITCH CHECKED==Checked
-  final int modCountAndSize;
-  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,root.modCountAndSize>>>9);
-  return (modCountAndSize&0x1FF);
-  #ELSE
-  return this.size;
-  #ENDIF
-#ENDIF
-}
-@Override public boolean add(boolean val){
-  #MACRO NYI()
-}
-@Override public boolean add(byte val){
-  #MACRO NYI()
-}
-#MACRO RemoveIfHelper(BytePredicate,filter)
-#MACRO RemoveIfHelper(Predicate<? super Byte>,filter::test)
-#IFNOTSWITCH VIEW==Full,Head,Tail,Body
-ERROR unknown view VIEW
-#ENDIF
-#IFNOTSWITCH SOURCE==root,this
-ERROR unknown source SOURCE
-#ENDIF
-#IFNOTSWITCH CHECKED==Checked,Unchecked
-ERROR unknown checked type CHECKED
-#ENDIF
-#IFNOTSWITCH VIEW==Full
-  #IFNOTSWITCH SOURCE==root
-ERROR the source SOURCE cannot be matched with the view VIEW
-  #ENDIF
-#ENDIF
-#ENDDEF
-#MACRODEF ToArrayHelper<RETTYPE>(CLASSPREFIX,DEFAULTARR)
-@Override public RETTYPE[] toCLASSPREFIXArray(){
-  #MACRO NYI()
-}
-#ENDDEF
-#MACRODEF ForEachHelper(CONSUMER,ACCEPT)
-@Override public void forEach(CONSUMER action){
-  #MACRO NYI()
-}
-#ENDDEF
-#MACRODEF RemoveIfHelper(PREDICATE,TEST)
-@Override public boolean removeIf(PREDICATE filter){
-  #MACRO NYI()
-}
-#ENDDEF
-#MACRODEF NYI()
-//TODO
-throw new omni.util.NotYetImplementedException();
-#ENDDEF
