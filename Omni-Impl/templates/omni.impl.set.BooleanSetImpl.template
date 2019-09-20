@@ -19,13 +19,11 @@ import java.util.Set;
 import omni.api.OmniSet;
 import java.util.NoSuchElementException;
 import omni.impl.AbstractBooleanItr;
-import omni.api.OmniNavigableSet;
 import java.util.ConcurrentModificationException;
 public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,Cloneable{
-  //TODO reconsider the subset implementation
   transient int state;
   @Override public OmniNavigableSet.OfBoolean descendingSet(){
-    return new Descending(this);
+    return new DescendingView(this);
   }
   #MACRO Constructors<BooleanSetImpl>()
   #MACRO Comparator<Ascending>()
@@ -59,7 +57,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
   public static class Checked extends BooleanSetImpl{
     #MACRO Constructors<Checked>()
     @Override public OmniNavigableSet.OfBoolean descendingSet(){
-      return new Descending.Checked(this);
+      return new DescendingView.Checked(this);
     }
     @Override public OmniIterator.OfBoolean iterator(){
       final int state;
@@ -103,7 +101,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     }
     #MACRO FirstAndLastBoolean<this,Descending,False,Full>()
     @Override public OmniNavigableSet.OfBoolean descendingSet(){
-      return new BooleanSetImpl(this);
+      return new AscendingView(this);
     }
     #MACRO SubSetMethods<this,Full,Descending,False>()
     public static class Checked extends Descending{
@@ -116,7 +114,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         return new CheckedDescendingFullItr(this,state);
       }
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
-        return new BooleanSetImpl.Checked(this);
+        return new AscendingView.Checked(this);
       }
       @Override public OmniIterator.OfBoolean descendingIterator(){
         final int state;
@@ -136,7 +134,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     this.state=ois.readUnsignedByte();
   }
   private static boolean equalsFullState(Set<?> val){
-    //TODO optimize
     if(val.size()==2){
       if(val instanceof OmniSet){
         if(val instanceof AbstractBooleanSet){
@@ -152,7 +149,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     return false;
   }
   private static boolean equalsTrueState(Set<?> val){
-    //TODO optimize
     if(val.size()==1){
       if(val instanceof OmniSet){
         if(val instanceof AbstractBooleanSet){
@@ -167,7 +163,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     return false;
   }
   private static boolean equalsFalseState(Set<?> val){
-    //TODO optimize
     if(val.size()==1){
       if(val instanceof OmniSet){
         if(val instanceof AbstractBooleanSet){
@@ -407,8 +402,11 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         return new CheckedTrueItr(root,0b10);
       }
       @Override public OmniIterator.OfBoolean descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        final BooleanSetImpl root;
+        if(((root=this.root).state)==0b00){
+          return EMPTY_ITR;
+        }
+        return new CheckedTrueItr(root,0b10);
       }
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
         return new UncheckedTrueView.Checked.Descending(root);
@@ -509,12 +507,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
     }
   }
-  
-  
-  
-
-
-
   private static class UncheckedAscendingFullItr extends AbstractBooleanItr{
     // valid itrStates
     // state | previously returned | next return | nextBoolean post-state | remove                                                  | forEachRemaining | expected root state
@@ -693,38 +685,604 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
 @Override public RETTYPE INPUTTYPECeiling(INPUTTYPE val){
 #ENDIF
 #IFSWITCH VIEW==Full
-
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH RETTYPE==boolean,Boolean
+  switch(SOURCE.state){
+    case 0b11:
+      return val;
+    case 0b10:
+      return TRUEVAL;
+    default:
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==char
+  switch(SOURCE.state){
+   case 0b11:
+     if(val==TRUEVAL){
+       return TRUEVAL;
+     }
+     break;
+   case 0b10:
+     if(val<=TRUEVAL){
+       return TRUEVAL;
+     }
+   default:
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==double,float
+  switch(SOURCE.state){
+  case 0b11:
+    if(val<=FALSEVAL){
+      return FALSEVAL;
+    }
+  case 0b10:
+    if(val<=TRUEVAL){
+      return TRUEVAL;
+    }
+    break;
+  case 0b01:
+    if(val<=FALSEVAL){
+      return FALSEVAL;
+    }
+    break;
+  default:
+  }
+  return DEFAULTVAL;
+      #ELSE
+  switch(SOURCE.state){
+  case 0b11:
+        #IFSWITCH RETTYPE==long
+    switch(Long.signum(val-TRUEVAL)){
+        #ELSE
+    switch(Integer.signum(val-TRUEVAL)){
+        #ENDIF
+    case -1:
+      return FALSEVAL;
+    case 0:
+      return TRUEVAL;
+    default:
+    }
+    break;
+  case 0b10:
+    if(val<=TRUEVAL){
+      return TRUEVAL;
+    }
+    break;
+  case 0b01:
+    if(val<=FALSEVAL){
+      return FALSEVAL;
+    }
+  default:
+  }
+  return DEFAULTVAL;
+      #ENDIF
+    #ELSEIFSWITCH DIRECTION==Descending
+      #IFSWITCH RETTYPE==Boolean
+  return super.floor(val); 
+      #ELSE
+  return super.RETTYPEFloor(val);
+      #ENDIF  
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH RETTYPE==Boolean
+  return root.floor(val); 
+    #ELSE
+  return root.RETTYPEFloor(val);
+    #ENDIF  
+  #ENDIF
 #ELSEIFSWITCH VIEW==True
-
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean
+  return (SOURCE.state&0b10)!=0;
+    #ELSEIFSWITCH RETTYPE==Boolean
+  if((SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+    #ELSE
+  if(val<=TRUEVAL && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH RETTYPE==Boolean
+  return super.floor(val);
+    #ELSE
+  return super.RETTYPEFloor(val);
+    #ENDIF
+  #ENDIF
 #ELSEIFSWITCH VIEW==False
-
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean,char
+  return DEFAULTVAL;
+    #ELSEIFSWITCH RETTYPE==Boolean
+  if(!val && (SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;
+    #ELSE
+  if(val<=FALSEVAL && (SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH RETTYPE==Boolean
+  return super.floor(val); 
+    #ELSE
+  return super.RETTYPEFloor(val);
+    #ENDIF
+  #ENDIF
 #ENDIF
-  //TODO
-  throw new omni.util.NotYetImplementedException();
 }
 #IFSWITCH RETTYPE==Boolean
 @Override public RETTYPE floor(INPUTTYPE val){
 #ELSE
 @Override public RETTYPE INPUTTYPEFloor(INPUTTYPE val){
 #ENDIF
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH RETTYPE==boolean
+  return val && (SOURCE.state&0b10)!=0;
+      #ELSEIFSWITCH RETTYPE==Boolean
+  switch(SOURCE.state){
+    case 0b11:
+      return val;
+    case 0b01:
+      return FALSEVAL;
+    case 0b10:
+      if(val){
+        return TRUEVAL;
+      }
+    case 0b00:
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==char
+  if(val>FALSEVAL && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==float,double
+  switch(SOURCE.state){
+  case 0b11:
+    if(val>=TRUEVAL){
+      return TRUEVAL;
+    }
+  case 0b01:
+    if(val>=FALSEVAL){
+      return FALSEVAL;
+    }
+    break;
+  case 0b10:
+    if(val>=TRUEVAL){
+      return TRUEVAL;
+    }
+  default:
+  }
+  return DEFAULTVAL;
+      #ELSE
+  switch(SOURCE.state){
+  case 0b11:
+        #IFSWITCH RETTYPE==long
+    switch(Long.signum(val)){
+        #ELSE
+    switch(Integer.signum(val)){ 
+        #ENDIF
+    case 1:
+      return TRUEVAL;
+    case 0:
+      return FALSEVAL;
+    default:
+    }
+    break;
+  case 0b01:
+    if(val>=FALSEVAL){
+      return FALSEVAL;
+    }
+    break;
+  case 0b10:
+    if(val>=TRUEVAL){
+      return TRUEVAL;
+    }
+  default:
+  }
+  return DEFAULTVAL;
+      #ENDIF
+    #ELSEIFSWITCH DIRECTION==Descending
+      #IFSWITCH RETTYPE==Boolean
+  return super.ceiling(val); 
+      #ELSE
+  return super.RETTYPECeiling(val);
+      #ENDIF  
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH RETTYPE==Boolean
+  return root.ceiling(val); 
+    #ELSE
+  return root.RETTYPECeiling(val);
+    #ENDIF  
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean
+  return val && (SOURCE.state&0b10)!=0;
+    #ELSEIFSWITCH RETTYPE==Boolean
+  if(val && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+    #ELSE
+   if(val>=TRUEVAL && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL; 
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH RETTYPE==Boolean
+  return super.ceiling(val);
+    #ELSE
+  return super.RETTYPECeiling(val);
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean,char
+  return DEFAULTVAL;
+    #ELSEIFSWITCH RETTYPE==Boolean
+  if((SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;  
+    #ELSE
+  if(val>=FALSEVAL && (SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH RETTYPE==Boolean
+  return super.ceiling(val); 
+    #ELSE
+  return super.RETTYPECeiling(val);
+    #ENDIF
+  #ENDIF
+#ENDIF
 }
 @Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH RETTYPE==boolean
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==Boolean
+  if(val && (SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==char
+  if(val>TRUEVAL && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==float,double
+  switch(SOURCE.state){
+  case 0b11:
+    if(val>TRUEVAL){
+      return TRUEVAL;
+    }
+  case 0b01:
+    if(val>FALSEVAL){
+      return FALSEVAL;
+    }
+    break;
+  case 0b10:
+    if(val>TRUEVAL){
+      return TRUEVAL;
+    }
+  default:
+  }
+  return DEFAULTVAL;
+      #ELSE
+  switch(SOURCE.state){
+  case 0b11:
+        #IFSWITCH RETTYPE==long
+    switch(Long.signum(val-TRUEVAL)){
+        #ELSE
+    switch(Integer.signum(val-TRUEVAL)){    
+        #ENDIF
+    case 1:
+      return TRUEVAL;
+    case 0:
+      return FALSEVAL;
+    default:
+    }
+    break;
+  case 0b01:
+    if(val>FALSEVAL){
+      return FALSEVAL;
+    }
+    break;
+  case 0b10:
+    if(val>TRUEVAL){
+      return TRUEVAL;
+    }
+  default:
+  }    
+  return DEFAULTVAL;
+      #ENDIF
+    #ELSEIFSWITCH DIRECTION==Descending
+  return super.higherCLASSPREFIX(val);
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+  return SOURCE.higherCLASSPREFIX(val);
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean,Boolean
+  return DEFAULTVAL;
+    #ELSE
+  if(val>TRUEVAL && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    return super.higherCLASSPREFIX(val);
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean,char
+  return DEFAULTVAL;
+    #ELSEIFSWITCH RETTYPE==Boolean
+  if(val && (SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;
+    #ELSE
+  if(val>FALSEVAL && (SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  }  
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+  return super.higherCLASSPREFIX(val);
+  #ENDIF
+#ENDIF
 }
 @Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH RETTYPE==boolean
+  return !val && (SOURCE.state&0b10)!=0;
+      #ELSEIFSWITCH RETTYPE==Boolean
+  if(!val && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==char
+  if(val==FALSEVAL && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==float,double
+  switch(SOURCE.state){
+  case 0b11:
+    if(val<FALSEVAL){
+      return FALSEVAL;
+    }
+  case 0b10:
+    if(val<TRUEVAL){
+      return TRUEVAL;
+    }
+    break;
+  case 0b01:
+    if(val<FALSEVAL){
+      return FALSEVAL;
+    }
+  default:
+  }
+  return DEFAULTVAL;
+      #ELSE
+  switch(SOURCE.state){
+  case 0b11:
+    #IFSWITCH RETTYPE==long
+    switch(Long.signum(val)){
+    #ELSE
+    switch(Integer.signum(val)){
+    #ENDIF
+    case -1:
+      return FALSEVAL;
+    case 0:
+      return TRUEVAL;
+    default:
+    }
+    break;
+  case 0b10:
+    if(val<TRUEVAL){
+      return TRUEVAL;
+    }
+    break;
+  case 0b01:
+    if(val<FALSEVAL){
+      return FALSEVAL;
+    }
+  default:
+  }
+  return DEFAULTVAL;
+      #ENDIF
+    #ELSEIFSWITCH DIRECTION==Descending
+  return super.lowerCLASSPREFIX(val);
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+  return SOURCE.lowerCLASSPREFIX(val);
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean
+  return !val && (SOURCE.state&0b10)!=0;
+    #ELSEIFSWITCH RETTYPE==Boolean
+  if(!val && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+    #ELSEIFSWITCH RETTYPE==char
+  if(val==0 && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  }  
+  return DEFAULTVAL;
+    #ELSE
+  if(val<TRUEVAL && (SOURCE.state&0b10)!=0){
+    return TRUEVAL;
+  } 
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+  return super.lowerCLASSPREFIX(val);
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean,Boolean,char
+  return DEFAULTVAL;
+    #ELSE
+  if(val<FALSEVAL && (SOURCE.state&0b01)!=0){
+    return FALSEVAL;
+  } 
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+  return super.lowerCLASSPREFIX(val);
+  #ENDIF
+#ENDIF
 }
 @Override public RETTYPE pollFirstCLASSPREFIX(){
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH RETTYPE==boolean,char
+  switch(SOURCE.state){
+    case 0b10:
+      SOURCE.state=0b00;
+      return TRUEVAL;
+    case 0b11:
+      SOURCE.state=0b10;
+      break;
+    case 0b01:
+      SOURCE.state=0b00;
+    default:
+  }
+  return DEFAULTVAL;
+      #ELSE
+  switch(SOURCE.state){
+    default:
+      return DEFAULTVAL;
+    case 0b10:
+      SOURCE.state=0b00;
+      return TRUEVAL;
+    case 0b11:
+      SOURCE.state=0b10;
+      break;
+    case 0b01:
+      SOURCE.state=0b00;
+  }
+  return FALSEVAL;  
+      #ENDIF
+    #ELSEIFSWITCH DIRECTION==Descending
+  return super.pollLastCLASSPREFIX();
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+  return root.pollLastCLASSPREFIX();
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b10)!=0){
+    SOURCE.state=state-0b10;
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+  #ELSEIFSWITCH DIRECTION==Descending
+  return super.pollLastCLASSPREFIX();
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean,char
+  SOURCE.state&=0b10;
+  return DEFAULTVAL;
+    #ELSE
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b01)!=0){
+    SOURCE.state=state-0b01;
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+  return super.pollLastCLASSPREFIX();
+  #ENDIF
+#ENDIF
+  
 }
 @Override public RETTYPE pollLastCLASSPREFIX(){
-  //TODO
-  throw new omni.util.NotYetImplementedException();
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+  switch(SOURCE.state){
+    case 0b01:
+      SOURCE.state=0b00;
+    #IFNOTSWITCH RETTYPE==boolean,char
+      return FALSEVAL;
+    #ENDIF
+    default:
+      return DEFAULTVAL;
+    case 0b10:
+      SOURCE.state=0b00;
+      break;
+    case 0b11:
+      SOURCE.state=0b01;
+  }
+  return TRUEVAL;
+    #ELSEIFSWITCH DIRECTION==Descending
+  return super.pollFirstCLASSPREFIX();
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+  return SOURCE.pollFirstCLASSPREFIX();
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b10)!=0){
+    SOURCE.state=state-0b10;
+    return TRUEVAL;
+  }
+  return DEFAULTVAL;
+  #ELSEIFSWITCH DIRECTION==Descending
+  return super.pollFirstCLASSPREFIX();
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH RETTYPE==boolean,char
+  SOURCE.state&=0b10;
+  return DEFAULTVAL;
+    #ELSE
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b01)!=0){
+    SOURCE.state=state-0b01;
+    return FALSEVAL;
+  }
+  return DEFAULTVAL;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+  return super.pollFirstCLASSPREFIX();
+  #ENDIF
+#ENDIF
 }
 #ENDDEF
 #MACRODEF AccessMethods<SOURCE,VIEW,DIRECTION>()
@@ -741,9 +1299,9 @@ ERROR the view VIEW cannot be matched with the source SOURCE
 #ENDIF
 #MACRO AccessMethodsHelper<Boolean>(Boolean.TRUE,Boolean.FALSE,,boolean,null)
 #MACRO AccessMethodsHelper<boolean>(true,false,Boolean,boolean,false)
-#MACRO AccessMethodsHelper<byte>((byte)1,(byte)0,Byte,byte,Byte.MIN_VALUE)
-#MACRO AccessMethodsHelper<char>((char)1,(char)0,Char,char,Character.MIN_VALUE)
-#MACRO AccessMethodsHelper<short>((short)1,(short)0,Short,short,Short.MIN_VALUE)
+#MACRO AccessMethodsHelper<byte>(1,0,Byte,byte,Byte.MIN_VALUE)
+#MACRO AccessMethodsHelper<char>(1,0,Char,char,Character.MIN_VALUE)
+#MACRO AccessMethodsHelper<short>(1,0,Short,short,Short.MIN_VALUE)
 #MACRO AccessMethodsHelper<int>(1,0,Int,int,Integer.MIN_VALUE)
 #MACRO AccessMethodsHelper<long>(1L,0L,Long,long,Long.MIN_VALUE)
 #MACRO AccessMethodsHelper<float>(1F,0F,Float,float,Float.NaN)
@@ -1201,27 +1759,491 @@ ERROR unknown checked type CHECKED_TYPE
 ERROR the source SOURCE cannot be matched with the view VIEW
   #ENDIF
 #ENDIF
+@Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
+#IFSWITCH VIEW==Full
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    return new UncheckedTrueView.Checked(SOURCE);
+  }
+  return this;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement){
+    return new UncheckedTrueView(SOURCE);
+  }
+  return this;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    return this;
+  }
+  return new UncheckedFalseView.Checked.Descending(SOURCE);
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement){
+    return this;
+  }
+  return new UncheckedFalseView.Descending(SOURCE);
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  return this;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    return this;
+  }
+  return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+  }
+  return this;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+  }
+  return this;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(!fromElement){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  return this;
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+@Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
+#IFSWITCH VIEW==Full
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement==inclusive){
+    return new UncheckedTrueView.Checked(SOURCE);
+  }else if(fromElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
+  }
+  return this;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement==inclusive){
+    return new UncheckedTrueView(SOURCE);
+  }else if(fromElement){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+  }
+  return this;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement^inclusive){
+    return new UncheckedFalseView.Checked.Descending(SOURCE);
+  }else if(fromElement){
+    return this;
+  }
+  return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement^inclusive){
+    return new UncheckedFalseView.Descending(SOURCE);
+  }else if(fromElement){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement==inclusive){
+    return this;
+  }else if(fromElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement==inclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement^inclusive){
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+  }else if(fromElement){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement^inclusive){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+  }
+  return this;
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement==inclusive){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+  }else if(inclusive){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement==inclusive){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+  }
+  return this;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement^inclusive){
+    return this;
+  }else if(!fromElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement^inclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+@Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
+#IFSWITCH VIEW==Full
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement){
+    return this;
+  }
+  return new UncheckedFalseView.Checked(SOURCE);
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement){
+    return this;
+  }
+  return new UncheckedFalseView(SOURCE);
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement){
+    return new UncheckedTrueView.Checked.Descending(SOURCE);
+  }
+  return this;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement){
+    return new UncheckedTrueView.Descending(SOURCE);
+  }
+  return this;
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement){
+    return this;
+  }
+  return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  return this;
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(!toElement){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  return this;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+  }
+  return this;
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+  }
+  return this;
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+@Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
+#IFSWITCH VIEW==Full
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement ^ inclusive){
+    return new UncheckedFalseView.Checked(SOURCE);
+  }else if(toElement){
+    return this;
+  }else{
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
+  }
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement ^ inclusive){
+    return new UncheckedFalseView(SOURCE);
+  }else if(toElement){
+    return this;
+  }else{
+    return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+  } 
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement==inclusive){
+    return new UncheckedTrueView.Checked.Descending(SOURCE);
+  }else if(toElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD;
+  }else{
+    return this;
+  }
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement==inclusive){
+    return new UncheckedTrueView.Descending(SOURCE);
+  }else if(toElement){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+  }else{
+    return this;
+  }  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement^inclusive){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+  }else if(toElement){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement && inclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement==inclusive){
+    return this;
+  }else if(toElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD;
+  }
+  throw new IllegalArgumentException("out of bounds");
+  
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement==inclusive){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement^inclusive){
+    return this;
+  }else if(!toElement){
+    return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement^inclusive){
+    return this;
+  }  
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement==inclusive){
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+  }else if(inclusive){
+    return this;
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(toElement==inclusive){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+  }  
+  return this;
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+@Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
+#IFSWITCH VIEW==Full
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    if(toElement){
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    }else{
+      return new UncheckedTrueView.Checked(SOURCE);
+    }
+  }else{
+    if(toElement){
+      return new UncheckedFalseView.Checked(SOURCE);
+    }else{
+      return this;
+    }
+  }
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement){
+    if(toElement){
+      return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    }else{
+      return new UncheckedTrueView(SOURCE);
+    }
+  }else{
+    if(toElement){
+      return new UncheckedFalseView(SOURCE);
+    }else{
+      return this;
+    }
+  } 
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    if(toElement){
+      return new UncheckedTrueView.Checked.Descending(SOURCE);
+    }else{
+      return this;
+    }
+  }else{
+    if(toElement){
+      return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+    }else{
+      return new UncheckedFalseView.Checked.Descending(SOURCE);
+    }
+  }
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement){
+    if(toElement){
+      return new UncheckedTrueView.Descending(SOURCE);
+    }else{
+      return this;
+    }
+  }else{
+    if(toElement){
+      return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+    }else{
+      return new UncheckedFalseView.Descending(SOURCE);
+    }
+  }  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==True
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(fromElement){
+    if(toElement){
+      return this;
+    }else{
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    }
+  }
+  throw new IllegalArgumentException("out of bounds");
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement && toElement){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(toElement){
+    if(fromElement){
+      return this;
+    }else{
+      return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+    }
+  }
+  throw new IllegalArgumentException("out of bounds"); 
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(fromElement && toElement){
+    return this;
+  } 
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==False
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED_TYPE==True
+  if(!toElement){
+    if(fromElement){
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    }else{
+      return this;
+    }
+  }
+  throw new IllegalArgumentException("out of bounds"); 
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(!toElement && !fromElement){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    #ENDIF
+  #ELSEIFSWITCH DIRECTION==Descending
+    #IFSWITCH CHECKED_TYPE==True
+  if(!fromElement){
+    if(toElement){
+      return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+    }else{
+      return this;
+    }
+  }
+  throw new IllegalArgumentException("out of bounds"); 
+    #ELSEIFSWITCH CHECKED_TYPE==False
+  if(!fromElement && !toElement){
+    return this;
+  }
+  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
 @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
 #IFSWITCH VIEW==Full
   #IFSWITCH DIRECTION==Ascending
-  //                     Truth table
-  // fromElem |  toElem  | fromIncl |  toIncl  | result 
-  //    T     |    T     |    T     |    F     | empty middle
-  //    T     |    F     |    T     |    T     | empty middle
-  //    F     |    T     |    F     |    F     | empty middle
-  //    F     |    F     |    F     |    T     | empty middle
-  //    T     |    T     |    T     |    T     | true view
-  //    F     |    T     |    F     |    T     | true view
-  //    T     |    F     |    T     |    F     | invalid
-  //    F     |    F     |    F     |    F     | invalid
-  //    F     |    T     |    T     |    F     | false view
-  //    F     |    F     |    T     |    T     | false view
-  //    T     |    T     |    F     |    F     | invalid
-  //    T     |    F     |    F     |    T     | invalid
-  //    T     |    T     |    F     |    T     | empty tail
-  //    F     |    T     |    T     |    T     | this
-  //    F     |    F     |    T     |    F     | empty head
-  //    T     |    F     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
   if(fromElement==fromInclusive){
     if(toElement^toInclusive){
@@ -1248,11 +2270,11 @@ ERROR the source SOURCE cannot be matched with the view VIEW
     #ELSEIFSWITCH CHECKED_TYPE==False
   if(fromElement==fromInclusive){
     if(toElement && toInclusive){
-      return new UncheckedTrueView.Checked(SOURCE);
+      return new UncheckedTrueView(SOURCE);
     }
   }else if(toElement^toInclusive){
     if(fromInclusive){
-      return new UncheckedFalseView.Checked(SOURCE);
+      return new UncheckedFalseView(SOURCE);
     }
   }else if(toElement && !fromElement){
     return this;
@@ -1260,28 +2282,10 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
-  //                     Truth table
-  // fromElem |  toElem  | fromIncl |  toIncl  | result
-  //    T     |    F     |    F     |    F     | empty middle
-  //    F     |    T     |    T     |    T     | empty middle
-  //    T     |    T     |    F     |    T     | empty middle
-  //    F     |    F     |    T     |    F     | empty middle
-  //    T     |    F     |    F     |    T     | false view
-  //    F     |    F     |    T     |    T     | false view
-  //    T     |    T     |    F     |    F     | invalid
-  //    F     |    T     |    T     |    F     | invalid
-  //    T     |    T     |    T     |    T     | true view
-  //    T     |    F     |    T     |    F     | true view
-  //    F     |    T     |    F     |    T     | invalid
-  //    F     |    F     |    F     |    F     | invalid
-  //    T     |    T     |    T     |    F     | empty head
-  //    T     |    F     |    T     |    T     | this
-  //    F     |    F     |    F     |    T     | empty tail
-  //    F     |    T     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
   if(fromElement^fromInclusive){
     if(toElement==toInclusive){
-      return AbstractBooleanSet.CHECKED_DESCENDING_MIDDLE;
+      return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
     }else if(toInclusive){
       return new UncheckedFalseView.Checked.Descending(SOURCE);
     }
@@ -1291,22 +2295,22 @@ ERROR the source SOURCE cannot be matched with the view VIEW
     }
   }else if(fromInclusive){
     if(toElement){
-      return AbstractBooleanSet.CHECKED_DESCENDING_HEAD;
+      return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD;
     }else{
       return this;
     }
   }else if(toInclusive){
-    return AbstractBooleanSet.CHECKED_DESCENDING_TAIL;
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL;
   }
   throw new IllegalArgumentException("out of bounds");  
     #ELSEIFSWITCH CHECKED_TYPE==False
   if(fromElement^fromInclusive){
     if(toInclusive && !toElement){
-      return new UncheckedFalseView.Checked.Descending(SOURCE);
+      return new UncheckedFalseView.Descending(SOURCE);
     }
   }else if(fromElement){
     if(toElement==toInclusive){
-      return new UncheckedTrueView.Checked.Descending(SOURCE);
+      return new UncheckedTrueView.Descending(SOURCE);
     }else if(toInclusive){
       return this;
     }
@@ -1316,24 +2320,6 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH DIRECTION==Ascending
-  //                     Truth table
-  // fromElem |  toElem  | fromIncl |  toIncl  | result
-  //    T     |    T     |    T     |    F     | empty middle
-  //    T     |    F     |    T     |    T     | empty middle
-  //    F     |    T     |    F     |    F     | empty middle
-  //    F     |    F     |    F     |    T     | empty middle
-  //    T     |    T     |    T     |    T     | this
-  //    F     |    T     |    F     |    T     | this
-  //    T     |    F     |    T     |    F     | invalid
-  //    F     |    F     |    F     |    F     | invalid
-  //    T     |    T     |    F     |    T     | empty tail
-  //    T     |    T     |    F     |    F     | invalid
-  //    T     |    F     |    F     |    T     | invalid
-  //    T     |    F     |    F     |    F     | invalid
-  //    F     |    T     |    T     |    T     | invalid
-  //    F     |    T     |    T     |    F     | invalid
-  //    F     |    F     |    T     |    T     | invalid
-  //    F     |    F     |    T     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
   if(fromElement==fromInclusive){
     if(toElement^toInclusive){
@@ -1352,24 +2338,6 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
-  //                     Truth table
-  // fromElem |  toElem  | fromIncl |  toIncl  | result
-  //    T     |    T     |    F     |    T     | empty middle
-  //    T     |    F     |    F     |    F     | empty middle
-  //    F     |    T     |    T     |    T     | empty middle
-  //    F     |    F     |    T     |    F     | empty middle
-  //    T     |    T     |    T     |    T     | this
-  //    T     |    F     |    T     |    F     | this
-  //    F     |    T     |    F     |    T     | invalid
-  //    F     |    F     |    F     |    F     | invalid
-  //    T     |    T     |    T     |    F     | empty head
-  //    T     |    T     |    F     |    F     | invalid
-  //    T     |    F     |    F     |    T     | invalid
-  //    F     |    T     |    T     |    F     | invalid
-  //    F     |    F     |    T     |    T     | invalid
-  //    T     |    F     |    T     |    T     | invalid
-  //    F     |    T     |    F     |    F     | invalid
-  //    F     |    F     |    F     |    T     | invalid
     #IFSWITCH CHECKED_TYPE==True
   if(toElement==toInclusive){
     if(fromElement^fromInclusive){
@@ -1378,7 +2346,7 @@ ERROR the source SOURCE cannot be matched with the view VIEW
       return this;
     }
   }else if(toElement && fromElement && fromInclusive){
-    return AbstractBooleanSEt.CHECKED_EMPTY_DESCENDING_HEAD;
+    return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD;
   }
   throw new IllegalArgumentException("out of bounds");
     #ELSEIFSWITCH CHECKED_TYPE==False
@@ -1390,24 +2358,6 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH DIRECTION==Ascending
-  //                     Truth table
-  // fromElem |  toElem  | fromIncl |  toIncl  | result
-  //    T     |    T     |    T     |    F     | empty middle
-  //    T     |    F     |    T     |    T     | empty middle
-  //    F     |    T     |    F     |    F     | empty middle
-  //    F     |    F     |    F     |    T     | empty middle
-  //    F     |    T     |    T     |    F     | this
-  //    F     |    F     |    T     |    T     | this
-  //    T     |    T     |    F     |    F     | invalid
-  //    T     |    F     |    F     |    T     | invalid
-  //    F     |    F     |    T     |    F     | empty head
-  //    T     |    T     |    F     |    T     | invalid
-  //    T     |    T     |    T     |    T     | invalid
-  //    T     |    F     |    T     |    F     | invalid
-  //    T     |    F     |    F     |    F     | invalid
-  //    F     |    T     |    T     |    T     | invalid
-  //    F     |    T     |    F     |    T     | invalid
-  //    F     |    F     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
   if(toElement ^ toInclusive){
     if(fromElement==fromInclusive){
@@ -1415,7 +2365,7 @@ ERROR the source SOURCE cannot be matched with the view VIEW
     }else if(fromInclusive){
       return this;
     }
-  }else if(!toInclusive && fromInclusive && && !fromElement){
+  }else if(!toInclusive && fromInclusive && !fromElement){
     return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
   }
   throw new IllegalArgumentException("out of bounds");
@@ -1426,24 +2376,6 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
-  //                     Truth table
-  // fromElem |  toElem  | fromIncl |  toIncl  | result
-  //    T     |    T     |    F     |    T     | empty middle
-  //    T     |    F     |    F     |    F     | empty middle
-  //    F     |    T     |    T     |    T     | empty middle
-  //    F     |    F     |    T     |    F     | empty middle
-  //    T     |    F     |    F     |    T     | this
-  //    F     |    F     |    T     |    T     | this
-  //    F     |    T     |    T     |    F     | invalid
-  //    T     |    T     |    F     |    F     | invalid
-  //    F     |    F     |    F     |    T     | empty tail
-  //    T     |    T     |    T     |    F     | invalid
-  //    T     |    F     |    T     |    T     | invalid
-  //    T     |    T     |    T     |    T     | invalid
-  //    T     |    F     |    T     |    F     | invalid
-  //    F     |    T     |    F     |    T     | invalid
-  //    F     |    T     |    F     |    F     | invalid
-  //    F     |    F     |    F     |    F     | invalid
     #IFSWITCH CHECKED_TYPE==True
   if(fromElement^fromInclusive){
     if(toElement==toInclusive){

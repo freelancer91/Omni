@@ -1,0 +1,99 @@
+#TYPEDEF OfByte
+package omni.impl.set;
+
+public class ByteSetImpl implements OmniSet.OfByte,Externalizable,Cloneable{
+  //TODO equals methods
+  //TODO toString methods
+  //TODO clone methods
+  //TODO hashCode methods
+  //TODO read/write methods
+  //TODO constructors
+  transient long word0;
+  transient long word1;
+  transient long word2;
+  transient long word3;
+
+
+  public static class Checked extends ByteSetImpl{
+    transient int modCountAndSize;
+    
+    public static class Descending extends Checked{
+    
+    }
+    
+  }
+  public static class Descending extends ByteSetImpl{
+  
+  }
+  
+  
+  private static class UncheckedFullView implements OmniSet.OfByte,Cloneable,Serializable{
+    transient final ByteSetImpl root;
+    private static class Descending{
+    
+    }
+  
+  }
+  
+  private static class UncheckedHeadView implements OmniSet.OfByte{
+    transient final ByteSetImpl root;
+    transient final UncheckedHeadView parent;
+    transient final int boundInfo;
+    transient int size;
+    private static class Descending extends UncheckedHeadView{
+    
+    }
+  }
+  private static class UncheckedTailView implements OmniSet.OfByte{
+    transient final ByteSetImpl root;
+    transient final UncheckedTailView parent;
+    transient final int boundInfo;
+    transient int size;
+    private static class Descending extends UncheckedTailView{
+    
+    }
+  }
+  private static class UncheckedBodyView implements OmniSet.OfByte{
+    transient final ByteSetImpl root;
+    transient final UncheckedBodyView parent;
+    transient final int boundInfo;
+    transient int size;
+    private static class Descending extends UncheckedBodyView{
+    
+    }
+  }
+  private static class CheckedFullView implements OmniSet.OfByte,Cloneable,Serializable{
+    transient final ByteSetImpl.Checked root;
+    transient int modCountAndSize;
+    private static class Descending extends CheckedFullView{
+    
+    }
+  }
+  private static class CheckedHeadView implements OmniSet.OfByte{
+    transient final ByteSetImpl.Checked root;
+    transient final CheckedHeadView parent;
+    transient final int boundInfo;
+    transient int modCountAndSize;
+    private static class Descending extends CheckedHeadView{
+    
+    }
+  }
+  private static class CheckedTailView implements OmniSet.OfByte{
+    transient final ByteSetImpl.Checked root;
+    transient final CheckedTailView parent;
+    transient final int boundInfo;
+    transient int modCountAndSize;
+    private static class Descending extends CheckedTailView{
+    
+    }
+  }
+  private static class CheckedBodyView implements OmniSet.OfByte{
+    transient final ByteSetImpl.Checked root;
+    transient final CheckedBodyView parent;
+    transient final int boundInfo;
+    transient int modCountAndSize;
+    private static class Descending extends CheckedBodyView{
+    
+    }
+  }
+}

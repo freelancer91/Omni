@@ -79,6 +79,38 @@ if(fromElement){       |                     |                     |
     }                  |                     |                     |
   }                    |                     |                     |
 }                      |                     |                     |
+
+                 headSet behavior 
+                 |   ASCENDING   |  DESCENDING   |
+if(toElement){   |               |               |
+  if(inclusive){ |               |               |
+                 |   [0]   [1] T |   [1] T [0]   |
+  }else{         |               |               |
+                 |   [0] T [1]   | T [1]   [0]   |
+  }              |               |               |
+}else{           |               |               |
+  if(inclusive){ |               |               |
+                 |   [0] T [1]   |   [1]   [0] T |
+  }else{         |               |               |
+                 | T [0]   [1]   |   [1] T [0]   |
+  }              |               |               |
+}                |               |               |
+
+                 tailSet behavior 
+                 |   ASCENDING   |  DESCENDING   |
+if(fromElement){ |               |               |
+  if(inclusive){ |               |               |
+                 |   [0] F [1]   | F [1]   [0]   |
+  }else{         |               |               |
+                 |   [0]   [1] F |   [1] F [0]   |
+  }              |               |               |
+}else{           |               |               |
+  if(inclusive){ |               |               |
+                 | F [0]   [1]   |   [1] F [0]   |
+  }else{         |               |               |
+                 |   [0] F [1]   |   [1]   [0] F |
+  }              |               |               |
+}                |               |               |
  */
     
     
@@ -290,28 +322,6 @@ if(fromElement){       |                     |                     |
     }
   }
 
-  @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      
-  }
-  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement){
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean headSet(boolean toElement,boolean inclusive){
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement){
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniNavigableSet.OfBoolean tailSet(boolean fromElement,boolean inclusive){
-    //TODO
-      throw new omni.util.NotYetImplementedException();
-  }
-  
   protected static final AbstractBooleanItr EMPTY_ITR=new AbstractBooleanItr(){
       @Override public Object clone(){
         return this;
@@ -332,12 +342,6 @@ if(fromElement){       |                     |                     |
           //nothing to do
       }
     };
-    
-    //TODO verify subSet(boolean,boolean)
-    //TODO verify headSet(boolean,boolean)
-    //TODO verify headSet(boolean)
-    //TODO verify tailSet(boolean,boolean)
-    //TODO verify tailSet(boolean)
     protected static final AscendingEmptyView CHECKED_EMPTY_ASCENDING_HEAD =new AscendingEmptyView(){
 
 
