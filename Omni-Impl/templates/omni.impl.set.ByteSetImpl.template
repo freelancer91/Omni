@@ -10,68 +10,270 @@ import omni.function.ByteConsumer;
 import java.util.function.Consumer;
 import omni.api.OmniIterator;
 import java.util.function.IntFunction;
-public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Cloneable{
- //TODO make not abstract
+import java.util.Set;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.IOException;
+import java.util.Collection;
+import omni.api.OmniCollection;
+public class ByteSetImpl extends AbstractByteSet implements Externalizable,Cloneable{
   //TODO equals methods
-  //TODO toString methods
-  //TODO clone methods
-  //TODO hashCode methods
-  //TODO read/write methods
-  //TODO constructors
   transient long word0;
   transient long word1;
   transient long word2;
   transient long word3;
-  
-
-  
-  
-  
-
-  @Override public boolean add(Byte val){
-    return this.add((byte)val);
+  #MACRO Constructors<ByteSetImpl>()
+  ByteSetImpl(long word0,long word1,long word2,long word3){
+    super();
+    this.word0=word0;
+    this.word1=word1;
+    this.word2=word2;
+    this.word3=word3;
   }
-  public abstract static class Checked extends ByteSetImpl{
-    transient int modCountAndSize;
-        //TODO make not abstract
-    
-    public abstract static class Descending extends Checked{
-        //TODO make not abstract
-    
+  #MACRO DirectionlessMethods<Full,this,Unchecked>()
+  #MACRO DirectionedMethods<Full,this,Unchecked,Ascending>()
+  @Override public void writeExternal(ObjectOutput output) throws IOException{
+    output.writeLong(word0);
+    output.writeLong(word1);
+    output.writeLong(word2);
+    output.writeLong(word3);
+  }
+  @Override public void readExternal(ObjectInput input) throws IOException{
+    word0=input.readLong();
+    word1=input.readLong();
+    word2=input.readLong();
+    word3=input.readLong();
+  }
+  private static int hashCodeForWord(long word,int offset,int sum){
+    for(;;){
+      int tail0s;
+      if((tail0s=Long.numberOfTrailingZeros(word))==64){
+        return sum;
+      }
+      offset+=tail0s;
+      sum+=offset;
+      word>>>=(1+tail0s);
+      ++offset;
     }
-    
-  }
-  public abstract static class Descending extends ByteSetImpl{
-      //TODO make not abstract
-  
   }
   
+  private int removeIfHelper(int inclusiveFrom,BytePredicate filter,int exclusiveTo){
+    //TODO make this more concise
+    //TODO write a checked version
+    //TODO write head set and tail set versions
+    long word;
+    switch(inclusiveFrom>>6){
+      case -2:
+        switch(exclusiveTo>>6){
+          case -2:
+            return Long.bitCount(((word=this.word0)^(this.word0=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+          case -1:
+            return Long.bitCount(((word=this.word0)&(this.word0=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+            + Long.bitCount(((word=this.word1)&(this.word1=processSubSetWordRemoveIf(word,-64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+          case 0:
+            return Long.bitCount(((word=this.word0)&(this.word0=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+            + Long.bitCount((word=this.word1)&(this.word1=processWordRemoveIf(word,-64,filter)))
+            + Long.bitCount(((word=this.word2)&(this.word2=processSubSetWordRemoveIf(word,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+          default:
+            return Long.bitCount(((word=this.word0)&(this.word0=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+            + Long.bitCount((word=this.word1)&(this.word1=processWordRemoveIf(word,-64,filter)))
+            + Long.bitCount((word=this.word2)&(this.word2=processWordRemoveIf(word,0,filter)))
+            + Long.bitCount(((word=this.word3)&(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+        }
+      case -1:
+        switch(exclusiveTo>>6){
+          case -1:
+            return Long.bitCount(((word=this.word1)^(this.word1=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+          case 0:
+            return Long.bitCount(((word=this.word1)&(this.word1=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+            + Long.bitCount(((word=this.word2)&(this.word2=processSubSetWordRemoveIf(word,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+          default:
+            return Long.bitCount(((word=this.word1)&(this.word1=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+            + Long.bitCount((word=this.word2)&(this.word2=processWordRemoveIf(word,0,filter)))
+            + Long.bitCount(((word=this.word3)&(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+        }
+      case 0:
+        if(exclusiveTo>>6==0){
+          return Long.bitCount(((word=this.word2)^(this.word2=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+        }else{
+          return Long.bitCount(((word=this.word2)&(this.word2=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+            + Long.bitCount(((word=this.word3)&(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+        }
+      default:
+        return Long.bitCount(((word=this.word3)^(this.word3=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+    }
+  }
   
-  private abstract static class UncheckedFullView implements OmniSet.OfByte,Cloneable,Serializable{
+  #MACRO WordRemoveIf(BytePredicate)
+  #MACRO WordRemoveIf(Predicate<? super Byte>)
+#MACRODEF WordRemoveIf(PREDICATE)
+  private static long processWordRemoveIf(long word,int valOffset,PREDICATE filter){
+    long marker=1L<<valOffset;
+    for(;;){
+      if((word & marker) != 0){
+        if(filter.test((byte)valOffset)){
+          word&=~marker;
+        }
+      }
+      if((marker<<=1) == 0){
+        return word;
+      }
+      ++valOffset;
+    }
+  }
+  private static long processSubSetWordRemoveIf(long word,int valOffset,int valBound,PREDICATE filter){
+    long marker=1L<<valOffset;
+    for(;;){
+      if((word & marker) != 0){
+        if(filter.test((byte)valOffset)){
+          word&=~marker;
+        }
+      }
+      if(++valOffset==valBound){
+        return word;
+      }
+      marker<<=1;
+    }
+  }
+#ENDDEF
+
+  public static class Checked extends ByteSetImpl{
+    transient int modCountAndSize;
+    #MACRO Constructors<Checked>()
+    public Checked(ByteSetImpl.Checked that){
+      super(that);
+      modCountAndSize=that.modCountAndSize&0x1ff;
+    }
+    Checked(int size,long word0,long word1,long word2,long word3){
+      super(word0,word1,word2,word3);
+      this.modCountAndSize=size;
+    }
+    #MACRO DirectionlessMethods<Full,this,Checked>()
+    #MACRO DirectionedMethods<Full,this,Checked,Ascending>()
+    @Override public void writeExternal(ObjectOutput output) throws IOException{
+      final int modCountAndSize=this.modCountAndSize;
+      try{
+        output.writeShort(modCountAndSize);
+        int numLeft;
+        if((numLeft=modCountAndSize&0x1ff)!=0){
+          //only write as many words as we need to
+          //start by writing the positive number since those will probably be more common
+          long word;
+          output.writeLong(word=this.word2);
+          if((numLeft-=Long.bitCount(word))!=0){
+            output.writeLong(word=this.word3);
+            if((numLeft-=Long.bitCount(word))!=0){
+              output.writeLong(word=this.word1);
+              if((numLeft-=Long.bitCount(word))!=0){
+                output.writeLong(this.word0);
+              }
+            }
+          }
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
+      }
+    }
+    @Override public void readExternal(ObjectInput input) throws IOException{
+      int numLeft;
+      this.modCountAndSize=numLeft=input.readUnsignedShort();
+      if((numLeft&=0x1ff)!=0){
+        long word;
+        word2=word=input.readLong();
+        if((numLeft-=Long.bitCount(word))!=0){
+          word3=word=input.readLong();
+          if((numLeft-=Long.bitCount(word))!=0){
+            word1=word=input.readLong();
+            if((numLeft-=Long.bitCount(word))!=0){
+              word0=input.readLong();
+            }
+          }
+        }
+      }
+    }
+    private static int hashCodeForWord(long word,int offset,int sumAndNumLeft){
+      int tail0s;
+      if((tail0s=Long.numberOfTrailingZeros(word))==64){
+        return sumAndNumLeft;
+      }
+      int numLeft=sumAndNumLeft&0x1ff;
+      sumAndNumLeft&=0xfffffe00;
+      for(;;){
+        sumAndNumLeft+=((offset+=tail0s)<<9);
+        if(--numLeft==0){
+          return sumAndNumLeft;
+        }
+        if((tail0s=Long.numberOfTrailingZeros(word>>>=(++tail0s)))==64){
+          return sumAndNumLeft|numLeft;
+        }
+        ++offset;
+      }
+    }
+    public static class Descending extends Checked{
+      #MACRO Constructors<Descending>()
+      public Descending(ByteSetImpl.Checked that){
+        super(that);
+      }
+      Descending(int size,long word0,long word1,long word2,long word3){
+        super(size,word0,word1,word2,word3);
+      }
+      #MACRO DirectionedMethods<Full,this,Checked,Descending>()
+    }
+  }
+  public static class Descending extends ByteSetImpl{
+    #MACRO Constructors<Descending>()
+    Descending(long word0,long word1,long word2,long word3){
+      super(word0,word1,word2,word3);
+    }
+    #MACRO DirectionedMethods<Full,this,Unchecked,Descending>()
+  }
+  private static class UncheckedFullView extends AbstractByteSet implements Cloneable,Serializable{
+    private static final long serialVersionUID=1L;
     transient final ByteSetImpl root;
-        //TODO make not abstract
     private UncheckedFullView(ByteSetImpl root){
       this.root=root;
     }
-    @Override public boolean add(Byte val){
-      return this.add((byte)val);
+    #MACRO DirectionlessMethods<Full,root,Unchecked>()
+    #MACRO DirectionedMethods<Full,root,Unchecked,Ascending>()
+    private Object writeReplace(){
+      return new ByteSetImpl(root);
     }
-    private abstract static class Descending extends UncheckedFullView{
-        //TODO make not abstract
+    private static class Descending extends UncheckedFullView{
       private Descending(ByteSetImpl root){
         super(root);
       }
+      private Object writeReplace(){
+        return new ByteSetImpl.Descending(root);
+      }
+      #MACRO DirectionedMethods<Full,root,Unchecked,Descending>()
     }
-   
-  
   }
-  
-  private abstract static class AbstractUncheckedSubSet implements OmniSet.OfByte{
+  private static class CheckedFullView extends AbstractByteSet implements Cloneable,Serializable{
+    private static final long serialVersionUID=1L;
+    transient final ByteSetImpl.Checked root;
+    private CheckedFullView(ByteSetImpl.Checked root){
+      this.root=root;
+    }
+    #MACRO DirectionlessMethods<Full,root,Checked>()
+    #MACRO DirectionedMethods<Full,root,Checked,Ascending>()
+    private Object writeReplace(){
+      return new ByteSetImpl.Checked(root);
+    }
+    private static class Descending extends CheckedFullView{
+      private Descending(final ByteSetImpl.Checked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Checked.Descending(root);
+      }
+      #MACRO DirectionedMethods<Full,root,Checked,Descending>()
+    }
+  }
+  private abstract static class AbstractUncheckedSubSet extends AbstractByteSet{
     transient final ByteSetImpl root;
     transient final AbstractUncheckedSubSet parent;
     transient final int boundInfo;
     transient int size;
-      
     private AbstractUncheckedSubSet(ByteSetImpl root,int boundInfo,int size){
       this.root=root;
       this.parent=null;
@@ -84,90 +286,8 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
       this.boundInfo=boundInfo;
       this.size=size;
     }
-    @Override public boolean add(Byte val){
-      return this.add((byte)val);
-    }
   }
-  
-  private abstract static class UncheckedHeadView extends AbstractUncheckedSubSet{
-      //TODO make not abstract
-  
-    private UncheckedHeadView(ByteSetImpl root,int boundInfo,int size){
-      super(root,boundInfo,size);
-    }
-    private UncheckedHeadView(AbstractUncheckedSubSet parent,int boundInfo,int size){
-      super(parent,boundInfo,size);
-    }
-   
-    private abstract static class Descending extends UncheckedHeadView{
-        //TODO make not abstract
-      private Descending(ByteSetImpl root,int boundInfo,int size){
-        super(root,boundInfo,size);
-      }
-      private Descending(AbstractUncheckedSubSet parent,int boundInfo,int size){
-        super(parent,boundInfo,size);
-      }
-    }
-  }
-  private abstract static class UncheckedTailView extends AbstractUncheckedSubSet{
-      //TODO make not abstract
-  
-    private UncheckedTailView(ByteSetImpl root,int boundInfo,int size){
-      super(root,boundInfo,size);
-    }
-    private UncheckedTailView(AbstractUncheckedSubSet parent,int boundInfo,int size){
-      super(parent,boundInfo,size);
-    }
-    
-    private abstract static class Descending extends UncheckedTailView{
-        //TODO make not abstract
-      private Descending(ByteSetImpl root,int boundInfo,int size){
-        super(root,boundInfo,size);
-      }
-      private Descending(AbstractUncheckedSubSet parent,int boundInfo,int size){
-        super(parent,boundInfo,size);
-      }
-    }
-  }
-  private abstract static class UncheckedBodyView extends AbstractUncheckedSubSet{
-      //TODO make not abstract
-  
-    private UncheckedBodyView(ByteSetImpl root,int boundInfo,int size){
-      super(root,boundInfo,size);
-    }
-    private UncheckedBodyView(AbstractUncheckedSubSet parent,int boundInfo,int size){
-      super(parent,boundInfo,size);
-    }
-    
-    private abstract static class Descending extends UncheckedBodyView{
-        //TODO make not abstract
-      private Descending(ByteSetImpl root,int boundInfo,int size){
-        super(root,boundInfo,size);
-      }
-      private Descending(AbstractUncheckedSubSet parent,int boundInfo,int size){
-        super(parent,boundInfo,size);
-      }
-    }
-  }
-  private abstract static class CheckedFullView implements OmniSet.OfByte,Cloneable,Serializable{
-      //TODO make not abstract
-  
-    transient final ByteSetImpl.Checked root;
-    private CheckedFullView(final ByteSetImpl.Checked root){
-      this.root=root;
-    }
-    @Override public boolean add(Byte val){
-      return this.add((byte)val);
-    }
-    
-    private abstract static class Descending extends CheckedFullView{
-        //TODO make not abstract
-      private Descending(final ByteSetImpl.Checked root){
-        super(root);
-      }
-    }
-  }
-  private abstract static class AbstractCheckedSubSet implements OmniSet.OfByte{
+  private abstract static class AbstractCheckedSubSet extends AbstractByteSet{
     transient final ByteSetImpl.Checked root;
     transient final AbstractCheckedSubSet parent;
     transient final int boundInfo;
@@ -184,51 +304,103 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
       this.boundInfo=boundInfo;
       this.modCountAndSize=modCountAndSize;
     }
-    @Override public boolean add(Byte val){
-      return this.add((byte)val);
+  }
+  private static class UncheckedHeadView extends AbstractUncheckedSubSet{
+    private UncheckedHeadView(ByteSetImpl root,int boundInfo,int size){
+      super(root,boundInfo,size);
+    }
+    private UncheckedHeadView(AbstractUncheckedSubSet parent,int boundInfo,int size){
+      super(parent,boundInfo,size);
+    }
+    #MACRO DirectionlessMethods<Head,root,Unchecked>()
+    #MACRO DirectionedMethods<Head,root,Unchecked,Ascending>()
+    private static class Descending extends UncheckedHeadView{
+      private Descending(ByteSetImpl root,int boundInfo,int size){
+        super(root,boundInfo,size);
+      }
+      private Descending(AbstractUncheckedSubSet parent,int boundInfo,int size){
+        super(parent,boundInfo,size);
+      }
+      #MACRO DirectionedMethods<Head,root,Unchecked,Descending>()
     }
   }
-  
-  private abstract static class CheckedHeadView extends AbstractCheckedSubSet{
-      //TODO make not abstract
+  private static class CheckedHeadView extends AbstractCheckedSubSet{
     private CheckedHeadView(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
       super(root,boundInfo,modCountAndSize);
     }
     private CheckedHeadView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
     }
-    
-    private static abstract class Descending extends CheckedHeadView{
-      //TODO make not abstract
+    #MACRO DirectionlessMethods<Head,root,Checked>()
+    #MACRO DirectionedMethods<Head,root,Checked,Ascending>()
+    private static class Descending extends CheckedHeadView{
       private Descending(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
         super(root,boundInfo,modCountAndSize);
       }
       private Descending(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
         super(parent,boundInfo,modCountAndSize);
       }
+      #MACRO DirectionedMethods<Head,root,Checked,Descending>()
     }
   }
-  private abstract static class CheckedTailView extends AbstractCheckedSubSet{
-      //TODO make not abstract
+  private static class UncheckedTailView extends AbstractUncheckedSubSet{
+    private UncheckedTailView(ByteSetImpl root,int boundInfo,int size){
+      super(root,boundInfo,size);
+    }
+    private UncheckedTailView(AbstractUncheckedSubSet parent,int boundInfo,int size){
+      super(parent,boundInfo,size);
+    }
+    #MACRO DirectionlessMethods<Tail,root,Unchecked>()
+    #MACRO DirectionedMethods<Tail,root,Unchecked,Ascending>()
+    private static class Descending extends UncheckedTailView{
+      private Descending(ByteSetImpl root,int boundInfo,int size){
+        super(root,boundInfo,size);
+      }
+      private Descending(AbstractUncheckedSubSet parent,int boundInfo,int size){
+        super(parent,boundInfo,size);
+      }
+      #MACRO DirectionedMethods<Tail,root,Unchecked,Descending>()
+    }
+  }
+  private static class CheckedTailView extends AbstractCheckedSubSet{
     private CheckedTailView(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
       super(root,boundInfo,modCountAndSize);
     }
     private CheckedTailView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
     }
-    
-    private static abstract class Descending extends CheckedTailView{
-      //TODO make not abstract
+    #MACRO DirectionlessMethods<Tail,root,Checked>()
+    #MACRO DirectionedMethods<Tail,root,Checked,Ascending>()
+    private static class Descending extends CheckedTailView{
       private Descending(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
         super(root,boundInfo,modCountAndSize);
       }
       private Descending(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
         super(parent,boundInfo,modCountAndSize);
       }
+      #MACRO DirectionedMethods<Tail,root,Checked,Descending>()
+    }
+  }
+  private static class UncheckedBodyView extends AbstractUncheckedSubSet{
+    private UncheckedBodyView(ByteSetImpl root,int boundInfo,int size){
+      super(root,boundInfo,size);
+    }
+    private UncheckedBodyView(AbstractUncheckedSubSet parent,int boundInfo,int size){
+      super(parent,boundInfo,size);
+    }
+    #MACRO DirectionlessMethods<Body,root,Unchecked>()
+    #MACRO DirectionedMethods<Body,root,Unchecked,Ascending>()
+    private static class Descending extends UncheckedBodyView{
+      private Descending(ByteSetImpl root,int boundInfo,int size){
+        super(root,boundInfo,size);
+      }
+      private Descending(AbstractUncheckedSubSet parent,int boundInfo,int size){
+        super(parent,boundInfo,size);
+      }
+      #MACRO DirectionedMethods<Body,root,Unchecked,Descending>()
     }
   }
   private static class CheckedBodyView extends AbstractCheckedSubSet{
-      //TODO make not abstract
     private CheckedBodyView(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
       super(root,boundInfo,modCountAndSize);
     }
@@ -237,9 +409,7 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
     }
     #MACRO DirectionlessMethods<Body,root,Checked>()
     #MACRO DirectionedMethods<Body,root,Checked,Ascending>()
-    
     private static class Descending extends CheckedBodyView{
-      //TODO make not abstract
       private Descending(final ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
         super(root,boundInfo,modCountAndSize);
       }
@@ -251,10 +421,17 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   }
 }
 #MACRODEF DirectionedMethods<VIEW,SOURCE,CHECKED,DIRECTION>()
+@Override public String toString(){
+
+  #MACRO NYI()
+  
+}
 #MACRO ForEachHelper(ByteConsumer,action)
 #MACRO ForEachHelper(Consumer<? super Byte>,action::accept)
 @Override public OmniIterator.OfByte iterator(){
+
   #MACRO NYI()
+  
 }
 #MACRO ToArrayHelper<Byte>(,DEFAULT_BOXED_ARR)
 #MACRO ToArrayHelper<byte>(Byte,DEFAULT_ARR)
@@ -264,61 +441,147 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
 #MACRO ToArrayHelper<float>(Float,DEFAULT_ARR)
 #MACRO ToArrayHelper<double>(Double,DEFAULT_ARR)
 @Override public <T> T[] toArray(T[] dst){
+
   #MACRO NYI()
+  
 }
 @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+
   #MACRO NYI()
+  
 }
 #ENDDEF
 #MACRODEF DirectionlessMethods<VIEW,SOURCE,CHECKED>()
-@Override public boolean contains(boolean val){
+@Override public int hashCode(){
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH CHECKED==Checked
+  int size;
+  if((size=this.modCountAndSize&0x1ff)!=0){
+    size=ByteSetImpl.Checked.hashCodeForWord(word0,Byte.MIN_VALUE,size);
+    if((size&0x1ff)!=0){
+      size=ByteSetImpl.Checked.hashCodeForWord(word1,-64,size);
+      if((size&0x1ff)!=0){
+        size=ByteSetImpl.Checked.hashCodeForWord(word2,0,size);
+        int numLeft;
+        if((numLeft=(size&0x1ff))!=0){
+          long word=word3;
+          size>>=9;
+          int offset=64;
+          for(;;){
+            int tail0s;
+            size+=(offset+=(tail0s=Long.numberOfTrailingZeros(word)));
+            if(--numLeft==0){
+              return size;
+            }
+            word>>>=(++tail0s);
+            ++offset;
+          }
+        }
+      }
+    }
+    return size>>9;
+  }
+  return 0;
+    #ELSEIFSWITCH CHECKED==Unchecked
+  return ByteSetImpl.hashCodeForWord(word0,Byte.MIN_VALUE,ByteSetImpl.hashCodeForWord(word1,-64,ByteSetImpl.hashCodeForWord(word2,0,ByteSetImpl.hashCodeForWord(word2,64,0))));  
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+  return root.hashCode();
+  #ENDIF
+#ELSEIFSWITCH VIEW==Head
+
   #MACRO NYI()
+  
+#ELSEIFSWITCH VIEW==Tail
+
+  #MACRO NYI()
+  
+#ELSEIFSWITCH VIEW==Body
+
+  #MACRO NYI()
+  
+#ENDIF
+}
+@Override public boolean contains(boolean val){
+
+  #MACRO NYI()
+  
 }
 @Override public boolean contains(byte val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean contains(char val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean contains(int val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean contains(long val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean contains(float val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean contains(double val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean contains(Object val){
-  #MACRO NYI()
-}
 
-@Override public boolean removeVal(boolean val){
   #MACRO NYI()
+  
+}
+@Override public boolean removeVal(boolean val){
+
+  #MACRO NYI()
+  
 }
 @Override public boolean removeVal(byte val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean removeVal(char val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean removeVal(int val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean removeVal(long val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean removeVal(float val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean removeVal(double val){
+
   #MACRO NYI()
+  
 }
 @Override public boolean remove(Object val){
+
   #MACRO NYI()
+  
 }
 @Override public void clear(){
 #IFSWITCH VIEW==Full
@@ -352,8 +615,8 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   int modCountAndSize;
   CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&0xfffffe00,((SOURCE=this.SOURCE).modCountAndSize)&0xfffffe00);
   if(((modCountAndSize&=0x1ff))!=0){
-    SOURCE.modCountAndSize+=(modCountAndSize=(1<<9)-modCountAndSize)
-    var curr=this;
+    SOURCE.modCountAndSize+=(modCountAndSize=(1<<9)-modCountAndSize);
+    AbstractCheckedSubSet curr=this;
     do{
       curr.modCountAndSize+=modCountAndSize;
     }while((curr=curr.parent)!=null);
@@ -395,15 +658,23 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   }
 #ELSEIFSWITCH VIEW==Tail
   #IFSWITCH CHECKED==Checked
+  
   #MACRO NYI();
+  
   #ELSE
+  
   #MACRO NYI();
+  
   #ENDIF
 #ELSEIFSWITCH VIEW==Body
   #IFSWITCH CHECKED==Checked
+  
   #MACRO NYI();
+  
   #ELSE
+  
   #MACRO NYI();
+  
   #ENDIF
 #ENDIF
 }
@@ -412,7 +683,12 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   #IFSWITCH CHECKED==Checked
   return (SOURCE.modCountAndSize&0x1FF)==0;
   #ELSE
-  return SOURCE.size==0;
+    #IFSWITCH SOURCE==this
+  return word0==0 && word1==0 && word2==0 && word3==0;
+    #ELSE
+  final ByteSetImpl SOURCE;
+  return (SOURCE=this.SOURCE).word0==0 && SOURCE.word1==0 && SOURCE.word2==0 && SOURCE.word3==0;
+    #ENDIF
   #ENDIF
 #ELSEIFSWITCH VIEW==Head,Tail,Body
   #IFSWITCH CHECKED==Checked
@@ -429,7 +705,12 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
   #IFSWITCH CHECKED==Checked
   return (SOURCE.modCountAndSize&0x1FF);
   #ELSE
-  return SOURCE.size;
+    #IFSWITCH SOURCE==this
+  return SetCommonImpl.size(word0,word1,word2,word3);
+    #ELSE
+  final ByteSetImpl SOURCE;
+  return SetCommonImpl.size((SOURCE=this.SOURCE).word0,SOURCE.word1,SOURCE.word2,SOURCE.word3);
+    #ENDIF
   #ENDIF
 #ELSEIFSWITCH VIEW==Head,Tail,Body
   #IFSWITCH CHECKED==Checked
@@ -442,10 +723,114 @@ public abstract class ByteSetImpl implements OmniSet.OfByte,Externalizable,Clone
 #ENDIF
 }
 @Override public boolean add(boolean val){
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH CHECKED==Checked
+    
   #MACRO NYI()
+    
+    #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+    #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Head
+  #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+  #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+  #ENDIF
+#ELSEIFSWITCH VIEW==Tail
+  #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+  #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+  #ENDIF
+#ELSEIFSWITCH VIEW==Body
+  #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+  #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+  #ENDIF
+#ENDIF
 }
 @Override public boolean add(byte val){
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH CHECKED==Checked
+    
   #MACRO NYI()
+    
+    #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+    #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Head
+  #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+  #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+  #ENDIF
+#ELSEIFSWITCH VIEW==Tail
+  #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+  #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+  #ENDIF
+#ELSEIFSWITCH VIEW==Body
+  #IFSWITCH CHECKED==Checked
+    
+  #MACRO NYI()
+    
+  #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+  #ENDIF
+#ENDIF
 }
 #MACRO RemoveIfHelper(BytePredicate,filter)
 #MACRO RemoveIfHelper(Predicate<? super Byte>,filter::test)
@@ -464,19 +849,650 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   #ENDIF
 #ENDIF
 #ENDDEF
+
+
+
+
 #MACRODEF ToArrayHelper<RETTYPE>(CLASSPREFIX,DEFAULTARR)
 @Override public RETTYPE[] toCLASSPREFIXArray(){
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+      #ELSEIFSWITCH DIRECTION==Descending
+  
   #MACRO NYI()
+  
+      #ENDIF
+    #ELSEIFSWITCH CHECKED==Unchecked
+      #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+      #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+      #ENDIF
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+      #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+      #ENDIF
+    #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Head
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Tail
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Body
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ENDIF
 }
 #ENDDEF
+
+
+
+
+
+
+
+
+
+
 #MACRODEF ForEachHelper(CONSUMER,ACCEPT)
 @Override public void forEach(CONSUMER action){
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+      #ELSEIFSWITCH DIRECTION==Descending
+  
   #MACRO NYI()
+  
+      #ENDIF
+    #ELSEIFSWITCH CHECKED==Unchecked
+      #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+      #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+      #ENDIF
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+      #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+      #ENDIF
+    #ELSEIFSWITCH CHECKED==Unchecked
+    
+  #MACRO NYI()
+    
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Head
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Tail
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Body
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ENDIF
 }
 #ENDDEF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #MACRODEF RemoveIfHelper(PREDICATE,TEST)
 @Override public boolean removeIf(PREDICATE filter){
-  #MACRO NYI()
+#IFSWITCH VIEW==Full
+  #IFSWITCH SOURCE==this
+    #IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  if(((modCountAndSize=SOURCE.modCountAndSize)&0x1ff)!=0) {
+    long word,newWord0,newWord1,newWord2,newWord3;
+    int numRemoved;
+    try {
+      numRemoved=Long.bitCount((word=SOURCE.word0)^(newWord0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)))
+        +Long.bitCount((word=SOURCE.word1)^(newWord1=processWordRemoveIf(word,-64,filter)))
+        +Long.bitCount((word=SOURCE.word2)^(newWord2=processWordRemoveIf(word,0,filter)))
+        +Long.bitCount((word=SOURCE.word3)^(newWord3=processWordRemoveIf(word,64,filter)));
+    }finally {
+      CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+    }
+    if(numRemoved!=0) {
+      SOURCE.word0=newWord0;
+      SOURCE.word1=newWord1;
+      SOURCE.word2=newWord2;
+      SOURCE.word3=newWord3;
+      SOURCE.modCountAndSize=modCountAndSize-numRemoved+(1<<9);
+      return true;
+    }
+  }
+  return false;
+    #ELSEIFSWITCH CHECKED==Unchecked
+  long word;
+  return (word=SOURCE.word0) != (SOURCE.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter))
+    | (word=SOURCE.word1) != (SOURCE.word1=processWordRemoveIf(word,-64,filter))
+    | (word=SOURCE.word2) != (SOURCE.word2=processWordRemoveIf(word,0,filter))
+    | (word=SOURCE.word3) != (SOURCE.word3=processWordRemoveIf(word,64,filter));
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+  return SOURCE.removeIf(filter);
+  #ENDIF
+#ELSEIFSWITCH VIEW==Head
+  #IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.Checked SOURCE=this.SOURCE;
+  if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
+    long newWord0=SOURCE.word0,newWord1=SOURCE.word1,newWord2=SOURCE.word2,newWord3=SOURCE.word3;
+    int numRemoved=0;
+    try{
+      goToEnd:for(;;){
+        goToWord0:for(;;){
+          goToWord1:for(;;){
+            final int boundInfo;
+            switch((boundInfo=this.boundInfo)>>6){
+            case -2:
+              numRemoved+=Long.bitCount(((newWord0)^(newWord0=processSubSetWordRemoveIf(newWord0,Byte.MIN_VALUE,boundInfo,filter)))&(-1L>>>-boundInfo));
+              break goToEnd;
+            case -1:
+              numRemoved+=Long.bitCount(((newWord1)^(newWord1=processSubSetWordRemoveIf(newWord1,-64,boundInfo,filter)))&(-1L>>>-boundInfo));
+              break goToWord0;
+            case 0:
+              numRemoved+=Long.bitCount(((newWord2)^(newWord2=processSubSetWordRemoveIf(newWord2,0,boundInfo,filter)))&(-1L>>>-boundInfo));
+              break goToWord1;
+            default:
+              numRemoved+=Long.bitCount(((newWord3)^(newWord3=processSubSetWordRemoveIf(newWord3,64,boundInfo,filter)))&(-1L>>>-boundInfo));
+            }
+            numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
+            break;
+          }
+          numRemoved+=Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)));
+          break;
+        }
+        numRemoved+=Long.bitCount(newWord0^(newWord0=processWordRemoveIf(newWord0,Byte.MIN_VALUE,filter)));
+        break;
+      }
+    }finally{
+      CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
+    }
+    if(numRemoved!=0){
+      SOURCE.word0=newWord0;
+      SOURCE.word1=newWord1;
+      SOURCE.word2=newWord2;
+      SOURCE.word3=newWord3;
+      SOURCE.modCountAndSize+=(numRemoved=(1<<9)-numRemoved);
+      AbstractCheckedSubSet curr=this;
+      do{
+        curr.modCountAndSize+=numRemoved;
+      }while((curr=curr.parent)!=null);
+      return true;
+    }
+    return false;
+  }
+  CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
+  #ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
+    int numRemoved=0;
+    final ByteSetImpl SOURCE=this.SOURCE;
+    long word;
+    goToEnd:for(;;){
+      goToWord0:for(;;){
+        goToWord1:for(;;){
+          final int boundInfo;
+          switch((boundInfo=this.boundInfo)>>6){
+          case -2:
+            numRemoved+=Long.bitCount(((word=SOURCE.word0)^(SOURCE.word0=processSubSetWordRemoveIf(word,Byte.MIN_VALUE,boundInfo,filter)))&(-1L>>>-boundInfo));
+            break goToEnd;
+          case -1:
+            numRemoved+=Long.bitCount(((word=SOURCE.word1)^(SOURCE.word1=processSubSetWordRemoveIf(word,-64,boundInfo,filter)))&(-1L>>>-boundInfo));
+            break goToWord0;
+          case 0:
+            numRemoved+=Long.bitCount(((word=SOURCE.word2)^(SOURCE.word2=processSubSetWordRemoveIf(word,0,boundInfo,filter)))&(-1L>>>-boundInfo));
+            break goToWord1;
+          default:
+            numRemoved+=Long.bitCount(((word=SOURCE.word3)^(SOURCE.word3=processSubSetWordRemoveIf(word,64,boundInfo,filter)))&(-1L>>>-boundInfo));
+          }
+          numRemoved+=Long.bitCount((word=SOURCE.word2)^(SOURCE.word2=processWordRemoveIf(word,0,filter)));
+          break;
+        }
+        numRemoved+=Long.bitCount((word=SOURCE.word1)^(SOURCE.word1=processWordRemoveIf(word,-64,filter)));
+        break;
+      }
+      numRemoved+=Long.bitCount((word=SOURCE.word0)^(SOURCE.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)));
+      break;
+    }
+    if(numRemoved!=0){
+      this.size=size-numRemoved;
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        parent.size-=numRemoved;
+      }
+      return true;
+    }
+  }
+  #ENDIF
+  return false;
+#ELSEIFSWITCH VIEW==Tail
+  #IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.Checked SOURCE=this.SOURCE;
+  if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
+    long newWord0=SOURCE.word0,newWord1=SOURCE.word1,newWord2=SOURCE.word2,newWord3=SOURCE.word3;
+    int numRemoved=0;
+    try{
+      goToEnd:for(;;){
+        goToWord3:for(;;){
+          goToWord2:for(;;){
+            final int boundInfo;
+            switch((boundInfo=this.boundInfo)>>6){
+            case 1:
+              numRemoved+=Long.bitCount(((newWord3)^(newWord3=processWordRemoveIf(newWord3,boundInfo,filter)))&(-1L<<boundInfo));
+              break goToEnd;
+            case 0:
+              numRemoved+=Long.bitCount(((newWord2)^(newWord2=processWordRemoveIf(newWord2,boundInfo,filter)))&(-1L<<boundInfo));
+              break goToWord3;
+            case -1:
+              numRemoved+=Long.bitCount(((newWord1)^(newWord1=processWordRemoveIf(newWord1,boundInfo,filter)))&(-1L<<boundInfo));
+              break goToWord2;
+            default:
+              numRemoved+=Long.bitCount(((newWord0)^(newWord0=processWordRemoveIf(newWord0,boundInfo,filter)))&(-1L<<boundInfo));
+            }
+            numRemoved+=Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)));
+            break;
+          }
+          numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
+          break;
+        }
+        numRemoved+=Long.bitCount(newWord3^(newWord3=processWordRemoveIf(newWord3,64,filter)));
+        break;
+      }
+    }finally{
+      CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
+    }
+    if(numRemoved!=0){
+      SOURCE.word0=newWord0;
+      SOURCE.word1=newWord1;
+      SOURCE.word2=newWord2;
+      SOURCE.word3=newWord3;
+      SOURCE.modCountAndSize+=(numRemoved=(1<<9)-numRemoved);
+      AbstractCheckedSubSet curr=this;
+      do{
+        curr.modCountAndSize+=numRemoved;
+      }while((curr=curr.parent)!=null);
+      return true;
+    }
+    return false;
+  }
+  CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
+  #ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
+    int numRemoved=0;
+    final ByteSetImpl SOURCE=this.SOURCE;
+    long word;
+    goToEnd:for(;;){
+      goToWord3:for(;;){
+        goToWord2:for(;;){
+          final int boundInfo;
+          switch((boundInfo=this.boundInfo)>>6){
+          case 1:
+            numRemoved+=Long.bitCount(((word=SOURCE.word3)^(SOURCE.word3=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
+            break goToEnd;
+          case 0:
+            numRemoved+=Long.bitCount(((word=SOURCE.word2)^(SOURCE.word2=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
+            break goToWord3;
+          case -1:
+            numRemoved+=Long.bitCount(((word=SOURCE.word1)^(SOURCE.word1=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
+            break goToWord2;
+          default:
+            numRemoved+=Long.bitCount(((word=SOURCE.word0)^(SOURCE.word0=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
+          }
+          numRemoved+=Long.bitCount((word=SOURCE.word1)^(SOURCE.word1=processWordRemoveIf(word,-64,filter)));
+          break;
+        }
+        numRemoved+=Long.bitCount((word=SOURCE.word2)^(SOURCE.word2=processWordRemoveIf(word,0,filter)));
+        break;
+      }
+      numRemoved+=Long.bitCount((word=SOURCE.word3)^(SOURCE.word3=processWordRemoveIf(word,64,filter)));
+      break;
+    }
+    if(numRemoved!=0){
+      this.size=size-numRemoved;
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        parent.size-=numRemoved;
+      }
+      return true;
+    }
+  }
+  #ENDIF
+  return false;
+#ELSEIFSWITCH VIEW==Body
+  #IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.Checked SOURCE=this.SOURCE;
+  if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
+    long newWord0=SOURCE.word0,newWord1=SOURCE.word1,newWord2=SOURCE.word2,newWord3=SOURCE.word3;
+    int numRemoved;
+    try{
+      final int boundInfo;
+      final int low;
+      switch((low=(boundInfo=this.boundInfo)&0xff)>>6){
+        case 2: //-128 < lowInclusiveBound < 64
+          final int high;
+          switch((high=boundInfo>>8)>>6){
+            case -2: //-128 < highExclusiveBound < -64
+              numRemoved=Long.bitCount((newWord0^(newWord0=processSubSetWordRemoveIf(newWord0,low,high,filter)))&(-1L<<low) & (-1L>>>-high));
+              break;
+            case -1: //-64 <= highExclusiveBound < 0
+              numRemoved=Long.bitCount((newWord0^(newWord0=processWordRemoveIf(newWord0,low,filter)))&(-1L<<low))
+                + Long.bitCount((newWord1^(newWord1=processSubSetWordRemoveIf(newWord1,-64,high,filter)))&(-1L>>>-high));
+              break;
+            case 0:  //0 <= highExclusiveBound < 64
+              numRemoved=Long.bitCount((newWord0^(newWord0=processWordRemoveIf(newWord0,low,filter)))&(-1L<<low))
+                + Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)))
+                + Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,0,high,filter)))&(-1L>>>-high));
+              break;
+            default: //64 <= highExclusiveBound < 128
+              numRemoved=Long.bitCount((newWord0^(newWord0=processWordRemoveIf(newWord0,low,filter)))&(-1L<<low))
+                + Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)))
+                + Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)))
+                + Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,high,filter)))&(-1L>>>-high));
+          }
+          break;
+        case 3: //-64 <= lowInclusiveBound < 0
+          switch((high=boundInfo>>8)>>6){
+            case -1: //-64 <= highExclusiveBound < 0
+              numRemoved=Long.bitCount((newWord1^(newWord1=processSubSetWordRemoveIf(newWord1,low,high,filter)))&(-1L<<low) & (-1L>>>-high));
+              break;
+            case 0:  //0 <= highExclusiveBound < 64
+              numRemoved=Long.bitCount((newWord1^(newWord1=processWordRemoveIf(newWord1,low,filter)))&(-1L<<low))
+                + Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,0,high,filter)))&(-1L>>>-high));
+              break;
+            default: //64 <= highExclusiveBound < 128
+              numRemoved=Long.bitCount((newWord1^(newWord1=processWordRemoveIf(newWord1,low,filter)))&(-1L<<low))
+                + Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)))
+                + Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,high,filter)))&(-1L>>>-high));
+          }
+          break;
+        case 0:  //0 <= lowInclusiveBound < 64
+          if((high=boundInfo>>8)>>6==0){ //0 <= highExclusiveBound < 64
+              numRemoved=Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,low,high,filter)))&(-1L<<low) & (-1L>>>-high));
+          }else{ //64 <= highExclusiveBound < 128
+              numRemoved=Long.bitCount((newWord2^(newWord2=processWordRemoveIf(newWord2,low,filter)))&(-1L<<low))
+                + Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,high,filter)))&(-1L>>>-high));
+          }
+          break;
+        default: //64 <= lowInclusiveBound < 128 ; 64 <= highExclusiveBound < 128
+          numRemoved=Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,low,high=boundInfo>>8,filter)))&(-1L<<low) & (-1L>>>-high));
+      }
+    }finally{
+      CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
+    }
+    if(numRemoved!=0){
+      SOURCE.word0=newWord0;
+      SOURCE.word1=newWord1;
+      SOURCE.word2=newWord2;
+      SOURCE.word3=newWord3;
+      SOURCE.modCountAndSize+=(numRemoved=(1<<9)-numRemoved);
+      AbstractCheckedSubSet curr=this;
+      do{
+        curr.modCountAndSize+=numRemoved;
+      }while((curr=curr.parent)!=null);
+      return true;
+    }
+    return false;
+  }
+  CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
+  #ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
+    int numRemoved;
+    if((numRemoved=SOURCE.removeIfHelper((byte)(0xff&(numRemoved=this.boundInfo)),TEST,(numRemoved>>8)))!=0){
+      this.size=size-numRemoved;
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        parent.size-=numRemoved;
+      }
+      return true;
+    }
+  }
+  #ENDIF
+  return false;
+#ENDIF
+}
+#ENDDEF
+#MACRODEF Constructors<NAME>()
+private static final long serialVersionUID=1L;
+public NAME(){
+  super();
+}
+public NAME(ByteSetImpl that){
+#IFSWITCH NAME==ByteSetImpl
+  super();
+  word0=that.word0;
+  word1=that.word1;
+  word2=that.word2;
+  word3=that.word3;
+#ELSE
+  super(that);
+  #IFSWITCH NAME==Checked
+  modCountAndSize=SetCommonImpl.size(word0,word1,word2,word3);
+  #ENDIF
+#ENDIF
+}
+public NAME(Collection<? extends Byte> that){
+#IFSWITCH NAME==ByteSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+public NAME(OmniCollection.OfRef<? extends Byte> that){
+#IFSWITCH NAME==ByteSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+public NAME(OmniCollection.ByteOutput<?> that){
+#IFSWITCH NAME==ByteSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+public NAME(OmniCollection.OfByte that){
+#IFSWITCH NAME==ByteSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+public NAME(OmniCollection.OfBoolean that){
+#IFSWITCH NAME==ByteSetImpl
+  super();
+  //TODO optimize
+  this.addAll(that);
+#ELSE
+  super(that);
+#ENDIF
+}
+@Override public Object clone(){
+  return new NAME(this);
 }
 #ENDDEF
 #MACRODEF NYI()
