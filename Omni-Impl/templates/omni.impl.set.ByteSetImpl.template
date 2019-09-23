@@ -16,6 +16,8 @@ import java.io.ObjectOutput;
 import java.io.IOException;
 import java.util.Collection;
 import omni.api.OmniCollection;
+import omni.util.ToStringUtil;
+import omni.util.OmniArray;
 public class ByteSetImpl extends AbstractByteSet implements Externalizable,Cloneable{
   //TODO equals methods
   transient long word0;
@@ -29,6 +31,261 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     this.word1=word1;
     this.word2=word2;
     this.word3=word3;
+  }
+  @Override public boolean contains(boolean val){
+    return (this.word2&(val?0b10:0b01))!=0;
+  }
+  @Override public boolean contains(byte val){
+    final long word;
+    switch(val>>6){
+      case -2:
+        word=this.word0;
+        break;
+      case -1:
+        word=this.word1;
+        break;
+      case 0:
+        word=this.word2;
+        break;
+      default:
+        word=this.word3;
+    }
+    return (word&(1L<<val))!=0;
+  }
+  @Override public boolean contains(char val){
+    final long word;
+    switch(val>>6){
+      case 0:
+        word=this.word2;
+        break;
+      case 1:
+        word=this.word3;
+        break;
+      default:
+        return false;
+    }
+    return (word&(1L<<val))!=0;
+  }
+  @Override public boolean contains(int val){
+    final long word;
+    switch(val>>6){
+      case -2:
+        word=this.word0;
+        break;
+      case -1:
+        word=this.word1;
+        break;
+      case 0:
+        word=this.word2;
+        break;
+      case 1:
+        word=this.word3;
+        break;
+      default:
+        return false;
+    }
+    return (word&(1L<<val))!=0;
+  }
+  @Override public boolean contains(long val){
+    final byte v;
+    return (v=(byte)val)==val && contains(v);
+  }
+  @Override public boolean contains(float val){
+    final byte v;
+    return (v=(byte)val)==val && contains(v);
+  }
+  @Override public boolean contains(double val){
+    final byte v;
+    return (v=(byte)val)==val && contains(v);
+  }
+  @Override public boolean contains(Object val){
+    for(;;){
+      final int v;
+      if(val instanceof Byte){
+        return this.contains((byte)val);
+      }else if(val instanceof Integer || val instanceof Short){
+        v=((Number)val).intValue();
+      }else if(val instanceof Long){
+        final long l;
+        if((l=(long)val)!=(v=(int)l)){
+          break;
+        }
+      }else if(val instanceof Float){
+        final float f;
+        if((f=(float)val)!=(v=(int)f)){
+          break;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if((d=(double)val)!=(v=(int)d)){
+          break;
+        }
+      }else if(val instanceof Character){
+        return this.contains((char)val);
+      }else if(val instanceof Boolean){
+        return this.contains((boolean)val);
+      }else{
+        break;
+      }
+      return contains(v);
+    }
+    return false;
+  }
+  @Override public boolean removeVal(boolean val){
+    long word;
+    if((word=this.word2)!=(word&=(val?~0b10:~0b01))){
+      this.word2=word;
+      return true;
+    }
+    return false;
+  }
+  @Override public boolean removeVal(byte val){
+    switch(val>>6){
+      case -2:
+        long word;
+        if((word=this.word0)!=(word&=(1L<<val))){
+          this.word0=word;
+          return true;
+        }
+        break;
+      case -1:
+        if((word=this.word1)!=(word&=(1L<<val))){
+          this.word1=word;
+          return true;
+        }
+        break;
+      case 0:
+        if((word=this.word2)!=(word&=(1L<<val))){
+          this.word2=word;
+          return true;
+        }
+        break;
+      default:
+        if((word=this.word3)!=(word&=(1L<<val))){
+          this.word3=word;
+          return true;
+        }
+    }
+    return false;
+  }
+  @Override public boolean removeVal(char val){
+    switch(val>>6){
+      case 0:
+        long word;
+        if((word=this.word2)!=(word&=(1L<<val))){
+          this.word2=word;
+          return true;
+        }
+        break;
+      case 1:
+        if((word=this.word3)!=(word&=(1L<<val))){
+          this.word3=word;
+          return true;
+        }
+      default:
+    }
+    return false;
+  }
+  @Override public boolean removeVal(int val){
+    switch(val>>6){
+      case -2:
+        long word;
+        if((word=this.word0)!=(word&=(1L<<val))){
+          this.word0=word;
+          return true;
+        }
+        break;
+      case -1:
+        if((word=this.word1)!=(word&=(1L<<val))){
+          this.word1=word;
+          return true;
+        }
+        break;
+      case 0:
+        if((word=this.word2)!=(word&=(1L<<val))){
+          this.word2=word;
+          return true;
+        }
+        break;
+      case 1:
+        if((word=this.word3)!=(word&=(1L<<val))){
+          this.word3=word;
+          return true;
+        }
+      default:
+    }
+    return false;
+  }
+  @Override public boolean removeVal(long val){
+    final int v;
+    return (v=(int)val)==val && removeVal(v);
+  }
+  @Override public boolean removeVal(float val){
+    final int v;
+    return (v=(int)val)==val && removeVal(v);
+  }
+  @Override public boolean removeVal(double val){
+    final int v;
+    return (v=(int)val)==val && removeVal(v);
+  }
+  @Override public boolean remove(Object val){
+    final int v;
+    if(val instanceof Byte){
+      return this.removeVal((byte)val);
+    }else if(val instanceof Integer || val instanceof Short){
+      return this.removeVal(((Number)val).intValue());
+    }else if(val instanceof Long){
+      final long l;
+      return (l=(long)val)==(v=(int)l) && this.removeVal(v);
+    }else if(val instanceof Float){
+      final float f;
+      return (f=(float)val)==(v=(int)f) && this.removeVal(v);
+    }else if(val instanceof Double){
+      final double d;
+      return (d=(double)val)==(v=(int)d) && this.removeVal(v);
+    }else if(val instanceof Character){
+      return this.removeVal((char)val);
+    }else if(val instanceof Boolean){
+      return this.removeVal((boolean)val);
+    }
+    return false;
+  }
+  @Override public boolean add(boolean val){
+    long word;
+    if((word=this.word2)!=(word|=(val?0b10:0b01))){
+      this.word2=word;
+      return true;
+    }
+    return false;
+  }
+  @Override public boolean add(byte val){
+    switch(val>>6){
+      case -2:
+        long word;
+        if((word=this.word0)!=(word|=(1L<<val))){
+          this.word0=word;
+          return true;
+        }
+        break;
+      case -1:
+        if((word=this.word1)!=(word|=(1L<<val))){
+          this.word1=word;
+          return true;
+        }
+        break;
+      case 0:
+        if((word=this.word2)!=(word|=(1L<<val))){
+          this.word2=word;
+          return true;
+        }
+        break;
+      default:
+        if((word=this.word3)!=(word|=(1L<<val))){
+          this.word3=word;
+          return true;
+        }
+    }
+    return false;
   }
   #MACRO DirectionlessMethods<Full,this,Unchecked>()
   #MACRO DirectionedMethods<Full,this,Unchecked,Ascending>()
@@ -56,58 +313,329 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
       ++offset;
     }
   }
-  
-  private int removeIfHelper(int inclusiveFrom,BytePredicate filter,int exclusiveTo){
-    //TODO make this more concise
-    //TODO write a checked version
-    //TODO write head set and tail set versions
+  private int removeIfHelper(BytePredicate filter,int exclusiveTo){
     long word;
+    int numRemoved;
+    goToWord0:for(;;){
+      goToWord1:for(;;){
+        goToWord2:switch(exclusiveTo>>6){
+        case -2:
+          return Long.bitCount(((word=this.word0)^(this.word0=processSubSetWordRemoveIf(word,Byte.MIN_VALUE,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+        case -1:
+          numRemoved=Long.bitCount(((word=this.word1)^(this.word1=processSubSetWordRemoveIf(word,-64,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+          break goToWord0;
+        case 0:
+          numRemoved=Long.bitCount(((word=this.word2)^(this.word2=processSubSetWordRemoveIf(word,0,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+          break goToWord1;
+        default:
+          numRemoved=Long.bitCount(((word=this.word3)^(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+          break goToWord2;
+        }
+        numRemoved+=Long.bitCount((word=this.word2)^(this.word2=processWordRemoveIf(word,0,filter)));
+        break;
+      }
+      numRemoved+=Long.bitCount((word=this.word1)^(this.word1=processWordRemoveIf(word,-64,filter)));
+      break;
+    }
+    return numRemoved+Long.bitCount((word=this.word0)^(this.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)));
+  }
+  private int removeIfHelper(int inclusiveFrom,BytePredicate filter){
+    int numRemoved;
+    long word;
+    goToWord3:for(;;){
+      goToWord2:for(;;){
+        goToWord1:switch(inclusiveFrom>>6){
+        case 1:
+          return Long.bitCount(((word=this.word3)^(this.word3=processWordRemoveIf(word,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+        case 0:
+          numRemoved=Long.bitCount(((word=this.word2)^(this.word2=processWordRemoveIf(word,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+          break goToWord3;
+        case -1:
+          numRemoved=Long.bitCount(((word=this.word1)^(this.word1=processWordRemoveIf(word,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+          break goToWord2;
+        default:
+          numRemoved=Long.bitCount(((word=this.word0)^(this.word0=processWordRemoveIf(word,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+          break goToWord1;
+        }
+        numRemoved+=Long.bitCount((word=this.word1)^(this.word1=processWordRemoveIf(word,-64,filter)));
+        break;
+      }
+      numRemoved+=Long.bitCount((word=this.word2)^(this.word2=processWordRemoveIf(word,0,filter)));
+      break;
+    }
+    return numRemoved+Long.bitCount((word=this.word3)^(this.word3=processWordRemoveIf(word,64,filter)));
+  }
+  private void forEachAscendingHelper(ByteConsumer action,int numLeft){
+    if((numLeft=forEachWordAscending(word0,Byte.MIN_VALUE,action,numLeft))!=0){
+      if((numLeft=forEachWordAscending(word1,-64,action,numLeft))!=0){
+        if((numLeft=forEachWordAscending(word2,0,action,numLeft))!=0){
+          forEachWordAscending(word3,64,action,numLeft);
+        }
+      }
+    }
+  }
+  private void forEachDescendingHelper(ByteConsumer action,int numLeft){
+    if((numLeft=forEachWordDescending(word3,128,action,numLeft))!=0){
+      if((numLeft=forEachWordDescending(word2,64,action,numLeft))!=0){
+        if((numLeft=forEachWordDescending(word1,0,action,numLeft))!=0){
+          forEachWordDescending(word0,-64,action,numLeft);
+        }
+      }
+    }
+  }
+  private void forEachDescendingHelper(ByteConsumer action,int numLeft,int exclusiveTo){
+    switch(exclusiveTo>>6){
+      case 1:
+        if((numLeft=forEachWordAscending(word3,exclusiveTo,action,numLeft))==0){
+          break;
+        }
+        exclusiveTo=64;
+      case 0:
+        if((numLeft=forEachWordAscending(word2,exclusiveTo,action,numLeft))==0){
+          break;
+        }
+        exclusiveTo=0;
+      case -1:
+        if((numLeft=forEachWordAscending(word1,exclusiveTo,action,numLeft))==0){
+          break;
+        }
+        exclusiveTo=-64;
+      default:
+        forEachWordAscending(word0,exclusiveTo,action,numLeft);
+    }
+  }
+  private void forEachAscendingHelper(int inclusiveFrom,ByteConsumer action,int numLeft){
     switch(inclusiveFrom>>6){
       case -2:
-        switch(exclusiveTo>>6){
-          case -2:
-            return Long.bitCount(((word=this.word0)^(this.word0=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
-          case -1:
-            return Long.bitCount(((word=this.word0)&(this.word0=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
-            + Long.bitCount(((word=this.word1)&(this.word1=processSubSetWordRemoveIf(word,-64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
-          case 0:
-            return Long.bitCount(((word=this.word0)&(this.word0=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
-            + Long.bitCount((word=this.word1)&(this.word1=processWordRemoveIf(word,-64,filter)))
-            + Long.bitCount(((word=this.word2)&(this.word2=processSubSetWordRemoveIf(word,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
-          default:
-            return Long.bitCount(((word=this.word0)&(this.word0=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
-            + Long.bitCount((word=this.word1)&(this.word1=processWordRemoveIf(word,-64,filter)))
-            + Long.bitCount((word=this.word2)&(this.word2=processWordRemoveIf(word,0,filter)))
-            + Long.bitCount(((word=this.word3)&(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+        if((numLeft=forEachWordAscending(word0,inclusiveFrom,action,numLeft))==0){
+          break;
         }
+        inclusiveFrom=-64;
       case -1:
-        switch(exclusiveTo>>6){
-          case -1:
-            return Long.bitCount(((word=this.word1)^(this.word1=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
-          case 0:
-            return Long.bitCount(((word=this.word1)&(this.word1=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
-            + Long.bitCount(((word=this.word2)&(this.word2=processSubSetWordRemoveIf(word,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
-          default:
-            return Long.bitCount(((word=this.word1)&(this.word1=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
-            + Long.bitCount((word=this.word2)&(this.word2=processWordRemoveIf(word,0,filter)))
-            + Long.bitCount(((word=this.word3)&(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+        if((numLeft=forEachWordAscending(word1,inclusiveFrom,action,numLeft))==0){
+          break;
         }
+        inclusiveFrom=0;
       case 0:
-        if(exclusiveTo>>6==0){
+        if((numLeft=forEachWordAscending(word2,inclusiveFrom,action,numLeft))==0){
+          break;
+        }
+        inclusiveFrom=64;
+      default:
+        forEachWordAscending(word3,inclusiveFrom,action,numLeft);
+    }
+  }
+  private static int forEachWordDescending(long word,int valBound,ByteConsumer action,int numLeft){
+    for(long marker=1L<<(--valBound);;--valBound){
+      if((word&marker)!=0){
+        action.accept((byte)valBound);
+        if(--numLeft==0){
+          break;
+        }
+      }
+      if((marker>>>=1)==0){
+        break;
+      }
+    }
+    return numLeft;
+  }
+  private static void forEachWordAscending(long word,int valOffset,ByteConsumer action){
+    for(long marker=1L;;++valOffset){
+      if((word&marker)!=0){
+        action.accept((byte)valOffset);
+      }
+      if((marker<<=1)==0){
+        break;
+      }
+    }
+  }
+  private static void forEachWordDescending(long word,int inclusiveValBound,ByteConsumer action){
+    for(long marker=Long.MIN_VALUE;;--inclusiveValBound){
+      if((word&marker)!=0){
+        action.accept((byte)inclusiveValBound);
+      }
+      if((marker>>>=1)==0){
+        break;
+      }
+    }
+  }
+  private static int forEachWordAscending(long word,int valOffset,ByteConsumer action,int numLeft){
+    for(long marker=1L<<valOffset;;++valOffset){
+      if((word&marker)!=0){
+        action.accept((byte)valOffset);
+        if(--numLeft==0){
+          break;
+        }
+      }
+      if((marker<<=1)==0){
+        break;
+      }
+    }
+    return numLeft;
+  }
+  #MACRO WordToArray(Object,(Byte)(byte),int)
+  #MACRO WordToArray(byte,(byte),int)
+  #MACRO WordToArray(Byte,(Byte)(byte),int)
+  #MACRO WordToArray(short,(short),int)
+  #MACRO WordToArray(int,,int)
+  #MACRO WordToArray(long,,long)
+  #MACRO WordToArray(float,(float),int)
+  #MACRO WordToArray(double,(double),int)
+#MACRODEF WordToArray(ARRTYPE,CAST,VALTYPE)
+private static int wordToArrayAscending(long word,VALTYPE valOffset,VALTYPE valBound,ARRTYPE[] dst,int magicWord){
+  int numLeft=magicWord>>>9;
+  for(magicWord&=(-1>>>-9);;){
+    if(((1L<<valOffset)&word)!=0){
+      dst[magicWord++]=CAST(valOffset);
+      if(--numLeft==0){
+        return magicWord;
+      }
+    }
+    if(++valOffset==valBound){
+      return magicWord|(numLeft<<9);
+    }
+  }
+}
+private static int finalWordToArrayAscending(long word,VALTYPE valOffset,ARRTYPE[] dst,int magicWord){
+  for(int dstOffset=magicWord&(-1>>>-9);;){
+    if(((1L<<valOffset)&word)!=0){
+      dst[dstOffset++]=CAST(valOffset);
+      if((magicWord-=(1<<9))<(1<<9)){
+        return magicWord;
+      }
+    }
+    ++valOffset;
+  }
+}
+private static int wordToArrayDescending(long word,VALTYPE valOffset,VALTYPE valBound,ARRTYPE[] dst,int magicWord){
+  int numLeft=magicWord>>>9;
+  for(magicWord&=(-1>>>-9);;){
+    if(((1L<<(--valBound))&word)!=0){
+      dst[magicWord++]=CAST(valBound);
+      if(--numLeft==0){
+        return magicWord;
+      }
+    }
+    if(valOffset==valBound){
+      return magicWord|(numLeft<<9);
+    }
+  }
+}
+private static int finalWordToArrayDescending(long word,VALTYPE valBound,ARRTYPE[] dst,int magicWord){
+  for(int dstOffset=magicWord&(-1>>>-9);;){
+    if(((1L<<(--valBound))&word)!=0){
+      dst[dstOffset++]=CAST(valBound);
+      if((magicWord-=(1<<9))<(1<<9)){
+        return magicWord;
+      }
+    }
+  }
+}
+#ENDDEF
+  private static int wordToStringAscending(long word,int valOffset,int valBound,byte[] buffer,int magicWord){
+    int size=magicWord>>>11;
+    for(magicWord&=(-1>>>-11);;){
+      if(((1L<<valOffset)&word)!=0){
+        magicWord=(ToStringUtil.getStringShort(valOffset,buffer,++magicWord));
+        if(--size==0){
+          return magicWord;
+        }
+      }
+      if(++valOffset==valBound){
+        return magicWord|(size<<11);
+      }
+    }
+  }
+  private static int finalWordToStringAscending(long word,int valOffset,byte[] buffer,int magicWord){
+    for(int bufferOffset=magicWord&(-1>>>-11);;){
+      if(((1L<<valOffset)&word)!=0){
+        bufferOffset=(ToStringUtil.getStringShort(valOffset,buffer,++bufferOffset));
+        if((magicWord-=(1<<11))<(1<<11)){
+          return magicWord;
+        }
+      }
+      ++valOffset;
+    }
+  }
+  private static int wordToStringDescending(long word,int valOffset,int valBound,byte[] buffer,int magicWord){
+    int size=magicWord>>>11;
+    for(magicWord&=(-1>>>-11);;){
+      if(((1L<<(--valBound))&word)!=0){
+        magicWord=(ToStringUtil.getStringShort(valBound,buffer,++magicWord));
+        if(--size==0){
+          return magicWord;
+        }
+      }
+      if(valOffset==valBound){
+        return magicWord|(size<<11);
+      }
+    }
+  }
+  private static int finalWordToStringDescending(long word,int valBound,byte[] buffer,int magicWord){
+    for(int bufferOffset=magicWord&(-1>>>-11);;){
+      if(((1L<<(--valBound))&word)!=0){
+        bufferOffset=(ToStringUtil.getStringShort(valBound,buffer,++bufferOffset));
+        if((magicWord-=(1<<11))<(1<<11)){
+          return magicWord;
+        }
+      }
+    }
+  }
+  private int removeIfHelper(int inclusiveFrom,BytePredicate filter,int exclusiveTo){
+    switch(inclusiveFrom>>6){
+      case -2:
+        long word;
+        int numRemoved;
+        goToWord0:for(;;){
+          goToWord1:for(;;){
+            goToWord2:switch(exclusiveTo>>6){
+              case -2:
+                return Long.bitCount(((word=this.word0)^(this.word0=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+              case -1:
+                numRemoved=Long.bitCount(((word=this.word1)^(this.word1=processSubSetWordRemoveIf(word,-64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                break goToWord0;
+              case 0:
+                numRemoved=Long.bitCount(((word=this.word2)^(this.word2=processSubSetWordRemoveIf(word,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                break goToWord1;
+              default:
+                numRemoved=Long.bitCount(((word=this.word3)^(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                break goToWord2;
+            }
+            numRemoved+=Long.bitCount((word=this.word2)^(this.word2=processWordRemoveIf(word,0,filter)));
+            break;
+          }
+          numRemoved+=Long.bitCount((word=this.word1)^(this.word1=processWordRemoveIf(word,-64,filter)));
+          break;
+        }
+        return numRemoved+Long.bitCount(((word=this.word0)^(this.word0=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)));
+      case -1:
+        goToWord1:for(;;){
+          goToWord2:switch(exclusiveTo>>6){
+            case -1:
+              return Long.bitCount(((word=this.word1)^(this.word1=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+            case 0:
+              numRemoved=Long.bitCount(((word=this.word2)^(this.word2=processSubSetWordRemoveIf(word,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+              break goToWord1;
+            default:
+              numRemoved=Long.bitCount(((word=this.word3)^(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+              break goToWord2;
+          }
+          numRemoved+=Long.bitCount((word=this.word2)^(this.word2=processWordRemoveIf(word,0,filter)));
+          break;
+        }
+        return numRemoved+Long.bitCount(((word=this.word1)^(this.word1=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)));
+      case 0:
+        if((exclusiveTo>>6)==0){
           return Long.bitCount(((word=this.word2)^(this.word2=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
         }else{
-          return Long.bitCount(((word=this.word2)&(this.word2=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
-            + Long.bitCount(((word=this.word3)&(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+          return Long.bitCount(((word=this.word2)^(this.word2=processWordRemoveIf(word,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+            + Long.bitCount(((word=this.word3)^(this.word3=processSubSetWordRemoveIf(word,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
         }
       default:
         return Long.bitCount(((word=this.word3)^(this.word3=processSubSetWordRemoveIf(word,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
     }
   }
-  
-  #MACRO WordRemoveIf(BytePredicate)
-  #MACRO WordRemoveIf(Predicate<? super Byte>)
-#MACRODEF WordRemoveIf(PREDICATE)
-  private static long processWordRemoveIf(long word,int valOffset,PREDICATE filter){
+  private static long processWordRemoveIf(long word,int valOffset,BytePredicate filter){
     long marker=1L<<valOffset;
     for(;;){
       if((word & marker) != 0){
@@ -121,7 +649,7 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
       ++valOffset;
     }
   }
-  private static long processSubSetWordRemoveIf(long word,int valOffset,int valBound,PREDICATE filter){
+  private static long processSubSetWordRemoveIf(long word,int valOffset,int valBound,BytePredicate filter){
     long marker=1L<<valOffset;
     for(;;){
       if((word & marker) != 0){
@@ -135,8 +663,6 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
       marker<<=1;
     }
   }
-#ENDDEF
-
   public static class Checked extends ByteSetImpl{
     transient int modCountAndSize;
     #MACRO Constructors<Checked>()
@@ -147,6 +673,156 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     Checked(int size,long word0,long word1,long word2,long word3){
       super(word0,word1,word2,word3);
       this.modCountAndSize=size;
+    }
+    @Override public boolean add(boolean val){
+      if(super.add(val)){
+        this.modCountAndSize+=((1<<9)+1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean add(byte val){
+      if(super.add(val)){
+        this.modCountAndSize+=((1<<9)+1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(boolean val){
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(int val){
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(long val){
+      final int modCountAndSize,v;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && (v=(int)val)==val && super.removeVal(v)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(float val){
+      final int modCountAndSize,v;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && (v=(int)val)==val && super.removeVal(v)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      final int modCountAndSize,v;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && (v=(int)val)==val && super.removeVal(v)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+        for(;;){
+          final int v;
+          if(val instanceof Byte){
+            if(!super.removeVal((byte)val)){
+              break;
+            }
+          }else if(val instanceof Integer || val instanceof Short){
+            if(!super.removeVal(((Number)val).intValue())){
+              break;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(v=(int)l) || !super.removeVal(v)){
+              break;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(v=(int)f) || !super.removeVal(v)){
+              break;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(v=(int)d) || !super.removeVal(v)){
+              break;
+            }
+          }else if(val instanceof Character){
+            if(!super.removeVal((char)val)){
+              break;
+            }
+          }else if(val instanceof Boolean){
+            if(!super.removeVal((boolean)val)){
+              break;
+            }
+          }else{
+            break;
+          }
+          this.modCountAndSize=modCountAndSize+((1<<9)-1);
+          return true;
+        }
+      }
+      return false;
+    }
+    @Override public boolean contains(Object val){
+      if((this.modCountAndSize&0x1ff)!=0){
+        for(;;){
+          final int v;
+          if(val instanceof Byte){
+            return super.contains((byte)val);
+          }else if(val instanceof Integer || val instanceof Short){
+            v=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(v=(int)l)){
+              break;
+            }     
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(v=(int)f)){
+              break;
+            }      
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(v=(int)d)){
+              break;
+            }
+          }else if(val instanceof Character){
+            return super.contains((char)val);
+          }else if(val instanceof Boolean){
+            return super.contains((boolean)val);
+          }else{
+            break;
+          }
+          return super.contains(v);
+        }
+      }
+      return false;
     }
     #MACRO DirectionlessMethods<Full,this,Checked>()
     #MACRO DirectionedMethods<Full,this,Checked,Ascending>()
@@ -191,6 +867,177 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
         }
       }
     }
+    private boolean removeIfHelper(BytePredicate filter,int modCountAndSize){
+      long word,newWord0,newWord1,newWord2,newWord3;
+      int numRemoved;
+      try {
+        numRemoved=Long.bitCount((word=this.word0)^(newWord0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)))
+          +Long.bitCount((word=this.word1)^(newWord1=processWordRemoveIf(word,-64,filter)))
+          +Long.bitCount((word=this.word2)^(newWord2=processWordRemoveIf(word,0,filter)))
+          +Long.bitCount((word=this.word3)^(newWord3=processWordRemoveIf(word,64,filter)));
+      }finally {
+        CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
+      }
+      if(numRemoved!=0) {
+        this.word0=newWord0;
+        this.word1=newWord1;
+        this.word2=newWord2;
+        this.word3=newWord3;
+        this.modCountAndSize=modCountAndSize-numRemoved+(1<<9);
+        return true;
+      }
+      return false;
+    }
+    private int removeIfHelper(BytePredicate filter,int exclusiveTo,CheckedCollection.AbstractModCountChecker modCountChecker){
+      long newWord0=this.word0,newWord1=this.word1,newWord2=this.word2,newWord3=this.word3;
+      int numRemoved;
+      try{
+        goToEnd:for(;;){
+          goToWord0:for(;;){
+            goToWord1:for(;;){
+              switch(exclusiveTo>>6){
+              case -2:
+                numRemoved=Long.bitCount(((newWord0)^(newWord0=processSubSetWordRemoveIf(newWord0,Byte.MIN_VALUE,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+                break goToEnd;
+              case -1:
+                numRemoved=Long.bitCount(((newWord1)^(newWord1=processSubSetWordRemoveIf(newWord1,-64,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+                break goToWord0;
+              case 0:
+                numRemoved=Long.bitCount(((newWord2)^(newWord2=processSubSetWordRemoveIf(newWord2,0,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+                break goToWord1;
+              default:
+                numRemoved=Long.bitCount(((newWord3)^(newWord3=processSubSetWordRemoveIf(newWord3,64,exclusiveTo,filter)))&(-1L>>>-exclusiveTo));
+              }
+              numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
+              break;
+            }
+            numRemoved+=Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)));
+            break;
+          }
+          numRemoved+=Long.bitCount(newWord0^(newWord0=processWordRemoveIf(newWord0,Byte.MIN_VALUE,filter)));
+          break;
+        }
+      }finally{
+        modCountChecker.checkModCount();
+      }
+      if(numRemoved!=0){
+        this.word0=newWord0;
+        this.word1=newWord1;
+        this.word2=newWord2;
+        this.word3=newWord3;
+      }
+      return numRemoved;
+    }
+    private int removeIfHelper(int inclusiveFrom,BytePredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker){
+      long newWord0=this.word0,newWord1=this.word1,newWord2=this.word2,newWord3=this.word3;
+      int numRemoved;
+      try{
+        goToEnd:for(;;){
+          goToWord3:for(;;){
+            goToWord2:for(;;){
+              switch(inclusiveFrom>>6){
+              case 1:
+                numRemoved=Long.bitCount(((newWord3)^(newWord3=processWordRemoveIf(newWord3,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+                break goToEnd;
+              case 0:
+                numRemoved=Long.bitCount(((newWord2)^(newWord2=processWordRemoveIf(newWord2,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+                break goToWord3;
+              case -1:
+                numRemoved=Long.bitCount(((newWord1)^(newWord1=processWordRemoveIf(newWord1,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+                break goToWord2;
+              default:
+                numRemoved=Long.bitCount(((newWord0)^(newWord0=processWordRemoveIf(newWord0,inclusiveFrom,filter)))&(-1L<<inclusiveFrom));
+              }
+              numRemoved+=Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)));
+              break;
+            }
+            numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
+            break;
+          }
+          numRemoved+=Long.bitCount(newWord3^(newWord3=processWordRemoveIf(newWord3,64,filter)));
+          break;
+        }
+      }finally{
+        modCountChecker.checkModCount();
+      }
+      if(numRemoved!=0){
+        this.word0=newWord0;
+        this.word1=newWord1;
+        this.word2=newWord2;
+        this.word3=newWord3;
+      }
+      return numRemoved;
+    }
+    private int removeIfHelper(int inclusiveFrom,BytePredicate filter,int exclusiveTo,CheckedCollection.AbstractModCountChecker modCountChecker){
+      long newWord0=this.word0,newWord1=this.word1,newWord2=this.word2,newWord3=this.word3;
+      int numRemoved;
+      try{
+        goToEnd:switch(inclusiveFrom>>6){
+          case -2:
+            goToWord0:for(;;){
+              goToWord1:for(;;){
+                goToWord2:switch(exclusiveTo>>6){
+                  case -2:
+                    numRemoved=Long.bitCount((newWord0^(newWord0=processSubSetWordRemoveIf(newWord0,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+                    break goToEnd;
+                  case -1:
+                    numRemoved=Long.bitCount((newWord1^(newWord1=processSubSetWordRemoveIf(newWord1,-64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                    break goToWord0;
+                  case 0:
+                    numRemoved=Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                    break goToWord1;
+                  default:
+                    numRemoved=Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                    break goToWord2;
+                }
+                numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
+                break;
+              }
+              numRemoved+=Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)));
+              break;
+            }
+            numRemoved+=Long.bitCount((newWord0^(newWord0=processWordRemoveIf(newWord0,inclusiveFrom,filter))&(1L<<inclusiveFrom)));
+            break;
+          case -1:
+            goToWord1:for(;;){
+              goToWord2:switch(exclusiveTo>>6){
+                case -1:
+                  numRemoved=Long.bitCount((newWord1^(newWord1=processSubSetWordRemoveIf(newWord1,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+                  break goToEnd;
+                case 0:
+                  numRemoved=Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,0,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                  break goToWord1;
+                default:
+                  numRemoved=Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+                  break goToWord2;
+              }
+              numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
+              break;
+            }
+            numRemoved+=Long.bitCount((newWord1^(newWord1=processWordRemoveIf(newWord1,inclusiveFrom,filter))&(1L<<inclusiveFrom)));
+            break;
+          case 0:
+            if((exclusiveTo>>6)==0){
+              numRemoved=Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+            }else{
+              numRemoved=Long.bitCount((newWord2^(newWord2=processWordRemoveIf(newWord2,inclusiveFrom,filter))&(1L<<inclusiveFrom)))
+                + Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,exclusiveTo,filter))&(-1L>>>-exclusiveTo)));
+            }
+            break;
+          default:
+            numRemoved=Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,inclusiveFrom,exclusiveTo,filter))&(-1L<<inclusiveFrom)&(-1L>>>-exclusiveTo)));
+        }
+      }finally{
+        modCountChecker.checkModCount();
+      }
+      if(numRemoved!=0){
+        this.word0=newWord0;
+        this.word1=newWord1;
+        this.word2=newWord2;
+        this.word3=newWord3;
+      }
+      return numRemoved;
+    }
     private static int hashCodeForWord(long word,int offset,int sumAndNumLeft){
       int tail0s;
       if((tail0s=Long.numberOfTrailingZeros(word))==64){
@@ -233,6 +1080,60 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     private UncheckedFullView(ByteSetImpl root){
       this.root=root;
     }
+    @Override public boolean add(boolean val){
+      return root.add(val);
+    }
+    @Override public boolean add(byte val){
+      return root.add(val);
+    }
+    @Override public boolean contains(boolean val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(byte val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(char val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(int val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(long val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(float val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(double val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(Object val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(boolean val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(byte val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(char val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(int val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(long val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(float val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(double val){
+      return root.removeVal(val);
+    }
+    @Override public boolean remove(Object val){
+      return root.remove(val);
+    }
     #MACRO DirectionlessMethods<Full,root,Unchecked>()
     #MACRO DirectionedMethods<Full,root,Unchecked,Ascending>()
     private Object writeReplace(){
@@ -253,6 +1154,60 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     transient final ByteSetImpl.Checked root;
     private CheckedFullView(ByteSetImpl.Checked root){
       this.root=root;
+    }
+    @Override public boolean add(boolean val){
+      return root.add(val);
+    }
+    @Override public boolean add(byte val){
+      return root.add(val);
+    }
+    @Override public boolean contains(boolean val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(byte val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(char val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(int val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(long val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(float val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(double val){
+      return root.contains(val);
+    }
+    @Override public boolean contains(Object val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(boolean val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(byte val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(char val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(int val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(long val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(float val){
+      return root.removeVal(val);
+    }
+    @Override public boolean removeVal(double val){
+      return root.removeVal(val);
+    }
+    @Override public boolean remove(Object val){
+      return root.remove(val);
     }
     #MACRO DirectionlessMethods<Full,root,Checked>()
     #MACRO DirectionedMethods<Full,root,Checked,Ascending>()
@@ -312,6 +1267,60 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     private UncheckedHeadView(AbstractUncheckedSubSet parent,int boundInfo,int size){
       super(parent,boundInfo,size);
     }
+    @Override public boolean add(boolean val){
+      return root.add(val);
+    }
+    @Override public boolean add(byte val){
+      return root.add(val);
+    }
+    @Override public boolean contains(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(Object val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean remove(Object val){
+      #MACRO NYI()
+    }
     #MACRO DirectionlessMethods<Head,root,Unchecked>()
     #MACRO DirectionedMethods<Head,root,Unchecked,Ascending>()
     private static class Descending extends UncheckedHeadView{
@@ -330,6 +1339,90 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     }
     private CheckedHeadView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
+    }
+    @Override public boolean add(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean add(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(byte val){
+      if(val<this.boundInfo){
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCountAndSize>>>9,(root=this.root).modCountAndSize>>>9);
+        return root.contains(val);
+      }
+      return false;
+    }
+    @Override public boolean contains(char val){
+      if(val<this.boundInfo){
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCountAndSize>>>9,(root=this.root).modCountAndSize>>>9);
+        return root.contains(val);
+      }
+      return false;
+    }
+    @Override public boolean contains(int val){
+      if(val<this.boundInfo){
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCountAndSize>>>9,(root=this.root).modCountAndSize>>>9);
+        return root.contains(val);
+      }
+      return false;
+    }
+    @Override public boolean contains(long val){
+      if(val<this.boundInfo){
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCountAndSize>>>9,(root=this.root).modCountAndSize>>>9);
+        return root.contains(val);
+      }
+      return false;
+    }
+    @Override public boolean contains(float val){
+      if(val<this.boundInfo){
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCountAndSize>>>9,(root=this.root).modCountAndSize>>>9);
+        return root.contains(val);
+      }
+      return false;
+    }
+    @Override public boolean contains(double val){
+      if(val<this.boundInfo){
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCountAndSize>>>9,(root=this.root).modCountAndSize>>>9);
+        return root.contains(val);
+      }
+      return false;
+    }
+    @Override public boolean contains(Object val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean remove(Object val){
+      #MACRO NYI()
     }
     #MACRO DirectionlessMethods<Head,root,Checked>()
     #MACRO DirectionedMethods<Head,root,Checked,Ascending>()
@@ -350,6 +1443,60 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     private UncheckedTailView(AbstractUncheckedSubSet parent,int boundInfo,int size){
       super(parent,boundInfo,size);
     }
+    @Override public boolean add(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean add(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(Object val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean remove(Object val){
+      #MACRO NYI()
+    }
     #MACRO DirectionlessMethods<Tail,root,Unchecked>()
     #MACRO DirectionedMethods<Tail,root,Unchecked,Ascending>()
     private static class Descending extends UncheckedTailView{
@@ -368,6 +1515,60 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     }
     private CheckedTailView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
+    }
+    @Override public boolean add(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean add(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(Object val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean remove(Object val){
+      #MACRO NYI()
     }
     #MACRO DirectionlessMethods<Tail,root,Checked>()
     #MACRO DirectionedMethods<Tail,root,Checked,Ascending>()
@@ -388,6 +1589,60 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     private UncheckedBodyView(AbstractUncheckedSubSet parent,int boundInfo,int size){
       super(parent,boundInfo,size);
     }
+    @Override public boolean add(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean add(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(Object val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean remove(Object val){
+      #MACRO NYI()
+    }
     #MACRO DirectionlessMethods<Body,root,Unchecked>()
     #MACRO DirectionedMethods<Body,root,Unchecked,Ascending>()
     private static class Descending extends UncheckedBodyView{
@@ -407,6 +1662,60 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     private CheckedBodyView(final AbstractCheckedSubSet parent,int boundInfo,int modCountAndSize){
       super(parent,boundInfo,modCountAndSize);
     }
+    @Override public boolean add(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean add(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean contains(Object val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(boolean val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(byte val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(char val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(int val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(long val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(float val){
+      #MACRO NYI()
+    }
+    @Override public boolean removeVal(double val){
+      #MACRO NYI()
+    }
+    @Override public boolean remove(Object val){
+      #MACRO NYI()
+    }
     #MACRO DirectionlessMethods<Body,root,Checked>()
     #MACRO DirectionedMethods<Body,root,Checked,Ascending>()
     private static class Descending extends CheckedBodyView{
@@ -422,33 +1731,291 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
 }
 #MACRODEF DirectionedMethods<VIEW,SOURCE,CHECKED,DIRECTION>()
 @Override public String toString(){
-
+#IFSWITCH VIEW==Full
+  int size;
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH SOURCE==this
+  if((size=(this.modCountAndSize&0x1ff))!=0){
+      #ELSE
+  final ByteSetImpl.Checked SOURCE;
+  if((size=((SOURCE=this.SOURCE).modCountAndSize&0x1ff))!=0){
+      #ENDIF
+    #ELSE
+  final long word0,word1,word2,word3;
+      #IFSWITCH SOURCE==this
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){  
+      #ELSE
+  final ByteSetImpl SOURCE;
+  if((size=SetCommonImpl.size(word0=(SOURCE=this.SOURCE).word0,word1=SOURCE.word1,word2=SOURCE.word2,word3=SOURCE.word3))!=0){      
+      #ENDIF
+    #ENDIF
+    final byte[] buffer;
+    (buffer=new byte[size*6])[0]='[';
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+    if((size=wordToStringDIRECTION(word0,Byte.MIN_VALUE,-64,buffer,size<<11))>=1<<11){
+      if((size=wordToStringDIRECTION(word1,-64,0,buffer,size))>=1<<11){
+        if((size=wordToStringDIRECTION(word2,0,64,buffer,size))>=1<<11){
+          size=finalWordToStringDIRECTION(word3,64,buffer,size);
+    #ELSE
+    if((size=wordToStringDIRECTION(word3,64,128,buffer,size<<11))>=1<<11){
+      if((size=wordToStringDIRECTION(word2,0,64,buffer,size))>=1<<11){
+        if((size=wordToStringDIRECTION(word1,-64,0,buffer,size))>=1<<11){
+          size=finalWordToStringDIRECTION(word0,-64,buffer,size);
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH DIRECTION==Ascending
+    if((size=wordToStringDIRECTION(SOURCE.word0,Byte.MIN_VALUE,-64,buffer,size<<11))>=1<<11){
+      if((size=wordToStringDIRECTION(SOURCE.word1,-64,0,buffer,size))>=1<<11){
+        if((size=wordToStringDIRECTION(SOURCE.word2,0,64,buffer,size))>=1<<11){
+          size=finalWordToStringDIRECTION(SOURCE.word3,64,buffer,size);
+      #ELSE
+    if((size=wordToStringDIRECTION(SOURCE.word3,64,128,buffer,size<<11))>=1<<11){
+      if((size=wordToStringDIRECTION(SOURCE.word2,0,64,buffer,size))>=1<<11){
+        if((size=wordToStringDIRECTION(SOURCE.word1,-64,0,buffer,size))>=1<<11){
+          size=finalWordToStringDIRECTION(SOURCE.word0,-64,buffer,size);
+      #ENDIF
+    #ELSE
+      #IFSWITCH DIRECTION==Ascending
+    if((size=wordToStringDIRECTION(word0,Byte.MIN_VALUE,-64,buffer,size<<11))>=1<<11){
+      if((size=wordToStringDIRECTION(word1,-64,0,buffer,size))>=1<<11){
+        if((size=wordToStringDIRECTION(word2,0,64,buffer,size))>=1<<11){
+          size=finalWordToStringDIRECTION(word3,64,buffer,size);
+      #ELSE
+    if((size=wordToStringDIRECTION(word3,64,128,buffer,size<<11))>=1<<11){
+      if((size=wordToStringDIRECTION(word2,0,64,buffer,size))>=1<<11){
+        if((size=wordToStringDIRECTION(word1,-64,0,buffer,size))>=1<<11){
+          size=finalWordToStringDIRECTION(word0,-64,buffer,size);
+      #ENDIF
+    #ENDIF
+  #ENDIF
+        }
+      }
+    }
+    buffer[++size]=']';
+    return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
+  }
+  return "[]";
+#ELSEIFSWITCH VIEW==Head
   #MACRO NYI()
-  
+#ELSEIFSWITCH VIEW==Tail
+  #MACRO NYI()
+#ELSEIFSWITCH VIEW==Body
+  #MACRO NYI()
+#ENDIF
 }
-#MACRO ForEachHelper(ByteConsumer,action)
-#MACRO ForEachHelper(Consumer<? super Byte>,action::accept)
+#MACRO ForEachHelper<action>(ByteConsumer)
+#MACRO ForEachHelper<action::accept>(Consumer<? super Byte>)
 @Override public OmniIterator.OfByte iterator(){
 
   #MACRO NYI()
   
 }
-#MACRO ToArrayHelper<Byte>(,DEFAULT_BOXED_ARR)
-#MACRO ToArrayHelper<byte>(Byte,DEFAULT_ARR)
-#MACRO ToArrayHelper<short>(Short,DEFAULT_ARR)
-#MACRO ToArrayHelper<int>(Int,DEFAULT_ARR)
-#MACRO ToArrayHelper<long>(Long,DEFAULT_ARR)
-#MACRO ToArrayHelper<float>(Float,DEFAULT_ARR)
-#MACRO ToArrayHelper<double>(Double,DEFAULT_ARR)
+#MACRO ToArrayHelper<Byte>(,OmniArray.OfByte.DEFAULT_BOXED_ARR,int,(Byte)(byte))
+#MACRO ToArrayHelper<byte>(Byte,OmniArray.OfByte.DEFAULT_ARR,int,(byte))
+#MACRO ToArrayHelper<short>(Short,OmniArray.OfShort.DEFAULT_ARR,int,(short))
+#MACRO ToArrayHelper<int>(Int,OmniArray.OfInt.DEFAULT_ARR,int,)
+#MACRO ToArrayHelper<long>(Long,OmniArray.OfLong.DEFAULT_ARR,long,)
+#MACRO ToArrayHelper<float>(Float,OmniArray.OfFloat.DEFAULT_ARR,int,(float))
+#MACRO ToArrayHelper<double>(Double,OmniArray.OfDouble.DEFAULT_ARR,int,(double))
 @Override public <T> T[] toArray(T[] dst){
-
+#IFSWITCH VIEW==Full
+  int size;
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH SOURCE==this
+  if((size=(this.modCountAndSize&0x1ff))!=0){
+      #ELSE
+  final ByteSetImpl.Checked SOURCE;
+  if((size=((SOURCE=this.SOURCE).modCountAndSize&0x1ff))!=0){
+      #ENDIF
+    #ELSE
+  final long word0,word1,word2,word3;
+      #IFSWITCH SOURCE==this
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){  
+      #ELSE
+  final ByteSetImpl SOURCE;
+  if((size=SetCommonImpl.size(word0=(SOURCE=this.SOURCE).word0,word1=SOURCE.word1,word2=SOURCE.word2,word3=SOURCE.word3))!=0){      
+      #ENDIF
+    #ENDIF
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+    if((size=wordToArrayDIRECTION(word0,Byte.MIN_VALUE,-64,dst=OmniArray.uncheckedArrResize(size,dst),size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word3,64,dst,size);
+    #ELSE
+    if((size=wordToArrayDIRECTION(word3,64,128,dst=OmniArray.uncheckedArrResize(size,dst),size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word0,-64,dst,size);
+    #ENDIF
+  #ELSEIFSWITCH SOURCE==root
+    #IFSWITCH CHECKED==Checked
+      #IFSWITCH DIRECTION==Ascending
+    if((size=wordToArrayDIRECTION(SOURCE.word0,Byte.MIN_VALUE,-64,dst=OmniArray.uncheckedArrResize(size,dst),size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(SOURCE.word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(SOURCE.word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(SOURCE.word3,64,dst,size);
+      #ELSE
+    if((size=wordToArrayDIRECTION(SOURCE.word3,64,128,dst=OmniArray.uncheckedArrResize(size,dst),size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(SOURCE.word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(SOURCE.word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(SOURCE.word0,-64,dst,size);
+      #ENDIF
+    #ELSE
+      #IFSWITCH DIRECTION==Ascending
+    if((size=wordToArrayDIRECTION(word0,Byte.MIN_VALUE,-64,dst=OmniArray.uncheckedArrResize(size,dst),size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word3,64,dst,size);
+      #ELSE
+    if((size=wordToArrayDIRECTION(word3,64,128,dst=OmniArray.uncheckedArrResize(size,dst),size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word0,-64,dst,size);
+      #ENDIF
+    #ENDIF
+  #ENDIF
+        }
+      }
+    }
+  }else if(dst.length!=0){
+    dst[0]=null;
+  }
+  return dst;
+#ELSEIFSWITCH VIEW==Head
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
   #MACRO NYI()
   
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Tail
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ELSEIFSWITCH VIEW==Body
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ELSEIFSWITCH CHECKED==Unchecked
+    #IFSWITCH DIRECTION==Ascending
+  
+  #MACRO NYI()    
+  
+    #ELSEIFSWITCH DIRECTION==Descending
+  
+  #MACRO NYI()
+  
+    #ENDIF
+  #ENDIF
+#ENDIF
 }
 @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-
-  #MACRO NYI()
+#IFSWITCH VIEW==Full
   
+  int size;
+  #IFSWITCH CHECKED==Checked
+  final T[] dst;
+    #IFSWITCH SOURCE==this
+  final int modCountAndSize=this.modCountAndSize;
+    #ELSE
+  final ByteSetImpl.Checked SOURCE;
+  final int modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize;
+    #ENDIF
+  try{
+    dst=arrConstructor.apply(size=(modCountAndSize&0x1ff));
+  }finally{
+    CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+  }
+  if(size!=0){
+    #IFSWITCH DIRECTION==Ascending
+    if((size=wordToArrayDIRECTION(SOURCE.word0,Byte.MIN_VALUE,-64,dst,size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(SOURCE.word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(SOURCE.word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(SOURCE.word3,64,dst,size);
+    #ELSE
+    if((size=wordToArrayDIRECTION(SOURCE.word3,64,128,dst,size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(SOURCE.word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(SOURCE.word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(SOURCE.word0,-64,dst,size);
+    #ENDIF
+  #ELSE
+  final long word0,word1,word2,word3;
+    #IFSWITCH SOURCE==this
+  final T[] dst=arrConstructor.apply(size=SetCommonImpl.size(word0=SOURCE.word0,word1=SOURCE.word1,word2=SOURCE.word2,word3=SOURCE.word3));
+    #ELSE
+  final ByteSetImpl SOURCE;
+  final T[] dst=arrConstructor.apply(size=SetCommonImpl.size(word0=(SOURCE=this.SOURCE).word0,word1=SOURCE.word1,word2=SOURCE.word2,word3=SOURCE.word3));
+    #ENDIF
+  if(size!=0){
+    #IFSWITCH DIRECTION==Ascending
+    if((size=wordToArrayDIRECTION(word0,Byte.MIN_VALUE,-64,dst,size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word3,64,dst,size);
+    #ELSE
+    if((size=wordToArrayDIRECTION(word3,64,128,dst,size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word0,-64,dst,size);
+    #ENDIF
+  #ENDIF
+        }
+      }
+    }
+  }
+  return dst;
+#ELSEIFSWITCH VIEW==Head
+  #MACRO NYI()
+#ELSEIFSWITCH VIEW==Tail
+  #MACRO NYI()
+
+#ELSEIFSWITCH VIEW==Body
+  #MACRO NYI()
+
+#ENDIF
 }
 #ENDDEF
 #MACRODEF DirectionlessMethods<VIEW,SOURCE,CHECKED>()
@@ -503,86 +2070,6 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
   
 #ENDIF
 }
-@Override public boolean contains(boolean val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean contains(byte val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean contains(char val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean contains(int val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean contains(long val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean contains(float val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean contains(double val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean contains(Object val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean removeVal(boolean val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean removeVal(byte val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean removeVal(char val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean removeVal(int val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean removeVal(long val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean removeVal(float val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean removeVal(double val){
-
-  #MACRO NYI()
-  
-}
-@Override public boolean remove(Object val){
-
-  #MACRO NYI()
-  
-}
 @Override public void clear(){
 #IFSWITCH VIEW==Full
   #IFSWITCH CHECKED==Checked
@@ -593,6 +2080,10 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
   final ByteSetImpl.Checked SOURCE;
   if(((modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize)&0x1ff)!=0){  
     #ENDIF
+    SOURCE.word0=0;
+    SOURCE.word1=0;
+    SOURCE.word2=0;
+    SOURCE.word3=0;
     SOURCE.modCountAndSize=(modCountAndSize+(1<<9))&0xfffffe00;
   }
   #ELSE
@@ -628,6 +2119,9 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
     for(var parent=this.parent;parent!=null;parent=parent.parent){
       parent.size-=size;
     }
+    #IFSWITCH SOURCE==root
+    final ByteSetImpl SOURCE=this.SOURCE;
+    #ENDIF
   #ENDIF
     goToEnd:for(;;){
       goToWord0:for(;;){
@@ -681,7 +2175,9 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
 @Override public boolean isEmpty(){
 #IFSWITCH VIEW==Full
   #IFSWITCH CHECKED==Checked
-  return (SOURCE.modCountAndSize&0x1FF)==0;
+    #MACRO NYI()
+  
+  //return (SOURCE.modCountAndSize&0x1FF)==0;
   #ELSE
     #IFSWITCH SOURCE==this
   return word0==0 && word1==0 && word2==0 && word3==0;
@@ -703,7 +2199,8 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
 @Override public int size(){
 #IFSWITCH VIEW==Full
   #IFSWITCH CHECKED==Checked
-  return (SOURCE.modCountAndSize&0x1FF);
+  #MACRO NYI()
+  //return (SOURCE.modCountAndSize&0x1FF);
   #ELSE
     #IFSWITCH SOURCE==this
   return SetCommonImpl.size(word0,word1,word2,word3);
@@ -722,118 +2219,8 @@ public class ByteSetImpl extends AbstractByteSet implements Externalizable,Clone
   #ENDIF
 #ENDIF
 }
-@Override public boolean add(boolean val){
-#IFSWITCH VIEW==Full
-  #IFSWITCH SOURCE==this
-    #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-    #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-    #ENDIF
-  #ELSEIFSWITCH SOURCE==root
-    #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-    #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-    #ENDIF
-  #ENDIF
-#ELSEIFSWITCH VIEW==Head
-  #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-  #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-  #ENDIF
-#ELSEIFSWITCH VIEW==Tail
-  #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-  #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-  #ENDIF
-#ELSEIFSWITCH VIEW==Body
-  #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-  #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-  #ENDIF
-#ENDIF
-}
-@Override public boolean add(byte val){
-#IFSWITCH VIEW==Full
-  #IFSWITCH SOURCE==this
-    #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-    #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-    #ENDIF
-  #ELSEIFSWITCH SOURCE==root
-    #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-    #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-    #ENDIF
-  #ENDIF
-#ELSEIFSWITCH VIEW==Head
-  #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-  #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-  #ENDIF
-#ELSEIFSWITCH VIEW==Tail
-  #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-  #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-  #ENDIF
-#ELSEIFSWITCH VIEW==Body
-  #IFSWITCH CHECKED==Checked
-    
-  #MACRO NYI()
-    
-  #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
-  #ENDIF
-#ENDIF
-}
-#MACRO RemoveIfHelper(BytePredicate,filter)
-#MACRO RemoveIfHelper(Predicate<? super Byte>,filter::test)
+#MACRO RemoveIfHelper<filter>(BytePredicate)
+#MACRO RemoveIfHelper<filter::test>(Predicate<? super Byte>)
 #IFNOTSWITCH VIEW==Full,Head,Tail,Body
 ERROR unknown view VIEW
 #ENDIF
@@ -853,48 +2240,72 @@ ERROR the source SOURCE cannot be matched with the view VIEW
 
 
 
-#MACRODEF ToArrayHelper<RETTYPE>(CLASSPREFIX,DEFAULTARR)
+#MACRODEF ToArrayHelper<RETTYPE>(CLASSPREFIX,DEFAULTARR,VALTYPE,CAST)
 @Override public RETTYPE[] toCLASSPREFIXArray(){
 #IFSWITCH VIEW==Full
-  #IFSWITCH SOURCE==this
+  int size;
     #IFSWITCH CHECKED==Checked
-      #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-      #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+      #IFSWITCH SOURCE==this
+  if((size=(this.modCountAndSize&0x1ff))!=0){
+      #ELSE
+  final ByteSetImpl.Checked SOURCE;
+  if((size=((SOURCE=this.SOURCE).modCountAndSize&0x1ff))!=0){
       #ENDIF
-    #ELSEIFSWITCH CHECKED==Unchecked
-      #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-      #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+    #ELSE
+  final long word0,word1,word2,word3;
+      #IFSWITCH SOURCE==this
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){  
+      #ELSE
+  final ByteSetImpl SOURCE;
+  if((size=SetCommonImpl.size(word0=(SOURCE=this.SOURCE).word0,word1=SOURCE.word1,word2=SOURCE.word2,word3=SOURCE.word3))!=0){      
       #ENDIF
+    #ENDIF
+    final RETTYPE[] dst;
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+    if((size=wordToArrayDIRECTION(word0,Byte.MIN_VALUE,-64,dst=new RETTYPE[size],size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word3,64,dst,size);
+    #ELSE
+    if((size=wordToArrayDIRECTION(word3,64,128,dst=new RETTYPE[size],size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word0,-64,dst,size);
     #ENDIF
   #ELSEIFSWITCH SOURCE==root
     #IFSWITCH CHECKED==Checked
       #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-      #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+    if((size=wordToArrayDIRECTION(SOURCE.word0,Byte.MIN_VALUE,-64,dst=new RETTYPE[size],size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(SOURCE.word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(SOURCE.word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(SOURCE.word3,64,dst,size);
+      #ELSE
+    if((size=wordToArrayDIRECTION(SOURCE.word3,64,128,dst=new RETTYPE[size],size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(SOURCE.word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(SOURCE.word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(SOURCE.word0,-64,dst,size);
       #ENDIF
-    #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
+    #ELSE
+      #IFSWITCH DIRECTION==Ascending
+    if((size=wordToArrayDIRECTION(word0,Byte.MIN_VALUE,-64,dst=new RETTYPE[size],size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word3,64,dst,size);
+      #ELSE
+    if((size=wordToArrayDIRECTION(word3,64,128,dst=new RETTYPE[size],size<<11))>=1<<11){
+      if((size=wordToArrayDIRECTION(word2,0,64,dst,size))>=1<<11){
+        if((size=wordToArrayDIRECTION(word1,-64,0,dst,size))>=1<<11){
+          size=finalWordToArrayDIRECTION(word0,-64,dst,size);
+      #ENDIF
     #ENDIF
   #ENDIF
+        }
+      }
+    }
+    return dst;
+  }
+  return DEFAULTARR;
 #ELSEIFSWITCH VIEW==Head
   #IFSWITCH CHECKED==Checked
     #IFSWITCH DIRECTION==Ascending
@@ -974,219 +2385,190 @@ ERROR the source SOURCE cannot be matched with the view VIEW
 
 
 
-#MACRODEF ForEachHelper(CONSUMER,ACCEPT)
+#MACRODEF ForEachHelper<ACCEPT>(CONSUMER)
 @Override public void forEach(CONSUMER action){
 #IFSWITCH VIEW==Full
   #IFSWITCH SOURCE==this
     #IFSWITCH CHECKED==Checked
-      #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-      #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
-      #ENDIF
+  final int modCountAndSize;
+  final int numLeft;
+  if((numLeft=(modCountAndSize=SOURCE.modCountAndSize)&0x1ff)!=0){
+    try{
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper(ACCEPT,numLeft);
+    }finally{
+      CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+    }
+  }
     #ELSEIFSWITCH CHECKED==Unchecked
-      #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
+      #IFSWITCH DIRECTION==Ascending  
+        #IFSWITCH ACCEPT==action
+  forEachWordAscending(SOURCE.word0,Byte.MIN_VALUE,ACCEPT);
+  forEachWordAscending(SOURCE.word1,-64,ACCEPT);
+  forEachWordAscending(SOURCE.word2,0,ACCEPT);
+  forEachWordAscending(SOURCE.word3,64,ACCEPT);
+        #ELSE
+  this.forEach((ByteConsumer)ACCEPT);
+        #ENDIF
       #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+        #IFSWITCH ACCEPT==action
+  forEachWordDescending(SOURCE.word3,128,ACCEPT);
+  forEachWordDescending(SOURCE.word2,64,ACCEPT);
+  forEachWordDescending(SOURCE.word1,0,ACCEPT);
+  forEachWordDescending(SOURCE.word0,-64,ACCEPT);
+        #ELSE
+  this.forEach((ByteConsumer)ACCEPT);
+        #ENDIF
       #ENDIF
     #ENDIF
   #ELSEIFSWITCH SOURCE==root
     #IFSWITCH CHECKED==Checked
-      #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-      #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
-      #ENDIF
+  final int modCountAndSize;
+  final int numLeft;
+  final ByteSetImpl.Checked SOURCE;
+  if((numLeft=(modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize)&0x1ff)!=0){
+    try{
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper(ACCEPT,numLeft);
+    }finally{
+      CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+    }
+  }
     #ELSEIFSWITCH CHECKED==Unchecked
-    
-  #MACRO NYI()
-    
+      #IFSWITCH DIRECTION==Ascending  
+        #IFSWITCH ACCEPT==action
+  final ByteSetImpl SOURCE;
+  forEachWordAscending((SOURCE=this.SOURCE).word0,Byte.MIN_VALUE,ACCEPT);
+  forEachWordAscending(SOURCE.word1,-64,ACCEPT);
+  forEachWordAscending(SOURCE.word2,0,ACCEPT);
+  forEachWordAscending(SOURCE.word3,64,ACCEPT);
+        #ELSE
+  this.forEach((ByteConsumer)ACCEPT);
+        #ENDIF
+      #ELSEIFSWITCH DIRECTION==Descending
+        #IFSWITCH ACCEPT==action
+  final ByteSetImpl SOURCE;
+  forEachWordDescending((SOURCE=this.SOURCE).word3,128,ACCEPT);
+  forEachWordDescending(SOURCE.word2,64,ACCEPT);
+  forEachWordDescending(SOURCE.word1,0,ACCEPT);
+  forEachWordDescending(SOURCE.word0,-64,ACCEPT);
+        #ELSE
+  this.forEach((ByteConsumer)ACCEPT);
+        #ENDIF
+      #ENDIF
     #ENDIF
   #ENDIF
 #ELSEIFSWITCH VIEW==Head
   #IFSWITCH CHECKED==Checked
+  final ByteSetImpl.Checked SOURCE;
+  final int modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize;
+  try{
+    final int numLeft;
+    if((numLeft=modCountAndSize&0x1ff)!=0){
     #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-    #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper(ACCEPT,numLeft);
+    #ELSE
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper(ACCEPT,numLeft,this.boundInfo);
     #ENDIF
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+  }
   #ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
     #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-    #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
-    #ENDIF
+    SOURCE.forEachDIRECTIONHelper(ACCEPT,size);
+    #ELSE
+    SOURCE.forEachDIRECTIONHelper(ACCEPT,size,this.boundInfo);
+    #ENDIF 
+  }
   #ENDIF
 #ELSEIFSWITCH VIEW==Tail
   #IFSWITCH CHECKED==Checked
+  final ByteSetImpl.Checked SOURCE;
+  final int modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize;
+  try{
+    final int numLeft;
+    if((numLeft=modCountAndSize&0x1ff)!=0){
     #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-    #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper(this.boundInfo,ACCEPT,numLeft);
+    #ELSE
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper(ACCEPT,numLeft);
     #ENDIF
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+  }
   #ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
     #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-    #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+    SOURCE.forEachDIRECTIONHelper(this.boundInfo,ACCEPT,size);
+    #ELSE
+    SOURCE.forEachDIRECTIONHelper(ACCEPT,size);
     #ENDIF
+  }
   #ENDIF
 #ELSEIFSWITCH VIEW==Body
   #IFSWITCH CHECKED==Checked
+  final ByteSetImpl.Checked SOURCE;
+  final int modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize;
+  try{
+    final int numLeft;
+    if((numLeft=modCountAndSize&0x1ff)!=0){
     #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-    #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper((byte)(0xff&this.boundInfo),ACCEPT,numLeft);
+    #ELSE
+      ((ByteSetImpl)SOURCE).forEachDIRECTIONHelper(ACCEPT,numLeft,this.boundInfo>>8);
     #ENDIF
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+  }
   #ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
     #IFSWITCH DIRECTION==Ascending
-  
-  #MACRO NYI()    
-  
-    #ELSEIFSWITCH DIRECTION==Descending
-  
-  #MACRO NYI()
-  
+      SOURCE.forEachDIRECTIONHelper((byte)(0xff&this.boundInfo),ACCEPT,size);
+    #ELSE
+      SOURCE.forEachDIRECTIONHelper(ACCEPT,size,this.boundInfo>>8);
     #ENDIF
+  }
   #ENDIF
 #ENDIF
 }
 #ENDDEF
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#MACRODEF RemoveIfHelper(PREDICATE,TEST)
+#MACRODEF RemoveIfHelper<TEST>(PREDICATE)
 @Override public boolean removeIf(PREDICATE filter){
 #IFSWITCH VIEW==Full
   #IFSWITCH SOURCE==this
     #IFSWITCH CHECKED==Checked
   final int modCountAndSize;
-  if(((modCountAndSize=SOURCE.modCountAndSize)&0x1ff)!=0) {
-    long word,newWord0,newWord1,newWord2,newWord3;
-    int numRemoved;
-    try {
-      numRemoved=Long.bitCount((word=SOURCE.word0)^(newWord0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)))
-        +Long.bitCount((word=SOURCE.word1)^(newWord1=processWordRemoveIf(word,-64,filter)))
-        +Long.bitCount((word=SOURCE.word2)^(newWord2=processWordRemoveIf(word,0,filter)))
-        +Long.bitCount((word=SOURCE.word3)^(newWord3=processWordRemoveIf(word,64,filter)));
-    }finally {
-      CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
-    }
-    if(numRemoved!=0) {
-      SOURCE.word0=newWord0;
-      SOURCE.word1=newWord1;
-      SOURCE.word2=newWord2;
-      SOURCE.word3=newWord3;
-      SOURCE.modCountAndSize=modCountAndSize-numRemoved+(1<<9);
-      return true;
-    }
-  }
-  return false;
+  return (((modCountAndSize=SOURCE.modCountAndSize)&0x1ff)!=0) && this.removeIfHelper(TEST,modCountAndSize);
     #ELSEIFSWITCH CHECKED==Unchecked
+      #IFSWITCH TEST==filter
   long word;
-  return (word=SOURCE.word0) != (SOURCE.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter))
-    | (word=SOURCE.word1) != (SOURCE.word1=processWordRemoveIf(word,-64,filter))
-    | (word=SOURCE.word2) != (SOURCE.word2=processWordRemoveIf(word,0,filter))
-    | (word=SOURCE.word3) != (SOURCE.word3=processWordRemoveIf(word,64,filter));
+  return (word=SOURCE.word0) != (SOURCE.word0=processWordRemoveIf(word,Byte.MIN_VALUE,TEST))
+    | (word=SOURCE.word1) != (SOURCE.word1=processWordRemoveIf(word,-64,TEST))
+    | (word=SOURCE.word2) != (SOURCE.word2=processWordRemoveIf(word,0,TEST))
+    | (word=SOURCE.word3) != (SOURCE.word3=processWordRemoveIf(word,64,TEST));      
+      #ELSE
+  return removeIf((BytePredicate)TEST);
+      #ENDIF
     #ENDIF
   #ELSEIFSWITCH SOURCE==root
-  return SOURCE.removeIf(filter);
+  return SOURCE.removeIf((BytePredicate)TEST);
   #ENDIF
 #ELSEIFSWITCH VIEW==Head
   #IFSWITCH CHECKED==Checked
   final int modCountAndSize;
   final ByteSetImpl.Checked SOURCE=this.SOURCE;
   if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
-    long newWord0=SOURCE.word0,newWord1=SOURCE.word1,newWord2=SOURCE.word2,newWord3=SOURCE.word3;
-    int numRemoved=0;
-    try{
-      goToEnd:for(;;){
-        goToWord0:for(;;){
-          goToWord1:for(;;){
-            final int boundInfo;
-            switch((boundInfo=this.boundInfo)>>6){
-            case -2:
-              numRemoved+=Long.bitCount(((newWord0)^(newWord0=processSubSetWordRemoveIf(newWord0,Byte.MIN_VALUE,boundInfo,filter)))&(-1L>>>-boundInfo));
-              break goToEnd;
-            case -1:
-              numRemoved+=Long.bitCount(((newWord1)^(newWord1=processSubSetWordRemoveIf(newWord1,-64,boundInfo,filter)))&(-1L>>>-boundInfo));
-              break goToWord0;
-            case 0:
-              numRemoved+=Long.bitCount(((newWord2)^(newWord2=processSubSetWordRemoveIf(newWord2,0,boundInfo,filter)))&(-1L>>>-boundInfo));
-              break goToWord1;
-            default:
-              numRemoved+=Long.bitCount(((newWord3)^(newWord3=processSubSetWordRemoveIf(newWord3,64,boundInfo,filter)))&(-1L>>>-boundInfo));
-            }
-            numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
-            break;
-          }
-          numRemoved+=Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)));
-          break;
-        }
-        numRemoved+=Long.bitCount(newWord0^(newWord0=processWordRemoveIf(newWord0,Byte.MIN_VALUE,filter)));
-        break;
+    int numRemoved;
+    if((numRemoved=SOURCE.removeIfHelper(TEST,this.boundInfo,new CheckedCollection.AbstractModCountChecker(modCountAndSize>>>9){
+      @Override protected int getActualModCount(){
+        return SOURCE.modCountAndSize>>>9;
       }
-    }finally{
-      CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
-    }
-    if(numRemoved!=0){
-      SOURCE.word0=newWord0;
-      SOURCE.word1=newWord1;
-      SOURCE.word2=newWord2;
-      SOURCE.word3=newWord3;
+    }))!=0){
       SOURCE.modCountAndSize+=(numRemoved=(1<<9)-numRemoved);
       AbstractCheckedSubSet curr=this;
       do{
@@ -1200,36 +2582,8 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   #ELSEIFSWITCH CHECKED==Unchecked
   final int size;
   if((size=this.size)!=0){
-    int numRemoved=0;
-    final ByteSetImpl SOURCE=this.SOURCE;
-    long word;
-    goToEnd:for(;;){
-      goToWord0:for(;;){
-        goToWord1:for(;;){
-          final int boundInfo;
-          switch((boundInfo=this.boundInfo)>>6){
-          case -2:
-            numRemoved+=Long.bitCount(((word=SOURCE.word0)^(SOURCE.word0=processSubSetWordRemoveIf(word,Byte.MIN_VALUE,boundInfo,filter)))&(-1L>>>-boundInfo));
-            break goToEnd;
-          case -1:
-            numRemoved+=Long.bitCount(((word=SOURCE.word1)^(SOURCE.word1=processSubSetWordRemoveIf(word,-64,boundInfo,filter)))&(-1L>>>-boundInfo));
-            break goToWord0;
-          case 0:
-            numRemoved+=Long.bitCount(((word=SOURCE.word2)^(SOURCE.word2=processSubSetWordRemoveIf(word,0,boundInfo,filter)))&(-1L>>>-boundInfo));
-            break goToWord1;
-          default:
-            numRemoved+=Long.bitCount(((word=SOURCE.word3)^(SOURCE.word3=processSubSetWordRemoveIf(word,64,boundInfo,filter)))&(-1L>>>-boundInfo));
-          }
-          numRemoved+=Long.bitCount((word=SOURCE.word2)^(SOURCE.word2=processWordRemoveIf(word,0,filter)));
-          break;
-        }
-        numRemoved+=Long.bitCount((word=SOURCE.word1)^(SOURCE.word1=processWordRemoveIf(word,-64,filter)));
-        break;
-      }
-      numRemoved+=Long.bitCount((word=SOURCE.word0)^(SOURCE.word0=processWordRemoveIf(word,Byte.MIN_VALUE,filter)));
-      break;
-    }
-    if(numRemoved!=0){
+    final int numRemoved;
+    if((numRemoved=SOURCE.removeIfHelper(TEST,this.boundInfo))!=0){
       this.size=size-numRemoved;
       for(var parent=this.parent;parent!=null;parent=parent.parent){
         parent.size-=numRemoved;
@@ -1244,43 +2598,12 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   final int modCountAndSize;
   final ByteSetImpl.Checked SOURCE=this.SOURCE;
   if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
-    long newWord0=SOURCE.word0,newWord1=SOURCE.word1,newWord2=SOURCE.word2,newWord3=SOURCE.word3;
-    int numRemoved=0;
-    try{
-      goToEnd:for(;;){
-        goToWord3:for(;;){
-          goToWord2:for(;;){
-            final int boundInfo;
-            switch((boundInfo=this.boundInfo)>>6){
-            case 1:
-              numRemoved+=Long.bitCount(((newWord3)^(newWord3=processWordRemoveIf(newWord3,boundInfo,filter)))&(-1L<<boundInfo));
-              break goToEnd;
-            case 0:
-              numRemoved+=Long.bitCount(((newWord2)^(newWord2=processWordRemoveIf(newWord2,boundInfo,filter)))&(-1L<<boundInfo));
-              break goToWord3;
-            case -1:
-              numRemoved+=Long.bitCount(((newWord1)^(newWord1=processWordRemoveIf(newWord1,boundInfo,filter)))&(-1L<<boundInfo));
-              break goToWord2;
-            default:
-              numRemoved+=Long.bitCount(((newWord0)^(newWord0=processWordRemoveIf(newWord0,boundInfo,filter)))&(-1L<<boundInfo));
-            }
-            numRemoved+=Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)));
-            break;
-          }
-          numRemoved+=Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)));
-          break;
-        }
-        numRemoved+=Long.bitCount(newWord3^(newWord3=processWordRemoveIf(newWord3,64,filter)));
-        break;
+    int numRemoved;
+    if((numRemoved=SOURCE.removeIfHelper(this.boundInfo,TEST,new CheckedCollection.AbstractModCountChecker(modCountAndSize>>>9){
+      @Override protected int getActualModCount(){
+        return SOURCE.modCountAndSize>>>9;
       }
-    }finally{
-      CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
-    }
-    if(numRemoved!=0){
-      SOURCE.word0=newWord0;
-      SOURCE.word1=newWord1;
-      SOURCE.word2=newWord2;
-      SOURCE.word3=newWord3;
+    }))!=0){
       SOURCE.modCountAndSize+=(numRemoved=(1<<9)-numRemoved);
       AbstractCheckedSubSet curr=this;
       do{
@@ -1294,36 +2617,8 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   #ELSEIFSWITCH CHECKED==Unchecked
   final int size;
   if((size=this.size)!=0){
-    int numRemoved=0;
-    final ByteSetImpl SOURCE=this.SOURCE;
-    long word;
-    goToEnd:for(;;){
-      goToWord3:for(;;){
-        goToWord2:for(;;){
-          final int boundInfo;
-          switch((boundInfo=this.boundInfo)>>6){
-          case 1:
-            numRemoved+=Long.bitCount(((word=SOURCE.word3)^(SOURCE.word3=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
-            break goToEnd;
-          case 0:
-            numRemoved+=Long.bitCount(((word=SOURCE.word2)^(SOURCE.word2=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
-            break goToWord3;
-          case -1:
-            numRemoved+=Long.bitCount(((word=SOURCE.word1)^(SOURCE.word1=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
-            break goToWord2;
-          default:
-            numRemoved+=Long.bitCount(((word=SOURCE.word0)^(SOURCE.word0=processWordRemoveIf(word,boundInfo,filter)))&(-1L<<boundInfo));
-          }
-          numRemoved+=Long.bitCount((word=SOURCE.word1)^(SOURCE.word1=processWordRemoveIf(word,-64,filter)));
-          break;
-        }
-        numRemoved+=Long.bitCount((word=SOURCE.word2)^(SOURCE.word2=processWordRemoveIf(word,0,filter)));
-        break;
-      }
-      numRemoved+=Long.bitCount((word=SOURCE.word3)^(SOURCE.word3=processWordRemoveIf(word,64,filter)));
-      break;
-    }
-    if(numRemoved!=0){
+    final int numRemoved;
+    if((numRemoved=SOURCE.removeIfHelper(this.boundInfo,TEST))!=0){
       this.size=size-numRemoved;
       for(var parent=this.parent;parent!=null;parent=parent.parent){
         parent.size-=numRemoved;
@@ -1338,68 +2633,12 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   final int modCountAndSize;
   final ByteSetImpl.Checked SOURCE=this.SOURCE;
   if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
-    long newWord0=SOURCE.word0,newWord1=SOURCE.word1,newWord2=SOURCE.word2,newWord3=SOURCE.word3;
     int numRemoved;
-    try{
-      final int boundInfo;
-      final int low;
-      switch((low=(boundInfo=this.boundInfo)&0xff)>>6){
-        case 2: //-128 < lowInclusiveBound < 64
-          final int high;
-          switch((high=boundInfo>>8)>>6){
-            case -2: //-128 < highExclusiveBound < -64
-              numRemoved=Long.bitCount((newWord0^(newWord0=processSubSetWordRemoveIf(newWord0,low,high,filter)))&(-1L<<low) & (-1L>>>-high));
-              break;
-            case -1: //-64 <= highExclusiveBound < 0
-              numRemoved=Long.bitCount((newWord0^(newWord0=processWordRemoveIf(newWord0,low,filter)))&(-1L<<low))
-                + Long.bitCount((newWord1^(newWord1=processSubSetWordRemoveIf(newWord1,-64,high,filter)))&(-1L>>>-high));
-              break;
-            case 0:  //0 <= highExclusiveBound < 64
-              numRemoved=Long.bitCount((newWord0^(newWord0=processWordRemoveIf(newWord0,low,filter)))&(-1L<<low))
-                + Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)))
-                + Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,0,high,filter)))&(-1L>>>-high));
-              break;
-            default: //64 <= highExclusiveBound < 128
-              numRemoved=Long.bitCount((newWord0^(newWord0=processWordRemoveIf(newWord0,low,filter)))&(-1L<<low))
-                + Long.bitCount(newWord1^(newWord1=processWordRemoveIf(newWord1,-64,filter)))
-                + Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)))
-                + Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,high,filter)))&(-1L>>>-high));
-          }
-          break;
-        case 3: //-64 <= lowInclusiveBound < 0
-          switch((high=boundInfo>>8)>>6){
-            case -1: //-64 <= highExclusiveBound < 0
-              numRemoved=Long.bitCount((newWord1^(newWord1=processSubSetWordRemoveIf(newWord1,low,high,filter)))&(-1L<<low) & (-1L>>>-high));
-              break;
-            case 0:  //0 <= highExclusiveBound < 64
-              numRemoved=Long.bitCount((newWord1^(newWord1=processWordRemoveIf(newWord1,low,filter)))&(-1L<<low))
-                + Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,0,high,filter)))&(-1L>>>-high));
-              break;
-            default: //64 <= highExclusiveBound < 128
-              numRemoved=Long.bitCount((newWord1^(newWord1=processWordRemoveIf(newWord1,low,filter)))&(-1L<<low))
-                + Long.bitCount(newWord2^(newWord2=processWordRemoveIf(newWord2,0,filter)))
-                + Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,high,filter)))&(-1L>>>-high));
-          }
-          break;
-        case 0:  //0 <= lowInclusiveBound < 64
-          if((high=boundInfo>>8)>>6==0){ //0 <= highExclusiveBound < 64
-              numRemoved=Long.bitCount((newWord2^(newWord2=processSubSetWordRemoveIf(newWord2,low,high,filter)))&(-1L<<low) & (-1L>>>-high));
-          }else{ //64 <= highExclusiveBound < 128
-              numRemoved=Long.bitCount((newWord2^(newWord2=processWordRemoveIf(newWord2,low,filter)))&(-1L<<low))
-                + Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,64,high,filter)))&(-1L>>>-high));
-          }
-          break;
-        default: //64 <= lowInclusiveBound < 128 ; 64 <= highExclusiveBound < 128
-          numRemoved=Long.bitCount((newWord3^(newWord3=processSubSetWordRemoveIf(newWord3,low,high=boundInfo>>8,filter)))&(-1L<<low) & (-1L>>>-high));
+    if((numRemoved=SOURCE.removeIfHelper((byte)(0xff&(numRemoved=this.boundInfo)),TEST,(numRemoved>>8),new CheckedCollection.AbstractModCountChecker(modCountAndSize>>>9){
+      @Override protected int getActualModCount(){
+        return SOURCE.modCountAndSize>>>9;
       }
-    }finally{
-      CheckedCollection.checkModCount(modCountAndSize>>>9,SOURCE.modCountAndSize>>>9);
-    }
-    if(numRemoved!=0){
-      SOURCE.word0=newWord0;
-      SOURCE.word1=newWord1;
-      SOURCE.word2=newWord2;
-      SOURCE.word3=newWord3;
+    }))!=0){
       SOURCE.modCountAndSize+=(numRemoved=(1<<9)-numRemoved);
       AbstractCheckedSubSet curr=this;
       do{
