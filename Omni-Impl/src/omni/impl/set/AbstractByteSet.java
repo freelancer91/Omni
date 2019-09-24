@@ -4,11 +4,11 @@ import java.util.Set;
 import omni.api.OmniSet;
 
 abstract class AbstractByteSet implements OmniSet.OfByte{
+  
     
     @Override public boolean add(Byte val) {
         return add((byte)val);
     }
-    
     @Override public boolean equals(Object val){
         if(val==this){
           return true;
