@@ -9,15 +9,45 @@ import omni.api.OmniIterator;
 import omni.util.OmniArray;
 import java.util.function.IntFunction;
 import java.util.NoSuchElementException;
-public abstract class ByteSetImpl extends AbstractByteSet{
+import omni.util.ToStringUtil;
+import omni.api.OmniCollection;
+import java.util.Collection;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
   transient long word0;
   transient long word1;
   transient long word2;
   transient long word3;
-  //TODO toString
   //TODO equals
-  //TODO hashCode
-  //TODO read/write methods
+  private ByteSetImpl(long word0,long word1,long word2,long word3){
+    super();
+    this.word0=word0;
+    this.word1=word1;
+    this.word2=word2;
+    this.word3=word3;
+  }
+  private ByteSetImpl(ByteSetImpl.Checked that){
+    super();
+    if((that.modCountAndSize&0x1ff)!=0){
+      this.word0=that.word0;
+      this.word1=that.word1;
+      this.word2=that.word2;
+      this.word3=that.word3;
+    }
+  }
+  private ByteSetImpl(ByteSetImpl.Unchecked that){
+    super();
+    this.word0=that.word0;
+    this.word1=that.word1;
+    this.word2=that.word2;
+    this.word3=that.word3;
+  }
+  private ByteSetImpl(){
+    super();
+  }
   @Override public boolean add(byte val){
     switch(val>>6){
       case -2:
@@ -323,8 +353,190 @@ public abstract class ByteSetImpl extends AbstractByteSet{
     }
     return false;
   }
-  public static class Checked extends ByteSetImpl{
+  public static class Checked extends ByteSetImpl implements Serializable{
+    private static final long serialVersionUID=1L;
     transient int modCountAndSize;
+    public Checked(){
+      super();
+    }
+    public Checked(ByteSetImpl.Checked that){
+      super(that);
+      this.modCountAndSize=that.modCountAndSize;
+    }
+    public Checked(ByteSetImpl.Unchecked that){
+      super(that);
+      this.modCountAndSize=SetCommonImpl.size(word0,word1,word2,word3);
+    }
+    public Checked(OmniCollection.OfBoolean that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Checked(OmniCollection.OfByte that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Checked(OmniCollection.ByteOutput<?> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Checked(OmniCollection.OfRef<? extends Byte> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Checked(Collection<? extends Byte> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    @Override public Object clone(){
+      return new Checked(this);
+    }
+    private void readObject(ObjectInputStream ois) throws IOException{
+      int size;
+      this.modCountAndSize=size=ois.readUnsignedShort();
+      if(size!=0){
+        long word;
+        this.word2=word=ois.readLong();
+        if((size-=Long.bitCount(word))!=0){
+          this.word3=word=ois.readLong();
+          if((size-=Long.bitCount(word))!=0){
+            this.word1=word=ois.readLong();
+            if((size-=Long.bitCount(word))!=0){
+              this.word0=ois.readLong();
+            }
+          }
+        }
+      }
+    }
+    private void writeObject(ObjectOutputStream oos) throws IOException{
+      int modCountAndSize=this.modCountAndSize;
+      try{
+        int size;
+        oos.writeShort(size=modCountAndSize&0x1ff);
+        if(size!=0){
+          long word;
+          oos.writeLong(word=this.word2);
+          if((size-=Long.bitCount(word))!=0){
+            oos.writeLong(word=this.word3);
+            if((size-=Long.bitCount(word))!=0){
+              oos.writeLong(word=this.word1);
+              if((size-=Long.bitCount(word))!=0){
+                oos.writeLong(this.word0);
+              }
+            }
+          }
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
+      }
+    }
+    @Override public int hashCode(){
+      int numLeft,sum=0;
+      if((numLeft=this.modCountAndSize&0x1ff)!=0){
+        int offset=Byte.MAX_VALUE;
+        goToEnd:for(long word=this.word3;;){
+          if((word&(1L<<offset))!=0){
+            sum+=offset;
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--offset==63){
+            for(word=this.word2;;){
+              if((word&(1L<<offset))!=0){
+                sum+=offset;
+                if(--numLeft==0){
+                  break goToEnd;
+                }
+              }
+              if(--offset==-1){
+                for(word=this.word1;;){
+                  if((word&(1L<<offset))!=0){
+                    sum+=offset;
+                    if(--numLeft==0){
+                      break goToEnd;
+                    }
+                  }
+                  if(--offset==-65){
+                    for(word=this.word0;;--offset){
+                      if((word&(1L<<offset))!=0){
+                        sum+=offset;
+                        if(--numLeft==0){
+                          break goToEnd;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return sum;
+    }
+    @Override public String toString(){
+      int numLeft;
+      if((numLeft=this.modCountAndSize&0x1ff)!=0){
+        final byte[] buffer;
+        int bufferOffset;
+        (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+        int offset=Byte.MIN_VALUE;
+        goToEnd:for(long word=this.word0;;){
+          if((word&(1L<<offset))!=0){
+            bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+            if(--numLeft==0){
+               break goToEnd;
+            }
+            buffer[bufferOffset]=',';
+            buffer[++bufferOffset]=' ';
+          }
+          if(++offset==-64){
+            for(word=this.word1;;){
+              if((word&(1L<<offset))!=0){
+                bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                if(--numLeft==0){
+                  break goToEnd;
+                }
+                buffer[bufferOffset]=',';
+                buffer[++bufferOffset]=' ';
+              }
+              if(++offset==0){
+                for(word=this.word2;;){
+                  if((word&(1L<<offset))!=0){
+                    bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                    if(--numLeft==0){
+                      break goToEnd;
+                    }
+                    buffer[bufferOffset]=',';
+                    buffer[++bufferOffset]=' ';
+                  }
+                  if(++offset==64){
+                    for(word=this.word3;;++offset){
+                      if((word&(1L<<offset))!=0){
+                        bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                        if(--numLeft==0){
+                          break goToEnd;
+                        }
+                        buffer[bufferOffset]=',';
+                        buffer[++bufferOffset]=' ';
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        buffer[++bufferOffset]=']';
+        return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+      }
+      return "[]";
+    }
     @Override public boolean add(byte val){
       if(super.add(val)){
         this.modCountAndSize+=((1<<9)+1);
@@ -1065,25 +1277,134 @@ public abstract class ByteSetImpl extends AbstractByteSet{
     }
     */
   }
-  private void uncheckedForEachAscending(int offset,ByteConsumer action){
-    switch(offset>>6){
-      case -2:
-        Unchecked.uncheckedAscendingWordForEach(this.word0,offset,offset=-64,action);
-      case -1:
-        Unchecked.uncheckedAscendingWordForEach(this.word1,offset,offset=0,action);
-      case 0:
-        Unchecked.uncheckedAscendingWordForEach(this.word2,offset,offset=64,action);
-      default:
-        Unchecked.uncheckedAscendingWordForEach(this.word3,offset,128,action);
+  public static class Unchecked extends ByteSetImpl implements Serializable{
+    private static final long serialVersionUID=1L;
+    public Unchecked(ByteSetImpl.Checked that){
+      super(that);
     }
-  }
-  public static class Unchecked extends ByteSetImpl{
+    public Unchecked(ByteSetImpl.Unchecked that){
+      super(that);
+    }
+    public Unchecked(OmniCollection.OfBoolean that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Unchecked(OmniCollection.OfByte that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Unchecked(OmniCollection.ByteOutput<?> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Unchecked(OmniCollection.OfRef<? extends Byte> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    public Unchecked(Collection<? extends Byte> that){
+      super();
+      //TODO optimize
+      this.addAll(that);
+    }
+    @Override public Object clone(){
+      return new Unchecked(this);
+    }
+    private void readObject(ObjectInputStream ois) throws IOException{
+      this.word0=ois.readLong();
+      this.word1=ois.readLong();
+      this.word2=ois.readLong();
+      this.word3=ois.readLong();
+    }
+    private void writeObject(ObjectOutputStream oos) throws IOException{
+      oos.writeLong(this.word0);
+      oos.writeLong(this.word1);
+      oos.writeLong(this.word2);
+      oos.writeLong(this.word3);
+    }
     private static void uncheckedAscendingWordForEach(long word,int offset,int bound,ByteConsumer action){
       do{
         if((word&(1L<<offset))!=0){
           action.accept((byte)offset);
         } 
       }while(++offset!=bound);
+    }
+    private static int hashCodeForWord(long word,int offset,int bound){
+      for(int sum=0;;){
+        if((word&(1L<<offset))!=0){
+          sum+=offset;
+        }
+        if(++offset==bound){
+          return sum;
+        }
+      }
+    }
+    @Override public int hashCode(){
+      return hashCodeForWord(word0,Byte.MIN_VALUE,-64)
+        + hashCodeForWord(word1,-64,0)
+        + hashCodeForWord(word2,0,64)
+        + hashCodeForWord(word3,64,128);
+    }
+    @Override public String toString(){
+      int numLeft;
+      final long word0,word1,word2,word3;
+      if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+        final byte[] buffer;
+        int bufferOffset;
+        (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+        goToEnd:for(int offset=Byte.MIN_VALUE;;){
+          if((word0&(1L<<offset))!=0){
+            bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+            if(--numLeft==0){
+               break goToEnd;
+            }
+            buffer[bufferOffset]=',';
+            buffer[++bufferOffset]=' ';
+          }
+          if(++offset==-64){
+            for(;;){
+              if((word1&(1L<<offset))!=0){
+                bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                if(--numLeft==0){
+                  break goToEnd;
+                }
+                buffer[bufferOffset]=',';
+                buffer[++bufferOffset]=' ';
+              }
+              if(++offset==0){
+                for(;;){
+                  if((word2&(1L<<offset))!=0){
+                    bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                    if(--numLeft==0){
+                      break goToEnd;
+                    }
+                    buffer[bufferOffset]=',';
+                    buffer[++bufferOffset]=' ';
+                  }
+                  if(++offset==64){
+                    for(;;++offset){
+                      if((word3&(1L<<offset))!=0){
+                        bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                        if(--numLeft==0){
+                          break goToEnd;
+                        }
+                        buffer[bufferOffset]=',';
+                        buffer[++bufferOffset]=' ';
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        buffer[++bufferOffset]=']';
+        return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+      }
+      return "[]";
     }
     @Override public void forEach(ByteConsumer action){
       uncheckedAscendingWordForEach(word0,-128,-64,action);
@@ -1625,6 +1946,18 @@ public abstract class ByteSetImpl extends AbstractByteSet{
     }
     */
   }
+  private void uncheckedForEachAscending(int offset,ByteConsumer action){
+    switch(offset>>6){
+      case -2:
+        Unchecked.uncheckedAscendingWordForEach(this.word0,offset,offset=-64,action);
+      case -1:
+        Unchecked.uncheckedAscendingWordForEach(this.word1,offset,offset=0,action);
+      case 0:
+        Unchecked.uncheckedAscendingWordForEach(this.word2,offset,offset=64,action);
+      default:
+        Unchecked.uncheckedAscendingWordForEach(this.word3,offset,128,action);
+    }
+  }
   private static class UncheckedAscendingItr extends AbstractByteItr{
     transient final ByteSetImpl root;
     transient int currIndex;
@@ -1776,13 +2109,68 @@ public abstract class ByteSetImpl extends AbstractByteSet{
       root.modCountAndSize=modCountAndSize+((1<<9)-1);
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
     }
+    private void uncheckedForEachRemaining(int currIndex,ByteConsumer action){
+      int modCountAndLastRet=this.modCountAndLastRet;
+      final var root=this.root;
+      int lastRet;
+      try{
+        action.accept((byte)(lastRet=currIndex));
+        switch((++currIndex)>>6){
+          case -2:
+            for(long word=root.word0;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(++currIndex==-64){
+                break;
+              }
+            }
+          case -1:
+            for(long word=root.word1;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(++currIndex==0){
+                break;
+              }
+            }
+          case 0:
+            for(long word=root.word2;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(++currIndex==64){
+                break;
+              }
+            }
+          case 1:
+            for(long word=root.word3;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(++currIndex==128){
+                break;
+              }
+            }
+          default:
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),root.modCountAndSize&(~0x1ff));
+      }
+      this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
+      this.currIndex=128;
+    }
     @Override public void forEachRemaining(ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int currIndex;
+      if((currIndex=this.currIndex)!=128){
+        uncheckedForEachRemaining(currIndex,action);
+      }
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int currIndex;
+      if((currIndex=this.currIndex)!=128){
+        uncheckedForEachRemaining(currIndex,action::accept);
+      }
     }
     @Override public boolean hasNext(){
       return this.currIndex!=128;
