@@ -115,54 +115,10 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       return false;
     }
   }
-  @Override public boolean contains(double val){
-    final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        return (this.word0&(1L<<v))!=0;
-      case -1:
-        return (this.word1&(1L<<v))!=0;
-      case 0:
-        return (this.word2&(1L<<v))!=0;
-      default:
-        return (this.word3&(1L<<v))!=0;
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(float val){
-    final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        return (this.word0&(1L<<v))!=0;
-      case -1:
-        return (this.word1&(1L<<v))!=0;
-      case 0:
-        return (this.word2&(1L<<v))!=0;
-      default:
-        return (this.word3&(1L<<v))!=0;
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(long val){
-    final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        return (this.word0&(1L<<v))!=0;
-      case -1:
-        return (this.word1&(1L<<v))!=0;
-      case 0:
-        return (this.word2&(1L<<v))!=0;
-      default:
-        return (this.word3&(1L<<v))!=0;
-      }
-    }
-    return false;
-  }
+  #MACRO UncheckedContainsVal<long>()
+  #MACRO UncheckedContainsVal<float>()
+  #MACRO UncheckedContainsVal<double>()
+
   @Override public boolean contains(int val){
     switch(val>>6){
     case -2:
@@ -233,102 +189,11 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     return false;
   }
-  @Override public boolean removeVal(double val){
-    final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        long word;
-        if((word=this.word0)!=(word&=(1L<<v))){
-          this.word0=word;
-          return true;
-        }
-        break;
-      case -1:
-        if((word=this.word1)!=(word&=(1L<<v))){
-          this.word1=word;
-          return true;
-        }
-        break;
-      case 0:
-        if((word=this.word2)!=(word&=(1L<<v))){
-          this.word2=word;
-          return true;
-        }
-        break;
-      default:
-        if((word=this.word3)!=(word&=(1L<<v))){
-          this.word3=word;
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(float val){
-    final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        long word;
-        if((word=this.word0)!=(word&=(1L<<v))){
-          this.word0=word;
-          return true;
-        }
-        break;
-      case -1:
-        if((word=this.word1)!=(word&=(1L<<v))){
-          this.word1=word;
-          return true;
-        }
-        break;
-      case 0:
-        if((word=this.word2)!=(word&=(1L<<v))){
-          this.word2=word;
-          return true;
-        }
-        break;
-      default:
-        if((word=this.word3)!=(word&=(1L<<v))){
-          this.word3=word;
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(long val){
-    final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        long word;
-        if((word=this.word0)!=(word&=(1L<<v))){
-          this.word0=word;
-          return true;
-        }
-        break;
-      case -1:
-        if((word=this.word1)!=(word&=(1L<<v))){
-          this.word1=word;
-          return true;
-        }
-        break;
-      case 0:
-        if((word=this.word2)!=(word&=(1L<<v))){
-          this.word2=word;
-          return true;
-        }
-        break;
-      default:
-        if((word=this.word3)!=(word&=(1L<<v))){
-          this.word3=word;
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+
+  #MACRO UncheckedRemoveVal<double>()
+  #MACRO UncheckedRemoveVal<float>()
+  #MACRO UncheckedRemoveVal<long>()
+  
   @Override public boolean removeVal(int val){
     switch(val>>6){
     case -2:
@@ -359,7 +224,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     return false;
   }
-  
+
   
   private int uncheckedRemoveFirst(){
     int tail0s;
@@ -718,62 +583,14 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       return false;
     }
-    @Override public boolean removeVal(boolean val){
-      final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(byte val){
-      final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(char val){
-      final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(int val){
-      final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(long val){
-      final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(float val){
-      final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return true;
-      }
-      return false;
-    }
-    @Override public boolean removeVal(double val){
-      final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return true;
-      }
-      return false;
-    }
+
+    #MACRO CheckedRemoveVal<boolean>()
+    #MACRO CheckedRemoveVal<byte>()
+    #MACRO CheckedRemoveVal<char>()
+    #MACRO CheckedRemoveVal<int>()
+    #MACRO CheckedRemoveVal<long>()
+    #MACRO CheckedRemoveVal<float>()
+    #MACRO CheckedRemoveVal<double>()
     #MACRO RootAccessMethods<Checked,Ascending,Byte>(byte,,null,(Byte)(byte))
     #MACRO RootAccessMethods<Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
     #MACRO RootAccessMethods<Checked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
@@ -1383,122 +1200,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     
   }
   
-  private static abstract class AbstractCheckedFullView extends AbstractByteSet{
-    transient final ByteSetImpl.Checked root;
-    
-    private AbstractCheckedFullView(ByteSetImpl.Checked root){
-      this.root=root;
-    }
-    @Override public int size(){
-      return root.modCountAndSize&0x1ff;
-    }
-    @Override public boolean isEmpty(){
-      return (root.modCountAndSize&0x1ff)!=0;
-    }
-    @Override public void clear(){
-      final ByteSetImpl.Checked root;
-      final int modCountAndSize;
-      if(((modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
-        root.modCountAndSize=(modCountAndSize+(1<<9))&(~0x1ff);
-        root.word0=0;
-        root.word1=0;
-        root.word2=0;
-        root.word3=0;
-      }
-    }
-    
-    @Override public int hashCode(){
-      #MACRO NYI()
-    }
-    private static class Ascending extends AbstractCheckedFullView implements Cloneable,Serializable{
-      private static final long serialVersionUID=1L;
-      private Ascending(ByteSetImpl.Checked root){
-        super(root);
-      }
-      private Object writeReplace(){
-        return new ByteSetImpl.Checked.Ascending(root);
-      }
-      @Override public Object clone(){
-        return new ByteSetImpl.Checked.Ascending(root);
-      }
-      @Override public String toString(){
-        #MACRO NYI()
-      }
-      
-    }
-    private static class Descending extends AbstractCheckedFullView implements Cloneable,Serializable{
-      private static final long serialVersionUID=1L;
-      private Descending(ByteSetImpl.Checked root){
-        super(root);
-      }
-      private Object writeReplace(){
-        return new ByteSetImpl.Checked.Descending(root);
-      }
-      @Override public Object clone(){
-        return new ByteSetImpl.Checked.Descending(root);
-      }
-      @Override public String toString(){
-        #MACRO NYI()
-      }
-    }
-    
-  }
   
-  private static abstract class AbstractUncheckedFullView extends AbstractByteSet{
-    transient final ByteSetImpl.Unchecked root;
-    private AbstractUncheckedFullView(ByteSetImpl.Unchecked root){
-      this.root=root;
-    }
-    @Override public int size(){
-      final ByteSetImpl.Unchecked root;
-      return SetCommonImpl.size((root=this.root).word0,root.word1,root.word2,root.word3);
-    }
-    @Override public boolean isEmpty(){
-      final ByteSetImpl.Unchecked root;
-      return (root=this.root).word0==0 && root.word1==0 && root.word2==0 && root.word3==0;
-    }
-    @Override public void clear(){
-      final ByteSetImpl.Unchecked root;
-      (root=this.root).word0=0;
-      root.word1=0;
-      root.word2=0;
-      root.word3=0;
-    }
-    @Override public int hashCode(){
-      #MACRO NYI()
-    }
-    private static class Ascending extends AbstractUncheckedFullView implements Cloneable,Serializable{
-      private static final long serialVersionUID=1L;
-      private Ascending(ByteSetImpl.Unchecked root){
-        super(root);
-      }
-      private Object writeReplace(){
-        return new ByteSetImpl.Unchecked.Ascending(root);
-      }
-      @Override public Object clone(){
-        return new ByteSetImpl.Unchecked.Ascending(root);
-      }
-      @Override public String toString(){
-        #MACRO NYI()
-      }
-      
-    }
-    private static class Descending extends AbstractUncheckedFullView implements Cloneable,Serializable{
-      private static final long serialVersionUID=1L;
-      private Descending(ByteSetImpl.Unchecked root){
-        super(root);
-      }
-      private Object writeReplace(){
-        return new ByteSetImpl.Unchecked.Descending(root);
-      }
-      @Override public Object clone(){
-        return new ByteSetImpl.Unchecked.Descending(root);
-      }
-      @Override public String toString(){
-        #MACRO NYI()
-      }
-    }
-  }
   
   
   
@@ -2021,8 +1723,213 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       return (byte)ret;
     }
   }
-
+  private static abstract class AbstractCheckedFullView extends AbstractByteSet{
+    transient final ByteSetImpl.Checked root;
+    
+    private AbstractCheckedFullView(ByteSetImpl.Checked root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.modCountAndSize&0x1ff;
+    }
+    @Override public boolean isEmpty(){
+      return (root.modCountAndSize&0x1ff)!=0;
+    }
+    @Override public void clear(){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      if(((modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
+        root.modCountAndSize=(modCountAndSize+(1<<9))&(~0x1ff);
+        root.word0=0;
+        root.word1=0;
+        root.word2=0;
+        root.word3=0;
+      }
+    }
+    
+    @Override public int hashCode(){
+      #MACRO NYI()
+    }
+    private static class Ascending extends AbstractCheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Ascending(ByteSetImpl.Checked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Checked.Ascending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Checked.Ascending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+      
+    }
+    private static class Descending extends AbstractCheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Descending(ByteSetImpl.Checked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Checked.Descending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Checked.Descending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+    }
+    
+  }
+  
+  private static abstract class AbstractUncheckedFullView extends AbstractByteSet{
+    transient final ByteSetImpl.Unchecked root;
+    private AbstractUncheckedFullView(ByteSetImpl.Unchecked root){
+      this.root=root;
+    }
+    @Override public int size(){
+      final ByteSetImpl.Unchecked root;
+      return SetCommonImpl.size((root=this.root).word0,root.word1,root.word2,root.word3);
+    }
+    @Override public boolean isEmpty(){
+      final ByteSetImpl.Unchecked root;
+      return (root=this.root).word0==0 && root.word1==0 && root.word2==0 && root.word3==0;
+    }
+    @Override public void clear(){
+      final ByteSetImpl.Unchecked root;
+      (root=this.root).word0=0;
+      root.word1=0;
+      root.word2=0;
+      root.word3=0;
+    }
+    @Override public int hashCode(){
+      #MACRO NYI()
+    }
+    private static class Ascending extends AbstractUncheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Ascending(ByteSetImpl.Unchecked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Unchecked.Ascending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Unchecked.Ascending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+      
+    }
+    private static class Descending extends AbstractUncheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Descending(ByteSetImpl.Unchecked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Unchecked.Descending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Unchecked.Descending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+    }
+  }
 }
+#MACRODEF FullViewAccessMethods<CHECKED,DIRECTION,RETTYPE>(INPUTTYPE,CLASSPREFIX,DEFAULTVAL,CAST)
+@Override public RETTYPE pollFirstCLASSPREFIX(){
+  #MACRO NYI()
+}
+@Override public RETTYPE pollLastCLASSPREFIX(){
+  #MACRO NYI()
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+  #MACRO NYI()
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+  #MACRO NYI()
+}
+#IFSWITCH RETTYPE==Byte
+@Override public RETTYPE ceiling(INPUTTYPE val){
+#ELSE
+@Override public RETTYPE RETTYPECeiling(INPUTTYPE val){
+#ENDIF
+  #MACRO NYI()
+}
+#IFSWITCH RETTYPE==Byte
+@Override public RETTYPE floor(INPUTTYPE val){
+#ELSE
+@Override public RETTYPE RETTYPEFloor(INPUTTYPE val){
+#ENDIF
+  #MACRO NYI()
+}
+#ENDDEF
+#MACRODEF UncheckedContainsVal<VALTYPE>()
+@Override public boolean contains(VALTYPE val){
+  final int v;
+  if((v=(byte)val)==val){
+    switch(v>>6){
+    case -2:
+      return (this.word0&(1L<<v))!=0;
+    case -1:
+      return (this.word1&(1L<<v))!=0;
+    case 0:
+      return (this.word2&(1L<<v))!=0;
+    default:
+      return (this.word3&(1L<<v))!=0;
+    }
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF UncheckedRemoveVal<VALTYPE>()
+@Override public boolean removeVal(VALTYPE val){
+  final int v;
+  if((v=(byte)val)==val){
+    switch(v>>6){
+    case -2:
+      long word;
+      if((word=this.word0)!=(word&=(1L<<v))){
+        this.word0=word;
+        return true;
+      }
+      break;
+    case -1:
+      if((word=this.word1)!=(word&=(1L<<v))){
+        this.word1=word;
+        return true;
+      }
+      break;
+    case 0:
+      if((word=this.word2)!=(word&=(1L<<v))){
+        this.word2=word;
+        return true;
+      }
+      break;
+    default:
+      if((word=this.word3)!=(word&=(1L<<v))){
+        this.word3=word;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF CheckedRemoveVal<VALTYPE>()
+@Override public boolean removeVal(VALTYPE val){
+  final int modCountAndSize;
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+    this.modCountAndSize=modCountAndSize+((1<<9)-1);
+    return true;
+  }
+  return false;
+}
+#ENDDEF
 #MACRODEF CeilingHelper(VAL,CAST)
 #IFSWITCH CHECKED==Unchecked
   #IFNOTSWITCH RETTYPE==Byte,byte
