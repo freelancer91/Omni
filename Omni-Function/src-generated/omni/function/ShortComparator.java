@@ -7,6 +7,9 @@ public interface ShortComparator extends Comparator<Short>
   public default int compare(final Short val1,final Short val2){
     return compare((short)val1,(short)val2);
   }
+  public static int descendingCompare(short val1,short val2){
+    return val2-val1;
+  }
   //TODO override reversed()
   //TODO override thenComparing(Comparator<? super T> other)
   //TODO override thenComparing(Function<? super T,? extends U> keyExtractor,Comparator<? super U> keyComparator);

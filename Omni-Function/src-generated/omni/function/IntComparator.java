@@ -7,6 +7,14 @@ public interface IntComparator extends Comparator<Integer>
   public default int compare(final Integer val1,final Integer val2){
     return compare((int)val1,(int)val2);
   }
+  public static int descendingCompare(int val1,int val2){
+    if(val1>val2){
+      return -1;
+    }else if(val1<val2){
+      return 1;
+    }
+    return 0;
+  }
   //TODO override reversed()
   //TODO override thenComparing(Comparator<? super T> other)
   //TODO override thenComparing(Function<? super T,? extends U> keyExtractor,Comparator<? super U> keyComparator);

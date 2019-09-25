@@ -7,6 +7,20 @@ public interface DoubleComparator extends Comparator<Double>
   public default int compare(final Double val1,final Double val2){
     return compare((double)val1,(double)val2);
   }
+  public static int descendingCompare(double val1,double val2){
+    if(val1>val2){
+      return -1;
+    }else if(val1<val2){
+      return 1;
+    }
+    final long thisBits,thatBits;
+    if((thisBits=Double.doubleToLongBits(val1))>(thatBits=Double.doubleToLongBits(val2))){
+      return 0;
+    }else if(thisBits<thatBits){
+      return -1;
+    }
+    return 1;
+  }
   //TODO override reversed()
   //TODO override thenComparing(Comparator<? super T> other)
   //TODO override thenComparing(Function<? super T,? extends U> keyExtractor,Comparator<? super U> keyComparator);

@@ -7,6 +7,20 @@ public interface FloatComparator extends Comparator<Float>
   public default int compare(final Float val1,final Float val2){
     return compare((float)val1,(float)val2);
   }
+  public static int descendingCompare(float val1,float val2){
+    if(val1>val2){
+      return -1;
+    }else if(val1<val2){
+      return 1;
+    }
+    final int thisBits,thatBits;
+    if((thisBits=Float.floatToIntBits(val1))==(thatBits=Float.floatToIntBits(val2))){
+      return 0;
+    }else if(thisBits<thatBits){
+      return -1;
+    }
+    return 1;
+  }
   //TODO override reversed()
   //TODO override thenComparing(Comparator<? super T> other)
   //TODO override thenComparing(Function<? super T,? extends U> keyExtractor,Comparator<? super U> keyComparator);

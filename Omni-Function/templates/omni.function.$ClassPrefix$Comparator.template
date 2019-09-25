@@ -15,17 +15,41 @@ public interface $ClassPrefix$Comparator extends Comparator<$BoxedType$>
   public default int compare(final $BoxedType$ val1,final $BoxedType$ val2){
     return compare(($exposedType$)val1,($exposedType$)val2);
   }
+  public static int descendingCompare($exposedType$ val1,$exposedType$ val2){
 #IF OfBoolean
-  public static int descendingCompare(boolean val1,boolean val2){
     if(val1==val2){
       return 0;
-    }
-    if(val1){
+    }else if(val1){
       return -1;
     }
     return 1;
-  }
+#ELSEIF OfByte,OfChar,OfShort
+    return val2-val1;
+#ELSE
+    if(val1>val2){
+      return -1;
+    }else if(val1<val2){
+      return 1;
+    }
+  #IF OfFloat,OfDouble
+    #IF OfFloat
+    final int thisBits,thatBits;
+    if((thisBits=Float.floatToIntBits(val1))==(thatBits=Float.floatToIntBits(val2))){
+    #ELSE
+    final long thisBits,thatBits;
+    if((thisBits=Double.doubleToLongBits(val1))>(thatBits=Double.doubleToLongBits(val2))){
+    #ENDIF
+      return 0;
+    }else if(thisBits<thatBits){
+      return -1;
+    }
+    return 1;
+  #ELSE
+    return 0;
+  #ENDIF
 #ENDIF
+  }
+
   
 
   

@@ -7,6 +7,14 @@ public interface LongComparator extends Comparator<Long>
   public default int compare(final Long val1,final Long val2){
     return compare((long)val1,(long)val2);
   }
+  public static int descendingCompare(long val1,long val2){
+    if(val1>val2){
+      return -1;
+    }else if(val1<val2){
+      return 1;
+    }
+    return 0;
+  }
   //TODO override reversed()
   //TODO override thenComparing(Comparator<? super T> other)
   //TODO override thenComparing(Function<? super T,? extends U> keyExtractor,Comparator<? super U> keyComparator);

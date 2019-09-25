@@ -10,8 +10,7 @@ public interface BooleanComparator extends Comparator<Boolean>
   public static int descendingCompare(boolean val1,boolean val2){
     if(val1==val2){
       return 0;
-    }
-    if(val1){
+    }else if(val1){
       return -1;
     }
     return 1;

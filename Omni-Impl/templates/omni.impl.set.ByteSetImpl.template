@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import omni.function.ByteComparator;
+import omni.api.OmniNavigableSet;
 
 public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
   transient long word0;
@@ -358,16 +360,56 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     return false;
   }
   
-
-
   
-
+  private int uncheckedRemoveFirst(){
+    int tail0s;
+    long word;
+    if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
+      this.word0=word&(~(1L<<tail0s));
+      return (Byte.MIN_VALUE+tail0s);
+    }
+    if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
+      this.word1=word&(~(1L<<tail0s));
+      return (tail0s-64);
+    }
+    if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
+      this.word2=word&(~(1L<<tail0s));
+      return tail0s;
+    }
+    this.word3=(word=this.word3)&(~(1L<<(tail0s=Long.numberOfTrailingZeros(word))));
+    return (tail0s+64);
+  }
   
-  
-  
-  
-  
-  public static class Checked extends ByteSetImpl implements Serializable{
+  private int uncheckedRemoveLast(){
+    int lead0s;
+    long word;
+    if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
+      this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
+      return (Byte.MAX_VALUE-lead0s);
+    }
+    if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
+      this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
+       return (63-lead0s);
+    }
+    if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
+      this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
+      return (-1-lead0s);
+    }
+    this.word0=(word=this.word0)&(~(Long.MIN_VALUE>>>(lead0s=Long.numberOfLeadingZeros(word))));
+    return (-65-lead0s);
+  }
+  #MACRO RootAccessMethods<Unchecked,Ascending,Byte>(byte,,null,(Byte)(byte))
+  #MACRO RootAccessMethods<Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+  #MACRO RootAccessMethods<Unchecked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
+  #MACRO RootAccessMethods<Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+  #MACRO RootAccessMethods<Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+  #MACRO RootAccessMethods<Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
+  #MACRO RootAccessMethods<Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
+  @Override public ByteComparator comparator(){
+    return Byte::compare;
+  }
+      
+  public static abstract class Checked extends ByteSetImpl implements Serializable{
     private static final long serialVersionUID=1L;
     transient int modCountAndSize;
     public Checked(){
@@ -406,9 +448,8 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       //TODO optimize
       this.addAll(that);
     }
-    @Override public Object clone(){
-      return new Checked(this);
-    }
+    
+    
     private void readObject(ObjectInputStream ois) throws IOException{
       int size;
       this.modCountAndSize=size=ois.readUnsignedShort();
@@ -493,64 +534,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       return sum;
     }
-    @Override public String toString(){
-      int numLeft;
-      if((numLeft=this.modCountAndSize&0x1ff)!=0){
-        final byte[] buffer;
-        int bufferOffset;
-        (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-        int offset=Byte.MIN_VALUE;
-        goToEnd:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-            if(--numLeft==0){
-               break goToEnd;
-            }
-            buffer[bufferOffset]=',';
-            buffer[++bufferOffset]=' ';
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                if(--numLeft==0){
-                  break goToEnd;
-                }
-                buffer[bufferOffset]=',';
-                buffer[++bufferOffset]=' ';
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                    if(--numLeft==0){
-                      break goToEnd;
-                    }
-                    buffer[bufferOffset]=',';
-                    buffer[++bufferOffset]=' ';
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                        if(--numLeft==0){
-                          break goToEnd;
-                        }
-                        buffer[bufferOffset]=',';
-                        buffer[++bufferOffset]=' ';
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        buffer[++bufferOffset]=']';
-        return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
-      }
-      return "[]";
-    }
     @Override public boolean add(byte val){
       if(super.add(val)){
         this.modCountAndSize+=((1<<9)+1);
@@ -564,9 +547,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         return true;
       }
       return false;
-    }
-    @Override public OmniIterator.OfByte iterator(){
-      return new CheckedAscendingItr(this);
     }
     private boolean uncheckedremoveIf(int modCountAndSize,BytePredicate filter){
       int offset=Byte.MAX_VALUE;
@@ -738,16 +718,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       return false;
     }
-    
-    #MACRO AscendingToArray<Checked,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
-    #MACRO AscendingToArray<Checked,byte>((byte),int,OmniArray.OfByte.DEFAULT_ARR,Byte)
-    #MACRO AscendingToArray<Checked,short>((short),int,OmniArray.OfShort.DEFAULT_ARR,Short)
-    #MACRO AscendingToArray<Checked,int>(,int,OmniArray.OfInt.DEFAULT_ARR,Int)
-    #MACRO AscendingToArray<Checked,long>(,long,OmniArray.OfLong.DEFAULT_ARR,Long)
-    #MACRO AscendingToArray<Checked,float>((float),int,OmniArray.OfFloat.DEFAULT_ARR,Float)
-    #MACRO AscendingToArray<Checked,double>((double),int,OmniArray.OfDouble.DEFAULT_ARR,Double)
-    
-    
     @Override public boolean removeVal(boolean val){
       final int modCountAndSize;
       if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
@@ -804,116 +774,491 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       return false;
     }
-    
-    private void uncheckedForEachAscending(int numLeft,ByteConsumer action){
-      int offset=-128;
-      for(long word=this.word0;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
+    #MACRO RootAccessMethods<Checked,Ascending,Byte>(byte,,null,(Byte)(byte))
+    #MACRO RootAccessMethods<Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+    #MACRO RootAccessMethods<Checked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
+    #MACRO RootAccessMethods<Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+    #MACRO RootAccessMethods<Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+    #MACRO RootAccessMethods<Checked,Ascending,float>(float,Float,Float.NaN,(float))
+    #MACRO RootAccessMethods<Checked,Ascending,double>(double,Double,Double.NaN,(double))
+    public static class Ascending extends Checked{
+      public Ascending(){
+        super();
+      }
+      public Ascending(ByteSetImpl.Checked that){
+        super(that);
+      }
+      public Ascending(ByteSetImpl.Unchecked that){
+        super(that);
+      }
+      public Ascending(OmniCollection.OfBoolean that){
+        super(that);
+      }
+      public Ascending(OmniCollection.OfByte that){
+        super(that);
+      }
+      public Ascending(OmniCollection.ByteOutput<?> that){
+        super(that);
+      }
+      public Ascending(OmniCollection.OfRef<? extends Byte> that){
+        super(that);
+      }
+      public Ascending(Collection<? extends Byte> that){
+        super(that);
+      }
+      @Override public Object clone(){
+        return new Ascending(this);
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        return new CheckedAscendingItr(this);
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        return new CheckedDescendingItr(this);
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+        if(toElement==Byte.MAX_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+        if(fromElement==Byte.MIN_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+        if(fromElement==Byte.MIN_VALUE){
+          return headSet(toElement);
+        }else{
+          if(toElement==Byte.MAX_VALUE){
+            return tailSet(fromElement);
+          }else{
+            #MACRO NYI()
           }
         }
-        if(++offset==-64){
-          for(word=this.word1;;){
-            if((word&(1L<<offset))!=0){
-              action.accept((byte)offset);
-              if(--numLeft==0){
-                return;
-              }
-            }
-            if(++offset==0){
-              for(word=this.word2;;){
-                if((word&(1L<<offset))!=0){
-                  action.accept((byte)offset);
-                  if(--numLeft==0){
-                    return;
-                  }
-                }
-                if(++offset==64){
-                  for(word=this.word3;;++offset){
-                    if((word&(1L<<offset))!=0){
-                      action.accept((byte)offset);
-                      if(--numLeft==0){
-                        return;
-                      }
-                    }
-                  }
-                }
-              }
-            }
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+        if(inclusive){
+          return headSet(toElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+        if(inclusive){
+          return tailSet(fromElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+        if(fromInclusive){
+          if(toInclusive){
+            return subSet(fromElement,toElement);
+          }else{
+            #MACRO NYI()
+          }
+        }else{
+          if(toInclusive){
+            #MACRO NYI()
+          }else{
+            #MACRO NYI()
           }
         }
       }
-    }
-    @Override public void forEach(ByteConsumer action){
-      final int modCountAndSize;
-      int numLeft;
-      if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        try{
-          uncheckedForEachAscending(numLeft,action);
-        }finally{
-          CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
-        }
+      @Override public OmniNavigableSet.OfByte descendingSet(){
+        return new AbstractCheckedFullView.Descending(this);
       }
+      #MACRO RootToString<Checked,Ascending>()
+      #MACRO RootForEach<Checked,Ascending>()
+      #MACRO RootToArray<Checked,Ascending,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+      #MACRO RootToArray<Checked,Ascending,byte>((byte),int,OmniArray.OfByte.DEFAULT_ARR,Byte)
+      #MACRO RootToArray<Checked,Ascending,short>((short),int,OmniArray.OfShort.DEFAULT_ARR,Short)
+      #MACRO RootToArray<Checked,Ascending,int>(,int,OmniArray.OfInt.DEFAULT_ARR,Int)
+      #MACRO RootToArray<Checked,Ascending,long>(,long,OmniArray.OfLong.DEFAULT_ARR,Long)
+      #MACRO RootToArray<Checked,Ascending,float>((float),int,OmniArray.OfFloat.DEFAULT_ARR,Float)
+      #MACRO RootToArray<Checked,Ascending,double>((double),int,OmniArray.OfDouble.DEFAULT_ARR,Double)
     }
-    @Override public void forEach(Consumer<? super Byte> action){
-      final int modCountAndSize;
-      int numLeft;
-      if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        try{
-          uncheckedForEachAscending(numLeft,action::accept);
-        }finally{
-          CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
-        }
-      }
-    }
-    
-    
-    /*
     public static class Descending extends Checked{
-    
+      public Descending(){
+        super();
+      }
+      public Descending(ByteSetImpl.Checked that){
+        super(that);
+      }
+      public Descending(ByteSetImpl.Unchecked that){
+        super(that);
+      }
+      public Descending(OmniCollection.OfBoolean that){
+        super(that);
+      }
+      public Descending(OmniCollection.OfByte that){
+        super(that);
+      }
+      public Descending(OmniCollection.ByteOutput<?> that){
+        super(that);
+      }
+      public Descending(OmniCollection.OfRef<? extends Byte> that){
+        super(that);
+      }
+      public Descending(Collection<? extends Byte> that){
+        super(that);
+      }
+      @Override public Object clone(){
+        return new Descending(this);
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        return new CheckedDescendingItr(this);
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        return new CheckedAscendingItr(this);
+      }
+      @Override public ByteComparator comparator(){
+        return ByteComparator::descendingCompare;
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+        if(toElement==Byte.MIN_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+        if(fromElement==Byte.MAX_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+        if(fromElement==Byte.MAX_VALUE){
+          return headSet(toElement);
+        }else{
+          if(toElement==Byte.MIN_VALUE){
+            return tailSet(fromElement);
+          }else{
+            #MACRO NYI()
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+        if(inclusive){
+          return headSet(toElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+        if(inclusive){
+          return tailSet(fromElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+        if(fromInclusive){
+          if(toInclusive){
+            return subSet(fromElement,toElement);
+          }else{
+            #MACRO NYI()
+          }
+        }else{
+          if(toInclusive){
+            #MACRO NYI()
+          }else{
+            #MACRO NYI()
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfByte descendingSet(){
+        return new AbstractCheckedFullView.Ascending(this);
+      }
+      #MACRO RootAccessMethods<Checked,Descending,Byte>(byte,,null,(Byte)(byte))
+      #MACRO RootAccessMethods<Checked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO RootAccessMethods<Checked,Descending,short>(short,Short,Short.MIN_VALUE,(short))
+      #MACRO RootAccessMethods<Checked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO RootAccessMethods<Checked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO RootAccessMethods<Checked,Descending,float>(float,Float,Float.NaN,(float))
+      #MACRO RootAccessMethods<Checked,Descending,double>(double,Double,Double.NaN,(double))
+      #MACRO RootToString<Checked,Descending>()
+      #MACRO RootForEach<Checked,Descending>()
+      #MACRO RootToArray<Checked,Descending,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+      #MACRO RootToArray<Checked,Descending,byte>((byte),int,OmniArray.OfByte.DEFAULT_ARR,Byte)
+      #MACRO RootToArray<Checked,Descending,short>((short),int,OmniArray.OfShort.DEFAULT_ARR,Short)
+      #MACRO RootToArray<Checked,Descending,int>(,int,OmniArray.OfInt.DEFAULT_ARR,Int)
+      #MACRO RootToArray<Checked,Descending,long>(,long,OmniArray.OfLong.DEFAULT_ARR,Long)
+      #MACRO RootToArray<Checked,Descending,float>((float),int,OmniArray.OfFloat.DEFAULT_ARR,Float)
+      #MACRO RootToArray<Checked,Descending,double>((double),int,OmniArray.OfDouble.DEFAULT_ARR,Double)
     }
-    */
   }
-  
-  
-  public static class Unchecked extends ByteSetImpl implements Serializable{
-    private static final long serialVersionUID=1L;
-    public Unchecked(ByteSetImpl.Checked that){
-      super(that);
-    }
-    public Unchecked(ByteSetImpl.Unchecked that){
-      super(that);
-    }
+  public abstract static class Unchecked extends ByteSetImpl implements Serializable{
     
-    public Unchecked(OmniCollection.OfBoolean that){
+    public static class Ascending extends Unchecked{
+      private static final long serialVersionUID=1L;
+      public Ascending(ByteSetImpl.Checked that){
+        super(that);
+      }
+      public Ascending(ByteSetImpl.Unchecked that){
+        super(that);
+      }
+      public Ascending(OmniCollection.OfBoolean that){
+        super(that);
+      }
+      public Ascending(OmniCollection.OfByte that){
+        super(that);
+      }
+      public Ascending(OmniCollection.ByteOutput<?> that){
+        super(that);
+      }
+      public Ascending(OmniCollection.OfRef<? extends Byte> that){
+        super(that);
+      }
+      public Ascending(Collection<? extends Byte> that){
+        super(that);
+      }
+      @Override public Object clone(){
+        return new Ascending(this);
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        return new UncheckedAscendingItr(this);
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        return new UncheckedDescendingItr(this);
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+        if(toElement==Byte.MAX_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+        if(fromElement==Byte.MIN_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+        if(fromElement==Byte.MIN_VALUE){
+          return headSet(toElement);
+        }else{
+          if(toElement==Byte.MAX_VALUE){
+            return tailSet(fromElement);
+          }else{
+            #MACRO NYI()
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+        if(inclusive){
+          return headSet(toElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+        if(inclusive){
+          return tailSet(fromElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+        if(fromInclusive){
+          if(toInclusive){
+            return subSet(fromElement,toElement);
+          }else{
+            #MACRO NYI()
+          }
+        }else{
+          if(toInclusive){
+            #MACRO NYI()
+          }else{
+            #MACRO NYI()
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfByte descendingSet(){
+        return new AbstractUncheckedFullView.Descending(this);
+      }
+      #MACRO RootToString<Unchecked,Ascending>()
+      #MACRO RootForEach<Unchecked,Ascending>()
+      #MACRO RootToArray<Unchecked,Ascending,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+      #MACRO RootToArray<Unchecked,Ascending,byte>((byte),int,OmniArray.OfByte.DEFAULT_ARR,Byte)
+      #MACRO RootToArray<Unchecked,Ascending,short>((short),int,OmniArray.OfShort.DEFAULT_ARR,Short)
+      #MACRO RootToArray<Unchecked,Ascending,int>(,int,OmniArray.OfInt.DEFAULT_ARR,Int)
+      #MACRO RootToArray<Unchecked,Ascending,long>(,long,OmniArray.OfLong.DEFAULT_ARR,Long)
+      #MACRO RootToArray<Unchecked,Ascending,float>((float),int,OmniArray.OfFloat.DEFAULT_ARR,Float)
+      #MACRO RootToArray<Unchecked,Ascending,double>((double),int,OmniArray.OfDouble.DEFAULT_ARR,Double)
+    }
+    public static class Descending extends Unchecked{
+      private static final long serialVersionUID=1L;
+      public Descending(ByteSetImpl.Checked that){
+        super(that);
+      }
+      public Descending(ByteSetImpl.Unchecked that){
+        super(that);
+      }
+      public Descending(OmniCollection.OfBoolean that){
+        super(that);
+      }
+      public Descending(OmniCollection.OfByte that){
+        super(that);
+      }
+      public Descending(OmniCollection.ByteOutput<?> that){
+        super(that);
+      }
+      public Descending(OmniCollection.OfRef<? extends Byte> that){
+        super(that);
+      }
+      public Descending(Collection<? extends Byte> that){
+        super(that);
+      }
+      @Override public Object clone(){
+        return new Descending(this);
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        return new UncheckedDescendingItr(this);
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        return new UncheckedAscendingItr(this);
+      }
+      @Override public ByteComparator comparator(){
+        return ByteComparator::descendingCompare;
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+        if(toElement==Byte.MIN_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+        if(fromElement==Byte.MAX_VALUE){
+          return this;
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+        if(fromElement==Byte.MAX_VALUE){
+          return headSet(toElement);
+        }else{
+          if(toElement==Byte.MIN_VALUE){
+            return tailSet(toElement);
+          }else{
+            #MACRO NYI()
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+        if(inclusive){
+          return headSet(toElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+        if(inclusive){
+          return tailSet(fromElement);
+        }else{
+          #MACRO NYI()
+        }
+      }
+      @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+        if(fromInclusive){
+          if(toInclusive){
+            return subSet(fromElement,toElement);
+          }else{
+            #MACRO NYI()
+          }
+        }else{
+          if(toInclusive){
+            #MACRO NYI()
+          }else{
+            #MACRO NYI()
+          }
+        }
+      }
+      @Override public OmniNavigableSet.OfByte descendingSet(){
+        return new AbstractUncheckedFullView.Ascending(this);
+      }
+      #MACRO RootAccessMethods<Unchecked,Descending,Byte>(byte,,null,(Byte)(byte))
+      #MACRO RootAccessMethods<Unchecked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO RootAccessMethods<Unchecked,Descending,short>(short,Short,Short.MIN_VALUE,(short))
+      #MACRO RootAccessMethods<Unchecked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO RootAccessMethods<Unchecked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO RootAccessMethods<Unchecked,Descending,float>(float,Float,Float.NaN,(float))
+      #MACRO RootAccessMethods<Unchecked,Descending,double>(double,Double,Double.NaN,(double))
+      #MACRO RootToString<Unchecked,Descending>()
+      #MACRO RootForEach<Unchecked,Descending>()
+      #MACRO RootToArray<Unchecked,Descending,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+      #MACRO RootToArray<Unchecked,Descending,byte>((byte),int,OmniArray.OfByte.DEFAULT_ARR,Byte)
+      #MACRO RootToArray<Unchecked,Descending,short>((short),int,OmniArray.OfShort.DEFAULT_ARR,Short)
+      #MACRO RootToArray<Unchecked,Descending,int>(,int,OmniArray.OfInt.DEFAULT_ARR,Int)
+      #MACRO RootToArray<Unchecked,Descending,long>(,long,OmniArray.OfLong.DEFAULT_ARR,Long)
+      #MACRO RootToArray<Unchecked,Descending,float>((float),int,OmniArray.OfFloat.DEFAULT_ARR,Float)
+      #MACRO RootToArray<Unchecked,Descending,double>((double),int,OmniArray.OfDouble.DEFAULT_ARR,Double)
+    }
+    private static final long serialVersionUID=1L;
+    private Unchecked(ByteSetImpl.Checked that){
+      super(that);
+    }
+    private Unchecked(ByteSetImpl.Unchecked that){
+      super(that);
+    }
+    private Unchecked(OmniCollection.OfBoolean that){
       super();
       //TODO optimize
       this.addAll(that);
     }
-    public Unchecked(OmniCollection.OfByte that){
+    private Unchecked(OmniCollection.OfByte that){
       super();
       //TODO optimize
       this.addAll(that);
     }
-    public Unchecked(OmniCollection.ByteOutput<?> that){
+    private Unchecked(OmniCollection.ByteOutput<?> that){
       super();
       //TODO optimize
       this.addAll(that);
     }
-    public Unchecked(OmniCollection.OfRef<? extends Byte> that){
+    private Unchecked(OmniCollection.OfRef<? extends Byte> that){
       super();
       //TODO optimize
       this.addAll(that);
     }
-    public Unchecked(Collection<? extends Byte> that){
+    private Unchecked(Collection<? extends Byte> that){
       super();
       //TODO optimize
       this.addAll(that);
     }
-    @Override public Object clone(){
-      return new Unchecked(this);
+    private void uncheckedForEachAscending(int offset,ByteConsumer action){
+      switch(offset>>6){
+        case -2:
+          Ascending.uncheckedWordForEach(this.word0,offset,offset=-64,action);
+        case -1:
+          Ascending.uncheckedWordForEach(this.word1,offset,offset=0,action);
+        case 0:
+          Ascending.uncheckedWordForEach(this.word2,offset,offset=64,action);
+        default:
+          Ascending.uncheckedWordForEach(this.word3,offset,128,action);
+      }
+    }
+    private void uncheckedForEachDescending(int offset,ByteConsumer action){
+      switch(offset>>6){
+        case 1:
+          Descending.uncheckedWordForEach(this.word3,offset,offset=63,action);
+        case 0:
+          Descending.uncheckedWordForEach(this.word2,offset,offset=-1,action);
+        case -1:
+          Descending.uncheckedWordForEach(this.word1,offset,offset=-65,action);
+        default:
+          Descending.uncheckedWordForEach(this.word0,offset,-129,action);
+      }
     }
     private void readObject(ObjectInputStream ois) throws IOException{
       this.word0=ois.readLong();
@@ -926,13 +1271,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       oos.writeLong(this.word1);
       oos.writeLong(this.word2);
       oos.writeLong(this.word3);
-    }
-    private static void uncheckedAscendingWordForEach(long word,int offset,int bound,ByteConsumer action){
-      do{
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-        } 
-      }while(++offset!=bound);
     }
     private static int hashCodeForWord(long word,int offset,int bound){
       for(int sum=0;;){
@@ -950,78 +1288,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         + hashCodeForWord(word2,0,64)
         + hashCodeForWord(word3,64,128);
     }
-    
-    @Override public String toString(){
-      int numLeft;
-      final long word0,word1,word2,word3;
-      if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
-        final byte[] buffer;
-        int bufferOffset;
-        (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-        goToEnd:for(int offset=Byte.MIN_VALUE;;){
-          if((word0&(1L<<offset))!=0){
-            bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-            if(--numLeft==0){
-               break goToEnd;
-            }
-            buffer[bufferOffset]=',';
-            buffer[++bufferOffset]=' ';
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                if(--numLeft==0){
-                  break goToEnd;
-                }
-                buffer[bufferOffset]=',';
-                buffer[++bufferOffset]=' ';
-              }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                    if(--numLeft==0){
-                      break goToEnd;
-                    }
-                    buffer[bufferOffset]=',';
-                    buffer[++bufferOffset]=' ';
-                  }
-                  if(++offset==64){
-                    for(;;++offset){
-                      if((word3&(1L<<offset))!=0){
-                        bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                        if(--numLeft==0){
-                          break goToEnd;
-                        }
-                        buffer[bufferOffset]=',';
-                        buffer[++bufferOffset]=' ';
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        buffer[++bufferOffset]=']';
-        return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
-      }
-      return "[]";
-    }
-    @Override public void forEach(ByteConsumer action){
-      uncheckedAscendingWordForEach(word0,-128,-64,action);
-      uncheckedAscendingWordForEach(word1,-64,0,action);
-      uncheckedAscendingWordForEach(word2,0,64,action);
-      uncheckedAscendingWordForEach(word3,64,128,action);
-    }
     @Override public void forEach(Consumer<? super Byte> action){
       forEach((ByteConsumer)action::accept);
     }
-    @Override public OmniIterator.OfByte iterator(){
-      return new UncheckedAscendingItr(this);
-    }
-    
     @Override public boolean removeIf(BytePredicate filter){
       boolean changed=false;
       int offset=Byte.MIN_VALUE;
@@ -1111,37 +1380,132 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       return false;
     }
-    #MACRO AscendingToArray<Unchecked,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
-    #MACRO AscendingToArray<Unchecked,byte>((byte),int,OmniArray.OfByte.DEFAULT_ARR,Byte)
-    #MACRO AscendingToArray<Unchecked,short>((short),int,OmniArray.OfShort.DEFAULT_ARR,Short)
-    #MACRO AscendingToArray<Unchecked,int>(,int,OmniArray.OfInt.DEFAULT_ARR,Int)
-    #MACRO AscendingToArray<Unchecked,long>(,long,OmniArray.OfLong.DEFAULT_ARR,Long)
-    #MACRO AscendingToArray<Unchecked,float>((float),int,OmniArray.OfFloat.DEFAULT_ARR,Float)
-    #MACRO AscendingToArray<Unchecked,double>((double),int,OmniArray.OfDouble.DEFAULT_ARR,Double)
-    /*
-    public static class Descending extends Unchecked{
     
+  }
+  
+  private static abstract class AbstractCheckedFullView extends AbstractByteSet{
+    transient final ByteSetImpl.Checked root;
+    
+    private AbstractCheckedFullView(ByteSetImpl.Checked root){
+      this.root=root;
     }
-    */
+    @Override public int size(){
+      return root.modCountAndSize&0x1ff;
+    }
+    @Override public boolean isEmpty(){
+      return (root.modCountAndSize&0x1ff)!=0;
+    }
+    @Override public void clear(){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      if(((modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
+        root.modCountAndSize=(modCountAndSize+(1<<9))&(~0x1ff);
+        root.word0=0;
+        root.word1=0;
+        root.word2=0;
+        root.word3=0;
+      }
+    }
+    
+    @Override public int hashCode(){
+      #MACRO NYI()
+    }
+    private static class Ascending extends AbstractCheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Ascending(ByteSetImpl.Checked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Checked.Ascending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Checked.Ascending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+      
+    }
+    private static class Descending extends AbstractCheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Descending(ByteSetImpl.Checked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Checked.Descending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Checked.Descending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+    }
+    
+  }
+  
+  private static abstract class AbstractUncheckedFullView extends AbstractByteSet{
+    transient final ByteSetImpl.Unchecked root;
+    private AbstractUncheckedFullView(ByteSetImpl.Unchecked root){
+      this.root=root;
+    }
+    @Override public int size(){
+      final ByteSetImpl.Unchecked root;
+      return SetCommonImpl.size((root=this.root).word0,root.word1,root.word2,root.word3);
+    }
+    @Override public boolean isEmpty(){
+      final ByteSetImpl.Unchecked root;
+      return (root=this.root).word0==0 && root.word1==0 && root.word2==0 && root.word3==0;
+    }
+    @Override public void clear(){
+      final ByteSetImpl.Unchecked root;
+      (root=this.root).word0=0;
+      root.word1=0;
+      root.word2=0;
+      root.word3=0;
+    }
+    @Override public int hashCode(){
+      #MACRO NYI()
+    }
+    private static class Ascending extends AbstractUncheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Ascending(ByteSetImpl.Unchecked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Unchecked.Ascending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Unchecked.Ascending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+      
+    }
+    private static class Descending extends AbstractUncheckedFullView implements Cloneable,Serializable{
+      private static final long serialVersionUID=1L;
+      private Descending(ByteSetImpl.Unchecked root){
+        super(root);
+      }
+      private Object writeReplace(){
+        return new ByteSetImpl.Unchecked.Descending(root);
+      }
+      @Override public Object clone(){
+        return new ByteSetImpl.Unchecked.Descending(root);
+      }
+      @Override public String toString(){
+        #MACRO NYI()
+      }
+    }
   }
   
   
-  private void uncheckedForEachAscending(int offset,ByteConsumer action){
-    switch(offset>>6){
-      case -2:
-        Unchecked.uncheckedAscendingWordForEach(this.word0,offset,offset=-64,action);
-      case -1:
-        Unchecked.uncheckedAscendingWordForEach(this.word1,offset,offset=0,action);
-      case 0:
-        Unchecked.uncheckedAscendingWordForEach(this.word2,offset,offset=64,action);
-      default:
-        Unchecked.uncheckedAscendingWordForEach(this.word3,offset,128,action);
-    }
-  }
+  
   private static class UncheckedAscendingItr extends AbstractByteItr{
-    transient final ByteSetImpl root;
+    transient final ByteSetImpl.Unchecked root;
     transient int currIndex;
-    private UncheckedAscendingItr(ByteSetImpl root){
+    private UncheckedAscendingItr(ByteSetImpl.Unchecked root){
       this.root=root;
       int currIndex;
       if((currIndex=Long.numberOfTrailingZeros(root.word0))==64){
@@ -1235,6 +1599,107 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
             break;
           }
           this.currIndex=128;
+      }
+      return (byte)ret;
+    }
+  }
+  private static class UncheckedDescendingItr extends AbstractByteItr{
+    transient final ByteSetImpl.Unchecked root;
+    transient int currIndex;
+    private UncheckedDescendingItr(ByteSetImpl.Unchecked root){
+      this.root=root;
+      int currIndex;
+      if((currIndex=Long.numberOfLeadingZeros(root.word3))==64){
+        if((currIndex+=Long.numberOfLeadingZeros(root.word2))==128){
+          if((currIndex+=Long.numberOfLeadingZeros(root.word1))==192){
+            currIndex+=Long.numberOfLeadingZeros(root.word0);
+          }
+        }
+      }
+      this.currIndex=Byte.MAX_VALUE-currIndex;
+    }
+    private UncheckedDescendingItr(UncheckedDescendingItr that){
+      this.root=that.root;
+      this.currIndex=that.currIndex;
+    }
+    @Override public Object clone(){
+      return new UncheckedDescendingItr(this);
+    }
+    @Override public void remove(){
+      final var root=this.root;
+      int currIndex;
+      switch(((currIndex=this.currIndex+1))>>6){
+      case -2:
+        int tail0s;
+        long word;
+        if((tail0s=Long.numberOfTrailingZeros((word=root.word0)>>>(currIndex)))!=64){
+          root.word0=word&(~(1L<<(currIndex+tail0s)));
+          break;
+        }
+        currIndex=0;
+      case -1:
+        if((tail0s=Long.numberOfTrailingZeros((word=root.word1)>>>(currIndex)))!=64){
+          root.word1=word&(~(1L<<(currIndex+tail0s)));
+          break;
+        }
+        currIndex=0;
+      case 0:
+        if((tail0s=Long.numberOfTrailingZeros((word=root.word2)>>>(currIndex)))!=64){
+          root.word2=word&(~(1L<<(currIndex+tail0s)));
+          break;
+        }
+        currIndex=0;
+      default:
+        root.word3=(word=root.word3)&(~(1L<<(currIndex+Long.numberOfTrailingZeros(word>>>(currIndex)))));
+      }
+    }
+    @Override public void forEachRemaining(ByteConsumer action){
+      final int currIndex;
+      if((currIndex=this.currIndex)!=-129){
+        root.uncheckedForEachDescending(currIndex,action);
+        this.currIndex=-129;
+      }
+    }
+    @Override public void forEachRemaining(Consumer<? super Byte> action){
+      final int currIndex;
+      if((currIndex=this.currIndex)!=-129){
+        root.uncheckedForEachDescending(currIndex,action::accept);
+        this.currIndex=-129;
+      }
+    }
+    @Override public boolean hasNext(){
+      return this.currIndex!=-129;
+    }
+    @Override public byte nextByte(){
+      final int ret;
+      int currIndex;
+      final var root=this.root;
+      switch((currIndex=ret=this.currIndex)>>6){
+        case -2:
+          int lead0s;
+          if((lead0s=Long.numberOfLeadingZeros(root.word3<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          currIndex=63;
+        case -1:
+          if((lead0s=Long.numberOfLeadingZeros(root.word2<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          currIndex=-1;
+        case 0:
+          if((lead0s=Long.numberOfLeadingZeros(root.word1<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          currIndex=-65;
+        default:
+          if((lead0s=Long.numberOfLeadingZeros(root.word0<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          this.currIndex=-129;
       }
       return (byte)ret;
     }
@@ -1360,7 +1825,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public byte nextByte(){
       final ByteSetImpl.Checked root;
       final int modCountAndLastRet;
-      CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(-0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+      CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
       final int ret;
       int currIndex;
       switch((currIndex=ret=this.currIndex)>>6){
@@ -1397,9 +1862,996 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       return (byte)ret;
     }
   }
+  
+  
+  
+  private static class CheckedDescendingItr extends AbstractByteItr{
+    transient final ByteSetImpl.Checked root;
+    transient int currIndex;
+    transient int modCountAndLastRet;
+    private CheckedDescendingItr(ByteSetImpl.Checked root){
+      this.root=root;
+      int currIndex;
+      if((currIndex=Long.numberOfLeadingZeros(root.word3))==64){
+        if((currIndex+=Long.numberOfLeadingZeros(root.word2))==128){
+          if((currIndex+=Long.numberOfLeadingZeros(root.word1))==192){
+            currIndex+=Long.numberOfLeadingZeros(root.word0);
+          }
+        }
+      }
+      this.currIndex=Byte.MAX_VALUE-currIndex;
+      this.modCountAndLastRet=root.modCountAndSize|0x1ff;
+    }
+    private CheckedDescendingItr(CheckedDescendingItr that){
+      this.root=that.root;
+      this.currIndex=that.currIndex;
+      this.modCountAndLastRet=that.modCountAndLastRet;
+    }
+    @Override public Object clone(){
+      return new CheckedDescendingItr(this);
+    }
+    @Override public void remove(){
+      int lastRet;
+      int modCountAndLastRet;
+      if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)==0x1ff){
+        throw new IllegalStateException();
+      }
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount(modCountAndLastRet&(~0x1ff),(modCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      switch((lastRet=(byte)lastRet)>>6){
+        case 1:
+          root.word3 &=(~(1L<<lastRet));
+          break;
+        case 0:
+          root.word2 &=(~(1L<<lastRet));
+          break;
+        case -1:
+          root.word1 &=(~(1L<<lastRet));
+          break;
+        default:
+          root.word0 &=(~(1L<<lastRet));
+      }
+      root.modCountAndSize=modCountAndSize+((1<<9)-1);
+      this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
+    }
+    private void uncheckedForEachRemaining(int currIndex,ByteConsumer action){
+      int modCountAndLastRet=this.modCountAndLastRet;
+      final var root=this.root;
+      int lastRet;
+      try{
+        action.accept((byte)(lastRet=currIndex));
+        switch((--currIndex)>>6){
+          case 1:
+            for(long word=root.word3;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(--currIndex==63){
+                break;
+              }
+            }
+          case 0:
+            for(long word=root.word2;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(--currIndex==-1){
+                break;
+              }
+            }
+          case -1:
+            for(long word=root.word0;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(--currIndex==-65){
+                break;
+              }
+            }
+          case -2:
+            for(long word=root.word0;;){
+              if((word&(1L<<currIndex))!=0){
+                action.accept((byte)(lastRet=currIndex));
+              }
+              if(--currIndex==-129){
+                break;
+              }
+            }
+          default:
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),root.modCountAndSize&(~0x1ff));
+      }
+      this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
+      this.currIndex=-129;
+    }
+    @Override public void forEachRemaining(ByteConsumer action){
+      final int currIndex;
+      if((currIndex=this.currIndex)!=-129){
+        uncheckedForEachRemaining(currIndex,action);
+      }
+    }
+    @Override public void forEachRemaining(Consumer<? super Byte> action){
+      final int currIndex;
+      if((currIndex=this.currIndex)!=-129){
+        uncheckedForEachRemaining(currIndex,action::accept);
+      }
+    }
+    @Override public boolean hasNext(){
+      return this.currIndex!=-129;
+    }
+    @Override public byte nextByte(){
+      final ByteSetImpl.Checked root;
+      final int modCountAndLastRet;
+      CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+      final int ret;
+      int currIndex;
+      switch((currIndex=ret=this.currIndex)>>6){
+        case 1:
+          int lead0s;
+          if((lead0s=Long.numberOfLeadingZeros(root.word3<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          currIndex=63;
+        case 0:
+          if((lead0s=Long.numberOfLeadingZeros(root.word2<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          currIndex=-1;
+        case -1:
+          if((lead0s=Long.numberOfLeadingZeros(root.word1<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          currIndex=-64;
+        case -2:
+          if((lead0s=Long.numberOfLeadingZeros(root.word0<<-currIndex))!=64){
+            this.currIndex=currIndex-lead0s;
+            break;
+          }
+          this.currIndex=-129;
+          break;
+        default:
+          throw new NoSuchElementException();
+      }
+      this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
+      return (byte)ret;
+    }
+  }
 
 }
-#MACRODEF AscendingToArray<CHECKED,ARRTYPE>(CAST,VALTYPE,DEFAULTARR,CLASSPREFIX)
+#MACRODEF CeilingHelper(VAL,CAST)
+#IFSWITCH CHECKED==Unchecked
+  #IFNOTSWITCH RETTYPE==Byte,byte
+default:
+  VAL=-128;
+  #ENDIF
+#ENDIF
+case -2:
+  int tail0s;
+  if((tail0s=Long.numberOfTrailingZeros(this.word0>>>VAL))!=64){
+    return CAST(tail0s-128);
+  }
+  VAL=0;
+case -1:
+  if((tail0s=Long.numberOfTrailingZeros(this.word1>>>VAL))!=64){
+    return CAST(tail0s-64);
+  }
+  VAL=0;
+case 0:
+  if((tail0s=Long.numberOfTrailingZeros(this.word2>>>VAL))!=64){
+    return CAST(tail0s);
+  }
+  VAL=0;
+#IFSWITCH RETTYPE==Byte,byte
+default:
+#ELSE
+case 1:
+#ENDIF
+  if((tail0s=Long.numberOfTrailingZeros(this.word3>>>VAL))!=64){
+    return CAST(tail0s+64);
+  }
+#IFNOTSWITCH RETTYPE==Byte,byte
+  #IFSWITCH CHECKED==Checked
+default:
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF HigherHelper(VAL,CAST)
+#IFSWITCH CHECKED==Unchecked
+  #IFNOTSWITCH RETTYPE==Byte,byte
+default:
+  VAL=-128;
+  #ENDIF
+#ENDIF
+case -2:
+  int tail0s;
+  if((tail0s=Long.numberOfTrailingZeros(this.word0>>>VAL))!=64){
+    return CAST(tail0s-128);
+  }
+  VAL=0;
+case -1:
+  if((tail0s=Long.numberOfTrailingZeros(this.word1>>>VAL))!=64){
+    return CAST(tail0s-64);
+  }
+  VAL=0;
+case 0:
+  if((tail0s=Long.numberOfTrailingZeros(this.word2>>>VAL))!=64){
+    return CAST(tail0s);
+  }
+  VAL=0;
+case 1:
+  if((tail0s=Long.numberOfTrailingZeros(this.word3>>>VAL))!=64){
+    return CAST(tail0s+64);
+  }
+#IFNOTSWITCH RETTYPE==Byte,byte
+  #IFSWITCH CHECKED==Checked
+default:
+  #ENDIF
+#ELSE
+default:
+#ENDIF
+#ENDDEF
+
+
+
+#MACRODEF FloorHelper(VAL,CAST)
+#IFSWITCH CHECKED==Unchecked
+  #IFNOTSWITCH RETTYPE==Byte,byte
+default:
+  VAL=127;
+  #ENDIF
+#ENDIF
+case 1:
+  int lead0s;
+  if((lead0s=Long.numberOfLeadingZeros(this.word3<<-VAL))!=64){
+    return CAST(127-lead0s);
+  }
+  VAL=0;
+case 0:
+  if((lead0s=Long.numberOfLeadingZeros(this.word2<<-VAL))!=64){
+    return CAST(63-lead0s);
+  }
+  VAL=0;
+case -1:
+  if((lead0s=Long.numberOfLeadingZeros(this.word1<<-VAL))!=64){
+    return CAST(-1-lead0s);
+  }
+  VAL=0;
+#IFSWITCH RETTYPE==Byte,byte
+default:
+#ELSE
+case -2:
+#ENDIF
+  if((lead0s=Long.numberOfLeadingZeros(this.word0<<-VAL))!=64){
+    return CAST(-65-lead0s);
+  }
+#IFNOTSWITCH RETTYPE==Byte,byte
+  #IFSWITCH CHECKED==Checked
+default:
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF LowerHelper(VAL,CAST)
+#IFSWITCH CHECKED==Unchecked
+  #IFNOTSWITCH RETTYPE==Byte,byte
+default:
+  VAL=127;
+  #ENDIF
+#ENDIF
+case 1:
+  int lead0s;
+  if((lead0s=Long.numberOfLeadingZeros(this.word3<<-VAL))!=64){
+    return CAST(127-lead0s);
+  }
+  VAL=0;
+case 0:
+  if((lead0s=Long.numberOfLeadingZeros(this.word2<<-VAL))!=64){
+    return CAST(63-lead0s);
+  }
+  VAL=0;
+case -1:
+  if((lead0s=Long.numberOfLeadingZeros(this.word1<<-VAL))!=64){
+    return CAST(-1-lead0s);
+  }
+  VAL=0;
+case -2:
+  if((lead0s=Long.numberOfLeadingZeros(this.word0<<-VAL))!=64){
+    return CAST(-65-lead0s);
+  }
+#IFNOTSWITCH RETTYPE==Byte,byte
+  #IFSWITCH CHECKED==Checked
+default:
+  #ENDIF
+#ELSE
+default:
+#ENDIF
+#ENDDEF
+
+#MACRODEF RootAccessMethods<CHECKED,DIRECTION,RETTYPE>(INPUTTYPE,CLASSPREFIX,DEFAULTVAL,CAST)
+#IFSWITCH RETTYPE==int
+@Override public RETTYPE firstCLASSPREFIX(){
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)==0){
+    throw new NoSuchElementException();
+  }
+  return super.firstCLASSPREFIX();
+    #ELSE
+  int tail0s;
+  if((tail0s=Long.numberOfTrailingZeros(word0))!=64){
+    return (Byte.MIN_VALUE+tail0s);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word1))!=64){
+    return (tail0s-64);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word2))!=64){
+    return tail0s;
+  }
+  return (Long.numberOfTrailingZeros(word3)+64);  
+    #ENDIF
+  #ELSE
+  return super.lastCLASSPREFIX();
+  #ENDIF
+}
+@Override public RETTYPE lastCLASSPREFIX(){
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)==0){
+    throw new NoSuchElementException();
+  }
+  return super.lastCLASSPREFIX();  
+    #ELSE
+  int lead0s;
+  if((lead0s=Long.numberOfLeadingZeros(word3))!=64){
+    return (Byte.MAX_VALUE-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word2))!=64){
+    return (63-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word1))!=64){
+    return (-1-lead0s);
+  }
+  return (-65-Long.numberOfLeadingZeros(word0));  
+    #ENDIF
+  #ELSE
+  return super.firstCLASSPREFIX();
+  #ENDIF
+}
+#ELSEIFNOTSWITCH RETTYPE==Byte
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED==Unchecked
+@Override public RETTYPE firstCLASSPREFIX(){
+  return CAST(firstInt());
+}
+@Override public RETTYPE lastCLASSPREFIX(){
+  return CAST(lastInt());
+}
+    #ENDIF
+  #ENDIF
+#ENDIF
+
+
+
+
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0){
+    #IFSWITCH RETTYPE==float,double
+    if(val!=val || val>Byte.MAX_VALUE){
+      return CAST(super.lastInt());
+    }
+    int v;
+    if((v=(int)val)>=val){
+      --v;
+    }
+    switch(v>>6){
+      #MACRO LowerHelper(v,CAST)
+    }
+    #ELSE
+      #IFSWITCH RETTYPE==short,int,long
+    if(val>Byte.MAX_VALUE){
+      return CAST(super.lastInt());
+    }
+      #ENDIF
+      #IFSWITCH RETTYPE==int
+    switch((--val)>>6){
+      #MACRO LowerHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=((int)val)+1)>>6){
+      #MACRO LowerHelper(v,CAST)
+      #ENDIF
+    }
+    #ENDIF
+  }
+  #ELSE
+    #IFSWITCH RETTYPE==float,double
+  for(;;){
+    int v;
+    if(val!=val){
+      v=Byte.MAX_VALUE;
+    }else if(val>Byte.MIN_VALUE){
+      if((v=(int)val)>=val){
+        --v;
+      }
+    }else{
+      break;
+    }
+    switch(v>>6){
+      #MACRO LowerHelper(v,CAST)
+    }
+    break;
+  }
+    #ELSE
+  if(val>Byte.MIN_VALUE){
+      #IFSWITCH RETTYPE==int
+    switch((--val)>>6){
+      #MACRO LowerHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=((int)val)-1)>>6){
+      #MACRO LowerHelper(v,CAST)
+      #ENDIF
+    }
+  }  
+    #ENDIF
+  #ENDIF
+  return DEFAULTVAL;
+#ELSE
+  return super.higherCLASSPREFIX(val);
+#ENDIF
+}
+
+
+#IFSWITCH RETTYPE==Byte
+@Override public RETTYPE floor(INPUTTYPE val){
+#ELSE
+@Override public RETTYPE RETTYPEFloor(INPUTTYPE val){
+#ENDIF
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0){
+    #IFSWITCH RETTYPE==float,double
+    if(val!=val || val>=Byte.MAX_VALUE){
+      return CAST(super.lastInt());
+    }
+    int v;
+    if((v=(int)val)>val){
+      --v;
+    }
+    switch(v>>6){
+      #MACRO FloorHelper(v,CAST)
+    }
+    #ELSE
+      #IFSWITCH RETTYPE==short,int,long
+    if(val>Byte.MAX_VALUE){
+      return CAST(super.lastInt());
+    }
+      #ENDIF
+      #IFSWITCH RETTYPE==Byte,byte,short,int
+    switch(val>>6){
+      #MACRO FloorHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=(int)val)>>6){
+      #MACRO FloorHelper(v,CAST)
+      #ENDIF
+    }
+    #ENDIF
+  }
+  #ELSE
+    #IFSWITCH RETTYPE==float,double
+  for(;;){
+    int v;
+    if(val!=val){
+      v=Byte.MAX_VALUE;
+    }else if(val>=Byte.MIN_VALUE){
+      if((v=(int)val)>val){
+        --v;
+      }
+    }else{
+      break;
+    }
+    switch(v>>6){
+      #MACRO FloorHelper(v,CAST)
+    }
+    break;
+  }
+    #ELSE
+      #IFSWITCH RETTYPE==short,int,long
+  if(val>=Byte.MIN_VALUE)
+      #ENDIF
+  {
+      #IFSWITCH RETTYPE==Byte,byte,short,int
+    switch(val>>6){
+      #MACRO FloorHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=(int)val)>>6){
+      #MACRO FloorHelper(v,CAST)
+      #ENDIF
+    }
+  }  
+    #ENDIF
+  #ENDIF
+  return DEFAULTVAL;
+#ELSE
+  #IFSWITCH RETTYPE==Byte
+  return super.ceiling(val);
+  #ELSE
+  return super.RETTYPECeiling(val);
+  #ENDIF
+#ENDIF
+}
+
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH CHECKED==Checked
+  
+    #IFSWITCH RETTYPE==float,double
+  if(val==val && (modCountAndSize&0x1ff)!=0){
+    if(val<Byte.MIN_VALUE){
+      return CAST(super.firstInt());
+    }
+    int v;
+    if((v=(int)val)<=val){
+      ++v;
+    }
+    switch(v>>6){
+      #MACRO HigherHelper(v,CAST)
+    }
+    #ELSE
+  if((modCountAndSize&0x1ff)!=0){
+      #IFSWITCH RETTYPE==short,int,long
+    if(val<Byte.MIN_VALUE){
+      return CAST(super.firstInt());
+    }
+      #ENDIF
+      #IFSWITCH RETTYPE==int
+    switch((++val)>>6){
+      #MACRO HigherHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=((int)val)+1)>>6){
+      #MACRO HigherHelper(v,CAST)
+      #ENDIF
+    }
+    #ENDIF
+  }
+  #ELSE
+    #IFSWITCH RETTYPE==float,double
+  if(val==val && val<Byte.MAX_VALUE){
+    int v;
+    if((v=(int)val)<=val){
+      ++v;
+    }
+    switch(v>>6){
+      #MACRO HigherHelper(v,CAST)
+    }
+  
+  }
+    #ELSE
+      #IFSWITCH RETTYPE==short,int,long
+  if(val<Byte.MAX_VALUE)
+      #ENDIF
+  {
+      #IFSWITCH RETTYPE==int
+    switch((++val)>>6){
+      #MACRO HigherHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=((int)val)+1)>>6){
+      #MACRO HigherHelper(v,CAST)
+      #ENDIF
+    }
+  }
+    #ENDIF
+  #ENDIF
+  return DEFAULTVAL;
+#ELSE
+  return super.lowerCLASSPREFIX(val);
+#ENDIF
+}
+
+
+
+
+#IFSWITCH RETTYPE==Byte
+@Override public RETTYPE ceiling(INPUTTYPE val){
+#ELSE
+@Override public RETTYPE RETTYPECeiling(INPUTTYPE val){
+#ENDIF
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH RETTYPE==float,double
+  if(val==val && (modCountAndSize&0x1ff)!=0){
+    if(val<Byte.MIN_VALUE){
+      return CAST(super.firstInt());
+    }
+    int v;
+    if((v=(int)val)<val){
+      ++v;
+    }
+    switch(v>>6){
+      #MACRO CeilingHelper(v,CAST)
+    }
+    #ELSE
+  if((modCountAndSize&0x1ff)!=0){
+      #IFSWITCH RETTYPE==short,int,long
+    if(val<Byte.MIN_VALUE){
+      return CAST(super.firstInt());
+    }
+      #ENDIF
+      #IFSWITCH RETTYPE==Byte,byte,short,int
+    switch(val>>6){
+      #MACRO CeilingHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=(int)val)>>6){
+      #MACRO CeilingHelper(v,CAST)
+      #ENDIF
+    }
+    #ENDIF
+    
+  }
+  #ELSE
+    #IFSWITCH RETTYPE==float,double
+  if(val==val && val<=Byte.MAX_VALUE){
+    int v;
+    if((v=(int)val)<val){
+      ++v;
+    }
+    switch(v>>6){
+      #MACRO CeilingHelper(v,CAST)
+    }
+  }
+    #ELSE
+      #IFSWITCH RETTYPE==short,int,long
+  if(val<=Byte.MAX_VALUE)
+      #ENDIF
+  {
+      #IFSWITCH RETTYPE==Byte,byte,short,int
+    switch(val>>6){
+      #MACRO CeilingHelper(val,CAST)
+      #ELSE
+    int v;
+    switch((v=(int)val)>>6){
+      #MACRO CeilingHelper(v,CAST)
+      #ENDIF
+    }
+  }
+    #ENDIF
+  
+  
+  #ENDIF
+  return DEFAULTVAL;
+#ELSE
+  #IFSWITCH RETTYPE==Byte
+  return super.floor(val);
+  #ELSE
+  return super.RETTYPEFloor(val);
+  #ENDIF
+#ENDIF
+}
+@Override public RETTYPE pollFirstCLASSPREFIX(){
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH CHECKED==Checked
+  int modCountAndSize;
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+    this.modCountAndSize=modCountAndSize+((1<<9)-1);
+    return CAST(super.uncheckedRemoveFirst());
+  }
+  #ELSE
+  long word;
+  int tail0s;
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
+    this.word0=word&(~(1L<<tail0s));
+    return CAST(Byte.MIN_VALUE+tail0s);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
+    this.word1=word&(~(1L<<tail0s));
+    return CAST(tail0s-64);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
+    this.word2=word&(~(1L<<tail0s));
+    return CAST(tail0s);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
+    this.word3=word&(~(1L<<tail0s));
+    return CAST(tail0s+64);
+  }
+  #ENDIF
+  return DEFAULTVAL;
+#ELSE
+  return super.pollLastCLASSPREFIX();
+#ENDIF
+}
+@Override public RETTYPE pollLastCLASSPREFIX(){
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH CHECKED==Checked
+  int modCountAndSize;
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+    this.modCountAndSize=modCountAndSize+((1<<9)-1);
+    return CAST(super.uncheckedRemoveLast());
+  }
+  #ELSE
+  long word;
+  int lead0s;
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
+    this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(Byte.MAX_VALUE-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
+    this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(63-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
+    this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(-1-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
+    this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(-65-lead0s); 
+  }
+  #ENDIF
+  return DEFAULTVAL;
+#ELSE
+  return super.pollFirstCLASSPREFIX();
+#ENDIF
+}
+#ENDDEF
+#MACRODEF RootForEach<CHECKED,DIRECTION>()
+#IFSWITCH CHECKED==Checked
+@Override public void forEach(ByteConsumer action){
+  final int modCountAndSize;
+  int numLeft;
+  if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+    try{
+      uncheckedForEach(numLeft,action);
+    }finally{
+      CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
+    }
+  }
+}
+@Override public void forEach(Consumer<? super Byte> action){
+  final int modCountAndSize;
+  int numLeft;
+  if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+    try{
+      uncheckedForEach(numLeft,action::accept);
+    }finally{
+      CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
+    }
+  }
+}
+private void uncheckedForEach(int numLeft,ByteConsumer action){
+  #IFSWITCH DIRECTION==Ascending
+  int offset=-128;
+  for(long word=this.word0;;){
+  #ELSE
+  int offset=127;
+  for(long word=this.word3;;){
+  #ENDIF
+    if((word&(1L<<offset))!=0){
+      action.accept((byte)offset);
+      if(--numLeft==0){
+        return;
+      }
+    }
+  #IFSWITCH DIRECTION==Ascending
+    if(++offset==-64){
+      for(word=this.word1;;){
+  #ELSE
+    if(--offset==63){
+      for(word=this.word2;;){
+  #ENDIF
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
+          }
+        }
+  #IFSWITCH DIRECTION==Ascending
+        if(++offset==0){
+          for(word=this.word2;;){
+  #ELSE
+        if(--offset==-1){
+          for(word=this.word1;;){
+  #ENDIF
+            if((word&(1L<<offset))!=0){
+              action.accept((byte)offset);
+              if(--numLeft==0){
+                return;
+              }
+            }
+  #IFSWITCH DIRECTION==Ascending
+            if(++offset==64){
+              for(word=this.word3;;++offset){
+  #ELSE
+            if(--offset==-65){
+              for(word=this.word0;;--offset){
+  #ENDIF
+                if((word&(1L<<offset))!=0){
+                  action.accept((byte)offset);
+                  if(--numLeft==0){
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+#ELSE
+@Override public void forEach(ByteConsumer action){
+  #IFSWITCH DIRECTION==Ascending
+  uncheckedWordForEach(word0,-128,-64,action);
+  uncheckedWordForEach(word1,-64,0,action);
+  uncheckedWordForEach(word2,0,64,action);
+  uncheckedWordForEach(word3,64,128,action);
+  #ELSE
+  uncheckedWordForEach(word3,127,63,action);
+  uncheckedWordForEach(word2,63,-1,action);
+  uncheckedWordForEach(word1,-1,-65,action);
+  uncheckedWordForEach(word0,-65,-129,action);
+  #ENDIF
+}
+private static void uncheckedWordForEach(long word,int offset,int bound,ByteConsumer action){
+  do{
+    if((word&(1L<<offset))!=0){
+      action.accept((byte)offset);
+    } 
+  #IFSWITCH DIRECTION==Ascending
+  }while(++offset!=bound);
+  #ELSE
+  }while(--offset!=bound);
+  #ENDIF
+}
+#ENDIF
+#ENDDEF
+#MACRODEF RootToString<CHECKED,DIRECTION>()
+@Override public String toString(){
+  int numLeft;
+#IFSWITCH CHECKED==Checked
+  if((numLeft=this.modCountAndSize&0x1ff)!=0){
+#ELSE
+  final long word0,word1,word2,word3;
+  if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+#ENDIF
+    final byte[] buffer;
+    int bufferOffset;
+    (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH DIRECTION==Ascending
+    int offset=Byte.MIN_VALUE;
+    goToEnd:for(long word=this.word0;;){
+  #ELSE
+    int offset=Byte.MAX_VALUE;
+    goToEnd:for(long word=this.word3;;){
+  #ENDIF
+      if((word&(1L<<offset))!=0){
+#ELSE
+  #IFSWITCH DIRECTION==Ascending
+    goToEnd:for(int offset=Byte.MIN_VALUE;;){
+      if((word0&(1L<<offset))!=0){
+  #ELSE
+    goToEnd:for(int offset=Byte.MAX_VALUE;;){
+      if((word3&(1L<<offset))!=0){
+  #ENDIF
+#ENDIF
+        bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+        if(--numLeft==0){
+           break goToEnd;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+#IFSWITCH DIRECTION==Ascending
+      if(++offset==-64){
+#ELSE
+      if(--offset==63){
+#ENDIF
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH DIRECTION==Ascending
+        for(word=this.word1;;){
+  #ELSE
+        for(word=this.word2;;){
+  #ENDIF
+          if((word&(1L<<offset))!=0){
+#ELSE
+        for(;;){
+  #IFSWITCH DIRECTION==Ascending
+          if((word1&(1L<<offset))!=0){
+  #ELSE
+          if((word2&(1L<<offset))!=0){
+  #ENDIF
+#ENDIF
+            bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+            buffer[bufferOffset]=',';
+            buffer[++bufferOffset]=' ';
+          }
+#IFSWITCH DIRECTION==Ascending
+          if(++offset==0){
+#ELSE
+          if(--offset==-1){
+#ENDIF
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH DIRECTION==Ascending
+            for(word=this.word2;;){
+  #ELSE
+            for(word=this.word1;;){
+  #ENDIF
+              if((word&(1L<<offset))!=0){
+#ELSE
+            for(;;){
+  #IFSWITCH DIRECTION==Ascending
+              if((word2&(1L<<offset))!=0){
+  #ELSE
+              if((word1&(1L<<offset))!=0){
+  #ENDIF
+#ENDIF
+                bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                if(--numLeft==0){
+                  break goToEnd;
+                }
+                buffer[bufferOffset]=',';
+                buffer[++bufferOffset]=' ';
+              }
+#IFSWITCH DIRECTION==Ascending
+              if(++offset==64){
+#ELSE
+              if(--offset==-65){
+#ENDIF
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH DIRECTION==Ascending
+                for(word=this.word3;;++offset){
+  #ELSE
+                for(word=this.word0;;--offset){
+  #ENDIF
+                  if((word&(1L<<offset))!=0){
+#ELSE
+  #IFSWITCH DIRECTION==Ascending
+                for(;;++offset){
+                  if((word3&(1L<<offset))!=0){
+  #ELSE
+                for(;;--offset){
+                  if((word0&(1L<<offset))!=0){
+  #ENDIF
+#ENDIF
+                    bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+                    if(--numLeft==0){
+                      break goToEnd;
+                    }
+                    buffer[bufferOffset]=',';
+                    buffer[++bufferOffset]=' ';
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    buffer[++bufferOffset]=']';
+    return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+  }
+  return "[]";
+}
+#ENDDEF
+#MACRODEF RootToArray<CHECKED,DIRECTION,ARRTYPE>(CAST,VALTYPE,DEFAULTARR,CLASSPREFIX)
 #IFSWITCH ARRTYPE==Byte
 @SuppressWarnings("unchecked")
 @Override public <T> T[] toArray(T[] dst){
@@ -1411,7 +2863,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
   if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
   #ENDIF
     dst=OmniArray.uncheckedArrResize(numLeft,dst);
-    #MACRO AscendingToArrayHelper((T)CAST,VALTYPE)
+    #MACRO DIRECTIONToArrayHelper((T)CAST,VALTYPE)
   }else if(dst.length!=0){
     dst[0]=null;
   }
@@ -1433,7 +2885,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
   final T[] dst=arrConstructor.apply(numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
   #ENDIF
   if(numLeft!=0){
-    #MACRO AscendingToArrayHelper((T)CAST,VALTYPE)
+    #MACRO DIRECTIONToArrayHelper((T)CAST,VALTYPE)
   }
   return dst;
 }
@@ -1448,12 +2900,73 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
   if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
   #ENDIF
     final ARRTYPE[] dst=new ARRTYPE[numLeft];
-  #MACRO AscendingToArrayHelper(CAST,VALTYPE)
+  #MACRO DIRECTIONToArrayHelper(CAST,VALTYPE)
     return dst;
   }
   return DEFAULTARR;
 }
 #ENDDEF
+#MACRODEF DescendingToArrayHelper(CAST,VALTYPE)
+VALTYPE offset=Byte.MIN_VALUE;
+  #IFSWITCH CHECKED==Checked
+outer:for(long word=this.word0;;){
+  if((word&(1L<<offset))!=0){
+  #ELSE
+outer:for(;;){
+  if((word0&(1L<<offset))!=0){
+  #ENDIF
+    dst[--numLeft]=CAST(offset);
+    if(numLeft==0){
+      break outer;
+    }
+  }
+  if(++offset==-64){
+  #IFSWITCH CHECKED==Checked
+    for(word=this.word1;;){
+      if((word&(1L<<offset))!=0){
+  #ELSE
+    for(;;){
+      if((word1&(1L<<offset))!=0){
+  #ENDIF
+        dst[--numLeft]=CAST(offset);
+        if(numLeft==0){
+          break outer;
+        }
+      }
+      if(++offset==0){
+  #IFSWITCH CHECKED==Checked
+        for(word=this.word2;;){
+          if((word&(1L<<offset))!=0){
+  #ELSE
+        for(;;){
+          if((word2&(1L<<offset))!=0){
+  #ENDIF
+            dst[--numLeft]=CAST(offset);
+            if(numLeft==0){
+              break outer;
+            }
+          }
+          if(++offset==64){
+  #IFSWITCH CHECKED==Checked
+            for(word=this.word3;;++offset){
+              if((word&(1L<<offset))!=0){
+  #ELSE
+            for(;;--offset){
+              if((word3&(1L<<offset))!=0){
+  #ENDIF
+                dst[--numLeft]=CAST(offset);
+                if(numLeft==0){
+                  break outer;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+#ENDDEF  
 #MACRODEF AscendingToArrayHelper(CAST,VALTYPE)
 VALTYPE offset=Byte.MAX_VALUE;
   #IFSWITCH CHECKED==Checked

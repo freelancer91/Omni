@@ -1,10 +1,13 @@
 package omni.impl.set;
 
 import java.util.Set;
+import omni.api.OmniNavigableSet;
 import omni.api.OmniSet;
 
-abstract class AbstractByteSet implements OmniSet.OfByte{
+abstract class AbstractByteSet implements OmniNavigableSet.OfByte{
   
+    
+   
     
     @Override public boolean add(Byte val) {
         return add((byte)val);
