@@ -20,6 +20,141 @@ public interface TypeUtil{
     long DBL_TRUE_BITS=0x3ff0000000000000L;
     int FLT_NAN_BITS=0x7fc00000;
     long DBL_NAN_BITS=0x7ff8000000000000L;
+    
+    static int intCeiling(double val) {
+        int v;
+        if((v=(int)val)<val){
+          ++v;
+        }
+        return v;
+        
+    }
+    static int intCeiling(float val) {
+        int v;
+        if((v=(int)val)<val){
+          ++v;
+        }
+        return v;
+    }
+    
+    static int intFloor(double val) {
+        int v;
+        if((v=(int)val)>val){
+            --v;
+          }
+        return v;
+        
+    }
+    static int intFloor(float val) {
+        int v;
+        if((v=(int)val)>val){
+            --v;
+          }
+        return v;
+    }
+    
+    static int higherInt(double val) {
+        int v;
+        if((v=(int)val)<=val){
+          ++v;
+        }
+        return v;
+        
+    }
+    static int higherInt(float val) {
+        int v;
+        if((v=(int)val)<=val){
+          ++v;
+        }
+        return v;
+    }
+    
+    static int lowerInt(double val) {
+      int v;
+      if((v=(int)val)>=val){
+         --v;
+      }
+      return v;
+        
+    }
+    static int lowerInt(float val) {
+        int v;
+        if((v=(int)val)>=val){
+           --v;
+        }
+        return v;  
+    }
+    
+    
+    
+    
+    
+    static long longCeiling(double val) {
+        long v;
+        if((v=(long)val)<val){
+          ++v;
+        }
+        return v;
+        
+    }
+    static long longCeiling(float val) {
+        long v;
+        if((v=(long)val)<val){
+          ++v;
+        }
+        return v;
+    }
+    
+    static long longFloor(double val) {
+        long v;
+        if((v=(long)val)>val){
+            --v;
+          }
+        return v;
+        
+    }
+    static long longFloor(float val) {
+        long v;
+        if((v=(long)val)>val){
+            --v;
+          }
+        return v;
+    }
+    
+    static long higherLong(double val) {
+        long v;
+        if((v=(long)val)<=val){
+          ++v;
+        }
+        return v;
+        
+    }
+    static long higherLong(float val) {
+        long v;
+        if((v=(long)val)<=val){
+          ++v;
+        }
+        return v;
+    }
+    
+    static long lowerLong(double val) {
+        long v;
+      if((v=(long)val)>=val){
+         --v;
+      }
+      return v;
+        
+    }
+    static long lowerLong(float val) {
+        long v;
+        if((v=(long)val)>=val){
+           --v;
+        }
+        return v;  
+    }
+    
+    
+    
     static byte castToByte(boolean val){
         if(val){ return 1; }
         return 0;

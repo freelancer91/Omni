@@ -16,6 +16,147 @@ import omni.util.OmniArray;
 
 abstract class AbstractByteSet implements OmniNavigableSet.OfByte{
   
+    
+    
+    static abstract class ComparatorlessImpl extends AbstractByteSet{
+    
+        @Override public ByteComparator comparator(){
+          return Byte::compare;
+        }
+        
+        @Override public byte firstByte() {
+            return (byte)firstInt();
+            
+        }
+        @Override public short firstShort() {
+            return (short)firstInt();
+            
+        }
+        @Override public long firstLong() {
+            return firstInt();
+            
+        }
+        @Override public float firstFloat() {
+            return firstInt();
+            
+        }
+        @Override public double firstDouble() {
+            return firstInt();
+            
+        }
+        
+        @Override public byte lastByte() {
+            return (byte)lastInt();
+            
+        }
+        @Override public short lastShort() {
+            return (short)lastInt();
+            
+        }
+        @Override public long lastLong() {
+            return lastInt();
+            
+        }
+        @Override public float lastFloat() {
+            return lastInt();
+            
+        }
+        @Override public double lastDouble() {
+            return lastInt();
+            
+        }
+        
+        
+        @Override public Byte pollFirst(){
+            final int v;
+            if((v=pollFirstInt())==Integer.MIN_VALUE){
+              return null;
+            }
+            return (byte)v;
+          }
+          @Override public byte pollFirstByte(){
+            final int v;
+            if((v=pollFirstInt())==Integer.MIN_VALUE){
+              return Byte.MIN_VALUE;
+            }
+            return (byte)v;
+          }
+          @Override public short pollFirstShort(){
+            final int v;
+            if((v=pollFirstInt())==Integer.MIN_VALUE){
+              return Short.MIN_VALUE;
+            }
+            return (short)v;
+          }
+          @Override public long pollFirstLong(){
+            final int v;
+            if((v=pollFirstInt())==Integer.MIN_VALUE){
+              return Long.MIN_VALUE;
+            }
+            return v;
+          }
+          @Override public float pollFirstFloat(){
+            final int v;
+            if((v=pollFirstInt())==Integer.MIN_VALUE){
+              return Float.NaN;
+            }
+            return v;
+          }
+          @Override public double pollFirstDouble(){
+            final int v;
+            if((v=pollFirstInt())==Integer.MIN_VALUE){
+              return Double.NaN;
+            }
+            return v;
+          }
+          
+          @Override public Byte pollLast(){
+            final int v;
+            if((v=pollLastInt())==Integer.MIN_VALUE){
+              return null;
+            }
+            return (byte)v;
+          }
+          @Override public byte pollLastByte(){
+            final int v;
+            if((v=pollLastInt())==Integer.MIN_VALUE){
+              return Byte.MIN_VALUE;
+            }
+            return (byte)v;
+          }
+          @Override public short pollLastShort(){
+            final int v;
+            if((v=pollLastInt())==Integer.MIN_VALUE){
+              return Short.MIN_VALUE;
+            }
+            return (short)v;
+          }
+          @Override public long pollLastLong(){
+            final int v;
+            if((v=pollLastInt())==Integer.MIN_VALUE){
+              return Long.MIN_VALUE;
+            }
+            return v;
+          }
+          @Override public float pollLastFloat(){
+            final int v;
+            if((v=pollLastInt())==Integer.MIN_VALUE){
+              return Float.NaN;
+            }
+            return v;
+          }
+          @Override public double pollLastDouble(){
+            final int v;
+            if((v=pollLastInt())==Integer.MIN_VALUE){
+              return Double.NaN;
+            }
+            return v;
+          }
+          
+        
+    }
+    
+    
     static abstract class EmptyView extends AbstractByteSet implements Cloneable{
         @Override public Object clone() {
             return this;

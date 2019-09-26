@@ -18,7 +18,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import omni.function.ByteComparator;
 import omni.api.OmniNavigableSet;
-public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
+import omni.util.TypeUtil;
+public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl implements Cloneable{
   transient long word0;
   transient long word1;
   transient long word2;
@@ -185,7 +186,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     return false;
   }
-  @Override public boolean removeVal(byte val){
+  private boolean uncheckedremoveByte(int val){
     switch(val>>6){
     case -2:
       long word;
@@ -211,125 +212,47 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         this.word3=word;
         return true;
       }
+    }
+    return false;
+  }
+  @Override public boolean removeVal(byte val){
+    return uncheckedremoveByte(val);
+  }
+  private boolean uncheckedremoveChar(int val){
+    switch(val>>6){
+    case 0:
+      long word;
+      if((word=this.word2)!=(word&=(1L<<val))){
+        this.word2=word;
+        return true;
+      }
+      break;
+    case 1:
+      if((word=this.word3)!=(word&=(1L<<val))){
+        this.word3=word;
+        return true;
+      }
+    default:
     }
     return false;
   }
   @Override public boolean removeVal(char val){
-    switch(val>>6){
-    case 0:
-      long word;
-      if((word=this.word2)!=(word&=(1L<<val))){
-        this.word2=word;
-        return true;
-      }
-      break;
-    case 1:
-      if((word=this.word3)!=(word&=(1L<<val))){
-        this.word3=word;
-        return true;
-      }
-    default:
-    }
-    return false;
+    return uncheckedremoveChar(val);
   }
   @Override public boolean removeVal(double val){
     final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        long word;
-        if((word=this.word0)!=(word&=(1L<<v))){
-          this.word0=word;
-          return true;
-        }
-        break;
-      case -1:
-        if((word=this.word1)!=(word&=(1L<<v))){
-          this.word1=word;
-          return true;
-        }
-        break;
-      case 0:
-        if((word=this.word2)!=(word&=(1L<<v))){
-          this.word2=word;
-          return true;
-        }
-        break;
-      default:
-        if((word=this.word3)!=(word&=(1L<<v))){
-          this.word3=word;
-          return true;
-        }
-      }
-    }
-    return false;
+    return (v=(byte)val)==val && uncheckedremoveByte(v);
   }
   @Override public boolean removeVal(float val){
     final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        long word;
-        if((word=this.word0)!=(word&=(1L<<v))){
-          this.word0=word;
-          return true;
-        }
-        break;
-      case -1:
-        if((word=this.word1)!=(word&=(1L<<v))){
-          this.word1=word;
-          return true;
-        }
-        break;
-      case 0:
-        if((word=this.word2)!=(word&=(1L<<v))){
-          this.word2=word;
-          return true;
-        }
-        break;
-      default:
-        if((word=this.word3)!=(word&=(1L<<v))){
-          this.word3=word;
-          return true;
-        }
-      }
-    }
-    return false;
+    return (v=(byte)val)==val && uncheckedremoveByte(v);
   }
   @Override public boolean removeVal(long val){
     final int v;
-    if((v=(byte)val)==val){
-      switch(v>>6){
-      case -2:
-        long word;
-        if((word=this.word0)!=(word&=(1L<<v))){
-          this.word0=word;
-          return true;
-        }
-        break;
-      case -1:
-        if((word=this.word1)!=(word&=(1L<<v))){
-          this.word1=word;
-          return true;
-        }
-        break;
-      case 0:
-        if((word=this.word2)!=(word&=(1L<<v))){
-          this.word2=word;
-          return true;
-        }
-        break;
-      default:
-        if((word=this.word3)!=(word&=(1L<<v))){
-          this.word3=word;
-          return true;
-        }
-      }
-    }
-    return false;
+    return (v=(byte)val)==val && uncheckedremoveByte(v);
   }
-  @Override public boolean removeVal(int val){
-    switch(val>>6){
+  private boolean uncheckedremoveInt(int val){
+   switch(val>>6){
     case -2:
       long word;
       if((word=this.word0)!=(word&=(1L<<val))){
@@ -357,6 +280,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     default:
     }
     return false;
+  }
+  @Override public boolean removeVal(int val){
+    return uncheckedremoveInt(val);
   }
   private int uncheckedRemoveFirst(){
     int tail0s;
@@ -395,486 +321,99 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     return (-65-lead0s);
   }
   @Override public Byte lower(byte val){
-    if(val>Byte.MIN_VALUE){
+    {
       int v;
-      switch((v=((int)val)-1)>>6){
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (Byte)(byte)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (Byte)(byte)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (Byte)(byte)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (Byte)(byte)(-65-lead0s);
-          }
-        default:
+      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val-1))!=-129){
+        return (Byte)(byte)(v);
       }
-    }  
+    }
     return null;
   }
   @Override public Byte floor(byte val){
     {
-      switch(val>>6){
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-            return (Byte)(byte)(127-lead0s);
-          }
-          val=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-            return (Byte)(byte)(63-lead0s);
-          }
-          val=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-            return (Byte)(byte)(-1-lead0s);
-          }
-          val=0;
-        default:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-            return (Byte)(byte)(-65-lead0s);
-          }
+      int v;
+      if((v=((ByteSetImpl)this).getThisOrLowerInRange(val))!=-129){
+        return (Byte)(byte)(v);
       }
-    }  
+    }
     return null;
   }
   @Override public Byte higher(byte val){
-    {
-      int v;
-      switch((v=((int)val)+1)>>6){
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (Byte)(byte)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (Byte)(byte)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (Byte)(byte)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (Byte)(byte)(tail0s+64);
-          }
-        default:
-      }
+    int v;
+    if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val+1))!=128){
+      return (Byte)(byte)(v);
     }
     return null;
   }
   @Override public Byte ceiling(byte val){
-    {
-      switch(val>>6){
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-            return (Byte)(byte)(tail0s-128);
-          }
-          val=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-            return (Byte)(byte)(tail0s-64);
-          }
-          val=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-            return (Byte)(byte)(tail0s);
-          }
-          val=0;
-        default:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-            return (Byte)(byte)(tail0s+64);
-          }
-      }
-    }
+    int v;
+    if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
+      return (Byte)(byte)(v);
+    }    
     return null;
-  }
-  @Override public Byte pollFirst(){
-    long word;
-    int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
-      this.word0=word&(~(1L<<tail0s));
-      return (Byte)(byte)(Byte.MIN_VALUE+tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
-      this.word1=word&(~(1L<<tail0s));
-      return (Byte)(byte)(tail0s-64);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
-      this.word2=word&(~(1L<<tail0s));
-      return (Byte)(byte)(tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
-      this.word3=word&(~(1L<<tail0s));
-      return (Byte)(byte)(tail0s+64);
-    }
-    return null;
-  }
-  @Override public Byte pollLast(){
-    long word;
-    int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
-      this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (Byte)(byte)(Byte.MAX_VALUE-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
-      this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (Byte)(byte)(63-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
-      this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (Byte)(byte)(-1-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
-      this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (Byte)(byte)(-65-lead0s); 
-    }
-    return null;
-  }
-  @Override public byte firstByte(){
-    return (byte)(firstInt());
-  }
-  @Override public byte lastByte(){
-    return (byte)(lastInt());
   }
   @Override public byte lowerByte(byte val){
-    if(val>Byte.MIN_VALUE){
+    {
       int v;
-      switch((v=((int)val)-1)>>6){
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (byte)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (byte)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (byte)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (byte)(-65-lead0s);
-          }
-        default:
+      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val-1))!=-129){
+        return (byte)(v);
       }
-    }  
+    }
     return Byte.MIN_VALUE;
   }
   @Override public byte byteFloor(byte val){
     {
-      switch(val>>6){
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-            return (byte)(127-lead0s);
-          }
-          val=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-            return (byte)(63-lead0s);
-          }
-          val=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-            return (byte)(-1-lead0s);
-          }
-          val=0;
-        default:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-            return (byte)(-65-lead0s);
-          }
+      int v;
+      if((v=((ByteSetImpl)this).getThisOrLowerInRange(val))!=-129){
+        return (byte)(v);
       }
-    }  
+    }
     return Byte.MIN_VALUE;
   }
   @Override public byte higherByte(byte val){
-    {
-      int v;
-      switch((v=((int)val)+1)>>6){
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (byte)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (byte)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (byte)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (byte)(tail0s+64);
-          }
-        default:
-      }
+    int v;
+    if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val+1))!=128){
+      return (byte)(v);
     }
     return Byte.MIN_VALUE;
   }
   @Override public byte byteCeiling(byte val){
-    {
-      switch(val>>6){
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-            return (byte)(tail0s-128);
-          }
-          val=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-            return (byte)(tail0s-64);
-          }
-          val=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-            return (byte)(tail0s);
-          }
-          val=0;
-        default:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-            return (byte)(tail0s+64);
-          }
-      }
-    }
+    int v;
+    if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
+      return (byte)(v);
+    }    
     return Byte.MIN_VALUE;
-  }
-  @Override public byte pollFirstByte(){
-    long word;
-    int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
-      this.word0=word&(~(1L<<tail0s));
-      return (byte)(Byte.MIN_VALUE+tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
-      this.word1=word&(~(1L<<tail0s));
-      return (byte)(tail0s-64);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
-      this.word2=word&(~(1L<<tail0s));
-      return (byte)(tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
-      this.word3=word&(~(1L<<tail0s));
-      return (byte)(tail0s+64);
-    }
-    return Byte.MIN_VALUE;
-  }
-  @Override public byte pollLastByte(){
-    long word;
-    int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
-      this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (byte)(Byte.MAX_VALUE-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
-      this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (byte)(63-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
-      this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (byte)(-1-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
-      this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (byte)(-65-lead0s); 
-    }
-    return Byte.MIN_VALUE;
-  }
-  @Override public short firstShort(){
-    return (short)(firstInt());
-  }
-  @Override public short lastShort(){
-    return (short)(lastInt());
   }
   @Override public short lowerShort(short val){
-    if(val>Byte.MIN_VALUE){
+    {
       int v;
-      switch((v=((int)val)-1)>>6){
-        default:
-          v=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (short)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (short)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (short)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (short)(-65-lead0s);
-          }
+      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
+        return (short)(v);
       }
-    }  
+    }
     return Short.MIN_VALUE;
   }
   @Override public short shortFloor(short val){
-    if(val>=Byte.MIN_VALUE)
     {
-      switch(val>>6){
-        default:
-          val=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-            return (short)(127-lead0s);
-          }
-          val=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-            return (short)(63-lead0s);
-          }
-          val=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-            return (short)(-1-lead0s);
-          }
-          val=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-            return (short)(-65-lead0s);
-          }
+      int v;
+      if(val>=Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:val))!=-129){
+        return (short)(v);
       }
-    }  
+    }
     return Short.MIN_VALUE;
   }
   @Override public short higherShort(short val){
-    if(val<Byte.MAX_VALUE)
-    {
-      int v;
-      switch((v=((int)val)+1)>>6){
-        default:
-          v=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (short)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (short)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (short)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (short)(tail0s+64);
-          }
-      }
+    int v;
+    if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:val+1))!=128){
+      return (short)(v);
     }
     return Short.MIN_VALUE;
   }
   @Override public short shortCeiling(short val){
-    if(val<=Byte.MAX_VALUE)
-    {
-      switch(val>>6){
-        default:
-          val=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-            return (short)(tail0s-128);
-          }
-          val=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-            return (short)(tail0s-64);
-          }
-          val=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-            return (short)(tail0s);
-          }
-          val=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-            return (short)(tail0s+64);
-          }
-      }
-    }
-    return Short.MIN_VALUE;
-  }
-  @Override public short pollFirstShort(){
-    long word;
-    int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
-      this.word0=word&(~(1L<<tail0s));
-      return (short)(Byte.MIN_VALUE+tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
-      this.word1=word&(~(1L<<tail0s));
-      return (short)(tail0s-64);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
-      this.word2=word&(~(1L<<tail0s));
-      return (short)(tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
-      this.word3=word&(~(1L<<tail0s));
-      return (short)(tail0s+64);
-    }
-    return Short.MIN_VALUE;
-  }
-  @Override public short pollLastShort(){
-    long word;
-    int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
-      this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (short)(Byte.MAX_VALUE-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
-      this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (short)(63-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
-      this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (short)(-1-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
-      this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (short)(-65-lead0s); 
-    }
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
+      return (short)(v);
+    }    
     return Short.MIN_VALUE;
   }
   @Override public int firstInt(){
@@ -904,121 +443,30 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     return (-65-Long.numberOfLeadingZeros(word0));  
   }
   @Override public int lowerInt(int val){
-    if(val>Byte.MIN_VALUE){
-      switch((--val)>>6){
-        default:
-          val=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-            return (int)(127-lead0s);
-          }
-          val=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-            return (int)(63-lead0s);
-          }
-          val=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-            return (int)(-1-lead0s);
-          }
-          val=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-            return (int)(-65-lead0s);
-          }
-      }
-    }  
-    return Integer.MIN_VALUE;
-  }
-  @Override public int intFloor(int val){
-    if(val>=Byte.MIN_VALUE)
     {
-      switch(val>>6){
-        default:
-          val=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-            return (int)(127-lead0s);
-          }
-          val=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-            return (int)(63-lead0s);
-          }
-          val=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-            return (int)(-1-lead0s);
-          }
-          val=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-            return (int)(-65-lead0s);
-          }
-      }
-    }  
-    return Integer.MIN_VALUE;
-  }
-  @Override public int higherInt(int val){
-    if(val<Byte.MAX_VALUE)
-    {
-      switch((++val)>>6){
-        default:
-          val=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-            return (int)(tail0s-128);
-          }
-          val=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-            return (int)(tail0s-64);
-          }
-          val=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-            return (int)(tail0s);
-          }
-          val=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-            return (int)(tail0s+64);
-          }
+      if(val>Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
+        return (int)(val);
       }
     }
     return Integer.MIN_VALUE;
   }
-  @Override public int intCeiling(int val){
-    if(val<=Byte.MAX_VALUE)
+  @Override public int intFloor(int val){
     {
-      switch(val>>6){
-        default:
-          val=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-            return (int)(tail0s-128);
-          }
-          val=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-            return (int)(tail0s-64);
-          }
-          val=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-            return (int)(tail0s);
-          }
-          val=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-            return (int)(tail0s+64);
-          }
+      if(val>=Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:val))!=-129){
+        return (int)(val);
       }
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public int higherInt(int val){
+    if(val<Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:val+1))!=128){
+      return (int)(val);
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public int intCeiling(int val){
+    if(val<=Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
+      return (int)(val);
     }
     return Integer.MIN_VALUE;
   }
@@ -1064,568 +512,318 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     return Integer.MIN_VALUE;
   }
-  @Override public long firstLong(){
-    return (long)(firstInt());
-  }
-  @Override public long lastLong(){
-    return (long)(lastInt());
-  }
   @Override public long lowerLong(long val){
-    if(val>Byte.MIN_VALUE){
+    {
       int v;
-      switch((v=((int)val)-1)>>6){
-        default:
-          v=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (long)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (long)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (long)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (long)(-65-lead0s);
-          }
+      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1))!=-129){
+        return (long)(v);
       }
-    }  
+    }
     return Long.MIN_VALUE;
   }
   @Override public long longFloor(long val){
-    if(val>=Byte.MIN_VALUE)
     {
       int v;
-      switch((v=(int)val)>>6){
-        default:
-          v=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (long)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (long)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (long)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (long)(-65-lead0s);
-          }
+      if(val>=Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val))!=-129){    
+        return (long)(v);
       }
-    }  
+    }
     return Long.MIN_VALUE;
   }
   @Override public long higherLong(long val){
-    if(val<Byte.MAX_VALUE)
-    {
-      int v;
-      switch((v=((int)val)+1)>>6){
-        default:
-          v=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (long)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (long)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (long)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (long)(tail0s+64);
-          }
-      }
+    int v;
+    if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1))!=128){
+      return (long)(v);
     }
     return Long.MIN_VALUE;
   }
   @Override public long longCeiling(long val){
-    if(val<=Byte.MAX_VALUE)
-    {
-      int v;
-      switch((v=(int)val)>>6){
-        default:
-          v=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (long)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (long)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (long)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (long)(tail0s+64);
-          }
-      }
-    }
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val))!=128){      
+      return (long)(v);
+    }    
     return Long.MIN_VALUE;
-  }
-  @Override public long pollFirstLong(){
-    long word;
-    int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
-      this.word0=word&(~(1L<<tail0s));
-      return (long)(Byte.MIN_VALUE+tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
-      this.word1=word&(~(1L<<tail0s));
-      return (long)(tail0s-64);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
-      this.word2=word&(~(1L<<tail0s));
-      return (long)(tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
-      this.word3=word&(~(1L<<tail0s));
-      return (long)(tail0s+64);
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public long pollLastLong(){
-    long word;
-    int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
-      this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (long)(Byte.MAX_VALUE-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
-      this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (long)(63-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
-      this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (long)(-1-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
-      this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (long)(-65-lead0s); 
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public float firstFloat(){
-    return (float)(firstInt());
-  }
-  @Override public float lastFloat(){
-    return (float)(lastInt());
   }
   @Override public float lowerFloat(float val){
-    for(;;){
+    for(;;)
+    {
       int v;
-      if(val!=val){
+      if(val!=val || val>Byte.MAX_VALUE){
         v=Byte.MAX_VALUE;
       }else if(val>Byte.MIN_VALUE){
-        if((v=(int)val)>=val){
-          --v;
-        }
+        v=TypeUtil.lowerInt(val);
       }else{
         break;
       }
-      switch(v>>6){
-        default:
-          v=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (float)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (float)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (float)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (float)(-65-lead0s);
-          }
+      if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
+        return (float)(v);
       }
       break;
     }
     return Float.NaN;
   }
   @Override public float floatFloor(float val){
-    for(;;){
+    for(;;)
+    {
       int v;
-      if(val!=val){
+      if(val!=val || val>=Byte.MAX_VALUE){
         v=Byte.MAX_VALUE;
       }else if(val>=Byte.MIN_VALUE){
-        if((v=(int)val)>val){
-          --v;
-        }
+        v=TypeUtil.intFloor(val);
       }else{
         break;
       }
-      switch(v>>6){
-        default:
-          v=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (float)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (float)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (float)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (float)(-65-lead0s);
-          }
+      if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
+        return (float)(v);
       }
       break;
     }
     return Float.NaN;
   }
   @Override public float higherFloat(float val){
-    if(val==val && val<Byte.MAX_VALUE){
-      int v;
-      if((v=(int)val)<=val){
-        ++v;
-      }
-      switch(v>>6){
-        default:
-          v=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (float)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (float)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (float)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (float)(tail0s+64);
-          }
-      }
+    int v;
+    if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.higherInt(val)))!=128){
+      return (float)(v);
     }
     return Float.NaN;
   }
   @Override public float floatCeiling(float val){
-    if(val==val && val<=Byte.MAX_VALUE){
-      int v;
-      if((v=(int)val)<val){
-        ++v;
-      }
-      switch(v>>6){
-        default:
-          v=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (float)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (float)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (float)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (float)(tail0s+64);
-          }
-      }
-    }
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
+      return (float)(v);
+    }    
     return Float.NaN;
-  }
-  @Override public float pollFirstFloat(){
-    long word;
-    int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
-      this.word0=word&(~(1L<<tail0s));
-      return (float)(Byte.MIN_VALUE+tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
-      this.word1=word&(~(1L<<tail0s));
-      return (float)(tail0s-64);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
-      this.word2=word&(~(1L<<tail0s));
-      return (float)(tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
-      this.word3=word&(~(1L<<tail0s));
-      return (float)(tail0s+64);
-    }
-    return Float.NaN;
-  }
-  @Override public float pollLastFloat(){
-    long word;
-    int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
-      this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (float)(Byte.MAX_VALUE-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
-      this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (float)(63-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
-      this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (float)(-1-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
-      this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (float)(-65-lead0s); 
-    }
-    return Float.NaN;
-  }
-  @Override public double firstDouble(){
-    return (double)(firstInt());
-  }
-  @Override public double lastDouble(){
-    return (double)(lastInt());
   }
   @Override public double lowerDouble(double val){
-    for(;;){
+    for(;;)
+    {
       int v;
-      if(val!=val){
+      if(val!=val || val>Byte.MAX_VALUE){
         v=Byte.MAX_VALUE;
       }else if(val>Byte.MIN_VALUE){
-        if((v=(int)val)>=val){
-          --v;
-        }
+        v=TypeUtil.lowerInt(val);
       }else{
         break;
       }
-      switch(v>>6){
-        default:
-          v=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (double)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (double)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (double)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (double)(-65-lead0s);
-          }
+      if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
+        return (double)(v);
       }
       break;
     }
     return Double.NaN;
   }
   @Override public double doubleFloor(double val){
-    for(;;){
+    for(;;)
+    {
       int v;
-      if(val!=val){
+      if(val!=val || val>=Byte.MAX_VALUE){
         v=Byte.MAX_VALUE;
       }else if(val>=Byte.MIN_VALUE){
-        if((v=(int)val)>val){
-          --v;
-        }
+        v=TypeUtil.intFloor(val);
       }else{
         break;
       }
-      switch(v>>6){
-        default:
-          v=127;
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-            return (double)(127-lead0s);
-          }
-          v=0;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-            return (double)(63-lead0s);
-          }
-          v=0;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-            return (double)(-1-lead0s);
-          }
-          v=0;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-            return (double)(-65-lead0s);
-          }
+      if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
+        return (double)(v);
       }
       break;
     }
     return Double.NaN;
   }
   @Override public double higherDouble(double val){
-    if(val==val && val<Byte.MAX_VALUE){
-      int v;
-      if((v=(int)val)<=val){
-        ++v;
-      }
-      switch(v>>6){
-        default:
-          v=-128;
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (double)(tail0s-128);
-          }
-          v=0;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (double)(tail0s-64);
-          }
-          v=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (double)(tail0s);
-          }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (double)(tail0s+64);
-          }
-      }
+    int v;
+    if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.higherInt(val)))!=128){
+      return (double)(v);
     }
     return Double.NaN;
   }
   @Override public double doubleCeiling(double val){
-    if(val==val && val<=Byte.MAX_VALUE){
-      int v;
-      if((v=(int)val)<val){
-        ++v;
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
+      return (double)(v);
+    }    
+    return Double.NaN;
+  }
+   private void uncheckedDescendingForEach(int numLeft,ByteConsumer action){
+      int offset=127;
+      for(long word=this.word3;;){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
+          }
+        }
+        if(--offset==63){
+          for(word=this.word2;;){
+            if((word&(1L<<offset))!=0){
+              action.accept((byte)offset);
+              if(--numLeft==0){
+                return;
+              }
+            }
+            if(--offset==-1){
+              for(word=this.word1;;){
+                if((word&(1L<<offset))!=0){
+                  action.accept((byte)offset);
+                  if(--numLeft==0){
+                    return;
+                  }
+                }
+                if(--offset==-65){
+                  for(word=this.word0;;--offset){
+                    if((word&(1L<<offset))!=0){
+                      action.accept((byte)offset);
+                      if(--numLeft==0){
+                        return;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-      switch(v>>6){
-        default:
-          v=-128;
+    }
+    private void uncheckedAscendingForEach(int numLeft,ByteConsumer action){
+      int offset=-128;
+      for(long word=this.word0;;){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
+          }
+        }
+        if(++offset==-64){
+          for(word=this.word1;;){
+            if((word&(1L<<offset))!=0){
+              action.accept((byte)offset);
+              if(--numLeft==0){
+                return;
+              }
+            }
+            if(++offset==0){
+              for(word=this.word2;;){
+                if((word&(1L<<offset))!=0){
+                  action.accept((byte)offset);
+                  if(--numLeft==0){
+                    return;
+                  }
+                }
+                if(++offset==64){
+                  for(word=this.word3;;++offset){
+                    if((word&(1L<<offset))!=0){
+                      action.accept((byte)offset);
+                      if(--numLeft==0){
+                        return;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingForEach(int inclusiveLo,int numLeft,ByteConsumer action){
+      goToEnd:switch(inclusiveLo>>6){
         case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-            return (double)(tail0s-128);
-          }
-          v=0;
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              action.accept((byte)inclusiveLo);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }  
         case -1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-            return (double)(tail0s-64);
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              action.accept((byte)inclusiveLo);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
           }
-          v=0;
         case 0:
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-            return (double)(tail0s);
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              action.accept((byte)inclusiveLo);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
           }
-          v=0;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-            return (double)(tail0s+64);
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              action.accept((byte)inclusiveLo);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
           }
       }
     }
-    return Double.NaN;
-  }
-  @Override public double pollFirstDouble(){
-    long word;
-    int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
-      this.word0=word&(~(1L<<tail0s));
-      return (double)(Byte.MIN_VALUE+tail0s);
+    private void uncheckedDescendingForEach(int exclusiveHi,int numLeft,ByteConsumer action){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word0;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              action.accept((byte)exclusiveHi);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }  
+        case 0:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              action.accept((byte)exclusiveHi);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              action.accept((byte)exclusiveHi);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              action.accept((byte)exclusiveHi);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
     }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
-      this.word1=word&(~(1L<<tail0s));
-      return (double)(tail0s-64);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
-      this.word2=word&(~(1L<<tail0s));
-      return (double)(tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
-      this.word3=word&(~(1L<<tail0s));
-      return (double)(tail0s+64);
-    }
-    return Double.NaN;
-  }
-  @Override public double pollLastDouble(){
-    long word;
-    int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
-      this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (double)(Byte.MAX_VALUE-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
-      this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (double)(63-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
-      this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (double)(-1-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
-      this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
-      return (double)(-65-lead0s); 
-    }
-    return Double.NaN;
-  }
-  @Override public ByteComparator comparator(){
-    return Byte::compare;
-  }
   private int countHeadSetElements(int exclToElement){
     //TODO
     throw new omni.util.NotYetImplementedException();
@@ -1907,11 +1105,11 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
         for(;;){
           if(val instanceof Byte){
-            if(!super.removeVal((byte)val)){
+            if(!super.uncheckedremoveByte((byte)val)){
               break;
             }
           }else if(val instanceof Integer || val instanceof Short){
-            if(!super.removeVal(((Number)val).intValue())){
+            if(!super.uncheckedremoveInt(((Number)val).intValue())){
               break;
             }
           }else if(val instanceof Long){
@@ -1927,7 +1125,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
               break;
             }
           }else if(val instanceof Character){
-            if(!super.removeVal((char)val)){
+            if(!super.uncheckedremoveChar((char)val)){
               break;
             }
           }else if(val instanceof Boolean){
@@ -1953,7 +1151,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public boolean removeVal(byte val){
       final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveByte(val)){
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
         return true;
       }
@@ -1961,7 +1159,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public boolean removeVal(char val){
       final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveChar(val)){
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
         return true;
       }
@@ -1969,7 +1167,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public boolean removeVal(int val){
       final int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveInt(val)){
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
         return true;
       }
@@ -2001,400 +1199,74 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public Byte lower(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (Byte)(byte)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (Byte)(byte)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (Byte)(byte)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (Byte)(byte)(-65-lead0s);
-            }
-          default:
-        }
+        return super.lower(val);
       }
       return null;
     }
     @Override public Byte floor(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        switch(val>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-              return (Byte)(byte)(127-lead0s);
-            }
-            val=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-              return (Byte)(byte)(63-lead0s);
-            }
-            val=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-              return (Byte)(byte)(-1-lead0s);
-            }
-            val=0;
-          default:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-              return (Byte)(byte)(-65-lead0s);
-            }
-        }
+        return super.floor(val);
       }
       return null;
     }
     @Override public Byte higher(byte val){
-      if((modCountAndSize&0x1ff)!=0){
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (Byte)(byte)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (Byte)(byte)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (Byte)(byte)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (Byte)(byte)(tail0s+64);
-            }
-          default:
-        }
+      if((modCountAndSize&0xff)!=0){
+        return super.higher(val);
       }
       return null;
     }
     @Override public Byte ceiling(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        switch(val>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-              return (Byte)(byte)(tail0s-128);
-            }
-            val=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-              return (Byte)(byte)(tail0s-64);
-            }
-            val=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-              return (Byte)(byte)(tail0s);
-            }
-            val=0;
-          default:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-              return (Byte)(byte)(tail0s+64);
-            }
-        }
-      }
-      return null;
-    }
-    @Override public Byte pollFirst(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (Byte)(byte)(super.uncheckedRemoveFirst());
-      }
-      return null;
-    }
-    @Override public Byte pollLast(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (Byte)(byte)(super.uncheckedRemoveLast());
-      }
+        return super.ceiling(val);
+      }  
       return null;
     }
     @Override public byte lowerByte(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (byte)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (byte)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (byte)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (byte)(-65-lead0s);
-            }
-          default:
-        }
+        return super.lowerByte(val);
       }
       return Byte.MIN_VALUE;
     }
     @Override public byte byteFloor(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        switch(val>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-              return (byte)(127-lead0s);
-            }
-            val=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-              return (byte)(63-lead0s);
-            }
-            val=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-              return (byte)(-1-lead0s);
-            }
-            val=0;
-          default:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-              return (byte)(-65-lead0s);
-            }
-        }
+        return super.byteFloor(val);
       }
       return Byte.MIN_VALUE;
     }
     @Override public byte higherByte(byte val){
-      if((modCountAndSize&0x1ff)!=0){
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (byte)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (byte)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (byte)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (byte)(tail0s+64);
-            }
-          default:
-        }
+      if((modCountAndSize&0xff)!=0){
+        return super.higherByte(val);
       }
       return Byte.MIN_VALUE;
     }
     @Override public byte byteCeiling(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        switch(val>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-              return (byte)(tail0s-128);
-            }
-            val=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-              return (byte)(tail0s-64);
-            }
-            val=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-              return (byte)(tail0s);
-            }
-            val=0;
-          default:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-              return (byte)(tail0s+64);
-            }
-        }
-      }
-      return Byte.MIN_VALUE;
-    }
-    @Override public byte pollFirstByte(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (byte)(super.uncheckedRemoveFirst());
-      }
-      return Byte.MIN_VALUE;
-    }
-    @Override public byte pollLastByte(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (byte)(super.uncheckedRemoveLast());
-      }
+        return super.byteCeiling(val);
+      }  
       return Byte.MIN_VALUE;
     }
     @Override public short lowerShort(short val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val>Byte.MAX_VALUE){
-          return (short)(super.lastInt());
-        }
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (short)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (short)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (short)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (short)(-65-lead0s);
-            }
-          default:
-        }
+        return super.lowerShort(val);
       }
       return Short.MIN_VALUE;
     }
     @Override public short shortFloor(short val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val>Byte.MAX_VALUE){
-          return (short)(super.lastInt());
-        }
-        switch(val>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-              return (short)(127-lead0s);
-            }
-            val=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-              return (short)(63-lead0s);
-            }
-            val=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-              return (short)(-1-lead0s);
-            }
-            val=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-              return (short)(-65-lead0s);
-            }
-          default:
-        }
+        return super.shortFloor(val);
       }
       return Short.MIN_VALUE;
     }
     @Override public short higherShort(short val){
-      if((modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (short)(super.firstInt());
-        }
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (short)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (short)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (short)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (short)(tail0s+64);
-            }
-          default:
-        }
+      if((modCountAndSize&0xff)!=0){
+        return super.higherShort(val);
       }
       return Short.MIN_VALUE;
     }
     @Override public short shortCeiling(short val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (short)(super.firstInt());
-        }
-        switch(val>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-              return (short)(tail0s-128);
-            }
-            val=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-              return (short)(tail0s-64);
-            }
-            val=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-              return (short)(tail0s);
-            }
-            val=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-              return (short)(tail0s+64);
-            }
-          default:
-        }
-      }
-      return Short.MIN_VALUE;
-    }
-    @Override public short pollFirstShort(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (short)(super.uncheckedRemoveFirst());
-      }
-      return Short.MIN_VALUE;
-    }
-    @Override public short pollLastShort(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (short)(super.uncheckedRemoveLast());
-      }
+        return super.shortCeiling(val);
+      }  
       return Short.MIN_VALUE;
     }
     @Override public int firstInt(){
@@ -2411,126 +1283,26 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public int lowerInt(int val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val>Byte.MAX_VALUE){
-          return (int)(super.lastInt());
-        }
-        switch((--val)>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-              return (int)(127-lead0s);
-            }
-            val=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-              return (int)(63-lead0s);
-            }
-            val=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-              return (int)(-1-lead0s);
-            }
-            val=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-              return (int)(-65-lead0s);
-            }
-          default:
-        }
+        return super.lowerInt(val);
       }
       return Integer.MIN_VALUE;
     }
     @Override public int intFloor(int val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val>Byte.MAX_VALUE){
-          return (int)(super.lastInt());
-        }
-        switch(val>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-val))!=64){
-              return (int)(127-lead0s);
-            }
-            val=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-val))!=64){
-              return (int)(63-lead0s);
-            }
-            val=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-val))!=64){
-              return (int)(-1-lead0s);
-            }
-            val=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-val))!=64){
-              return (int)(-65-lead0s);
-            }
-          default:
-        }
+        return super.intFloor(val);
       }
       return Integer.MIN_VALUE;
     }
     @Override public int higherInt(int val){
-      if((modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (int)(super.firstInt());
-        }
-        switch((++val)>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-              return (int)(tail0s-128);
-            }
-            val=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-              return (int)(tail0s-64);
-            }
-            val=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-              return (int)(tail0s);
-            }
-            val=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-              return (int)(tail0s+64);
-            }
-          default:
-        }
+      if((modCountAndSize&0xff)!=0){
+        return super.higherInt(val);
       }
       return Integer.MIN_VALUE;
     }
     @Override public int intCeiling(int val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (int)(super.firstInt());
-        }
-        switch(val>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>val))!=64){
-              return (int)(tail0s-128);
-            }
-            val=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>val))!=64){
-              return (int)(tail0s-64);
-            }
-            val=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>val))!=64){
-              return (int)(tail0s);
-            }
-            val=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>val))!=64){
-              return (int)(tail0s+64);
-            }
-          default:
-        }
-      }
+        return super.intCeiling(val);
+      }  
       return Integer.MIN_VALUE;
     }
     @Override public int pollFirstInt(){
@@ -2551,541 +1323,75 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public long lowerLong(long val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val>Byte.MAX_VALUE){
-          return (long)(super.lastInt());
-        }
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (long)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (long)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (long)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (long)(-65-lead0s);
-            }
-          default:
-        }
+        return super.lowerLong(val);
       }
       return Long.MIN_VALUE;
     }
     @Override public long longFloor(long val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val>Byte.MAX_VALUE){
-          return (long)(super.lastInt());
-        }
-        int v;
-        switch((v=(int)val)>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (long)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (long)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (long)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (long)(-65-lead0s);
-            }
-          default:
-        }
+        return super.longFloor(val);
       }
       return Long.MIN_VALUE;
     }
     @Override public long higherLong(long val){
-      if((modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (long)(super.firstInt());
-        }
-        int v;
-        switch((v=((int)val)+1)>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (long)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (long)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (long)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (long)(tail0s+64);
-            }
-          default:
-        }
+      if((modCountAndSize&0xff)!=0){
+        return super.higherLong(val);
       }
       return Long.MIN_VALUE;
     }
     @Override public long longCeiling(long val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (long)(super.firstInt());
-        }
-        int v;
-        switch((v=(int)val)>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (long)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (long)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (long)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (long)(tail0s+64);
-            }
-          default:
-        }
-      }
-      return Long.MIN_VALUE;
-    }
-    @Override public long pollFirstLong(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (long)(super.uncheckedRemoveFirst());
-      }
-      return Long.MIN_VALUE;
-    }
-    @Override public long pollLastLong(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (long)(super.uncheckedRemoveLast());
-      }
+        return super.longCeiling(val);
+      }  
       return Long.MIN_VALUE;
     }
     @Override public float lowerFloat(float val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val!=val || val>Byte.MAX_VALUE){
-          return (float)(super.lastInt());
-        }
-        int v;
-        if((v=(int)val)>=val){
-          --v;
-        }
-        switch(v>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (float)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (float)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (float)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (float)(-65-lead0s);
-            }
-          default:
-        }
+        return super.lowerFloat(val);
       }
       return Float.NaN;
     }
     @Override public float floatFloor(float val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val!=val || val>=Byte.MAX_VALUE){
-          return (float)(super.lastInt());
-        }
-        int v;
-        if((v=(int)val)>val){
-          --v;
-        }
-        switch(v>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (float)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (float)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (float)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (float)(-65-lead0s);
-            }
-          default:
-        }
+        return super.floatFloor(val);
       }
       return Float.NaN;
     }
     @Override public float higherFloat(float val){
-      if(val==val && (modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (float)(super.firstInt());
-        }
-        int v;
-        if((v=(int)val)<=val){
-          ++v;
-        }
-        switch(v>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (float)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (float)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (float)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (float)(tail0s+64);
-            }
-          default:
-        }
+      if((modCountAndSize&0xff)!=0){
+        return super.higherFloat(val);
       }
       return Float.NaN;
     }
     @Override public float floatCeiling(float val){
-      if(val==val && (modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (float)(super.firstInt());
-        }
-        int v;
-        if((v=(int)val)<val){
-          ++v;
-        }
-        switch(v>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (float)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (float)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (float)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (float)(tail0s+64);
-            }
-          default:
-        }
-      }
-      return Float.NaN;
-    }
-    @Override public float pollFirstFloat(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (float)(super.uncheckedRemoveFirst());
-      }
-      return Float.NaN;
-    }
-    @Override public float pollLastFloat(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (float)(super.uncheckedRemoveLast());
-      }
+      if((modCountAndSize&0x1ff)!=0){
+        return super.floatCeiling(val);
+      }  
       return Float.NaN;
     }
     @Override public double lowerDouble(double val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val!=val || val>Byte.MAX_VALUE){
-          return (double)(super.lastInt());
-        }
-        int v;
-        if((v=(int)val)>=val){
-          --v;
-        }
-        switch(v>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (double)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (double)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (double)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (double)(-65-lead0s);
-            }
-          default:
-        }
+        return super.lowerDouble(val);
       }
       return Double.NaN;
     }
     @Override public double doubleFloor(double val){
       if((modCountAndSize&0x1ff)!=0){
-        if(val!=val || val>=Byte.MAX_VALUE){
-          return (double)(super.lastInt());
-        }
-        int v;
-        if((v=(int)val)>val){
-          --v;
-        }
-        switch(v>>6){
-          case 1:
-            int lead0s;
-            if((lead0s=Long.numberOfLeadingZeros(this.word3<<-v))!=64){
-              return (double)(127-lead0s);
-            }
-            v=0;
-          case 0:
-            if((lead0s=Long.numberOfLeadingZeros(this.word2<<-v))!=64){
-              return (double)(63-lead0s);
-            }
-            v=0;
-          case -1:
-            if((lead0s=Long.numberOfLeadingZeros(this.word1<<-v))!=64){
-              return (double)(-1-lead0s);
-            }
-            v=0;
-          case -2:
-            if((lead0s=Long.numberOfLeadingZeros(this.word0<<-v))!=64){
-              return (double)(-65-lead0s);
-            }
-          default:
-        }
+        return super.doubleFloor(val);
       }
       return Double.NaN;
     }
     @Override public double higherDouble(double val){
-      if(val==val && (modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (double)(super.firstInt());
-        }
-        int v;
-        if((v=(int)val)<=val){
-          ++v;
-        }
-        switch(v>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (double)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (double)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (double)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (double)(tail0s+64);
-            }
-          default:
-        }
+      if((modCountAndSize&0xff)!=0){
+        return super.higherDouble(val);
       }
       return Double.NaN;
     }
     @Override public double doubleCeiling(double val){
-      if(val==val && (modCountAndSize&0x1ff)!=0){
-        if(val<Byte.MIN_VALUE){
-          return (double)(super.firstInt());
-        }
-        int v;
-        if((v=(int)val)<val){
-          ++v;
-        }
-        switch(v>>6){
-          case -2:
-            int tail0s;
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>v))!=64){
-              return (double)(tail0s-128);
-            }
-            v=0;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>v))!=64){
-              return (double)(tail0s-64);
-            }
-            v=0;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word2>>>v))!=64){
-              return (double)(tail0s);
-            }
-            v=0;
-          case 1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word3>>>v))!=64){
-              return (double)(tail0s+64);
-            }
-          default:
-        }
-      }
+      if((modCountAndSize&0x1ff)!=0){
+        return super.doubleCeiling(val);
+      }  
       return Double.NaN;
-    }
-    @Override public double pollFirstDouble(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (double)(super.uncheckedRemoveFirst());
-      }
-      return Double.NaN;
-    }
-    @Override public double pollLastDouble(){
-      int modCountAndSize;
-      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-        this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        return (double)(super.uncheckedRemoveLast());
-      }
-      return Double.NaN;
-    }
-    private void uncheckedDescendingForEach(int numLeft,ByteConsumer action){
-      int offset=127;
-      for(long word=this.word3;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(--offset==63){
-          for(word=this.word2;;){
-            if((word&(1L<<offset))!=0){
-              action.accept((byte)offset);
-              if(--numLeft==0){
-                return;
-              }
-            }
-            if(--offset==-1){
-              for(word=this.word1;;){
-                if((word&(1L<<offset))!=0){
-                  action.accept((byte)offset);
-                  if(--numLeft==0){
-                    return;
-                  }
-                }
-                if(--offset==-65){
-                  for(word=this.word0;;--offset){
-                    if((word&(1L<<offset))!=0){
-                      action.accept((byte)offset);
-                      if(--numLeft==0){
-                        return;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    private void uncheckedAscendingForEach(int numLeft,ByteConsumer action){
-      int offset=-128;
-      for(long word=this.word0;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(++offset==-64){
-          for(word=this.word1;;){
-            if((word&(1L<<offset))!=0){
-              action.accept((byte)offset);
-              if(--numLeft==0){
-                return;
-              }
-            }
-            if(++offset==0){
-              for(word=this.word2;;){
-                if((word&(1L<<offset))!=0){
-                  action.accept((byte)offset);
-                  if(--numLeft==0){
-                    return;
-                  }
-                }
-                if(++offset==64){
-                  for(word=this.word3;;++offset){
-                    if((word&(1L<<offset))!=0){
-                      action.accept((byte)offset);
-                      if(--numLeft==0){
-                        return;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
     public static class Ascending extends Checked{
       public Ascending(){
@@ -3265,7 +1571,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         int numLeft;
         if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
           try{
-            super.uncheckedAscendingForEach(numLeft,action);
+            ((ByteSetImpl)this).uncheckedAscendingForEach(numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
           }
@@ -3276,7 +1582,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         int numLeft;
         if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
           try{
-            super.uncheckedAscendingForEach(numLeft,action::accept);
+            ((ByteSetImpl)this).uncheckedAscendingForEach(numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
           }
@@ -3844,12 +2150,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public Byte ceiling(byte val){
         return super.floor(val);
       }
-      @Override public Byte pollFirst(){
-        return super.pollLast();
-      }
-      @Override public Byte pollLast(){
-        return super.pollFirst();
-      }
       @Override public byte lowerByte(byte val){
         return super.higherByte(val);
       }
@@ -3862,12 +2162,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public byte byteCeiling(byte val){
         return super.byteFloor(val);
       }
-      @Override public byte pollFirstByte(){
-        return super.pollLastByte();
-      }
-      @Override public byte pollLastByte(){
-        return super.pollFirstByte();
-      }
       @Override public short lowerShort(short val){
         return super.higherShort(val);
       }
@@ -3879,12 +2173,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       @Override public short shortCeiling(short val){
         return super.shortFloor(val);
-      }
-      @Override public short pollFirstShort(){
-        return super.pollLastShort();
-      }
-      @Override public short pollLastShort(){
-        return super.pollFirstShort();
       }
       @Override public int firstInt(){
         return super.lastInt();
@@ -3922,12 +2210,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public long longCeiling(long val){
         return super.longFloor(val);
       }
-      @Override public long pollFirstLong(){
-        return super.pollLastLong();
-      }
-      @Override public long pollLastLong(){
-        return super.pollFirstLong();
-      }
       @Override public float lowerFloat(float val){
         return super.higherFloat(val);
       }
@@ -3940,12 +2222,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public float floatCeiling(float val){
         return super.floatFloor(val);
       }
-      @Override public float pollFirstFloat(){
-        return super.pollLastFloat();
-      }
-      @Override public float pollLastFloat(){
-        return super.pollFirstFloat();
-      }
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
@@ -3957,12 +2233,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       @Override public double doubleCeiling(double val){
         return super.doubleFloor(val);
-      }
-      @Override public double pollFirstDouble(){
-        return super.pollLastDouble();
-      }
-      @Override public double pollLastDouble(){
-        return super.pollFirstDouble();
       }
       @Override public String toString(){
         int numLeft;
@@ -4027,7 +2297,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         int numLeft;
         if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
           try{
-            super.uncheckedDescendingForEach(numLeft,action);
+            ((ByteSetImpl)this).uncheckedDescendingForEach(numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
           }
@@ -4038,7 +2308,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         int numLeft;
         if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
           try{
-            super.uncheckedDescendingForEach(numLeft,action::accept);
+            ((ByteSetImpl)this).uncheckedDescendingForEach(numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
           }
@@ -5209,12 +3479,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public Byte ceiling(byte val){
         return super.floor(val);
       }
-      @Override public Byte pollFirst(){
-        return super.pollLast();
-      }
-      @Override public Byte pollLast(){
-        return super.pollFirst();
-      }
       @Override public byte lowerByte(byte val){
         return super.higherByte(val);
       }
@@ -5227,12 +3491,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public byte byteCeiling(byte val){
         return super.byteFloor(val);
       }
-      @Override public byte pollFirstByte(){
-        return super.pollLastByte();
-      }
-      @Override public byte pollLastByte(){
-        return super.pollFirstByte();
-      }
       @Override public short lowerShort(short val){
         return super.higherShort(val);
       }
@@ -5244,12 +3502,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       @Override public short shortCeiling(short val){
         return super.shortFloor(val);
-      }
-      @Override public short pollFirstShort(){
-        return super.pollLastShort();
-      }
-      @Override public short pollLastShort(){
-        return super.pollFirstShort();
       }
       @Override public int firstInt(){
         return super.lastInt();
@@ -5287,12 +3539,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public long longCeiling(long val){
         return super.longFloor(val);
       }
-      @Override public long pollFirstLong(){
-        return super.pollLastLong();
-      }
-      @Override public long pollLastLong(){
-        return super.pollFirstLong();
-      }
       @Override public float lowerFloat(float val){
         return super.higherFloat(val);
       }
@@ -5305,12 +3551,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       @Override public float floatCeiling(float val){
         return super.floatFloor(val);
       }
-      @Override public float pollFirstFloat(){
-        return super.pollLastFloat();
-      }
-      @Override public float pollLastFloat(){
-        return super.pollFirstFloat();
-      }
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
@@ -5322,12 +3562,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       @Override public double doubleCeiling(double val){
         return super.doubleFloor(val);
-      }
-      @Override public double pollFirstDouble(){
-        return super.pollLastDouble();
-      }
-      @Override public double pollLastDouble(){
-        return super.pollFirstDouble();
       }
       @Override public String toString(){
         int numLeft;
@@ -6092,158 +4326,343 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
     }
   }
-  private int getTailSetLo(int inclusiveLo){
-    switch(inclusiveLo>>6){
-      case -2:
-        int tail0s;
-        if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
-          return inclusiveLo+tail0s;
-        }
-        inclusiveLo=-64;
-      case -1:
-        if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
-          return inclusiveLo+tail0s;
-        }
-        inclusiveLo=0;
-      case 0:
-        if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))!=64){
-          return inclusiveLo+tail0s;
-        }
-        inclusiveLo=64;
-      default:
-        if((tail0s=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))!=64){
-          return inclusiveLo+tail0s;
-        }
-    }
-    return 128;
-  }
-  private int getBodySetLo(int boundInfo){
-    int exclusiveHi=boundInfo>>8;
-    int tail0s;
-    goToEnd:switch((boundInfo=(byte)boundInfo)>>6){
-      case -2:
-        switch(exclusiveHi>>6){
-          case -2:
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>boundInfo))<exclusiveHi){
-              return boundInfo+tail0s;
+  /*
+  //TODO consider using these two methods
+  private int getBodySetLo(int inclusiveLo,int exclusiveHi){
+    foundElementAtEnd:for(;;){
+      int tail0s;
+      foundElementInMiddle:for(;;){
+        switch((exclusiveHi-1)>>6){
+          case 1:
+            switch(inclusiveLo>>6){
+              case -2:
+                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveLo=-64;
+              case -1:
+                if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveLo=0;
+              case 0:
+                if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveLo=64;
+              case 1:
+                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))<exclusiveHi){
+                  break foundElementAtEnd;
+                }
+              default:
             }
-            break goToEnd;
-          case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>boundInfo))<64){
-              return boundInfo+tail0s;
-            }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word1))<exclusiveHi){
-              return tail0s;
-            }
-            break goToEnd;
+            break;
           case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>boundInfo))<64){
-              return boundInfo+tail0s;
+            switch(inclusiveLo>>6){
+              case -2:
+                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveLo=-64;
+              case -1:
+                if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveLo=0;
+              case 0:
+                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))<exclusiveHi){
+                  break foundElementAtEnd;
+                }
+              default:
             }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word1))<128){
-              return tail0s;
-            }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<exclusiveHi){
-              return tail0s;
-            }
-            break goToEnd;
-          default:
-            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>boundInfo))<64){
-              return boundInfo+tail0s;
-            }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word1))<128){
-              return tail0s;
-            }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<192){
-              return tail0s;
-            }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word3))<exclusiveHi){
-              return tail0s;
-            }
-            break goToEnd;
-        }
-      case -1:
-        switch(exclusiveHi>>6){
+            break;
           case -1:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>boundInfo))<exclusiveHi){
-              return boundInfo+tail0s;
+            switch(inclusiveLo>>6){
+              case -2:
+                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveLo=-64;
+              case -1:
+                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))<exclusiveHi){
+                  break foundElementAtEnd;
+                }
+              default:
             }
-            break goToEnd;
-          case 0:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>boundInfo))<64){
-              return boundInfo+tail0s;
-            }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<exclusiveHi){
-              return tail0s;
-            }
-            break goToEnd;
+            break;
           default:
-            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>boundInfo))<64){
-              return boundInfo+tail0s;
+            if(inclusiveLo>>6==-2 && (inclusiveLo+=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))<exclusiveHi){
+              break foundElementAtEnd;
             }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<128){
-              return tail0s;
-            }
-            if((tail0s+=Long.numberOfTrailingZeros(this.word3))<exclusiveHi){
-              return tail0s;
-            }
-            break goToEnd;
         }
-      case 0:
-        if(exclusiveHi>>6==0){
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>boundInfo))<exclusiveHi){
-            return boundInfo+tail0s;
-          }
-        }else{
-          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>boundInfo))<64){
-            return boundInfo+tail0s;
-          }
-          if((tail0s+=Long.numberOfTrailingZeros(this.word3))<exclusiveHi){
-            return tail0s;
-          }
-        }
-        break goToEnd;
-      default:
-        if((tail0s=Long.numberOfTrailingZeros(this.word3>>>boundInfo))<exclusiveHi){
-          return boundInfo+tail0s;
-        }
-        break goToEnd;
+        return 128;
+      }
+      return inclusiveLo+tail0s;
     }
-    return 128;
+    return inclusiveLo;
   }
-  private int getHeadSetHi(int inclusiveHi){
-    switch((inclusiveHi)>>6){
-    case 1:
+  private int getBodySetHi(int inclusiveLo,int inclusiveHi){
+    foundElementAtEnd:for(;;){
       int lead0s;
-      if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-        return inclusiveHi-lead0s;
+      foundElementInMiddle:for(;;){
+        switch(inclusiveLo>>6){
+          case -2:
+            switch(inclusiveHi>>6){
+              case 1:
+                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveHi=63;
+              case 0:
+                if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveHi=-1;
+              case -1:
+                if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveHi=-65;
+              case -2:
+                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))>=inclusiveLo){
+                  break foundElementAtEnd;
+                }
+              default:
+            }
+            break;
+          case -1:
+            switch(inclusiveHi>>6){
+              case 1:
+                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveHi=63;
+              case 0:
+                if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveHi=-1;
+              case -1:
+                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))>=inclusiveLo){
+                  break foundElementAtEnd;
+                }
+              default:
+            }
+            break;
+          case 0:
+            switch(inclusiveHi>>6){
+              case 1:
+                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+                  break foundElementInMiddle;
+                }
+                inclusiveHi=63;
+              case 0:
+                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))>=inclusiveLo){
+                  break foundElementAtEnd;
+                }
+              default:
+            }
+            break;
+          default:
+            if(inclusiveHi>>6==1 && (inclusiveHi-=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))>=inclusiveLo){
+               break foundElementAtEnd;
+            }
+        }
+        return -129;
       }
-      inclusiveHi=63;
-    case 0:
-      if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
-        return inclusiveHi-lead0s;
+      return inclusiveHi-lead0s;
+    }
+    return inclusiveHi;
+  }
+  */
+  private int getThisOrLowerInRange(int inclusiveHi){
+    int lead0s;
+    foundElement:for(;;){
+      switch(inclusiveHi>>6){
+        case 1:// [64,127]
+          if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=63;
+        case 0:// [0,63]
+          if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-1;
+        case -1:// [-64,-1]
+          if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-65;
+        default:// [-128,-65]
+          if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
       }
-      inclusiveHi=-1;
-    case -1:
-      if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
-        return inclusiveHi-lead0s;
+      return -129;
+    }
+    return inclusiveHi-lead0s;
+  }
+  private int removeThisOrLowerInRange(int inclusiveHi){
+    foundElement:for(;;){
+      switch(inclusiveHi>>6){
+        case 1:// [64,127]
+          int lead0s;
+          long word;
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word3)<<(-inclusiveHi-1)))!=64){
+            this.word3=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=63;
+        case 0:// [0,63]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word2)<<(-inclusiveHi-1)))!=64){
+            this.word2=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=-1;
+        case -1:// [-64,-1]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word1)<<(-inclusiveHi-1)))!=64){
+            this.word1=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=-65;
+        default:// [-128,-65]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word0)<<(-inclusiveHi-1)))!=64){
+            this.word0=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
       }
-      inclusiveHi=-65;
-    default:
-      if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
-        return inclusiveHi-lead0s;
+      return Integer.MIN_VALUE;
+    }
+    return inclusiveHi;
+  }
+  private int getThisOrLower(int inclusiveHi){
+    int lead0s;
+    foundElement:for(;;){
+      switch(inclusiveHi>>6){
+        case 1:// [64,127]
+          if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=63;
+        case 0:// [0,63]
+          if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-1;
+        case -1:// [-64,-1]
+          if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-65;
+        case -2:// [-128,-65]
+          if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+        default:// < 128
+          return -129;
       }
     }
-    return -129;
+    return inclusiveHi-lead0s;
   }
-  private int getBodySetHi(int boundInfo){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private int getThisOrHigher(int inclusiveLo){
+    int tail0s;
+    foundElement:for(;;){
+      switch(inclusiveLo>>6){
+        case -2:// [-128,-65]
+          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+          inclusiveLo=-64;
+        case -1:// [-64,-1]
+          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+          inclusiveLo=0;
+        case 0:// [0,63]
+          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+          inclusiveLo=64;
+        case 1:// [64,127]
+          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+        default:// > 127
+          return 128;
+      }
+    }
+    return inclusiveLo+tail0s;
+  }
+  private int getThisOrHigherInRange(int inclusiveLo){
+    int tail0s;
+    foundElement:for(;;){
+      switch(inclusiveLo>>6){
+        case -2:// [-128,-65]
+          if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+          inclusiveLo=-64;
+        case -1:// [-64,-1]
+          if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+          inclusiveLo=0;
+        case 0:// [0,63]
+          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+          inclusiveLo=64;
+        default:// [64,127]
+          if((tail0s=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))!=64){
+            break foundElement;
+          }
+      }
+      return 128;
+    }
+    return inclusiveLo+tail0s;
+  }
+  private int removeThisOrHigherInRange(int inclusiveLo){
+    foundElement:for(;;){
+      switch(inclusiveLo>>6){
+        case -2:// [-128,-65]
+          int tail0s;
+          long word;
+          if((tail0s=Long.numberOfTrailingZeros((word=this.word0)>>>inclusiveLo))!=64){
+            this.word0=word&(~(1L<<(inclusiveLo+=tail0s)));
+            break foundElement;
+          }
+          inclusiveLo=-64;
+        case -1:// [-64,-1]
+          if((tail0s=Long.numberOfTrailingZeros((word=this.word1)>>>inclusiveLo))!=64){
+            this.word1=word&(~(1L<<(inclusiveLo+=tail0s)));
+            break foundElement;
+          }
+          inclusiveLo=0;
+        case 0:// [0,63]
+          if((tail0s=Long.numberOfTrailingZeros((word=this.word2)>>>inclusiveLo))!=64){
+            this.word2=word&(~(1L<<(inclusiveLo+=tail0s)));
+            break foundElement;
+          }
+          inclusiveLo=64;
+        default:// [64,127]
+          if((tail0s=Long.numberOfTrailingZeros((word=this.word3)>>>inclusiveLo))!=64){
+            this.word3=word&(~(1L<<(inclusiveLo+=tail0s)));
+            break foundElement;
+          }
+      }
+      return Integer.MIN_VALUE;
+    }
+    return inclusiveLo;
   }
   private static class UncheckedAscendingItr extends AbstractByteItr{
     transient final ByteSetImpl.Unchecked root;
-    transient int currIndex;
+    transient int currIndexAndNumLeft;
+    //transient int currIndex;
     private UncheckedAscendingItr(ByteSetImpl.Unchecked root){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=root;
       int currIndex;
       if((currIndex=Long.numberOfTrailingZeros(root.word0))==64){
@@ -6254,15 +4673,23 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
       }
       this.currIndex=currIndex-128;
+      */
     }
     private UncheckedAscendingItr(UncheckedAscendingItr that){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=that.root;
       this.currIndex=that.currIndex;
+      */
     }
     @Override public Object clone(){
       return new UncheckedAscendingItr(this);
     }
     @Override public void remove(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+     /*
       final var root=this.root;
       int currIndex;
       switch(((currIndex=this.currIndex)-1)>>6){
@@ -6289,34 +4716,54 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         default:
           root.word0=(word=root.word0)&(~(1L<<(currIndex-Long.numberOfLeadingZeros(word<<(-currIndex)))));
       }
+      */
     }
     @Override public void forEachRemaining(ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=128){
         root.uncheckedForEachAscending(currIndex,action);
         this.currIndex=128;
       }
+      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=128){
         root.uncheckedForEachAscending(currIndex,action::accept);
         this.currIndex=128;
       }
+      */
     }
     @Override public boolean hasNext(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       return this.currIndex!=128;
+      */
     }
     @Override public byte nextByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int ret;
-      this.currIndex=((ByteSetImpl)root).getTailSetLo(ret=this.currIndex);
+      this.currIndex=((ByteSetImpl)root).getThisOrHigher((ret=this.currIndex)+1);
       return (byte)ret;
+      */
     }
   }
   private static class UncheckedDescendingItr extends AbstractByteItr{
     transient final ByteSetImpl.Unchecked root;
     transient int currIndex;
     private UncheckedDescendingItr(ByteSetImpl.Unchecked root){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=root;
       int currIndex;
       if((currIndex=Long.numberOfLeadingZeros(root.word3))==64){
@@ -6327,15 +4774,23 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
       }
       this.currIndex=Byte.MAX_VALUE-currIndex;
+      */
     }
     private UncheckedDescendingItr(UncheckedDescendingItr that){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=that.root;
       this.currIndex=that.currIndex;
+      */
     }
     @Override public Object clone(){
       return new UncheckedDescendingItr(this);
     }
     @Override public void remove(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final var root=this.root;
       int currIndex;
       switch(((currIndex=this.currIndex+1))>>6){
@@ -6362,28 +4817,45 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       default:
         root.word3=(word=root.word3)&(~(1L<<(currIndex+Long.numberOfTrailingZeros(word>>>(currIndex)))));
       }
+      */
     }
     @Override public void forEachRemaining(ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=-129){
         root.uncheckedForEachDescending(currIndex,action);
         this.currIndex=-129;
       }
+      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=-129){
         root.uncheckedForEachDescending(currIndex,action::accept);
         this.currIndex=-129;
       }
+      */
     }
     @Override public boolean hasNext(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       return this.currIndex!=-129;
+      */
     }
     @Override public byte nextByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int ret;
-      this.currIndex=((ByteSetImpl)root).getHeadSetHi(ret=this.currIndex);
+      this.currIndex=((ByteSetImpl)root).getThisOrLower((ret=this.currIndex)-1);
       return (byte)ret;
+      */
     }
   }
   private static class CheckedAscendingItr extends AbstractByteItr{
@@ -6391,6 +4863,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     transient int currIndex;
     transient int modCountAndLastRet;
     private CheckedAscendingItr(ByteSetImpl.Checked root){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=root;
       int currIndex;
       if((currIndex=Long.numberOfTrailingZeros(root.word0))==64){
@@ -6402,16 +4877,24 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       this.currIndex=currIndex-128;
       this.modCountAndLastRet=root.modCountAndSize|0x1ff;
+      */
     }
     private CheckedAscendingItr(CheckedAscendingItr that){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=that.root;
       this.currIndex=that.currIndex;
       this.modCountAndLastRet=that.modCountAndLastRet;
+      */
     }
     @Override public Object clone(){
       return new CheckedAscendingItr(this);
     }
     @Override public void remove(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       int lastRet;
       int modCountAndLastRet;
       if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)==0x1ff){
@@ -6435,8 +4918,12 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       root.modCountAndSize=modCountAndSize+((1<<9)-1);
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
+      */
     }
     private void uncheckedForEachRemaining(int currIndex,ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       int modCountAndLastRet=this.modCountAndLastRet;
       final var root=this.root;
       int lastRet;
@@ -6486,23 +4973,39 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
       this.currIndex=128;
+      */
     }
     @Override public void forEachRemaining(ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=128){
         uncheckedForEachRemaining(currIndex,action);
       }
+      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=128){
         uncheckedForEachRemaining(currIndex,action::accept);
       }
+      */
     }
     @Override public boolean hasNext(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       return this.currIndex!=128;
+      */
     }
     @Override public byte nextByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final ByteSetImpl.Checked root;
       final int modCountAndLastRet;
       CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
@@ -6540,6 +5043,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
       return (byte)ret;
+      */
     }
   }
   private static class CheckedDescendingItr extends AbstractByteItr{
@@ -6547,6 +5051,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     transient int currIndex;
     transient int modCountAndLastRet;
     private CheckedDescendingItr(ByteSetImpl.Checked root){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=root;
       int currIndex;
       if((currIndex=Long.numberOfLeadingZeros(root.word3))==64){
@@ -6558,16 +5065,24 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       this.currIndex=Byte.MAX_VALUE-currIndex;
       this.modCountAndLastRet=root.modCountAndSize|0x1ff;
+      */
     }
     private CheckedDescendingItr(CheckedDescendingItr that){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       this.root=that.root;
       this.currIndex=that.currIndex;
       this.modCountAndLastRet=that.modCountAndLastRet;
+      */
     }
     @Override public Object clone(){
       return new CheckedDescendingItr(this);
     }
     @Override public void remove(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       int lastRet;
       int modCountAndLastRet;
       if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)==0x1ff){
@@ -6591,8 +5106,12 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       root.modCountAndSize=modCountAndSize+((1<<9)-1);
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
+      */
     }
     private void uncheckedForEachRemaining(int currIndex,ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       int modCountAndLastRet=this.modCountAndLastRet;
       final var root=this.root;
       int lastRet;
@@ -6642,23 +5161,39 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
       this.currIndex=-129;
+      */
     }
     @Override public void forEachRemaining(ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=-129){
         uncheckedForEachRemaining(currIndex,action);
       }
+      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=-129){
         uncheckedForEachRemaining(currIndex,action::accept);
       }
+      */
     }
     @Override public boolean hasNext(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       return this.currIndex!=-129;
+      */
     }
     @Override public byte nextByte(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
       final ByteSetImpl.Checked root;
       final int modCountAndLastRet;
       CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
@@ -6696,9 +5231,10 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
       return (byte)ret;
+      */
     }
   }
-  private static abstract class AbstractCheckedFullView extends AbstractByteSet{
+  private static abstract class AbstractCheckedFullView extends AbstractByteSet.ComparatorlessImpl{
     transient final ByteSetImpl.Checked root;
     private AbstractCheckedFullView(ByteSetImpl.Checked root){
       this.root=root;
@@ -6787,12 +5323,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public Byte ceiling(byte val){
       return root.floor(val);
     }
-    @Override public Byte pollFirst(){
-      return root.pollLast();
-    }
-    @Override public Byte pollLast(){
-      return root.pollFirst();
-    }
     @Override public byte lowerByte(byte val){
       return root.higherByte(val);
     }
@@ -6805,12 +5335,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public byte byteCeiling(byte val){
       return root.byteFloor(val);
     }
-    @Override public byte pollFirstByte(){
-      return root.pollLastByte();
-    }
-    @Override public byte pollLastByte(){
-      return root.pollFirstByte();
-    }
     @Override public short lowerShort(short val){
       return root.higherShort(val);
     }
@@ -6822,12 +5346,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public short shortCeiling(short val){
       return root.shortFloor(val);
-    }
-    @Override public short pollFirstShort(){
-      return root.pollLastShort();
-    }
-    @Override public short pollLastShort(){
-      return root.pollFirstShort();
     }
     @Override public int lowerInt(int val){
       return root.higherInt(val);
@@ -6859,12 +5377,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public long longCeiling(long val){
       return root.longFloor(val);
     }
-    @Override public long pollFirstLong(){
-      return root.pollLastLong();
-    }
-    @Override public long pollLastLong(){
-      return root.pollFirstLong();
-    }
     @Override public float lowerFloat(float val){
       return root.higherFloat(val);
     }
@@ -6876,12 +5388,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public float floatCeiling(float val){
       return root.floatFloor(val);
-    }
-    @Override public float pollFirstFloat(){
-      return root.pollLastFloat();
-    }
-    @Override public float pollLastFloat(){
-      return root.pollFirstFloat();
     }
     @Override public double lowerDouble(double val){
       return root.higherDouble(val);
@@ -6895,44 +5401,8 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public double doubleCeiling(double val){
       return root.doubleFloor(val);
     }
-    @Override public double pollFirstDouble(){
-      return root.pollLastDouble();
-    }
-    @Override public double pollLastDouble(){
-      return root.pollFirstDouble();
-    }
     @Override public OmniNavigableSet.OfByte descendingSet(){
       return root;
-    }
-    @Override public byte firstByte(){
-      return (byte)root.lastInt();
-    }
-    @Override public short firstShort(){
-      return (short)root.lastInt();
-    }
-    @Override public long firstLong(){
-      return (long)root.lastInt();
-    }
-    @Override public float firstFloat(){
-      return (float)root.lastInt();
-    }
-    @Override public double firstDouble(){
-      return (double)root.lastInt();
-    }
-    @Override public byte lastByte(){
-      return (byte)root.firstInt();
-    }
-    @Override public short lastShort(){
-      return (short)root.firstInt();
-    }
-    @Override public long lastLong(){
-      return (long)root.firstInt();
-    }
-    @Override public float lastFloat(){
-      return (float)root.firstInt();
-    }
-    @Override public double lastDouble(){
-      return (double)root.firstInt();
     }
     @Override public int firstInt(){
       return root.lastInt();
@@ -6942,7 +5412,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     private static class Ascending extends AbstractCheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
-      private Ascending(ByteSetImpl.Checked root){
+      private Ascending(ByteSetImpl.Checked.Descending root){
         super(root);
       }
       private Object writeReplace(){
@@ -6956,9 +5426,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       @Override public OmniIterator.OfByte descendingIterator(){
         return new CheckedDescendingItr(root);
-      }
-      @Override public ByteComparator comparator(){
-        return Byte::compare;
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MAX_VALUE){
@@ -7087,7 +5554,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         final ByteSetImpl.Checked root;
         if((numLeft=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.uncheckedAscendingForEach(numLeft,action);
+            ((ByteSetImpl)root).uncheckedAscendingForEach(numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -7099,7 +5566,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         final ByteSetImpl.Checked root;
         if((numLeft=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.uncheckedAscendingForEach(numLeft,action::accept);
+            ((ByteSetImpl)root).uncheckedAscendingForEach(numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -7548,7 +6015,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     private static class Descending extends AbstractCheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
-      private Descending(ByteSetImpl.Checked root){
+      private Descending(ByteSetImpl.Checked.Ascending root){
         super(root);
       }
       private Object writeReplace(){
@@ -7693,7 +6160,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         final ByteSetImpl.Checked root;
         if((numLeft=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.uncheckedDescendingForEach(numLeft,action);
+            ((ByteSetImpl)root).uncheckedDescendingForEach(numLeft,action);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -7705,7 +6172,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         final ByteSetImpl.Checked root;
         if((numLeft=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.uncheckedDescendingForEach(numLeft,action::accept);
+            ((ByteSetImpl)root).uncheckedDescendingForEach(numLeft,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -8153,7 +6620,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
     }
   }
-  private static abstract class AbstractUncheckedFullView extends AbstractByteSet{
+  private static abstract class AbstractUncheckedFullView extends AbstractByteSet.ComparatorlessImpl{
     transient final ByteSetImpl.Unchecked root;
     private AbstractUncheckedFullView(ByteSetImpl.Unchecked root){
       this.root=root;
@@ -8242,12 +6709,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public Byte ceiling(byte val){
       return root.floor(val);
     }
-    @Override public Byte pollFirst(){
-      return root.pollLast();
-    }
-    @Override public Byte pollLast(){
-      return root.pollFirst();
-    }
     @Override public byte lowerByte(byte val){
       return root.higherByte(val);
     }
@@ -8260,12 +6721,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public byte byteCeiling(byte val){
       return root.byteFloor(val);
     }
-    @Override public byte pollFirstByte(){
-      return root.pollLastByte();
-    }
-    @Override public byte pollLastByte(){
-      return root.pollFirstByte();
-    }
     @Override public short lowerShort(short val){
       return root.higherShort(val);
     }
@@ -8277,12 +6732,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public short shortCeiling(short val){
       return root.shortFloor(val);
-    }
-    @Override public short pollFirstShort(){
-      return root.pollLastShort();
-    }
-    @Override public short pollLastShort(){
-      return root.pollFirstShort();
     }
     @Override public int lowerInt(int val){
       return root.higherInt(val);
@@ -8314,12 +6763,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public long longCeiling(long val){
       return root.longFloor(val);
     }
-    @Override public long pollFirstLong(){
-      return root.pollLastLong();
-    }
-    @Override public long pollLastLong(){
-      return root.pollFirstLong();
-    }
     @Override public float lowerFloat(float val){
       return root.higherFloat(val);
     }
@@ -8331,12 +6774,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public float floatCeiling(float val){
       return root.floatFloor(val);
-    }
-    @Override public float pollFirstFloat(){
-      return root.pollLastFloat();
-    }
-    @Override public float pollLastFloat(){
-      return root.pollFirstFloat();
     }
     @Override public double lowerDouble(double val){
       return root.higherDouble(val);
@@ -8350,44 +6787,8 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     @Override public double doubleCeiling(double val){
       return root.doubleFloor(val);
     }
-    @Override public double pollFirstDouble(){
-      return root.pollLastDouble();
-    }
-    @Override public double pollLastDouble(){
-      return root.pollFirstDouble();
-    }
     @Override public OmniNavigableSet.OfByte descendingSet(){
       return root;
-    }
-    @Override public byte firstByte(){
-      return (byte)root.lastInt();
-    }
-    @Override public short firstShort(){
-      return (short)root.lastInt();
-    }
-    @Override public long firstLong(){
-      return (long)root.lastInt();
-    }
-    @Override public float firstFloat(){
-      return (float)root.lastInt();
-    }
-    @Override public double firstDouble(){
-      return (double)root.lastInt();
-    }
-    @Override public byte lastByte(){
-      return (byte)root.firstInt();
-    }
-    @Override public short lastShort(){
-      return (short)root.firstInt();
-    }
-    @Override public long lastLong(){
-      return (long)root.firstInt();
-    }
-    @Override public float lastFloat(){
-      return (float)root.firstInt();
-    }
-    @Override public double lastDouble(){
-      return (double)root.firstInt();
     }
     @Override public int firstInt(){
       return root.lastInt();
@@ -8397,7 +6798,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     private static class Ascending extends AbstractUncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
-      private Ascending(ByteSetImpl.Unchecked root){
+      private Ascending(ByteSetImpl.Unchecked.Descending root){
         super(root);
       }
       private Object writeReplace(){
@@ -8411,9 +6812,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       }
       @Override public OmniIterator.OfByte descendingIterator(){
         return new UncheckedDescendingItr(root);
-      }
-      @Override public ByteComparator comparator(){
-        return Byte::compare;
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MAX_VALUE){
@@ -8992,7 +7390,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     private static class Descending extends AbstractUncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
-      private Descending(ByteSetImpl.Unchecked root){
+      private Descending(ByteSetImpl.Unchecked.Ascending root){
         super(root);
       }
       private Object writeReplace(){
@@ -9684,7 +8082,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         this.word3&=((-1L>>>(-boundInfo))|(-1L<<exclusiveTo));
     }
   }
-  private static abstract class UncheckedSubSet extends AbstractByteSet{
+  private static abstract class UncheckedSubSet extends AbstractByteSet.ComparatorlessImpl{
     transient final ByteSetImpl.Unchecked root;
     transient final UncheckedSubSet parent;
     transient final int boundInfo;
@@ -9705,6 +8103,138 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       this.size=size;
     }
     abstract boolean isInRange(int val);
+    abstract void forEachImpl(int numLeft,ByteConsumer action);
+    @Override public void forEach(ByteConsumer action){
+      final int numLeft;
+      if((numLeft=this.size)!=0){
+        forEachImpl(numLeft,action);
+      }
+    }
+    @Override public void forEach(Consumer<? super Byte> action){
+      final int numLeft;
+      if((numLeft=this.size)!=0){
+        forEachImpl(numLeft,action::accept);
+      }
+    }
+    @Override public boolean removeVal(boolean val){
+      final ByteSetImpl.Unchecked root;
+      final int mask;
+      final int size;
+      long word;
+      if((size=this.size)!=0 && isInRange(mask=val?0b10:0b01) && (word=(root=this.root).word2)!=(word&=(~mask))){
+        root.word2=word;
+        bubbleUpDecrementSize();
+        this.size=size-1;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      final int size;
+      if((size=this.size)!=0 && isInRange(val) && ((ByteSetImpl)root).uncheckedremoveByte(val)){
+        bubbleUpDecrementSize();
+        this.size=size-1;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      final int size;
+      if((size=this.size)!=0 && isInRange(val) && ((ByteSetImpl)root).uncheckedremoveChar(val)){
+        bubbleUpDecrementSize();
+        this.size=size-1;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(int val){
+      final int size;
+      if((size=this.size)!=0 && isInRange(val) && ((ByteSetImpl)root).uncheckedremoveInt(val)){
+        bubbleUpDecrementSize();
+        this.size=size-1;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(long val){
+      final int size;
+      final int v;
+      if((size=this.size)!=0 && (v=(byte)val)==val && isInRange(v) && ((ByteSetImpl)root).uncheckedremoveByte(v)){
+        bubbleUpDecrementSize();
+        this.size=size-1;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(float val){
+      final int size;
+      final int v;
+      if((size=this.size)!=0 && (v=(byte)val)==val && isInRange(v) && ((ByteSetImpl)root).uncheckedremoveByte(v)){
+        bubbleUpDecrementSize();
+        this.size=size-1;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      final int size;
+      final int v;
+      if((size=this.size)!=0 && (v=(byte)val)==val && isInRange(v) && ((ByteSetImpl)root).uncheckedremoveByte(v)){
+        bubbleUpDecrementSize();
+        this.size=size-1;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      final int size;
+      if((size=this.size)!=0){
+        for(;;){
+          final int v;
+          if(val instanceof Byte){
+            if(!isInRange(v=(byte)val) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Integer || val instanceof Short){
+            if(!isInRange(v=((Number)val).intValue()) || !((ByteSetImpl)root).uncheckedremoveInt(v)){
+              break;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(v=(byte)l) || !isInRange(v) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(v=(byte)f) || !isInRange(v) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(v=(byte)d) || !isInRange(v) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Character){
+            if(!isInRange(v=(char)val) || !((ByteSetImpl)root).uncheckedremoveChar(v)){
+              break;
+            }
+          }else if(val instanceof Boolean){
+            final ByteSetImpl root;
+            long word;
+            if(!isInRange(v=((boolean)val)?0b10:0b01) || (word=(root=this.root).word2)==(word&=(~v))){
+              break;
+            }
+            root.word2=word;
+          }else{
+            break;
+          }
+          bubbleUpDecrementSize();
+          this.size=size-1;
+          return true;
+        }
+      }
+      return false;
+    }
     @Override public boolean contains(boolean val){
       final int mask;
       return size!=0 && isInRange(mask=val?0b10:0b01) && (root.word2&mask)!=0;
@@ -9767,6 +8297,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
       }
       return false;
+    }
+    private void bubbleUpDecrementSize(){
+      for(var parent=this.parent;parent!=null;--parent.size,parent=parent.parent){}
     }
     private void bubbleUpDecrementSize(int numToRemove){
       for(var parent=this.parent;parent!=null;parent.size-=numToRemove,parent=parent.parent){}
@@ -9847,6 +8380,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         private Ascending(Ascending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
+        @Override void forEachImpl(int numLeft,ByteConsumer action){
+          ((ByteSetImpl)root).uncheckedAscendingForEach(numLeft,action);
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -9854,6 +8390,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
         private Descending(Descending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
+        }
+        @Override void forEachImpl(int numLeft,ByteConsumer action){
+          ((ByteSetImpl)root).uncheckedDescendingForEach(this.boundInfo,numLeft,action);
         }
       }
     }
@@ -9959,6 +8498,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         private Ascending(Ascending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
+        @Override void forEachImpl(int numLeft,ByteConsumer action){
+          ((ByteSetImpl)root).uncheckedAscendingForEach(this.boundInfo,numLeft,action);
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -9966,6 +8508,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
         private Descending(Descending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
+        }
+        @Override void forEachImpl(int numLeft,ByteConsumer action){
+          ((ByteSetImpl)root).uncheckedDescendingForEach(numLeft,action);
         }
       }
     }
@@ -9993,6 +8538,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         private Ascending(UncheckedSubSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
+        @Override void forEachImpl(int numLeft,ByteConsumer action){
+          ((ByteSetImpl)root).uncheckedAscendingForEach((byte)this.boundInfo,numLeft,action);
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -10001,10 +8549,13 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         private Descending(UncheckedSubSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
+        @Override void forEachImpl(int numLeft,ByteConsumer action){
+          ((ByteSetImpl)root).uncheckedAscendingForEach(this.boundInfo>>8,numLeft,action);
+        }
       }
     }
   }
-  private static abstract class CheckedSubSet extends AbstractByteSet{
+  private static abstract class CheckedSubSet extends AbstractByteSet.ComparatorlessImpl{
     transient final ByteSetImpl.Checked root;
     transient final CheckedSubSet parent;
     transient final int boundInfo;
@@ -10019,6 +8570,155 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       final int modCountAndSize;
       CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
       return (modCountAndSize&0x1ff)!=0 && isInRange(mask=val?0b10:0b01) && (root.word2&mask)!=0;
+    }
+    @Override public boolean removeVal(boolean val){
+      final ByteSetImpl.Checked root;
+      final int mask;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      long word;
+      if((modCountAndSize&0x1ff)!=0 && isInRange(mask=val?0b10:0b01) && (word=root.word2)!=(word&=(~mask))){
+        root.word2=word;
+        root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+        bubbleUpModifyModCountAndSize(rootModCountAndSize);
+        this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ((ByteSetImpl)root).uncheckedremoveByte(val)){
+        root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+        bubbleUpModifyModCountAndSize(rootModCountAndSize);
+        this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ((ByteSetImpl)root).uncheckedremoveChar(val)){
+        root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+        bubbleUpModifyModCountAndSize(rootModCountAndSize);
+        this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ((ByteSetImpl)root).uncheckedremoveInt(val)){
+        root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+        bubbleUpModifyModCountAndSize(rootModCountAndSize);
+        this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(long val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      final int v;
+      if((modCountAndSize&0x1ff)!=0 && (v=(byte)val)==val && isInRange(v) && ((ByteSetImpl)root).uncheckedremoveByte(v)){
+        root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+        bubbleUpModifyModCountAndSize(rootModCountAndSize);
+        this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(float val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      final int v;
+      if((modCountAndSize&0x1ff)!=0 && (v=(byte)val)==val && isInRange(v) && ((ByteSetImpl)root).uncheckedremoveByte(v)){
+        root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+        bubbleUpModifyModCountAndSize(rootModCountAndSize);
+        this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      final int v;
+      if((modCountAndSize&0x1ff)!=0 && (v=(byte)val)==val && isInRange(v) && ((ByteSetImpl)root).uncheckedremoveByte(v)){
+        root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+        bubbleUpModifyModCountAndSize(rootModCountAndSize);
+        this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      int rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&(~0x1ff));
+      final int v;
+      if((modCountAndSize&0x1ff)!=0){
+        for(;;){
+          if(val instanceof Byte){
+            if(!isInRange(v=(byte)val) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Integer || val instanceof Short){
+            if(!isInRange(v=((Number)val).intValue()) || !((ByteSetImpl)root).uncheckedremoveInt(v)){
+              break;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(v=(byte)l) || !isInRange(v) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(v=(byte)f) || !isInRange(v) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(v=(byte)d) || !isInRange(v) || !((ByteSetImpl)root).uncheckedremoveByte(v)){
+              break;
+            }
+          }else if(val instanceof Character){
+            if(!isInRange(v=(char)val) || !((ByteSetImpl)root).uncheckedremoveChar(v)){
+              break;
+            }
+          }else if(val instanceof Boolean){
+            long word;
+            if(!isInRange(v=((boolean)val)?0b10:0b01) || (word=root.word2)==(word&=(~v))){
+              break;
+            }
+            root.word2=word;
+          }else{
+            break;
+          }
+          root.modCountAndSize=rootModCountAndSize+(rootModCountAndSize=(1<<9)-1);
+          bubbleUpModifyModCountAndSize(rootModCountAndSize);
+          this.modCountAndSize=modCountAndSize+rootModCountAndSize;
+          return true;
+        }
+      }
+      return false;
     }
     @Override public boolean contains(byte val){
       final ByteSetImpl.Checked root;
@@ -10205,6 +8905,31 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
       this.boundInfo=boundInfo;
       this.modCountAndSize=modCountAndSize;
     }
+    abstract void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action);
+    @Override public void forEach(ByteConsumer action){
+      final int modCountAndSize=this.modCountAndSize;
+      final var root=this.root;
+      try{
+        final int numLeft;
+        if((numLeft=modCountAndSize&0x1ff)!=0){
+          forEachImpl(numLeft,root,action);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndSize&(~0x1ff),root.modCountAndSize&(~0x1ff));
+      }
+    }
+    @Override public void forEach(Consumer<? super Byte> action){
+      final int modCountAndSize=this.modCountAndSize;
+      final var root=this.root;
+      try{
+        final int numLeft;
+        if((numLeft=modCountAndSize&0x1ff)!=0){
+          forEachImpl(numLeft,root,action::accept);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndSize&(~0x1ff),root.modCountAndSize&(~0x1ff));
+      }
+    }
     private static abstract class HeadSet extends CheckedSubSet{
       private HeadSet(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
         super(root,boundInfo,modCountAndSize);
@@ -10309,6 +9034,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         private Ascending(Ascending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
+        @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
+          root.uncheckedAscendingForEach(numLeft,action);
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -10316,6 +9044,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
         private Descending(Descending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
+        }
+         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
+          root.uncheckedDescendingForEach(this.boundInfo,numLeft,action);
         }
       }
     }
@@ -10342,6 +9073,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         private Ascending(Ascending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
+        @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
+          root.uncheckedAscendingForEach(this.boundInfo,numLeft,action);
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -10349,6 +9083,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
         private Descending(Descending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
+        }
+        @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
+          root.uncheckedDescendingForEach(numLeft,action);
         }
       }
     }
@@ -10445,7 +9182,6 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
               }
             }
             if(--inclusiveTo==-65){
-              this.word1=word;
               break goToWord0;
             }
           }
@@ -10483,6 +9219,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         private Ascending(CheckedSubSet parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
+        @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
+          root.uncheckedAscendingForEach((byte)boundInfo,numLeft,action);
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -10490,6 +9229,9 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
         private Descending(CheckedSubSet parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
+        }
+        @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
+          root.uncheckedDescendingForEach(boundInfo>>8,numLeft,action);
         }
       }
     }
