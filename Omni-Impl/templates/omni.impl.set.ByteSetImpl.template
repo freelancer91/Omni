@@ -1467,6 +1467,156 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
   
   
   
+  private int getTailSetLo(int inclusiveLo){
+    switch(inclusiveLo>>6){
+      case -2:
+        int tail0s;
+        if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
+          return inclusiveLo+tail0s;
+        }
+        inclusiveLo=-64;
+      case -1:
+        if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
+          return inclusiveLo+tail0s;
+        }
+        inclusiveLo=0;
+      case 0:
+        if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))!=64){
+          return inclusiveLo+tail0s;
+        }
+        inclusiveLo=64;
+      default:
+        if((tail0s=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))!=64){
+          return inclusiveLo+tail0s;
+        }
+    }
+    return 128;
+  }
+  
+  private int getBodySetLo(int inclusiveLo,int exclusiveHi){
+    int tail0s;
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        switch(exclusiveHi>>6){
+          case -2:
+            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))<exclusiveHi){
+              return inclusiveLo+tail0s;
+            }
+            break goToEnd;
+          case -1:
+            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))<64){
+              return inclusiveLo+tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word1))<exclusiveHi){
+              return tail0s;
+            }
+            break goToEnd;
+          case 0:
+            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))<64){
+              return inclusiveLo+tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word1))<128){
+              return tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<exclusiveHi){
+              return tail0s;
+            }
+            break goToEnd;
+          default:
+            if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))<64){
+              return inclusiveLo+tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word1))<128){
+              return tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<192){
+              return tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word3))<exclusiveHi){
+              return tail0s;
+            }
+            break goToEnd;
+        }
+      case -1:
+        switch(exclusiveHi>>6){
+          case -1:
+            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))<exclusiveHi){
+              return inclusiveLo+tail0s;
+            }
+            break goToEnd;
+          case 0:
+            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))<64){
+              return inclusiveLo+tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<exclusiveHi){
+              return tail0s;
+            }
+            break goToEnd;
+          default:
+            if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))<64){
+              return inclusiveLo+tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word2))<128){
+              return tail0s;
+            }
+            if((tail0s+=Long.numberOfTrailingZeros(this.word3))<exclusiveHi){
+              return tail0s;
+            }
+            break goToEnd;
+        }
+      case 0:
+        if(exclusiveHi>>6==0){
+          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))<exclusiveHi){
+            return inclusiveLo+tail0s;
+          }
+        }else{
+          if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))<64){
+            return inclusiveLo+tail0s;
+          }
+          if((tail0s+=Long.numberOfTrailingZeros(this.word3))<exclusiveHi){
+            return tail0s;
+          }
+        }
+        break goToEnd;
+      default:
+        if((tail0s=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))<exclusiveHi){
+          return inclusiveLo+tail0s;
+        }
+        break goToEnd;
+    }
+    return 128;
+  }
+  
+  private int getHeadSetHi(int inclusiveHi){
+    switch((inclusiveHi)>>6){
+    case 1:
+      int lead0s;
+      if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+        return inclusiveHi-lead0s;
+      }
+      inclusiveHi=63;
+    case 0:
+      if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
+        return inclusiveHi-lead0s;
+      }
+      inclusiveHi=-1;
+    case -1:
+      if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
+        return inclusiveHi-lead0s;
+      }
+      inclusiveHi=-65;
+    default:
+      if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
+        return inclusiveHi-lead0s;
+      }
+    }
+    return -129;
+  }
+  
+  private int getBodySetHi(int exclusiveLo,int inclusiveHi){
+    #MACRO NYI()
+  }
+  
   
   
   private static class UncheckedAscendingItr extends AbstractByteItr{
@@ -1538,35 +1688,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public byte nextByte(){
       final int ret;
-      int currIndex;
-      final var root=this.root;
-      switch((currIndex=ret=this.currIndex)>>6){
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(root.word0>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          currIndex=-64;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(root.word1>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          currIndex=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(root.word2>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          currIndex=64;
-        default:
-          if((tail0s=Long.numberOfTrailingZeros(root.word3>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          this.currIndex=128;
-      }
+      this.currIndex=((ByteSetImpl)root).getTailSetLo(ret=this.currIndex);
       return (byte)ret;
     }
   }
@@ -1639,35 +1761,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
     }
     @Override public byte nextByte(){
       final int ret;
-      int currIndex;
-      final var root=this.root;
-      switch((currIndex=ret=this.currIndex)>>6){
-        case -2:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(root.word3<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          currIndex=63;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(root.word2<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          currIndex=-1;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(root.word1<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          currIndex=-65;
-        default:
-          if((lead0s=Long.numberOfLeadingZeros(root.word0<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          this.currIndex=-129;
-      }
+      this.currIndex=((ByteSetImpl)root).getHeadSetHi(ret=this.currIndex);
       return (byte)ret;
     }
   }
@@ -2630,8 +2724,8 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
   }
   private void clearBodySet(int boundInfo){
     final int exclusiveTo=(boundInfo>>8);
-    goToEnd:switch((boundInfo=(byte)(boundInfo&0xff))>>6){
-      case -2:
+    goToEnd:switch((boundInfo&=0xff)>>6){
+      case 2:
         clearWord0:for(;;){
           switch(exclusiveTo>>6){
             case -2:
@@ -2652,7 +2746,7 @@ public abstract class ByteSetImpl extends AbstractByteSet implements Cloneable{
         }
         this.word0&=(-1L>>>(-boundInfo));
         break;
-      case -1:
+      case 3:
         switch(exclusiveTo>>6){
           case -1:
             this.word1&=((-1L>>>(-boundInfo))|(-1L<<exclusiveTo));
