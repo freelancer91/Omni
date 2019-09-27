@@ -644,6 +644,223 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }    
     return Double.NaN;
   }
+  private int uncheckedHashCode(int numLeft){
+    int sum=0;
+    goToEnd:for(;;){
+      int offset=127;
+      for(long word=this.word3;;){
+        if((word&(1L<<offset))!=0){
+          sum+=offset;
+          if(--numLeft==0){
+            break goToEnd;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<offset))!=0){
+          sum+=offset;
+          if(--numLeft==0){
+            break goToEnd;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<offset))!=0){
+          sum+=offset;
+          if(--numLeft==0){
+            break goToEnd;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--offset){
+        if((word&(1L<<offset))!=0){
+          sum+=offset;
+          if(--numLeft==0){
+            break goToEnd;
+          }
+        }
+      } 
+    }
+    return sum;
+  }
+  private int uncheckedHashCode(int exclusiveHi,int numLeft){
+    int sum=0;
+    goToEnd:switch((--exclusiveHi)>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<exclusiveHi))!=0){
+            sum+=exclusiveHi;
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--exclusiveHi==63){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<exclusiveHi))!=0){
+            sum+=exclusiveHi;
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--exclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<exclusiveHi))!=0){
+            sum+=exclusiveHi;
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--exclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--exclusiveHi){
+          if((word&(1L<<exclusiveHi))!=0){
+            sum+=exclusiveHi;
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+    return sum;
+  }
+  private String uncheckedAscendingToString(int numLeft){
+    int bufferOffset;
+    byte[] buffer;
+    (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+    goToEnd:for(;;){
+      int offset=-128;
+      for(long word=this.word0;;){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++offset){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+      }
+    }
+    buffer[++bufferOffset]=']';
+    return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+  }
+  private String uncheckedDescendingToString(int numLeft){
+    int bufferOffset;
+    byte[] buffer;
+    (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+    goToEnd:for(;;){
+      int offset=127;
+      for(long word=this.word3;;){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--offset){
+        if((word&(1L<<offset))!=0){
+          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+          if(--numLeft==0){
+            break goToEnd;
+          }
+          buffer[bufferOffset]=',';
+          buffer[++bufferOffset]=' ';
+        }
+      }
+    }
+    buffer[++bufferOffset]=']';
+    return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+  }
    private void uncheckedDescendingForEach(int numLeft,ByteConsumer action){
       int offset=127;
       for(long word=this.word3;;){
@@ -654,33 +871,36 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
         if(--offset==63){
-          for(word=this.word2;;){
-            if((word&(1L<<offset))!=0){
-              action.accept((byte)offset);
-              if(--numLeft==0){
-                return;
-              }
-            }
-            if(--offset==-1){
-              for(word=this.word1;;){
-                if((word&(1L<<offset))!=0){
-                  action.accept((byte)offset);
-                  if(--numLeft==0){
-                    return;
-                  }
-                }
-                if(--offset==-65){
-                  for(word=this.word0;;--offset){
-                    if((word&(1L<<offset))!=0){
-                      action.accept((byte)offset);
-                      if(--numLeft==0){
-                        return;
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--offset){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
           }
         }
       }
@@ -695,36 +915,93 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
         if(++offset==-64){
-          for(word=this.word1;;){
-            if((word&(1L<<offset))!=0){
-              action.accept((byte)offset);
-              if(--numLeft==0){
-                return;
-              }
-            }
-            if(++offset==0){
-              for(word=this.word2;;){
-                if((word&(1L<<offset))!=0){
-                  action.accept((byte)offset);
-                  if(--numLeft==0){
-                    return;
-                  }
-                }
-                if(++offset==64){
-                  for(word=this.word3;;++offset){
-                    if((word&(1L<<offset))!=0){
-                      action.accept((byte)offset);
-                      if(--numLeft==0){
-                        return;
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++offset){
+        if((word&(1L<<offset))!=0){
+          action.accept((byte)offset);
+          if(--numLeft==0){
+            return;
           }
         }
       }
+    }
+    private String uncheckedAscendingToString(int inclusiveLo,int numLeft){
+      int bufferOffset;
+      byte[] buffer;
+      (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }  
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }  
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }  
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+      buffer[++bufferOffset]=']';
+      return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
     }
     private void uncheckedAscendingForEach(int inclusiveLo,int numLeft,ByteConsumer action){
       goToEnd:switch(inclusiveLo>>6){
@@ -775,6 +1052,60 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
       }
     }
+    private String uncheckedDescendingToString(int exclusiveHi,int numLeft){
+      int bufferOffset;
+      byte[] buffer;
+      (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }  
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }  
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==65){
+              break;
+            }
+          }  
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
+              if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+      buffer[++bufferOffset]=']';
+      return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+    }
     private void uncheckedDescendingForEach(int exclusiveHi,int numLeft,ByteConsumer action){
       goToEnd:switch((--exclusiveHi)>>6){
         case 1:
@@ -818,6 +1149,1494 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             if((word&(1L<<exclusiveHi))!=0){
               action.accept((byte)exclusiveHi);
               if(--numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,byte[] dst){
+      int val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,byte[] dst){
+      int val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,byte[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,byte[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,Byte[] dst){
+      int val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,Byte[] dst){
+      int val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,Byte[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,Byte[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,Object[] dst){
+      int val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,Object[] dst){
+      int val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(Byte)(byte)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,Object[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,Object[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,short[] dst){
+      int val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,short[] dst){
+      int val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(short)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,short[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(short)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(short)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(short)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(short)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,short[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(short)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(short)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(short)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(short)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,int[] dst){
+      int val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,int[] dst){
+      int val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(int)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,int[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(int)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(int)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(int)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(int)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,int[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(int)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(int)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(int)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(int)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,long[] dst){
+      long val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,long[] dst){
+      long val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(long)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,long[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(long)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(long)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(long)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(long)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,long[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(long)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(long)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(long)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(long)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,float[] dst){
+      int val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,float[] dst){
+      int val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(float)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,float[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(float)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(float)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(float)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(float)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,float[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(float)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(float)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(float)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(float)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedAscendingToArray(int numLeft,double[] dst){
+      int val=Byte.MAX_VALUE;
+      for(long word=this.word3;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==63){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-1){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(--val==-65){
+          break;
+        }
+      }
+      for(long word=this.word0;;--val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedDescendingToArray(int numLeft,double[] dst){
+      int val=Byte.MIN_VALUE;
+      for(long word=this.word0;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==-64){
+          break;
+        }
+      }
+      for(long word=this.word1;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==0){
+          break;
+        }
+      }
+      for(long word=this.word2;;){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+        if(++val==64){
+          break;
+        }
+      }
+      for(long word=this.word3;;++val){
+        if((word&(1L<<val))!=0){
+          dst[--numLeft]=(double)(val);
+          if(numLeft==0){
+            return;
+          }
+        }
+      }
+    }
+    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,double[] dst){
+      goToEnd:switch((--exclusiveHi)>>6){
+        case 1:
+          for(long word=this.word3;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(double)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==63){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(double)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-1){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(double)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(--exclusiveHi==-65){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word0;;--exclusiveHi){
+            if((word&(1L<<exclusiveHi))!=0){
+              dst[--numLeft]=(double)(exclusiveHi);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+          }
+      }
+    }
+    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,double[] dst){
+      goToEnd:switch(inclusiveLo>>6){
+        case -2:
+          for(long word=this.word0;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(double)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==-64){
+              break;
+            }
+          }
+        case -1:
+          for(long word=this.word1;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(double)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==0){
+              break;
+            }
+          }
+        case 0:
+          for(long word=this.word2;;){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(double)(inclusiveLo);
+              if(numLeft==0){
+                break goToEnd;
+              }
+            }
+            if(++inclusiveLo==64){
+              break;
+            }
+          }
+        default:
+          for(long word=this.word3;;++inclusiveLo){
+            if((word&(1L<<inclusiveLo))!=0){
+              dst[--numLeft]=(double)(inclusiveLo);
+              if(numLeft==0){
                 break goToEnd;
               }
             }
@@ -915,49 +2734,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
     @Override public int hashCode(){
-      int numLeft,sum=0;
+      int numLeft;
       if((numLeft=this.modCountAndSize&0x1ff)!=0){
-        int offset=Byte.MAX_VALUE;
-        goToEnd:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            sum+=offset;
-            if(--numLeft==0){
-              break goToEnd;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                sum+=offset;
-                if(--numLeft==0){
-                  break goToEnd;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    sum+=offset;
-                    if(--numLeft==0){
-                      break goToEnd;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        sum+=offset;
-                        if(--numLeft==0){
-                          break goToEnd;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        return ((ByteSetImpl)this).uncheckedHashCode(numLeft);
       }
-      return sum;
+      return 0;
     }
     @Override public boolean add(byte val){
       if(super.uncheckedAdd(val)){
@@ -975,10 +2756,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     private int uncheckedremoveIf(int modCount,int size,BytePredicate filter){
       int numRemoved=0;
-      long word3=this.word3;
-      for(int offset=Byte.MAX_VALUE;;){
+      long word2=this.word2;
+      for(int offset=0;;){
         long marker;
-        if((word3&(marker=1L<<offset))!=0){
+        if((word2&(marker=1L<<offset))!=0){
           if(filter.test((byte)offset)){
             word3&=(~marker);
             ++numRemoved;
@@ -991,10 +2772,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             break;
           }
         }
-        if(--offset==63){
-          long word2=this.word2;
+        if(++offset==64){
+          long word3=this.word3;
           for(;;){
-            if((word2&(marker=1L<<offset))!=0){
+            if((word3&(marker=1L<<offset))!=0){
               if(filter.test((byte)offset)){
                 word2&=(~marker);
                 ++numRemoved;
@@ -1007,9 +2788,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 break;
               }
             }
-            if(--offset==-1){
+            if(++offset==128){
               long word1=this.word1;
-              for(;;){
+              for(offset=-1;;){
                 if((word1&(marker=1L<<offset))!=0){
                   if(filter.test((byte)offset)){
                     word1&=(~marker);
@@ -1048,11 +2829,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               break;
             }
           }
-          this.word2=word2;
+          this.word3=word3;
           break;
         }
       }
-      this.word3=word3;
+      this.word2=word2;
       this.modCountAndSize=modCount+(modCount=(1<<9)-numRemoved);
       return modCount;
     }
@@ -1511,58 +3292,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public String toString(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final byte[] buffer;
-          int bufferOffset;
-          (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-          int offset=Byte.MIN_VALUE;
-          goToEnd:for(long word=this.word0;;){
-            if((word&(1L<<offset))!=0){
-              bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-              if(--numLeft==0){
-                 break goToEnd;
-              }
-              buffer[bufferOffset]=',';
-              buffer[++bufferOffset]=' ';
-            }
-            if(++offset==-64){
-              for(word=this.word1;;){
-                if((word&(1L<<offset))!=0){
-                  bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                  buffer[bufferOffset]=',';
-                  buffer[++bufferOffset]=' ';
-                }
-                if(++offset==0){
-                  for(word=this.word2;;){
-                    if((word&(1L<<offset))!=0){
-                      bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                      if(--numLeft==0){
-                        break goToEnd;
-                      }
-                      buffer[bufferOffset]=',';
-                      buffer[++bufferOffset]=' ';
-                    }
-                    if(++offset==64){
-                      for(word=this.word3;;++offset){
-                        if((word&(1L<<offset))!=0){
-                          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                          if(--numLeft==0){
-                            break goToEnd;
-                          }
-                          buffer[bufferOffset]=',';
-                          buffer[++bufferOffset]=' ';
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          buffer[++bufferOffset]=']';
-          return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          return ((ByteSetImpl)this).uncheckedAscendingToString(numLeft);
         }
         return "[]";
       }
@@ -1592,46 +3322,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public <T> T[] toArray(T[] dst){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          dst=OmniArray.uncheckedArrResize(numLeft,dst);
-          int offset=Byte.MAX_VALUE;
-          outer:for(long word=this.word3;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(--offset==63){
-              for(word=this.word2;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(--offset==-1){
-                  for(word=this.word1;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(--offset==-65){
-                      for(word=this.word0;;--offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=OmniArray.uncheckedArrResize(numLeft,dst));
         }else if(dst.length!=0){
           dst[0]=null;
         }
@@ -1648,91 +3339,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
         }
         if(numLeft!=0){
-          int offset=Byte.MAX_VALUE;
-          outer:for(long word=this.word3;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(--offset==63){
-              for(word=this.word2;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(--offset==-1){
-                  for(word=this.word1;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(--offset==-65){
-                      for(word=this.word0;;--offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst);
         }
         return dst;
       }
       @Override public Byte[] toArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final Byte[] dst;
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=new Byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -1740,46 +3355,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public byte[] toByteArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final byte[] dst=new byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final byte[] dst;
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=new byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -1787,46 +3364,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public short[] toShortArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final short[] dst=new short[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final short[] dst;
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=new short[numLeft]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -1834,46 +3373,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int[] toIntArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final int[] dst=new int[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final int[] dst;
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=new int[numLeft]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -1881,46 +3382,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public long[] toLongArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final long[] dst=new long[numLeft];
-        long offset=Byte.MAX_VALUE;
-        outer:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final long[] dst;
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=new long[numLeft]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -1928,46 +3391,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public float[] toFloatArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final float[] dst=new float[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final float[] dst;
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=new float[numLeft]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -1975,46 +3400,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double[] toDoubleArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final double[] dst=new double[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=this.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=this.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=this.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=this.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final double[] dst;
+          ((ByteSetImpl)this).uncheckedAscendingToArray(numLeft,dst=new double[numLeft]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -2237,58 +3624,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public String toString(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final byte[] buffer;
-          int bufferOffset;
-          (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-          int offset=Byte.MAX_VALUE;
-          goToEnd:for(long word=this.word3;;){
-            if((word&(1L<<offset))!=0){
-              bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-              if(--numLeft==0){
-                 break goToEnd;
-              }
-              buffer[bufferOffset]=',';
-              buffer[++bufferOffset]=' ';
-            }
-            if(--offset==63){
-              for(word=this.word2;;){
-                if((word&(1L<<offset))!=0){
-                  bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                  buffer[bufferOffset]=',';
-                  buffer[++bufferOffset]=' ';
-                }
-                if(--offset==-1){
-                  for(word=this.word1;;){
-                    if((word&(1L<<offset))!=0){
-                      bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                      if(--numLeft==0){
-                        break goToEnd;
-                      }
-                      buffer[bufferOffset]=',';
-                      buffer[++bufferOffset]=' ';
-                    }
-                    if(--offset==-65){
-                      for(word=this.word0;;--offset){
-                        if((word&(1L<<offset))!=0){
-                          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                          if(--numLeft==0){
-                            break goToEnd;
-                          }
-                          buffer[bufferOffset]=',';
-                          buffer[++bufferOffset]=' ';
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          buffer[++bufferOffset]=']';
-          return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          return ((ByteSetImpl)this).uncheckedDescendingToString(numLeft);
         }
         return "[]";
       }
@@ -2318,46 +3654,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public <T> T[] toArray(T[] dst){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          dst=OmniArray.uncheckedArrResize(numLeft,dst);
-          int offset=Byte.MIN_VALUE;
-          outer:for(long word=this.word0;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(++offset==-64){
-              for(word=this.word1;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(++offset==0){
-                  for(word=this.word2;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(++offset==64){
-                      for(word=this.word3;;++offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=OmniArray.uncheckedArrResize(numLeft,dst));
         }else if(dst.length!=0){
           dst[0]=null;
         }
@@ -2374,91 +3671,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
         }
         if(numLeft!=0){
-          int offset=Byte.MIN_VALUE;
-          outer:for(long word=this.word0;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(++offset==-64){
-              for(word=this.word1;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(++offset==0){
-                  for(word=this.word2;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(++offset==64){
-                      for(word=this.word3;;++offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst);
         }
         return dst;
       }
       @Override public Byte[] toArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final Byte[] dst;
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=new Byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -2466,46 +3687,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public byte[] toByteArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final byte[] dst=new byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final byte[] dst;
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=new byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -2513,46 +3696,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public short[] toShortArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final short[] dst=new short[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final short[] dst;
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=new short[numLeft]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -2560,46 +3705,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int[] toIntArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final int[] dst=new int[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final int[] dst;
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=new int[numLeft]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -2607,46 +3714,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public long[] toLongArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final long[] dst=new long[numLeft];
-        long offset=Byte.MIN_VALUE;
-        outer:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final long[] dst;
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=new long[numLeft]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -2654,46 +3723,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public float[] toFloatArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final float[] dst=new float[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final float[] dst;
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=new float[numLeft]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -2701,46 +3732,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double[] toDoubleArray(){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
-          final double[] dst=new double[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=this.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=this.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=this.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=this.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final double[] dst;
+          ((ByteSetImpl)this).uncheckedDescendingToArray(numLeft,dst=new double[numLeft]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -3027,36 +4020,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(Byte)(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(Byte)(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(Byte)(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(Byte)(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3065,7 +4059,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -3075,36 +4068,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final byte[] dst=new byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3113,7 +4107,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -3123,36 +4116,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final short[] dst=new short[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(short)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(short)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(short)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(short)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3161,7 +4155,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -3171,36 +4164,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final int[] dst=new int[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3209,7 +4203,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -3219,36 +4212,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final long[] dst=new long[numLeft];
-        long offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          long offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3257,7 +4251,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -3267,36 +4260,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final float[] dst=new float[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(float)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(float)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(float)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(float)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3305,7 +4299,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -3315,36 +4308,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final double[] dst=new double[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(double)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(double)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(double)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(double)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3353,7 +4347,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -3665,7 +4658,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                       }
                     }
                     if(++offset==64){
-                      for(;;--offset){
+                      for(;;++offset){
                         if((word3&(1L<<offset))!=0){
                           dst[--numLeft]=(T)(Byte)(byte)(offset);
                           if(numLeft==0){
@@ -3715,7 +4708,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                       }
                     }
                     if(++offset==64){
-                      for(;;--offset){
+                      for(;;++offset){
                         if((word3&(1L<<offset))!=0){
                           dst[--numLeft]=(T)(Byte)(byte)(offset);
                           if(numLeft==0){
@@ -3737,36 +4730,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(Byte)(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(Byte)(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(Byte)(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(Byte)(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3775,7 +4769,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -3785,36 +4778,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final byte[] dst=new byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3823,7 +4817,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -3833,36 +4826,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final short[] dst=new short[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(short)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(short)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(short)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(short)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3871,7 +4865,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -3881,36 +4874,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final int[] dst=new int[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3919,7 +4913,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -3929,36 +4922,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final long[] dst=new long[numLeft];
-        long offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          long offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -3967,7 +4961,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -3977,36 +4970,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final float[] dst=new float[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(float)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(float)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(float)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(float)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -4015,7 +5009,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -4025,36 +5018,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final long word0,word1,word2,word3;
         if((numLeft=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
           final double[] dst=new double[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(double)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(double)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(double)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(double)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -4063,7 +5057,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -4657,12 +5650,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   }
   private static class UncheckedAscendingItr extends AbstractByteItr{
     transient final ByteSetImpl.Unchecked root;
-    transient int currIndexAndNumLeft;
-    //transient int currIndex;
+    transient int currIndex;
     private UncheckedAscendingItr(ByteSetImpl.Unchecked root){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=root;
       int currIndex;
       if((currIndex=Long.numberOfTrailingZeros(root.word0))==64){
@@ -4673,23 +5662,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
       this.currIndex=currIndex-128;
-      */
     }
     private UncheckedAscendingItr(UncheckedAscendingItr that){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=that.root;
       this.currIndex=that.currIndex;
-      */
     }
     @Override public Object clone(){
       return new UncheckedAscendingItr(this);
     }
     @Override public void remove(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-     /*
       final var root=this.root;
       int currIndex;
       switch(((currIndex=this.currIndex)-1)>>6){
@@ -4716,54 +5697,34 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         default:
           root.word0=(word=root.word0)&(~(1L<<(currIndex-Long.numberOfLeadingZeros(word<<(-currIndex)))));
       }
-      */
     }
     @Override public void forEachRemaining(ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=128){
         root.uncheckedForEachAscending(currIndex,action);
         this.currIndex=128;
       }
-      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=128){
         root.uncheckedForEachAscending(currIndex,action::accept);
         this.currIndex=128;
       }
-      */
     }
     @Override public boolean hasNext(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       return this.currIndex!=128;
-      */
     }
     @Override public byte nextByte(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final int ret;
       this.currIndex=((ByteSetImpl)root).getThisOrHigher((ret=this.currIndex)+1);
       return (byte)ret;
-      */
     }
   }
   private static class UncheckedDescendingItr extends AbstractByteItr{
     transient final ByteSetImpl.Unchecked root;
     transient int currIndex;
     private UncheckedDescendingItr(ByteSetImpl.Unchecked root){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=root;
       int currIndex;
       if((currIndex=Long.numberOfLeadingZeros(root.word3))==64){
@@ -4774,23 +5735,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
       this.currIndex=Byte.MAX_VALUE-currIndex;
-      */
     }
     private UncheckedDescendingItr(UncheckedDescendingItr that){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=that.root;
       this.currIndex=that.currIndex;
-      */
     }
     @Override public Object clone(){
       return new UncheckedDescendingItr(this);
     }
     @Override public void remove(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final var root=this.root;
       int currIndex;
       switch(((currIndex=this.currIndex+1))>>6){
@@ -4817,56 +5770,38 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       default:
         root.word3=(word=root.word3)&(~(1L<<(currIndex+Long.numberOfTrailingZeros(word>>>(currIndex)))));
       }
-      */
     }
     @Override public void forEachRemaining(ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=-129){
         root.uncheckedForEachDescending(currIndex,action);
         this.currIndex=-129;
       }
-      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final int currIndex;
       if((currIndex=this.currIndex)!=-129){
         root.uncheckedForEachDescending(currIndex,action::accept);
         this.currIndex=-129;
       }
-      */
     }
     @Override public boolean hasNext(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       return this.currIndex!=-129;
-      */
     }
     @Override public byte nextByte(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final int ret;
       this.currIndex=((ByteSetImpl)root).getThisOrLower((ret=this.currIndex)-1);
       return (byte)ret;
-      */
     }
   }
   private static class CheckedAscendingItr extends AbstractByteItr{
     transient final ByteSetImpl.Checked root;
-    transient int currIndex;
+    transient int currIndexAndNumLeft;
     transient int modCountAndLastRet;
     private CheckedAscendingItr(ByteSetImpl.Checked root){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=root;
+      int modCountAndSize;
+      this.modCountAndLastRet=(modCountAndSize=root.modCountAndSize)|0x1ff;
       int currIndex;
       if((currIndex=Long.numberOfTrailingZeros(root.word0))==64){
         if((currIndex+=Long.numberOfTrailingZeros(root.word1))==128){
@@ -4875,26 +5810,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       }
-      this.currIndex=currIndex-128;
-      this.modCountAndLastRet=root.modCountAndSize|0x1ff;
-      */
+      this.currIndexAndNumLeft=(currIndex<<9)|(modCountAndSize&(0x1ff));
     }
     private CheckedAscendingItr(CheckedAscendingItr that){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=that.root;
-      this.currIndex=that.currIndex;
+      this.currIndexAndNumLeft=that.currIndexAndNumLeft;
       this.modCountAndLastRet=that.modCountAndLastRet;
-      */
     }
     @Override public Object clone(){
       return new CheckedAscendingItr(this);
     }
     @Override public void remove(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       int lastRet;
       int modCountAndLastRet;
       if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)==0x1ff){
@@ -4918,143 +5844,107 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       root.modCountAndSize=modCountAndSize+((1<<9)-1);
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
-      */
     }
-    private void uncheckedForEachRemaining(int currIndex,ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
+    private void uncheckedForEachRemaining(int numLeft,int currIndex,ByteConsumer action){
       int modCountAndLastRet=this.modCountAndLastRet;
       final var root=this.root;
       int lastRet;
       try{
         action.accept((byte)(lastRet=currIndex));
-        switch((++currIndex)>>6){
-          case -2:
-            for(long word=root.word0;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
+        if(--numLeft!=0){
+          goToEnd:switch((++currIndex)>>6){
+            case -2:
+              for(long word=root.word0;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(++currIndex==-64){
+                  break;
+                }
               }
-              if(++currIndex==-64){
-                break;
+            case -1:
+              for(long word=root.word1;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(++currIndex==0){
+                  break;
+                }
               }
-            }
-          case -1:
-            for(long word=root.word1;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
+            case 0:
+              for(long word=root.word2;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(++currIndex==64){
+                  break;
+                }
               }
-              if(++currIndex==0){
-                break;
+            case 1:
+              for(long word=root.word3;;++currIndex){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
               }
-            }
-          case 0:
-            for(long word=root.word2;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
-              }
-              if(++currIndex==64){
-                break;
-              }
-            }
-          case 1:
-            for(long word=root.word3;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
-              }
-              if(++currIndex==128){
-                break;
-              }
-            }
-          default:
+            default:
+          }
         }
       }finally{
         CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),root.modCountAndSize&(~0x1ff));
       }
       this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
-      this.currIndex=128;
-      */
+      this.currIndexAndNumLeft=1<<16;
     }
     @Override public void forEachRemaining(ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
-      final int currIndex;
-      if((currIndex=this.currIndex)!=128){
-        uncheckedForEachRemaining(currIndex,action);
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=1<<16){
+        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action);
       }
-      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
-      final int currIndex;
-      if((currIndex=this.currIndex)!=128){
-        uncheckedForEachRemaining(currIndex,action::accept);
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=1<<16){
+        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action::accept);
       }
-      */
     }
     @Override public boolean hasNext(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
-      return this.currIndex!=128;
-      */
+      return this.currIndexAndNumLeft!=1<<16;
     }
     @Override public byte nextByte(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final ByteSetImpl.Checked root;
       final int modCountAndLastRet;
       CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
-      final int ret;
-      int currIndex;
-      switch((currIndex=ret=this.currIndex)>>6){
-        case -2:
-          int tail0s;
-          if((tail0s=Long.numberOfTrailingZeros(root.word0>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          currIndex=-64;
-        case -1:
-          if((tail0s=Long.numberOfTrailingZeros(root.word1>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          currIndex=0;
-        case 0:
-          if((tail0s=Long.numberOfTrailingZeros(root.word2>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          currIndex=64;
-        case 1:
-          if((tail0s=Long.numberOfTrailingZeros(root.word3>>>currIndex))!=64){
-            this.currIndex=currIndex+tail0s;
-            break;
-          }
-          this.currIndex=128;
-          break;
-        default:
-          throw new NoSuchElementException();
+      int currIndexAndNumLeft;
+      int numLeft;
+      if((numLeft=(currIndexAndNumLeft=this.currIndexAndNumLeft)&0x1ff)!=0){
+        final int ret;
+        this.currIndexAndNumLeft=(((ByteSetImpl)root).getThisOrHigher((ret=currIndexAndNumLeft>>9)+1)<<9)|(numLeft-1);
+        this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
+        return (byte)ret;
       }
-      this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
-      return (byte)ret;
-      */
+      throw new NoSuchElementException();
     }
   }
   private static class CheckedDescendingItr extends AbstractByteItr{
     transient final ByteSetImpl.Checked root;
-    transient int currIndex;
+    transient int currIndexAndNumLeft;
     transient int modCountAndLastRet;
     private CheckedDescendingItr(ByteSetImpl.Checked root){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=root;
+      int modCountAndSize;
+      this.modCountAndLastRet=(modCountAndSize=root.modCountAndSize)|0x1ff;
       int currIndex;
       if((currIndex=Long.numberOfLeadingZeros(root.word3))==64){
         if((currIndex+=Long.numberOfLeadingZeros(root.word2))==128){
@@ -5063,26 +5953,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       }
-      this.currIndex=Byte.MAX_VALUE-currIndex;
-      this.modCountAndLastRet=root.modCountAndSize|0x1ff;
-      */
+      this.currIndexAndNumLeft=((Byte.MAX_VALUE-currIndex)<<9)|(modCountAndSize&(0x1ff));
     }
     private CheckedDescendingItr(CheckedDescendingItr that){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       this.root=that.root;
-      this.currIndex=that.currIndex;
+      this.currIndexAndNumLeft=that.currIndexAndNumLeft;
       this.modCountAndLastRet=that.modCountAndLastRet;
-      */
     }
     @Override public Object clone(){
       return new CheckedDescendingItr(this);
     }
     @Override public void remove(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       int lastRet;
       int modCountAndLastRet;
       if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)==0x1ff){
@@ -5106,132 +5987,97 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       root.modCountAndSize=modCountAndSize+((1<<9)-1);
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
-      */
     }
-    private void uncheckedForEachRemaining(int currIndex,ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
+    private void uncheckedForEachRemaining(int numLeft,int currIndex,ByteConsumer action){
       int modCountAndLastRet=this.modCountAndLastRet;
       final var root=this.root;
       int lastRet;
       try{
         action.accept((byte)(lastRet=currIndex));
-        switch((--currIndex)>>6){
-          case 1:
-            for(long word=root.word3;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
+        if(--numLeft!=0){
+          goToEnd:switch((--currIndex)>>6){
+            case 1:
+              for(long word=root.word3;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(--currIndex==63){
+                  break;
+                }
               }
-              if(--currIndex==63){
-                break;
+            case 0:
+              for(long word=root.word2;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(--currIndex==-1){
+                  break;
+                }
               }
-            }
-          case 0:
-            for(long word=root.word2;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
+            case -1:
+              for(long word=root.word1;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(--currIndex==-65){
+                  break;
+                }
               }
-              if(--currIndex==-1){
-                break;
+            case -2:
+              for(long word=root.word0;;--currIndex){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--numLeft==0){
+                    break goToEnd;
+                  }
+                }
               }
-            }
-          case -1:
-            for(long word=root.word0;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
-              }
-              if(--currIndex==-65){
-                break;
-              }
-            }
-          case -2:
-            for(long word=root.word0;;){
-              if((word&(1L<<currIndex))!=0){
-                action.accept((byte)(lastRet=currIndex));
-              }
-              if(--currIndex==-129){
-                break;
-              }
-            }
-          default:
+            default:
+          }
         }
       }finally{
         CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),root.modCountAndSize&(~0x1ff));
       }
       this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
-      this.currIndex=-129;
-      */
+      this.currIndexAndNumLeft=-129<<9;
     }
     @Override public void forEachRemaining(ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
-      final int currIndex;
-      if((currIndex=this.currIndex)!=-129){
-        uncheckedForEachRemaining(currIndex,action);
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=(-129)<<9){
+        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action);
       }
-      */
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
-      final int currIndex;
-      if((currIndex=this.currIndex)!=-129){
-        uncheckedForEachRemaining(currIndex,action::accept);
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=(-129<<9)){
+        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action::accept);
       }
-      */
     }
     @Override public boolean hasNext(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
-      return this.currIndex!=-129;
-      */
+      return this.currIndexAndNumLeft!=(-129<<9);
     }
     @Override public byte nextByte(){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-      /*
       final ByteSetImpl.Checked root;
       final int modCountAndLastRet;
       CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
-      final int ret;
-      int currIndex;
-      switch((currIndex=ret=this.currIndex)>>6){
-        case 1:
-          int lead0s;
-          if((lead0s=Long.numberOfLeadingZeros(root.word3<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          currIndex=63;
-        case 0:
-          if((lead0s=Long.numberOfLeadingZeros(root.word2<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          currIndex=-1;
-        case -1:
-          if((lead0s=Long.numberOfLeadingZeros(root.word1<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          currIndex=-64;
-        case -2:
-          if((lead0s=Long.numberOfLeadingZeros(root.word0<<-currIndex))!=64){
-            this.currIndex=currIndex-lead0s;
-            break;
-          }
-          this.currIndex=-129;
-          break;
-        default:
-          throw new NoSuchElementException();
+      int currIndexAndNumLeft;
+      int numLeft;
+      if((numLeft=(currIndexAndNumLeft=this.currIndexAndNumLeft)&0x1ff)!=0){
+        final int ret;
+        this.currIndexAndNumLeft=(((ByteSetImpl)root).getThisOrLower((ret=currIndexAndNumLeft>>9)-1)<<9)|(numLeft-1);
+        this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
+        return (byte)ret;
       }
-      this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
-      return (byte)ret;
-      */
+      throw new NoSuchElementException();
     }
   }
   private static abstract class AbstractCheckedFullView extends AbstractByteSet.ComparatorlessImpl{
@@ -5493,58 +6339,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){
-          final byte[] buffer;
-          int bufferOffset;
-          (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-          int offset=Byte.MIN_VALUE;
-          goToEnd:for(long word=root.word0;;){
-            if((word&(1L<<offset))!=0){
-              bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-              if(--numLeft==0){
-                 break goToEnd;
-              }
-              buffer[bufferOffset]=',';
-              buffer[++bufferOffset]=' ';
-            }
-            if(++offset==-64){
-              for(word=root.word1;;){
-                if((word&(1L<<offset))!=0){
-                  bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                  buffer[bufferOffset]=',';
-                  buffer[++bufferOffset]=' ';
-                }
-                if(++offset==0){
-                  for(word=root.word2;;){
-                    if((word&(1L<<offset))!=0){
-                      bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                      if(--numLeft==0){
-                        break goToEnd;
-                      }
-                      buffer[bufferOffset]=',';
-                      buffer[++bufferOffset]=' ';
-                    }
-                    if(++offset==64){
-                      for(word=root.word3;;++offset){
-                        if((word&(1L<<offset))!=0){
-                          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                          if(--numLeft==0){
-                            break goToEnd;
-                          }
-                          buffer[bufferOffset]=',';
-                          buffer[++bufferOffset]=' ';
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          buffer[++bufferOffset]=']';
-          return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          return ((ByteSetImpl)root).uncheckedAscendingToString(numLeft);
         }
         return "[]";
       }
@@ -5577,46 +6372,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          dst=OmniArray.uncheckedArrResize(numLeft,dst);
-          int offset=Byte.MAX_VALUE;
-          outer:for(long word=root.word3;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(--offset==63){
-              for(word=root.word2;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(--offset==-1){
-                  for(word=root.word1;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(--offset==-65){
-                      for(word=root.word0;;--offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=OmniArray.uncheckedArrResize(numLeft,dst));
         }else if(dst.length!=0){
           dst[0]=null;
         }
@@ -5634,45 +6390,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
         }
         if(numLeft!=0){
-          int offset=Byte.MAX_VALUE;
-          outer:for(long word=root.word3;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(--offset==63){
-              for(word=root.word2;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(--offset==-1){
-                  for(word=root.word1;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(--offset==-65){
-                      for(word=root.word0;;--offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
         }
         return dst;
       }
@@ -5680,46 +6398,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=root.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=root.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=root.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=root.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final Byte[] dst;
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=new Byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -5728,46 +6408,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final byte[] dst=new byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=root.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=root.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=root.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=root.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final byte[] dst;
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=new byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -5776,46 +6418,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final short[] dst=new short[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=root.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=root.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=root.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=root.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final short[] dst;
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=new short[numLeft]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -5824,46 +6428,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final int[] dst=new int[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=root.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=root.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=root.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=root.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final int[] dst;
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=new int[numLeft]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -5872,46 +6438,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final long[] dst=new long[numLeft];
-        long offset=Byte.MAX_VALUE;
-        outer:for(long word=root.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=root.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=root.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=root.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final long[] dst;
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=new long[numLeft]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -5920,46 +6448,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final float[] dst=new float[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=root.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=root.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=root.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=root.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final float[] dst;
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=new float[numLeft]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -5968,46 +6458,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final double[] dst=new double[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(long word=root.word3;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(word=root.word2;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(--offset==-1){
-                for(word=root.word1;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(--offset==-65){
-                    for(word=root.word0;;--offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final double[] dst;
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst=new double[numLeft]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -6099,58 +6551,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){
-          final byte[] buffer;
-          int bufferOffset;
-          (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-          int offset=Byte.MAX_VALUE;
-          goToEnd:for(long word=root.word3;;){
-            if((word&(1L<<offset))!=0){
-              bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-              if(--numLeft==0){
-                 break goToEnd;
-              }
-              buffer[bufferOffset]=',';
-              buffer[++bufferOffset]=' ';
-            }
-            if(--offset==63){
-              for(word=root.word2;;){
-                if((word&(1L<<offset))!=0){
-                  bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                  buffer[bufferOffset]=',';
-                  buffer[++bufferOffset]=' ';
-                }
-                if(--offset==-1){
-                  for(word=root.word1;;){
-                    if((word&(1L<<offset))!=0){
-                      bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                      if(--numLeft==0){
-                        break goToEnd;
-                      }
-                      buffer[bufferOffset]=',';
-                      buffer[++bufferOffset]=' ';
-                    }
-                    if(--offset==-65){
-                      for(word=root.word0;;--offset){
-                        if((word&(1L<<offset))!=0){
-                          bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-                          if(--numLeft==0){
-                            break goToEnd;
-                          }
-                          buffer[bufferOffset]=',';
-                          buffer[++bufferOffset]=' ';
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          buffer[++bufferOffset]=']';
-          return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          return ((ByteSetImpl)root).uncheckedDescendingToString(numLeft);
         }
         return "[]";
       }
@@ -6183,46 +6584,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          dst=OmniArray.uncheckedArrResize(numLeft,dst);
-          int offset=Byte.MIN_VALUE;
-          outer:for(long word=root.word0;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(++offset==-64){
-              for(word=root.word1;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(++offset==0){
-                  for(word=root.word2;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(++offset==64){
-                      for(word=root.word3;;++offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=OmniArray.uncheckedArrResize(numLeft,dst));
         }else if(dst.length!=0){
           dst[0]=null;
         }
@@ -6240,45 +6602,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
         }
         if(numLeft!=0){
-          int offset=Byte.MIN_VALUE;
-          outer:for(long word=root.word0;;){
-            if((word&(1L<<offset))!=0){
-              dst[--numLeft]=(T)(Byte)(byte)(offset);
-              if(numLeft==0){
-                break outer;
-              }
-            }
-            if(++offset==-64){
-              for(word=root.word1;;){
-                if((word&(1L<<offset))!=0){
-                  dst[--numLeft]=(T)(Byte)(byte)(offset);
-                  if(numLeft==0){
-                    break outer;
-                  }
-                }
-                if(++offset==0){
-                  for(word=root.word2;;){
-                    if((word&(1L<<offset))!=0){
-                      dst[--numLeft]=(T)(Byte)(byte)(offset);
-                      if(numLeft==0){
-                        break outer;
-                      }
-                    }
-                    if(++offset==64){
-                      for(word=root.word3;;++offset){
-                        if((word&(1L<<offset))!=0){
-                          dst[--numLeft]=(T)(Byte)(byte)(offset);
-                          if(numLeft==0){
-                            break outer;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
         }
         return dst;
       }
@@ -6286,46 +6610,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=root.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=root.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=root.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=root.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final Byte[] dst;
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=new Byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -6334,46 +6620,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final byte[] dst=new byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=root.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=root.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=root.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=root.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final byte[] dst;
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=new byte[numLeft]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -6382,46 +6630,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final short[] dst=new short[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=root.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=root.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=root.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=root.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final short[] dst;
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=new short[numLeft]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -6430,46 +6640,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final int[] dst=new int[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=root.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=root.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=root.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=root.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final int[] dst;
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=new int[numLeft]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -6478,46 +6650,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final long[] dst=new long[numLeft];
-        long offset=Byte.MIN_VALUE;
-        outer:for(long word=root.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=root.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=root.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=root.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final long[] dst;
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=new long[numLeft]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -6526,46 +6660,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final float[] dst=new float[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=root.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=root.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=root.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=root.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final float[] dst;
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=new float[numLeft]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -6574,46 +6670,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int numLeft;
         final ByteSetImpl.Checked root;
         if((numLeft=(root=this.root).modCountAndSize&0x1ff)!=0){   
-          final double[] dst=new double[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(long word=root.word0;;){
-          if((word&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(word=root.word1;;){
-              if((word&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
-              }
-              if(++offset==0){
-                for(word=root.word2;;){
-                  if((word&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
-                  }
-                  if(++offset==64){
-                    for(word=root.word3;;++offset){
-                      if((word&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+          final double[] dst;
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst=new double[numLeft]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -7050,36 +7108,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(Byte)(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(Byte)(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(Byte)(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(Byte)(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7088,7 +7147,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -7099,36 +7157,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final byte[] dst=new byte[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7137,7 +7196,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -7148,36 +7206,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final short[] dst=new short[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(short)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(short)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(short)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(short)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7186,7 +7245,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -7197,36 +7255,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final int[] dst=new int[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7235,7 +7294,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -7246,36 +7304,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final long[] dst=new long[numLeft];
-        long offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          long offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7284,7 +7343,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -7295,36 +7353,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final float[] dst=new float[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(float)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(float)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(float)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(float)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7333,7 +7392,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -7344,36 +7402,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final double[] dst=new double[numLeft];
-        int offset=Byte.MAX_VALUE;
-        outer:for(;;){
-          if((word3&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(--offset==63){
-            for(;;){
-              if((word2&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MAX_VALUE;
+          outer:for(;;){
+            if((word3&(1L<<offset))!=0){
+              dst[--numLeft]=(double)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(--offset==-1){
-                for(;;){
-                  if((word1&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(--offset==63){
+              for(;;){
+                if((word2&(1L<<offset))!=0){
+                  dst[--numLeft]=(double)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(--offset==-65){
-                    for(;;--offset){
-                      if((word0&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(--offset==-1){
+                  for(;;){
+                    if((word1&(1L<<offset))!=0){
+                      dst[--numLeft]=(double)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(--offset==-65){
+                      for(;;--offset){
+                        if((word0&(1L<<offset))!=0){
+                          dst[--numLeft]=(double)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7382,7 +7441,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -7571,7 +7629,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                       }
                     }
                     if(++offset==64){
-                      for(;;--offset){
+                      for(;;++offset){
                         if((word3&(1L<<offset))!=0){
                           dst[--numLeft]=(T)(Byte)(byte)(offset);
                           if(numLeft==0){
@@ -7622,7 +7680,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                       }
                     }
                     if(++offset==64){
-                      for(;;--offset){
+                      for(;;++offset){
                         if((word3&(1L<<offset))!=0){
                           dst[--numLeft]=(T)(Byte)(byte)(offset);
                           if(numLeft==0){
@@ -7645,36 +7703,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final Byte[] dst=new Byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(Byte)(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(Byte)(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(Byte)(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(Byte)(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(Byte)(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(Byte)(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(Byte)(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(Byte)(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7683,7 +7742,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -7694,36 +7752,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final byte[] dst=new byte[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(byte)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(byte)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(byte)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(byte)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(byte)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(byte)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(byte)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(byte)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7732,7 +7791,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -7743,36 +7801,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final short[] dst=new short[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(short)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(short)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(short)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(short)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(short)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(short)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(short)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(short)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7781,7 +7840,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -7792,36 +7850,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final int[] dst=new int[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7830,7 +7889,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -7841,36 +7899,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final long[] dst=new long[numLeft];
-        long offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          long offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7879,7 +7938,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -7890,36 +7948,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final float[] dst=new float[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(float)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(float)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(float)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(float)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(float)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(float)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(float)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(float)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7928,7 +7987,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -7939,36 +7997,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Unchecked root;
         if((numLeft=SetCommonImpl.size(word0=(root=this.root).word0,word1=root.word1,word2=root.word2,word3=root.word3))!=0){ 
           final double[] dst=new double[numLeft];
-        int offset=Byte.MIN_VALUE;
-        outer:for(;;){
-          if((word0&(1L<<offset))!=0){
-            dst[--numLeft]=(double)(offset);
-            if(numLeft==0){
-              break outer;
-            }
-          }
-          if(++offset==-64){
-            for(;;){
-              if((word1&(1L<<offset))!=0){
-                dst[--numLeft]=(double)(offset);
-                if(numLeft==0){
-                  break outer;
-                }
+          int offset=Byte.MIN_VALUE;
+          outer:for(;;){
+            if((word0&(1L<<offset))!=0){
+              dst[--numLeft]=(double)(offset);
+              if(numLeft==0){
+                break outer;
               }
-              if(++offset==0){
-                for(;;){
-                  if((word2&(1L<<offset))!=0){
-                    dst[--numLeft]=(double)(offset);
-                    if(numLeft==0){
-                      break outer;
-                    }
+            }
+            if(++offset==-64){
+              for(;;){
+                if((word1&(1L<<offset))!=0){
+                  dst[--numLeft]=(double)(offset);
+                  if(numLeft==0){
+                    break outer;
                   }
-                  if(++offset==64){
-                    for(;;--offset){
-                      if((word3&(1L<<offset))!=0){
-                        dst[--numLeft]=(double)(offset);
-                        if(numLeft==0){
-                          break outer;
+                }
+                if(++offset==0){
+                  for(;;){
+                    if((word2&(1L<<offset))!=0){
+                      dst[--numLeft]=(double)(offset);
+                      if(numLeft==0){
+                        break outer;
+                      }
+                    }
+                    if(++offset==64){
+                      for(;;++offset){
+                        if((word3&(1L<<offset))!=0){
+                          dst[--numLeft]=(double)(offset);
+                          if(numLeft==0){
+                            break outer;
+                          }
                         }
                       }
                     }
@@ -7977,7 +8036,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-        }
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -8087,8 +8145,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     transient final UncheckedSubSet parent;
     transient final int boundInfo;
     transient int size;
-    //TODO hashCode
-    //TODO toString
     //TODO equals
     private UncheckedSubSet(ByteSetImpl.Unchecked root,int boundInfo,int size){
       this.root=root;
@@ -8104,6 +8160,110 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     abstract boolean isInRange(int val);
     abstract void forEachImpl(int numLeft,ByteConsumer action);
+    abstract String toStringImpl(int numLeft);
+    abstract void toArrayImpl(int numLeft,Byte[] dst);
+    abstract void toArrayImpl(int numLeft,Object[] dst);
+    abstract void toArrayImpl(int numLeft,byte[] dst);
+    abstract void toArrayImpl(int numLeft,short[] dst);
+    abstract void toArrayImpl(int numLeft,int[] dst);
+    abstract void toArrayImpl(int numLeft,long[] dst);
+    abstract void toArrayImpl(int numLeft,float[] dst);
+    abstract void toArrayImpl(int numLeft,double[] dst);
+    @Override public Byte[] toArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final Byte[] dst;
+        toArrayImpl(size,dst=new Byte[size]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      final int size;
+      final T[] dst=arrConstructor.apply(size=this.size);
+      if(size!=0){
+        toArrayImpl(size,dst);
+      }
+      return dst;
+    }
+    @Override public <T> T[] toArray(T[] dst){
+      final int size;
+      if((size=this.size)!=0){
+        toArrayImpl(size,dst=OmniArray.uncheckedArrResize(size,dst));
+      }else if(dst.length!=0){
+        dst[0]=null;
+      }
+      return dst;
+    }
+    @Override public byte[] toByteArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final byte[] dst;
+        toArrayImpl(size,dst=new byte[size]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    @Override public short[] toShortArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final short[] dst;
+        toArrayImpl(size,dst=new short[size]);
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    @Override public int[] toIntArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final int[] dst;
+        toArrayImpl(size,dst=new int[size]);
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    @Override public long[] toLongArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final long[] dst;
+        toArrayImpl(size,dst=new long[size]);
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final float[] dst;
+        toArrayImpl(size,dst=new float[size]);
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final double[] dst;
+        toArrayImpl(size,dst=new double[size]);
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public String toString(){
+      int size;
+      if((size=this.size)!=0){
+        return toStringImpl(size);
+      }
+      return "[]";
+    }
+    abstract int hashCodeImpl(int numLeft);
+    @Override public int hashCode(){
+      int size;
+      if((size=this.size)!=0){
+        return hashCodeImpl(size);
+      }
+      return 0;
+    }
     @Override public void forEach(ByteConsumer action){
       final int numLeft;
       if((numLeft=this.size)!=0){
@@ -8373,6 +8533,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override void clearImpl(){
         ((ByteSetImpl)root).clearHeadSet(this.boundInfo);
       }
+      @Override int hashCodeImpl(int numLeft){
+        return ((ByteSetImpl)root).uncheckedHashCode(this.boundInfo,numLeft);
+      }
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
@@ -8382,6 +8545,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedAscendingForEach(numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft){
+          return ((ByteSetImpl)root).uncheckedAscendingToString(numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,Byte[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,Object[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,byte[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,short[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,int[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,long[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,float[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,double[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
         }
       }
       private static class Descending extends HeadSet{
@@ -8393,6 +8583,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(this.boundInfo,numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft){
+          return ((ByteSetImpl)root).uncheckedDescendingToString(this.boundInfo,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,Byte[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,Object[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,byte[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,short[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,int[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,long[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,float[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,double[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
         }
       }
     }
@@ -8408,6 +8625,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override void clearImpl(){
         ((ByteSetImpl)root).clearTailSet(this.boundInfo);
+      }
+      @Override int hashCodeImpl(int numLeft){
+        return ((ByteSetImpl)root).uncheckedHashCode(numLeft);
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
         int numRemoved=0;
@@ -8501,6 +8721,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedAscendingForEach(this.boundInfo,numLeft,action);
         }
+        @Override String toStringImpl(int numLeft){
+          return ((ByteSetImpl)root).uncheckedAscendingToString(this.boundInfo,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,Byte[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,Object[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,byte[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,short[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,int[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,long[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,float[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,double[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -8511,6 +8758,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft){
+          return ((ByteSetImpl)root).uncheckedDescendingToString(numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,Byte[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,Object[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,byte[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,short[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,int[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,long[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,float[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,double[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
         }
       }
     }
@@ -8531,6 +8805,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override int removeIfImpl(int size,BytePredicate filter){
         return root.headSetRemoveIfImpl((this.boundInfo>>8)-1,size,filter);
       }
+      @Override int hashCodeImpl(int numLeft){
+        return ((ByteSetImpl)root).uncheckedHashCode(this.boundInfo>>8,numLeft);
+      }
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
@@ -8541,6 +8818,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedAscendingForEach((byte)this.boundInfo,numLeft,action);
         }
+        @Override String toStringImpl(int numLeft){
+          return ((ByteSetImpl)root).uncheckedAscendingToString((byte)this.boundInfo,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,Byte[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,Object[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,byte[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,short[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,int[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,long[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,float[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,double[] dst){
+          ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -8550,7 +8854,34 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           super(parent,boundInfo,size);
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
-          ((ByteSetImpl)root).uncheckedAscendingForEach(this.boundInfo>>8,numLeft,action);
+          ((ByteSetImpl)root).uncheckedDescendingForEach(this.boundInfo>>8,numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft){
+          return ((ByteSetImpl)root).uncheckedDescendingToString(this.boundInfo>>8,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,Byte[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,Object[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,byte[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,short[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,int[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,long[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,float[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,double[] dst){
+          ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
         }
       }
     }
@@ -8560,10 +8891,139 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     transient final CheckedSubSet parent;
     transient final int boundInfo;
     transient int modCountAndSize;
-    //TODO hashCode
-    //TODO toString
     //TODO equals
     abstract boolean isInRange(int val);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,byte[] dst);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,short[] dst);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,int[] dst);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,long[] dst);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,float[] dst);
+    abstract void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst);
+    @Override public Byte[] toArray(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        final Byte[] dst;
+        toArrayImpl(modCountAndSize,root,dst=new Byte[modCountAndSize]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      final int modCountAndSize=this.modCountAndSize;
+      final T[] dst;
+      final ByteSetImpl.Checked root;
+      int size;
+      try{
+        dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+      }finally{
+        CheckedCollection.checkModCount(modCountAndSize>>>9,(root=this.root).modCountAndSize>>>9);
+      }
+      if(size!=0){
+        toArrayImpl(size,root,dst);
+      }
+      return dst;
+    }
+    @Override public <T> T[] toArray(T[] dst){
+       final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        toArrayImpl(modCountAndSize,root,dst=OmniArray.uncheckedArrResize(modCountAndSize,dst));
+      }else if(dst.length!=0){
+        dst[0]=null;
+      }
+      return dst;
+    }
+    @Override public byte[] toByteArray(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        final byte[] dst;
+        toArrayImpl(modCountAndSize,root,dst=new byte[modCountAndSize]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    @Override public short[] toShortArray(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        final short[] dst;
+        toArrayImpl(modCountAndSize,root,dst=new short[modCountAndSize]);
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    @Override public int[] toIntArray(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        final int[] dst;
+        toArrayImpl(modCountAndSize,root,dst=new int[modCountAndSize]);
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    @Override public long[] toLongArray(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        final long[] dst;
+        toArrayImpl(modCountAndSize,root,dst=new long[modCountAndSize]);
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        final float[] dst;
+        toArrayImpl(modCountAndSize,root,dst=new float[modCountAndSize]);
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        final double[] dst;
+        toArrayImpl(modCountAndSize,root,dst=new double[modCountAndSize]);
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    abstract String toStringImpl(int numLeft,ByteSetImpl root);
+    abstract int hashCodeImpl(int numLeft,ByteSetImpl root);
+    @Override public int hashCode(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        return hashCodeImpl(modCountAndSize,root);
+      }
+      return 0;
+    }
+    @Override public String toString(){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
+      if((modCountAndSize&=0x1ff)!=0){
+        return toStringImpl(modCountAndSize,root);
+      }
+      return "[]";
+    }
     @Override public boolean contains(boolean val){
       final ByteSetImpl.Checked root;
       final int mask;
@@ -8943,6 +9403,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override boolean isInRange(int val){
         return val<this.boundInfo;
       }
+      @Override int hashCodeImpl(int numLeft,ByteSetImpl root){
+        return root.uncheckedHashCode(this.boundInfo,numLeft);
+      }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
         int numRemoved=0;
         final int rootModCountAndSize;
@@ -9037,6 +9500,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedAscendingForEach(numLeft,action);
         }
+        @Override String toStringImpl(int numLeft,ByteSetImpl root){
+          return root.uncheckedAscendingToString(numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,byte[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,short[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,int[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,long[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,float[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9045,8 +9535,35 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(Descending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
-         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
+        @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedDescendingForEach(this.boundInfo,numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft,ByteSetImpl root){
+          return root.uncheckedDescendingToString(this.boundInfo,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,byte[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,short[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,int[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,long[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,float[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
+          root.uncheckedDescendingToArray(numLeft,dst);
         }
       }
     }
@@ -9066,6 +9583,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
         return root.uncheckedremoveIf(modCount,size,filter);
       }
+      @Override int hashCodeImpl(int numLeft,ByteSetImpl root){
+        return root.uncheckedHashCode(numLeft);
+      }
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
@@ -9075,6 +9595,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedAscendingForEach(this.boundInfo,numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft,ByteSetImpl root){
+          return root.uncheckedAscendingToString(this.boundInfo,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,byte[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,short[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,int[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,long[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,float[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
+          root.uncheckedAscendingToArray(numLeft,dst);
         }
       }
       private static class Descending extends TailSet{
@@ -9086,6 +9633,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedDescendingForEach(numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft,ByteSetImpl root){
+          return root.uncheckedDescendingToString(numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,byte[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,short[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,int[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,long[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,float[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
+          root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
         }
       }
     }
@@ -9099,6 +9673,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override boolean isInRange(int val){
         final int boundInfo;
         return val<((boundInfo=this.boundInfo)>>8) && val>=((byte)(boundInfo&0x1ff));
+      }
+      @Override int hashCodeImpl(int numLeft,ByteSetImpl root){
+        return root.uncheckedHashCode(this.boundInfo>>8,numLeft);
       }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
         int numRemoved=0;
@@ -9222,6 +9799,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedAscendingForEach((byte)boundInfo,numLeft,action);
         }
+        @Override String toStringImpl(int numLeft,ByteSetImpl root){
+          return root.uncheckedAscendingToString((byte)boundInfo,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,byte[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,short[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,int[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,long[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,float[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
+          root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9232,6 +9836,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedDescendingForEach(boundInfo>>8,numLeft,action);
+        }
+        @Override String toStringImpl(int numLeft,ByteSetImpl root){
+          return root.uncheckedDescendingToString(boundInfo>>8,numLeft);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,byte[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,short[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,int[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,long[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,float[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
+          root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
         }
       }
     }
