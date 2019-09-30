@@ -3268,9 +3268,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new Ascending(this);
       }
       @Override public OmniIterator.OfByte iterator(){
+        if((modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedAscendingItr(this);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        if((modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedDescendingItr(this);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
@@ -3499,9 +3505,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new Descending(this);
       }
       @Override public OmniIterator.OfByte iterator(){
+        if((modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedDescendingItr(this);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        if((modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedAscendingItr(this);
       }
       @Override public ByteComparator comparator(){
@@ -3828,9 +3840,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new Ascending(this);
       }
       @Override public OmniIterator.OfByte iterator(){
+        if(this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedAscendingItr(this);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        if(this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedDescendingItr(this);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
@@ -4438,9 +4456,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new Descending(this);
       }
       @Override public OmniIterator.OfByte iterator(){
+        if(this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedDescendingItr(this);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        if(this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedAscendingItr(this);
       }
       @Override public ByteComparator comparator(){
@@ -5939,6 +5963,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
     }
     private void uncheckedForEachRemaining(int numLeft,int currIndex,ByteConsumer action){
+      //TODO move this to the root
       int modCountAndLastRet=this.modCountAndLastRet;
       final var root=this.root;
       int lastRet;
@@ -6082,6 +6107,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
     }
     private void uncheckedForEachRemaining(int numLeft,int currIndex,ByteConsumer action){
+      //TODO move this to the root
       int modCountAndLastRet=this.modCountAndLastRet;
       final var root=this.root;
       int lastRet;
@@ -6361,9 +6387,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new ByteSetImpl.Checked.Ascending(root);
       }
       @Override public OmniIterator.OfByte iterator(){
+        final ByteSetImpl.Checked root;
+        if(((root=this.root).modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedAscendingItr(root);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        final ByteSetImpl.Checked root;
+        if(((root=this.root).modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedDescendingItr(root);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
@@ -6592,9 +6626,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new ByteSetImpl.Checked.Descending(root);
       }
       @Override public OmniIterator.OfByte iterator(){
+        final ByteSetImpl.Checked root;
+        if(((root=this.root).modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedDescendingItr(root);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        final ByteSetImpl.Checked root;
+        if(((root=this.root).modCountAndSize&0x1ff)==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new CheckedAscendingItr(root);
       }
       @Override public ByteComparator comparator(){
@@ -7002,9 +7044,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new ByteSetImpl.Unchecked.Ascending(root);
       }
       @Override public OmniIterator.OfByte iterator(){
+        final ByteSetImpl.Unchecked root;
+        if((root=this.root).word0==0 && root.word1==0 && root.word2==0 && root.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedAscendingItr(root);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        final ByteSetImpl.Unchecked root;
+        if((root=this.root).word0==0 && root.word1==0 && root.word2==0 && root.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedDescendingItr(root);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
@@ -7609,9 +7659,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new ByteSetImpl.Unchecked.Descending(root);
       }
       @Override public OmniIterator.OfByte iterator(){
+        final ByteSetImpl.Unchecked root;
+        if((root=this.root).word0==0 && root.word1==0 && root.word2==0 && root.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedDescendingItr(root);
       }
       @Override public OmniIterator.OfByte descendingIterator(){
+        final ByteSetImpl.Unchecked root;
+        if((root=this.root).word0==0 && root.word1==0 && root.word2==0 && root.word3==0){
+          return AbstractByteSet.EmptyView.EMPTY_ITR;
+        }
         return new UncheckedAscendingItr(root);
       }
       @Override public ByteComparator comparator(){
@@ -9075,7 +9133,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
         }
-        private Ascending(Ascending parent,int boundInfo,int size){
+        private Ascending(HeadSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
@@ -9117,38 +9175,60 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          return new UncheckedSubSet.HeadSet.Descending(root,this.boundInfo,size);
+          return new UncheckedSubSet.HeadSet.Descending(this,this.boundInfo,size);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          if(inclToElement==boundInfo){
+            return this;
+          }
+          if(inclToElement==Byte.MIN_VALUE-1){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          return new UncheckedSubSet.HeadSet.Ascending(this,inclToElement,((ByteSetImpl)root).countHeadSetElements(inclToElement));
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          if(inclFromElement==Byte.MIN_VALUE){
+            return this;
+          }
+          final int inclHi;
+          if((inclHi=this.boundInfo)<inclFromElement){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          return new UncheckedSubSet.BodySet.Ascending(this,(inclHi<<8)|(inclFromElement&0xff),((ByteSetImpl)root).countSubSetElements(inclFromElement,inclHi));
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          if(inclToElement<inclFromElement){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          if(inclFromElement==Byte.MIN_VALUE && inclToElement==boundInfo){
+            return this;
+          }
+          return new UncheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(0xff&inclFromElement),((ByteSetImpl)root).countSubSetElements(inclFromElement,inclToElement));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement+1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement+1,toInclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
         }
-        private Descending(Descending parent,int boundInfo,int size){
+        private Descending(HeadSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
         @Override int ceilingImpl(byte val){
@@ -9256,31 +9336,53 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          return new UncheckedSubSet.HeadSet.Ascending(root,this.boundInfo,size);
+          return new UncheckedSubSet.HeadSet.Ascending(this,this.boundInfo,size);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          if(inclToElement==Byte.MIN_VALUE){
+            return this;
+          }
+          final int inclHi;
+          if((inclHi=this.boundInfo)<inclToElement){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          return new UncheckedSubSet.BodySet.Descending(this,(inclHi<<8)|(inclToElement&0xff),((ByteSetImpl)root).countSubSetElements(inclToElement,inclHi));
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          if(this.boundInfo==inclFromElement){
+            return this;
+          }
+          if((inclFromElement)==Byte.MIN_VALUE-1){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          return new UncheckedSubSet.HeadSet.Descending(this,inclFromElement,((ByteSetImpl)root).countHeadSetElements(inclFromElement));
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          if(inclFromElement<inclToElement){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          if(inclToElement==Byte.MIN_VALUE && inclFromElement==boundInfo){
+            return this;
+          }
+          return new UncheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(0xff&inclToElement),((ByteSetImpl)root).countSubSetElements(inclToElement,inclFromElement));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement-1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement-1,toInclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
     }
@@ -9543,7 +9645,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
         }
-        private Ascending(Ascending parent,int boundInfo,int size){
+        private Ascending(TailSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
@@ -9585,38 +9687,60 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          return new UncheckedSubSet.TailSet.Descending(root,this.boundInfo,size);
+          return new UncheckedSubSet.TailSet.Descending(this,this.boundInfo,size);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          if(inclToElement==Byte.MAX_VALUE){
+            return this;
+          }
+          final int inclLo;
+          if((inclToElement)<(inclLo=this.boundInfo)){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          return new UncheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(inclLo&0xff),((ByteSetImpl)root).countSubSetElements(inclLo,inclToElement));
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          if(inclFromElement==this.boundInfo){
+            return this;
+          }
+          if(inclFromElement==Byte.MAX_VALUE+1){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          return new UncheckedSubSet.TailSet.Ascending(this,inclFromElement,((ByteSetImpl)root).countTailSetElements(inclFromElement));
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          if(inclToElement<inclFromElement){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          if(inclToElement==Byte.MAX_VALUE && inclFromElement==this.boundInfo){
+            return this;
+          }
+          return new UncheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(0xff&inclFromElement),((ByteSetImpl)root).countSubSetElements(inclFromElement,inclToElement));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement+1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement+1,toInclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
         }
-        private Descending(Descending parent,int boundInfo,int size){
+        private Descending(TailSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
         @Override int ceilingImpl(byte val){
@@ -9724,31 +9848,53 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          return new UncheckedSubSet.TailSet.Ascending(root,this.boundInfo,size);
+          return new UncheckedSubSet.TailSet.Ascending(this,this.boundInfo,size);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          if(inclToElement==boundInfo){
+            return this;
+          }
+          if(inclToElement-1==Byte.MAX_VALUE){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          return new UncheckedSubSet.TailSet.Descending(this,inclToElement,((ByteSetImpl)root).countTailSetElements(inclToElement));
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          if(Byte.MAX_VALUE==inclFromElement){
+            return this;
+          }
+          final int inclLo;
+          if(inclFromElement<(inclLo=this.boundInfo)){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          return new UncheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(inclLo&0xff),((ByteSetImpl)root).countSubSetElements(inclLo,inclFromElement));
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          if(inclFromElement<inclToElement){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          if(inclFromElement==Byte.MAX_VALUE && inclToElement==this.boundInfo){
+            return this;
+          }
+          return new UncheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(0xff&inclToElement),((ByteSetImpl)root).countSubSetElements(inclToElement,inclFromElement));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement-1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement-1,toInclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-         //TODO
-         throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
     }
@@ -9997,32 +10143,56 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           //TODO
           throw new omni.util.NotYetImplementedException();
         }
-        @Override public OmniNavigableSet.OfByte descendingSet(){
-          return new UncheckedSubSet.BodySet.Descending(root,this.boundInfo,size);
+       @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.BodySet.Descending(this,this.boundInfo,size);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          int boundInfo;
+          if((boundInfo=this.boundInfo)>>8==inclToElement){
+            return this;
+          }
+          if((inclToElement)-(boundInfo=(byte)boundInfo)<0){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          return new UncheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(boundInfo&0xff),((ByteSetImpl)root).countSubSetElements(boundInfo,inclToElement));
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          int boundInfo;
+          if(inclFromElement==(byte)(boundInfo=this.boundInfo)){
+            return this;
+          }
+          if((boundInfo>>=8)<inclFromElement){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          return new UncheckedSubSet.BodySet.Ascending(this,(boundInfo<<8)|(inclFromElement&0xff),((ByteSetImpl)root).countSubSetElements(inclFromElement,boundInfo));
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          if(inclToElement<inclFromElement){
+            return AbstractByteSet.EmptyView.ASCENDING;
+          }
+          final int boundInfo;
+          if(inclToElement==(boundInfo=this.boundInfo)>>8 && inclFromElement==(byte)boundInfo){
+            return this;
+          }
+          return new UncheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(0xff&inclFromElement),((ByteSetImpl)root).countSubSetElements(inclFromElement,inclToElement));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement+1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement+1,toInclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
       private static class Descending extends BodySet{
@@ -10137,31 +10307,55 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          return new UncheckedSubSet.BodySet.Ascending(root,this.boundInfo,size);
+          return new UncheckedSubSet.BodySet.Ascending(this,this.boundInfo,size);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          int boundInfo;
+          if(inclToElement==((byte)(boundInfo=this.boundInfo))){
+            return this;
+          }
+          if((boundInfo=boundInfo>>8)<inclToElement){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          return new UncheckedSubSet.BodySet.Descending(this,(boundInfo<<8)|(inclToElement&0xff),((ByteSetImpl)root).countSubSetElements(inclToElement,boundInfo));
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          int boundInfo;
+          if(inclFromElement==((boundInfo=this.boundInfo)>>8)){
+            return this;
+          }
+          if(inclFromElement<(boundInfo=(byte)boundInfo)){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          } 
+          return new UncheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(boundInfo&0xff),((ByteSetImpl)root).countSubSetElements(boundInfo,inclFromElement));
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          if(inclFromElement<inclToElement){
+            return AbstractByteSet.EmptyView.DESCENDING;
+          }
+          final int boundInfo;
+          if((boundInfo=this.boundInfo)>>8==inclFromElement && inclToElement==(byte)boundInfo){
+            return this;
+          }
+          return new UncheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(0xff&inclToElement),((ByteSetImpl)root).countSubSetElements(inclToElement,inclFromElement));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement-1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement-1,toInclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
     }
@@ -10959,9 +11153,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return root.uncheckedHashCode(this.boundInfo,numLeft);
       }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-        /*
         int numRemoved=0;
         final int rootModCountAndSize;
         long word0=root.word0;
@@ -11044,7 +11235,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         root.word0=word0;
         root.modCountAndSize=rootModCountAndSize+(modCount=(1<<9)-numRemoved);
         return modCount;
-        */
       }
       @Override int ceilingImpl(ByteSetImpl root,byte val){
         final int inclTo;
@@ -11215,7 +11405,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
         }
-        private Ascending(Ascending parent,int boundInfo,int modCountAndSize){
+        private Ascending(HeadSet parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
@@ -11257,39 +11447,91 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          final int modCountAndSize;
+          CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
+          return new CheckedSubSet.HeadSet.Descending(this,this.boundInfo,modCountAndSize);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          switch(Integer.signum(boundInfo-inclToElement)){
+            case 0:
+              return this;
+            case 1:
+              if(inclToElement==Byte.MIN_VALUE-1){
+                return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
+              }
+              return new CheckedSubSet.HeadSet.Ascending(this,inclToElement,modCount|((ByteSetImpl)root).countHeadSetElements(inclToElement));
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          if(inclFromElement==Byte.MIN_VALUE){
+            return this;
+          }
+          final int inclHi;
+          switch(Integer.signum((inclHi=this.boundInfo)-(inclFromElement-1))){
+            case 1:
+              return new CheckedSubSet.BodySet.Ascending(this,(inclHi<<8)|(inclFromElement&0xff),modCount|((ByteSetImpl)root).countSubSetElements(inclFromElement,inclHi));
+            case 0:
+              return new AbstractByteSet.EmptyView.Checked.Ascending(inclFromElement);
+            default:
+              throw new IllegalArgumentException("out of bounds");
+          }
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          switch(Integer.signum(inclToElement-inclFromElement+1)){
+            case 1:
+              switch(Integer.signum(boundInfo-inclToElement)){
+                case 0:
+                  if(inclFromElement==Byte.MIN_VALUE){
+                    return this;
+                  }
+                case 1:
+                  return new CheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(0xff&inclFromElement),modCount|((ByteSetImpl)root).countSubSetElements(inclFromElement,inclToElement));
+                default:
+              }
+              break;
+            case 0:
+              if(inclToElement<=boundInfo){
+                return new AbstractByteSet.EmptyView.Checked.Ascending(inclFromElement);
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement+1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement+1,toInclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
         }
-        private Descending(Descending parent,int boundInfo,int modCountAndSize){
+        private Descending(HeadSet parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
         @Override int ceilingImpl(ByteSetImpl root,byte val){
@@ -11397,32 +11639,84 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          final int modCountAndSize;
+          CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
+          return new CheckedSubSet.HeadSet.Ascending(this,this.boundInfo,modCountAndSize);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          if(inclToElement==Byte.MIN_VALUE){
+            return this;
+          }
+          final int inclHi;
+          switch(Integer.signum((inclHi=this.boundInfo)-(inclToElement-1))){
+            case 1:
+              return new CheckedSubSet.BodySet.Descending(this,(inclHi<<8)|(inclToElement&0xff),modCount|((ByteSetImpl)root).countSubSetElements(inclToElement,inclHi));
+            case 0:
+              return new AbstractByteSet.EmptyView.Checked.Descending(inclToElement);
+            default:
+              throw new IllegalArgumentException("out of bounds");
+          }
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          switch(Integer.signum(this.boundInfo-inclFromElement)){
+            case 0:
+              return this;
+            case 1:
+              if((inclFromElement)==Byte.MIN_VALUE-1){
+                return new AbstractByteSet.EmptyView.Checked.Descending(Byte.MIN_VALUE);
+              }
+              return new CheckedSubSet.HeadSet.Descending(this,inclFromElement,modCount|((ByteSetImpl)root).countHeadSetElements(inclFromElement));
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          goToOOB:switch(Integer.signum(inclFromElement-inclToElement+1)){
+            case 1:
+              switch(Integer.signum(boundInfo-inclFromElement)){
+                default:
+                  break goToOOB;
+                case 0:
+                  if(inclToElement==Byte.MIN_VALUE){
+                    return this;
+                  }
+                case 1:
+              }
+              return new CheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(0xff&inclToElement),modCount|((ByteSetImpl)root).countSubSetElements(inclToElement,inclFromElement));
+            case 0:
+              if(inclFromElement<=boundInfo){
+                return new AbstractByteSet.EmptyView.Checked.Descending(inclToElement);
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement-1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement-1,toInclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
     }
@@ -11614,7 +11908,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
         }
-        private Ascending(Ascending parent,int boundInfo,int modCountAndSize){
+        private Ascending(TailSet parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
@@ -11656,39 +11950,95 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          final int modCountAndSize;
+          CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
+          return new CheckedSubSet.TailSet.Descending(this,this.boundInfo,modCountAndSize);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          if(inclToElement==Byte.MAX_VALUE){
+            return this;
+          }
+          final int inclLo;
+          switch(Integer.signum((inclToElement+1)-(inclLo=this.boundInfo))){
+            case 1:
+              return new CheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(inclLo&0xff),modCount|((ByteSetImpl)root).countSubSetElements(inclLo,inclToElement));
+            case 0:
+              return new AbstractByteSet.EmptyView.Checked.Ascending(inclLo);
+            default:
+              throw new IllegalArgumentException("out of bounds");
+          }
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          switch(Integer.signum(inclFromElement-this.boundInfo)){
+            case 0:
+              return this;
+            case 1:
+              if(Byte.MAX_VALUE+1==inclFromElement){
+                return new AbstractByteSet.EmptyView.Checked.Ascending(inclFromElement);
+              }
+              return new CheckedSubSet.TailSet.Ascending(this,inclFromElement,modCount|((ByteSetImpl)root).countTailSetElements(inclFromElement));
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          goToOOB:switch(Integer.signum(inclToElement-inclFromElement+1)){
+            case 1:
+              if(inclToElement==Byte.MAX_VALUE){
+                switch(Integer.signum(inclFromElement-boundInfo)){
+                  case 0:
+                    return this;
+                  default:
+                    break goToOOB;
+                  case 1:
+                }
+              }else{
+                if(inclFromElement<boundInfo){
+                  break goToOOB;
+                }
+              }
+              return new CheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(0xff&inclFromElement),modCount|((ByteSetImpl)root).countSubSetElements(inclFromElement,inclToElement));
+            case 0:
+              if(inclFromElement>=boundInfo){
+                return new AbstractByteSet.EmptyView.Checked.Ascending(inclFromElement);
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement+1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement+1,toInclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
         }
-        private Descending(Descending parent,int boundInfo,int modCountAndSize){
+        private Descending(TailSet parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
         @Override int ceilingImpl(ByteSetImpl root,byte val){
@@ -11796,32 +12146,88 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          final int modCountAndSize;
+          CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
+          return new CheckedSubSet.TailSet.Ascending(this,this.boundInfo,modCountAndSize);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          switch(Integer.signum(inclToElement-this.boundInfo)){
+            case 0:
+              return this;
+            case 1:
+              if(inclToElement==Byte.MAX_VALUE+1){
+                return new AbstractByteSet.EmptyView.Checked.Descending(inclToElement);
+              }
+              return new CheckedSubSet.TailSet.Descending(this,inclToElement,modCount|((ByteSetImpl)root).countTailSetElements(inclToElement));
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          if(Byte.MAX_VALUE==inclFromElement){
+            return this;
+          }
+          final int inclLo;
+          switch(Integer.signum(inclFromElement+1-(inclLo=this.boundInfo))){
+            case 1:
+              return new CheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(inclLo&0xff),modCount|((ByteSetImpl)root).countSubSetElements(inclLo,inclFromElement));
+            case 0:
+              return new AbstractByteSet.EmptyView.Checked.Descending(inclLo);
+            default:
+              throw new IllegalArgumentException("out of bounds");
+          }
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          goToOOB:switch(Integer.signum(inclFromElement-inclToElement+1)){
+            case 1:
+              if(inclFromElement==Byte.MAX_VALUE){
+                switch(Integer.signum(inclToElement-boundInfo)){
+                  case 0:
+                    return this;
+                  default:
+                    break goToOOB;
+                  case 1:
+                }
+              }else{
+                if(inclToElement<boundInfo){
+                  break goToOOB;
+                }
+              }
+              return new CheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(0xff&inclToElement),modCount|((ByteSetImpl)root).countSubSetElements(inclToElement,inclFromElement));
+            case 0:
+              if(inclToElement>=boundInfo){
+                return new AbstractByteSet.EmptyView.Checked.Descending(inclToElement);
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement-1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement-1,toInclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
     }
@@ -11840,15 +12246,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return root.uncheckedHashCode(this.boundInfo>>8,numLeft);
       }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-        /*
         int numRemoved=0;
         long word0=root.word0,word1=root.word1,word2=root.word2,word3=root.word3;
         int inclusiveTo;
         goToWord0:for(;;){
           goToWord1:for(;;){
-            switch((inclusiveTo=(this.boundInfo>>8)-1)>>6){
+            switch((inclusiveTo=(this.boundInfo>>8))>>6){
               case -2:
                 break goToWord0;
               case -1:
@@ -11950,7 +12353,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
           }
         }
-        */
       }
       @Override void clearImpl(ByteSetImpl root){
         root.clearBodySet(this.boundInfo);
@@ -12189,32 +12591,100 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          final int modCountAndSize;
+          CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
+          return new CheckedSubSet.BodySet.Descending(this,this.boundInfo,modCountAndSize);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          int boundInfo;
+          switch(Integer.signum(((boundInfo=this.boundInfo)>>8)-inclToElement)){
+            case 0:
+              return this;
+            case 1:
+              switch(Integer.signum((inclToElement+1)-(boundInfo=(byte)boundInfo))){
+                case 1:
+                  return new CheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(boundInfo&0xff),modCount|((ByteSetImpl)root).countSubSetElements(boundInfo,inclToElement));
+                case 0:
+                  return new AbstractByteSet.EmptyView.Checked.Ascending(boundInfo);
+                default:
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          int boundInfo;
+          switch(Integer.signum((inclFromElement)-((byte)(boundInfo=this.boundInfo)))){
+            case 0:
+              return this;
+            case 1:
+              switch(Integer.signum((boundInfo=boundInfo>>8)-(inclFromElement-1))){
+                case 1:
+                  return new CheckedSubSet.BodySet.Ascending(this,(boundInfo<<8)|(inclFromElement&0xff),modCount|((ByteSetImpl)root).countSubSetElements(inclFromElement,boundInfo));
+                case 0:
+                  return new AbstractByteSet.EmptyView.Checked.Ascending(inclFromElement);
+                default:
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          goToOOB:switch(Integer.signum(inclToElement-inclFromElement+1)){
+            case 1:
+              final int boundInfo;
+              switch(Integer.signum(((boundInfo=this.boundInfo)>>8)-inclToElement)){
+                default:
+                  break goToOOB;
+                case 1:
+                  if(inclFromElement<(byte)boundInfo){
+                    break goToOOB;
+                  }
+                  break;
+                case 0:
+                  switch(Integer.signum(inclFromElement-(byte)boundInfo)){
+                    default:
+                      break goToOOB;
+                    case 0:
+                      return this;
+                    case 1:
+                  }
+              }
+              return new CheckedSubSet.BodySet.Ascending(this,(inclToElement<<8)|(0xff&inclFromElement),modCount|((ByteSetImpl)root).countSubSetElements(inclFromElement,inclToElement));
+            case 0:
+              if(inclToElement<=((boundInfo=this.boundInfo)>>8) && inclFromElement>=((byte)boundInfo)){
+                return new AbstractByteSet.EmptyView.Checked.Ascending(inclFromElement);
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement+1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement+1,toInclusive?toElement:toElement-1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
       private static class Descending extends BodySet{
@@ -12329,32 +12799,100 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           throw new omni.util.NotYetImplementedException();
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          final int modCountAndSize;
+          CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
+          return new CheckedSubSet.BodySet.Ascending(this,this.boundInfo,modCountAndSize);
+        }
+        private OmniNavigableSet.OfByte headSetImpl(int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          int boundInfo;
+          switch(Integer.signum(inclToElement-((byte)(boundInfo=this.boundInfo)))){
+            case 0:
+              return this;
+            case 1:
+              switch(Integer.signum((boundInfo=boundInfo>>8)-(inclToElement-1))){
+                case 1:
+                  return new CheckedSubSet.BodySet.Descending(this,(boundInfo<<8)|(inclToElement&0xff),modCount|((ByteSetImpl)root).countSubSetElements(inclToElement,boundInfo));
+                case 0:
+                  return new AbstractByteSet.EmptyView.Checked.Descending(inclToElement);
+                default:
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte tailSetImpl(int inclFromElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          int boundInfo;
+          switch(Integer.signum(((boundInfo=this.boundInfo)>>8)-inclFromElement)){
+            case 0:
+              return this;
+            case 1:
+              switch(Integer.signum((inclFromElement+1)-(boundInfo=(byte)boundInfo))){
+                case 1:
+                  return new CheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(boundInfo&0xff),modCount|((ByteSetImpl)root).countSubSetElements(boundInfo,inclFromElement));
+                case 0:
+                  return new AbstractByteSet.EmptyView.Checked.Descending(boundInfo);
+                default:
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
+        }
+        private OmniNavigableSet.OfByte subSetImpl(int inclFromElement,int inclToElement){
+          final ByteSetImpl.Checked root;
+          final int modCount;
+          CheckedCollection.checkModCount(modCount=(this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
+          goToOOB:switch(Integer.signum(inclFromElement-inclToElement+1)){
+            case 1:
+              final int boundInfo;
+              switch(Integer.signum(((boundInfo=this.boundInfo)>>8)-inclFromElement)){
+                default:
+                  break goToOOB;
+                case 1:
+                  if(inclToElement<(byte)boundInfo){
+                    break goToOOB;
+                  }
+                  break;
+                case 0:
+                  switch(Integer.signum(inclToElement-(byte)boundInfo)){
+                    default:
+                      break goToOOB;
+                    case 0:
+                      return this;
+                    case 1:
+                  }
+              }
+              return new CheckedSubSet.BodySet.Descending(this,(inclFromElement<<8)|(0xff&inclToElement),modCount|((ByteSetImpl)root).countSubSetElements(inclToElement,inclFromElement));
+            case 0:
+              if(inclFromElement<=((boundInfo=this.boundInfo)>>8) && inclToElement>=((byte)boundInfo)){
+                return new AbstractByteSet.EmptyView.Checked.Descending(inclToElement);
+              }
+            default:
+          }
+          throw new IllegalArgumentException("out of bounds");
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(inclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(inclusive?fromElement:fromElement-1);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromInclusive?fromElement:fromElement-1,toInclusive?toElement:toElement+1);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return headSetImpl(toElement);
         }
         @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return tailSetImpl(fromElement);
         }
         @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return subSetImpl(fromElement,toElement);
         }
       }
     }

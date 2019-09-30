@@ -20,6 +20,8 @@ abstract class AbstractByteSet implements OmniNavigableSet.OfByte{
     
     static abstract class ComparatorlessImpl extends AbstractByteSet{
     
+        
+        
         @Override public ByteComparator comparator(){
           return Byte::compare;
         }
