@@ -26,7 +26,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   transient long word1;
   transient long word2;
   transient long word3;
-  //TODO equals
+  //todo equals
   private ByteSetImpl(long word0,long word1,long word2,long word3){
     super();
     this.word0=word0;
@@ -280,13 +280,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     this.word0=(word=this.word0)&(~(Long.MIN_VALUE>>>(lead0s=Long.numberOfLeadingZeros(word))));
     return (-65-lead0s);
   }
-  #MACRO FullViewAccessMethods<this,Unchecked,Ascending,Byte>(byte,,null,(Byte)(byte))
-  #MACRO FullViewAccessMethods<this,Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
-  #MACRO FullViewAccessMethods<this,Unchecked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
-  #MACRO FullViewAccessMethods<this,Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
-  #MACRO FullViewAccessMethods<this,Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
-  #MACRO FullViewAccessMethods<this,Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
-  #MACRO FullViewAccessMethods<this,Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
+  #MACRO AccessMethods<Full,this,Unchecked,Ascending,Byte>(byte,,null,(Byte)(byte))
+  #MACRO AccessMethods<Full,this,Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+  #MACRO AccessMethods<Full,this,Unchecked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
+  #MACRO AccessMethods<Full,this,Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+  #MACRO AccessMethods<Full,this,Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+  #MACRO AccessMethods<Full,this,Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
+  #MACRO AccessMethods<Full,this,Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
   
   private int uncheckedHashCode(int numLeft){
     int sum=0;
@@ -336,49 +336,49 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return sum;
   }
-  private int uncheckedHashCode(int exclusiveHi,int numLeft){
+  private int uncheckedHashCode(int inclusiveHi,int numLeft){
     int sum=0;
-    goToEnd:switch((--exclusiveHi)>>6){
+    goToEnd:switch(inclusiveHi>>6){
       case 1:
         for(long word=this.word3;;){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
           }
-          if(--exclusiveHi==63){
+          if(--inclusiveHi==63){
             break;
           }
         }
       case 0:
         for(long word=this.word2;;){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
           }
-          if(--exclusiveHi==-1){
+          if(--inclusiveHi==-1){
             break;
           }
         }
       case -1:
         for(long word=this.word1;;){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
           }
-          if(--exclusiveHi==-65){
+          if(--inclusiveHi==-65){
             break;
           }
         }
       default:
-        for(long word=this.word0;;--exclusiveHi){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
@@ -508,311 +508,311 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   }
   
 
-   private void uncheckedDescendingForEach(int numLeft,ByteConsumer action){
-      int offset=127;
-      for(long word=this.word3;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(--offset==63){
-          break;
+  private void uncheckedDescendingForEach(int numLeft,ByteConsumer action){
+    int offset=127;
+    for(long word=this.word3;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(--offset==-1){
-          break;
+      if(--offset==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(--offset==-65){
-          break;
+      if(--offset==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word0;;--offset){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
+      if(--offset==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--offset){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
     }
+  }
     
-    private void uncheckedAscendingForEach(int numLeft,ByteConsumer action){
-      int offset=-128;
-      for(long word=this.word0;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(++offset==-64){
-          break;
+  private void uncheckedAscendingForEach(int numLeft,ByteConsumer action){
+    int offset=-128;
+    for(long word=this.word0;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(++offset==0){
-          break;
+      if(++offset==-64){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(++offset==64){
-          break;
+      if(++offset==0){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++offset){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
+      if(++offset==64){
+        break;
+      }
+    }
+    for(long word=this.word3;;++offset){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
     }
-    private String uncheckedAscendingToString(int inclusiveLo,int numLeft){
-      int bufferOffset;
-      byte[] buffer;
-      (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }  
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }  
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }  
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+  }
+  private String uncheckedAscendingToString(int inclusiveLo,int numLeft){
+    int bufferOffset;
+    byte[] buffer;
+    (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
-      buffer[++bufferOffset]=']';
-      return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }  
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }  
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }  
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
+    buffer[++bufferOffset]=']';
+    return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+  }
     
-    private void uncheckedAscendingForEach(int inclusiveLo,int numLeft,ByteConsumer action){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }  
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
+  private void uncheckedAscendingForEach(int inclusiveLo,int numLeft,ByteConsumer action){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }  
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
-    private String uncheckedDescendingToString(int exclusiveHi,int numLeft){
-      int bufferOffset;
-      byte[] buffer;
-      (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }  
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }  
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==65){
-              break;
-            }
-          }  
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+  }
+  private String uncheckedDescendingToString(int inclusiveHi,int numLeft){
+    int bufferOffset;
+    byte[] buffer;
+    (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
-      buffer[++bufferOffset]=']';
-      return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          if(--inclusiveHi==63){
+            break;
+          }
+        }  
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }  
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==65){
+            break;
+          }
+        }  
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
+    buffer[++bufferOffset]=']';
+    return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+  }
     
-    private void uncheckedDescendingForEach(int exclusiveHi,int numLeft,ByteConsumer action){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word0;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }  
-        case 0:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
+  private void uncheckedDescendingForEach(int inclusiveHi,int numLeft,ByteConsumer action){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        case -1:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
+          if(--inclusiveHi==63){
+            break;
+          }
+        }  
+      case 0:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        default:
-          for(long word=this.word3;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
-    #MACRO UncheckedToArray<byte>((byte),int)
-    #MACRO UncheckedToArray<Byte>((Byte)(byte),int)
-    #MACRO UncheckedToArray<Object>((Byte)(byte),int)
-    #MACRO UncheckedToArray<short>((short),int)
-    #MACRO UncheckedToArray<int>((int),int)
-    #MACRO UncheckedToArray<long>((long),long)
-    #MACRO UncheckedToArray<float>((float),int)
-    #MACRO UncheckedToArray<double>((double),int)
+  }
+  #MACRO UncheckedToArray<byte>((byte),int)
+  #MACRO UncheckedToArray<Byte>((Byte)(byte),int)
+  #MACRO UncheckedToArray<Object>((Byte)(byte),int)
+  #MACRO UncheckedToArray<short>((short),int)
+  #MACRO UncheckedToArray<int>((int),int)
+  #MACRO UncheckedToArray<long>((long),long)
+  #MACRO UncheckedToArray<float>((float),int)
+  #MACRO UncheckedToArray<double>((double),int)
     
     
 #MACRODEF UncheckedToArray<ARRTYPE>(CAST,VALTYPE)
@@ -904,48 +904,48 @@ private void uncheckedDescendingToArray(int numLeft,ARRTYPE[] dst){
     }
   }
 }
-private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,ARRTYPE[] dst){
-  goToEnd:switch((--exclusiveHi)>>6){
+private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,ARRTYPE[] dst){
+  goToEnd:switch(inclusiveHi>>6){
     case 1:
       for(long word=this.word3;;){
-        if((word&(1L<<exclusiveHi))!=0){
-          dst[--numLeft]=CAST(exclusiveHi);
+        if((word&(1L<<inclusiveHi))!=0){
+          dst[--numLeft]=CAST(inclusiveHi);
           if(numLeft==0){
             break goToEnd;
           }
         }
-        if(--exclusiveHi==63){
+        if(--inclusiveHi==63){
           break;
         }
       }
     case 0:
       for(long word=this.word2;;){
-        if((word&(1L<<exclusiveHi))!=0){
-          dst[--numLeft]=CAST(exclusiveHi);
+        if((word&(1L<<inclusiveHi))!=0){
+          dst[--numLeft]=CAST(inclusiveHi);
           if(numLeft==0){
             break goToEnd;
           }
         }
-        if(--exclusiveHi==-1){
+        if(--inclusiveHi==-1){
           break;
         }
       }
     case -1:
       for(long word=this.word1;;){
-        if((word&(1L<<exclusiveHi))!=0){
-          dst[--numLeft]=CAST(exclusiveHi);
+        if((word&(1L<<inclusiveHi))!=0){
+          dst[--numLeft]=CAST(inclusiveHi);
           if(numLeft==0){
             break goToEnd;
           }
         }
-        if(--exclusiveHi==-65){
+        if(--inclusiveHi==-65){
           break;
         }
       }
     default:
-      for(long word=this.word0;;--exclusiveHi){
-        if((word&(1L<<exclusiveHi))!=0){
-          dst[--numLeft]=CAST(exclusiveHi);
+      for(long word=this.word0;;--inclusiveHi){
+        if((word&(1L<<inclusiveHi))!=0){
+          dst[--numLeft]=CAST(inclusiveHi);
           if(numLeft==0){
             break goToEnd;
           }
@@ -1005,15 +1005,82 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
 #ENDDEF
   
   
-  private int countHeadSetElements(int exclToElement){
-    #MACRO NYI()
+  private int countHeadSetElements(int inclToElement){
+    int count=0;
+    switch(inclToElement>>6){
+      case 1:
+        count+=Long.bitCount(this.word3&(-1L>>>(-inclToElement-1)));
+        inclToElement=-1;
+      case 0:
+        count+=Long.bitCount(this.word2&(-1L>>>(-inclToElement-1)));
+        inclToElement=-1;
+      case -1:
+        count+=Long.bitCount(this.word1&(-1L>>>(-inclToElement-1)));
+        inclToElement=-1;
+      default:
+        return count+Long.bitCount(this.word0&(-1L>>>(-inclToElement-1)));
+    }
   }
   private int countTailSetElements(int inclFromElement){
-    #MACRO NYI()
+    int count=0;
+    switch(inclFromElement>>6){
+      case -2:
+        count+=Long.bitCount(this.word0&(-1L<<inclFromElement));
+        inclFromElement=0;
+      case -1:
+        count+=Long.bitCount(this.word1&(-1L<<inclFromElement));
+        inclFromElement=0;
+      case 0:
+        count+=Long.bitCount(this.word2&(-1L<<inclFromElement));
+        inclFromElement=0;
+      default:
+        return count+Long.bitCount(this.word3&(-1L<<inclFromElement));
+    }
   }
-  private int countSubSetElements(int inclFromElement,int exclToElement){
-    #MACRO NYI()
-    
+  private int countSubSetElements(int inclFromElement,int inclToElement){
+    switch(inclToElement>>6){
+      case -2:
+        return Long.bitCount(this.word0&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+      case -1:
+        if(inclFromElement>>6==-1){
+          return Long.bitCount(this.word1&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+        }else{
+          return Long.bitCount(this.word0&(-1L<<inclFromElement)) 
+            + Long.bitCount(this.word1&(-1L>>>(-inclToElement-1)));
+        }
+      case 0:
+        int count;
+        switch(inclFromElement>>6){
+          case 0:
+            return Long.bitCount(this.word2&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+          case -1:
+            count=Long.bitCount(this.word1&(-1L<<inclFromElement));
+            break;
+          default:
+            count=Long.bitCount(this.word0&(-1L<<inclFromElement))
+              + Long.bitCount(this.word1);
+        }
+        return count+ Long.bitCount(this.word2&(-1L>>>(-inclToElement-1)));
+      default:
+        goToWord3:for(;;){
+          switch(inclFromElement>>6){
+            case 1:
+              return Long.bitCount(this.word3&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+            case 0:
+              count=Long.bitCount(this.word2&(-1L<<inclFromElement));
+              break goToWord3;
+            case -1:
+              count=Long.bitCount(this.word1&(-1L<<inclFromElement));
+              break;
+            default:
+              count=Long.bitCount(this.word0&(-1L<<inclFromElement))
+                + Long.bitCount(this.word1);
+          }
+          count+=Long.bitCount(this.word2);
+          break;
+        }
+        return count + Long.bitCount(this.word3&(-1L>>>(-inclToElement-1)));
+    }
   }
       
   public static abstract class Checked extends ByteSetImpl implements Serializable{
@@ -1032,27 +1099,27 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     }
     public Checked(OmniCollection.OfBoolean that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(OmniCollection.OfByte that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(OmniCollection.ByteOutput<?> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(OmniCollection.OfRef<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(Collection<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     
@@ -1295,18 +1362,13 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     #MACRO CheckedRemoveVal<long>()
     #MACRO CheckedRemoveVal<float>()
     #MACRO CheckedRemoveVal<double>()
-    #MACRO FullViewAccessMethods<this,Checked,Ascending,Byte>(byte,,null,(Byte)(byte))
-    #MACRO FullViewAccessMethods<this,Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
-    #MACRO FullViewAccessMethods<this,Checked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
-    #MACRO FullViewAccessMethods<this,Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
-    #MACRO FullViewAccessMethods<this,Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
-    #MACRO FullViewAccessMethods<this,Checked,Ascending,float>(float,Float,Float.NaN,(float))
-    #MACRO FullViewAccessMethods<this,Checked,Ascending,double>(double,Double,Double.NaN,(double))
-    
-    
-   
-    
-  
+    #MACRO AccessMethods<Full,this,Checked,Ascending,Byte>(byte,,null,(Byte)(byte))
+    #MACRO AccessMethods<Full,this,Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+    #MACRO AccessMethods<Full,this,Checked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
+    #MACRO AccessMethods<Full,this,Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+    #MACRO AccessMethods<Full,this,Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+    #MACRO AccessMethods<Full,this,Checked,Ascending,float>(float,Float,Float.NaN,(float))
+    #MACRO AccessMethods<Full,this,Checked,Ascending,double>(double,Double,Double.NaN,(double))
     
     public static class Ascending extends Checked{
       public Ascending(){
@@ -1346,8 +1408,7 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(toElement==Byte.MAX_VALUE){
           return this;
         }
-        final int t;
-        return new CheckedSubSet.HeadSet.Ascending(this,t=toElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(t));
+        return new CheckedSubSet.HeadSet.Ascending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
@@ -1356,26 +1417,26 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         return new CheckedSubSet.TailSet.Ascending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        final int t;
-        switch(Integer.signum((t=toElement+1)-fromElement)){
-        case 1:
-          if(t==128){
-            if(fromElement==-128){
-              return this;
+        final int exclusiveTo;
+        switch(Integer.signum((exclusiveTo=toElement+1)-fromElement)){
+          case 1:
+            if(toElement==127){
+              if(fromElement==-128){
+                return this;
+              }else{
+                return new CheckedSubSet.TailSet.Ascending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(fromElement));
+              }
             }else{
-              return new CheckedSubSet.TailSet.Ascending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(fromElement));
+              if(fromElement==-128){
+                return new CheckedSubSet.HeadSet.Ascending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(toElement));
+              }else{
+                return new CheckedSubSet.BodySet.Ascending(this,(toElement<<8)|(fromElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(fromElement,toElement));
+              }
             }
-          }else{
-            if(fromElement==-128){
-              return new CheckedSubSet.HeadSet.Ascending(this,t,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(t));
-            }else{
-              return new CheckedSubSet.BodySet.Ascending(this,(t<<8)|(fromElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(fromElement,t));
-            }
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Ascending(t);
-        default:
-          throw new IllegalArgumentException("out of bounds");
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Ascending(exclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
@@ -1385,7 +1446,8 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(toElement==Byte.MIN_VALUE){
           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
         }
-        return new CheckedSubSet.HeadSet.Ascending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(toElement));
+        final int inclusiveTo;
+        return new CheckedSubSet.HeadSet.Ascending(this,inclusiveTo=toElement-1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -1394,28 +1456,28 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(fromElement==Byte.MAX_VALUE){
            return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MAX_VALUE+1);
         }
-        final int f;
-        return new CheckedSubSet.TailSet.Ascending(this,f=fromElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(f));
+        final int inclusiveFrom;
+        return new CheckedSubSet.TailSet.Ascending(this,inclusiveFrom=fromElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        switch(Integer.signum((t=(toInclusive?toElement+1:toElement))-(f=(fromInclusive?fromElement:fromElement+1)))){
+        final int inclusiveTo,inclusiveFrom;
+        switch(Integer.signum((inclusiveTo=toInclusive?toElement:toElement-1)-(inclusiveFrom=fromInclusive?fromElement:fromElement+1)+1)){
         case 1:
-          if(t==128){
-            if(f==-128){
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
               return this;
             }else{
-              return new CheckedSubSet.TailSet.Ascending(this,f,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(f));
+              return new CheckedSubSet.TailSet.Ascending(this,inclusiveFrom,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
             }
           }else{
-            if(f==-128){
-              return new CheckedSubSet.HeadSet.Ascending(this,t,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(t));
+            if(inclusiveFrom==-128){
+              return new CheckedSubSet.HeadSet.Ascending(this,inclusiveTo,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
             }else{
-              return new CheckedSubSet.BodySet.Ascending(this,(t<<8)|(f&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(f,t));
+              return new CheckedSubSet.BodySet.Ascending(this,(inclusiveTo<<8)|(inclusiveFrom&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(inclusiveFrom,inclusiveTo));
             }
           }
         case 0:
-          return new AbstractByteSet.EmptyView.Checked.Ascending(t);
+          return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
         default:
           throw new IllegalArgumentException("out of bounds");
         }
@@ -1480,30 +1542,28 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(fromElement==Byte.MAX_VALUE){
           return this;
         }
-        final int f;
-        return new CheckedSubSet.HeadSet.Descending(this,f=fromElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(f));
+        return new CheckedSubSet.HeadSet.Descending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        final int f;
-        switch(Integer.signum((f=fromElement+1)-toElement)){
-        case 1:
-          if(f==128){
-            if(toElement==-128){
-              return this;
+        switch(Integer.signum(fromElement+1-toElement)){
+          case 1:
+            if(fromElement==127){
+              if(toElement==-128){
+                return this;
+              }else{
+                return new CheckedSubSet.TailSet.Descending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(toElement));
+              }
             }else{
-              return new CheckedSubSet.TailSet.Descending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(toElement));
+              if(toElement==-128){
+                return new CheckedSubSet.HeadSet.Descending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(fromElement));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(this,(fromElement<<8)|(toElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(toElement,fromElement));
+              }
             }
-          }else{
-            if(toElement==-128){
-              return new CheckedSubSet.HeadSet.Descending(this,f,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(f));
-            }else{
-              return new CheckedSubSet.BodySet.Descending(this,(f<<8)|(toElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(toElement,f));
-            }
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Descending(f);
-        default:
-          throw new IllegalArgumentException("out of bounds");
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(toElement);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
@@ -1513,8 +1573,8 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(toElement==Byte.MAX_VALUE){
           return new AbstractByteSet.EmptyView.Checked.Descending(128);
         }
-        final int t;
-        return new CheckedSubSet.TailSet.Descending(this,t=toElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(t));
+        final int inclusiveTo;
+        return new CheckedSubSet.TailSet.Descending(this,inclusiveTo=toElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -1523,41 +1583,42 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(fromElement==Byte.MIN_VALUE){
           return new AbstractByteSet.EmptyView.Checked.Descending(Byte.MIN_VALUE);
         }
-        return new CheckedSubSet.HeadSet.Descending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(fromElement));
+        final int inclusiveFrom;
+        return new CheckedSubSet.HeadSet.Descending(this,inclusiveFrom=fromElement-1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        switch(Integer.signum((f=(fromInclusive?fromElement+1:fromElement))-(t=(toInclusive?toElement:toElement+1)))){
-        case 1:
-          if(t==-128){
-            if(f==128){
-              return this;
+        final int inclusiveFrom,inclusiveTo;
+        switch(Integer.signum((inclusiveFrom=fromInclusive?fromElement:fromElement-1)-(inclusiveTo=toInclusive?toElement:toElement+1)+1)){
+          case 1:
+            if(inclusiveTo==-128){
+              if(inclusiveFrom==127){
+                return this;
+              }else{
+                return new CheckedSubSet.HeadSet.Descending(this,inclusiveFrom,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
+              }
             }else{
-              return new CheckedSubSet.HeadSet.Descending(this,f,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(f));
+              if(inclusiveFrom==127){
+                return new CheckedSubSet.TailSet.Descending(this,inclusiveTo,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveTo));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(this,(inclusiveFrom<<8)|(inclusiveTo&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(inclusiveTo,inclusiveFrom));
+              }
             }
-          }else{
-            if(f==128){
-              return new CheckedSubSet.TailSet.Descending(this,t,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(t));
-            }else{
-              return new CheckedSubSet.BodySet.Descending(this,(f<<8)|(t&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(t,f));
-            }
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Descending(f);
-        default:
-          throw new IllegalArgumentException("out of bounds");
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new AbstractCheckedFullView.Ascending(this);
       }
-      #MACRO FullViewAccessMethods<this,Checked,Descending,Byte>(byte,,null,(Byte)(byte))
-      #MACRO FullViewAccessMethods<this,Checked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
-      #MACRO FullViewAccessMethods<this,Checked,Descending,short>(short,Short,Short.MIN_VALUE,(short))
-      #MACRO FullViewAccessMethods<this,Checked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
-      #MACRO FullViewAccessMethods<this,Checked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
-      #MACRO FullViewAccessMethods<this,Checked,Descending,float>(float,Float,Float.NaN,(float))
-      #MACRO FullViewAccessMethods<this,Checked,Descending,double>(double,Double,Double.NaN,(double))
+      #MACRO AccessMethods<Full,this,Checked,Descending,Byte>(byte,,null,(Byte)(byte))
+      #MACRO AccessMethods<Full,this,Checked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Full,this,Checked,Descending,short>(short,Short,Short.MIN_VALUE,(short))
+      #MACRO AccessMethods<Full,this,Checked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Full,this,Checked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Full,this,Checked,Descending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Full,this,Checked,Descending,double>(double,Double,Double.NaN,(double))
       #MACRO FullViewToString<this,Checked,Descending>()
       #MACRO FullViewForEach<this,Checked,Descending>()
       #MACRO FullViewToArray<this,Checked,Descending,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
@@ -1606,8 +1667,7 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(toElement==Byte.MAX_VALUE){
           return this;
         }
-        final int t;
-        return new UncheckedSubSet.HeadSet.Ascending(this,t=toElement+1,((ByteSetImpl)this).countHeadSetElements(t));
+        return new UncheckedSubSet.HeadSet.Ascending(this,toElement,((ByteSetImpl)this).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
@@ -1624,11 +1684,10 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
               return new UncheckedSubSet.TailSet.Ascending(this,fromElement,((ByteSetImpl)this).countTailSetElements(fromElement));
             }
           }else{
-            final int t=toElement+1;
             if(fromElement==-128){
-              return new UncheckedSubSet.HeadSet.Ascending(this,t,((ByteSetImpl)this).countHeadSetElements(t));
+              return new UncheckedSubSet.HeadSet.Ascending(this,toElement,((ByteSetImpl)this).countHeadSetElements(toElement));
             }else{
-              return new UncheckedSubSet.BodySet.Ascending(this,(t<<8)|(fromElement&0xff),((ByteSetImpl)this).countSubSetElements(fromElement,t));
+              return new UncheckedSubSet.BodySet.Ascending(this,(toElement<<8)|(fromElement&0xff),((ByteSetImpl)this).countSubSetElements(fromElement,toElement));
             }
           }
         }
@@ -1641,7 +1700,8 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(toElement==Byte.MIN_VALUE){
           return AbstractByteSet.EmptyView.ASCENDING;
         }
-        return new UncheckedSubSet.HeadSet.Ascending(this,toElement,((ByteSetImpl)this).countHeadSetElements(toElement));
+        final int inclusiveTo;
+        return new UncheckedSubSet.HeadSet.Ascending(this,inclusiveTo=toElement-1,((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -1650,23 +1710,23 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(fromElement==Byte.MAX_VALUE){
            return AbstractByteSet.EmptyView.ASCENDING;
         }
-        final int f;
-        return new UncheckedSubSet.TailSet.Ascending(this,f=fromElement+1,((ByteSetImpl)this).countTailSetElements(f));
+        final int inclusiveFrom;
+        return new UncheckedSubSet.TailSet.Ascending(this,inclusiveFrom=fromElement+1,((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        if((t=(toInclusive?toElement+1:toElement))>(f=(fromInclusive?fromElement:fromElement+1))){
-          if(t==128){
-            if(f==-128){
+        final int inclusiveTo,inclusiveFrom;
+        if((inclusiveTo=toInclusive?toElement:toElement-1)>=(inclusiveFrom=fromInclusive?fromElement:fromElement+1)){
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
               return this;
             }else{
-              return new UncheckedSubSet.TailSet.Ascending(this,f,((ByteSetImpl)this).countTailSetElements(f));
+              return new UncheckedSubSet.TailSet.Ascending(this,inclusiveFrom,((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
             }
           }else{
-            if(f==-128){
-              return new UncheckedSubSet.HeadSet.Ascending(this,t,((ByteSetImpl)this).countHeadSetElements(t));
+            if(inclusiveFrom==-128){
+              return new UncheckedSubSet.HeadSet.Ascending(this,inclusiveTo,((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
             }else{
-              return new UncheckedSubSet.BodySet.Ascending(this,(t<<8)|(f&0xff),((ByteSetImpl)this).countSubSetElements(f,t));
+              return new UncheckedSubSet.BodySet.Ascending(this,(inclusiveTo<<8)|(inclusiveFrom&0xff),((ByteSetImpl)this).countSubSetElements(inclusiveFrom,inclusiveTo));
             }
           }
         }
@@ -1730,8 +1790,7 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(fromElement==Byte.MAX_VALUE){
           return this;
         }
-        final int f;
-        return new UncheckedSubSet.HeadSet.Descending(this,f=fromElement+1,((ByteSetImpl)this).countHeadSetElements(f));
+        return new UncheckedSubSet.HeadSet.Descending(this,fromElement,((ByteSetImpl)this).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
         if(fromElement>=toElement){
@@ -1742,11 +1801,10 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
               return new UncheckedSubSet.TailSet.Descending(this,toElement,((ByteSetImpl)this).countTailSetElements(toElement));
             }
           }else{
-            final int f=fromElement+1;
             if(toElement==-128){
-              return new UncheckedSubSet.HeadSet.Descending(this,f,((ByteSetImpl)this).countHeadSetElements(f));
+              return new UncheckedSubSet.HeadSet.Descending(this,fromElement,((ByteSetImpl)this).countHeadSetElements(fromElement));
             }else{
-              return new UncheckedSubSet.BodySet.Descending(this,(f<<8)|(toElement&0xff),((ByteSetImpl)this).countSubSetElements(toElement,f));
+              return new UncheckedSubSet.BodySet.Descending(this,(fromElement<<8)|(toElement&0xff),((ByteSetImpl)this).countSubSetElements(toElement,fromElement));
             }
           }
         }
@@ -1757,10 +1815,10 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
           return headSet(toElement);
         }
         if(toElement==Byte.MAX_VALUE){
-          return AbstractByteSet.EmptyView.DESCENDING;
+         return AbstractByteSet.EmptyView.DESCENDING;
         }
-        final int t;
-        return new UncheckedSubSet.TailSet.Descending(this,t=toElement+1,((ByteSetImpl)this).countTailSetElements(t));
+        final int inclusiveTo;
+        return new UncheckedSubSet.TailSet.Descending(this,inclusiveTo=toElement+1,((ByteSetImpl)this).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -1769,22 +1827,23 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         if(fromElement==Byte.MIN_VALUE){
           return AbstractByteSet.EmptyView.DESCENDING;
         }
-        return new UncheckedSubSet.HeadSet.Descending(this,fromElement,((ByteSetImpl)this).countHeadSetElements(fromElement));
+        final int inclusiveFrom;
+        return new UncheckedSubSet.HeadSet.Descending(this,inclusiveFrom=fromElement-1,((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        if((f=(fromInclusive?fromElement+1:fromElement))>(t=(toInclusive?toElement:toElement+1))){
-          if(t==-128){
-            if(f==128){
+        final int inclusiveFrom,inclusiveTo;
+        if((inclusiveFrom=fromInclusive?fromElement:fromElement-1)>=(inclusiveTo=toInclusive?toElement:toElement+1)){
+          if(inclusiveTo==-128){
+            if(inclusiveFrom==127){
               return this;
             }else{
-              return new UncheckedSubSet.HeadSet.Descending(this,f,((ByteSetImpl)this).countHeadSetElements(f));
+              return new UncheckedSubSet.HeadSet.Descending(this,inclusiveFrom,((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
             }
           }else{
-            if(f==128){
-              return new UncheckedSubSet.TailSet.Descending(this,t,((ByteSetImpl)this).countTailSetElements(t));
+            if(inclusiveFrom==127){
+              return new UncheckedSubSet.TailSet.Descending(this,inclusiveTo,((ByteSetImpl)this).countTailSetElements(inclusiveTo));
             }else{
-              return new UncheckedSubSet.BodySet.Descending(this,(f<<8)|(t&0xff),((ByteSetImpl)this).countSubSetElements(t,f));
+              return new UncheckedSubSet.BodySet.Descending(this,(inclusiveFrom<<8)|(inclusiveTo&0xff),((ByteSetImpl)this).countSubSetElements(inclusiveTo,inclusiveFrom));
             }
           }
         }
@@ -1793,13 +1852,13 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new AbstractUncheckedFullView.Ascending(this);
       }
-      #MACRO FullViewAccessMethods<this,Unchecked,Descending,Byte>(byte,,null,(Byte)(byte))
-      #MACRO FullViewAccessMethods<this,Unchecked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
-      #MACRO FullViewAccessMethods<this,Unchecked,Descending,short>(short,Short,Short.MIN_VALUE,(short))
-      #MACRO FullViewAccessMethods<this,Unchecked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
-      #MACRO FullViewAccessMethods<this,Unchecked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
-      #MACRO FullViewAccessMethods<this,Unchecked,Descending,float>(float,Float,Float.NaN,(float))
-      #MACRO FullViewAccessMethods<this,Unchecked,Descending,double>(double,Double,Double.NaN,(double))
+      #MACRO AccessMethods<Full,this,Unchecked,Descending,Byte>(byte,,null,(Byte)(byte))
+      #MACRO AccessMethods<Full,this,Unchecked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Full,this,Unchecked,Descending,short>(short,Short,Short.MIN_VALUE,(short))
+      #MACRO AccessMethods<Full,this,Unchecked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Full,this,Unchecked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Full,this,Unchecked,Descending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Full,this,Unchecked,Descending,double>(double,Double,Double.NaN,(double))
       #MACRO FullViewToString<this,Unchecked,Descending>()
       #MACRO FullViewForEach<this,Unchecked,Descending>()
       #MACRO FullViewToArray<this,Unchecked,Descending,Byte>((Byte)(byte),int,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
@@ -1819,27 +1878,27 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     }
     private Unchecked(OmniCollection.OfBoolean that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(OmniCollection.OfByte that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(OmniCollection.ByteOutput<?> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(OmniCollection.OfRef<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(Collection<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private void uncheckedForEachAscending(int offset,ByteConsumer action){
@@ -1986,9 +2045,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
       return false;
     }
-    
-    
-    
     private int headSetRemoveIfImpl(int inclusiveTo,int size,BytePredicate filter){
       int numRemoved=0;
       goToWord0:for(;;){
@@ -2069,232 +2125,9 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         }
       }
     }
-    
   }
   
-  
-  
-  
-  
-  /*
-  //TODO consider using these two methods
-  private int getBodySetLo(int inclusiveLo,int exclusiveHi){
-    foundElementAtEnd:for(;;){
-      int tail0s;
-      foundElementInMiddle:for(;;){
-        switch((exclusiveHi-1)>>6){
-          case 1:
-            switch(inclusiveLo>>6){
-              case -2:
-                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=-64;
-              case -1:
-                if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=0;
-              case 0:
-                if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=64;
-              case 1:
-                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))<exclusiveHi){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case 0:
-            switch(inclusiveLo>>6){
-              case -2:
-                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=-64;
-              case -1:
-                if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=0;
-              case 0:
-                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))<exclusiveHi){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case -1:
-            switch(inclusiveLo>>6){
-              case -2:
-                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=-64;
-              case -1:
-                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))<exclusiveHi){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          default:
-            if(inclusiveLo>>6==-2 && (inclusiveLo+=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))<exclusiveHi){
-              break foundElementAtEnd;
-            }
-        }
-        return 128;
-      }
-      return inclusiveLo+tail0s;
-    }
-    return inclusiveLo;
-  }
-  private int getBodySetHi(int inclusiveLo,int inclusiveHi){
-    foundElementAtEnd:for(;;){
-      int lead0s;
-      foundElementInMiddle:for(;;){
-        switch(inclusiveLo>>6){
-          case -2:
-            switch(inclusiveHi>>6){
-              case 1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=63;
-              case 0:
-                if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=-1;
-              case -1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=-65;
-              case -2:
-                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))>=inclusiveLo){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case -1:
-            switch(inclusiveHi>>6){
-              case 1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=63;
-              case 0:
-                if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=-1;
-              case -1:
-                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))>=inclusiveLo){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case 0:
-            switch(inclusiveHi>>6){
-              case 1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=63;
-              case 0:
-                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))>=inclusiveLo){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          default:
-            if(inclusiveHi>>6==1 && (inclusiveHi-=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))>=inclusiveLo){
-               break foundElementAtEnd;
-            }
-        }
-       
-        return -129;
-      }
-      return inclusiveHi-lead0s;
-    }
-    return inclusiveHi;
-    
-  }
-  */
-  
-  private int getThisOrLowerInRange(int inclusiveHi){
-    int lead0s;
-    foundElement:for(;;){
-      switch(inclusiveHi>>6){
-        case 1:// [64,127]
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-          inclusiveHi=63;
-        case 0:// [0,63]
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-          inclusiveHi=-1;
-        case -1:// [-64,-1]
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-          inclusiveHi=-65;
-        default:// [-128,-65]
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-      }
-      return -129;
-    }
-    return inclusiveHi-lead0s;
-  
-  }
-  
-  
-  private int removeThisOrLowerInRange(int inclusiveHi){
-    foundElement:for(;;){
-      switch(inclusiveHi>>6){
-        case 1:// [64,127]
-          int lead0s;
-          long word;
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word3)<<(-inclusiveHi-1)))!=64){
-            this.word3=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-          inclusiveHi=63;
-        case 0:// [0,63]
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word2)<<(-inclusiveHi-1)))!=64){
-            this.word2=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-          inclusiveHi=-1;
-        case -1:// [-64,-1]
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word1)<<(-inclusiveHi-1)))!=64){
-            this.word1=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-          inclusiveHi=-65;
-        default:// [-128,-65]
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word0)<<(-inclusiveHi-1)))!=64){
-            this.word0=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-      }
-      return Integer.MIN_VALUE;
-    }
-    return inclusiveHi;
-  
-  }
-  
-  
+
   private int getThisOrLower(int inclusiveHi){
     int lead0s;
     foundElement:for(;;){
@@ -2353,7 +2186,220 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     }
     return inclusiveLo+tail0s;
   }
+  private int getThisOrHigherInRange(int inclusiveLo,int inclusiveHi){
+    int index;
+    switch(inclusiveLo>>6){
+      case -2:
+        switch(inclusiveHi>>6){
+          case -2:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=inclusiveHi){
+              return index;
+            }
+            break;
+          case -1:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=-65){
+              return index;
+            }
+            if((index=-64+Long.numberOfTrailingZeros(this.word1))<=inclusiveHi){
+              return index;
+            }
+            break;
+          case 0:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=-65){
+              return index;
+            }
+            if((index=-64+Long.numberOfTrailingZeros(this.word1))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=inclusiveHi){
+              return index;
+            }
+            break;
+          default:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=-65){
+              return index;
+            }
+            if((index=-64+Long.numberOfTrailingZeros(this.word1))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=63){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word3))<=inclusiveHi){
+              return index;
+            }
+        }
+        break;
+      case -1:
+        switch(inclusiveHi>>6){
+          case -1:
+            if((index=-64+Long.numberOfTrailingZeros(this.word1&(-1L<<inclusiveLo)))<=inclusiveHi){
+              return index;
+            }
+            break;
+          case 0:
+            if((index=-64+Long.numberOfTrailingZeros(this.word1&(-1L<<inclusiveLo)))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=inclusiveHi){
+              return index;
+            }
+            break;
+          default:
+            if((index=-64+Long.numberOfTrailingZeros(this.word1&(-1L<<inclusiveLo)))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=63){
+              return index;
+            }
+            if((index=64+Long.numberOfTrailingZeros(this.word3))<=inclusiveHi){
+              return index;
+            }
+        }
+        break;
+      case 0:
+        if(inclusiveHi>>6==0){
+          if((index=Long.numberOfTrailingZeros(this.word2&(-1L<<inclusiveLo)))<=inclusiveHi){
+            return index;
+          }
+        }else{
+          if((index=Long.numberOfTrailingZeros(this.word2&(-1L<<inclusiveLo)))<=63){
+            return index;
+          }
+          if((index=64+Long.numberOfTrailingZeros(this.word3))<=127){
+            return index;
+          }
+        }
+        break;
+      default:
+        if((index=64+Long.numberOfTrailingZeros(this.word3&(-1L<<inclusiveLo)))<=inclusiveHi){
+          return index;
+        }
+    }
+    return Integer.MIN_VALUE;
+  }
+  private int getThisOrLowerInRange(int inclusiveLo,int inclusiveHi){
+    int index;
+    switch(inclusiveHi>>6){
+      case 1:
+        switch(inclusiveLo>>6){
+          case 1:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+              return index;
+            }
+            break;
+          case 0:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=64){
+              return index;
+            }
+            if((index=63-Long.numberOfLeadingZeros(this.word2))>=inclusiveLo){
+              return index;
+            }
+            break;
+          case -1:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=64){
+              return index;
+            }
+            if((index=63-Long.numberOfLeadingZeros(this.word2))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=inclusiveLo){
+              return index;
+            }
+            break;
+          default:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=64){
+              return index;
+            }
+            if((index=63-Long.numberOfLeadingZeros(this.word2))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=-64){
+              return index;
+            }
+            if((index=-65-Long.numberOfLeadingZeros(this.word0))>=inclusiveLo){
+              return index;
+            }
+        }
+        break;
+      case 0:
+        switch(inclusiveLo>>6){
+          case 0:
+            if((index=63-Long.numberOfLeadingZeros(this.word2&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+              return index;
+            }
+            break;
+          case -1:
+            if((index=63-Long.numberOfLeadingZeros(this.word2&(-1L>>>(-inclusiveHi-1))))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=inclusiveLo){
+              return index;
+            }
+            break;
+          default:
+            if((index=63-Long.numberOfLeadingZeros(this.word2&(-1L>>>(-inclusiveHi-1))))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=-64){
+              return index;
+            }
+            if((index=-65-Long.numberOfLeadingZeros(this.word0))>=inclusiveLo){
+              return index;
+            }
+        }
+        break;
+      case -1:
+        if(inclusiveLo>>6==-1){
+          if((index=-1-Long.numberOfLeadingZeros(this.word1&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+            return index;
+          }
+        }else{
+          if((index=-1-Long.numberOfLeadingZeros(this.word1&(-1L>>>(-inclusiveHi-1))))>=-64){
+            return index;
+          }
+          if((index=-65-Long.numberOfLeadingZeros(this.word0))>=inclusiveLo){
+            return index;
+          }
+        }
+        break;
+      default:
+        if((index=-65-Long.numberOfLeadingZeros(this.word0&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+          return index;
+        }
+      
+    }
+    return Integer.MIN_VALUE;
+  }
   
+  private int getThisOrLowerInRange(int inclusiveHi){
+    int lead0s;
+    foundElement:for(;;){
+      switch(inclusiveHi>>6){
+        case 1:// [64,127]
+          if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=63;
+        case 0:// [0,63]
+          if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-1;
+        case -1:// [-64,-1]
+          if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-65;
+        default:// [-128,-65]
+          if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+      }
+      return -129;
+    }
+    return inclusiveHi-lead0s;
+  }
   private int getThisOrHigherInRange(int inclusiveLo){
     int tail0s;
     foundElement:for(;;){
@@ -2384,7 +2430,39 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
   }
   
   
-  
+  private int removeThisOrLowerInRange(int inclusiveHi){
+    foundElement:for(;;){
+      switch(inclusiveHi>>6){
+        case 1:// [64,127]
+          int lead0s;
+          long word;
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word3)<<(-inclusiveHi-1)))!=64){
+            this.word3=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=63;
+        case 0:// [0,63]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word2)<<(-inclusiveHi-1)))!=64){
+            this.word2=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=-1;
+        case -1:// [-64,-1]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word1)<<(-inclusiveHi-1)))!=64){
+            this.word1=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=-65;
+        default:// [-128,-65]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word0)<<(-inclusiveHi-1)))!=64){
+            this.word0=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+      }
+      return Integer.MIN_VALUE;
+    }
+    return inclusiveHi;
+  }
   private int removeThisOrHigherInRange(int inclusiveLo){
     foundElement:for(;;){
       switch(inclusiveLo>>6){
@@ -2933,13 +3011,13 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     @Override public boolean remove(Object val){
       return root.remove(val);
     }
-    #MACRO FullViewAccessMethods<root,Checked,Ascending,Byte>(byte,,null,(Byte)(byte))
-    #MACRO FullViewAccessMethods<root,Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
-    #MACRO FullViewAccessMethods<root,Checked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
-    #MACRO FullViewAccessMethods<root,Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
-    #MACRO FullViewAccessMethods<root,Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
-    #MACRO FullViewAccessMethods<root,Checked,Ascending,float>(float,Float,Float.NaN,(float))
-    #MACRO FullViewAccessMethods<root,Checked,Ascending,double>(double,Double,Double.NaN,(double))
+    #MACRO AccessMethods<Full,root,Checked,Ascending,Byte>(byte,,null,(Byte)(byte))
+    #MACRO AccessMethods<Full,root,Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+    #MACRO AccessMethods<Full,root,Checked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
+    #MACRO AccessMethods<Full,root,Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+    #MACRO AccessMethods<Full,root,Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+    #MACRO AccessMethods<Full,root,Checked,Ascending,float>(float,Float,Float.NaN,(float))
+    #MACRO AccessMethods<Full,root,Checked,Ascending,double>(double,Double,Double.NaN,(double))
     @Override public OmniNavigableSet.OfByte descendingSet(){
       return root;
     }
@@ -2966,59 +3044,90 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       @Override public OmniIterator.OfByte descendingIterator(){
         return new CheckedDescendingItr(root);
       }
-      
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.HeadSet.Ascending(root=this.root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.TailSet.Ascending(root=this.root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MIN_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MAX_VALUE){
-            return tailSet(fromElement);
-          }else{
-            #MACRO NYI()
-          }
+        final int exclusiveTo;
+        switch(Integer.signum((exclusiveTo=toElement+1)-fromElement)){
+          case 1:
+            if(toElement==127){
+              if(fromElement==-128){
+                return this;
+              }else{
+                final ByteSetImpl.Checked root;
+                return new CheckedSubSet.TailSet.Ascending(root=this.root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(fromElement));
+              }
+            }else{
+              final var root=this.root;
+              if(fromElement==-128){
+                return new CheckedSubSet.HeadSet.Ascending(root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(toElement));
+              }else{
+                return new CheckedSubSet.BodySet.Ascending(root,(toElement<<8)|(fromElement&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(fromElement,toElement));
+              }
+            }
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Ascending(exclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          #MACRO NYI()
         }
+        if(toElement==Byte.MIN_VALUE){
+          return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveTo;
+        return new CheckedSubSet.HeadSet.Ascending(root=this.root,inclusiveTo=toElement-1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          #MACRO NYI()
         }
+        if(fromElement==Byte.MAX_VALUE){
+           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MAX_VALUE+1);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveFrom;
+        return new CheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom=fromElement+1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
+        final int inclusiveTo,inclusiveFrom;
+        switch(Integer.signum((inclusiveTo=toInclusive?toElement:toElement-1)-(inclusiveFrom=fromInclusive?fromElement:fromElement+1)+1)){
+        case 1:
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Checked root;
+              return new CheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
+            }
           }else{
-            #MACRO NYI()
+            final var root=this.root;
+            if(inclusiveFrom==-128){
+              return new CheckedSubSet.HeadSet.Ascending(root,inclusiveTo,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
+            }else{
+              return new CheckedSubSet.BodySet.Ascending(root,(inclusiveTo<<8)|(inclusiveFrom&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(inclusiveFrom,inclusiveTo));
+            }
           }
-        }else{
-          if(toInclusive){
-            #MACRO NYI()
-          }else{
-            #MACRO NYI()
-          }
+        case 0:
+          return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
+        default:
+          throw new IllegalArgumentException("out of bounds");
         }
       }
       
@@ -3055,55 +3164,86 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.TailSet.Descending(root=this.root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.HeadSet.Descending(root=this.root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MAX_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MIN_VALUE){
-            return tailSet(toElement);
-          }else{
-            #MACRO NYI()
-          }
+        switch(Integer.signum(fromElement+1-toElement)){
+          case 1:
+            if(fromElement==127){
+              if(toElement==-128){
+                return this;
+              }else{
+                final ByteSetImpl.Checked root;
+                return new CheckedSubSet.TailSet.Descending(root=this.root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(toElement));
+              }
+            }else{
+              final var root=this.root;
+              if(toElement==-128){
+                return new CheckedSubSet.HeadSet.Descending(root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(fromElement));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(root,(fromElement<<8)|(toElement&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(toElement,fromElement));
+              }
+            }
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(toElement);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          #MACRO NYI()
         }
+        if(toElement==Byte.MAX_VALUE){
+          return new AbstractByteSet.EmptyView.Checked.Descending(128);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveTo;
+        return new CheckedSubSet.TailSet.Descending(root=this.root,inclusiveTo=toElement+1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          #MACRO NYI()
         }
+        if(fromElement==Byte.MIN_VALUE){
+          return new AbstractByteSet.EmptyView.Checked.Descending(Byte.MIN_VALUE);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveFrom;
+        return new CheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom=fromElement-1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
-          }else{
-            #MACRO NYI()
-          }
-        }else{
-          if(toInclusive){
-            #MACRO NYI()
-          }else{
-            #MACRO NYI()
-          }
+        final int inclusiveFrom,inclusiveTo;
+        switch(Integer.signum((inclusiveFrom=fromInclusive?fromElement:fromElement-1)-(inclusiveTo=toInclusive?toElement:toElement+1)+1)){
+          case 1:
+            if(inclusiveTo==-128){
+              if(inclusiveFrom==127){
+                return this;
+              }else{
+                final ByteSetImpl.Checked root;
+                return new CheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
+              }
+            }else{
+              final var root=this.root;
+              if(inclusiveFrom==127){
+                return new CheckedSubSet.TailSet.Descending(root,inclusiveTo,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveTo));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(root,(inclusiveFrom<<8)|(inclusiveTo&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(inclusiveTo,inclusiveFrom));
+              }
+            }
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       #MACRO FullViewToString<root,Checked,Descending>()
@@ -3196,13 +3336,13 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     @Override public boolean remove(Object val){
       return root.remove(val);
     }
-    #MACRO FullViewAccessMethods<root,Unchecked,Ascending,Byte>(byte,,null,(Byte)(byte))
-    #MACRO FullViewAccessMethods<root,Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
-    #MACRO FullViewAccessMethods<root,Unchecked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
-    #MACRO FullViewAccessMethods<root,Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
-    #MACRO FullViewAccessMethods<root,Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
-    #MACRO FullViewAccessMethods<root,Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
-    #MACRO FullViewAccessMethods<root,Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
+    #MACRO AccessMethods<Full,root,Unchecked,Ascending,Byte>(byte,,null,(Byte)(byte))
+    #MACRO AccessMethods<Full,root,Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+    #MACRO AccessMethods<Full,root,Unchecked,Ascending,short>(short,Short,Short.MIN_VALUE,(short))
+    #MACRO AccessMethods<Full,root,Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+    #MACRO AccessMethods<Full,root,Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+    #MACRO AccessMethods<Full,root,Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
+    #MACRO AccessMethods<Full,root,Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
     @Override public OmniNavigableSet.OfByte descendingSet(){
       return root;
     }
@@ -3232,56 +3372,79 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.HeadSet.Ascending(root=this.root,toElement,((ByteSetImpl)root).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.TailSet.Ascending(root=this.root,fromElement,((ByteSetImpl)root).countTailSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MIN_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MAX_VALUE){
-            return tailSet(fromElement);
+        if(toElement>=fromElement){
+          if(toElement==127){
+            if(fromElement==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.TailSet.Ascending(root=this.root,fromElement,((ByteSetImpl)root).countTailSetElements(fromElement));
+            }
           }else{
-            #MACRO NYI()
+            final var root=this.root;
+            if(fromElement==-128){
+              return new UncheckedSubSet.HeadSet.Ascending(root,toElement,((ByteSetImpl)root).countHeadSetElements(toElement));
+            }else{
+              return new UncheckedSubSet.BodySet.Ascending(root,(toElement<<8)|(fromElement&0xff),((ByteSetImpl)root).countSubSetElements(fromElement,toElement));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.ASCENDING;
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          #MACRO NYI()
         }
+        if(toElement==Byte.MIN_VALUE){
+          return AbstractByteSet.EmptyView.ASCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveTo;
+        return new UncheckedSubSet.HeadSet.Ascending(root=this.root,inclusiveTo=toElement-1,((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          #MACRO NYI()
         }
+        if(fromElement==Byte.MAX_VALUE){
+           return AbstractByteSet.EmptyView.ASCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveFrom;
+        return new UncheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom=fromElement+1,((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
+        final int inclusiveTo,inclusiveFrom;
+        if((inclusiveTo=toInclusive?toElement:toElement-1)>=(inclusiveFrom=fromInclusive?fromElement:fromElement+1)){
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom,((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
+            }
           }else{
-            #MACRO NYI()
-          }
-        }else{
-          if(toInclusive){
-            #MACRO NYI()
-          }else{
-            #MACRO NYI()
+            final var root=this.root;
+            if(inclusiveFrom==-128){
+              return new UncheckedSubSet.HeadSet.Ascending(root,inclusiveTo,((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
+            }else{
+              return new UncheckedSubSet.BodySet.Ascending(root,(inclusiveTo<<8)|(inclusiveFrom&0xff),((ByteSetImpl)root).countSubSetElements(inclusiveFrom,inclusiveTo));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.ASCENDING;
       }
       #MACRO FullViewToString<root,Unchecked,Ascending>()
       #MACRO FullViewForEach<root,Unchecked,Ascending>()
@@ -3316,56 +3479,79 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.TailSet.Descending(root=this.root,toElement,((ByteSetImpl)root).countTailSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          #MACRO NYI()
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.HeadSet.Descending(root=this.root,fromElement,((ByteSetImpl)root).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MAX_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MIN_VALUE){
-            return tailSet(toElement);
+        if(fromElement>=toElement){
+          if(fromElement==127){
+            if(toElement==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.TailSet.Descending(root=this.root,toElement,((ByteSetImpl)root).countTailSetElements(toElement));
+            }
           }else{
-            #MACRO NYI()
+            final var root=this.root;
+            if(toElement==-128){
+              return new UncheckedSubSet.HeadSet.Descending(root,fromElement,((ByteSetImpl)root).countHeadSetElements(fromElement));
+            }else{
+              return new UncheckedSubSet.BodySet.Descending(root,(fromElement<<8)|(toElement&0xff),((ByteSetImpl)root).countSubSetElements(toElement,fromElement));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.DESCENDING;
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          #MACRO NYI()
         }
+        if(toElement==Byte.MAX_VALUE){
+         return AbstractByteSet.EmptyView.DESCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveTo;
+        return new UncheckedSubSet.TailSet.Descending(root=this.root,inclusiveTo=toElement+1,((ByteSetImpl)root).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          #MACRO NYI()
         }
+        if(fromElement==Byte.MIN_VALUE){
+          return AbstractByteSet.EmptyView.DESCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveFrom;
+        return new UncheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom=fromElement-1,((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
+        final int inclusiveFrom,inclusiveTo;
+        if((inclusiveFrom=fromInclusive?fromElement:fromElement-1)>=(inclusiveTo=toInclusive?toElement:toElement+1)){
+          if(inclusiveTo==-128){
+            if(inclusiveFrom==127){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom,((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
+            }
           }else{
-            #MACRO NYI()
-          }
-        }else{
-          if(toInclusive){
-            #MACRO NYI()
-          }else{
-            #MACRO NYI()
+            final var root=this.root;
+            if(inclusiveFrom==127){
+              return new UncheckedSubSet.TailSet.Descending(root,inclusiveTo,((ByteSetImpl)root).countTailSetElements(inclusiveTo));
+            }else{
+              return new UncheckedSubSet.BodySet.Descending(root,(inclusiveFrom<<8)|(inclusiveTo&0xff),((ByteSetImpl)root).countSubSetElements(inclusiveTo,inclusiveFrom));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.DESCENDING;
       }
       #MACRO FullViewToString<root,Unchecked,Descending>()
       #MACRO FullViewForEach<root,Unchecked,Descending>()
@@ -3378,7 +3564,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       #MACRO FullViewToArray<root,Unchecked,Descending,double>((double),int,OmniArray.OfDouble.DEFAULT_ARR,Double)
     }
   }
-  
   
   private void clearHeadSet(int exclusiveTo){
     goToEnd:for(;;){
@@ -3404,6 +3589,9 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       break;
     }
   }
+  
+  
+
   private void clearTailSet(int inclusiveFrom){
     goToEnd:for(;;){
       clearWord3:for(;;){
@@ -3429,7 +3617,7 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     }
   }
   private void clearBodySet(int boundInfo){
-    final int exclusiveTo=(boundInfo>>8);
+    final int exclusiveTo=(boundInfo>>8)+1;
     goToEnd:switch((boundInfo&=0xff)>>6){
       case 2:
         clearWord0:for(;;){
@@ -3481,13 +3669,15 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
   
   
   
+  
+  
   private static abstract class UncheckedSubSet extends AbstractByteSet.ComparatorlessImpl{
     transient final ByteSetImpl.Unchecked root;
     transient final UncheckedSubSet parent;
     transient final int boundInfo;
     transient int size;
     
-    //TODO equals
+    //todo equals
     
     
     private UncheckedSubSet(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -3597,8 +3787,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
       return OmniArray.OfDouble.DEFAULT_ARR;
     }
-    
-    
     @Override public String toString(){
       int size;
       if((size=this.size)!=0){
@@ -3614,8 +3802,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
       return 0;
     }
-    
-    
     @Override public void forEach(ByteConsumer action){
       final int numLeft;
       if((numLeft=this.size)!=0){
@@ -3747,8 +3933,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
       return false;
     }
-    
-    
     @Override public boolean contains(boolean val){
       final int mask;
       return size!=0 && isInRange(mask=val?0b10:0b01) && (root.word2&mask)!=0;
@@ -3841,15 +4025,12 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
       return false;
     }
-    
-    
     @Override public int size(){
       return this.size;
     }
     @Override public boolean isEmpty(){
       return this.size==0;
     }
-    
     @Override public boolean add(byte val){
       if(((ByteSetImpl)root).uncheckedAdd(val)){
         ++this.size;
@@ -3876,9 +4057,227 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         clearImpl();
       }
     }
+    abstract int ceilingImpl(double val);
+    abstract int floorImpl(double val);
+    abstract int higherImpl(double val);
+    abstract int lowerImpl(double val);
+    
+    abstract int ceilingImpl(float val);
+    abstract int floorImpl(float val);
+    abstract int higherImpl(float val);
+    abstract int lowerImpl(float val);
+    
+    abstract int ceilingImpl(long val);
+    abstract int floorImpl(long val);
+    abstract int higherImpl(long val);
+    abstract int lowerImpl(long val);
+    
+    abstract int ceilingImpl(int val);
+    abstract int floorImpl(int val);
+    abstract int higherImpl(int val);
+    abstract int lowerImpl(int val);
+    
+    abstract int ceilingImpl(byte val);
+    abstract int floorImpl(byte val);
+    abstract int higherImpl(byte val);
+    abstract int lowerImpl(byte val);
     
     
     
+    
+    @Override public double doubleCeiling(double val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatCeiling(float val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long longCeiling(long val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intCeiling(int val){
+      if(this.size!=0){
+        return ceilingImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortCeiling(short val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteCeiling(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte ceiling(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
+    @Override public double doubleFloor(double val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatFloor(float val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long longFloor(long val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intFloor(int val){
+      if(this.size!=0){
+        return floorImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortFloor(short val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteFloor(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte floor(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
+    
+    @Override public double lowerDouble(double val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float lowerFloat(float val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long lowerLong(long val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int lowerInt(int val){
+      if(this.size!=0){
+        return lowerImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short lowerShort(short val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte lowerByte(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte lower(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
+    @Override public double higherDouble(double val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float higherFloat(float val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long higherLong(long val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int higherInt(int val){
+      if(this.size!=0){
+        return higherImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short higherShort(short val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte higherByte(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte higher(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
     private static abstract class HeadSet extends UncheckedSubSet{
       private HeadSet(ByteSetImpl.Unchecked root,int boundInfo,int size){
         super(root,boundInfo,size);
@@ -3887,17 +4286,22 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         super(parent,boundInfo,size);
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
-        return root.headSetRemoveIfImpl(this.boundInfo-1,size,filter);
+        return root.headSetRemoveIfImpl(this.boundInfo,size,filter);
       }
       @Override boolean isInRange(int val){
-        return val<this.boundInfo;
+        return val<=this.boundInfo;
       }
       @Override void clearImpl(){
-        ((ByteSetImpl)root).clearHeadSet(this.boundInfo);
+        ((ByteSetImpl)root).clearHeadSet(this.boundInfo+1);
       }
       @Override int hashCodeImpl(int numLeft){
         return ((ByteSetImpl)root).uncheckedHashCode(this.boundInfo,numLeft);
       }
+      #MACRO AccessMethods<Head,root,Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Head,root,Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Head,root,Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Head,root,Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Head,root,Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
@@ -3935,6 +4339,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.HeadSet.Descending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -3943,6 +4374,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         private Descending(Descending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
+        #MACRO AccessMethods<Head,root,Unchecked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+        #MACRO AccessMethods<Head,root,Unchecked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+        #MACRO AccessMethods<Head,root,Unchecked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+        #MACRO AccessMethods<Head,root,Unchecked,Descending,float>(float,Float,Float.NaN,(float))
+        #MACRO AccessMethods<Head,root,Unchecked,Descending,double>(double,Double,Double.NaN,(double))
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(this.boundInfo,numLeft,action);
         }
@@ -3972,6 +4408,34 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         }
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.HeadSet.Ascending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
         }
       }
     }
@@ -4074,7 +4538,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
           }
         }
       }
-      
+      #MACRO AccessMethods<Tail,root,Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Tail,root,Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Tail,root,Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Tail,root,Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Tail,root,Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
@@ -4112,6 +4580,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.TailSet.Descending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -4120,6 +4615,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         private Descending(Descending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
+        #MACRO AccessMethods<Tail,root,Unchecked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+        #MACRO AccessMethods<Tail,root,Unchecked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+        #MACRO AccessMethods<Tail,root,Unchecked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+        #MACRO AccessMethods<Tail,root,Unchecked,Descending,float>(float,Float,Float.NaN,(float))
+        #MACRO AccessMethods<Tail,root,Unchecked,Descending,double>(double,Double,Double.NaN,(double))
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(numLeft,action);
         }
@@ -4150,6 +4650,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.TailSet.Ascending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+         #MACRO NYI()
+        }
       }
     }
     
@@ -4162,17 +4689,22 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
       @Override boolean isInRange(int val){
         final int boundInfo;
-        return val<((boundInfo=this.boundInfo)>>8) && val>=((byte)(boundInfo&0x1ff));
+        return val<=((boundInfo=this.boundInfo)>>8) && val>=((byte)(boundInfo&0x1ff));
       }
       @Override void clearImpl(){
         ((ByteSetImpl)root).clearBodySet(this.boundInfo);
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
-        return root.headSetRemoveIfImpl((this.boundInfo>>8)-1,size,filter);
+        return root.headSetRemoveIfImpl((this.boundInfo>>8),size,filter);
       }
       @Override int hashCodeImpl(int numLeft){
         return ((ByteSetImpl)root).uncheckedHashCode(this.boundInfo>>8,numLeft);
       }
+      #MACRO AccessMethods<Body,root,Unchecked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Body,root,Unchecked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Body,root,Unchecked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Body,root,Unchecked,Ascending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Body,root,Unchecked,Ascending,double>(double,Double,Double.NaN,(double))
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
@@ -4210,6 +4742,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.BodySet.Descending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -4218,6 +4777,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         private Descending(UncheckedSubSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
         }
+        #MACRO AccessMethods<Body,root,Unchecked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+        #MACRO AccessMethods<Body,root,Unchecked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+        #MACRO AccessMethods<Body,root,Unchecked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+        #MACRO AccessMethods<Body,root,Unchecked,Descending,float>(float,Float,Float.NaN,(float))
+        #MACRO AccessMethods<Body,root,Unchecked,Descending,double>(double,Double,Double.NaN,(double))
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(this.boundInfo>>8,numLeft,action);
         }
@@ -4248,27 +4812,37 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.BodySet.Ascending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
     }
   }
-  
-  
-  
-  
-  
-  
-  
-  
- 
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
   
   private static abstract class CheckedSubSet extends AbstractByteSet.ComparatorlessImpl{
     transient final ByteSetImpl.Checked root;
@@ -4276,7 +4850,7 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     transient final int boundInfo;
     transient int modCountAndSize;
     
-    //TODO equals
+    //todo equals
     abstract boolean isInRange(int val);
     
     
@@ -4706,11 +5280,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
       return false;
     }
-    
-    
-    
-    
-    
     @Override public boolean removeIf(Predicate<? super Byte> filter){
       final var root=this.root;
       final int modCountAndSize;
@@ -4770,7 +5339,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       this.modCountAndSize=modCountAndSize;
     }
     
-    
     abstract void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action);
     
     @Override public void forEach(ByteConsumer action){
@@ -4798,6 +5366,284 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       }
     }
     
+    abstract int ceilingImpl(ByteSetImpl root,double val);
+    abstract int floorImpl(ByteSetImpl root,double val);
+    abstract int higherImpl(ByteSetImpl root,double val);
+    abstract int lowerImpl(ByteSetImpl root,double val);
+    
+    abstract int ceilingImpl(ByteSetImpl root,float val);
+    abstract int floorImpl(ByteSetImpl root,float val);
+    abstract int higherImpl(ByteSetImpl root,float val);
+    abstract int lowerImpl(ByteSetImpl root,float val);
+    
+    abstract int ceilingImpl(ByteSetImpl root,long val);
+    abstract int floorImpl(ByteSetImpl root,long val);
+    abstract int higherImpl(ByteSetImpl root,long val);
+    abstract int lowerImpl(ByteSetImpl root,long val);
+    
+    abstract int ceilingImpl(ByteSetImpl root,int val);
+    abstract int floorImpl(ByteSetImpl root,int val);
+    abstract int higherImpl(ByteSetImpl root,int val);
+    abstract int lowerImpl(ByteSetImpl root,int val);
+    
+    abstract int ceilingImpl(ByteSetImpl root,byte val);
+    abstract int floorImpl(ByteSetImpl root,byte val);
+    abstract int higherImpl(ByteSetImpl root,byte val);
+    abstract int lowerImpl(ByteSetImpl root,byte val);
+    
+    @Override public double doubleCeiling(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatCeiling(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long longCeiling(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intCeiling(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return ceilingImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortCeiling(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteCeiling(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte ceiling(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
+    @Override public double doubleFloor(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatFloor(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long longFloor(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intFloor(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return floorImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortFloor(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteFloor(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte floor(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
+    @Override public double lowerDouble(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float lowerFloat(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long lowerLong(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int lowerInt(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return lowerImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short lowerShort(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte lowerByte(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte lower(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
+    @Override public double higherDouble(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float higherFloat(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long higherLong(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int higherInt(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return higherImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short higherShort(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte higherByte(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte higher(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
+    
     
     private static abstract class HeadSet extends CheckedSubSet{
       private HeadSet(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -4807,15 +5653,17 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         super(parent,boundInfo,modCountAndSize);
       }
       @Override void clearImpl(ByteSetImpl root){
-        root.clearHeadSet(this.boundInfo);
+        root.clearHeadSet(this.boundInfo+1);
       }
       @Override boolean isInRange(int val){
-        return val<this.boundInfo;
+        return val<=this.boundInfo;
       }
       @Override int hashCodeImpl(int numLeft,ByteSetImpl root){
         return root.uncheckedHashCode(this.boundInfo,numLeft);
       }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
+        #MACRO NYI()
+        /*
         int numRemoved=0;
         final int rootModCountAndSize;
         long word0=root.word0;
@@ -4898,7 +5746,13 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         root.word0=word0;
         root.modCountAndSize=rootModCountAndSize+(modCount=(1<<9)-numRemoved);
         return modCount;
+        */
       }
+      #MACRO AccessMethods<Head,root,Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Head,root,Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Head,root,Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Head,root,Checked,Ascending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Head,root,Checked,Ascending,double>(double,Double,Double.NaN,(double))
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
@@ -4912,7 +5766,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override String toStringImpl(int numLeft,ByteSetImpl root){
           return root.uncheckedAscendingToString(numLeft);
         }
-        
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
           root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
         }
@@ -4937,7 +5790,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
         }
-        
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -4946,6 +5825,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         private Descending(Descending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
+        #MACRO AccessMethods<Head,root,Checked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+        #MACRO AccessMethods<Head,root,Checked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+        #MACRO AccessMethods<Head,root,Checked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+        #MACRO AccessMethods<Head,root,Checked,Descending,float>(float,Float,Float.NaN,(float))
+        #MACRO AccessMethods<Head,root,Checked,Descending,double>(double,Double,Double.NaN,(double))
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedDescendingForEach(this.boundInfo,numLeft,action);
         }
@@ -4976,6 +5860,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedDescendingToArray(numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
     }
     
@@ -4998,6 +5909,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
       @Override int hashCodeImpl(int numLeft,ByteSetImpl root){
         return root.uncheckedHashCode(numLeft);
       }
+      #MACRO AccessMethods<Tail,root,Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Tail,root,Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Tail,root,Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Tail,root,Checked,Ascending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Tail,root,Checked,Ascending,double>(double,Double,Double.NaN,(double))
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
@@ -5035,6 +5951,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedAscendingToArray(numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -5043,6 +5986,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         private Descending(Descending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
         }
+        #MACRO AccessMethods<Tail,root,Checked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+        #MACRO AccessMethods<Tail,root,Checked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+        #MACRO AccessMethods<Tail,root,Checked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+        #MACRO AccessMethods<Tail,root,Checked,Descending,float>(float,Float,Float.NaN,(float))
+        #MACRO AccessMethods<Tail,root,Checked,Descending,double>(double,Double,Double.NaN,(double))
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedDescendingForEach(numLeft,action);
         }
@@ -5073,6 +6021,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
     }
     
@@ -5091,6 +6066,8 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         return root.uncheckedHashCode(this.boundInfo>>8,numLeft);
       }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
+        #MACRO NYI()
+        /*
         int numRemoved=0;
         long word0=root.word0,word1=root.word1,word2=root.word2,word3=root.word3;
         int inclusiveTo;
@@ -5199,12 +6176,17 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
           }
         }
         
-        
+        */
         
       }
       @Override void clearImpl(ByteSetImpl root){
         root.clearBodySet(this.boundInfo);
       }
+      #MACRO AccessMethods<Body,root,Checked,Ascending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+      #MACRO AccessMethods<Body,root,Checked,Ascending,int>(int,Int,Integer.MIN_VALUE,(int))
+      #MACRO AccessMethods<Body,root,Checked,Ascending,long>(long,Long,Long.MIN_VALUE,(long))
+      #MACRO AccessMethods<Body,root,Checked,Ascending,float>(float,Float,Float.NaN,(float))
+      #MACRO AccessMethods<Body,root,Checked,Ascending,double>(double,Double,Double.NaN,(double))
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
           super(root,boundInfo,modCountAndSize);
@@ -5242,6 +6224,33 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -5256,6 +6265,11 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override String toStringImpl(int numLeft,ByteSetImpl root){
           return root.uncheckedDescendingToString(boundInfo>>8,numLeft);
         }
+        #MACRO AccessMethods<Body,root,Checked,Descending,byte>(byte,Byte,Byte.MIN_VALUE,(byte))
+        #MACRO AccessMethods<Body,root,Checked,Descending,int>(int,Int,Integer.MIN_VALUE,(int))
+        #MACRO AccessMethods<Body,root,Checked,Descending,long>(long,Long,Long.MIN_VALUE,(long))
+        #MACRO AccessMethods<Body,root,Checked,Descending,float>(float,Float,Float.NaN,(float))
+        #MACRO AccessMethods<Body,root,Checked,Descending,double>(double,Double,Double.NaN,(double))
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
           root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
         }
@@ -5280,63 +6294,709 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          #MACRO NYI()
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          #MACRO NYI()
+        }
       }
     }
   }
 }
 
-
-
-#MACRODEF UncheckedContainsVal<VALTYPE>()
-@Override public boolean contains(VALTYPE val){
-  final int v;
-  if((v=(byte)val)==val){
-    switch(v>>6){
-    case -2:
-      return (this.word0&(1L<<v))!=0;
-    case -1:
-      return (this.word1&(1L<<v))!=0;
-    case 0:
-      return (this.word2&(1L<<v))!=0;
-    default:
-      return (this.word3&(1L<<v))!=0;
-    }
-  }
-  return false;
-}
-#ENDDEF
-#MACRODEF UncheckedRemoveVal<VALTYPE>()
-@Override public boolean removeVal(VALTYPE val){
-  final int v;
-  return (v=(byte)val)==val && uncheckedremoveByte(v);
-}
-#ENDDEF
-#MACRODEF CheckedRemoveVal<VALTYPE>()
-@Override public boolean removeVal(VALTYPE val){
-  final int modCountAndSize;
-  #IFSWITCH VALTYPE==byte
-  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveByte(val)){
-  #ELSEIFSWITCH VALTYPE==char
-  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveChar(val)){
-  #ELSEIFSWITCH VALTYPE==int
-  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveInt(val)){
+#MACRODEF AccessMethods<VIEW,SOURCE,CHECKED,DIRECTION,RETTYPE>(INPUTTYPE,CLASSPREFIX,DEFAULTVAL,CAST)
+#IFSWITCH VIEW==Body,Head,Tail
+  #IFSWITCH CHECKED==Checked
+@Override int ceilingImpl(ByteSetImpl root,INPUTTYPE val){
   #ELSE
-  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+@Override int ceilingImpl(INPUTTYPE val){
   #ENDIF
-    this.modCountAndSize=modCountAndSize+((1<<9)-1);
-    return true;
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH VIEW==Head
+      #IFSWITCH RETTYPE==int,long
+  final int inclTo;
+  if(val<=(inclTo=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val,inclTo);
   }
-  return false;
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  final int inclTo;
+  if(val<=(inclTo=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange((int)val,inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ELSE
+  final int inclTo;
+  if(val<=(inclTo=this.boundInfo) || val!=val){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val),inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ELSEIFSWITCH VIEW==Tail
+      #IFSWITCH RETTYPE==int,long
+  if(val<=Byte.MAX_VALUE){
+    final int inclFrom;
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  final int inclFrom;
+  return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+      #ELSE
+  if(val<=Byte.MAX_VALUE){
+    final int inclFrom;
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.intCeiling(val));
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ELSE
+      #IFSWITCH RETTYPE==int,long
+  int boundInfo;
+  final int inclTo;
+  if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+  }
+  return Integer.MIN_VALUE;  
+      #ELSEIFSWITCH RETTYPE==byte
+  int boundInfo;
+  final int inclTo;
+  if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+  }
+  return Integer.MIN_VALUE;  
+      #ELSE
+  int boundInfo;
+  final int inclTo;
+  if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.intCeiling(val),inclTo);
+  }
+  return Integer.MIN_VALUE;  
+      #ENDIF
+    #ENDIF
+  #ELSE
+    #IFSWITCH CHECKED==Checked
+  return super.floorImpl(root,val);
+    #ELSE
+  return super.floorImpl(val);
+    #ENDIF
+  #ENDIF
 }
-#ENDDEF
+  #IFSWITCH CHECKED==Checked
+@Override int floorImpl(ByteSetImpl root,INPUTTYPE val){
+  #ELSE
+@Override int floorImpl(INPUTTYPE val){
+  #ENDIF
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH VIEW==Head
+      #IFSWITCH RETTYPE==int,long
+  if(val>=Byte.MIN_VALUE){
+    final int inclTo;
+    return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  final int inclTo;
+  return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+      #ELSE
+  if(val>=Byte.MIN_VALUE || val!=val){
+    final int inclTo;
+    return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.intFloor(val):inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ELSEIFSWITCH VIEW==Tail
+      #IFSWITCH RETTYPE==int,long
+  final int inclFrom;
+  if(val>=(inclFrom=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  final int inclFrom;
+  if(val>=(inclFrom=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,(int)val);
+  }
+  return Integer.MIN_VALUE;  
+      #ELSE
+  final int inclFrom;
+  if(val>=(inclFrom=this.boundInfo) || val!=val){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.intFloor(val):Byte.MAX_VALUE);
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ELSE
+      #IFSWITCH RETTYPE==int,long
+  int boundInfo;
+  final int inclFrom;
+  if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  int boundInfo;
+  final int inclFrom;
+  if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+  }
+  return Integer.MIN_VALUE;
+      #ELSE
+  int boundInfo;
+  final int inclFrom;
+  if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=(boundInfo>>=8)?TypeUtil.intFloor(val):boundInfo);
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ENDIF
+  #ELSE
+    #IFSWITCH CHECKED==Checked
+  return super.ceilingImpl(root,val);
+    #ELSE
+  return super.ceilingImpl(val);
+    #ENDIF
+  #ENDIF
+}
+  #IFSWITCH CHECKED==Checked
+@Override int higherImpl(ByteSetImpl root,INPUTTYPE val){
+  #ELSE
+@Override int higherImpl(INPUTTYPE val){
+  #ENDIF
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH VIEW==Head
+      #IFSWITCH RETTYPE==int,long
+  final int inclTo;
+  if(val<(inclTo=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1,inclTo);
+  }
+  return Integer.MIN_VALUE;  
+      #ELSEIFSWITCH RETTYPE==byte
+  final int inclTo;
+  if(val<(inclTo=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(((int)val)+1,inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ELSE
+  final int inclTo;
+  if(val<(inclTo=this.boundInfo) || val!=val){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val>=Byte.MIN_VALUE?TypeUtil.higherInt(val):Byte.MIN_VALUE,inclTo);
+  }
+  return Integer.MIN_VALUE;  
+      #ENDIF
+    #ELSEIFSWITCH VIEW==Tail
+      #IFSWITCH RETTYPE==int,long
+  if(val<Byte.MAX_VALUE){
+    final int inclFrom;
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  if(val<Byte.MAX_VALUE){
+    final int inclFrom;
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+  }
+  return Integer.MIN_VALUE;
+      #ELSE
+  if(val<Byte.MAX_VALUE){
+    final int inclFrom;
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.higherInt(val));
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ELSE
+      #IFSWITCH RETTYPE==int,long
+  int boundInfo;
+  final int inclTo;
+  if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  int boundInfo;
+  final int inclTo;
+  if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ELSE
+  int boundInfo;
+  final int inclTo;
+  if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+    return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.higherInt(val),inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ENDIF
+  #ELSE
+    #IFSWITCH CHECKED==Checked
+  return super.lowerImpl(root,val);
+    #ELSE
+  return super.lowerImpl(val);
+    #ENDIF
+  #ENDIF
+}
+  #IFSWITCH CHECKED==Checked
+@Override int lowerImpl(ByteSetImpl root,INPUTTYPE val){
+  #ELSE
+@Override int lowerImpl(INPUTTYPE val){
+  #ENDIF
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH VIEW==Head
+      #IFSWITCH RETTYPE==int,long
+  if(val>Byte.MIN_VALUE){
+    final int inclTo;
+    return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  if(val>Byte.MIN_VALUE){
+    final int inclTo;
+    return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+  }
+  return Integer.MIN_VALUE;
+      #ELSE
+  if(val>Byte.MIN_VALUE || val!=val){
+    final int inclTo;
+    return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.lowerInt(val):inclTo);
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ELSEIFSWITCH VIEW==Tail
+      #IFSWITCH RETTYPE==int,long
+  final int inclFrom;
+  if(val>(inclFrom=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1);
+  }
+  return Integer.MIN_VALUE;  
+      #ELSEIFSWITCH RETTYPE==byte
+  final int inclFrom;
+  if(val>(inclFrom=this.boundInfo)){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,((int)val)-1);
+  }
+  return Integer.MIN_VALUE;  
+      #ELSE
+  final int inclFrom;
+  if(val>(inclFrom=this.boundInfo) || val!=val){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.lowerInt(val):Byte.MAX_VALUE);
+  }
+  return Integer.MIN_VALUE;
+      #ENDIF
+    #ELSE
+      #IFSWITCH RETTYPE==int,long
+  int boundInfo;
+  final int inclFrom;
+  if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+  }
+  return Integer.MIN_VALUE;
+      #ELSEIFSWITCH RETTYPE==byte
+  int boundInfo;
+  final int inclFrom;
+  if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+  }
+  return Integer.MIN_VALUE;  
+      #ELSE
+  int boundInfo;
+  final int inclFrom;
+  if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))||val!=val){
+    return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?TypeUtil.lowerInt(val):boundInfo);
+  }
+  return Integer.MIN_VALUE;  
+      #ENDIF
+    #ENDIF
+  #ELSE
+    #IFSWITCH CHECKED==Checked
+  return super.higherImpl(root,val);
+    #ELSE
+  return super.higherImpl(val);
+    #ENDIF
+  #ENDIF
+}
+  #IFSWITCH RETTYPE==int
+@Override public int pollLastInt(){
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED==Checked
+  final ByteSetImpl.Checked root;
+  int modCountAndSize;
+  final int rootModCountAndSize;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+  final int ret;
+      #IFSWITCH VIEW==Head
+   if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo))!=Integer.MIN_VALUE){
+      #ELSEIFSWITCH VIEW==Tail
+   if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveLast())!=Integer.MIN_VALUE){
+      #ELSE
+   if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo>>8))!=Integer.MIN_VALUE){
+      #ENDIF
+    this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+    root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+    ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+    return ret;
+  }
+    #ELSE
+  final int size;
+  final int ret;
+      #IFSWITCH VIEW==Head
+  if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo))!=Integer.MIN_VALUE){
+      #ELSEIFSWITCH VIEW==Tail
+  if((size=this.size)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveLast())!=Integer.MIN_VALUE){
+      #ELSE
+  if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo>>8))!=Integer.MIN_VALUE){
+      #ENDIF
+    this.size=size-1;
+    ((UncheckedSubSet)this).bubbleUpDecrementSize();
+    return ret;
+  }
+    #ENDIF
+  return Integer.MIN_VALUE;
+  #ELSE
+  return super.pollFirstInt();
+  #ENDIF
+}
+@Override public int pollFirstInt(){
+  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH CHECKED==Checked
+  final ByteSetImpl.Checked root;
+  int modCountAndSize;
+  final int rootModCountAndSize;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+  final int ret;
+      #IFSWITCH VIEW==Head
+   if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveFirst())!=Integer.MIN_VALUE){
+      #ELSEIFSWITCH VIEW==Tail
+   if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange(this.boundInfo))!=Integer.MIN_VALUE){
+      #ELSE
+   if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange((byte)this.boundInfo))!=Integer.MIN_VALUE){
+      #ENDIF
+    this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+    root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+    ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+    return ret;
+  }
+    #ELSE
+  final int size;
+  final int ret;
+      #IFSWITCH VIEW==Head
+  if((size=this.size)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveFirst())!=Integer.MIN_VALUE){
+      #ELSEIFSWITCH VIEW==Tail
+  if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange(this.boundInfo))!=Integer.MIN_VALUE){
+      #ELSE
+  if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange((byte)this.boundInfo))!=Integer.MIN_VALUE){
+      #ENDIF
+    this.size=size-1;
+    ((UncheckedSubSet)this).bubbleUpDecrementSize();
+    return ret;
+  }
+    #ENDIF
+  return Integer.MIN_VALUE;
+  #ELSE
+  return super.pollFirstInt();
+  #ENDIF
+}
+  #ENDIF
+#ELSE
+  #IFSWITCH RETTYPE==Byte
+@Override public RETTYPE ceiling(INPUTTYPE val){
+  #ELSE
+@Override public RETTYPE RETTYPECeiling(INPUTTYPE val){
+  #ENDIF
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0){
+        #IFSWITCH RETTYPE==Byte
+    return super.ceiling(val);
+        #ELSE
+    return super.RETTYPECeiling(val);
+        #ENDIF
+  }  
+      #ELSE
+        #IFSWITCH RETTYPE==int
+  if(val<=Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
+    return CAST(val);
+  }
+        #ELSE
+  int v;
+          #IFSWITCH RETTYPE==byte,Byte
+  if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
+          #ELSEIFSWITCH RETTYPE==short
+  if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
+          #ELSEIFSWITCH RETTYPE==long
+  if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val))!=128){      
+          #ELSE
+  if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
+          #ENDIF
+    return CAST(v);
+  }    
+        #ENDIF
+      #ENDIF
+  return DEFAULTVAL;
+    #ELSE
+      #IFSWITCH RETTYPE==Byte
+  return super.floor(val);
+      #ELSE
+  return super.RETTYPEFloor(val);
+      #ENDIF
+    #ENDIF
+  #ELSE
+    #IFSWITCH RETTYPE==Byte
+  return root.floor(val);
+    #ELSE
+  return root.RETTYPEFloor(val);
+    #ENDIF
+  #ENDIF
+}
+  #IFSWITCH RETTYPE==Byte
+@Override public RETTYPE floor(INPUTTYPE val){
+  #ELSE
+@Override public RETTYPE RETTYPEFloor(INPUTTYPE val){
+  #ENDIF
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0){
+        #IFSWITCH RETTYPE==Byte
+    return super.floor(val);
+        #ELSE
+    return super.RETTYPEFloor(val);
+        #ENDIF
+  }
+      #ELSE
+        #IFSWITCH RETTYPE==double,float
+  for(;;)
+        #ENDIF
+  {
+        #IFSWITCH RETTYPE==int
+    if(val>=Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:val))!=-129){
+      return CAST(val);
+    }
+        #ELSE
+    int v;
+          #IFSWITCH RETTYPE==byte,Byte
+    if((v=((ByteSetImpl)this).getThisOrLowerInRange(val))!=-129){
+          #ELSEIFSWITCH RETTYPE==short
+    if(val>=Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:val))!=-129){
+          #ELSEIFSWITCH RETTYPE==long
+    if(val>=Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val))!=-129){    
+          #ELSE
+    if(val!=val || val>=Byte.MAX_VALUE){
+      v=Byte.MAX_VALUE;
+    }else if(val>=Byte.MIN_VALUE){
+      v=TypeUtil.intFloor(val);
+    }else{
+      break;
+    }
+    if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
+          #ENDIF
+      return CAST(v);
+    }
+          #IFSWITCH RETTYPE==double,float
+    break;
+          #ENDIF
+        #ENDIF
+  }
+      #ENDIF
+  return DEFAULTVAL;
+    #ELSE
+      #IFSWITCH RETTYPE==Byte
+  return super.ceiling(val);
+      #ELSE
+  return super.RETTYPECeiling(val);
+      #ENDIF
+    #ENDIF
+  #ELSE
+    #IFSWITCH RETTYPE==Byte
+  return root.ceiling(val);
+    #ELSE
+  return root.RETTYPECeiling(val);
+    #ENDIF
+  #ENDIF
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0xff)!=0){
+    return super.higherCLASSPREFIX(val);
+  }
+      #ELSE
+        #IFSWITCH RETTYPE==int
+  if(val<Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:val+1))!=128){
+    return CAST(val);
+  }
+        #ELSE
+  int v;
+          #IFSWITCH RETTYPE==byte,Byte
+  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val+1))!=128){
+          #ELSEIFSWITCH RETTYPE==short
+  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:val+1))!=128){
+          #ELSEIFSWITCH RETTYPE==long
+  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1))!=128){
+          #ELSE
+  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.higherInt(val)))!=128){
+          #ENDIF
+    return CAST(v);
+  }
+        #ENDIF
+      #ENDIF
+  return DEFAULTVAL;
+    #ELSE
+  return super.lowerCLASSPREFIX(val);
+    #ENDIF
+  #ELSE
+  return root.lowerCLASSPREFIX(val);
+  #ENDIF
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+  #IFSWITCH SOURCE==this
+    #IFSWITCH DIRECTION==Ascending
+      #IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0){
+    return super.lowerCLASSPREFIX(val);
+  }
+      #ELSE
+      #IFSWITCH RETTYPE==double,float
+  for(;;)
+        #ENDIF
+  {
+        #IFSWITCH RETTYPE==int
+    if(val>Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
+      return CAST(val);
+    }
+        #ELSE
+    int v;
+          #IFSWITCH RETTYPE==byte,Byte
+    if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val-1))!=-129){
+          #ELSEIFSWITCH RETTYPE==short
+    if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
+          #ELSEIFSWITCH RETTYPE==long
+    if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1))!=-129){
+          #ELSE
+    if(val!=val || val>Byte.MAX_VALUE){
+      v=Byte.MAX_VALUE;
+    }else if(val>Byte.MIN_VALUE){
+      v=TypeUtil.lowerInt(val);
+    }else{
+      break;
+    }
+    if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
+          #ENDIF
+      return CAST(v);
+    }
+          #IFSWITCH RETTYPE==double,float
+    break;
+          #ENDIF
+        #ENDIF
+  }
+      #ENDIF
+  return DEFAULTVAL;
+    #ELSE
+  return super.higherCLASSPREFIX(val);
+    #ENDIF
+  #ELSE
+  return root.higherCLASSPREFIX(val);
+  #ENDIF
+}
+  #IFSWITCH RETTYPE==int
+@Override public RETTYPE pollFirstCLASSPREFIX(){
+    #IFSWITCH SOURCE==this
+      #IFSWITCH DIRECTION==Ascending
+        #IFSWITCH CHECKED==Checked
+  int modCountAndSize;
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+    this.modCountAndSize=modCountAndSize+((1<<9)-1);
+    return CAST(super.uncheckedRemoveFirst());
+  }
+        #ELSE
+  long word;
+  int tail0s;
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
+    this.word0=word&(~(1L<<tail0s));
+    return CAST(Byte.MIN_VALUE+tail0s);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
+    this.word1=word&(~(1L<<tail0s));
+    return CAST(tail0s-64);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
+    this.word2=word&(~(1L<<tail0s));
+    return CAST(tail0s);
+  }
+  if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
+    this.word3=word&(~(1L<<tail0s));
+    return CAST(tail0s+64);
+  }
+        #ENDIF
+  return DEFAULTVAL;
+      #ELSE
+  return super.pollLastCLASSPREFIX();
+      #ENDIF
+    #ELSE
+  return root.pollLastCLASSPREFIX();
+    #ENDIF
+}
+@Override public RETTYPE pollLastCLASSPREFIX(){
+    #IFSWITCH SOURCE==this
+      #IFSWITCH DIRECTION==Ascending
+        #IFSWITCH CHECKED==Checked
+  int modCountAndSize;
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+    this.modCountAndSize=modCountAndSize+((1<<9)-1);
+    return CAST(super.uncheckedRemoveLast());
+  }
+        #ELSE
+  long word;
+  int lead0s;
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
+    this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(Byte.MAX_VALUE-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
+    this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(63-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
+    this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(-1-lead0s);
+  }
+  if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
+    this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
+    return CAST(-65-lead0s); 
+  }
+        #ENDIF
+  return DEFAULTVAL;
+      #ELSE
+  return super.pollFirstCLASSPREFIX();
+      #ENDIF
+    #ELSE
+  return root.pollFirstCLASSPREFIX();
+    #ENDIF
+}
+  #ENDIF
+#ENDIF
 
-
-
-
-
-
-
-#MACRODEF FullViewAccessMethods<SOURCE,CHECKED,DIRECTION,RETTYPE>(INPUTTYPE,CLASSPREFIX,DEFAULTVAL,CAST)
 #IFSWITCH SOURCE==this
   #IFSWITCH RETTYPE==int
 @Override public RETTYPE firstCLASSPREFIX(){
@@ -5388,284 +7048,6 @@ private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,ARRTYPE[] ds
     #ENDIF
 }
   #ENDIF
-#ENDIF
-@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
-#IFSWITCH SOURCE==this
-  #IFSWITCH DIRECTION==Ascending
-    #IFSWITCH CHECKED==Checked
-  if((modCountAndSize&0x1ff)!=0){
-    return super.lowerCLASSPREFIX(val);
-  }
-    #ELSE
-      #IFSWITCH RETTYPE==double,float
-  for(;;)
-      #ENDIF
-  {
-      #IFSWITCH RETTYPE==int
-    if(val>Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
-      return CAST(val);
-    }
-      #ELSE
-    int v;
-        #IFSWITCH RETTYPE==byte,Byte
-    if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val-1))!=-129){
-        #ELSEIFSWITCH RETTYPE==short
-    if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
-        #ELSEIFSWITCH RETTYPE==long
-    if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1))!=-129){
-        #ELSE
-    if(val!=val || val>Byte.MAX_VALUE){
-      v=Byte.MAX_VALUE;
-    }else if(val>Byte.MIN_VALUE){
-      v=TypeUtil.lowerInt(val);
-    }else{
-      break;
-    }
-    if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
-        #ENDIF
-      return CAST(v);
-    }
-        #IFSWITCH RETTYPE==double,float
-    break;
-        #ENDIF
-      #ENDIF
-  }
-    #ENDIF
-  return DEFAULTVAL;
-  #ELSE
-  return super.higherCLASSPREFIX(val);
-  #ENDIF
-#ELSE
-  return root.higherCLASSPREFIX(val);
-#ENDIF
-}
-#IFSWITCH RETTYPE==Byte
-@Override public RETTYPE floor(INPUTTYPE val){
-#ELSE
-@Override public RETTYPE RETTYPEFloor(INPUTTYPE val){
-#ENDIF
-#IFSWITCH SOURCE==this
-  #IFSWITCH DIRECTION==Ascending
-    #IFSWITCH CHECKED==Checked
-  if((modCountAndSize&0x1ff)!=0){
-      #IFSWITCH RETTYPE==Byte
-    return super.floor(val);
-      #ELSE
-    return super.RETTYPEFloor(val);
-      #ENDIF
-  }
-    #ELSE
-      #IFSWITCH RETTYPE==double,float
-  for(;;)
-      #ENDIF
-  {
-      #IFSWITCH RETTYPE==int
-    if(val>=Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:val))!=-129){
-      return CAST(val);
-    }
-      #ELSE
-    int v;
-        #IFSWITCH RETTYPE==byte,Byte
-    if((v=((ByteSetImpl)this).getThisOrLowerInRange(val))!=-129){
-        #ELSEIFSWITCH RETTYPE==short
-    if(val>=Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:val))!=-129){
-        #ELSEIFSWITCH RETTYPE==long
-    if(val>=Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>=Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val))!=-129){    
-        #ELSE
-    if(val!=val || val>=Byte.MAX_VALUE){
-      v=Byte.MAX_VALUE;
-    }else if(val>=Byte.MIN_VALUE){
-      v=TypeUtil.intFloor(val);
-    }else{
-      break;
-    }
-    if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
-        #ENDIF
-      return CAST(v);
-    }
-        #IFSWITCH RETTYPE==double,float
-    break;
-        #ENDIF
-      #ENDIF
-  }
-    #ENDIF
-  return DEFAULTVAL;
-  #ELSE
-    #IFSWITCH RETTYPE==Byte
-  return super.ceiling(val);
-    #ELSE
-  return super.RETTYPECeiling(val);
-    #ENDIF
-  #ENDIF
-#ELSE
-  #IFSWITCH RETTYPE==Byte
-  return root.ceiling(val);
-  #ELSE
-  return root.RETTYPECeiling(val);
-  #ENDIF
-#ENDIF
-}
-@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
-#IFSWITCH SOURCE==this
-  #IFSWITCH DIRECTION==Ascending
-    #IFSWITCH CHECKED==Checked
-  if((modCountAndSize&0xff)!=0){
-    return super.higherCLASSPREFIX(val);
-  }
-    #ELSE
-      #IFSWITCH RETTYPE==int
-  if(val<Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:val+1))!=128){
-    return CAST(val);
-  }
-      #ELSE
-  int v;
-        #IFSWITCH RETTYPE==byte,Byte
-  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val+1))!=128){
-        #ELSEIFSWITCH RETTYPE==short
-  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:val+1))!=128){
-        #ELSEIFSWITCH RETTYPE==long
-  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1))!=128){
-        #ELSE
-  if(val<Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.higherInt(val)))!=128){
-        #ENDIF
-    return CAST(v);
-  }
-      #ENDIF
-    #ENDIF
-  return DEFAULTVAL;
-  #ELSE
-  return super.lowerCLASSPREFIX(val);
-  #ENDIF
-#ELSE
-  return root.lowerCLASSPREFIX(val);
-#ENDIF
-}
-#IFSWITCH RETTYPE==Byte
-@Override public RETTYPE ceiling(INPUTTYPE val){
-#ELSE
-@Override public RETTYPE RETTYPECeiling(INPUTTYPE val){
-#ENDIF
-#IFSWITCH SOURCE==this
-  #IFSWITCH DIRECTION==Ascending
-    #IFSWITCH CHECKED==Checked
-  if((modCountAndSize&0x1ff)!=0){
-      #IFSWITCH RETTYPE==Byte
-    return super.ceiling(val);
-      #ELSE
-    return super.RETTYPECeiling(val);
-      #ENDIF
-  }  
-    #ELSE
-      #IFSWITCH RETTYPE==int
-  if(val<=Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
-    return CAST(val);
-  }
-      #ELSE
-  int v;
-        #IFSWITCH RETTYPE==byte,Byte
-  if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
-        #ELSEIFSWITCH RETTYPE==short
-  if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
-        #ELSEIFSWITCH RETTYPE==long
-  if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val))!=128){      
-        #ELSE
-  if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
-        #ENDIF
-    return CAST(v);
-  }    
-      #ENDIF
-    #ENDIF
-  return DEFAULTVAL;
-  #ELSE
-    #IFSWITCH RETTYPE==Byte
-  return super.floor(val);
-    #ELSE
-  return super.RETTYPEFloor(val);
-    #ENDIF
-  #ENDIF
-#ELSE
-  #IFSWITCH RETTYPE==Byte
-  return root.floor(val);
-  #ELSE
-  return root.RETTYPEFloor(val);
-  #ENDIF
-#ENDIF
-}
-#IFSWITCH RETTYPE==int
-@Override public RETTYPE pollFirstCLASSPREFIX(){
-  #IFSWITCH SOURCE==this
-    #IFSWITCH DIRECTION==Ascending
-      #IFSWITCH CHECKED==Checked
-  int modCountAndSize;
-  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-    this.modCountAndSize=modCountAndSize+((1<<9)-1);
-    return CAST(super.uncheckedRemoveFirst());
-  }
-      #ELSE
-  long word;
-  int tail0s;
-  if((tail0s=Long.numberOfTrailingZeros(word=this.word0))!=64){
-    this.word0=word&(~(1L<<tail0s));
-    return CAST(Byte.MIN_VALUE+tail0s);
-  }
-  if((tail0s=Long.numberOfTrailingZeros(word=this.word1))!=64){
-    this.word1=word&(~(1L<<tail0s));
-    return CAST(tail0s-64);
-  }
-  if((tail0s=Long.numberOfTrailingZeros(word=this.word2))!=64){
-    this.word2=word&(~(1L<<tail0s));
-    return CAST(tail0s);
-  }
-  if((tail0s=Long.numberOfTrailingZeros(word=this.word3))!=64){
-    this.word3=word&(~(1L<<tail0s));
-    return CAST(tail0s+64);
-  }
-      #ENDIF
-  return DEFAULTVAL;
-    #ELSE
-  return super.pollLastCLASSPREFIX();
-    #ENDIF
-  #ELSE
-  return root.pollLastCLASSPREFIX();
-  #ENDIF
-}
-@Override public RETTYPE pollLastCLASSPREFIX(){
-  #IFSWITCH SOURCE==this
-    #IFSWITCH DIRECTION==Ascending
-      #IFSWITCH CHECKED==Checked
-  int modCountAndSize;
-  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
-    this.modCountAndSize=modCountAndSize+((1<<9)-1);
-    return CAST(super.uncheckedRemoveLast());
-  }
-      #ELSE
-  long word;
-  int lead0s;
-  if((lead0s=Long.numberOfLeadingZeros(word=this.word3))!=64){
-    this.word3=word&(~(Long.MIN_VALUE>>>lead0s));
-    return CAST(Byte.MAX_VALUE-lead0s);
-  }
-  if((lead0s=Long.numberOfLeadingZeros(word=this.word2))!=64){
-    this.word2=word&(~(Long.MIN_VALUE>>>lead0s));
-    return CAST(63-lead0s);
-  }
-  if((lead0s=Long.numberOfLeadingZeros(word=this.word1))!=64){
-    this.word1=word&(~(Long.MIN_VALUE>>>lead0s));
-    return CAST(-1-lead0s);
-  }
-  if((lead0s=Long.numberOfLeadingZeros(word=this.word0))!=64){
-    this.word0=word&(~(Long.MIN_VALUE>>>lead0s));
-    return CAST(-65-lead0s); 
-  }
-      #ENDIF
-  return DEFAULTVAL;
-    #ELSE
-  return super.pollFirstCLASSPREFIX();
-    #ENDIF
-  #ELSE
-  return root.pollFirstCLASSPREFIX();
-  #ENDIF
-}
 #ENDIF
 
 #ENDDEF
@@ -5858,9 +7240,10 @@ private static void uncheckedWordForEach(long word,int offset,int bound,ByteCons
 #ENDDEF
 #MACRODEF FullViewToArray<SOURCE,CHECKED,DIRECTION,ARRTYPE>(CAST,VALTYPE,DEFAULTARR,CLASSPREFIX)
 #IFSWITCH ARRTYPE==Byte
+#IFNOTSWITCH CHECKED==Checked
 @SuppressWarnings("unchecked")
+#ENDIF
 @Override public <T> T[] toArray(T[] dst){
-  
   int numLeft;
     #IFSWITCH CHECKED==Checked
       #IFSWITCH SOURCE==this
@@ -5887,7 +7270,9 @@ private static void uncheckedWordForEach(long word,int offset,int bound,ByteCons
   }
   return dst;
 }
+#IFNOTSWITCH CHECKED==Checked
 @SuppressWarnings("unchecked")
+#ENDIF
 @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
   int numLeft;
     #IFSWITCH CHECKED==Checked
@@ -6032,6 +7417,51 @@ outer:for(;;){
   }
 }
 #ENDDEF  
+
+
+#MACRODEF UncheckedContainsVal<VALTYPE>()
+@Override public boolean contains(VALTYPE val){
+  final int v;
+  if((v=(byte)val)==val){
+    switch(v>>6){
+    case -2:
+      return (this.word0&(1L<<v))!=0;
+    case -1:
+      return (this.word1&(1L<<v))!=0;
+    case 0:
+      return (this.word2&(1L<<v))!=0;
+    default:
+      return (this.word3&(1L<<v))!=0;
+    }
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF UncheckedRemoveVal<VALTYPE>()
+@Override public boolean removeVal(VALTYPE val){
+  final int v;
+  return (v=(byte)val)==val && uncheckedremoveByte(v);
+}
+#ENDDEF
+#MACRODEF CheckedRemoveVal<VALTYPE>()
+@Override public boolean removeVal(VALTYPE val){
+  final int modCountAndSize;
+  #IFSWITCH VALTYPE==byte
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveByte(val)){
+  #ELSEIFSWITCH VALTYPE==char
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveChar(val)){
+  #ELSEIFSWITCH VALTYPE==int
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.uncheckedremoveInt(val)){
+  #ELSE
+  if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && super.removeVal(val)){
+  #ENDIF
+    this.modCountAndSize=modCountAndSize+((1<<9)-1);
+    return true;
+  }
+  return false;
+}
+#ENDDEF
+
 #MACRODEF NYI()
 //TODO
 throw new omni.util.NotYetImplementedException();

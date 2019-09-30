@@ -24,7 +24,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   transient long word1;
   transient long word2;
   transient long word3;
-  //TODO equals
+  //todo equals
   private ByteSetImpl(long word0,long word1,long word2,long word3){
     super();
     this.word0=word0;
@@ -320,13 +320,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     this.word0=(word=this.word0)&(~(Long.MIN_VALUE>>>(lead0s=Long.numberOfLeadingZeros(word))));
     return (-65-lead0s);
   }
-  @Override public Byte lower(byte val){
-    {
-      int v;
-      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val-1))!=-129){
-        return (Byte)(byte)(v);
-      }
-    }
+  @Override public Byte ceiling(byte val){
+    int v;
+    if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
+      return (Byte)(byte)(v);
+    }    
     return null;
   }
   @Override public Byte floor(byte val){
@@ -345,20 +343,20 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return null;
   }
-  @Override public Byte ceiling(byte val){
-    int v;
-    if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
-      return (Byte)(byte)(v);
-    }    
-    return null;
-  }
-  @Override public byte lowerByte(byte val){
+  @Override public Byte lower(byte val){
     {
       int v;
       if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val-1))!=-129){
-        return (byte)(v);
+        return (Byte)(byte)(v);
       }
     }
+    return null;
+  }
+  @Override public byte byteCeiling(byte val){
+    int v;
+    if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
+      return (byte)(v);
+    }    
     return Byte.MIN_VALUE;
   }
   @Override public byte byteFloor(byte val){
@@ -377,20 +375,20 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return Byte.MIN_VALUE;
   }
-  @Override public byte byteCeiling(byte val){
-    int v;
-    if((v=((ByteSetImpl)this).getThisOrHigherInRange(val))!=128){
-      return (byte)(v);
-    }    
-    return Byte.MIN_VALUE;
-  }
-  @Override public short lowerShort(short val){
+  @Override public byte lowerByte(byte val){
     {
       int v;
-      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
-        return (short)(v);
+      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val-1))!=-129){
+        return (byte)(v);
       }
     }
+    return Byte.MIN_VALUE;
+  }
+  @Override public short shortCeiling(short val){
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
+      return (short)(v);
+    }    
     return Short.MIN_VALUE;
   }
   @Override public short shortFloor(short val){
@@ -409,44 +407,18 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return Short.MIN_VALUE;
   }
-  @Override public short shortCeiling(short val){
-    int v;
-    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
-      return (short)(v);
-    }    
+  @Override public short lowerShort(short val){
+    {
+      int v;
+      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
+        return (short)(v);
+      }
+    }
     return Short.MIN_VALUE;
   }
-  @Override public int firstInt(){
-    int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word0))!=64){
-      return (Byte.MIN_VALUE+tail0s);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word1))!=64){
-      return (tail0s-64);
-    }
-    if((tail0s=Long.numberOfTrailingZeros(word2))!=64){
-      return tail0s;
-    }
-    return (Long.numberOfTrailingZeros(word3)+64);  
-  }
-  @Override public int lastInt(){
-    int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word3))!=64){
-      return (Byte.MAX_VALUE-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word2))!=64){
-      return (63-lead0s);
-    }
-    if((lead0s=Long.numberOfLeadingZeros(word1))!=64){
-      return (-1-lead0s);
-    }
-    return (-65-Long.numberOfLeadingZeros(word0));  
-  }
-  @Override public int lowerInt(int val){
-    {
-      if(val>Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
-        return (int)(val);
-      }
+  @Override public int intCeiling(int val){
+    if(val<=Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
+      return (int)(val);
     }
     return Integer.MIN_VALUE;
   }
@@ -464,9 +436,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return Integer.MIN_VALUE;
   }
-  @Override public int intCeiling(int val){
-    if(val<=Byte.MAX_VALUE && (val=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:val))!=128){
-      return (int)(val);
+  @Override public int lowerInt(int val){
+    {
+      if(val>Byte.MIN_VALUE && (val=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:val-1))!=-129){
+        return (int)(val);
+      }
     }
     return Integer.MIN_VALUE;
   }
@@ -512,13 +486,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return Integer.MIN_VALUE;
   }
-  @Override public long lowerLong(long val){
-    {
-      int v;
-      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1))!=-129){
-        return (long)(v);
-      }
+  @Override public int firstInt(){
+    int tail0s;
+    if((tail0s=Long.numberOfTrailingZeros(word0))!=64){
+      return (Byte.MIN_VALUE+tail0s);
     }
+    if((tail0s=Long.numberOfTrailingZeros(word1))!=64){
+      return (tail0s-64);
+    }
+    if((tail0s=Long.numberOfTrailingZeros(word2))!=64){
+      return tail0s;
+    }
+    return (Long.numberOfTrailingZeros(word3)+64);  
+  }
+  @Override public int lastInt(){
+    int lead0s;
+    if((lead0s=Long.numberOfLeadingZeros(word3))!=64){
+      return (Byte.MAX_VALUE-lead0s);
+    }
+    if((lead0s=Long.numberOfLeadingZeros(word2))!=64){
+      return (63-lead0s);
+    }
+    if((lead0s=Long.numberOfLeadingZeros(word1))!=64){
+      return (-1-lead0s);
+    }
+    return (-65-Long.numberOfLeadingZeros(word0));  
+  }
+  @Override public long longCeiling(long val){
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val))!=128){      
+      return (long)(v);
+    }    
     return Long.MIN_VALUE;
   }
   @Override public long longFloor(long val){
@@ -537,29 +535,20 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return Long.MIN_VALUE;
   }
-  @Override public long longCeiling(long val){
-    int v;
-    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val))!=128){      
-      return (long)(v);
-    }    
-    return Long.MIN_VALUE;
-  }
-  @Override public float lowerFloat(float val){
-    for(;;)
+  @Override public long lowerLong(long val){
     {
       int v;
-      if(val!=val || val>Byte.MAX_VALUE){
-        v=Byte.MAX_VALUE;
-      }else if(val>Byte.MIN_VALUE){
-        v=TypeUtil.lowerInt(val);
-      }else{
-        break;
+      if(val>Byte.MIN_VALUE && (v=((ByteSetImpl)this).getThisOrLowerInRange(val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1))!=-129){
+        return (long)(v);
       }
-      if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
-        return (float)(v);
-      }
-      break;
     }
+    return Long.MIN_VALUE;
+  }
+  @Override public float floatCeiling(float val){
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
+      return (float)(v);
+    }    
     return Float.NaN;
   }
   @Override public float floatFloor(float val){
@@ -587,14 +576,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return Float.NaN;
   }
-  @Override public float floatCeiling(float val){
-    int v;
-    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
-      return (float)(v);
-    }    
-    return Float.NaN;
-  }
-  @Override public double lowerDouble(double val){
+  @Override public float lowerFloat(float val){
     for(;;)
     {
       int v;
@@ -606,10 +588,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         break;
       }
       if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
-        return (double)(v);
+        return (float)(v);
       }
       break;
     }
+    return Float.NaN;
+  }
+  @Override public double doubleCeiling(double val){
+    int v;
+    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
+      return (double)(v);
+    }    
     return Double.NaN;
   }
   @Override public double doubleFloor(double val){
@@ -637,11 +626,22 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return Double.NaN;
   }
-  @Override public double doubleCeiling(double val){
-    int v;
-    if(val<=Byte.MAX_VALUE && (v=((ByteSetImpl)this).getThisOrHigherInRange(val<=Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val)))!=128){      
-      return (double)(v);
-    }    
+  @Override public double lowerDouble(double val){
+    for(;;)
+    {
+      int v;
+      if(val!=val || val>Byte.MAX_VALUE){
+        v=Byte.MAX_VALUE;
+      }else if(val>Byte.MIN_VALUE){
+        v=TypeUtil.lowerInt(val);
+      }else{
+        break;
+      }
+      if((v=((ByteSetImpl)this).getThisOrLowerInRange(v))!=-129){
+        return (double)(v);
+      }
+      break;
+    }
     return Double.NaN;
   }
   private int uncheckedHashCode(int numLeft){
@@ -692,49 +692,49 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return sum;
   }
-  private int uncheckedHashCode(int exclusiveHi,int numLeft){
+  private int uncheckedHashCode(int inclusiveHi,int numLeft){
     int sum=0;
-    goToEnd:switch((--exclusiveHi)>>6){
+    goToEnd:switch(inclusiveHi>>6){
       case 1:
         for(long word=this.word3;;){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
           }
-          if(--exclusiveHi==63){
+          if(--inclusiveHi==63){
             break;
           }
         }
       case 0:
         for(long word=this.word2;;){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
           }
-          if(--exclusiveHi==-1){
+          if(--inclusiveHi==-1){
             break;
           }
         }
       case -1:
         for(long word=this.word1;;){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
           }
-          if(--exclusiveHi==-65){
+          if(--inclusiveHi==-65){
             break;
           }
         }
       default:
-        for(long word=this.word0;;--exclusiveHi){
-          if((word&(1L<<exclusiveHi))!=0){
-            sum+=exclusiveHi;
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            sum+=inclusiveHi;
             if(--numLeft==0){
               break goToEnd;
             }
@@ -861,1799 +861,1864 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     buffer[++bufferOffset]=']';
     return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
   }
-   private void uncheckedDescendingForEach(int numLeft,ByteConsumer action){
-      int offset=127;
-      for(long word=this.word3;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(--offset==63){
-          break;
+  private void uncheckedDescendingForEach(int numLeft,ByteConsumer action){
+    int offset=127;
+    for(long word=this.word3;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(--offset==-1){
-          break;
+      if(--offset==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(--offset==-65){
-          break;
+      if(--offset==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word0;;--offset){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
+      if(--offset==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--offset){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingForEach(int numLeft,ByteConsumer action){
-      int offset=-128;
-      for(long word=this.word0;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(++offset==-64){
-          break;
+  }
+  private void uncheckedAscendingForEach(int numLeft,ByteConsumer action){
+    int offset=-128;
+    for(long word=this.word0;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(++offset==0){
-          break;
+      if(++offset==-64){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
-        }
-        if(++offset==64){
-          break;
+      if(++offset==0){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++offset){
-        if((word&(1L<<offset))!=0){
-          action.accept((byte)offset);
-          if(--numLeft==0){
-            return;
-          }
+      if(++offset==64){
+        break;
+      }
+    }
+    for(long word=this.word3;;++offset){
+      if((word&(1L<<offset))!=0){
+        action.accept((byte)offset);
+        if(--numLeft==0){
+          return;
         }
       }
     }
-    private String uncheckedAscendingToString(int inclusiveLo,int numLeft){
-      int bufferOffset;
-      byte[] buffer;
-      (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }  
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }  
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }  
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+  }
+  private String uncheckedAscendingToString(int inclusiveLo,int numLeft){
+    int bufferOffset;
+    byte[] buffer;
+    (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
-      buffer[++bufferOffset]=']';
-      return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }  
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }  
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }  
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveLo,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
-    private void uncheckedAscendingForEach(int inclusiveLo,int numLeft,ByteConsumer action){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }  
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
+    buffer[++bufferOffset]=']';
+    return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+  }
+  private void uncheckedAscendingForEach(int inclusiveLo,int numLeft,ByteConsumer action){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }  
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              action.accept((byte)inclusiveLo);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            action.accept((byte)inclusiveLo);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
-    private String uncheckedDescendingToString(int exclusiveHi,int numLeft){
-      int bufferOffset;
-      byte[] buffer;
-      (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }  
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }  
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==65){
-              break;
-            }
-          }  
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              bufferOffset=ToStringUtil.getStringShort(exclusiveHi,buffer,++bufferOffset);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+  }
+  private String uncheckedDescendingToString(int inclusiveHi,int numLeft){
+    int bufferOffset;
+    byte[] buffer;
+    (buffer=new byte[6*numLeft])[bufferOffset=0]='[';
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
-      buffer[++bufferOffset]=']';
-      return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+          if(--inclusiveHi==63){
+            break;
+          }
+        }  
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }  
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==65){
+            break;
+          }
+        }  
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            bufferOffset=ToStringUtil.getStringShort(inclusiveHi,buffer,++bufferOffset);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
-    private void uncheckedDescendingForEach(int exclusiveHi,int numLeft,ByteConsumer action){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word0;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }  
-        case 0:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
+    buffer[++bufferOffset]=']';
+    return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+  }
+  private void uncheckedDescendingForEach(int inclusiveHi,int numLeft,ByteConsumer action){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        case -1:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
+          if(--inclusiveHi==63){
+            break;
+          }
+        }  
+      case 0:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-        default:
-          for(long word=this.word3;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              action.accept((byte)exclusiveHi);
-              if(--numLeft==0){
-                break goToEnd;
-              }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
             }
           }
-      }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            action.accept((byte)inclusiveHi);
+            if(--numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
     }
-    private void uncheckedAscendingToArray(int numLeft,byte[] dst){
-      int val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+  }
+  private void uncheckedAscendingToArray(int numLeft,byte[] dst){
+    int val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
-      }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
+      if(--val==63){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,byte[] dst){
-      int val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==-64){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
-        }
+      if(--val==-65){
+        break;
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(byte)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,byte[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,byte[] dst){
+    int val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,byte[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-    private void uncheckedAscendingToArray(int numLeft,Byte[] dst){
-      int val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
+      if(++val==64){
+        break;
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,Byte[] dst){
-      int val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,byte[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
           }
         }
-        if(++val==-64){
-          break;
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,byte[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedAscendingToArray(int numLeft,Byte[] dst){
+    int val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
+      if(--val==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,Byte[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,Byte[] dst){
+    int val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,Byte[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-    private void uncheckedAscendingToArray(int numLeft,Object[] dst){
-      int val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
+      if(++val==64){
+        break;
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,Object[] dst){
-      int val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,Byte[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
           }
         }
-        if(++val==-64){
-          break;
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,Byte[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedAscendingToArray(int numLeft,Object[] dst){
+    int val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(Byte)(byte)(val);
-          if(numLeft==0){
-            return;
-          }
+      if(--val==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,Object[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(Byte)(byte)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,Object[] dst){
+    int val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,Object[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(Byte)(byte)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-    private void uncheckedAscendingToArray(int numLeft,short[] dst){
-      int val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
+      if(++val==64){
+        break;
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(Byte)(byte)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,short[] dst){
-      int val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,Object[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
           }
         }
-        if(++val==-64){
-          break;
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,Object[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(Byte)(byte)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedAscendingToArray(int numLeft,short[] dst){
+    int val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(short)(val);
-          if(numLeft==0){
-            return;
-          }
+      if(--val==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,short[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(short)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(short)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(short)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(short)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,short[] dst){
+    int val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,short[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(short)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(short)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(short)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(short)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-    private void uncheckedAscendingToArray(int numLeft,int[] dst){
-      int val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
+      if(++val==64){
+        break;
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(short)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,int[] dst){
-      int val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,short[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(short)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
           }
         }
-        if(++val==-64){
-          break;
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(short)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(short)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(short)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,short[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(short)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(short)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(short)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(short)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedAscendingToArray(int numLeft,int[] dst){
+    int val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(int)(val);
-          if(numLeft==0){
-            return;
-          }
+      if(--val==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,int[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(int)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(int)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(int)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(int)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,int[] dst){
+    int val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,int[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(int)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(int)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(int)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(int)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-    private void uncheckedAscendingToArray(int numLeft,long[] dst){
-      long val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
+      if(++val==64){
+        break;
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(int)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,long[] dst){
-      long val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,int[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(int)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
           }
         }
-        if(++val==-64){
-          break;
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(int)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(int)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(int)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,int[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(int)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(int)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(int)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(int)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedAscendingToArray(int numLeft,long[] dst){
+    long val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(long)(val);
-          if(numLeft==0){
-            return;
-          }
+      if(--val==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,long[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(long)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(long)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(long)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(long)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,long[] dst){
+    long val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,long[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(long)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(long)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(long)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(long)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-    private void uncheckedAscendingToArray(int numLeft,float[] dst){
-      int val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
+      if(++val==64){
+        break;
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(long)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,float[] dst){
-      int val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,long[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(long)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
           }
         }
-        if(++val==-64){
-          break;
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(long)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(long)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(long)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,long[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(long)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(long)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(long)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(long)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedAscendingToArray(int numLeft,float[] dst){
+    int val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(float)(val);
-          if(numLeft==0){
-            return;
-          }
+      if(--val==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,float[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(float)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(float)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(float)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(float)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,float[] dst){
+    int val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,float[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(float)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(float)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(float)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(float)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-    private void uncheckedAscendingToArray(int numLeft,double[] dst){
-      int val=Byte.MAX_VALUE;
-      for(long word=this.word3;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==63){
-          break;
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-1){
-          break;
-        }
+      if(++val==64){
+        break;
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(--val==-65){
-          break;
-        }
-      }
-      for(long word=this.word0;;--val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
-          }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(float)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedDescendingToArray(int numLeft,double[] dst){
-      int val=Byte.MIN_VALUE;
-      for(long word=this.word0;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,float[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(float)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
           }
         }
-        if(++val==-64){
-          break;
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(float)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(float)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(float)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,float[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(float)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(float)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(float)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(float)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedAscendingToArray(int numLeft,double[] dst){
+    int val=Byte.MAX_VALUE;
+    for(long word=this.word3;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word1;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==0){
-          break;
+      if(--val==63){
+        break;
+      }
+    }
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word2;;){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
-          }
-        }
-        if(++val==64){
-          break;
+      if(--val==-1){
+        break;
+      }
+    }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
         }
       }
-      for(long word=this.word3;;++val){
-        if((word&(1L<<val))!=0){
-          dst[--numLeft]=(double)(val);
-          if(numLeft==0){
-            return;
-          }
+      if(--val==-65){
+        break;
+      }
+    }
+    for(long word=this.word0;;--val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
         }
       }
     }
-    private void uncheckedAscendingToArray(int exclusiveHi,int numLeft,double[] dst){
-      goToEnd:switch((--exclusiveHi)>>6){
-        case 1:
-          for(long word=this.word3;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(double)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==63){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(double)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-1){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(double)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(--exclusiveHi==-65){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word0;;--exclusiveHi){
-            if((word&(1L<<exclusiveHi))!=0){
-              dst[--numLeft]=(double)(exclusiveHi);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+  }
+  private void uncheckedDescendingToArray(int numLeft,double[] dst){
+    int val=Byte.MIN_VALUE;
+    for(long word=this.word0;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==-64){
+        break;
       }
     }
-    private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,double[] dst){
-      goToEnd:switch(inclusiveLo>>6){
-        case -2:
-          for(long word=this.word0;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(double)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==-64){
-              break;
-            }
-          }
-        case -1:
-          for(long word=this.word1;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(double)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==0){
-              break;
-            }
-          }
-        case 0:
-          for(long word=this.word2;;){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(double)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-            if(++inclusiveLo==64){
-              break;
-            }
-          }
-        default:
-          for(long word=this.word3;;++inclusiveLo){
-            if((word&(1L<<inclusiveLo))!=0){
-              dst[--numLeft]=(double)(inclusiveLo);
-              if(numLeft==0){
-                break goToEnd;
-              }
-            }
-          }
+    for(long word=this.word1;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==0){
+        break;
       }
     }
-  private int countHeadSetElements(int exclToElement){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    for(long word=this.word2;;){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+      if(++val==64){
+        break;
+      }
+    }
+    for(long word=this.word3;;++val){
+      if((word&(1L<<val))!=0){
+        dst[--numLeft]=(double)(val);
+        if(numLeft==0){
+          return;
+        }
+      }
+    }
+  }
+  private void uncheckedAscendingToArray(int inclusiveHi,int numLeft,double[] dst){
+    goToEnd:switch(inclusiveHi>>6){
+      case 1:
+        for(long word=this.word3;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(double)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==63){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(double)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-1){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(double)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(--inclusiveHi==-65){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word0;;--inclusiveHi){
+          if((word&(1L<<inclusiveHi))!=0){
+            dst[--numLeft]=(double)(inclusiveHi);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private void uncheckedDescendingToArray(int inclusiveLo,int numLeft,double[] dst){
+    goToEnd:switch(inclusiveLo>>6){
+      case -2:
+        for(long word=this.word0;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(double)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==-64){
+            break;
+          }
+        }
+      case -1:
+        for(long word=this.word1;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(double)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==0){
+            break;
+          }
+        }
+      case 0:
+        for(long word=this.word2;;){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(double)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+          if(++inclusiveLo==64){
+            break;
+          }
+        }
+      default:
+        for(long word=this.word3;;++inclusiveLo){
+          if((word&(1L<<inclusiveLo))!=0){
+            dst[--numLeft]=(double)(inclusiveLo);
+            if(numLeft==0){
+              break goToEnd;
+            }
+          }
+        }
+    }
+  }
+  private int countHeadSetElements(int inclToElement){
+    int count=0;
+    switch(inclToElement>>6){
+      case 1:
+        count+=Long.bitCount(this.word3&(-1L>>>(-inclToElement-1)));
+        inclToElement=-1;
+      case 0:
+        count+=Long.bitCount(this.word2&(-1L>>>(-inclToElement-1)));
+        inclToElement=-1;
+      case -1:
+        count+=Long.bitCount(this.word1&(-1L>>>(-inclToElement-1)));
+        inclToElement=-1;
+      default:
+        return count+Long.bitCount(this.word0&(-1L>>>(-inclToElement-1)));
+    }
   }
   private int countTailSetElements(int inclFromElement){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    int count=0;
+    switch(inclFromElement>>6){
+      case -2:
+        count+=Long.bitCount(this.word0&(-1L<<inclFromElement));
+        inclFromElement=0;
+      case -1:
+        count+=Long.bitCount(this.word1&(-1L<<inclFromElement));
+        inclFromElement=0;
+      case 0:
+        count+=Long.bitCount(this.word2&(-1L<<inclFromElement));
+        inclFromElement=0;
+      default:
+        return count+Long.bitCount(this.word3&(-1L<<inclFromElement));
+    }
   }
-  private int countSubSetElements(int inclFromElement,int exclToElement){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private int countSubSetElements(int inclFromElement,int inclToElement){
+    switch(inclToElement>>6){
+      case -2:
+        return Long.bitCount(this.word0&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+      case -1:
+        if(inclFromElement>>6==-1){
+          return Long.bitCount(this.word1&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+        }else{
+          return Long.bitCount(this.word0&(-1L<<inclFromElement)) 
+            + Long.bitCount(this.word1&(-1L>>>(-inclToElement-1)));
+        }
+      case 0:
+        int count;
+        switch(inclFromElement>>6){
+          case 0:
+            return Long.bitCount(this.word2&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+          case -1:
+            count=Long.bitCount(this.word1&(-1L<<inclFromElement));
+            break;
+          default:
+            count=Long.bitCount(this.word0&(-1L<<inclFromElement))
+              + Long.bitCount(this.word1);
+        }
+        return count+ Long.bitCount(this.word2&(-1L>>>(-inclToElement-1)));
+      default:
+        goToWord3:for(;;){
+          switch(inclFromElement>>6){
+            case 1:
+              return Long.bitCount(this.word3&(-1L<<inclFromElement)&(-1L>>>(-inclToElement-1)));
+            case 0:
+              count=Long.bitCount(this.word2&(-1L<<inclFromElement));
+              break goToWord3;
+            case -1:
+              count=Long.bitCount(this.word1&(-1L<<inclFromElement));
+              break;
+            default:
+              count=Long.bitCount(this.word0&(-1L<<inclFromElement))
+                + Long.bitCount(this.word1);
+          }
+          count+=Long.bitCount(this.word2);
+          break;
+        }
+        return count + Long.bitCount(this.word3&(-1L>>>(-inclToElement-1)));
+    }
   }
   public static abstract class Checked extends ByteSetImpl implements Serializable{
     private static final long serialVersionUID=1L;
@@ -2671,27 +2736,27 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     public Checked(OmniCollection.OfBoolean that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(OmniCollection.OfByte that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(OmniCollection.ByteOutput<?> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(OmniCollection.OfRef<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     public Checked(Collection<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private void readObject(ObjectInputStream ois) throws IOException{
@@ -2978,10 +3043,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return false;
     }
-    @Override public Byte lower(byte val){
+    @Override public Byte ceiling(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.lower(val);
-      }
+        return super.ceiling(val);
+      }  
       return null;
     }
     @Override public Byte floor(byte val){
@@ -2996,16 +3061,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return null;
     }
-    @Override public Byte ceiling(byte val){
+    @Override public Byte lower(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.ceiling(val);
-      }  
+        return super.lower(val);
+      }
       return null;
     }
-    @Override public byte lowerByte(byte val){
+    @Override public byte byteCeiling(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.lowerByte(val);
-      }
+        return super.byteCeiling(val);
+      }  
       return Byte.MIN_VALUE;
     }
     @Override public byte byteFloor(byte val){
@@ -3020,16 +3085,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Byte.MIN_VALUE;
     }
-    @Override public byte byteCeiling(byte val){
+    @Override public byte lowerByte(byte val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.byteCeiling(val);
-      }  
+        return super.lowerByte(val);
+      }
       return Byte.MIN_VALUE;
     }
-    @Override public short lowerShort(short val){
+    @Override public short shortCeiling(short val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.lowerShort(val);
-      }
+        return super.shortCeiling(val);
+      }  
       return Short.MIN_VALUE;
     }
     @Override public short shortFloor(short val){
@@ -3044,28 +3109,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Short.MIN_VALUE;
     }
-    @Override public short shortCeiling(short val){
+    @Override public short lowerShort(short val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.shortCeiling(val);
-      }  
+        return super.lowerShort(val);
+      }
       return Short.MIN_VALUE;
     }
-    @Override public int firstInt(){
-      if((modCountAndSize&0x1ff)==0){
-        throw new NoSuchElementException();
-      }
-      return super.firstInt();
-    }
-    @Override public int lastInt(){
-      if((modCountAndSize&0x1ff)==0){
-        throw new NoSuchElementException();
-      }
-      return super.lastInt();  
-    }
-    @Override public int lowerInt(int val){
+    @Override public int intCeiling(int val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.lowerInt(val);
-      }
+        return super.intCeiling(val);
+      }  
       return Integer.MIN_VALUE;
     }
     @Override public int intFloor(int val){
@@ -3080,10 +3133,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Integer.MIN_VALUE;
     }
-    @Override public int intCeiling(int val){
+    @Override public int lowerInt(int val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.intCeiling(val);
-      }  
+        return super.lowerInt(val);
+      }
       return Integer.MIN_VALUE;
     }
     @Override public int pollFirstInt(){
@@ -3102,10 +3155,22 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Integer.MIN_VALUE;
     }
-    @Override public long lowerLong(long val){
-      if((modCountAndSize&0x1ff)!=0){
-        return super.lowerLong(val);
+    @Override public int firstInt(){
+      if((modCountAndSize&0x1ff)==0){
+        throw new NoSuchElementException();
       }
+      return super.firstInt();
+    }
+    @Override public int lastInt(){
+      if((modCountAndSize&0x1ff)==0){
+        throw new NoSuchElementException();
+      }
+      return super.lastInt();  
+    }
+    @Override public long longCeiling(long val){
+      if((modCountAndSize&0x1ff)!=0){
+        return super.longCeiling(val);
+      }  
       return Long.MIN_VALUE;
     }
     @Override public long longFloor(long val){
@@ -3120,16 +3185,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Long.MIN_VALUE;
     }
-    @Override public long longCeiling(long val){
+    @Override public long lowerLong(long val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.longCeiling(val);
-      }  
+        return super.lowerLong(val);
+      }
       return Long.MIN_VALUE;
     }
-    @Override public float lowerFloat(float val){
+    @Override public float floatCeiling(float val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.lowerFloat(val);
-      }
+        return super.floatCeiling(val);
+      }  
       return Float.NaN;
     }
     @Override public float floatFloor(float val){
@@ -3144,16 +3209,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Float.NaN;
     }
-    @Override public float floatCeiling(float val){
+    @Override public float lowerFloat(float val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.floatCeiling(val);
-      }  
+        return super.lowerFloat(val);
+      }
       return Float.NaN;
     }
-    @Override public double lowerDouble(double val){
+    @Override public double doubleCeiling(double val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.lowerDouble(val);
-      }
+        return super.doubleCeiling(val);
+      }  
       return Double.NaN;
     }
     @Override public double doubleFloor(double val){
@@ -3168,10 +3233,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Double.NaN;
     }
-    @Override public double doubleCeiling(double val){
+    @Override public double lowerDouble(double val){
       if((modCountAndSize&0x1ff)!=0){
-        return super.doubleCeiling(val);
-      }  
+        return super.lowerDouble(val);
+      }
       return Double.NaN;
     }
     public static class Ascending extends Checked{
@@ -3212,8 +3277,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(toElement==Byte.MAX_VALUE){
           return this;
         }
-        final int t;
-        return new CheckedSubSet.HeadSet.Ascending(this,t=toElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(t));
+        return new CheckedSubSet.HeadSet.Ascending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
@@ -3222,26 +3286,26 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new CheckedSubSet.TailSet.Ascending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        final int t;
-        switch(Integer.signum((t=toElement+1)-fromElement)){
-        case 1:
-          if(t==128){
-            if(fromElement==-128){
-              return this;
+        final int exclusiveTo;
+        switch(Integer.signum((exclusiveTo=toElement+1)-fromElement)){
+          case 1:
+            if(toElement==127){
+              if(fromElement==-128){
+                return this;
+              }else{
+                return new CheckedSubSet.TailSet.Ascending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(fromElement));
+              }
             }else{
-              return new CheckedSubSet.TailSet.Ascending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(fromElement));
+              if(fromElement==-128){
+                return new CheckedSubSet.HeadSet.Ascending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(toElement));
+              }else{
+                return new CheckedSubSet.BodySet.Ascending(this,(toElement<<8)|(fromElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(fromElement,toElement));
+              }
             }
-          }else{
-            if(fromElement==-128){
-              return new CheckedSubSet.HeadSet.Ascending(this,t,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(t));
-            }else{
-              return new CheckedSubSet.BodySet.Ascending(this,(t<<8)|(fromElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(fromElement,t));
-            }
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Ascending(t);
-        default:
-          throw new IllegalArgumentException("out of bounds");
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Ascending(exclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
@@ -3251,7 +3315,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(toElement==Byte.MIN_VALUE){
           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
         }
-        return new CheckedSubSet.HeadSet.Ascending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(toElement));
+        final int inclusiveTo;
+        return new CheckedSubSet.HeadSet.Ascending(this,inclusiveTo=toElement-1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -3260,28 +3325,28 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(fromElement==Byte.MAX_VALUE){
            return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MAX_VALUE+1);
         }
-        final int f;
-        return new CheckedSubSet.TailSet.Ascending(this,f=fromElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(f));
+        final int inclusiveFrom;
+        return new CheckedSubSet.TailSet.Ascending(this,inclusiveFrom=fromElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        switch(Integer.signum((t=(toInclusive?toElement+1:toElement))-(f=(fromInclusive?fromElement:fromElement+1)))){
+        final int inclusiveTo,inclusiveFrom;
+        switch(Integer.signum((inclusiveTo=toInclusive?toElement:toElement-1)-(inclusiveFrom=fromInclusive?fromElement:fromElement+1)+1)){
         case 1:
-          if(t==128){
-            if(f==-128){
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
               return this;
             }else{
-              return new CheckedSubSet.TailSet.Ascending(this,f,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(f));
+              return new CheckedSubSet.TailSet.Ascending(this,inclusiveFrom,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
             }
           }else{
-            if(f==-128){
-              return new CheckedSubSet.HeadSet.Ascending(this,t,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(t));
+            if(inclusiveFrom==-128){
+              return new CheckedSubSet.HeadSet.Ascending(this,inclusiveTo,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
             }else{
-              return new CheckedSubSet.BodySet.Ascending(this,(t<<8)|(f&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(f,t));
+              return new CheckedSubSet.BodySet.Ascending(this,(inclusiveTo<<8)|(inclusiveFrom&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(inclusiveFrom,inclusiveTo));
             }
           }
         case 0:
-          return new AbstractByteSet.EmptyView.Checked.Ascending(t);
+          return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
         default:
           throw new IllegalArgumentException("out of bounds");
         }
@@ -3318,7 +3383,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(T[] dst){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
@@ -3328,7 +3392,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return dst;
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         int numLeft;
         final T[] dst;
@@ -3454,30 +3517,28 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(fromElement==Byte.MAX_VALUE){
           return this;
         }
-        final int f;
-        return new CheckedSubSet.HeadSet.Descending(this,f=fromElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(f));
+        return new CheckedSubSet.HeadSet.Descending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        final int f;
-        switch(Integer.signum((f=fromElement+1)-toElement)){
-        case 1:
-          if(f==128){
-            if(toElement==-128){
-              return this;
+        switch(Integer.signum(fromElement+1-toElement)){
+          case 1:
+            if(fromElement==127){
+              if(toElement==-128){
+                return this;
+              }else{
+                return new CheckedSubSet.TailSet.Descending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(toElement));
+              }
             }else{
-              return new CheckedSubSet.TailSet.Descending(this,toElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(toElement));
+              if(toElement==-128){
+                return new CheckedSubSet.HeadSet.Descending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(fromElement));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(this,(fromElement<<8)|(toElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(toElement,fromElement));
+              }
             }
-          }else{
-            if(toElement==-128){
-              return new CheckedSubSet.HeadSet.Descending(this,f,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(f));
-            }else{
-              return new CheckedSubSet.BodySet.Descending(this,(f<<8)|(toElement&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(toElement,f));
-            }
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Descending(f);
-        default:
-          throw new IllegalArgumentException("out of bounds");
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(toElement);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
@@ -3487,8 +3548,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(toElement==Byte.MAX_VALUE){
           return new AbstractByteSet.EmptyView.Checked.Descending(128);
         }
-        final int t;
-        return new CheckedSubSet.TailSet.Descending(this,t=toElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(t));
+        final int inclusiveTo;
+        return new CheckedSubSet.TailSet.Descending(this,inclusiveTo=toElement+1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -3497,36 +3558,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(fromElement==Byte.MIN_VALUE){
           return new AbstractByteSet.EmptyView.Checked.Descending(Byte.MIN_VALUE);
         }
-        return new CheckedSubSet.HeadSet.Descending(this,fromElement,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(fromElement));
+        final int inclusiveFrom;
+        return new CheckedSubSet.HeadSet.Descending(this,inclusiveFrom=fromElement-1,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        switch(Integer.signum((f=(fromInclusive?fromElement+1:fromElement))-(t=(toInclusive?toElement:toElement+1)))){
-        case 1:
-          if(t==-128){
-            if(f==128){
-              return this;
+        final int inclusiveFrom,inclusiveTo;
+        switch(Integer.signum((inclusiveFrom=fromInclusive?fromElement:fromElement-1)-(inclusiveTo=toInclusive?toElement:toElement+1)+1)){
+          case 1:
+            if(inclusiveTo==-128){
+              if(inclusiveFrom==127){
+                return this;
+              }else{
+                return new CheckedSubSet.HeadSet.Descending(this,inclusiveFrom,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
+              }
             }else{
-              return new CheckedSubSet.HeadSet.Descending(this,f,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countHeadSetElements(f));
+              if(inclusiveFrom==127){
+                return new CheckedSubSet.TailSet.Descending(this,inclusiveTo,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(inclusiveTo));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(this,(inclusiveFrom<<8)|(inclusiveTo&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(inclusiveTo,inclusiveFrom));
+              }
             }
-          }else{
-            if(f==128){
-              return new CheckedSubSet.TailSet.Descending(this,t,(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countTailSetElements(t));
-            }else{
-              return new CheckedSubSet.BodySet.Descending(this,(f<<8)|(t&0xff),(this.modCountAndSize&(~0x1ff))|((ByteSetImpl)this).countSubSetElements(t,f));
-            }
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Descending(f);
-        default:
-          throw new IllegalArgumentException("out of bounds");
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new AbstractCheckedFullView.Ascending(this);
       }
-      @Override public Byte lower(byte val){
-        return super.higher(val);
+      @Override public Byte ceiling(byte val){
+        return super.floor(val);
       }
       @Override public Byte floor(byte val){
         return super.ceiling(val);
@@ -3534,11 +3596,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public Byte higher(byte val){
         return super.lower(val);
       }
-      @Override public Byte ceiling(byte val){
-        return super.floor(val);
+      @Override public Byte lower(byte val){
+        return super.higher(val);
       }
-      @Override public byte lowerByte(byte val){
-        return super.higherByte(val);
+      @Override public byte byteCeiling(byte val){
+        return super.byteFloor(val);
       }
       @Override public byte byteFloor(byte val){
         return super.byteCeiling(val);
@@ -3546,11 +3608,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public byte higherByte(byte val){
         return super.lowerByte(val);
       }
-      @Override public byte byteCeiling(byte val){
-        return super.byteFloor(val);
+      @Override public byte lowerByte(byte val){
+        return super.higherByte(val);
       }
-      @Override public short lowerShort(short val){
-        return super.higherShort(val);
+      @Override public short shortCeiling(short val){
+        return super.shortFloor(val);
       }
       @Override public short shortFloor(short val){
         return super.shortCeiling(val);
@@ -3558,17 +3620,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public short higherShort(short val){
         return super.lowerShort(val);
       }
-      @Override public short shortCeiling(short val){
-        return super.shortFloor(val);
+      @Override public short lowerShort(short val){
+        return super.higherShort(val);
       }
-      @Override public int firstInt(){
-        return super.lastInt();
-      }
-      @Override public int lastInt(){
-        return super.firstInt();
-      }
-      @Override public int lowerInt(int val){
-        return super.higherInt(val);
+      @Override public int intCeiling(int val){
+        return super.intFloor(val);
       }
       @Override public int intFloor(int val){
         return super.intCeiling(val);
@@ -3576,8 +3632,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int higherInt(int val){
         return super.lowerInt(val);
       }
-      @Override public int intCeiling(int val){
-        return super.intFloor(val);
+      @Override public int lowerInt(int val){
+        return super.higherInt(val);
       }
       @Override public int pollFirstInt(){
         return super.pollLastInt();
@@ -3585,8 +3641,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int pollLastInt(){
         return super.pollFirstInt();
       }
-      @Override public long lowerLong(long val){
-        return super.higherLong(val);
+      @Override public int firstInt(){
+        return super.lastInt();
+      }
+      @Override public int lastInt(){
+        return super.firstInt();
+      }
+      @Override public long longCeiling(long val){
+        return super.longFloor(val);
       }
       @Override public long longFloor(long val){
         return super.longCeiling(val);
@@ -3594,11 +3656,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public long higherLong(long val){
         return super.lowerLong(val);
       }
-      @Override public long longCeiling(long val){
-        return super.longFloor(val);
+      @Override public long lowerLong(long val){
+        return super.higherLong(val);
       }
-      @Override public float lowerFloat(float val){
-        return super.higherFloat(val);
+      @Override public float floatCeiling(float val){
+        return super.floatFloor(val);
       }
       @Override public float floatFloor(float val){
         return super.floatCeiling(val);
@@ -3606,11 +3668,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public float higherFloat(float val){
         return super.lowerFloat(val);
       }
-      @Override public float floatCeiling(float val){
-        return super.floatFloor(val);
+      @Override public float lowerFloat(float val){
+        return super.higherFloat(val);
       }
-      @Override public double lowerDouble(double val){
-        return super.higherDouble(val);
+      @Override public double doubleCeiling(double val){
+        return super.doubleFloor(val);
       }
       @Override public double doubleFloor(double val){
         return super.doubleCeiling(val);
@@ -3618,8 +3680,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double higherDouble(double val){
         return super.lowerDouble(val);
       }
-      @Override public double doubleCeiling(double val){
-        return super.doubleFloor(val);
+      @Override public double lowerDouble(double val){
+        return super.higherDouble(val);
       }
       @Override public String toString(){
         int numLeft;
@@ -3650,7 +3712,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(T[] dst){
         int numLeft;
         if((numLeft=this.modCountAndSize&0x1ff)!=0){
@@ -3660,7 +3721,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return dst;
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         int numLeft;
         final T[] dst;
@@ -3777,8 +3837,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(toElement==Byte.MAX_VALUE){
           return this;
         }
-        final int t;
-        return new UncheckedSubSet.HeadSet.Ascending(this,t=toElement+1,((ByteSetImpl)this).countHeadSetElements(t));
+        return new UncheckedSubSet.HeadSet.Ascending(this,toElement,((ByteSetImpl)this).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
@@ -3795,11 +3854,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               return new UncheckedSubSet.TailSet.Ascending(this,fromElement,((ByteSetImpl)this).countTailSetElements(fromElement));
             }
           }else{
-            final int t=toElement+1;
             if(fromElement==-128){
-              return new UncheckedSubSet.HeadSet.Ascending(this,t,((ByteSetImpl)this).countHeadSetElements(t));
+              return new UncheckedSubSet.HeadSet.Ascending(this,toElement,((ByteSetImpl)this).countHeadSetElements(toElement));
             }else{
-              return new UncheckedSubSet.BodySet.Ascending(this,(t<<8)|(fromElement&0xff),((ByteSetImpl)this).countSubSetElements(fromElement,t));
+              return new UncheckedSubSet.BodySet.Ascending(this,(toElement<<8)|(fromElement&0xff),((ByteSetImpl)this).countSubSetElements(fromElement,toElement));
             }
           }
         }
@@ -3812,7 +3870,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(toElement==Byte.MIN_VALUE){
           return AbstractByteSet.EmptyView.ASCENDING;
         }
-        return new UncheckedSubSet.HeadSet.Ascending(this,toElement,((ByteSetImpl)this).countHeadSetElements(toElement));
+        final int inclusiveTo;
+        return new UncheckedSubSet.HeadSet.Ascending(this,inclusiveTo=toElement-1,((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -3821,23 +3880,23 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(fromElement==Byte.MAX_VALUE){
            return AbstractByteSet.EmptyView.ASCENDING;
         }
-        final int f;
-        return new UncheckedSubSet.TailSet.Ascending(this,f=fromElement+1,((ByteSetImpl)this).countTailSetElements(f));
+        final int inclusiveFrom;
+        return new UncheckedSubSet.TailSet.Ascending(this,inclusiveFrom=fromElement+1,((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        if((t=(toInclusive?toElement+1:toElement))>(f=(fromInclusive?fromElement:fromElement+1))){
-          if(t==128){
-            if(f==-128){
+        final int inclusiveTo,inclusiveFrom;
+        if((inclusiveTo=toInclusive?toElement:toElement-1)>=(inclusiveFrom=fromInclusive?fromElement:fromElement+1)){
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
               return this;
             }else{
-              return new UncheckedSubSet.TailSet.Ascending(this,f,((ByteSetImpl)this).countTailSetElements(f));
+              return new UncheckedSubSet.TailSet.Ascending(this,inclusiveFrom,((ByteSetImpl)this).countTailSetElements(inclusiveFrom));
             }
           }else{
-            if(f==-128){
-              return new UncheckedSubSet.HeadSet.Ascending(this,t,((ByteSetImpl)this).countHeadSetElements(t));
+            if(inclusiveFrom==-128){
+              return new UncheckedSubSet.HeadSet.Ascending(this,inclusiveTo,((ByteSetImpl)this).countHeadSetElements(inclusiveTo));
             }else{
-              return new UncheckedSubSet.BodySet.Ascending(this,(t<<8)|(f&0xff),((ByteSetImpl)this).countSubSetElements(f,t));
+              return new UncheckedSubSet.BodySet.Ascending(this,(inclusiveTo<<8)|(inclusiveFrom&0xff),((ByteSetImpl)this).countSubSetElements(inclusiveFrom,inclusiveTo));
             }
           }
         }
@@ -4397,8 +4456,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(fromElement==Byte.MAX_VALUE){
           return this;
         }
-        final int f;
-        return new UncheckedSubSet.HeadSet.Descending(this,f=fromElement+1,((ByteSetImpl)this).countHeadSetElements(f));
+        return new UncheckedSubSet.HeadSet.Descending(this,fromElement,((ByteSetImpl)this).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
         if(fromElement>=toElement){
@@ -4409,11 +4467,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               return new UncheckedSubSet.TailSet.Descending(this,toElement,((ByteSetImpl)this).countTailSetElements(toElement));
             }
           }else{
-            final int f=fromElement+1;
             if(toElement==-128){
-              return new UncheckedSubSet.HeadSet.Descending(this,f,((ByteSetImpl)this).countHeadSetElements(f));
+              return new UncheckedSubSet.HeadSet.Descending(this,fromElement,((ByteSetImpl)this).countHeadSetElements(fromElement));
             }else{
-              return new UncheckedSubSet.BodySet.Descending(this,(f<<8)|(toElement&0xff),((ByteSetImpl)this).countSubSetElements(toElement,f));
+              return new UncheckedSubSet.BodySet.Descending(this,(fromElement<<8)|(toElement&0xff),((ByteSetImpl)this).countSubSetElements(toElement,fromElement));
             }
           }
         }
@@ -4424,10 +4481,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return headSet(toElement);
         }
         if(toElement==Byte.MAX_VALUE){
-          return AbstractByteSet.EmptyView.DESCENDING;
+         return AbstractByteSet.EmptyView.DESCENDING;
         }
-        final int t;
-        return new UncheckedSubSet.TailSet.Descending(this,t=toElement+1,((ByteSetImpl)this).countTailSetElements(t));
+        final int inclusiveTo;
+        return new UncheckedSubSet.TailSet.Descending(this,inclusiveTo=toElement+1,((ByteSetImpl)this).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
@@ -4436,22 +4493,23 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(fromElement==Byte.MIN_VALUE){
           return AbstractByteSet.EmptyView.DESCENDING;
         }
-        return new UncheckedSubSet.HeadSet.Descending(this,fromElement,((ByteSetImpl)this).countHeadSetElements(fromElement));
+        final int inclusiveFrom;
+        return new UncheckedSubSet.HeadSet.Descending(this,inclusiveFrom=fromElement-1,((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        final int f,t;
-        if((f=(fromInclusive?fromElement+1:fromElement))>(t=(toInclusive?toElement:toElement+1))){
-          if(t==-128){
-            if(f==128){
+        final int inclusiveFrom,inclusiveTo;
+        if((inclusiveFrom=fromInclusive?fromElement:fromElement-1)>=(inclusiveTo=toInclusive?toElement:toElement+1)){
+          if(inclusiveTo==-128){
+            if(inclusiveFrom==127){
               return this;
             }else{
-              return new UncheckedSubSet.HeadSet.Descending(this,f,((ByteSetImpl)this).countHeadSetElements(f));
+              return new UncheckedSubSet.HeadSet.Descending(this,inclusiveFrom,((ByteSetImpl)this).countHeadSetElements(inclusiveFrom));
             }
           }else{
-            if(f==128){
-              return new UncheckedSubSet.TailSet.Descending(this,t,((ByteSetImpl)this).countTailSetElements(t));
+            if(inclusiveFrom==127){
+              return new UncheckedSubSet.TailSet.Descending(this,inclusiveTo,((ByteSetImpl)this).countTailSetElements(inclusiveTo));
             }else{
-              return new UncheckedSubSet.BodySet.Descending(this,(f<<8)|(t&0xff),((ByteSetImpl)this).countSubSetElements(t,f));
+              return new UncheckedSubSet.BodySet.Descending(this,(inclusiveFrom<<8)|(inclusiveTo&0xff),((ByteSetImpl)this).countSubSetElements(inclusiveTo,inclusiveFrom));
             }
           }
         }
@@ -4460,8 +4518,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new AbstractUncheckedFullView.Ascending(this);
       }
-      @Override public Byte lower(byte val){
-        return super.higher(val);
+      @Override public Byte ceiling(byte val){
+        return super.floor(val);
       }
       @Override public Byte floor(byte val){
         return super.ceiling(val);
@@ -4469,11 +4527,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public Byte higher(byte val){
         return super.lower(val);
       }
-      @Override public Byte ceiling(byte val){
-        return super.floor(val);
+      @Override public Byte lower(byte val){
+        return super.higher(val);
       }
-      @Override public byte lowerByte(byte val){
-        return super.higherByte(val);
+      @Override public byte byteCeiling(byte val){
+        return super.byteFloor(val);
       }
       @Override public byte byteFloor(byte val){
         return super.byteCeiling(val);
@@ -4481,11 +4539,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public byte higherByte(byte val){
         return super.lowerByte(val);
       }
-      @Override public byte byteCeiling(byte val){
-        return super.byteFloor(val);
+      @Override public byte lowerByte(byte val){
+        return super.higherByte(val);
       }
-      @Override public short lowerShort(short val){
-        return super.higherShort(val);
+      @Override public short shortCeiling(short val){
+        return super.shortFloor(val);
       }
       @Override public short shortFloor(short val){
         return super.shortCeiling(val);
@@ -4493,17 +4551,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public short higherShort(short val){
         return super.lowerShort(val);
       }
-      @Override public short shortCeiling(short val){
-        return super.shortFloor(val);
+      @Override public short lowerShort(short val){
+        return super.higherShort(val);
       }
-      @Override public int firstInt(){
-        return super.lastInt();
-      }
-      @Override public int lastInt(){
-        return super.firstInt();
-      }
-      @Override public int lowerInt(int val){
-        return super.higherInt(val);
+      @Override public int intCeiling(int val){
+        return super.intFloor(val);
       }
       @Override public int intFloor(int val){
         return super.intCeiling(val);
@@ -4511,8 +4563,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int higherInt(int val){
         return super.lowerInt(val);
       }
-      @Override public int intCeiling(int val){
-        return super.intFloor(val);
+      @Override public int lowerInt(int val){
+        return super.higherInt(val);
       }
       @Override public int pollFirstInt(){
         return super.pollLastInt();
@@ -4520,8 +4572,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int pollLastInt(){
         return super.pollFirstInt();
       }
-      @Override public long lowerLong(long val){
-        return super.higherLong(val);
+      @Override public int firstInt(){
+        return super.lastInt();
+      }
+      @Override public int lastInt(){
+        return super.firstInt();
+      }
+      @Override public long longCeiling(long val){
+        return super.longFloor(val);
       }
       @Override public long longFloor(long val){
         return super.longCeiling(val);
@@ -4529,11 +4587,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public long higherLong(long val){
         return super.lowerLong(val);
       }
-      @Override public long longCeiling(long val){
-        return super.longFloor(val);
+      @Override public long lowerLong(long val){
+        return super.higherLong(val);
       }
-      @Override public float lowerFloat(float val){
-        return super.higherFloat(val);
+      @Override public float floatCeiling(float val){
+        return super.floatFloor(val);
       }
       @Override public float floatFloor(float val){
         return super.floatCeiling(val);
@@ -4541,11 +4599,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public float higherFloat(float val){
         return super.lowerFloat(val);
       }
-      @Override public float floatCeiling(float val){
-        return super.floatFloor(val);
+      @Override public float lowerFloat(float val){
+        return super.higherFloat(val);
       }
-      @Override public double lowerDouble(double val){
-        return super.higherDouble(val);
+      @Override public double doubleCeiling(double val){
+        return super.doubleFloor(val);
       }
       @Override public double doubleFloor(double val){
         return super.doubleCeiling(val);
@@ -4553,8 +4611,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double higherDouble(double val){
         return super.lowerDouble(val);
       }
-      @Override public double doubleCeiling(double val){
-        return super.doubleFloor(val);
+      @Override public double lowerDouble(double val){
+        return super.higherDouble(val);
       }
       @Override public String toString(){
         int numLeft;
@@ -5071,27 +5129,27 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     private Unchecked(OmniCollection.OfBoolean that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(OmniCollection.OfByte that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(OmniCollection.ByteOutput<?> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(OmniCollection.OfRef<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private Unchecked(Collection<? extends Byte> that){
       super();
-      //TODO optimize
+      //todo optimize
       this.addAll(that);
     }
     private void uncheckedForEachAscending(int offset,ByteConsumer action){
@@ -5319,216 +5377,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  /*
-  //TODO consider using these two methods
-  private int getBodySetLo(int inclusiveLo,int exclusiveHi){
-    foundElementAtEnd:for(;;){
-      int tail0s;
-      foundElementInMiddle:for(;;){
-        switch((exclusiveHi-1)>>6){
-          case 1:
-            switch(inclusiveLo>>6){
-              case -2:
-                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=-64;
-              case -1:
-                if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=0;
-              case 0:
-                if((tail0s=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=64;
-              case 1:
-                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word3>>>inclusiveLo))<exclusiveHi){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case 0:
-            switch(inclusiveLo>>6){
-              case -2:
-                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=-64;
-              case -1:
-                if((tail0s=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=0;
-              case 0:
-                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word2>>>inclusiveLo))<exclusiveHi){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case -1:
-            switch(inclusiveLo>>6){
-              case -2:
-                if((tail0s=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveLo=-64;
-              case -1:
-                if((inclusiveLo+=Long.numberOfTrailingZeros(this.word1>>>inclusiveLo))<exclusiveHi){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          default:
-            if(inclusiveLo>>6==-2 && (inclusiveLo+=Long.numberOfTrailingZeros(this.word0>>>inclusiveLo))<exclusiveHi){
-              break foundElementAtEnd;
-            }
-        }
-        return 128;
-      }
-      return inclusiveLo+tail0s;
-    }
-    return inclusiveLo;
-  }
-  private int getBodySetHi(int inclusiveLo,int inclusiveHi){
-    foundElementAtEnd:for(;;){
-      int lead0s;
-      foundElementInMiddle:for(;;){
-        switch(inclusiveLo>>6){
-          case -2:
-            switch(inclusiveHi>>6){
-              case 1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=63;
-              case 0:
-                if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=-1;
-              case -1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=-65;
-              case -2:
-                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))>=inclusiveLo){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case -1:
-            switch(inclusiveHi>>6){
-              case 1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=63;
-              case 0:
-                if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=-1;
-              case -1:
-                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))>=inclusiveLo){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          case 0:
-            switch(inclusiveHi>>6){
-              case 1:
-                if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-                  break foundElementInMiddle;
-                }
-                inclusiveHi=63;
-              case 0:
-                if((inclusiveHi-=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))>=inclusiveLo){
-                  break foundElementAtEnd;
-                }
-              default:
-            }
-            break;
-          default:
-            if(inclusiveHi>>6==1 && (inclusiveHi-=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))>=inclusiveLo){
-               break foundElementAtEnd;
-            }
-        }
-        return -129;
-      }
-      return inclusiveHi-lead0s;
-    }
-    return inclusiveHi;
-  }
-  */
-  private int getThisOrLowerInRange(int inclusiveHi){
-    int lead0s;
-    foundElement:for(;;){
-      switch(inclusiveHi>>6){
-        case 1:// [64,127]
-          if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-          inclusiveHi=63;
-        case 0:// [0,63]
-          if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-          inclusiveHi=-1;
-        case -1:// [-64,-1]
-          if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-          inclusiveHi=-65;
-        default:// [-128,-65]
-          if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
-            break foundElement;
-          }
-      }
-      return -129;
-    }
-    return inclusiveHi-lead0s;
-  }
-  private int removeThisOrLowerInRange(int inclusiveHi){
-    foundElement:for(;;){
-      switch(inclusiveHi>>6){
-        case 1:// [64,127]
-          int lead0s;
-          long word;
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word3)<<(-inclusiveHi-1)))!=64){
-            this.word3=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-          inclusiveHi=63;
-        case 0:// [0,63]
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word2)<<(-inclusiveHi-1)))!=64){
-            this.word2=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-          inclusiveHi=-1;
-        case -1:// [-64,-1]
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word1)<<(-inclusiveHi-1)))!=64){
-            this.word1=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-          inclusiveHi=-65;
-        default:// [-128,-65]
-          if((lead0s=Long.numberOfLeadingZeros((word=this.word0)<<(-inclusiveHi-1)))!=64){
-            this.word0=word&(~(1L<<(inclusiveHi-=lead0s)));
-            break foundElement;
-          }
-      }
-      return Integer.MIN_VALUE;
-    }
-    return inclusiveHi;
-  }
   private int getThisOrLower(int inclusiveHi){
     int lead0s;
     foundElement:for(;;){
@@ -5587,6 +5435,218 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return inclusiveLo+tail0s;
   }
+  private int getThisOrHigherInRange(int inclusiveLo,int inclusiveHi){
+    int index;
+    switch(inclusiveLo>>6){
+      case -2:
+        switch(inclusiveHi>>6){
+          case -2:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=inclusiveHi){
+              return index;
+            }
+            break;
+          case -1:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=-65){
+              return index;
+            }
+            if((index=-64+Long.numberOfTrailingZeros(this.word1))<=inclusiveHi){
+              return index;
+            }
+            break;
+          case 0:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=-65){
+              return index;
+            }
+            if((index=-64+Long.numberOfTrailingZeros(this.word1))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=inclusiveHi){
+              return index;
+            }
+            break;
+          default:
+            if((index=-128+Long.numberOfTrailingZeros(this.word0&(-1L<<inclusiveLo)))<=-65){
+              return index;
+            }
+            if((index=-64+Long.numberOfTrailingZeros(this.word1))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=63){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word3))<=inclusiveHi){
+              return index;
+            }
+        }
+        break;
+      case -1:
+        switch(inclusiveHi>>6){
+          case -1:
+            if((index=-64+Long.numberOfTrailingZeros(this.word1&(-1L<<inclusiveLo)))<=inclusiveHi){
+              return index;
+            }
+            break;
+          case 0:
+            if((index=-64+Long.numberOfTrailingZeros(this.word1&(-1L<<inclusiveLo)))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=inclusiveHi){
+              return index;
+            }
+            break;
+          default:
+            if((index=-64+Long.numberOfTrailingZeros(this.word1&(-1L<<inclusiveLo)))<=-1){
+              return index;
+            }
+            if((index=Long.numberOfTrailingZeros(this.word2))<=63){
+              return index;
+            }
+            if((index=64+Long.numberOfTrailingZeros(this.word3))<=inclusiveHi){
+              return index;
+            }
+        }
+        break;
+      case 0:
+        if(inclusiveHi>>6==0){
+          if((index=Long.numberOfTrailingZeros(this.word2&(-1L<<inclusiveLo)))<=inclusiveHi){
+            return index;
+          }
+        }else{
+          if((index=Long.numberOfTrailingZeros(this.word2&(-1L<<inclusiveLo)))<=63){
+            return index;
+          }
+          if((index=64+Long.numberOfTrailingZeros(this.word3))<=127){
+            return index;
+          }
+        }
+        break;
+      default:
+        if((index=64+Long.numberOfTrailingZeros(this.word3&(-1L<<inclusiveLo)))<=inclusiveHi){
+          return index;
+        }
+    }
+    return Integer.MIN_VALUE;
+  }
+  private int getThisOrLowerInRange(int inclusiveLo,int inclusiveHi){
+    int index;
+    switch(inclusiveHi>>6){
+      case 1:
+        switch(inclusiveLo>>6){
+          case 1:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+              return index;
+            }
+            break;
+          case 0:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=64){
+              return index;
+            }
+            if((index=63-Long.numberOfLeadingZeros(this.word2))>=inclusiveLo){
+              return index;
+            }
+            break;
+          case -1:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=64){
+              return index;
+            }
+            if((index=63-Long.numberOfLeadingZeros(this.word2))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=inclusiveLo){
+              return index;
+            }
+            break;
+          default:
+            if((index=127-Long.numberOfLeadingZeros(this.word3&(-1L>>>(-inclusiveHi-1))))>=64){
+              return index;
+            }
+            if((index=63-Long.numberOfLeadingZeros(this.word2))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=-64){
+              return index;
+            }
+            if((index=-65-Long.numberOfLeadingZeros(this.word0))>=inclusiveLo){
+              return index;
+            }
+        }
+        break;
+      case 0:
+        switch(inclusiveLo>>6){
+          case 0:
+            if((index=63-Long.numberOfLeadingZeros(this.word2&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+              return index;
+            }
+            break;
+          case -1:
+            if((index=63-Long.numberOfLeadingZeros(this.word2&(-1L>>>(-inclusiveHi-1))))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=inclusiveLo){
+              return index;
+            }
+            break;
+          default:
+            if((index=63-Long.numberOfLeadingZeros(this.word2&(-1L>>>(-inclusiveHi-1))))>=0){
+              return index;
+            }
+            if((index=-1-Long.numberOfLeadingZeros(this.word1))>=-64){
+              return index;
+            }
+            if((index=-65-Long.numberOfLeadingZeros(this.word0))>=inclusiveLo){
+              return index;
+            }
+        }
+        break;
+      case -1:
+        if(inclusiveLo>>6==-1){
+          if((index=-1-Long.numberOfLeadingZeros(this.word1&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+            return index;
+          }
+        }else{
+          if((index=-1-Long.numberOfLeadingZeros(this.word1&(-1L>>>(-inclusiveHi-1))))>=-64){
+            return index;
+          }
+          if((index=-65-Long.numberOfLeadingZeros(this.word0))>=inclusiveLo){
+            return index;
+          }
+        }
+        break;
+      default:
+        if((index=-65-Long.numberOfLeadingZeros(this.word0&(-1L>>>(-inclusiveHi-1))))>=inclusiveLo){
+          return index;
+        }
+    }
+    return Integer.MIN_VALUE;
+  }
+  private int getThisOrLowerInRange(int inclusiveHi){
+    int lead0s;
+    foundElement:for(;;){
+      switch(inclusiveHi>>6){
+        case 1:// [64,127]
+          if((lead0s=Long.numberOfLeadingZeros(this.word3<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=63;
+        case 0:// [0,63]
+          if((lead0s=Long.numberOfLeadingZeros(this.word2<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-1;
+        case -1:// [-64,-1]
+          if((lead0s=Long.numberOfLeadingZeros(this.word1<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+          inclusiveHi=-65;
+        default:// [-128,-65]
+          if((lead0s=Long.numberOfLeadingZeros(this.word0<<(-inclusiveHi-1)))!=64){
+            break foundElement;
+          }
+      }
+      return -129;
+    }
+    return inclusiveHi-lead0s;
+  }
   private int getThisOrHigherInRange(int inclusiveLo){
     int tail0s;
     foundElement:for(;;){
@@ -5614,6 +5674,39 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       return 128;
     }
     return inclusiveLo+tail0s;
+  }
+  private int removeThisOrLowerInRange(int inclusiveHi){
+    foundElement:for(;;){
+      switch(inclusiveHi>>6){
+        case 1:// [64,127]
+          int lead0s;
+          long word;
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word3)<<(-inclusiveHi-1)))!=64){
+            this.word3=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=63;
+        case 0:// [0,63]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word2)<<(-inclusiveHi-1)))!=64){
+            this.word2=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=-1;
+        case -1:// [-64,-1]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word1)<<(-inclusiveHi-1)))!=64){
+            this.word1=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+          inclusiveHi=-65;
+        default:// [-128,-65]
+          if((lead0s=Long.numberOfLeadingZeros((word=this.word0)<<(-inclusiveHi-1)))!=64){
+            this.word0=word&(~(1L<<(inclusiveHi-=lead0s)));
+            break foundElement;
+          }
+      }
+      return Integer.MIN_VALUE;
+    }
+    return inclusiveHi;
   }
   private int removeThisOrHigherInRange(int inclusiveLo){
     foundElement:for(;;){
@@ -6157,8 +6250,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public boolean remove(Object val){
       return root.remove(val);
     }
-    @Override public Byte lower(byte val){
-      return root.higher(val);
+    @Override public Byte ceiling(byte val){
+      return root.floor(val);
     }
     @Override public Byte floor(byte val){
       return root.ceiling(val);
@@ -6166,11 +6259,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public Byte higher(byte val){
       return root.lower(val);
     }
-    @Override public Byte ceiling(byte val){
-      return root.floor(val);
+    @Override public Byte lower(byte val){
+      return root.higher(val);
     }
-    @Override public byte lowerByte(byte val){
-      return root.higherByte(val);
+    @Override public byte byteCeiling(byte val){
+      return root.byteFloor(val);
     }
     @Override public byte byteFloor(byte val){
       return root.byteCeiling(val);
@@ -6178,11 +6271,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public byte higherByte(byte val){
       return root.lowerByte(val);
     }
-    @Override public byte byteCeiling(byte val){
-      return root.byteFloor(val);
+    @Override public byte lowerByte(byte val){
+      return root.higherByte(val);
     }
-    @Override public short lowerShort(short val){
-      return root.higherShort(val);
+    @Override public short shortCeiling(short val){
+      return root.shortFloor(val);
     }
     @Override public short shortFloor(short val){
       return root.shortCeiling(val);
@@ -6190,11 +6283,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public short higherShort(short val){
       return root.lowerShort(val);
     }
-    @Override public short shortCeiling(short val){
-      return root.shortFloor(val);
+    @Override public short lowerShort(short val){
+      return root.higherShort(val);
     }
-    @Override public int lowerInt(int val){
-      return root.higherInt(val);
+    @Override public int intCeiling(int val){
+      return root.intFloor(val);
     }
     @Override public int intFloor(int val){
       return root.intCeiling(val);
@@ -6202,8 +6295,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public int higherInt(int val){
       return root.lowerInt(val);
     }
-    @Override public int intCeiling(int val){
-      return root.intFloor(val);
+    @Override public int lowerInt(int val){
+      return root.higherInt(val);
     }
     @Override public int pollFirstInt(){
       return root.pollLastInt();
@@ -6211,8 +6304,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public int pollLastInt(){
       return root.pollFirstInt();
     }
-    @Override public long lowerLong(long val){
-      return root.higherLong(val);
+    @Override public long longCeiling(long val){
+      return root.longFloor(val);
     }
     @Override public long longFloor(long val){
       return root.longCeiling(val);
@@ -6220,11 +6313,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public long higherLong(long val){
       return root.lowerLong(val);
     }
-    @Override public long longCeiling(long val){
-      return root.longFloor(val);
+    @Override public long lowerLong(long val){
+      return root.higherLong(val);
     }
-    @Override public float lowerFloat(float val){
-      return root.higherFloat(val);
+    @Override public float floatCeiling(float val){
+      return root.floatFloor(val);
     }
     @Override public float floatFloor(float val){
       return root.floatCeiling(val);
@@ -6232,11 +6325,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public float higherFloat(float val){
       return root.lowerFloat(val);
     }
-    @Override public float floatCeiling(float val){
-      return root.floatFloor(val);
+    @Override public float lowerFloat(float val){
+      return root.higherFloat(val);
     }
-    @Override public double lowerDouble(double val){
-      return root.higherDouble(val);
+    @Override public double doubleCeiling(double val){
+      return root.doubleFloor(val);
     }
     @Override public double doubleFloor(double val){
       return root.doubleCeiling(val);
@@ -6244,8 +6337,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public double higherDouble(double val){
       return root.lowerDouble(val);
     }
-    @Override public double doubleCeiling(double val){
-      return root.doubleFloor(val);
+    @Override public double lowerDouble(double val){
+      return root.higherDouble(val);
     }
     @Override public OmniNavigableSet.OfByte descendingSet(){
       return root;
@@ -6276,63 +6369,87 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.HeadSet.Ascending(root=this.root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.TailSet.Ascending(root=this.root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MIN_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MAX_VALUE){
-            return tailSet(fromElement);
-          }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }
+        final int exclusiveTo;
+        switch(Integer.signum((exclusiveTo=toElement+1)-fromElement)){
+          case 1:
+            if(toElement==127){
+              if(fromElement==-128){
+                return this;
+              }else{
+                final ByteSetImpl.Checked root;
+                return new CheckedSubSet.TailSet.Ascending(root=this.root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(fromElement));
+              }
+            }else{
+              final var root=this.root;
+              if(fromElement==-128){
+                return new CheckedSubSet.HeadSet.Ascending(root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(toElement));
+              }else{
+                return new CheckedSubSet.BodySet.Ascending(root,(toElement<<8)|(fromElement&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(fromElement,toElement));
+              }
+            }
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Ascending(exclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(toElement==Byte.MIN_VALUE){
+          return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveTo;
+        return new CheckedSubSet.HeadSet.Ascending(root=this.root,inclusiveTo=toElement-1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(fromElement==Byte.MAX_VALUE){
+           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MAX_VALUE+1);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveFrom;
+        return new CheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom=fromElement+1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
+        final int inclusiveTo,inclusiveFrom;
+        switch(Integer.signum((inclusiveTo=toInclusive?toElement:toElement-1)-(inclusiveFrom=fromInclusive?fromElement:fromElement+1)+1)){
+        case 1:
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Checked root;
+              return new CheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
+            }
           }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
+            final var root=this.root;
+            if(inclusiveFrom==-128){
+              return new CheckedSubSet.HeadSet.Ascending(root,inclusiveTo,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
+            }else{
+              return new CheckedSubSet.BodySet.Ascending(root,(inclusiveTo<<8)|(inclusiveFrom&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(inclusiveFrom,inclusiveTo));
+            }
           }
-        }else{
-          if(toInclusive){
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }
+        case 0:
+          return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
+        default:
+          throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public String toString(){
@@ -6367,7 +6484,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(T[] dst){
         int numLeft;
         final ByteSetImpl.Checked root;
@@ -6378,7 +6494,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return dst;
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         int numLeft;
         final T[] dst;
@@ -6488,63 +6603,86 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.TailSet.Descending(root=this.root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Checked root;
+        return new CheckedSubSet.HeadSet.Descending(root=this.root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MAX_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MIN_VALUE){
-            return tailSet(toElement);
-          }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }
+        switch(Integer.signum(fromElement+1-toElement)){
+          case 1:
+            if(fromElement==127){
+              if(toElement==-128){
+                return this;
+              }else{
+                final ByteSetImpl.Checked root;
+                return new CheckedSubSet.TailSet.Descending(root=this.root,toElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(toElement));
+              }
+            }else{
+              final var root=this.root;
+              if(toElement==-128){
+                return new CheckedSubSet.HeadSet.Descending(root,fromElement,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(fromElement));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(root,(fromElement<<8)|(toElement&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(toElement,fromElement));
+              }
+            }
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(toElement);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(toElement==Byte.MAX_VALUE){
+          return new AbstractByteSet.EmptyView.Checked.Descending(128);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveTo;
+        return new CheckedSubSet.TailSet.Descending(root=this.root,inclusiveTo=toElement+1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(fromElement==Byte.MIN_VALUE){
+          return new AbstractByteSet.EmptyView.Checked.Descending(Byte.MIN_VALUE);
+        }
+        final ByteSetImpl.Checked root;
+        final int inclusiveFrom;
+        return new CheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom=fromElement-1,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
-          }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }
-        }else{
-          if(toInclusive){
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }
+        final int inclusiveFrom,inclusiveTo;
+        switch(Integer.signum((inclusiveFrom=fromInclusive?fromElement:fromElement-1)-(inclusiveTo=toInclusive?toElement:toElement+1)+1)){
+          case 1:
+            if(inclusiveTo==-128){
+              if(inclusiveFrom==127){
+                return this;
+              }else{
+                final ByteSetImpl.Checked root;
+                return new CheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
+              }
+            }else{
+              final var root=this.root;
+              if(inclusiveFrom==127){
+                return new CheckedSubSet.TailSet.Descending(root,inclusiveTo,(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countTailSetElements(inclusiveTo));
+              }else{
+                return new CheckedSubSet.BodySet.Descending(root,(inclusiveFrom<<8)|(inclusiveTo&0xff),(root.modCountAndSize&(~0x1ff))|((ByteSetImpl)root).countSubSetElements(inclusiveTo,inclusiveFrom));
+              }
+            }
+          case 0:
+            return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
+          default:
+            throw new IllegalArgumentException("out of bounds");
         }
       }
       @Override public String toString(){
@@ -6579,7 +6717,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(T[] dst){
         int numLeft;
         final ByteSetImpl.Checked root;
@@ -6590,7 +6727,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return dst;
       }
-      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         int numLeft;
         final T[] dst;
@@ -6755,8 +6891,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public boolean remove(Object val){
       return root.remove(val);
     }
-    @Override public Byte lower(byte val){
-      return root.higher(val);
+    @Override public Byte ceiling(byte val){
+      return root.floor(val);
     }
     @Override public Byte floor(byte val){
       return root.ceiling(val);
@@ -6764,11 +6900,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public Byte higher(byte val){
       return root.lower(val);
     }
-    @Override public Byte ceiling(byte val){
-      return root.floor(val);
+    @Override public Byte lower(byte val){
+      return root.higher(val);
     }
-    @Override public byte lowerByte(byte val){
-      return root.higherByte(val);
+    @Override public byte byteCeiling(byte val){
+      return root.byteFloor(val);
     }
     @Override public byte byteFloor(byte val){
       return root.byteCeiling(val);
@@ -6776,11 +6912,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public byte higherByte(byte val){
       return root.lowerByte(val);
     }
-    @Override public byte byteCeiling(byte val){
-      return root.byteFloor(val);
+    @Override public byte lowerByte(byte val){
+      return root.higherByte(val);
     }
-    @Override public short lowerShort(short val){
-      return root.higherShort(val);
+    @Override public short shortCeiling(short val){
+      return root.shortFloor(val);
     }
     @Override public short shortFloor(short val){
       return root.shortCeiling(val);
@@ -6788,11 +6924,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public short higherShort(short val){
       return root.lowerShort(val);
     }
-    @Override public short shortCeiling(short val){
-      return root.shortFloor(val);
+    @Override public short lowerShort(short val){
+      return root.higherShort(val);
     }
-    @Override public int lowerInt(int val){
-      return root.higherInt(val);
+    @Override public int intCeiling(int val){
+      return root.intFloor(val);
     }
     @Override public int intFloor(int val){
       return root.intCeiling(val);
@@ -6800,8 +6936,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public int higherInt(int val){
       return root.lowerInt(val);
     }
-    @Override public int intCeiling(int val){
-      return root.intFloor(val);
+    @Override public int lowerInt(int val){
+      return root.higherInt(val);
     }
     @Override public int pollFirstInt(){
       return root.pollLastInt();
@@ -6809,8 +6945,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public int pollLastInt(){
       return root.pollFirstInt();
     }
-    @Override public long lowerLong(long val){
-      return root.higherLong(val);
+    @Override public long longCeiling(long val){
+      return root.longFloor(val);
     }
     @Override public long longFloor(long val){
       return root.longCeiling(val);
@@ -6818,11 +6954,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public long higherLong(long val){
       return root.lowerLong(val);
     }
-    @Override public long longCeiling(long val){
-      return root.longFloor(val);
+    @Override public long lowerLong(long val){
+      return root.higherLong(val);
     }
-    @Override public float lowerFloat(float val){
-      return root.higherFloat(val);
+    @Override public float floatCeiling(float val){
+      return root.floatFloor(val);
     }
     @Override public float floatFloor(float val){
       return root.floatCeiling(val);
@@ -6830,11 +6966,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public float higherFloat(float val){
       return root.lowerFloat(val);
     }
-    @Override public float floatCeiling(float val){
-      return root.floatFloor(val);
+    @Override public float lowerFloat(float val){
+      return root.higherFloat(val);
     }
-    @Override public double lowerDouble(double val){
-      return root.higherDouble(val);
+    @Override public double doubleCeiling(double val){
+      return root.doubleFloor(val);
     }
     @Override public double doubleFloor(double val){
       return root.doubleCeiling(val);
@@ -6842,8 +6978,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public double higherDouble(double val){
       return root.lowerDouble(val);
     }
-    @Override public double doubleCeiling(double val){
-      return root.doubleFloor(val);
+    @Override public double lowerDouble(double val){
+      return root.higherDouble(val);
     }
     @Override public OmniNavigableSet.OfByte descendingSet(){
       return root;
@@ -6874,64 +7010,79 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.HeadSet.Ascending(root=this.root,toElement,((ByteSetImpl)root).countHeadSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.TailSet.Ascending(root=this.root,fromElement,((ByteSetImpl)root).countTailSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MIN_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MAX_VALUE){
-            return tailSet(fromElement);
+        if(toElement>=fromElement){
+          if(toElement==127){
+            if(fromElement==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.TailSet.Ascending(root=this.root,fromElement,((ByteSetImpl)root).countTailSetElements(fromElement));
+            }
           }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
+            final var root=this.root;
+            if(fromElement==-128){
+              return new UncheckedSubSet.HeadSet.Ascending(root,toElement,((ByteSetImpl)root).countHeadSetElements(toElement));
+            }else{
+              return new UncheckedSubSet.BodySet.Ascending(root,(toElement<<8)|(fromElement&0xff),((ByteSetImpl)root).countSubSetElements(fromElement,toElement));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.ASCENDING;
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(toElement==Byte.MIN_VALUE){
+          return AbstractByteSet.EmptyView.ASCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveTo;
+        return new UncheckedSubSet.HeadSet.Ascending(root=this.root,inclusiveTo=toElement-1,((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(fromElement==Byte.MAX_VALUE){
+           return AbstractByteSet.EmptyView.ASCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveFrom;
+        return new UncheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom=fromElement+1,((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
+        final int inclusiveTo,inclusiveFrom;
+        if((inclusiveTo=toInclusive?toElement:toElement-1)>=(inclusiveFrom=fromInclusive?fromElement:fromElement+1)){
+          if(inclusiveTo==127){
+            if(inclusiveFrom==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.TailSet.Ascending(root=this.root,inclusiveFrom,((ByteSetImpl)root).countTailSetElements(inclusiveFrom));
+            }
           }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }
-        }else{
-          if(toInclusive){
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
+            final var root=this.root;
+            if(inclusiveFrom==-128){
+              return new UncheckedSubSet.HeadSet.Ascending(root,inclusiveTo,((ByteSetImpl)root).countHeadSetElements(inclusiveTo));
+            }else{
+              return new UncheckedSubSet.BodySet.Ascending(root,(inclusiveTo<<8)|(inclusiveFrom&0xff),((ByteSetImpl)root).countSubSetElements(inclusiveFrom,inclusiveTo));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.ASCENDING;
       }
       @Override public String toString(){
         int numLeft;
@@ -7469,64 +7620,79 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         if(toElement==Byte.MIN_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.TailSet.Descending(root=this.root,toElement,((ByteSetImpl)root).countTailSetElements(toElement));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
         if(fromElement==Byte.MAX_VALUE){
           return this;
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        final ByteSetImpl.Unchecked root;
+        return new UncheckedSubSet.HeadSet.Descending(root=this.root,fromElement,((ByteSetImpl)root).countHeadSetElements(fromElement));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        if(fromElement==Byte.MAX_VALUE){
-          return headSet(toElement);
-        }else{
-          if(toElement==Byte.MIN_VALUE){
-            return tailSet(toElement);
+        if(fromElement>=toElement){
+          if(fromElement==127){
+            if(toElement==-128){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.TailSet.Descending(root=this.root,toElement,((ByteSetImpl)root).countTailSetElements(toElement));
+            }
           }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
+            final var root=this.root;
+            if(toElement==-128){
+              return new UncheckedSubSet.HeadSet.Descending(root,fromElement,((ByteSetImpl)root).countHeadSetElements(fromElement));
+            }else{
+              return new UncheckedSubSet.BodySet.Descending(root,(fromElement<<8)|(toElement&0xff),((ByteSetImpl)root).countSubSetElements(toElement,fromElement));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.DESCENDING;
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         if(inclusive){
           return headSet(toElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(toElement==Byte.MAX_VALUE){
+         return AbstractByteSet.EmptyView.DESCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveTo;
+        return new UncheckedSubSet.TailSet.Descending(root=this.root,inclusiveTo=toElement+1,((ByteSetImpl)root).countTailSetElements(inclusiveTo));
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         if(inclusive){
           return tailSet(fromElement);
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
+        if(fromElement==Byte.MIN_VALUE){
+          return AbstractByteSet.EmptyView.DESCENDING;
+        }
+        final ByteSetImpl.Unchecked root;
+        final int inclusiveFrom;
+        return new UncheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom=fromElement-1,((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
-        if(fromInclusive){
-          if(toInclusive){
-            return subSet(fromElement,toElement);
+        final int inclusiveFrom,inclusiveTo;
+        if((inclusiveFrom=fromInclusive?fromElement:fromElement-1)>=(inclusiveTo=toInclusive?toElement:toElement+1)){
+          if(inclusiveTo==-128){
+            if(inclusiveFrom==127){
+              return this;
+            }else{
+              final ByteSetImpl.Unchecked root;
+              return new UncheckedSubSet.HeadSet.Descending(root=this.root,inclusiveFrom,((ByteSetImpl)root).countHeadSetElements(inclusiveFrom));
+            }
           }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }
-        }else{
-          if(toInclusive){
-            //TODO
-            throw new omni.util.NotYetImplementedException();
-          }else{
-            //TODO
-            throw new omni.util.NotYetImplementedException();
+            final var root=this.root;
+            if(inclusiveFrom==127){
+              return new UncheckedSubSet.TailSet.Descending(root,inclusiveTo,((ByteSetImpl)root).countTailSetElements(inclusiveTo));
+            }else{
+              return new UncheckedSubSet.BodySet.Descending(root,(inclusiveFrom<<8)|(inclusiveTo&0xff),((ByteSetImpl)root).countSubSetElements(inclusiveTo,inclusiveFrom));
+            }
           }
         }
+        return AbstractByteSet.EmptyView.DESCENDING;
       }
       @Override public String toString(){
         int numLeft;
@@ -8091,7 +8257,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
   }
   private void clearBodySet(int boundInfo){
-    final int exclusiveTo=(boundInfo>>8);
+    final int exclusiveTo=(boundInfo>>8)+1;
     goToEnd:switch((boundInfo&=0xff)>>6){
       case 2:
         clearWord0:for(;;){
@@ -8145,7 +8311,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     transient final UncheckedSubSet parent;
     transient final int boundInfo;
     transient int size;
-    //TODO equals
+    //todo equals
     private UncheckedSubSet(ByteSetImpl.Unchecked root,int boundInfo,int size){
       this.root=root;
       this.parent=null;
@@ -8517,6 +8683,218 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         clearImpl();
       }
     }
+    abstract int ceilingImpl(double val);
+    abstract int floorImpl(double val);
+    abstract int higherImpl(double val);
+    abstract int lowerImpl(double val);
+    abstract int ceilingImpl(float val);
+    abstract int floorImpl(float val);
+    abstract int higherImpl(float val);
+    abstract int lowerImpl(float val);
+    abstract int ceilingImpl(long val);
+    abstract int floorImpl(long val);
+    abstract int higherImpl(long val);
+    abstract int lowerImpl(long val);
+    abstract int ceilingImpl(int val);
+    abstract int floorImpl(int val);
+    abstract int higherImpl(int val);
+    abstract int lowerImpl(int val);
+    abstract int ceilingImpl(byte val);
+    abstract int floorImpl(byte val);
+    abstract int higherImpl(byte val);
+    abstract int lowerImpl(byte val);
+    @Override public double doubleCeiling(double val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatCeiling(float val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long longCeiling(long val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intCeiling(int val){
+      if(this.size!=0){
+        return ceilingImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortCeiling(short val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteCeiling(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte ceiling(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=ceilingImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
+    @Override public double doubleFloor(double val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatFloor(float val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long longFloor(long val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intFloor(int val){
+      if(this.size!=0){
+        return floorImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortFloor(short val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteFloor(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte floor(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=floorImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
+    @Override public double lowerDouble(double val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float lowerFloat(float val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long lowerLong(long val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int lowerInt(int val){
+      if(this.size!=0){
+        return lowerImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short lowerShort(short val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte lowerByte(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte lower(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=lowerImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
+    @Override public double higherDouble(double val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (double)size;
+      }
+      return Double.NaN;
+    }
+    @Override public float higherFloat(float val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (float)size;
+      }
+      return Float.NaN;
+    }
+    @Override public long higherLong(long val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (long)size;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int higherInt(int val){
+      if(this.size!=0){
+        return higherImpl(val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short higherShort(short val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (short)size;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte higherByte(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (byte)size;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte higher(byte val){
+      int size;
+      if((size=this.size)!=0 && (size=higherImpl(val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)size;
+      }
+      return null;
+    }
     private static abstract class HeadSet extends UncheckedSubSet{
       private HeadSet(ByteSetImpl.Unchecked root,int boundInfo,int size){
         super(root,boundInfo,size);
@@ -8525,16 +8903,173 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(parent,boundInfo,size);
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
-        return root.headSetRemoveIfImpl(this.boundInfo-1,size,filter);
+        return root.headSetRemoveIfImpl(this.boundInfo,size,filter);
       }
       @Override boolean isInRange(int val){
-        return val<this.boundInfo;
+        return val<=this.boundInfo;
       }
       @Override void clearImpl(){
-        ((ByteSetImpl)root).clearHeadSet(this.boundInfo);
+        ((ByteSetImpl)root).clearHeadSet(this.boundInfo+1);
       }
       @Override int hashCodeImpl(int numLeft){
         return ((ByteSetImpl)root).uncheckedHashCode(this.boundInfo,numLeft);
+      }
+      @Override int ceilingImpl(byte val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange((int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(byte val){
+        final int inclTo;
+        return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+      }
+      @Override int higherImpl(byte val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(byte val){
+        if(val>Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(int val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(int val){
+        if(val>=Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(int val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(int val){
+        if(val>Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollLastInt(){
+        final int size;
+        final int ret;
+        if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo))!=Integer.MIN_VALUE){
+          this.size=size-1;
+          ((UncheckedSubSet)this).bubbleUpDecrementSize();
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollFirstInt(){
+        final int size;
+        final int ret;
+        if((size=this.size)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveFirst())!=Integer.MIN_VALUE){
+          this.size=size-1;
+          ((UncheckedSubSet)this).bubbleUpDecrementSize();
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(long val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(long val){
+        if(val>=Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(long val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(long val){
+        if(val>Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(float val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(float val){
+        if(val>=Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.intFloor(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(float val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val>=Byte.MIN_VALUE?TypeUtil.higherInt(val):Byte.MIN_VALUE,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(float val){
+        if(val>Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.lowerInt(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(double val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(double val){
+        if(val>=Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.intFloor(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(double val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val>=Byte.MIN_VALUE?TypeUtil.higherInt(val):Byte.MIN_VALUE,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(double val){
+        if(val>Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.lowerInt(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
       }
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -8573,6 +9108,41 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.HeadSet.Descending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -8580,6 +9150,72 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(Descending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
+        }
+        @Override int ceilingImpl(byte val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(byte val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(byte val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(byte val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(int val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(int val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(int val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(int val){
+          return super.higherImpl(val);
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public int pollFirstInt(){
+          return super.pollFirstInt();
+        }
+        @Override int ceilingImpl(long val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(long val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(long val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(long val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(float val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(float val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(float val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(float val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(double val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(double val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(double val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(double val){
+          return super.higherImpl(val);
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(this.boundInfo,numLeft,action);
@@ -8610,6 +9246,41 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedDescendingToArray(numLeft,dst);
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.HeadSet.Ascending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
         }
       }
     }
@@ -8711,6 +9382,163 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       }
+      @Override int ceilingImpl(byte val){
+        final int inclFrom;
+        return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+      }
+      @Override int floorImpl(byte val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,(int)val);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int higherImpl(byte val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(byte val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,((int)val)-1);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(int val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(int val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(int val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(int val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override public int pollLastInt(){
+        final int size;
+        final int ret;
+        if((size=this.size)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveLast())!=Integer.MIN_VALUE){
+          this.size=size-1;
+          ((UncheckedSubSet)this).bubbleUpDecrementSize();
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollFirstInt(){
+        final int size;
+        final int ret;
+        if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange(this.boundInfo))!=Integer.MIN_VALUE){
+          this.size=size-1;
+          ((UncheckedSubSet)this).bubbleUpDecrementSize();
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(long val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(long val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(long val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(long val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(float val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.intCeiling(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(float val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.intFloor(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(float val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.higherInt(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(float val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.lowerInt(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(double val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.intCeiling(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(double val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.intFloor(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(double val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.higherInt(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(double val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.lowerInt(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
+      }
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
           super(root,boundInfo,size);
@@ -8748,6 +9576,41 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedAscendingToArray(numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.TailSet.Descending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -8755,6 +9618,72 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(Descending parent,int boundInfo,int size){
           super(parent,boundInfo,size);
+        }
+        @Override int ceilingImpl(byte val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(byte val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(byte val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(byte val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(int val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(int val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(int val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(int val){
+          return super.higherImpl(val);
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public int pollFirstInt(){
+          return super.pollFirstInt();
+        }
+        @Override int ceilingImpl(long val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(long val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(long val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(long val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(float val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(float val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(float val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(float val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(double val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(double val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(double val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(double val){
+          return super.higherImpl(val);
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(numLeft,action);
@@ -8786,6 +9715,41 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.TailSet.Ascending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+         //TODO
+         throw new omni.util.NotYetImplementedException();
+        }
       }
     }
     private static abstract class BodySet extends UncheckedSubSet{
@@ -8797,16 +9761,196 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override boolean isInRange(int val){
         final int boundInfo;
-        return val<((boundInfo=this.boundInfo)>>8) && val>=((byte)(boundInfo&0x1ff));
+        return val<=((boundInfo=this.boundInfo)>>8) && val>=((byte)(boundInfo&0x1ff));
       }
       @Override void clearImpl(){
         ((ByteSetImpl)root).clearBodySet(this.boundInfo);
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
-        return root.headSetRemoveIfImpl((this.boundInfo>>8)-1,size,filter);
+        return root.headSetRemoveIfImpl((this.boundInfo>>8),size,filter);
       }
       @Override int hashCodeImpl(int numLeft){
         return ((ByteSetImpl)root).uncheckedHashCode(this.boundInfo>>8,numLeft);
+      }
+      @Override int ceilingImpl(byte val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(byte val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(byte val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(byte val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(int val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(int val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(int val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(int val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollLastInt(){
+        final int size;
+        final int ret;
+        if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo>>8))!=Integer.MIN_VALUE){
+          this.size=size-1;
+          ((UncheckedSubSet)this).bubbleUpDecrementSize();
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollFirstInt(){
+        final int size;
+        final int ret;
+        if((size=this.size)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange((byte)this.boundInfo))!=Integer.MIN_VALUE){
+          this.size=size-1;
+          ((UncheckedSubSet)this).bubbleUpDecrementSize();
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(long val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(long val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(long val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(long val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(float val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(float val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=(boundInfo>>=8)?TypeUtil.intFloor(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(float val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.higherInt(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(float val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))||val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?TypeUtil.lowerInt(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(double val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(double val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=(boundInfo>>=8)?TypeUtil.intFloor(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(double val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.higherInt(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(double val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))||val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?TypeUtil.lowerInt(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;  
       }
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -8845,6 +9989,41 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.BodySet.Descending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Unchecked root,int boundInfo,int size){
@@ -8852,6 +10031,72 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(UncheckedSubSet parent,int boundInfo,int size){
           super(parent,boundInfo,size);
+        }
+        @Override int ceilingImpl(byte val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(byte val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(byte val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(byte val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(int val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(int val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(int val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(int val){
+          return super.higherImpl(val);
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public int pollFirstInt(){
+          return super.pollFirstInt();
+        }
+        @Override int ceilingImpl(long val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(long val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(long val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(long val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(float val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(float val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(float val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(float val){
+          return super.higherImpl(val);
+        }
+        @Override int ceilingImpl(double val){
+          return super.floorImpl(val);
+        }
+        @Override int floorImpl(double val){
+          return super.ceilingImpl(val);
+        }
+        @Override int higherImpl(double val){
+          return super.lowerImpl(val);
+        }
+        @Override int lowerImpl(double val){
+          return super.higherImpl(val);
         }
         @Override void forEachImpl(int numLeft,ByteConsumer action){
           ((ByteSetImpl)root).uncheckedDescendingForEach(this.boundInfo>>8,numLeft,action);
@@ -8883,6 +10128,41 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,double[] dst){
           ((ByteSetImpl)root).uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          return new UncheckedSubSet.BodySet.Ascending(root,this.boundInfo,size);
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
     }
   }
@@ -8891,7 +10171,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     transient final CheckedSubSet parent;
     transient final int boundInfo;
     transient int modCountAndSize;
-    //TODO equals
+    //todo equals
     abstract boolean isInRange(int val);
     abstract void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst);
     abstract void toArrayImpl(int numLeft,ByteSetImpl root,Object[] dst);
@@ -9390,6 +10670,278 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         CheckedCollection.checkModCount(modCountAndSize&(~0x1ff),root.modCountAndSize&(~0x1ff));
       }
     }
+    abstract int ceilingImpl(ByteSetImpl root,double val);
+    abstract int floorImpl(ByteSetImpl root,double val);
+    abstract int higherImpl(ByteSetImpl root,double val);
+    abstract int lowerImpl(ByteSetImpl root,double val);
+    abstract int ceilingImpl(ByteSetImpl root,float val);
+    abstract int floorImpl(ByteSetImpl root,float val);
+    abstract int higherImpl(ByteSetImpl root,float val);
+    abstract int lowerImpl(ByteSetImpl root,float val);
+    abstract int ceilingImpl(ByteSetImpl root,long val);
+    abstract int floorImpl(ByteSetImpl root,long val);
+    abstract int higherImpl(ByteSetImpl root,long val);
+    abstract int lowerImpl(ByteSetImpl root,long val);
+    abstract int ceilingImpl(ByteSetImpl root,int val);
+    abstract int floorImpl(ByteSetImpl root,int val);
+    abstract int higherImpl(ByteSetImpl root,int val);
+    abstract int lowerImpl(ByteSetImpl root,int val);
+    abstract int ceilingImpl(ByteSetImpl root,byte val);
+    abstract int floorImpl(ByteSetImpl root,byte val);
+    abstract int higherImpl(ByteSetImpl root,byte val);
+    abstract int lowerImpl(ByteSetImpl root,byte val);
+    @Override public double doubleCeiling(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatCeiling(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long longCeiling(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intCeiling(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return ceilingImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortCeiling(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteCeiling(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte ceiling(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=ceilingImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
+    @Override public double doubleFloor(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float floatFloor(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long longFloor(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int intFloor(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return floorImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short shortFloor(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte byteFloor(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte floor(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=floorImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
+    @Override public double lowerDouble(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float lowerFloat(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long lowerLong(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int lowerInt(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return lowerImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short lowerShort(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte lowerByte(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte lower(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=lowerImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
+    @Override public double higherDouble(double val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (double)modCountAndSize;
+      }
+      return Double.NaN;
+    }
+    @Override public float higherFloat(float val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (float)modCountAndSize;
+      }
+      return Float.NaN;
+    }
+    @Override public long higherLong(long val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (long)modCountAndSize;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override public int higherInt(int val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0){
+        return higherImpl(root,val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override public short higherShort(short val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (short)modCountAndSize;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override public byte higherByte(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (byte)modCountAndSize;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override public Byte higher(byte val){
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),(root=this.root).modCountAndSize);
+      if((modCountAndSize&0x1ff)!=0 && (modCountAndSize=higherImpl(root,val))!=Integer.MIN_VALUE){
+        return (Byte)(byte)modCountAndSize;
+      }
+      return null;
+    }
     private static abstract class HeadSet extends CheckedSubSet{
       private HeadSet(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
         super(root,boundInfo,modCountAndSize);
@@ -9398,15 +10950,18 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(parent,boundInfo,modCountAndSize);
       }
       @Override void clearImpl(ByteSetImpl root){
-        root.clearHeadSet(this.boundInfo);
+        root.clearHeadSet(this.boundInfo+1);
       }
       @Override boolean isInRange(int val){
-        return val<this.boundInfo;
+        return val<=this.boundInfo;
       }
       @Override int hashCodeImpl(int numLeft,ByteSetImpl root){
         return root.uncheckedHashCode(this.boundInfo,numLeft);
       }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+        /*
         int numRemoved=0;
         final int rootModCountAndSize;
         long word0=root.word0;
@@ -9489,6 +11044,172 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         root.word0=word0;
         root.modCountAndSize=rootModCountAndSize+(modCount=(1<<9)-numRemoved);
         return modCount;
+        */
+      }
+      @Override int ceilingImpl(ByteSetImpl root,byte val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange((int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,byte val){
+        final int inclTo;
+        return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+      }
+      @Override int higherImpl(ByteSetImpl root,byte val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,byte val){
+        if(val>Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,int val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,int val){
+        if(val>=Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,int val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(ByteSetImpl root,int val){
+        if(val>Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollLastInt(){
+        final ByteSetImpl.Checked root;
+        int modCountAndSize;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+        final int ret;
+         if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo))!=Integer.MIN_VALUE){
+          this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+          root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+          ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollFirstInt(){
+        final ByteSetImpl.Checked root;
+        int modCountAndSize;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+        final int ret;
+         if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveFirst())!=Integer.MIN_VALUE){
+          this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+          root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+          ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,long val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,long val){
+        if(val>=Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,long val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(ByteSetImpl root,long val){
+        if(val>Byte.MIN_VALUE){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val>(inclTo=this.boundInfo)?inclTo:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,float val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,float val){
+        if(val>=Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.intFloor(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,float val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val>=Byte.MIN_VALUE?TypeUtil.higherInt(val):Byte.MIN_VALUE,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(ByteSetImpl root,float val){
+        if(val>Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.lowerInt(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,double val){
+        final int inclTo;
+        if(val<=(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<Byte.MIN_VALUE?Byte.MIN_VALUE:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,double val){
+        if(val>=Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.intFloor(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,double val){
+        final int inclTo;
+        if(val<(inclTo=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val>=Byte.MIN_VALUE?TypeUtil.higherInt(val):Byte.MIN_VALUE,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int lowerImpl(ByteSetImpl root,double val){
+        if(val>Byte.MIN_VALUE || val!=val){
+          final int inclTo;
+          return ((ByteSetImpl)root).getThisOrLowerInRange(val<=(inclTo=this.boundInfo)?TypeUtil.lowerInt(val):inclTo);
+        }
+        return Integer.MIN_VALUE;
       }
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9527,6 +11248,42 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedAscendingToArray(this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9534,6 +11291,72 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(Descending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,byte val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,byte val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,byte val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,byte val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,int val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,int val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,int val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,int val){
+          return super.higherImpl(root,val);
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public int pollFirstInt(){
+          return super.pollFirstInt();
+        }
+        @Override int ceilingImpl(ByteSetImpl root,long val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,long val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,long val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,long val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,float val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,float val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,float val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,float val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,double val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,double val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,double val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,double val){
+          return super.higherImpl(root,val);
         }
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedDescendingForEach(this.boundInfo,numLeft,action);
@@ -9565,6 +11388,42 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedDescendingToArray(numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
     }
     private static abstract class TailSet extends CheckedSubSet{
@@ -9585,6 +11444,171 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override int hashCodeImpl(int numLeft,ByteSetImpl root){
         return root.uncheckedHashCode(numLeft);
+      }
+      @Override int ceilingImpl(ByteSetImpl root,byte val){
+        final int inclFrom;
+        return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+      }
+      @Override int floorImpl(ByteSetImpl root,byte val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,(int)val);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int higherImpl(ByteSetImpl root,byte val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,byte val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,((int)val)-1);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(ByteSetImpl root,int val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,int val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,int val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,int val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override public int pollLastInt(){
+        final ByteSetImpl.Checked root;
+        int modCountAndSize;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+        final int ret;
+         if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).uncheckedRemoveLast())!=Integer.MIN_VALUE){
+          this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+          root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+          ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollFirstInt(){
+        final ByteSetImpl.Checked root;
+        int modCountAndSize;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+        final int ret;
+         if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange(this.boundInfo))!=Integer.MIN_VALUE){
+          this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+          root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+          ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,long val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,long val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,long val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:((int)val)+1);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,long val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo)){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>Byte.MAX_VALUE?Byte.MAX_VALUE:((int)val)-1);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(ByteSetImpl root,float val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.intCeiling(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,float val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.intFloor(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,float val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.higherInt(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,float val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.lowerInt(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,double val){
+        if(val<=Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.intCeiling(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int floorImpl(ByteSetImpl root,double val){
+        final int inclFrom;
+        if(val>=(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.intFloor(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,double val){
+        if(val<Byte.MAX_VALUE){
+          final int inclFrom;
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(inclFrom=this.boundInfo)?inclFrom:TypeUtil.higherInt(val));
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,double val){
+        final int inclFrom;
+        if(val>(inclFrom=this.boundInfo) || val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=Byte.MAX_VALUE?TypeUtil.lowerInt(val):Byte.MAX_VALUE);
+        }
+        return Integer.MIN_VALUE;
       }
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9623,6 +11647,42 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedAscendingToArray(numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9630,6 +11690,72 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(Descending parent,int boundInfo,int modCountAndSize){
           super(parent,boundInfo,modCountAndSize);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,byte val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,byte val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,byte val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,byte val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,int val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,int val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,int val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,int val){
+          return super.higherImpl(root,val);
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public int pollFirstInt(){
+          return super.pollFirstInt();
+        }
+        @Override int ceilingImpl(ByteSetImpl root,long val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,long val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,long val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,long val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,float val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,float val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,float val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,float val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,double val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,double val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,double val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,double val){
+          return super.higherImpl(root,val);
         }
         @Override void forEachImpl(int numLeft,ByteSetImpl root,ByteConsumer action){
           root.uncheckedDescendingForEach(numLeft,action);
@@ -9661,6 +11787,42 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedDescendingToArray(this.boundInfo,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
     }
     private static abstract class BodySet extends CheckedSubSet{
@@ -9678,6 +11840,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return root.uncheckedHashCode(this.boundInfo>>8,numLeft);
       }
       @Override int removeIfImpl(int modCount,int size,ByteSetImpl.Checked root,BytePredicate filter){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+        /*
         int numRemoved=0;
         long word0=root.word0,word1=root.word1,word2=root.word2,word3=root.word3;
         int inclusiveTo;
@@ -9785,9 +11950,198 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
           }
         }
+        */
       }
       @Override void clearImpl(ByteSetImpl root){
         root.clearBodySet(this.boundInfo);
+      }
+      @Override int ceilingImpl(ByteSetImpl root,byte val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(ByteSetImpl root,byte val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,byte val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,byte val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(ByteSetImpl root,int val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(ByteSetImpl root,int val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,int val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,int val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollLastInt(){
+        final ByteSetImpl.Checked root;
+        int modCountAndSize;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+        final int ret;
+         if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrLowerInRange(this.boundInfo>>8))!=Integer.MIN_VALUE){
+          this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+          root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+          ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override public int pollFirstInt(){
+        final ByteSetImpl.Checked root;
+        int modCountAndSize;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>>9);
+        final int ret;
+         if((modCountAndSize&0x1ff)!=0 && (ret=((ByteSetImpl)root).removeThisOrHigherInRange((byte)this.boundInfo))!=Integer.MIN_VALUE){
+          this.modCountAndSize=modCountAndSize+(modCountAndSize=(1<<9)-1);
+          root.modCountAndSize=rootModCountAndSize+modCountAndSize;
+          ((CheckedSubSet)this).bubbleUpModifyModCountAndSize(modCountAndSize);
+          return ret;
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,long val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:(int)val,inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(ByteSetImpl root,long val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val>(boundInfo>>=8)?boundInfo:(int)val);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,long val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:((int)val)+1,inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,long val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?((int)val)-1:boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int ceilingImpl(ByteSetImpl root,float val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(ByteSetImpl root,float val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=(boundInfo>>=8)?TypeUtil.intFloor(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,float val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.higherInt(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,float val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))||val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?TypeUtil.lowerInt(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int ceilingImpl(ByteSetImpl root,double val){
+        int boundInfo;
+        final int inclTo;
+        if(val<=(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.intCeiling(val),inclTo);
+        }
+        return Integer.MIN_VALUE;  
+      }
+      @Override int floorImpl(ByteSetImpl root,double val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>=(inclFrom=(byte)(boundInfo=this.boundInfo))){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=(boundInfo>>=8)?TypeUtil.intFloor(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int higherImpl(ByteSetImpl root,double val){
+        int boundInfo;
+        final int inclTo;
+        if(val<(inclTo=(boundInfo=this.boundInfo)>>8)){
+          return ((ByteSetImpl)root).getThisOrHigherInRange(val<(boundInfo=(byte)boundInfo)?boundInfo:TypeUtil.higherInt(val),inclTo);
+        }
+        return Integer.MIN_VALUE;
+      }
+      @Override int lowerImpl(ByteSetImpl root,double val){
+        int boundInfo;
+        final int inclFrom;
+        if(val>(inclFrom=(byte)(boundInfo=this.boundInfo))||val!=val){
+          return ((ByteSetImpl)root).getThisOrLowerInRange(inclFrom,val<=((boundInfo>>=8))?TypeUtil.lowerInt(val):boundInfo);
+        }
+        return Integer.MIN_VALUE;  
       }
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9826,6 +12180,42 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedAscendingToArray(this.boundInfo>>8,numLeft,dst);
         }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Checked root,int boundInfo,int modCountAndSize){
@@ -9839,6 +12229,72 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override String toStringImpl(int numLeft,ByteSetImpl root){
           return root.uncheckedDescendingToString(boundInfo>>8,numLeft);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,byte val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,byte val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,byte val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,byte val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,int val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,int val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,int val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,int val){
+          return super.higherImpl(root,val);
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public int pollFirstInt(){
+          return super.pollFirstInt();
+        }
+        @Override int ceilingImpl(ByteSetImpl root,long val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,long val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,long val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,long val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,float val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,float val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,float val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,float val){
+          return super.higherImpl(root,val);
+        }
+        @Override int ceilingImpl(ByteSetImpl root,double val){
+          return super.floorImpl(root,val);
+        }
+        @Override int floorImpl(ByteSetImpl root,double val){
+          return super.ceilingImpl(root,val);
+        }
+        @Override int higherImpl(ByteSetImpl root,double val){
+          return super.lowerImpl(root,val);
+        }
+        @Override int lowerImpl(ByteSetImpl root,double val){
+          return super.higherImpl(root,val);
         }
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,Byte[] dst){
           root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
@@ -9863,6 +12319,42 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override void toArrayImpl(int numLeft,ByteSetImpl root,double[] dst){
           root.uncheckedDescendingToArray((byte)this.boundInfo,numLeft,dst);
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniIterator.OfByte iterator(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte descendingSet(){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte headSet(byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
+        }
+        @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
+          //TODO
+          throw new omni.util.NotYetImplementedException();
         }
       }
     }
