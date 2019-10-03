@@ -462,10 +462,18 @@ public enum DataType{
         @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfBoolean)collection).sort((Comparator<? super Boolean>)sorter);
-            }else{
-                ((OmniList.OfBoolean)collection).sort((BooleanComparator)sorter);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfBoolean)collection).sort((Comparator<? super Boolean>)sorter);
+                }else{
+                    ((OmniList.OfBoolean)collection).sort((BooleanComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfBoolean)collection).sort((Comparator<? super Boolean>)sorter::compare);
+                }else{
+                    ((OmniList.OfBoolean)collection).sort((BooleanComparator)sorter::compare);
+                }
             }
         }
         @Override
@@ -928,17 +936,32 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.ByteOutput<?>)collection).removeByteAt(index);
         }
+        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfByte)collection).sort((Comparator<? super Byte>)sorter::compare);
-            }else{
-                ((OmniList.OfByte)collection).sort((ByteComparator)sorter::compare);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfByte)collection).sort((Comparator<? super Byte>)sorter);
+                }else{
+                    ((OmniList.OfByte)collection).sort((ByteComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfByte)collection).sort((Comparator<? super Byte>)sorter::compare);
+                }else{
+                    ((OmniList.OfByte)collection).sort((ByteComparator)sorter::compare);
+                }
             }
+            
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfByte)collection).unstableSort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfByte)collection).unstableSort((ByteComparator)sorter);
+            }else {
+                ((OmniList.OfByte)collection).unstableSort(sorter::compare);
+            }
+            
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -1381,17 +1404,31 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.CharOutput<?>)collection).removeCharAt(index);
         }
+        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfChar)collection).sort((Comparator<? super Character>)sorter::compare);
-            }else{
-                ((OmniList.OfChar)collection).sort((CharComparator)sorter::compare);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfChar)collection).sort((Comparator<? super Character>)sorter);
+                }else{
+                    ((OmniList.OfChar)collection).sort((CharComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfChar)collection).sort((Comparator<? super Character>)sorter::compare);
+                }else{
+                    ((OmniList.OfChar)collection).sort((CharComparator)sorter::compare);
+                }
             }
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfChar)collection).unstableSort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfChar)collection).unstableSort((CharComparator)sorter);
+            }else {
+                ((OmniList.OfChar)collection).unstableSort(sorter::compare);
+            }
+            
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -1831,18 +1868,31 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.ShortOutput<?>)collection).removeShortAt(index);
         }
+        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfShort)collection).sort((Comparator<? super Short>)sorter::compare);
-            }else{
-                ((OmniList.OfShort)collection).sort((ShortComparator)sorter::compare);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfShort)collection).sort((Comparator<? super Short>)sorter);
+                }else{
+                    ((OmniList.OfShort)collection).sort((ShortComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfShort)collection).sort((Comparator<? super Short>)sorter::compare);
+                }else{
+                    ((OmniList.OfShort)collection).sort((ShortComparator)sorter::compare);
+                }
             }
+           
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfShort)collection).unstableSort(sorter::compare);
-        }
+            if(sorter==null) {
+                ((OmniList.OfShort)collection).unstableSort((ShortComparator)sorter);
+            }else {
+                ((OmniList.OfShort)collection).unstableSort(sorter::compare);
+            }        }
         @Override
         public Object callElement(OmniQueue<?> collection){
             return ((OmniQueue.ShortOutput<?>)collection).shortElement();
@@ -2269,17 +2319,31 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.IntOutput<?>)collection).removeIntAt(index);
         }
+        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfInt)collection).sort((Comparator<? super Integer>)sorter::compare);
-            }else{
-                ((OmniList.OfInt)collection).sort((IntComparator)sorter::compare);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfInt)collection).sort((Comparator<? super Integer>)sorter);
+                }else{
+                    ((OmniList.OfInt)collection).sort((IntComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfInt)collection).sort((Comparator<? super Integer>)sorter::compare);
+                }else{
+                    ((OmniList.OfInt)collection).sort((IntComparator)sorter::compare);
+                }
             }
+            
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfInt)collection).unstableSort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfInt)collection).unstableSort((IntComparator)sorter);
+            }else {
+                ((OmniList.OfInt)collection).unstableSort(sorter::compare);
+            }
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -2699,17 +2763,31 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.LongOutput<?>)collection).removeLongAt(index);
         }
+        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfLong)collection).sort((Comparator<? super Long>)sorter::compare);
-            }else{
-                ((OmniList.OfLong)collection).sort((LongComparator)sorter::compare);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfLong)collection).sort((Comparator<? super Long>)sorter);
+                }else{
+                    ((OmniList.OfLong)collection).sort((LongComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfLong)collection).sort((Comparator<? super Long>)sorter::compare);
+                }else{
+                    ((OmniList.OfLong)collection).sort((LongComparator)sorter::compare);
+                }
             }
+            
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfLong)collection).unstableSort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfLong)collection).unstableSort((LongComparator)sorter);
+            }else {
+                ((OmniList.OfLong)collection).unstableSort(sorter::compare);
+            }
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -3150,17 +3228,31 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.FloatOutput<?>)collection).removeFloatAt(index);
         }
+        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfFloat)collection).sort((Comparator<? super Float>)sorter::compare);
-            }else{
-                ((OmniList.OfFloat)collection).sort((FloatComparator)sorter::compare);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfFloat)collection).sort((Comparator<? super Float>)sorter);
+                }else{
+                    ((OmniList.OfFloat)collection).sort((FloatComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfFloat)collection).sort((Comparator<? super Float>)sorter::compare);
+                }else{
+                    ((OmniList.OfFloat)collection).sort((FloatComparator)sorter::compare);
+                }
             }
+            
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfFloat)collection).unstableSort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfFloat)collection).unstableSort((FloatComparator)sorter);
+            }else {
+                ((OmniList.OfFloat)collection).unstableSort(sorter::compare);
+            }
         }
         @Override
         public Object callElement(OmniQueue<?> collection){
@@ -3524,17 +3616,31 @@ public enum DataType{
         public Object callRemoveAt(int index,OmniList<?> collection){
             return ((OmniList.DoubleOutput<?>)collection).removeDoubleAt(index);
         }
+        @SuppressWarnings("unchecked")
         @Override
         public void callStableSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
-            if(functionCallType.boxed){
-                ((OmniList.OfDouble)collection).sort((Comparator<? super Double>)sorter::compare);
-            }else{
-                ((OmniList.OfDouble)collection).sort((DoubleComparator)sorter::compare);
+            if(sorter==null) {
+                if(functionCallType.boxed){
+                    ((OmniList.OfDouble)collection).sort((Comparator<? super Double>)sorter);
+                }else{
+                    ((OmniList.OfDouble)collection).sort((DoubleComparator)sorter);
+                }
+            }else {
+                if(functionCallType.boxed){
+                    ((OmniList.OfDouble)collection).sort((Comparator<? super Double>)sorter::compare);
+                }else{
+                    ((OmniList.OfDouble)collection).sort((DoubleComparator)sorter::compare);
+                }
             }
+            
         }
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfDouble)collection).unstableSort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfDouble)collection).unstableSort((DoubleComparator)sorter);
+            }else {
+                ((OmniList.OfDouble)collection).unstableSort(sorter::compare);
+            }
         }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
@@ -3975,12 +4081,21 @@ public enum DataType{
             if(functionCallType.boxed){
                 throw DataType.cannotBeBoxed();
             }
-            ((OmniList.OfRef<Object>)collection).sort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfRef<Object>)collection).sort((Comparator<Object>)sorter);
+            }else {
+                ((OmniList.OfRef<Object>)collection).sort(sorter::compare);
+            }
+            
         }
         @SuppressWarnings("unchecked")
         @Override
         public void callUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
-            ((OmniList.OfRef<Object>)collection).unstableSort(sorter::compare);
+            if(sorter==null) {
+                ((OmniList.OfRef<Object>)collection).unstableSort((Comparator<Object>)sorter);
+            }else {
+                ((OmniList.OfRef<Object>)collection).unstableSort(sorter::compare);
+            }
         }
         @SuppressWarnings("unchecked")
         @Override

@@ -3239,6 +3239,126 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Double.NaN;
     }
+    private int ascendingItrForEachRemaining(int modCountAndLastRet,int currIndexAndNumLeft,ByteConsumer action){
+      int lastRet;
+      int currIndex;
+      try{
+        action.accept((byte)(lastRet=currIndex=currIndexAndNumLeft>>9));
+        if((currIndexAndNumLeft=(currIndexAndNumLeft&0x1ff)-1)!=0){
+          goToEnd:switch((++currIndex)>>6){
+            case -2:
+              for(long word=this.word0;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(++currIndex==-64){
+                  break;
+                }
+              }
+            case -1:
+              for(long word=this.word1;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(++currIndex==0){
+                  break;
+                }
+              }
+            case 0:
+              for(long word=this.word2;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(++currIndex==64){
+                  break;
+                }
+              }
+            case 1:
+              for(long word=this.word3;;++currIndex){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+              }
+            default:
+          }
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),this.modCountAndSize&(~0x1ff));    
+      }
+      return modCountAndLastRet|(0xff&lastRet);
+    }
+    private int descendingItrForEachRemaining(int modCountAndLastRet,int currIndexAndNumLeft,ByteConsumer action){
+      int lastRet;
+      int currIndex;
+      try{
+        action.accept((byte)(lastRet=currIndex=currIndexAndNumLeft>>9));
+        if((currIndexAndNumLeft=(currIndexAndNumLeft&0x1ff)-1)!=0){
+          goToEnd:switch((--currIndex)>>6){
+            case 1:
+              for(long word=this.word3;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(--currIndex==63){
+                  break;
+                }
+              }
+            case 0:
+              for(long word=this.word2;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(--currIndex==-1){
+                  break;
+                }
+              }
+            case -1:
+              for(long word=this.word1;;){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+                if(--currIndex==-65){
+                  break;
+                }
+              }
+            case -2:
+              for(long word=this.word0;;--currIndex){
+                if((word&(1L<<currIndex))!=0){
+                  action.accept((byte)(lastRet=currIndex));
+                  if(--currIndexAndNumLeft==0){
+                    break goToEnd;
+                  }
+                }
+              }
+            default:
+          }
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),this.modCountAndSize&(~0x1ff));    
+      }
+      return modCountAndLastRet|(0xff&lastRet);
+    }
     public static class Ascending extends Checked{
       public Ascending(){
         super();
@@ -5911,6 +6031,83 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       return (byte)ret;
     }
   }
+  private static class CheckedAscendingSubItr extends AbstractByteItr{
+    transient final CheckedSubSet parent;
+    transient int currIndexAndNumLeft;
+    transient int modCountAndLastRet;
+    private CheckedAscendingSubItr(CheckedSubSet parent,int currIndexAndNumLeft,int modCountAndLastRet){
+      this.parent=parent;
+      this.currIndexAndNumLeft=currIndexAndNumLeft;
+      this.modCountAndLastRet=modCountAndLastRet;
+    }
+    @Override public Object clone(){
+      return new CheckedAscendingSubItr(parent,currIndexAndNumLeft,modCountAndLastRet);
+    }
+    @Override public boolean hasNext(){
+      return this.currIndexAndNumLeft!=1<<16;
+    }
+    @Override public void forEachRemaining(ByteConsumer action){
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=1<<16){
+        this.modCountAndLastRet=parent.root.ascendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action);
+        this.currIndexAndNumLeft=1<<16;
+      }
+    }
+    @Override public void forEachRemaining(Consumer<? super Byte> action){
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=1<<16){
+        this.modCountAndLastRet=parent.root.ascendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action::accept);
+        this.currIndexAndNumLeft=1<<16;
+      }
+    }
+    @Override public byte nextByte(){
+      final ByteSetImpl.Checked root;
+      final int modCountAndLastRet;
+      CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=parent.root).modCountAndSize&(~0x1ff));
+      int currIndexAndNumLeft;
+      final int ret=(currIndexAndNumLeft=this.currIndexAndNumLeft)>>9;
+      switch(currIndexAndNumLeft&=0x1ff){
+        case 0:
+          throw new NoSuchElementException();
+        default:
+          this.currIndexAndNumLeft=(((ByteSetImpl)root).getThisOrHigher(ret+1)<<9)|(currIndexAndNumLeft-1);
+          break;
+        case 1:
+          this.currIndexAndNumLeft=1<<16;
+          break;
+      }
+      this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
+      return (byte)ret;
+    }
+    @Override public void remove(){
+      int lastRet;
+      int modCountAndLastRet;
+      if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)==0x1ff){
+        throw new IllegalStateException();
+      }
+      final CheckedSubSet parent;
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount(modCountAndLastRet&(~0x1ff),(modCountAndSize=(root=(parent=this.parent).root).modCountAndSize)&(~0x1ff));
+      switch((lastRet=(byte)lastRet)>>6){
+        case -2:
+          root.word0 &=(~(1L<<lastRet));
+          break;
+        case -1:
+          root.word1 &=(~(1L<<lastRet));
+          break;
+        case 0:
+          root.word2 &=(~(1L<<lastRet));
+          break;
+        default:
+          root.word3 &=(~(1L<<lastRet));
+      }
+      root.modCountAndSize=modCountAndSize+(modCountAndSize=((1<<9)-1));
+      parent.modCountAndSize+=modCountAndSize;
+      parent.bubbleUpModifyModCountAndSize(modCountAndSize);
+      this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
+    }
+  }
   private static class CheckedAscendingItr extends AbstractByteItr{
     transient final ByteSetImpl.Checked root;
     transient int currIndexAndNumLeft;
@@ -5962,79 +6159,18 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       root.modCountAndSize=modCountAndSize+((1<<9)-1);
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
     }
-    private void uncheckedForEachRemaining(int numLeft,int currIndex,ByteConsumer action){
-      //TODO move this to the root
-      int modCountAndLastRet=this.modCountAndLastRet;
-      final var root=this.root;
-      int lastRet;
-      try{
-        action.accept((byte)(lastRet=currIndex));
-        if(--numLeft!=0){
-          goToEnd:switch((++currIndex)>>6){
-            case -2:
-              for(long word=root.word0;;){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-                if(++currIndex==-64){
-                  break;
-                }
-              }
-            case -1:
-              for(long word=root.word1;;){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-                if(++currIndex==0){
-                  break;
-                }
-              }
-            case 0:
-              for(long word=root.word2;;){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-                if(++currIndex==64){
-                  break;
-                }
-              }
-            case 1:
-              for(long word=root.word3;;++currIndex){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-              }
-            default:
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),root.modCountAndSize&(~0x1ff));
-      }
-      this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
-      this.currIndexAndNumLeft=1<<16;
-    }
     @Override public void forEachRemaining(ByteConsumer action){
       final int currIndexAndNumLeft;
       if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=1<<16){
-        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action);
+        this.modCountAndLastRet=root.ascendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action);
+        this.currIndexAndNumLeft=1<<16;
       }
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
       final int currIndexAndNumLeft;
       if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=1<<16){
-        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action::accept);
+        this.modCountAndLastRet=root.ascendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action::accept);
+        this.currIndexAndNumLeft=1<<16;
       }
     }
     @Override public boolean hasNext(){
@@ -6053,6 +6189,83 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return (byte)ret;
       }
       throw new NoSuchElementException();
+    }
+  }
+  private static class CheckedDescendingSubItr extends AbstractByteItr{
+    transient final CheckedSubSet parent;
+    transient int currIndexAndNumLeft;
+    transient int modCountAndLastRet;
+    private CheckedDescendingSubItr(CheckedSubSet parent,int currIndexAndNumLeft,int modCountAndLastRet){
+      this.parent=parent;
+      this.currIndexAndNumLeft=currIndexAndNumLeft;
+      this.modCountAndLastRet=modCountAndLastRet;
+    }
+    @Override public Object clone(){
+      return new CheckedDescendingSubItr(parent,currIndexAndNumLeft,modCountAndLastRet);
+    }
+    @Override public boolean hasNext(){
+      return this.currIndexAndNumLeft!=(-129<<9);
+    }
+    @Override public void forEachRemaining(ByteConsumer action){
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=(-129)<<9){
+        this.modCountAndLastRet=parent.root.descendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action);
+        this.currIndexAndNumLeft=-129<<9;
+      }
+    }
+    @Override public void forEachRemaining(Consumer<? super Byte> action){
+      final int currIndexAndNumLeft;
+      if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=(-129)<<9){
+        this.modCountAndLastRet=parent.root.descendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action::accept);
+        this.currIndexAndNumLeft=-129<<9;
+      }
+    }
+    @Override public byte nextByte(){
+      final ByteSetImpl.Checked root;
+      final int modCountAndLastRet;
+      CheckedCollection.checkModCount((modCountAndLastRet=this.modCountAndLastRet)&(~0x1ff),(root=parent.root).modCountAndSize&(~0x1ff));
+      int currIndexAndNumLeft;
+      final int ret=(currIndexAndNumLeft=this.currIndexAndNumLeft)>>9;
+      switch(currIndexAndNumLeft&=0x1ff){
+        case 0:
+          throw new NoSuchElementException();
+        default:
+          this.currIndexAndNumLeft=(((ByteSetImpl)root).getThisOrLower(ret-1)<<9)|(currIndexAndNumLeft-1);
+          break;
+        case 1:
+          this.currIndexAndNumLeft=-129<<9;
+          break;
+      }
+      this.modCountAndLastRet=(modCountAndLastRet&(~0x1ff))+(ret&0xff);
+      return (byte)ret;
+    }
+    @Override public void remove(){
+      int lastRet;
+      int modCountAndLastRet;
+      if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)==0x1ff){
+        throw new IllegalStateException();
+      }
+      final CheckedSubSet parent;
+      final ByteSetImpl.Checked root;
+      int modCountAndSize;
+      CheckedCollection.checkModCount(modCountAndLastRet&(~0x1ff),(modCountAndSize=(root=(parent=this.parent).root).modCountAndSize)&(~0x1ff));
+      switch((lastRet=(byte)lastRet)>>6){
+        case -2:
+          root.word0 &=(~(1L<<lastRet));
+          break;
+        case -1:
+          root.word1 &=(~(1L<<lastRet));
+          break;
+        case 0:
+          root.word2 &=(~(1L<<lastRet));
+          break;
+        default:
+          root.word3 &=(~(1L<<lastRet));
+      }
+      root.modCountAndSize=modCountAndSize+(modCountAndSize=((1<<9)-1));
+      parent.modCountAndSize+=modCountAndSize;
+      parent.bubbleUpModifyModCountAndSize(modCountAndSize);
+      this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
     }
   }
   private static class CheckedDescendingItr extends AbstractByteItr{
@@ -6106,79 +6319,18 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       root.modCountAndSize=modCountAndSize+((1<<9)-1);
       this.modCountAndLastRet=(modCountAndLastRet+(1<<9))|0x1ff;
     }
-    private void uncheckedForEachRemaining(int numLeft,int currIndex,ByteConsumer action){
-      //TODO move this to the root
-      int modCountAndLastRet=this.modCountAndLastRet;
-      final var root=this.root;
-      int lastRet;
-      try{
-        action.accept((byte)(lastRet=currIndex));
-        if(--numLeft!=0){
-          goToEnd:switch((--currIndex)>>6){
-            case 1:
-              for(long word=root.word3;;){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-                if(--currIndex==63){
-                  break;
-                }
-              }
-            case 0:
-              for(long word=root.word2;;){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-                if(--currIndex==-1){
-                  break;
-                }
-              }
-            case -1:
-              for(long word=root.word1;;){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-                if(--currIndex==-65){
-                  break;
-                }
-              }
-            case -2:
-              for(long word=root.word0;;--currIndex){
-                if((word&(1L<<currIndex))!=0){
-                  action.accept((byte)(lastRet=currIndex));
-                  if(--numLeft==0){
-                    break goToEnd;
-                  }
-                }
-              }
-            default:
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),root.modCountAndSize&(~0x1ff));
-      }
-      this.modCountAndLastRet=modCountAndLastRet|(0xff&lastRet);
-      this.currIndexAndNumLeft=-129<<9;
-    }
     @Override public void forEachRemaining(ByteConsumer action){
       final int currIndexAndNumLeft;
       if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=(-129)<<9){
-        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action);
+        this.modCountAndLastRet=root.descendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action);
+        this.currIndexAndNumLeft=-129<<9;
       }
     }
     @Override public void forEachRemaining(Consumer<? super Byte> action){
       final int currIndexAndNumLeft;
       if((currIndexAndNumLeft=this.currIndexAndNumLeft)!=(-129<<9)){
-        uncheckedForEachRemaining(currIndexAndNumLeft&0x1ff,currIndexAndNumLeft>>9,action::accept);
+        this.modCountAndLastRet=root.descendingItrForEachRemaining(this.modCountAndLastRet,currIndexAndNumLeft,action::accept);
+        this.currIndexAndNumLeft=-129<<9;
       }
     }
     @Override public boolean hasNext(){
