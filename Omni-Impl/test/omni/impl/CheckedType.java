@@ -6,4 +6,7 @@ public enum CheckedType{
     CheckedType(boolean checked){
         this.checked=checked;
     }
+    public UnsupportedOperationException invalid() {
+      return new UnsupportedOperationException("Unsupported CheckedType "+this);
+    }
 }

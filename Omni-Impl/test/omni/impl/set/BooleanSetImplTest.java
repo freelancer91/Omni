@@ -1,27 +1,64 @@
 package omni.impl.set;
 
+import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import omni.api.OmniIterator;
+import omni.api.OmniNavigableSet;
+import omni.api.OmniNavigableSet.OfBoolean;
+import omni.function.BooleanComparator;
+import omni.impl.CheckedType;
+import omni.impl.DataType;
+import omni.impl.FunctionCallType;
+import omni.impl.IteratorRemoveScenario;
+import omni.impl.IteratorType;
+import omni.impl.MonitoredCollection;
+import omni.impl.MonitoredFunction;
+import omni.impl.MonitoredFunctionGen;
+import omni.impl.MonitoredNavigableSet;
+import omni.impl.MonitoredObjectOutputStream;
+import omni.impl.MonitoredRemoveIfPredicate;
+import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
+import omni.impl.MonitoredSet;
+import omni.impl.QueryCastType;
+import omni.impl.QueryVal;
+import omni.impl.QueryVal.QueryValModification;
+import omni.impl.SorterOrder;
+import omni.impl.StructType;
+import omni.util.NotYetImplementedException;
+import omni.util.TestExecutorService;
+
 public class BooleanSetImplTest{
-    /*
-    private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImplOld>{
+  
+  
+    
+    private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         final CheckedType checkedType;
-        final BooleanSetImplOld set;
+        final BooleanSetImpl set;
         int expectedState;
         BooleanSetImplMonitor(CheckedType checkedType){
             this.checkedType=checkedType;
             this.expectedState=0;
             if(checkedType.checked){
-                this.set=new BooleanSetImplOld.Checked();
+                this.set=new BooleanSetImpl.Checked();
             }else{
-                this.set=new BooleanSetImplOld();
+                this.set=new BooleanSetImpl();
             }
         }
         BooleanSetImplMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
             this.checkedType=checkedType;
-            Class<? extends BooleanSetImplOld> clazz;
+            Class<? extends BooleanSetImpl> clazz;
             if(checkedType.checked) {
-                clazz=BooleanSetImplOld.Checked.class;
+                clazz=BooleanSetImpl.Checked.class;
             }else {
-                clazz=BooleanSetImplOld.class;
+                clazz=BooleanSetImpl.class;
             }
             try{
                 this.set=clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
@@ -36,9 +73,9 @@ public class BooleanSetImplTest{
             this.checkedType=checkedType;
             this.expectedState=expectedState;
             if(checkedType.checked) {
-                this.set=new BooleanSetImplOld.Checked(expectedState);
+                this.set=new BooleanSetImpl.Checked(expectedState);
             }else {
-                this.set=new BooleanSetImplOld(expectedState);
+                this.set=new BooleanSetImpl(expectedState);
             }
         }
 
@@ -62,7 +99,7 @@ public class BooleanSetImplTest{
             return this.checkedType;
         }
 
-        @Override public BooleanSetImplOld getCollection(){
+        @Override public BooleanSetImpl getCollection(){
             return set;
         }
 
@@ -70,19 +107,19 @@ public class BooleanSetImplTest{
             return DataType.BOOLEAN;
         }
 
-        @Override public MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImplOld> getMonitoredIterator(){
+        @Override public MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImpl> getMonitoredIterator(){
             if(checkedType.checked) {
                 return new CheckedMonitoredItr();
             }
             return new UncheckedMonitoredItr();
         }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImplOld> getMonitoredIterator(IteratorType itrType){
+        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(IteratorType itrType){
             if(itrType!=IteratorType.AscendingItr) {
                 throw itrType.invalid();
             }
             return getMonitoredIterator();
         }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImplOld> getMonitoredIterator(int index,IteratorType itrType){
+        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(int index,IteratorType itrType){
             var itrMonitor=getMonitoredIterator(itrType);
             while(--index>=0 && itrMonitor.hasNext()) {
                 itrMonitor.iterateForward();
@@ -114,8 +151,8 @@ public class BooleanSetImplTest{
         }
 
         @Override public void verifyClone(Object clone){
-            var cast=(BooleanSetImplOld)clone;
-            Assertions.assertEquals(checkedType.checked,cast instanceof BooleanSetImplOld.Checked);
+            var cast=(BooleanSetImpl)clone;
+            Assertions.assertEquals(checkedType.checked,cast instanceof BooleanSetImpl.Checked);
             Assertions.assertEquals(set.state,cast.state);
         }
 
@@ -229,7 +266,7 @@ public class BooleanSetImplTest{
             //nothing to do
         }
 
-        abstract class AbstractMonitoredItr implements MonitoredSet.MonitoredSetIterator<OmniIterator.OfBoolean,BooleanSetImplOld>{
+        abstract class AbstractMonitoredItr implements MonitoredSet.MonitoredSetIterator<OmniIterator.OfBoolean,BooleanSetImpl>{
 
             final OmniIterator.OfBoolean itr;
             int expectedItrState;
@@ -242,7 +279,7 @@ public class BooleanSetImplTest{
                 return itr;
             }
 
-            @Override public MonitoredCollection<BooleanSetImplOld> getMonitoredCollection(){
+            @Override public MonitoredCollection<BooleanSetImpl> getMonitoredCollection(){
                 return BooleanSetImplMonitor.this;
             }
         }
@@ -1075,5 +1112,5 @@ public class BooleanSetImplTest{
             Assertions.assertEquals(expectedResult,actualResult);
         }
     }
-    */
+    
 }

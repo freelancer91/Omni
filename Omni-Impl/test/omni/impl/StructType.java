@@ -4,7 +4,9 @@ import java.util.EnumSet;
 public enum StructType{
     ArrDeq("ArrDeq"),ArrList("ArrList"),ArrStack("ArrStack"),ArrSubList("ArrSubList"),DblLnkList("DblLnkList"),
     DblLnkSubList("DblLnkSubList"),SnglLnkQueue("SnglLnkQueue"),SnglLnkStack("SnglLnkStack"),
-    BooleanSetImpl("BooleanSetImpl"),ByteSetImpl("ByteSetImpl"),
+    BooleanSetImpl("BooleanSetImpl"),
+    BooleanSetEmpty("BooleanSetEmpty"),
+    ByteSetImpl("ByteSetImpl"),
     IntegralOpenAddressHashSet("IntegralOpenAddressHashSet"),OpenAddressHashSet("OpenAddressHashSet"),
     PackedBooleanArrStack("PackedBooleanArrStack"),PackedBooleanArrList("PackedBooleanArrList"),PackedBooleanArrSubList("PackedBooleanArrSubList"),PackedBooleanArrDeq("PackedBooleanArrDeq");
     public final String name;
@@ -30,6 +32,8 @@ public enum StructType{
     private static EnumSet<MonitoredComparatorGen> initValidComparatorGens(StructType structType){
         switch(structType.name){
         case "BooleanSetImpl":
+        case "BooleanSetEmpty":
+          return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,MonitoredComparatorGen.ModCollectionDescending);
         case "ByteSetImpl":
         case "IntegralOpenAddressHashSet":
         case "OpenAddressHashSet":
@@ -66,7 +70,7 @@ public enum StructType{
     }
     private static EnumSet<IteratorType> initValidItrTypes(StructType structType){
         switch(structType.name){
-        case "BooleanSetImpl":
+        
         case "ByteSetImpl":
         case "IntegralOpenAddressHashSet":
         case "OpenAddressHashSet":
@@ -77,6 +81,8 @@ public enum StructType{
             return EnumSet.of(IteratorType.AscendingItr);
         case "ArrDeq":
         case "PackedBooleanArrDeq":
+        case "BooleanSetImpl":
+        case "BooleanSetEmpty":
             return EnumSet.of(IteratorType.AscendingItr,IteratorType.DescendingItr);
         case "ArrList":
         case "PackedBooleanArrList":
@@ -93,6 +99,7 @@ public enum StructType{
     private static EnumSet<MonitoredObjectGen> initValidMonitoredObjectGens(StructType structType){
         switch(structType.name){
         case "BooleanSetImpl":
+        case "BooleanSetEmpty":
         case "ByteSetImpl":
         case "IntegralOpenAddressHashSet":
         case "PackedBooleanArrList":
@@ -120,7 +127,8 @@ public enum StructType{
     private static EnumSet<MonitoredRemoveIfPredicateGen> initValidMonitoredRemoveIfPredicateGens(
             StructType structType){
         switch(structType.name){
-        
+        case "BooleanSetEmpty":
+          return EnumSet.noneOf(MonitoredRemoveIfPredicateGen.class);
         case "ArrList":
         case "ArrStack":
         case "ByteSetImpl":
@@ -184,6 +192,7 @@ public enum StructType{
         case "ArrList":
         case "ArrStack":
         case "BooleanSetImpl":
+        case "BooleanSetEmpty":
         case "ByteSetImpl":
         case "DblLnkList":
         case "IntegralOpenAddressHashSet":
@@ -206,6 +215,8 @@ public enum StructType{
     }
     private static EnumSet<MonitoredFunctionGen> initValidMonitoredFunctionGens(StructType structType){
         switch(structType.name){
+        case "BooleanSetEmpty":
+          return EnumSet.noneOf(MonitoredFunctionGen.class);
         case "ArrDeq":
         case "ArrList":
         case "ArrStack":
@@ -240,6 +251,7 @@ public enum StructType{
         case "ByteSetImpl":
         case "SnglLnkQueue":
         case "BooleanSetImpl":
+        case "BooleanSetEmpty":
             return QueryMethod.BASIC_COLLECTION_METHODS;
         case "SnglLnkStack":
         case "ArrStack":
@@ -261,6 +273,7 @@ public enum StructType{
     }
     private static EnumSet<DataType> initValidDataTypes(StructType structType){
         switch(structType.name){
+        case "BooleanSetEmpty":
         case "BooleanSetImpl":
         case "PackedBooleanArrList":
         case "PackedBooleanArrStack":

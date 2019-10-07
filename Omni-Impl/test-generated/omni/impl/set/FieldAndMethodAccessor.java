@@ -5,6 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import omni.impl.AbstractBooleanItr;
+import omni.impl.AbstractByteItr;
 final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
     super();
@@ -81,6 +84,13 @@ final class FieldAndMethodAccessor{
       throw new ExceptionInInitializerError(e);
     }
   }
+  static Object callMethod(Method method,Object obj,Object...params){
+    try{
+      return method.invoke(obj,params);
+    }catch(InvocationTargetException|IllegalAccessException e){
+      throw new Error(e);
+    }
+  }
   private static final char DOLLARSIGN=(char)36;
   static interface RefOpenAddressHashSet
     extends AbstractOpenAddressHashSet{
@@ -150,114 +160,228 @@ final class FieldAndMethodAccessor{
       }
     }
   }
-  /*
-  static interface BooleanSetImpl{
+  static interface AbstractBooleanSet{
+    static final AbstractBooleanItr EMPTY_ITR=omni.impl.set.AbstractBooleanSet.EMPTY_ITR;
+    static final omni.impl.set.AbstractBooleanSet.AscendingEmptyView CHECKED_EMPTY_ASCENDING_HEAD=omni.impl.set.AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
+    static final omni.impl.set.AbstractBooleanSet.DescendingEmptyView CHECKED_EMPTY_DESCENDING_HEAD=omni.impl.set.AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD;
+    static final omni.impl.set.AbstractBooleanSet.AscendingEmptyView CHECKED_EMPTY_ASCENDING_MIDDLE=omni.impl.set.AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
+    static final omni.impl.set.AbstractBooleanSet.DescendingEmptyView CHECKED_EMPTY_DESCENDING_MIDDLE=omni.impl.set.AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE;
+    static final omni.impl.set.AbstractBooleanSet.AscendingEmptyView CHECKED_EMPTY_ASCENDING_TAIL=omni.impl.set.AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL;
+    static final omni.impl.set.AbstractBooleanSet.DescendingEmptyView CHECKED_EMPTY_DESCENDING_TAIL=omni.impl.set.AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL;
+    static final omni.impl.set.AbstractBooleanSet.AscendingEmptyView UNCHECKED_EMPTY_ASCENDING=omni.impl.set.AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+    static final omni.impl.set.AbstractBooleanSet.DescendingEmptyView UNCHECKED_EMPTY_DESCENDING=omni.impl.set.AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+  }
+  static interface BooleanSetImpl extends AbstractBooleanSet{
     public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-      ((Externalizable)obj).writeExternal(oos);
+      oos.writeObject(obj);
+    }
+    public static omni.impl.set.BooleanSetImpl clone(Object obj){
+      return (omni.impl.set.BooleanSetImpl)((omni.impl.set.BooleanSetImpl)obj).clone();
     }
     public static int state(Object obj){
       return ((omni.impl.set.BooleanSetImpl)obj).state;
     }
-    public interface Itr{
-      static final Field rootField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"Itr","root");
-      public static omni.impl.set.BooleanSetImpl root(Object obj){
+    static interface Checked extends BooleanSetImpl{
+      public static omni.impl.set.BooleanSetImpl.Checked clone(Object obj){
+        return (omni.impl.set.BooleanSetImpl.Checked)((omni.impl.set.BooleanSetImpl.Checked)obj).clone();
+      }
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        oos.writeObject(obj);
+      }
+      public static int state(Object obj){
+        return ((omni.impl.set.BooleanSetImpl)obj).state;
+      }
+    }
+    static interface Descending extends BooleanSetImpl{
+      public static omni.impl.set.BooleanSetImpl.Descending clone(Object obj){
+        return (omni.impl.set.BooleanSetImpl.Descending)((omni.impl.set.BooleanSetImpl.Descending)obj).clone();
+      }
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        oos.writeObject(obj);
+      }
+      public static int state(Object obj){
+        return ((omni.impl.set.BooleanSetImpl)obj).state;
+      }
+      static interface Checked extends Descending{
+        public static omni.impl.set.BooleanSetImpl.Descending.Checked clone(Object obj){
+          return (omni.impl.set.BooleanSetImpl.Descending.Checked)((omni.impl.set.BooleanSetImpl.Descending.Checked)obj).clone();
+        }
+        public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+          oos.writeObject(obj);
+        }
+        public static int state(Object obj){
+          return ((omni.impl.set.BooleanSetImpl)obj).state;
+        }
+      }
+    }
+    static interface AbstractFullView extends AbstractBooleanSet{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AbstractFullView","root");
+      static omni.impl.set.BooleanSetImpl root(Object obj){
         return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
       }
-      static final Field itrStateField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"Itr","itrState");
-      public static int itrState(Object obj){
+    }
+    static interface DescendingView extends AbstractFullView{
+      public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"DescendingView","clone");
+      public static omni.impl.set.BooleanSetImpl.Descending clone(Object obj){
+        return (omni.impl.set.BooleanSetImpl.Descending)callMethod(cloneMethod,obj);
+      }
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        oos.writeObject(obj);
+      }
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static interface Checked extends DescendingView{
+        public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked","clone");
+        public static omni.impl.set.BooleanSetImpl.Descending.Checked clone(Object obj){
+          return (omni.impl.set.BooleanSetImpl.Descending.Checked)callMethod(cloneMethod,obj);
+        }
+        public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+          oos.writeObject(obj);
+        }
+        static omni.impl.set.BooleanSetImpl root(Object obj){
+          return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+        }
+      }
+    }
+    static interface AscendingView extends AbstractFullView{
+      public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AscendingView","clone");
+      public static omni.impl.set.BooleanSetImpl clone(Object obj){
+        return (omni.impl.set.BooleanSetImpl)callMethod(cloneMethod,obj);
+      }
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        oos.writeObject(obj);
+      }
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static interface Checked extends AscendingView{
+        public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked","clone");
+        public static omni.impl.set.BooleanSetImpl.Checked clone(Object obj){
+          return (omni.impl.set.BooleanSetImpl.Checked)callMethod(cloneMethod,obj);
+        }
+        public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+          oos.writeObject(obj);
+        }
+        static omni.impl.set.BooleanSetImpl root(Object obj){
+          return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+        }
+      }
+    }
+    static interface AbstractSingleView extends AbstractBooleanSet{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AbstractFullView","root");
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+    }
+    static interface UncheckedTrueView extends AbstractSingleView{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static interface Descending extends UncheckedTrueView{
+        static omni.impl.set.BooleanSetImpl root(Object obj){
+          return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+        }
+      }
+      static interface Checked extends UncheckedTrueView{
+        static omni.impl.set.BooleanSetImpl root(Object obj){
+          return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+        }
+        static interface Descending extends Checked{
+          static omni.impl.set.BooleanSetImpl root(Object obj){
+            return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+          }
+        }
+      }
+    }
+    static interface UncheckedFalseView extends AbstractSingleView{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static interface Descending extends UncheckedFalseView{
+        static omni.impl.set.BooleanSetImpl root(Object obj){
+          return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+        }
+      }
+      static interface Checked extends UncheckedFalseView{
+        static omni.impl.set.BooleanSetImpl root(Object obj){
+          return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+        }
+        static interface Descending extends Checked{
+          static omni.impl.set.BooleanSetImpl root(Object obj){
+            return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+          }
+        }
+      }
+    }
+    static interface UncheckedAscendingFullItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"UncheckedAscendingFullItr","root");
+      static final Field itrStateField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"UncheckedAscendingFullItr","itrState");
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static int itrState(Object obj){
         return getIntValue(itrStateField,obj);
       }
     }
-    public interface Checked extends BooleanSetImpl{
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        ((Externalizable)obj).writeExternal(oos);
+    static interface CheckedAscendingFullItr extends UncheckedAscendingFullItr{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
       }
-      public static int state(Object obj){
-        return ((omni.impl.set.BooleanSetImpl.Checked)obj).state;
+      static int itrState(Object obj){
+        return getIntValue(itrStateField,obj);
       }
-      public interface Itr{
-        static final Field rootField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","root");
-        public static omni.impl.set.BooleanSetImpl.Checked root(Object obj){
-          return (omni.impl.set.BooleanSetImpl.Checked)getValue(rootField,obj);
-        }
-        static final Field itrStateField=prepareFieldForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","itrState");
-        public static int itrState(Object obj){
-          return getIntValue(itrStateField,obj);
-        }
+    }
+    static interface UncheckedDescendingFullItr extends UncheckedAscendingFullItr{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static int itrState(Object obj){
+        return getIntValue(itrStateField,obj);
+      }
+    }
+    static interface CheckedDescendingFullItr extends CheckedAscendingFullItr{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static int itrState(Object obj){
+        return getIntValue(itrStateField,obj);
+      }
+    }
+    static interface UncheckedTrueItr extends UncheckedAscendingFullItr{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static int itrState(Object obj){
+        return getIntValue(itrStateField,obj);
+      }
+    }
+    static interface UncheckedFalseItr extends UncheckedTrueItr{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static int itrState(Object obj){
+        return getIntValue(itrStateField,obj);
+      }
+    }
+    static interface CheckedTrueItr extends UncheckedAscendingFullItr{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static int itrState(Object obj){
+        return getIntValue(itrStateField,obj);
+      }
+    }
+    static interface CheckedFalseItr extends CheckedTrueItr{
+      static omni.impl.set.BooleanSetImpl root(Object obj){
+        return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
+      }
+      static int itrState(Object obj){
+        return getIntValue(itrStateField,obj);
       }
     }
   }
-  */
-  /*
-  static interface ByteSetImpl{
-    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-      ((Externalizable)obj).writeExternal(oos);
-    }
-    public static long word0(Object obj){
-      return ((omni.impl.set.ByteSetImpl)obj).word0;
-    }
-    public static long word1(Object obj){
-      return ((omni.impl.set.ByteSetImpl)obj).word1;
-    }
-    public static long word2(Object obj){
-      return ((omni.impl.set.ByteSetImpl)obj).word2;
-    }
-    public static long word3(Object obj){
-      return ((omni.impl.set.ByteSetImpl)obj).word3;
-    }
-    public interface Itr{
-      static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"Itr","root");
-      public static omni.impl.set.ByteSetImpl root(Object obj){
-        return (omni.impl.set.ByteSetImpl)getValue(rootField,obj);
-      }
-      static final Field valOffsetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"Itr","valOffset");
-      public static int valOffset(Object obj){
-        return getIntValue(valOffsetField,obj);
-      }
-    }
-    public interface Checked extends ByteSetImpl{
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        ((Externalizable)obj).writeExternal(oos);
-      }
-      public static long word0(Object obj){
-        return ((omni.impl.set.ByteSetImpl)obj).word0;
-      }
-      public static long word1(Object obj){
-        return ((omni.impl.set.ByteSetImpl)obj).word1;
-      }
-      public static long word2(Object obj){
-        return ((omni.impl.set.ByteSetImpl)obj).word2;
-      }
-      public static long word3(Object obj){
-        return ((omni.impl.set.ByteSetImpl)obj).word3;
-      }
-      public static int modCount(Object obj){
-        return ((omni.impl.set.ByteSetImpl.Checked)obj).modCount;
-      }
-      public static int size(Object obj){
-        return ((omni.impl.set.ByteSetImpl.Checked)obj).size;
-      }
-      public interface Itr{
-        static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","root");
-        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
-          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
-        }
-        static final Field valOffsetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","valOffset");
-        public static int valOffset(Object obj){
-          return getIntValue(valOffsetField,obj);
-        }
-        static final Field modCountField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","modCount");
-        public static int modCount(Object obj){
-          return getIntValue(modCountField,obj);
-        }
-        static final Field lastRetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","lastRet");
-        public static int lastRet(Object obj){
-          return getIntValue(lastRetField,obj);
-        }
-      }
-    }
-  }
-  */
+  //TODO ByteSet
   static interface CharOpenAddressHashSet
     extends AbstractIntegralTypeOpenAddressHashSet{
     public static long word0(Object obj){
