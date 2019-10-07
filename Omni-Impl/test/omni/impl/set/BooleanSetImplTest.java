@@ -1,7 +1,7 @@
 package omni.impl.set;
 
-import java.lang.reflect.InvocationTargetException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import omni.api.OmniIterator;
 import omni.api.OmniNavigableSet;
 import omni.api.OmniNavigableSet.OfBoolean;
-import omni.function.BooleanComparator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
@@ -22,7 +21,6 @@ import omni.impl.IteratorType;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
-import omni.impl.MonitoredNavigableSet;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
@@ -30,14 +28,1058 @@ import omni.impl.MonitoredSet;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
-import omni.impl.SorterOrder;
+import omni.impl.SortOrder;
 import omni.impl.StructType;
 import omni.util.NotYetImplementedException;
 import omni.util.TestExecutorService;
 
 public class BooleanSetImplTest{
   
-  
+    private static class EmptyItrMonitor implements MonitoredCollection.MonitoredIterator<OmniIterator.OfBoolean,OmniNavigableSet.OfBoolean>{
+        final OmniIterator.OfBoolean itr;
+        final IteratorType itrType;
+        final AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean> root;
+
+        EmptyItrMonitor(OmniIterator.OfBoolean itr,AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean> root,IteratorType itrType){
+            this.itr=itr;
+            this.root=root;
+            this.itrType=itrType;
+        }
+        
+        @Override
+        public boolean nextWasJustCalled(){
+            return false;
+        }
+
+        @Override
+        public void updateItrNextState(){
+            //nothing to do
+        }
+
+        @Override
+        public void verifyNextResult(DataType outputType,Object result){
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void updateItrRemoveState(){
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public omni.api.OmniIterator.OfBoolean getIterator(){
+            return itr;
+        }
+
+        @Override
+        public IteratorType getIteratorType(){
+            return itrType;
+        }
+
+        @Override
+        public MonitoredCollection<OfBoolean> getMonitoredCollection(){
+            return root;
+        }
+
+        @Override
+        public boolean hasNext(){
+            return false;
+        }
+
+        @Override
+        public int getNumLeft(){
+            return 0;
+        }
+
+        @Override
+        public void verifyForEachRemaining(MonitoredFunction function){
+            Assertions.assertTrue(function.isEmpty());
+        }
+        @Override
+        public void verifyIteratorState() {
+           Assertions.assertSame(this,AbstractBooleanSet.EMPTY_ITR);
+        }
+        @Override
+        public void verifyCloneHelper(Object clone){
+            Assertions.assertSame(clone,itr);
+        }
+        
+    }
+    private static class FullItrMonitor implements MonitoredCollection.MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImpl>{
+        final BooleanSetImplMonitor2 root;
+        final OmniIterator.OfBoolean itr;
+        final IteratorType itrType;
+        int expectedItrState;
+        int lastRet;
+        
+        @Override
+        public boolean nextWasJustCalled(){
+            return lastRet!=-1;
+        }
+
+        @Override
+        public void updateItrNextState(){
+           switch(itrType) {
+            case AscendingItr:
+              if(root.checkedType.checked) {
+                  switch(this.expectedItrState<<2|root.expectedState){
+                  default:
+                    this.expectedItrState=0b110;
+                    break;
+                  case 0b00101:
+                    this.expectedItrState=0b100;
+                    break;
+                  case 0b01111:
+                    this.expectedItrState=0b000;
+                }
+                
+              }else {
+                  switch(this.expectedItrState){
+                  case 0b11:
+                    this.expectedItrState=0b10;
+                    break;
+                  case 0b10:
+                    this.expectedItrState=0b00;
+                    break;
+                  default:
+                    this.expectedItrState=0b00;
+                } 
+              }
+              break;
+            case DescendingItr:
+                if(root.checkedType.checked) {
+                    switch(this.expectedItrState<<2|root.expectedState){
+                    default:
+                      this.expectedItrState=0b100;
+                      break;
+                    case 0b01010:
+                      this.expectedItrState=0b110;
+                      break;
+                    case 0b01111:
+                      this.expectedItrState=0b000;
+                  }
+                }else {
+                    switch(this.expectedItrState){
+                    case 0b11:
+                      this.expectedItrState=0b01;
+                      break;
+                    case 0b01:
+                      this.expectedItrState=0b00;
+                      break;
+                    default:
+                      this.expectedItrState=0b00;
+                      break;
+                  } 
+                }
+                break;
+            default:
+                throw itrType.invalid();
+           }
+        }
+
+        @Override
+        public void verifyNextResult(DataType outputType,Object result){
+            boolean expected;
+            switch(itrType) {
+            case AscendingItr:
+              if(root.checkedType.checked) {
+                  switch(this.expectedItrState<<2|root.expectedState){
+                  default:
+                  expected=true;
+                  break;
+                    case 0b00101:
+                    case 0b01111:
+                  expected=false;
+                }
+                
+              }else {
+                 expected=this.expectedItrState==0b10;
+              }
+              break;
+            case DescendingItr:
+                if(root.checkedType.checked) {
+                  switch(this.expectedItrState<<2|root.expectedState){
+                    default:
+                      expected=false;
+                      break;
+                    case 0b01010:
+                    case 0b01111:
+                      expected=true;
+                  }
+                }else {
+                    expected=this.expectedItrState!=0b01;
+                }
+                break;
+            default:
+                throw itrType.invalid();
+           }
+           Assertions.assertEquals(outputType.convertVal(expected),result);
+        }
+
+        @Override
+        public void updateItrRemoveState(){
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public omni.api.OmniIterator.OfBoolean getIterator(){
+            return itr;
+        }
+
+        @Override
+        public IteratorType getIteratorType(){
+            return itrType;
+        }
+
+        @Override
+        public MonitoredCollection<BooleanSetImpl> getMonitoredCollection(){
+            return root;
+        }
+
+        @Override
+        public boolean hasNext(){
+            if(root.checkedType.checked) {
+                return expectedItrState<0b100;
+            }else {
+                return expectedItrState!=0;
+            }
+        }
+
+        @Override
+        public int getNumLeft(){
+            if(root.checkedType.checked) {
+                switch(expectedItrState) {
+                case 0b011:
+                  return 2;
+                case 0b010:
+                case 0b001:
+                case 0b000:
+                    return 1;
+                default:
+                    return 0;
+                }
+            }else {
+                return Integer.bitCount(expectedItrState);
+            }
+        }
+
+        @Override
+        public void verifyForEachRemaining(MonitoredFunction function){
+            if(root.checkedType.checked) {
+                switch(itrType) {
+                case AscendingItr:
+                    switch(expectedItrState) {
+                    case 0b011:
+                        Assertions.assertEquals(2,function.size());
+                        Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                        Assertions.assertEquals(Boolean.TRUE,function.get(1));
+                        expectedItrState=0b110;
+                        break;
+                    case 0b001:
+                        Assertions.assertEquals(1,function.size());
+                        Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                        expectedItrState=0b100;
+                        break;
+                    case 0b010:
+                    case 0b000:
+                        Assertions.assertEquals(1,function.size());
+                        Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                        expectedItrState=0b110;
+                        break;
+                    default:
+                        Assertions.assertTrue(function.isEmpty());
+                    }
+                    break;
+                case DescendingItr:
+                    switch(expectedItrState) {
+                    case 0b011:
+                        Assertions.assertEquals(2,function.size());
+                        Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                        Assertions.assertEquals(Boolean.FALSE,function.get(1));
+                        expectedItrState=0b100;
+                        break;
+                    case 0b010:
+                        Assertions.assertEquals(1,function.size());
+                        Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                        expectedItrState=0b110;
+                        break;
+                    case 0b001:
+                    case 0b000:
+                        Assertions.assertEquals(1,function.size());
+                        Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                        expectedItrState=0b100;
+                        break;
+                    default:
+                        Assertions.assertTrue(function.isEmpty());
+                    }
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+            }else {
+                switch(expectedItrState) {
+                case 0b11:
+                    Assertions.assertEquals(2,function.size());
+                    switch(itrType) {
+                    case AscendingItr:
+                        Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                        Assertions.assertEquals(Boolean.TRUE,function.get(1));
+                        break;
+                    case DescendingItr:
+                        Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                        Assertions.assertEquals(Boolean.FALSE,function.get(1));
+                        break;
+                    default:
+                        throw itrType.invalid();
+                    }
+                    break;
+                case 0b10:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                    break;
+                case 0b01:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                    break;
+                case 0b00:
+                    Assertions.assertTrue(function.isEmpty());
+                    break;
+                default:
+                    throw new IllegalStateException("expectedItrState = "+expectedItrState);
+                }
+                expectedItrState=0b00;
+            }
+        }
+
+        @Override
+        public void verifyCloneHelper(Object clone){
+           if(root.checkedType.checked) {
+               
+           }else {
+               
+           }
+        }
+        
+    }
+    
+    private static class BooleanSetImplMonitor2 extends AbstractBooleanSetMonitor<BooleanSetImpl>{
+        int expectedState;
+        BooleanSetImplMonitor2(BooleanSetImpl set,int expectedState,CheckedType checkedType,SortOrder sortOrder){
+            super(set,checkedType,sortOrder);
+            this.expectedState=expectedState;
+        }
+        private IllegalStateException illegalState() {
+            return new IllegalStateException("state = "+expectedState);
+        }
+        @Override
+        public void updateAddState(Object inputVal,DataType inputType,boolean result){
+            Assertions.assertEquals(DataType.BOOLEAN,inputType);
+            switch(expectedState) {
+            case 0b00:
+                Assertions.assertTrue(result);
+                if((boolean)inputVal) {
+                    expectedState=0b10;
+                }else {
+                    expectedState=0b01;
+                }
+                break;
+            case 0b01:
+                Assertions.assertEquals(result,(boolean)inputVal);
+                if(result) {
+                    expectedState=0b11;
+                }
+                break;
+            case 0b10:
+                Assertions.assertEquals(!result,(boolean)inputVal);
+                if(result) {
+                    expectedState=0b11;
+                }
+                break;
+            case 0b11:
+                Assertions.assertFalse(result);
+                break;
+            default:
+                throw illegalState();
+            }
+        }
+        @Override
+        public void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
+            boolean boolVal=(boolean)DataType.BOOLEAN.convertVal(inputType,queryVal.getInputVal(inputType,modification));
+            switch(expectedState) {
+            case 0b01:
+                Assertions.assertFalse(boolVal);
+                expectedState=0b00;
+                break;
+            case 0b10:
+                Assertions.assertTrue(boolVal);
+                expectedState=0b00;
+                break;
+            case 0b11:
+                if(boolVal) {
+                    expectedState=0b01;
+                }else {
+                    expectedState=0b10;
+                }
+                break;
+            default:
+                throw illegalState();
+            }
+        }
+        private Object get(int iterationIndex,DataType outputType,SortOrder sortOrder)
+        {
+            switch(expectedState) {
+            case 0b00:
+                throw new UnsupportedOperationException("iteration index = "+iterationIndex);
+            case 0b01:
+                if(iterationIndex==0) {
+                    return outputType.convertVal(false);
+                }
+                throw new UnsupportedOperationException("iteration index = "+iterationIndex);
+            case 0b10:
+                if(iterationIndex==0) {
+                    return outputType.convertVal(true);
+                }
+                throw new UnsupportedOperationException("iteration index = "+iterationIndex);
+            case 0b11:
+                switch(iterationIndex) {
+                case 0:
+                    switch(sortOrder) {
+                    case Ascending:
+                        return outputType.convertVal(false);
+                    case Descending:
+                        return outputType.convertVal(true);
+                    default:
+                        throw sortOrder.invalid();
+                    }
+                case 1:
+                    switch(sortOrder) {
+                    case Ascending:
+                        return outputType.convertVal(true);
+                    case Descending:
+                        return outputType.convertVal(false);
+                    default:
+                        throw sortOrder.invalid();
+                    }
+                default:
+                    throw new UnsupportedOperationException("iteration index = "+iterationIndex);
+                }
+            default:
+                throw illegalState();
+            }
+        }
+        @Override
+        public Object get(int iterationIndex,DataType outputType){
+            return get(iterationIndex,outputType,sortOrder);
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(int index,
+                IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public StructType getStructType(){
+            return StructType.BooleanSetImpl;
+        }
+        @Override
+        public void modCollection(){
+            switch(expectedState) {
+            case 0b00:
+                switch(sortOrder) {
+                case Ascending:
+                    set.addFalse();
+                    expectedState=0b01;
+                    break;
+                case Descending:
+                    set.addTrue();
+                    expectedState=0b10;
+                    break;
+                default:
+                    throw sortOrder.invalid();
+                }
+                break;
+            case 0b01:
+                set.addTrue();
+                expectedState=0b11;
+                break;
+            case 0b10:
+                set.addFalse();
+                expectedState=0b11;
+                break;
+            case 0b11:
+                switch(sortOrder) {
+                case Ascending:
+                    set.removeFalse();
+                    expectedState=0b10;
+                    break;
+                case Descending:
+                    set.removeTrue();
+                    expectedState=0b01;
+                    break;
+                default:
+                    throw sortOrder.invalid();
+                }
+                break;
+            default:
+                throw illegalState();
+            }
+        }
+        @Override
+        public int size(){
+            switch(expectedState) {
+            case 0b00:
+                return 0;
+            case 0b01:
+            case 0b10:
+                return 1;
+            case 0b11:
+                return 2;
+            default:
+                throw illegalState();
+            }
+        }
+        @Override
+        public void updateClearState(){
+            expectedState=0b00;
+        }
+        @Override
+        public void updateCollectionState(){
+            expectedState=set.state;
+        }
+        @Override
+        public void verifyCollectionState(){
+            Assertions.assertEquals(expectedState,set.state);
+        }
+        @Override
+        public void verifyClone(Object clone){
+            Assertions.assertNotSame(set,clone);
+            switch(sortOrder) {
+            case Ascending:
+                if(checkedType.checked) {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl.Checked);
+                }else {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl);
+                    Assertions.assertFalse(clone instanceof BooleanSetImpl.Descending);
+                    Assertions.assertFalse(clone instanceof BooleanSetImpl.Checked);
+                }
+                break;
+            case Descending:
+                if(checkedType.checked) {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl.Descending.Checked);
+                }else {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl.Descending);
+                    Assertions.assertFalse(clone instanceof BooleanSetImpl.Descending.Checked);
+                }
+                break;
+            default:
+                throw sortOrder.invalid();
+            }
+            Assertions.assertEquals(expectedState,((BooleanSetImpl)clone).state);
+        }
+        @Override
+        public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+            
+            switch(expectedState) {
+            case 0b00:
+                Assertions.assertFalse(result);
+                Assertions.assertTrue(filter.removedVals.isEmpty());
+                Assertions.assertTrue(filter.retainedVals.isEmpty());
+                Assertions.assertEquals(0,filter.numCalls);
+                Assertions.assertEquals(0,filter.numRemoved);
+                Assertions.assertEquals(0,filter.numRetained);
+                break;
+            case 0b01:
+                Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+                Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                Assertions.assertNotEquals(filter.removedVals.contains(Boolean.FALSE),filter.retainedVals.contains(Boolean.FALSE));
+                Assertions.assertEquals(1,filter.numCalls);
+                if(result) {
+                    Assertions.assertEquals(1,filter.numRemoved);
+                    Assertions.assertEquals(0,filter.numRetained);
+                    Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
+                    expectedState=0b00;
+                }else {
+                    Assertions.assertEquals(0,filter.numRemoved);
+                    Assertions.assertEquals(1,filter.numRetained);
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+                }
+                break;
+            case 0b10:
+                Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+                Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                Assertions.assertNotEquals(filter.removedVals.contains(Boolean.TRUE),filter.retainedVals.contains(Boolean.TRUE));
+                Assertions.assertEquals(1,filter.numCalls);
+                if(result) {
+                    Assertions.assertEquals(1,filter.numRemoved);
+                    Assertions.assertEquals(0,filter.numRetained);
+                    Assertions.assertTrue(filter.removedVals.contains(Boolean.TRUE));
+                    expectedState=0b00;
+                }else {
+                    Assertions.assertEquals(0,filter.numRemoved);
+                    Assertions.assertEquals(1,filter.numRetained);
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+                }
+                break;
+            case 0b11:
+                Assertions.assertNotEquals(filter.removedVals.contains(Boolean.TRUE),filter.retainedVals.contains(Boolean.TRUE));
+                Assertions.assertNotEquals(filter.removedVals.contains(Boolean.FALSE),filter.retainedVals.contains(Boolean.FALSE));
+                Assertions.assertEquals(2,filter.numCalls);
+                if(result) {
+                    if(filter.removedVals.contains(Boolean.TRUE)) {
+                        if(filter.removedVals.contains(Boolean.FALSE)) {
+                            Assertions.assertEquals(0,filter.numRetained);
+                            Assertions.assertEquals(2,filter.numRemoved);
+                            expectedState=0b00;
+                        }else {
+                            Assertions.assertEquals(1,filter.numRetained);
+                            Assertions.assertEquals(1,filter.numRemoved);
+                            expectedState=0b01;
+                        }
+                    }else {
+                        Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
+                        Assertions.assertEquals(1,filter.numRetained);
+                        Assertions.assertEquals(1,filter.numRemoved);
+                        expectedState=0b10;
+                    }
+                }else {
+                    Assertions.assertEquals(0,filter.numRemoved);
+                    Assertions.assertEquals(2,filter.numRetained);
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+                }
+                break;
+            default:
+                throw illegalState();
+            }
+        }
+        @Override
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
+            //nothing to do
+        }
+        @Override
+        public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+            switch(sortOrder) {
+            case Ascending:
+                if(checkedType.checked) {
+                    FieldAndMethodAccessor.BooleanSetImpl.Checked.writeObject(set,oos);
+                }else {
+                    FieldAndMethodAccessor.BooleanSetImpl.writeObject(set,oos);
+                }
+                break;
+            case Descending:
+                if(checkedType.checked) {
+                    FieldAndMethodAccessor.BooleanSetImpl.Descending.Checked.writeObject(set,oos);
+                }else {
+                    FieldAndMethodAccessor.BooleanSetImpl.Descending.writeObject(set,oos);
+                }
+                break;
+            default:
+                throw sortOrder.invalid();
+            
+            }
+           
+        }
+        
+    }
+    private static class FullViewMonitor extends AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean>{
+        final BooleanSetImplMonitor2 root;
+        FullViewMonitor(OmniNavigableSet.OfBoolean set,BooleanSetImplMonitor2 root,CheckedType checkedType,SortOrder sortOrder){
+            super(set,checkedType,sortOrder);
+            this.root=root;
+        }
+        @Override
+        public void updateAddState(Object inputVal,DataType inputType,boolean result){
+            root.updateAddState(inputVal,inputType,result);
+        }
+        @Override
+        public void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
+            root.removeFromExpectedState(inputType,queryVal,modification);
+        }
+        @Override
+        public Object get(int iterationIndex,DataType outputType){
+            return root.get(iterationIndex,outputType,root.sortOrder.reverse());
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(int index,
+                IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public StructType getStructType(){
+            return StructType.BooleanSetFullView;
+        }
+        @Override
+        public void modCollection(){
+            root.modCollection();
+        }
+        @Override
+        public int size(){
+            return root.size();
+        }
+        @Override
+        public void updateClearState(){
+            root.updateClearState();
+        }
+        @Override
+        public void updateCollectionState(){
+            root.updateCollectionState();
+        }
+        @Override
+        public void verifyCollectionState(){
+            root.verifyCollectionState();
+            Assertions.assertSame(root.set,FieldAndMethodAccessor.BooleanSetImpl.AbstractFullView.root(set));
+        }
+        @Override
+        public void verifyClone(Object clone){
+            Assertions.assertNotSame(set,clone);
+            Assertions.assertNotSame(root.set,clone);
+            switch(root.sortOrder) {
+            case Descending:
+                if(checkedType.checked) {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl.Checked);
+                }else {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl);
+                    Assertions.assertFalse(clone instanceof BooleanSetImpl.Descending);
+                    Assertions.assertFalse(clone instanceof BooleanSetImpl.Checked);
+                }
+                break;
+            case Ascending:
+                if(checkedType.checked) {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl.Descending.Checked);
+                }else {
+                    Assertions.assertTrue(clone instanceof BooleanSetImpl.Descending);
+                    Assertions.assertFalse(clone instanceof BooleanSetImpl.Descending.Checked);
+                }
+                break;
+            default:
+                throw sortOrder.invalid();
+            }
+            Assertions.assertEquals(root.expectedState,((BooleanSetImpl)clone).state);
+        }
+        @Override
+        public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+            root.verifyRemoveIf(result,filter);
+        }
+        @Override
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
+            //nothing to do
+        }
+        @Override
+        public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+            switch(sortOrder) {
+            case Ascending:
+                if(checkedType.checked) {
+                    FieldAndMethodAccessor.BooleanSetImpl.AscendingView.Checked.writeObject(set,oos);
+                }else {
+                    FieldAndMethodAccessor.BooleanSetImpl.AscendingView.writeObject(set,oos);
+                }
+                break;
+            case Descending:
+                if(checkedType.checked) {
+                    FieldAndMethodAccessor.BooleanSetImpl.DescendingView.Checked.writeObject(set,oos);
+                }else {
+                    FieldAndMethodAccessor.BooleanSetImpl.DescendingView.writeObject(set,oos);
+                }
+                break;
+            default:
+                throw sortOrder.invalid();
+            
+            }
+        }
+        
+    }
+    private static class EmptyViewMonitor extends AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean>{
+        final int position;
+        EmptyViewMonitor(OmniNavigableSet.OfBoolean set,int position,CheckedType checkedType,SortOrder sortOrder){
+            super(set,checkedType,sortOrder);
+            this.position=position;
+        }
+        @Override
+        public void updateAddState(Object inputVal,DataType inputType,boolean result){
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public Object get(int iterationIndex,DataType outputType){
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(int index,
+                IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public StructType getStructType(){
+            return StructType.BooleanSetEmpty;
+        }
+        @Override
+        public void modCollection(){
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public int size(){
+            return 0;
+        }
+        @Override
+        public void updateClearState(){
+            //nothing to do
+        }
+        @Override
+        public void updateCollectionState(){
+            //nothing to do
+        }
+        @Override
+        public void verifyCollectionState(){
+            switch(sortOrder) {
+            case Ascending:
+                if(checkedType.checked) {
+                    switch(position) {
+                    case 0:
+                        Assertions.assertSame(this,AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD);
+                        break;
+                    case 1:
+                        Assertions.assertSame(this,AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE);
+                        break;
+                    case 2:
+                        Assertions.assertSame(this,AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_TAIL);
+                        break;
+                    default:
+                        throw new IllegalStateException();
+                    }
+                }else {
+                    Assertions.assertSame(this,AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING);
+                }
+                break;
+            case Descending:
+                if(checkedType.checked) {
+                    switch(position) {
+                    case 0:
+                        Assertions.assertSame(this,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD);
+                        break;
+                    case 1:
+                        Assertions.assertSame(this,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE);
+                        break;
+                    case 2:
+                        Assertions.assertSame(this,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL);
+                        break;
+                    default:
+                        throw new IllegalStateException();
+                    }
+                }else {
+                    Assertions.assertSame(this,AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING);
+                }
+                break;
+            default:
+                throw sortOrder.invalid();
+            }
+        }
+        @Override
+        public void verifyClone(Object clone){
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+            Assertions.assertFalse(result);
+            Assertions.assertEquals(0,filter.numCalls);
+            Assertions.assertEquals(0,filter.numRemoved);
+            Assertions.assertEquals(0,filter.numRetained);
+            Assertions.assertTrue(filter.removedVals.isEmpty());
+            Assertions.assertTrue(filter.retainedVals.isEmpty());
+        }
+        @Override
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
+            //nothing to do
+        }
+        @Override
+        public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+            throw new UnsupportedOperationException();
+        }
+        
+    }
+    private static class SingleViewMonitor extends AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean>{
+        final BooleanSetImplMonitor2 root;
+        final boolean viewedVal;
+        private int getMask() {
+            if(viewedVal) {
+                return 0b10;
+            }else {
+                return 0b01;
+            }
+        }
+        SingleViewMonitor(OmniNavigableSet.OfBoolean set,BooleanSetImplMonitor2 root,boolean viewedVal,CheckedType checkedType,SortOrder sortOrder){
+            super(set,checkedType,sortOrder);
+            this.root=root;
+            this.viewedVal=viewedVal;
+        }
+        @Override
+        public void updateAddState(Object inputVal,DataType inputType,boolean result){
+            if(result) {
+                root.expectedState|=getMask();
+            }
+        }
+        @Override
+        public void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
+            root.expectedState&=~getMask();
+        }
+        @Override
+        public Object get(int iterationIndex,DataType outputType){
+            if((root.expectedState&getMask())!=0) {
+                return outputType.convertVal(viewedVal);
+            }
+            throw new UnsupportedOperationException("iterationIndex = "+iterationIndex+", viewedVal = "+viewedVal+", state = "+root.expectedState);
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(int index,
+                IteratorType itrType){
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public StructType getStructType(){
+            return StructType.BooleanSetSingleView;
+        }
+        @Override
+        public void modCollection(){
+            int mask=getMask();
+            if((root.expectedState&mask)!=0){
+                root.expectedState&=~mask;
+                set.removeVal(viewedVal);
+            }else {
+                root.expectedState|=mask;
+                set.add(viewedVal);
+            }
+        }
+        @Override
+        public int size(){
+            if((root.expectedState&getMask())!=0){
+                return 1;
+            }
+            return 0;
+        }
+        @Override
+        public void updateClearState(){
+            root.expectedState&=~getMask();
+        }
+        @Override
+        public void updateCollectionState(){
+            root.updateCollectionState();
+        }
+        @Override
+        public void verifyCollectionState(){
+            root.verifyCollectionState();
+        }
+        @Override
+        public void verifyClone(Object clone){
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+            int mask=getMask();
+            if((root.expectedState&mask)!=0) {
+                Assertions.assertFalse(filter.removedVals.contains(!viewedVal));
+                Assertions.assertFalse(filter.retainedVals.contains(!viewedVal));
+                Assertions.assertNotEquals(filter.removedVals.contains(viewedVal),filter.retainedVals.contains(viewedVal));
+                Assertions.assertEquals(1,filter.numCalls);
+                if(result) {
+                    Assertions.assertEquals(1,filter.numRemoved);
+                    Assertions.assertEquals(0,filter.numRetained);
+                    Assertions.assertTrue(filter.removedVals.contains(viewedVal));
+                    root.expectedState&=~mask;
+                }else {
+                    Assertions.assertEquals(0,filter.numRemoved);
+                    Assertions.assertEquals(1,filter.numRetained);
+                    Assertions.assertFalse(filter.removedVals.contains(viewedVal));
+                }
+            }else {
+                Assertions.assertFalse(result);
+                Assertions.assertTrue(filter.removedVals.isEmpty());
+                Assertions.assertTrue(filter.retainedVals.isEmpty());
+                Assertions.assertEquals(0,filter.numCalls);
+                Assertions.assertEquals(0,filter.numRemoved);
+                Assertions.assertEquals(0,filter.numRetained);
+            }
+            
+        }
+        @Override
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
+            //nothing to do
+        }
+        @Override
+        public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+            throw new UnsupportedOperationException();
+        }
+        
+    }
+    private static abstract class AbstractBooleanSetMonitor<SET extends OmniNavigableSet.OfBoolean> implements MonitoredSet<SET>{
+        final SET set;
+        final CheckedType checkedType;
+        final SortOrder sortOrder;
+        AbstractBooleanSetMonitor(SET set,CheckedType checkedType,SortOrder sortOrder){
+            this.set=set;
+            this.checkedType=checkedType;
+            this.sortOrder=sortOrder;
+           
+        }
+        @Override
+        public CheckedType getCheckedType(){
+            return checkedType;
+        }
+        @Override
+        public SET getCollection(){
+            return set;
+        }
+        @Override
+        public DataType getDataType(){
+            return DataType.BOOLEAN;
+        }
+    }
+   
     
     private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         final CheckedType checkedType;

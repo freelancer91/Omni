@@ -6,6 +6,8 @@ public enum StructType{
     DblLnkSubList("DblLnkSubList"),SnglLnkQueue("SnglLnkQueue"),SnglLnkStack("SnglLnkStack"),
     BooleanSetImpl("BooleanSetImpl"),
     BooleanSetEmpty("BooleanSetEmpty"),
+    BooleanSetFullView("BooleanSetFullView"),
+    BooleanSetSingleView("BooleanSetSingleView"),
     ByteSetImpl("ByteSetImpl"),
     IntegralOpenAddressHashSet("IntegralOpenAddressHashSet"),OpenAddressHashSet("OpenAddressHashSet"),
     PackedBooleanArrStack("PackedBooleanArrStack"),PackedBooleanArrList("PackedBooleanArrList"),PackedBooleanArrSubList("PackedBooleanArrSubList"),PackedBooleanArrDeq("PackedBooleanArrDeq");
@@ -33,6 +35,8 @@ public enum StructType{
         switch(structType.name){
         case "BooleanSetImpl":
         case "BooleanSetEmpty":
+        case "BooleanSetFullView":
+        case "BooleanSetSingleView":
           return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,MonitoredComparatorGen.ModCollectionDescending);
         case "ByteSetImpl":
         case "IntegralOpenAddressHashSet":
@@ -83,6 +87,8 @@ public enum StructType{
         case "PackedBooleanArrDeq":
         case "BooleanSetImpl":
         case "BooleanSetEmpty":
+        case "BooleanSetFullView":
+        case "BooleanSetSingleView":
             return EnumSet.of(IteratorType.AscendingItr,IteratorType.DescendingItr);
         case "ArrList":
         case "PackedBooleanArrList":
@@ -100,6 +106,8 @@ public enum StructType{
         switch(structType.name){
         case "BooleanSetImpl":
         case "BooleanSetEmpty":
+        case "BooleanSetFullView":
+        case "BooleanSetSingleView":
         case "ByteSetImpl":
         case "IntegralOpenAddressHashSet":
         case "PackedBooleanArrList":
@@ -179,6 +187,8 @@ public enum StructType{
                     MonitoredRemoveIfPredicateGen.ModParent,MonitoredRemoveIfPredicateGen.ModRoot,
                     MonitoredRemoveIfPredicateGen.ThrowModParent,MonitoredRemoveIfPredicateGen.ThrowModRoot);
         case "BooleanSetImpl":
+        case "BooleanSetFullView":
+        case "BooleanSetSingleView":
             return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.RemoveAll,
                     MonitoredRemoveIfPredicateGen.RemoveFalse,MonitoredRemoveIfPredicateGen.RemoveNone,
                     MonitoredRemoveIfPredicateGen.RemoveTrue,MonitoredRemoveIfPredicateGen.Throw,
@@ -193,6 +203,8 @@ public enum StructType{
         case "ArrStack":
         case "BooleanSetImpl":
         case "BooleanSetEmpty":
+        case "BooleanSetFullView":
+        case "BooleanSetSingleView":
         case "ByteSetImpl":
         case "DblLnkList":
         case "IntegralOpenAddressHashSet":
@@ -221,6 +233,8 @@ public enum StructType{
         case "ArrList":
         case "ArrStack":
         case "BooleanSetImpl":
+        case "BooleanSetFullView":
+        case "BooleanSetSingleView":
         case "ByteSetImpl":
         case "DblLnkList":
         case "IntegralOpenAddressHashSet":
@@ -252,6 +266,8 @@ public enum StructType{
         case "SnglLnkQueue":
         case "BooleanSetImpl":
         case "BooleanSetEmpty":
+        case "BooleanSetFullView":
+        case "BooleanSetSingleView":
             return QueryMethod.BASIC_COLLECTION_METHODS;
         case "SnglLnkStack":
         case "ArrStack":
@@ -275,10 +291,12 @@ public enum StructType{
         switch(structType.name){
         case "BooleanSetEmpty":
         case "BooleanSetImpl":
+        case "BooleanSetFullView":
         case "PackedBooleanArrList":
         case "PackedBooleanArrStack":
         case "PackedBooleanArrSubList":
         case "PackedBooleanArrDeq":
+        case "BooleanSetSingleView":
             return DataType.getDataTypeSet("BOOLEAN");
         case "ByteSetImpl":
             return DataType.getDataTypeSet("BYTE");
