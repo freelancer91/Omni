@@ -617,11 +617,13 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         var iterator=collection.iterator();
         if(getDataType()==DataType.REF) {
             for(int i=0;i<size;++i) {
-                Assertions.assertSame(iterator.next(),result[i]);
+            	final int index;
+                Assertions.assertSame(iterator.next(),result[index=i],()->"mismatch at index "+index);
             }
         }else {
             for(int i=0;i<size;++i) {
-                Assertions.assertEquals(iterator.next(),result[i]);
+            	final int index;
+                Assertions.assertEquals(iterator.next(),result[index=i],()->"mismatch at index "+index);
             }
         }
         Assertions.assertFalse(iterator.hasNext());

@@ -4,13 +4,16 @@ public interface CheckedCollection{
     static void checkLo(int index) throws IndexOutOfBoundsException{
         if(index<0){ throw new IndexOutOfBoundsException(index); }
     }
+    static <X extends RuntimeException> void checkModCount(int expectedModCount,int actualModCount,int expectedCursor,int actualCursor,X e)
+            throws X{
+    	checkModCount(expectedModCount,actualModCount,e);
+    	checkModCount(expectedCursor,actualCursor,e);
+    }
     static void checkModCount(int expectedModCount,int actualModCount,int expectedCursor,int actualCursor)
             throws ConcurrentModificationException{
-        if(expectedCursor != actualCursor){
-            throw new ConcurrentModificationException(
-                    "Expected cursor = " + expectedCursor + "; Actual cursor = " + actualCursor);
-        }
-        checkModCount(expectedModCount,actualModCount);
+    	checkModCount(expectedModCount,actualModCount);
+    	checkModCount(expectedCursor,actualCursor);
+        
     }
     static void checkModCount(int expectedModCount,int actualModCount,Object expectedNode,Object actualNode){
         if(expectedModCount != actualModCount || expectedNode != actualNode){
@@ -53,8 +56,8 @@ public interface CheckedCollection{
         if(index<=size){ return; }
         throw new IndexOutOfBoundsException("Invalid write index : index = "+index+"; size = "+size);
     }
-    private static String getCMEMessage(int expectedModCount,int actualModCount){
-        return "Expected modCount = "+expectedModCount+"; Actual modCount = "+actualModCount;
+    private static String getCMEMessage(int expected,int actual){
+        return "Expected = "+expected+"; Actual = "+actual;
     }
 
     static abstract class AbstractModCountChecker{

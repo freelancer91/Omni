@@ -5,6 +5,8 @@ import java.io.Externalizable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
+import java.lang.invoke.VarHandle;
+import java.lang.invoke.MethodHandles;
 import omni.api.OmniList;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +14,27 @@ final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
     super();
   }
+  private static final VarHandle MODIFIER_HANDLE;
+  static
+  {
+    try
+    {
+      var lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup());
+      MODIFIER_HANDLE = lookup.findVarHandle(Field.class, "modifiers", int.class);
+    }
+    catch(IllegalAccessException|NoSuchFieldException e)
+    {
+      throw new ExceptionInInitializerError(e);
+    }
+  }
+  private static void makeNonFinal(Field field){
+    int mods=field.getModifiers();
+    if(Modifier.isFinal(mods))
+    {
+      MODIFIER_HANDLE.set(field,mods&~Modifier.FINAL);
+    }
+  }
+  /*
   private static final Field MODIFIERS_FIELD;
   static{
     try{
@@ -21,6 +44,7 @@ final class FieldAndMethodAccessor{
         throw new ExceptionInInitializerError(e);
     }
   }
+  */
   static Field prepareFieldForObj(Object obj,String fieldName){
     return prepareFieldForClass(obj.getClass(),fieldName);
   }
@@ -74,10 +98,10 @@ final class FieldAndMethodAccessor{
   static Field prepareFieldForClass(Class<?> clazz,String fieldName){
     try{
       Field field=clazz.getDeclaredField(fieldName);
+      makeNonFinal(field);
       field.setAccessible(true);
-      MODIFIERS_FIELD.setInt(field,field.getModifiers() & ~Modifier.FINAL);
       return field;
-    }catch(NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e){
+    }catch(NoSuchFieldException | SecurityException | IllegalArgumentException e){
       for(var field:clazz.getDeclaredFields()){
         System.err.println(field);
       }

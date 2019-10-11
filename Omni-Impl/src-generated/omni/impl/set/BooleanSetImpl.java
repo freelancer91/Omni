@@ -1388,6 +1388,28 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override public OmniNavigableSet.OfBoolean descendingSet(){
       return new DescendingView.Checked(this);
     }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      final int state=this.state;
+      final T[] dst;
+      try{
+	      switch(state){
+	        case 0b00:
+	          return arrConstructor.apply(0);
+	        case 0b01:
+	          (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
+	          break;
+	        case 0b10:
+	          (dst=arrConstructor.apply(1))[0]=(T)Boolean.TRUE;
+	          break;
+	        default:
+	          (dst=arrConstructor.apply(2))[0]=(T)Boolean.FALSE;
+	          dst[1]=(T)Boolean.TRUE;
+	      }
+      }finally{
+        CheckedCollection.checkModCount(state,this.state);
+      }
+      return dst;
+    }
     @Override public void writeExternal(ObjectOutput oos) throws IOException{
       final int expectedState=this.state;
       try{
@@ -1987,6 +2009,28 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         }
         return new CheckedDescendingFullItr(this,state);
       }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+	      final int state=this.state;
+	      final T[] dst;
+	      try{
+		      switch(state){
+		        case 0b00:
+		          return arrConstructor.apply(0);
+		        case 0b01:
+		          (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
+		          break;
+		        case 0b10:
+		          (dst=arrConstructor.apply(1))[0]=(T)Boolean.TRUE;
+		          break;
+		        default:
+		          (dst=arrConstructor.apply(2))[0]=(T)Boolean.TRUE;
+		          dst[1]=(T)Boolean.FALSE;
+		      }
+	      }finally{
+	        CheckedCollection.checkModCount(state,this.state);
+	      }
+	      return dst;
+	    }
       @Override public void writeExternal(ObjectOutput oos) throws IOException{
         final int expectedState=this.state;
         try{
@@ -2756,6 +2800,29 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
         return root;
       }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+         final BooleanSetImpl root;
+	      final int state=(root=this.root).state;
+	      final T[] dst;
+	      try{
+		      switch(state){
+		        case 0b00:
+		          return arrConstructor.apply(0);
+		        case 0b01:
+		          (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
+		          break;
+		        case 0b10:
+		          (dst=arrConstructor.apply(1))[0]=(T)Boolean.TRUE;
+		          break;
+		        default:
+		          (dst=arrConstructor.apply(2))[0]=(T)Boolean.TRUE;
+		          dst[1]=(T)Boolean.FALSE;
+		      }
+	      }finally{
+	        CheckedCollection.checkModCount(state,root.state);
+	      }
+	      return dst;
+	    }
       @Override public Object clone(){
         return new Descending.Checked(root.state);
       }
@@ -3319,6 +3386,29 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       private Checked(BooleanSetImpl root){
         super(root);
       }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+         final BooleanSetImpl root;
+	      final int state=(root=this.root).state;
+	      final T[] dst;
+	      try{
+		      switch(state){
+		        case 0b00:
+		          return arrConstructor.apply(0);
+		        case 0b01:
+		          (dst=arrConstructor.apply(1))[0]=(T)Boolean.FALSE;
+		          break;
+		        case 0b10:
+		          (dst=arrConstructor.apply(1))[0]=(T)Boolean.TRUE;
+		          break;
+		        default:
+		          (dst=arrConstructor.apply(2))[0]=(T)Boolean.FALSE;
+		          dst[1]=(T)Boolean.TRUE;
+		      }
+	      }finally{
+	        CheckedCollection.checkModCount(state,root.state);
+	      }
+	      return dst;
+	    }
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
         return root;
       }
@@ -4092,6 +4182,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         }
         return true;
       }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        final BooleanSetImpl root;
+        final int state;
+        final T[] dst;
+        final int size=(state=(root=this.root).state)>>>1;
+        try{
+          dst=arrConstructor.apply(size);
+        }finally{
+          CheckedCollection.checkModCount(state,root.state);
+        }
+        if(size!=0){
+          dst[0]=(T)Boolean.TRUE;
+        }
+        return dst;
+      }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
         if(((root=this.root).state)==0b00){
@@ -4842,6 +4947,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
           return new UncheckedFalseView.Checked.Descending(root);
         }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        final BooleanSetImpl root;
+        final int state;
+        final T[] dst;
+        final int size=(state=(root=this.root).state)&0b01;
+        try{
+          dst=arrConstructor.apply(size);
+        }finally{
+          CheckedCollection.checkModCount(state,root.state);
+        }
+        if(size!=0){
+          dst[0]=(T)Boolean.FALSE;
+        }
+        return dst;
+      }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
         if(((root=this.root).state)==0b00){
@@ -4971,11 +5091,11 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   }
   private static class UncheckedAscendingFullItr extends AbstractBooleanItr{
     // valid itrStates
-    // state | previously returned | next return | nextBoolean post-state | remove                                                  | forEachRemaining | expected root state
-    // 0b00  | true OR false       | undefined   | undefined              | if root contains true, remove true, else remove false   | do nothing       | 0b01 OR 0b10 OR 0b11
-    // 0b01  | undefined           | false       | 0b00                   | undefined                                               | false            | 0b01
-    // 0b10  | assumed false       | true        | 0b00                   | remove false                                            | true             | 0b11
-    // 0b11  | undefined           | false       | 0b10                   | undefined                                               | false,true       | 0b11
+    // state | next        | forEachRemaining | expected root state | remove
+    // 0b00  | undefined   | do nothing       | any                 | if root contains true, remove true, else remove false
+    // 0b01  | false->0b00 | false            | 0b01                | undefined
+    // 0b10  | true ->0b00 | true             | 0b11                | remove false
+    // 0b11  | false->0b10 | false,true       | 0b11                | undefined
     transient final BooleanSetImpl root;
     transient int itrState;
     private UncheckedAscendingFullItr(BooleanSetImpl root,int itrState){
@@ -4986,7 +5106,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return new UncheckedAscendingFullItr(root,itrState);
     }
     @Override public boolean hasNext(){
-      return itrState!=0;
+      return this.itrState!=0;
     }
     @Override public boolean nextBoolean(){
       switch(this.itrState){
@@ -5041,122 +5161,116 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   }
   private static class CheckedAscendingFullItr extends UncheckedAscendingFullItr{
     // valid itrStates
-    // state | previously returned | next return | nextBoolean post-state | remove       | remove post-state | forEachRemaining | forEachRemaining post-state | expected root state
-    // 0b000 | false               | true        | 0b110                  | remove false | 0b010             | true             | 0b110                       | 0b11
-    // 0b001 | undefined           | false       | 0b100                  | throw ISE    | 0b001             | false            | 0b100                       | 0b01
-    // 0b010 | undefined           | true        | 0b110                  | throw ISE    | 0b010             | true             | 0b110                       | 0b10
-    // 0b011 | undefined           | false       | 0b000                  | throw ISE    | 0b011             | false,true       | 0b110                       | 0b11
-    // 0b100 | false               | throw NSE   | 0b100                  | remove false | 0b101             | do nothing       | 0b100                       | 0b01
-    // 0b101 | undefined           | throw NSE   | 0b101                  | throw ISE    | 0b101             | do nothing       | 0b101                       | 0b00 OR 0b01
-    // 0b110 | true                | throw NSE   | 0b110                  | remove true  | 0b101             | do nothing       | 0b110                       | 0b10 OR 0b11
+    // state | next         | forEachRemaining | expected root state  | remove
+    // 0b000 | throw NSE    | do nothing       | 0b00 OR 0b01         | throw ISE
+    // 0b001 | false->0b100 | false            | 0b01                 | throw ISE
+    // 0b010 | true ->0b100 | true             | 0b10                 | throw ISE
+    // 0b011 | false->0b110 | false,true       | 0b11                 | throw ISE
+    // 0b100 | throw NSE    | do nothing       | 0b01 OR 0b10 OR 0b11 | if root contains true, remove true, else remove false
+    // 0b110 | true ->0b100 | true             | 0b11                 | remove false
+    transient int expectedRootState;
     private CheckedAscendingFullItr(BooleanSetImpl root,int itrState){
       super(root,itrState);
+      this.expectedRootState=itrState;
     }
     @Override public Object clone(){
       return new CheckedAscendingFullItr(root,itrState);
     }
     @Override public boolean hasNext(){
-      return itrState<0b100;
+      return (this.itrState&0b11)!=0;
     }
     @Override public boolean nextBoolean(){
-      switch((this.itrState<<2)|(root.state)){
-        case 0b10001:
-        case 0b10100:
-        case 0b10101:
-        case 0b11010:
-        case 0b11011:
-          throw new NoSuchElementException();
+      CheckedCollection.checkModCount(expectedRootState,this.root.state);
+      switch(itrState&0b11){
         default:
-          throw new ConcurrentModificationException();
-        case 0b00011:
-        case 0b01010:
-          this.itrState=0b110;
-          return true;
-        case 0b00101:
+          throw new NoSuchElementException();
+        case 0b01:
           this.itrState=0b100;
-          break;
-        case 0b01111:
-          this.itrState=0b000;
+          return false;
+        case 0b10:
+          this.itrState=0b100;
+          return true;
+        case 0b11:
+          this.itrState=0b110;
+          return false; 
       }
-      return false;
     }
     @Override public void remove(){
+        final int itrState;
+        if(((itrState=this.itrState)&0b100)!=0){
           final BooleanSetImpl root;
-          switch((itrState<<2)|((root=this.root).state)){
-          case 0b00000:
-          case 0b00001:
-          case 0b00010:
-          case 0b10010:
-          case 0b10011:
-          case 0b11000:
-          case 0b11001:
-          case 0b10000:
-            throw new ConcurrentModificationException();
-          default:
-            throw new IllegalStateException();
-          case 0b00011:
-            root.state=0b10;
-            itrState=0b010;
-            return;
-          case 0b10001:
-          case 0b11010:
-            root.state=0b00;
-            break;
-          case 0b11011:
-            root.state=0b01;
+          int rootState;
+          CheckedCollection.checkModCount(rootState=expectedRootState,(root=this.root).state);
+          if(itrState==0b100){
+            if(rootState==0b11){
+              root.state=0b01;
+              this.expectedRootState=0b01;
+            }else{
+              root.state=0b00;
+              this.expectedRootState=0b00;
+            }
+            this.itrState=0b000;
+          }else{
+            this.itrState=0b010;
+            root.state=rootState&=0b10;
+            this.expectedRootState=rootState;
           }
-          itrState=0b101;
+          return;
+        }
+        throw new IllegalStateException();
     }
     @Override public void forEachRemaining(BooleanConsumer action){
-      switch((itrState<<2)|root.state){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b00101:
-        action.accept(false);
-        itrState=0b100;
-        break;
-      case 0b01111:
-        action.accept(false);
-      case 0b00011:
-      case 0b01010:
-        action.accept(true);
-        itrState=0b110;
-      case 0b10001:
-      case 0b10100:
-      case 0b10101:
-      case 0b11010:
-      case 0b11011:
+      final int itrState=this.itrState;
+      try{
+    	  switch(itrState&0b11){
+    	    default:
+    	      return;
+            case 0b11:
+              action.accept(false);
+            case 0b10:
+              action.accept(true);
+              break;
+            case 0b01:
+              action.accept(false);
+    	  }
+    	  CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState);
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
+      this.itrState=0b100;
     }
     @Override public void forEachRemaining(Consumer<? super Boolean> action){
-      switch((itrState<<2)|root.state){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b00101:
-        action.accept(Boolean.FALSE);
-        itrState=0b100;
-        break;
-      case 0b01111:
-        action.accept(Boolean.FALSE);
-      case 0b00011:
-      case 0b01010:
-        action.accept(Boolean.TRUE);
-        itrState=0b110;
-      case 0b10001:
-      case 0b10100:
-      case 0b10101:
-      case 0b11010:
-      case 0b11011:
+      final int itrState=this.itrState;
+      try{
+    	  switch(itrState&0b11){
+    	    default:
+    	      return;
+            case 0b11:
+              action.accept(Boolean.FALSE);
+            case 0b10:
+              action.accept(Boolean.TRUE);
+              break;
+            case 0b01:
+              action.accept(Boolean.FALSE);
+    	  }
+    	  CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState);
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
+      this.itrState=0b100;
     }
   }
   private static class UncheckedDescendingFullItr extends UncheckedAscendingFullItr{
     // valid itrStates
-    // state | previously returned | next return | nextBoolean post-state | remove                                                 | forEachRemaining | expected root state
-    // 0b00  | true OR false       | undefined   | undefined              | if root contains false, remove false, else remove true | do nothing       | 0b01 OR 0b10 OR 0b11
-    // 0b01  | assumed true        | false       | 0b00                   | remove true                                            | false            | 0b11
-    // 0b10  | undefined           | true        | 0b00                   | undefined                                              | true             | 0b10
-    // 0b11  | undefined           | true        | 0b01                   | undefined                                              | true,false       | 0b11
+    // state | next        | forEachRemaining | expected root state | remove
+    // 0b00  | undefined   | do nothing       | any                 | if root contains false, remove false, else remove true
+    // 0b01  | false->0b00 | false            | 0b11                | remove true
+    // 0b10  | true ->0b00 | true             | 0b10                | undefined
+    // 0b11  | true ->0b01 | true,false       | 0b11                | undefined
     private UncheckedDescendingFullItr(BooleanSetImpl root,int itrState){
       super(root,itrState);
     }
@@ -5217,14 +5331,13 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   }
   private static class CheckedDescendingFullItr extends CheckedAscendingFullItr{
     // valid itrStates
-    // state | previously returned | next return | nextBoolean post-state | remove       | remove post-state | forEachRemaining | forEachRemaining post-state | expected root state
-    // 0b000 | true                | false       | 0b100                  | remove true  | 0b001             | false            | 0b100                       | 0b11
-    // 0b001 | undefined           | false       | 0b100                  | throw ISE    | 0b001             | false            | 0b100                       | 0b01
-    // 0b010 | undefined           | true        | 0b110                  | throw ISE    | 0b010             | true             | 0b110                       | 0b10
-    // 0b011 | undefined           | true        | 0b000                  | throw ISE    | 0b011             | true,false       | 0b100                       | 0b11
-    // 0b100 | false               | throw NSE   | 0b100                  | remove false | 0b101             | do nothing       | 0b100                       | 0b01 OR 0b11
-    // 0b101 | undefined           | throw NSE   | 0b101                  | throw ISE    | 0b101             | do nothing       | 0b101                       | 0b00 OR 0b10
-    // 0b110 | true                | throw NSE   | 0b110                  | remove true  | 0b101             | do nothing       | 0b110                       | 0b10
+    // state | next         | forEachRemaining | expected root state  | remove
+    // 0b000 | throw NSE    | do nothing       | 0b00 OR 0b10         | throw ISE
+    // 0b001 | false->0b100 | false            | 0b01                 | throw ISE
+    // 0b010 | true ->0b100 | true             | 0b10                 | throw ISE
+    // 0b011 | true ->0b101 | true,false       | 0b11                 | throw ISE
+    // 0b100 | throw NSE    | do nothing       | 0b01 OR 0b10 OR 0b11 | if root contains false, remove false, else remove true
+    // 0b101 | false->0b100 | false            | 0b11                 | remove true
     private CheckedDescendingFullItr(BooleanSetImpl root,int itrState){
       super(root,itrState);
     }
@@ -5232,95 +5345,88 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return new CheckedDescendingFullItr(root,itrState);
     }
     @Override public boolean nextBoolean(){
-      switch((this.itrState<<2)|(root.state)){
-        case 0b10001:
-        case 0b10011:
-        case 0b10100:
-        case 0b10110:
-        case 0b11010:
-          throw new NoSuchElementException();
+      CheckedCollection.checkModCount(expectedRootState,this.root.state);
+      switch(itrState&0b11){
         default:
-          throw new ConcurrentModificationException();
-        case 0b00011:
-        case 0b00101:
+          throw new NoSuchElementException();
+        case 0b01:
           this.itrState=0b100;
           return false;
-        case 0b01010:
-          this.itrState=0b110;
-          break;
-        case 0b01111:
-          this.itrState=0b000;
+        case 0b10:
+          this.itrState=0b100;
+          return true;
+        case 0b11:
+          this.itrState=0b101;
+          return true;
       }
-      return true;
     }
     @Override public void remove(){
-    final BooleanSetImpl root;
-          switch((itrState<<2)|((root=this.root).state)){
-          case 0b00000:
-          case 0b00001:
-          case 0b00010:
-          case 0b10000:
-          case 0b10010:
-          case 0b11000:
-          case 0b11001:
-          case 0b11011:
-            throw new ConcurrentModificationException();
-          default:
-            throw new IllegalStateException();
-          case 0b00011:
-            root.state=0b01;
-            itrState=0b001;
-            return;
-          case 0b10001:
-          case 0b11010:
-            root.state=0b00;
-            break;
-          case 0b10011:
-            root.state=0b10;
+        final int itrState;
+        if(((itrState=this.itrState)&0b100)!=0){
+          final BooleanSetImpl root;
+          int rootState;
+          CheckedCollection.checkModCount(rootState=expectedRootState,(root=this.root).state);
+          if(itrState==0b100){
+            if(rootState==0b11){
+              root.state=0b10;
+              this.expectedRootState=0b10;
+            }else{
+              root.state=0b00;
+              this.expectedRootState=0b00;
+            }
+            this.itrState=0b000;
+          }else{
+            this.itrState=0b001;
+            root.state=rootState&=0b01;
+            this.expectedRootState=rootState;
           }
-          itrState=0b101;
+          return;
+        }
+        throw new IllegalStateException();
     }
     @Override public void forEachRemaining(BooleanConsumer action){
-      switch((itrState<<2)|root.state){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b01010:
-        action.accept(true);
-        itrState=0b110;
-        break;
-      case 0b01111:
-        action.accept(true);
-      case 0b00011:
-      case 0b00101:
-        action.accept(false);
-        itrState=0b100;
-      case 0b10001:
-      case 0b10011:
-      case 0b10100:
-      case 0b10110:
-      case 0b11010:
+      final int itrState=this.itrState;
+      try{
+    	  switch(itrState&0b11){
+    	    default:
+    	      return;
+            case 0b11:
+              action.accept(true);
+            case 0b01:
+              action.accept(false);
+              break;
+            case 0b10:
+              action.accept(true);
+    	  }
+    	  CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState);
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
+      this.itrState=0b100;
     }
     @Override public void forEachRemaining(Consumer<? super Boolean> action){
-      switch((itrState<<2)|root.state){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b01010:
-        action.accept(Boolean.TRUE);
-        itrState=0b110;
-        break;
-      case 0b01111:
-        action.accept(Boolean.TRUE);
-      case 0b00011:
-      case 0b00101:
-        action.accept(Boolean.FALSE);
-        itrState=0b100;
-      case 0b10001:
-      case 0b10011:
-      case 0b10100:
-      case 0b10110:
-      case 0b11010:
+      final int itrState=this.itrState;
+      try{
+    	  switch(itrState&0b11){
+    	    default:
+    	      return;
+            case 0b11:
+              action.accept(Boolean.TRUE);
+            case 0b01:
+              action.accept(Boolean.FALSE);
+              break;
+            case 0b10:
+              action.accept(Boolean.TRUE);
+    	  }
+    	  CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState);
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
+      this.itrState=0b100;
     }
   }
   private static class UncheckedTrueItr extends UncheckedAscendingFullItr{

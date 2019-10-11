@@ -124,6 +124,7 @@ public class BooleanSetImplTest{
         final OmniIterator.OfBoolean itr;
         final IteratorType itrType;
         int expectedItrState;
+        int expectedRootState;
         int lastRet;
         
         FullItrMonitor(BooleanSetImplMonitor root,OmniIterator.OfBoolean itr,IteratorType itrType,int expectedItrState){
@@ -131,6 +132,7 @@ public class BooleanSetImplTest{
             this.itr=itr;
             this.itrType=itrType;
             this.expectedItrState=expectedItrState;
+            this.expectedRootState=expectedItrState&0b11;
             this.lastRet=-1;
         }
         
@@ -141,112 +143,105 @@ public class BooleanSetImplTest{
 
         @Override
         public void updateItrNextState(){
-           switch(itrType) {
-            case AscendingItr:
-              if(root.checkedType.checked) {
-                  switch(this.expectedItrState<<2|root.expectedState){
-                  default:
-                    this.expectedItrState=0b110;
-                    this.lastRet=1;
-                    break;
-                  case 0b00101:
-                    this.expectedItrState=0b100;
-                    this.lastRet=0;
-                    break;
-                  case 0b01111:
-                    this.expectedItrState=0b000;
-                    this.lastRet=0;
-                }
-                
-              }else {
-                  switch(this.expectedItrState){
-                  case 0b11:
-                    this.expectedItrState=0b10;
-                    this.lastRet=0;
-                    break;
-                  case 0b10:
-                    this.expectedItrState=0b00;
-                    this.lastRet=1;
-                    break;
-                  default:
-                    this.expectedItrState=0b00;
-                    this.lastRet=0;
-                } 
-              }
-              break;
-            case DescendingItr:
-                if(root.checkedType.checked) {
-                    switch(this.expectedItrState<<2|root.expectedState){
-                    default:
-                      this.expectedItrState=0b100;
+          if(root.checkedType.checked) {
+        	  switch(this.expectedItrState&0b11) {
+        	  case 0b001:
+        		  this.expectedItrState=0b100;
+        		  this.lastRet=0;
+        		  break;
+        	  case 0b010:
+        		  this.expectedItrState=0b100;
+        		  this.lastRet=1;
+        		  break;
+        	  default:
+        		  switch(itrType) {
+        		  case AscendingItr:
+        			  this.expectedItrState=0b110;
+        			  this.lastRet=0;
+        			  break;
+        		  case DescendingItr:
+        			  this.expectedItrState=0b101;
+        			  this.lastRet=1;
+        			  break;
+        		  default:
+        			  throw itrType.invalid();
+        		  }
+        		  break;
+        	  }
+          }else {
+        	  switch(this.expectedItrState){
+        	  default:
+        		  switch(itrType) {
+        		  case AscendingItr:
+        			  this.expectedItrState=0b10;
                       this.lastRet=0;
-                      break;
-                    case 0b01010:
-                      this.expectedItrState=0b110;
+        			  break;
+        		  case DescendingItr:
+        			  this.expectedItrState=0b01;
                       this.lastRet=1;
-                      break;
-                    case 0b01111:
-                      this.expectedItrState=0b000;
-                      this.lastRet=1;
-                  }
-                }else {
-                    switch(this.expectedItrState){
-                    case 0b11:
-                      this.expectedItrState=0b01;
-                      this.lastRet=1;
-                      break;
-                    case 0b01:
-                      this.expectedItrState=0b00;
-                      this.lastRet=0;
-                      break;
-                    default:
-                      this.expectedItrState=0b00;
-                      this.lastRet=1;
-                      break;
-                  } 
-                }
-                break;
-            default:
-                throw itrType.invalid();
-           }
+        			  break;
+        		  default:
+        			  throw itrType.invalid();
+        		  }
+        		  break;
+        	  case 0b01:
+        		  this.expectedItrState=0b00;
+                  this.lastRet=0;
+                  break;
+        	  case 0b10:
+        		  this.expectedItrState=0b00;
+                  this.lastRet=1;
+        	  
+        	  }
+          }
         }
 
         @Override
         public void verifyNextResult(DataType outputType,Object result){
-            boolean expected;
-            switch(itrType) {
-            case AscendingItr:
-              if(root.checkedType.checked) {
-                  switch(this.expectedItrState<<2|root.expectedState){
-                  default:
+        	boolean expected;
+        	if(root.checkedType.checked) {
+          	  switch(this.expectedItrState) {
+          	  case 0b001:
+          		  expected=false;
+          		  break;
+          	  case 0b010:
                   expected=true;
-                  break;
-                    case 0b00101:
-                    case 0b01111:
-                  expected=false;
-                }
-                
-              }else {
-                 expected=this.expectedItrState==0b10;
-              }
-              break;
-            case DescendingItr:
-                if(root.checkedType.checked) {
-                  switch(this.expectedItrState<<2|root.expectedState){
-                    default:
-                      expected=false;
-                      break;
-                    case 0b01010:
-                    case 0b01111:
+          		  break;
+          	  default:
+          		  switch(itrType) {
+          		  case AscendingItr:
+          			  expected=false;
+          			  break;
+          		  case DescendingItr:
                       expected=true;
-                  }
-                }else {
-                    expected=this.expectedItrState!=0b01;
-                }
-                break;
-            default:
-                throw itrType.invalid();
-           }
+          			  break;
+          		  default:
+          			  throw itrType.invalid();
+          		  }
+          		  break;
+          	  }
+            }else {
+          	  switch(this.expectedItrState){
+          	  default:
+          		  switch(itrType) {
+          		  case AscendingItr:
+          			  expected=false;
+          			  break;
+          		  case DescendingItr:
+                      expected=true;
+          			  break;
+          		  default:
+          			  throw itrType.invalid();
+          		  }
+          		  break;
+          	  case 0b01:
+          		  expected=false;
+                    break;
+          	  case 0b10:
+                    expected=true;
+          	  
+          	  }
+            }
            
            Assertions.assertEquals(outputType.convertVal(expected),result);
            
@@ -256,39 +251,42 @@ public class BooleanSetImplTest{
         public void updateItrRemoveState(){
             lastRet=-1;
             if(root.checkedType.checked) {
-                switch(itrType) {
-                case AscendingItr:
-                    switch(expectedItrState<<2|root.expectedState){
-                    default:
-                      root.expectedState=0b10;
-                      expectedItrState=0b010;
-                      return;
-                    case 0b10001:
-                    case 0b11010:
-                      root.expectedState=0b00;
-                      break;
-                    case 0b11011:
-                      root.expectedState=0b01;
-                    }
-                    expectedItrState=0b101;
-                    break;
-                case DescendingItr:
-                    switch(expectedItrState<<2|root.expectedState){
-                    default:
-                      root.expectedState=0b01;
-                      expectedItrState=0b001;
-                      return;
-                    case 0b10001:
-                    case 0b11010:
-                      root.expectedState=0b00;
-                      break;
-                    case 0b10011:
-                      root.expectedState=0b10;
-                    }
-                    expectedItrState=0b101;
+            	switch(itrType) {
+            	case AscendingItr:
+            		if(expectedItrState==0b110) {
+            			root.expectedState&=0b10;
+            			expectedRootState&=0b10;
+            			expectedItrState=0b010;
+            		}else {
+            			if(root.expectedState==0b11) {
+            				root.expectedState=0b01;
+            				expectedRootState=0b01;
+            			}else {
+            				root.expectedState=0b00;
+            				expectedRootState=0b00;
+            			}
+            			expectedItrState=0b000;
+            		}
+            		break;
+            	case DescendingItr:
+            		if(expectedItrState==0b101) {
+            			root.expectedState&=0b01;
+            			expectedRootState&=0b01;
+            			expectedItrState=0b001;
+            		}else {
+            			if(root.expectedState==0b11) {
+            				root.expectedState=0b10;
+            				expectedRootState=0b10;
+            			}else {
+            				root.expectedState=0b00;
+            				expectedRootState=0b00;
+            			}
+            			expectedItrState=0b000;
+            		}
+            		break;
                 default:
-                    throw itrType.invalid();
-                }
+                	throw itrType.invalid();
+            	}
             }else {
                 switch(itrType) {
                 case AscendingItr:
@@ -308,6 +306,7 @@ public class BooleanSetImplTest{
                 default:
                     throw itrType.invalid();
                 }
+                expectedRootState=root.expectedState;
             }
         }
 
@@ -329,7 +328,7 @@ public class BooleanSetImplTest{
         @Override
         public boolean hasNext(){
             if(root.checkedType.checked) {
-                return expectedItrState<0b100;
+            	return (this.expectedItrState&0b11)!=0;
             }else {
                 return expectedItrState!=0;
             }
@@ -337,20 +336,7 @@ public class BooleanSetImplTest{
 
         @Override
         public int getNumLeft(){
-            if(root.checkedType.checked) {
-                switch(expectedItrState) {
-                case 0b011:
-                  return 2;
-                case 0b010:
-                case 0b001:
-                case 0b000:
-                    return 1;
-                default:
-                    return 0;
-                }
-            }else {
-                return Integer.bitCount(expectedItrState);
-            }
+        	return Integer.bitCount(expectedItrState&0b11);
         }
 
         @Override
@@ -358,60 +344,53 @@ public class BooleanSetImplTest{
             if(root.checkedType.checked) {
                 switch(itrType) {
                 case AscendingItr:
-                    switch(expectedItrState) {
-                    case 0b011:
-                        Assertions.assertEquals(2,function.size());
-                        Assertions.assertEquals(Boolean.FALSE,function.get(0));
-                        Assertions.assertEquals(Boolean.TRUE,function.get(1));
-                        lastRet=1;
-                        expectedItrState=0b110;
-                        break;
-                    case 0b001:
-                        Assertions.assertEquals(1,function.size());
-                        Assertions.assertEquals(Boolean.FALSE,function.get(0));
-                        lastRet=0;
-                        expectedItrState=0b100;
-                        break;
-                    case 0b010:
-                    case 0b000:
-                        Assertions.assertEquals(1,function.size());
-                        Assertions.assertEquals(Boolean.TRUE,function.get(0));
-                        lastRet=1;
-                        expectedItrState=0b110;
-                        break;
-                    default:
-                        Assertions.assertTrue(function.isEmpty());
-                    }
+                	switch(expectedItrState&0b11){
+            	    default:
+            	      Assertions.assertTrue(function.isEmpty());
+            	      return;
+                    case 0b11:
+                      Assertions.assertEquals(2, function.size());
+                      Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                      Assertions.assertEquals(Boolean.TRUE,function.get(1));
+                      lastRet=1;
+                      break;
+                    case 0b10:
+                      Assertions.assertEquals(1, function.size());
+                      Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                      lastRet=1;
+                      break;
+                    case 0b01:
+	                  Assertions.assertEquals(1, function.size());
+	                  Assertions.assertEquals(Boolean.FALSE,function.get(0));
+	                  lastRet=0;
+            	    }
                     break;
                 case DescendingItr:
-                    switch(expectedItrState) {
-                    case 0b011:
-                        Assertions.assertEquals(2,function.size());
-                        Assertions.assertEquals(Boolean.TRUE,function.get(0));
-                        Assertions.assertEquals(Boolean.FALSE,function.get(1));
-                        lastRet=0;
-                        expectedItrState=0b100;
-                        break;
-                    case 0b010:
-                        Assertions.assertEquals(1,function.size());
-                        Assertions.assertEquals(Boolean.TRUE,function.get(0));
-                        lastRet=1;
-                        expectedItrState=0b110;
-                        break;
-                    case 0b001:
-                    case 0b000:
-                        Assertions.assertEquals(1,function.size());
-                        Assertions.assertEquals(Boolean.FALSE,function.get(0));
-                        lastRet=0;
-                        expectedItrState=0b100;
-                        break;
-                    default:
-                        Assertions.assertTrue(function.isEmpty());
-                    }
+                	switch(expectedItrState&0b11){
+            	    default:
+            	      Assertions.assertTrue(function.isEmpty());
+            	      return;
+                    case 0b11:
+                      Assertions.assertEquals(2, function.size());
+                      Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                      Assertions.assertEquals(Boolean.FALSE,function.get(1));
+                      lastRet=1;
+                      break;
+                    case 0b10:
+                      Assertions.assertEquals(1, function.size());
+                      Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                      lastRet=1;
+                      break;
+                    case 0b01:
+	                  Assertions.assertEquals(1, function.size());
+	                  Assertions.assertEquals(Boolean.FALSE,function.get(0));
+	                  lastRet=0;
+            	    }
                     break;
                 default:
                     throw itrType.invalid();
                 }
+                this.expectedItrState=0b100;
             }else {
                 switch(expectedItrState) {
                 case 0b11:
@@ -455,6 +434,9 @@ public class BooleanSetImplTest{
         public void verifyCloneHelper(Object clone){
           Assertions.assertEquals(this.expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.UncheckedAscendingFullItr.itrState(itr));
           Assertions.assertSame(this.root.set,FieldAndMethodAccessor.BooleanSetImpl.UncheckedAscendingFullItr.root(itr));
+          if(root.checkedType.checked) {
+        	  Assertions.assertEquals(expectedRootState,FieldAndMethodAccessor.BooleanSetImpl.CheckedAscendingFullItr.expectedRootState(itr));
+          }
         }
         
     }
@@ -2240,12 +2222,7 @@ public class BooleanSetImplTest{
                                 }
                                 for(var itrCountTmp=itrOffset;itrCountTmp<=itrBound;++itrCountTmp) {
                                     final int itrCount=itrCountTmp;
-                                    //TODO
-                                        //TestExecutorService.submitTest(()->{
-                                    if(initSet==SetInitialization.AddTrue && itrRemoveScenario==IteratorRemoveScenario.PostNext && preMod==IllegalModification.ModCollection && itrCount==1)
-                                    {
-                                        TestExecutorService.suspend();
-                                    }
+                                        TestExecutorService.submitTest(()->{
                                             final var setMonitor=initSet
                                                     .initialize(new BooleanSetImplMonitor(checkedType));
                                             final var itrMonitor=setMonitor.getMonitoredIterator();
@@ -2272,7 +2249,7 @@ public class BooleanSetImplTest{
                                                 itrMonitor.verifyIteratorState();
                                                 setMonitor.verifyCollectionState();
                                             }
-                                        //});
+                                        });
                                      }
                             }
                         }
