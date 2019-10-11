@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import omni.impl.AbstractBooleanItr;
 import omni.impl.AbstractByteItr;
+import java.io.ObjectOutputStream;
 
 final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
@@ -76,7 +77,56 @@ final class FieldAndMethodAccessor{
       }
       throw new ExceptionInInitializerError(e);
     }
-  } 
+  }
+  private static void writeObjectHelper(Object obj,ObjectOutputStream oos,Method writeObjectMethod) throws IOException{
+      try {
+          writeObjectMethod.invoke(obj,oos);
+      }catch(IllegalAccessException e){
+          throw new Error(e);
+        }catch(InvocationTargetException e){
+          var cause=e.getCause();
+          if(cause instanceof RuntimeException){
+            throw (RuntimeException)cause;
+          }else if(cause instanceof IOException){
+            throw (IOException)cause;
+          }
+          throw new Error(e);
+        }
+  }
+  private static void writeReplaceHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod) throws IOException{
+    Object replacement=null;
+    try{
+      replacement=writeReplaceMethod.invoke(obj);
+    }catch(IllegalAccessException e){
+      throw new Error(e);
+    }catch(InvocationTargetException e){
+      var cause=e.getCause();
+      if(cause instanceof RuntimeException){
+        throw (RuntimeException)cause;
+      }else if(cause instanceof IOException){
+        throw (IOException)cause;
+      }
+      throw new Error(e);
+    }
+    ((Externalizable)replacement).writeExternal(oos);
+  }
+  private static void writeReplaceHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod,Method writeObjectMethod) throws IOException{
+    Object replacement=null;
+    try{
+      replacement=writeReplaceMethod.invoke(obj);
+    }catch(IllegalAccessException e){
+      throw new Error(e);
+    }catch(InvocationTargetException e){
+      var cause=e.getCause();
+      if(cause instanceof RuntimeException){
+        throw (RuntimeException)cause;
+      }else if(cause instanceof IOException){
+        throw (IOException)cause;
+      }
+      throw new Error(e);
+    }
+    writeObjectHelper(replacement,oos,writeObjectMethod);
+  }
   static Method prepareMethodForClass(Class<?> clazz,String methodName,Class<?>...params){
     try{
       Method method=clazz.getDeclaredMethod(methodName,params);
@@ -159,8 +209,8 @@ static interface AbstractCLASSPREFIXSet{
   static final omni.impl.set.AbstractBooleanSet.DescendingEmptyView UNCHECKED_EMPTY_DESCENDING=omni.impl.set.AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
 }
 static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
-  public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-    oos.writeObject(obj);
+  public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+    ((Externalizable)obj).writeExternal(oos);
   }
   public static omni.impl.set.CLASSPREFIXSetImpl clone(Object obj){
     return (omni.impl.set.CLASSPREFIXSetImpl)((omni.impl.set.CLASSPREFIXSetImpl)obj).clone();
@@ -169,11 +219,12 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
     return ((omni.impl.set.CLASSPREFIXSetImpl)obj).state;
   }
   static interface Checked extends CLASSPREFIXSetImpl{
+    
     public static omni.impl.set.CLASSPREFIXSetImpl.Checked clone(Object obj){
       return (omni.impl.set.CLASSPREFIXSetImpl.Checked)((omni.impl.set.CLASSPREFIXSetImpl.Checked)obj).clone();
     }
-    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-      oos.writeObject(obj);
+    public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
     }
     public static int state(Object obj){
       return ((omni.impl.set.CLASSPREFIXSetImpl)obj).state;
@@ -183,8 +234,8 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
     public static omni.impl.set.CLASSPREFIXSetImpl.Descending clone(Object obj){
       return (omni.impl.set.CLASSPREFIXSetImpl.Descending)((omni.impl.set.CLASSPREFIXSetImpl.Descending)obj).clone();
     }
-    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-      oos.writeObject(obj);
+    public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
     }
     public static int state(Object obj){
       return ((omni.impl.set.CLASSPREFIXSetImpl)obj).state;
@@ -193,8 +244,8 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
       public static omni.impl.set.CLASSPREFIXSetImpl.Descending.Checked clone(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl.Descending.Checked)((omni.impl.set.CLASSPREFIXSetImpl.Descending.Checked)obj).clone();
       }
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        oos.writeObject(obj);
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
       }
       public static int state(Object obj){
         return ((omni.impl.set.CLASSPREFIXSetImpl)obj).state;
@@ -208,23 +259,27 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
     }
   }
   static interface DescendingView extends AbstractFullView{
+    static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"DescendingView","writeReplace");
+  
     public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"DescendingView","clone");
     public static omni.impl.set.CLASSPREFIXSetImpl.Descending clone(Object obj){
       return (omni.impl.set.CLASSPREFIXSetImpl.Descending)callMethod(cloneMethod,obj);
     }
-    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-      oos.writeObject(obj);
-    }
+    public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        writeReplaceHelper(obj,oos,writeReplaceMethod);
+      }
     static omni.impl.set.CLASSPREFIXSetImpl root(Object obj){
       return (omni.impl.set.CLASSPREFIXSetImpl)getValue(rootField,obj);
     }
     static interface Checked extends DescendingView{
+      static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked","writeReplace");
+      
       public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked","clone");
       public static omni.impl.set.CLASSPREFIXSetImpl.Descending.Checked clone(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl.Descending.Checked)callMethod(cloneMethod,obj);
       }
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        oos.writeObject(obj);
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        writeReplaceHelper(obj,oos,writeReplaceMethod);
       }
       static omni.impl.set.CLASSPREFIXSetImpl root(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl)getValue(rootField,obj);
@@ -232,23 +287,27 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
     }
   }
   static interface AscendingView extends AbstractFullView{
+    static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"AscendingView","writeReplace");
+  
     public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"AscendingView","clone");
     public static omni.impl.set.CLASSPREFIXSetImpl clone(Object obj){
       return (omni.impl.set.CLASSPREFIXSetImpl)callMethod(cloneMethod,obj);
     }
-    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-      oos.writeObject(obj);
-    }
+    public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        writeReplaceHelper(obj,oos,writeReplaceMethod);
+      }
     static omni.impl.set.CLASSPREFIXSetImpl root(Object obj){
       return (omni.impl.set.CLASSPREFIXSetImpl)getValue(rootField,obj);
     }
     static interface Checked extends AscendingView{
+      static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked","writeReplace");
+  
       public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked","clone");
       public static omni.impl.set.CLASSPREFIXSetImpl.Checked clone(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl.Checked)callMethod(cloneMethod,obj);
       }
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        oos.writeObject(obj);
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        writeReplaceHelper(obj,oos,writeReplaceMethod);
       }
       static omni.impl.set.CLASSPREFIXSetImpl root(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl)getValue(rootField,obj);

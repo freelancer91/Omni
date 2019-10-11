@@ -1,6 +1,7 @@
 package omni.impl.set;
 import omni.api.OmniNavigableSet;
 import java.io.Serializable;
+import java.io.Externalizable;
 import java.util.Collection;
 import omni.api.OmniCollection;
 import omni.function.BooleanComparator;
@@ -8,8 +9,8 @@ import omni.function.BooleanConsumer;
 import java.util.function.Consumer;
 import omni.function.BooleanPredicate;
 import java.util.function.Predicate;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectInput;
 import java.io.IOException;
 import java.util.function.IntFunction;
 import omni.util.OmniArray;
@@ -19,7 +20,8 @@ import omni.api.OmniSet;
 import java.util.NoSuchElementException;
 import omni.impl.AbstractBooleanItr;
 import java.util.ConcurrentModificationException;
-public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,Cloneable{
+import omni.impl.CheckedCollection;
+public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable,Cloneable{
   transient int state;
   @Override public OmniNavigableSet.OfBoolean descendingSet(){
     return new DescendingView(this);
@@ -1386,6 +1388,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
     @Override public OmniNavigableSet.OfBoolean descendingSet(){
       return new DescendingView.Checked(this);
     }
+    @Override public void writeExternal(ObjectOutput oos) throws IOException{
+      final int expectedState=this.state;
+      try{
+        super.writeExternal(oos);
+      }finally{
+        CheckedCollection.checkModCount(expectedState,this.state);
+      }
+    }
     @Override public OmniIterator.OfBoolean iterator(){
       final int state;
       if((state=this.state)==0b00){
@@ -1977,6 +1987,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
         }
         return new CheckedDescendingFullItr(this,state);
       }
+      @Override public void writeExternal(ObjectOutput oos) throws IOException{
+        final int expectedState=this.state;
+        try{
+          super.writeExternal(oos);
+        }finally{
+          CheckedCollection.checkModCount(expectedState,this.state);
+        }
+      }
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
         return new AscendingView.Checked(this);
       }
@@ -2075,10 +2093,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Serializable,C
       }
     }
   }
-  private void writeObject(ObjectOutputStream oos) throws IOException{
+  @Override public void writeExternal(ObjectOutput oos) throws IOException{
     oos.writeByte(this.state);
   }
-  private void readObject(ObjectInputStream ois) throws IOException{
+  @Override public void readExternal(ObjectInput ois) throws IOException{
     this.state=ois.readUnsignedByte();
   }
   private static boolean equalsFullState(Set<?> val){

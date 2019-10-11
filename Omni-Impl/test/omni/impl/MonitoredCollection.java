@@ -662,7 +662,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         }
         ITR getIterator();
         IteratorType getIteratorType();
-        MonitoredCollection<COL> getMonitoredCollection();
+        MonitoredCollection<? extends COL> getMonitoredCollection();
         boolean hasNext();
         int getNumLeft();
         void verifyForEachRemaining(MonitoredFunction function);

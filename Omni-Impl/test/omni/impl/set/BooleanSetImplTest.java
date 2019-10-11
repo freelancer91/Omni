@@ -16,6 +16,7 @@ import omni.api.OmniNavigableSet.OfBoolean;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
+import omni.impl.IllegalModification;
 import omni.impl.IteratorRemoveScenario;
 import omni.impl.IteratorType;
 import omni.impl.MonitoredCollection;
@@ -38,14 +39,27 @@ public class BooleanSetImplTest{
     private static class EmptyItrMonitor implements MonitoredCollection.MonitoredIterator<OmniIterator.OfBoolean,OmniNavigableSet.OfBoolean>{
         final OmniIterator.OfBoolean itr;
         final IteratorType itrType;
-        final AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean> root;
+        final AbstractBooleanSetMonitor root;
 
-        EmptyItrMonitor(OmniIterator.OfBoolean itr,AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean> root,IteratorType itrType){
+        EmptyItrMonitor(OmniIterator.OfBoolean itr,AbstractBooleanSetMonitor root,IteratorType itrType){
             this.itr=itr;
             this.root=root;
             this.itrType=itrType;
         }
-        
+        @Override
+        public Object verifyClone(){
+            final OmniIterator.OfBoolean itr=getIterator();
+            final Object clone;
+            try{
+                clone=itr.clone();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+            Assertions.assertSame(itr,clone);
+            verifyCloneHelper(clone);
+            return clone;
+        }
         @Override
         public boolean nextWasJustCalled(){
             return false;
@@ -77,7 +91,7 @@ public class BooleanSetImplTest{
         }
 
         @Override
-        public MonitoredCollection<OfBoolean> getMonitoredCollection(){
+        public MonitoredCollection<? extends OfBoolean> getMonitoredCollection(){
             return root;
         }
 
@@ -97,7 +111,7 @@ public class BooleanSetImplTest{
         }
         @Override
         public void verifyIteratorState() {
-           Assertions.assertSame(this,AbstractBooleanSet.EMPTY_ITR);
+           Assertions.assertSame(itr,AbstractBooleanSet.EMPTY_ITR);
         }
         @Override
         public void verifyCloneHelper(Object clone){
@@ -105,7 +119,7 @@ public class BooleanSetImplTest{
         }
         
     }
-    private static class FullItrMonitor implements MonitoredCollection.MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImpl>{
+    private static class FullItrMonitor implements MonitoredCollection.MonitoredIterator<OmniIterator.OfBoolean,OmniNavigableSet.OfBoolean>{
         final BooleanSetImplMonitor root;
         final OmniIterator.OfBoolean itr;
         final IteratorType itrType;
@@ -133,24 +147,30 @@ public class BooleanSetImplTest{
                   switch(this.expectedItrState<<2|root.expectedState){
                   default:
                     this.expectedItrState=0b110;
+                    this.lastRet=1;
                     break;
                   case 0b00101:
                     this.expectedItrState=0b100;
+                    this.lastRet=0;
                     break;
                   case 0b01111:
                     this.expectedItrState=0b000;
+                    this.lastRet=0;
                 }
                 
               }else {
                   switch(this.expectedItrState){
                   case 0b11:
                     this.expectedItrState=0b10;
+                    this.lastRet=0;
                     break;
                   case 0b10:
                     this.expectedItrState=0b00;
+                    this.lastRet=1;
                     break;
                   default:
                     this.expectedItrState=0b00;
+                    this.lastRet=0;
                 } 
               }
               break;
@@ -159,23 +179,29 @@ public class BooleanSetImplTest{
                     switch(this.expectedItrState<<2|root.expectedState){
                     default:
                       this.expectedItrState=0b100;
+                      this.lastRet=0;
                       break;
                     case 0b01010:
                       this.expectedItrState=0b110;
+                      this.lastRet=1;
                       break;
                     case 0b01111:
                       this.expectedItrState=0b000;
+                      this.lastRet=1;
                   }
                 }else {
                     switch(this.expectedItrState){
                     case 0b11:
                       this.expectedItrState=0b01;
+                      this.lastRet=1;
                       break;
                     case 0b01:
                       this.expectedItrState=0b00;
+                      this.lastRet=0;
                       break;
                     default:
                       this.expectedItrState=0b00;
+                      this.lastRet=1;
                       break;
                   } 
                 }
@@ -223,11 +249,7 @@ public class BooleanSetImplTest{
            }
            
            Assertions.assertEquals(outputType.convertVal(expected),result);
-           if(expected) {
-               lastRet=1;
-           }else {
-               lastRet=0;
-           }
+           
         }
 
         @Override
@@ -300,7 +322,7 @@ public class BooleanSetImplTest{
         }
 
         @Override
-        public MonitoredCollection<BooleanSetImpl> getMonitoredCollection(){
+        public MonitoredCollection<? extends OmniNavigableSet.OfBoolean> getMonitoredCollection(){
             return root;
         }
 
@@ -453,16 +475,17 @@ public class BooleanSetImplTest{
             }else {
                 expectedItrState=0b00;
             }
-        }
-
-        @Override
-        public void verifyNextResult(DataType outputType,Object result){
-            Assertions.assertEquals(outputType.convertVal(viewedVal),result);
             if(viewedVal) {
                 lastRet=1;
             }else {
                 lastRet=0;
             }
+        }
+
+        @Override
+        public void verifyNextResult(DataType outputType,Object result){
+            Assertions.assertEquals(outputType.convertVal(viewedVal),result);
+            
         }
 
         @Override
@@ -515,9 +538,8 @@ public class BooleanSetImplTest{
         }
     }
     
-    private static class BooleanSetImplMonitor extends AbstractBooleanSetMonitor<BooleanSetImpl>{
+    private static class BooleanSetImplMonitor extends AbstractBooleanSetMonitor{
         int expectedState;
-        
         private static BooleanSetImpl getCopyConstructorSet(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
           Class<? extends BooleanSetImpl> clazz;
           if(checkedType.checked) {
@@ -542,7 +564,7 @@ public class BooleanSetImplTest{
         public Object verifyClone(){
             final Object clone;
             try{
-                clone=set.clone();
+                clone=FieldAndMethodAccessor.BooleanSetImpl.clone(set);
             }finally{
                 verifyCollectionState();
             }
@@ -665,20 +687,48 @@ public class BooleanSetImplTest{
             return get(iterationIndex,outputType,sortOrder);
         }
         @Override
-        public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(int index,
-                IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
+        public MonitoredIterator<? extends OmniIterator<?>,OmniNavigableSet.OfBoolean> getMonitoredIterator(IteratorType itrType){
+            OmniIterator.OfBoolean itr;
+            IteratorType iType;
+            switch(this.sortOrder) {
+            case Ascending:
+            {
+                iType=itrType;
+                switch(itrType) {
+                case AscendingItr:
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            }
+            case Descending:
+            {
+                switch(itrType) {
+                case AscendingItr:
+                    iType=IteratorType.DescendingItr;
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    iType=IteratorType.AscendingItr;
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            }
+            default:
+                throw this.sortOrder.invalid();
+            }
+            if(this.expectedState==0b00) {
+                return new EmptyItrMonitor(itr,this,iType);
+            }
+            return new FullItrMonitor(this,itr,iType,this.expectedState);
         }
         @Override
         public StructType getStructType(){
@@ -690,11 +740,11 @@ public class BooleanSetImplTest{
             case 0b00:
                 switch(sortOrder) {
                 case Ascending:
-                    set.addFalse();
+                    set.add(false);
                     expectedState=0b01;
                     break;
                 case Descending:
-                    set.addTrue();
+                    set.add(true);
                     expectedState=0b10;
                     break;
                 default:
@@ -702,21 +752,21 @@ public class BooleanSetImplTest{
                 }
                 break;
             case 0b01:
-                set.addTrue();
+                set.add(true);
                 expectedState=0b11;
                 break;
             case 0b10:
-                set.addFalse();
+                set.add(false);
                 expectedState=0b11;
                 break;
             case 0b11:
                 switch(sortOrder) {
                 case Ascending:
-                    set.removeFalse();
+                    set.removeVal(false);
                     expectedState=0b10;
                     break;
                 case Descending:
-                    set.removeTrue();
+                    set.removeVal(true);
                     expectedState=0b01;
                     break;
                 default:
@@ -747,11 +797,11 @@ public class BooleanSetImplTest{
         }
         @Override
         public void updateCollectionState(){
-            expectedState=set.state;
+            expectedState=FieldAndMethodAccessor.BooleanSetImpl.state(set);
         }
         @Override
         public void verifyCollectionState(){
-            Assertions.assertEquals(expectedState,set.state);
+            Assertions.assertEquals(expectedState,FieldAndMethodAccessor.BooleanSetImpl.state(set));
         }
         @Override
         public void verifyClone(Object clone){
@@ -884,7 +934,7 @@ public class BooleanSetImplTest{
         }
         
     }
-    private static class FullViewMonitor extends AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean>{
+    private static class FullViewMonitor extends AbstractBooleanSetMonitor{
         final BooleanSetImplMonitor root;
         FullViewMonitor(OmniNavigableSet.OfBoolean set,BooleanSetImplMonitor root,CheckedType checkedType,SortOrder sortOrder){
             super(set,checkedType,sortOrder);
@@ -904,20 +954,52 @@ public class BooleanSetImplTest{
         }
         @Override
         public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
+            OmniIterator.OfBoolean itr;
+            IteratorType iType;
+            switch(sortOrder) {
+            case Ascending:
+            {
+                iType=itrType;
+                switch(itrType) {
+                case AscendingItr:
+                    
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            }
+            case Descending:
+            {
+                
+                switch(itrType) {
+                case AscendingItr:
+                    iType=IteratorType.DescendingItr;
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    iType=IteratorType.AscendingItr;
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            }
+            default:
+                throw root.sortOrder.invalid();
+            }
+            if(root.expectedState==0b00) {
+                return new EmptyItrMonitor(itr,root,iType);
+            }
+            return new FullItrMonitor(root,itr,iType,root.expectedState);
         }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(int index,
-                IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
-        }
+       
         @Override
         public StructType getStructType(){
             return StructType.BooleanSetFullView;
@@ -1002,12 +1084,13 @@ public class BooleanSetImplTest{
         }
         
     }
-    private static class EmptyViewMonitor extends AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean>{
+    private static class EmptyViewMonitor extends AbstractBooleanSetMonitor{
         final int position;
         EmptyViewMonitor(OmniNavigableSet.OfBoolean set,int position,CheckedType checkedType,SortOrder sortOrder){
             super(set,checkedType,sortOrder);
             this.position=position;
         }
+       
         @Override
         public void updateAddState(Object inputVal,DataType inputType,boolean result){
             throw new UnsupportedOperationException();
@@ -1022,20 +1105,46 @@ public class BooleanSetImplTest{
         }
         @Override
         public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
+            OmniIterator.OfBoolean itr;
+            IteratorType iType;
+            switch(this.sortOrder) {
+            case Ascending:
+            {
+                iType=itrType;
+                switch(itrType) {
+                case AscendingItr:
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            }
+            case Descending:
+            {
+                switch(itrType) {
+                case AscendingItr:
+                    iType=IteratorType.DescendingItr;
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    iType=IteratorType.AscendingItr;
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            }
+            default:
+                throw this.sortOrder.invalid();
+            }
+            return new EmptyItrMonitor(itr,this,iType);
         }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(int index,
-                IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
-        }
+
         @Override
         public StructType getStructType(){
             return StructType.BooleanSetEmpty;
@@ -1124,7 +1233,7 @@ public class BooleanSetImplTest{
         }
         
     }
-    private static class SingleViewMonitor extends AbstractBooleanSetMonitor<OmniNavigableSet.OfBoolean>{
+    private static class SingleViewMonitor extends AbstractBooleanSetMonitor{
         final BooleanSetImplMonitor root;
         final boolean viewedVal;
         private int getMask() {
@@ -1158,19 +1267,44 @@ public class BooleanSetImplTest{
         }
         @Override
         public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override
-        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(int index,
-                IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
+            OmniIterator.OfBoolean itr;
+            IteratorType iType;
+            switch(sortOrder) {
+            case Ascending:
+                iType=itrType;
+                switch(itrType) {
+                case AscendingItr:
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            case Descending:
+                switch(itrType) {
+                case AscendingItr:
+                    iType=IteratorType.DescendingItr;
+                    itr=set.iterator();
+                    break;
+                case DescendingItr:
+                    iType=IteratorType.AscendingItr;
+                    itr=set.descendingIterator();
+                    break;
+                default:
+                    throw itrType.invalid();
+                }
+                break;
+            default:
+                throw sortOrder.invalid();
+            }
+            if(isEmpty()) {
+                return new EmptyItrMonitor(itr,root,iType);
+            }
+            return new SingleViewItrMonitor(viewedVal,root,itr,iType,checkedType.checked?0b10:0b01);
+           
         }
         @Override
         public StructType getStructType(){
@@ -1248,11 +1382,11 @@ public class BooleanSetImplTest{
         }
         
     }
-    private static abstract class AbstractBooleanSetMonitor<SET extends OmniNavigableSet.OfBoolean> implements MonitoredSet<SET>{
-        final SET set;
+    private static abstract class AbstractBooleanSetMonitor implements MonitoredSet<OmniNavigableSet.OfBoolean>{
+        final OmniNavigableSet.OfBoolean set;
         final CheckedType checkedType;
         final SortOrder sortOrder;
-        AbstractBooleanSetMonitor(SET set,CheckedType checkedType,SortOrder sortOrder){
+        AbstractBooleanSetMonitor(OmniNavigableSet.OfBoolean set,CheckedType checkedType,SortOrder sortOrder){
             this.set=set;
             this.checkedType=checkedType;
             this.sortOrder=sortOrder;
@@ -1263,12 +1397,25 @@ public class BooleanSetImplTest{
             return checkedType;
         }
         @Override
-        public SET getCollection(){
+        public OmniNavigableSet.OfBoolean getCollection(){
             return set;
         }
         @Override
         public DataType getDataType(){
             return DataType.BOOLEAN;
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(){
+            return getMonitoredIterator(IteratorType.AscendingItr);
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OfBoolean> getMonitoredIterator(int index,
+                IteratorType itrType){
+            var itr=getMonitoredIterator(itrType);
+            for(int i=0;i<index;++i) {
+                itr.iterateForward();
+            }
+            return itr;
         }
     }
    
@@ -2091,8 +2238,14 @@ public class BooleanSetImplTest{
                                     itrOffset=1;
                                     itrBound=setSize;
                                 }
-                                IntStream.rangeClosed(itrOffset,itrBound).forEach(
-                                        itrCount->TestExecutorService.submitTest(()->{
+                                for(var itrCountTmp=itrOffset;itrCountTmp<=itrBound;++itrCountTmp) {
+                                    final int itrCount=itrCountTmp;
+                                    //TODO
+                                        //TestExecutorService.submitTest(()->{
+                                    if(initSet==SetInitialization.AddTrue && itrRemoveScenario==IteratorRemoveScenario.PostNext && preMod==IllegalModification.ModCollection && itrCount==1)
+                                    {
+                                        TestExecutorService.suspend();
+                                    }
                                             final var setMonitor=initSet
                                                     .initialize(new BooleanSetImplMonitor(checkedType));
                                             final var itrMonitor=setMonitor.getMonitoredIterator();
@@ -2113,12 +2266,14 @@ public class BooleanSetImplTest{
                                                     itrMonitor.iterateForward();
                                                 }
                                             }else{
+                                                
                                                 Assertions.assertThrows(expectedException,
                                                         ()->itrMonitor.verifyRemove());
                                                 itrMonitor.verifyIteratorState();
                                                 setMonitor.verifyCollectionState();
                                             }
-                                        }));
+                                        //});
+                                     }
                             }
                         }
                     }
@@ -2130,11 +2285,13 @@ public class BooleanSetImplTest{
     
     @Test
     public void testReadAndWrite(){
+        TestExecutorService.setNumWorkers(1);
         MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
             var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
             if(functionGen.expectedException==null) {
                 Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
             }else {
+                
                 Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
             }
         };

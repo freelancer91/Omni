@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import omni.impl.AbstractBooleanItr;
 import omni.impl.AbstractByteItr;
+import java.io.ObjectOutputStream;
 final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
     super();
@@ -74,7 +75,56 @@ final class FieldAndMethodAccessor{
       }
       throw new ExceptionInInitializerError(e);
     }
-  } 
+  }
+  private static void writeObjectHelper(Object obj,ObjectOutputStream oos,Method writeObjectMethod) throws IOException{
+      try {
+          writeObjectMethod.invoke(obj,oos);
+      }catch(IllegalAccessException e){
+          throw new Error(e);
+        }catch(InvocationTargetException e){
+          var cause=e.getCause();
+          if(cause instanceof RuntimeException){
+            throw (RuntimeException)cause;
+          }else if(cause instanceof IOException){
+            throw (IOException)cause;
+          }
+          throw new Error(e);
+        }
+  }
+  private static void writeReplaceHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod) throws IOException{
+    Object replacement=null;
+    try{
+      replacement=writeReplaceMethod.invoke(obj);
+    }catch(IllegalAccessException e){
+      throw new Error(e);
+    }catch(InvocationTargetException e){
+      var cause=e.getCause();
+      if(cause instanceof RuntimeException){
+        throw (RuntimeException)cause;
+      }else if(cause instanceof IOException){
+        throw (IOException)cause;
+      }
+      throw new Error(e);
+    }
+    ((Externalizable)replacement).writeExternal(oos);
+  }
+  private static void writeReplaceHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod,Method writeObjectMethod) throws IOException{
+    Object replacement=null;
+    try{
+      replacement=writeReplaceMethod.invoke(obj);
+    }catch(IllegalAccessException e){
+      throw new Error(e);
+    }catch(InvocationTargetException e){
+      var cause=e.getCause();
+      if(cause instanceof RuntimeException){
+        throw (RuntimeException)cause;
+      }else if(cause instanceof IOException){
+        throw (IOException)cause;
+      }
+      throw new Error(e);
+    }
+    writeObjectHelper(replacement,oos,writeObjectMethod);
+  }
   static Method prepareMethodForClass(Class<?> clazz,String methodName,Class<?>...params){
     try{
       Method method=clazz.getDeclaredMethod(methodName,params);
@@ -172,8 +222,8 @@ final class FieldAndMethodAccessor{
     static final omni.impl.set.AbstractBooleanSet.DescendingEmptyView UNCHECKED_EMPTY_DESCENDING=omni.impl.set.AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
   }
   static interface BooleanSetImpl extends AbstractBooleanSet{
-    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-      oos.writeObject(obj);
+    public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
     }
     public static omni.impl.set.BooleanSetImpl clone(Object obj){
       return (omni.impl.set.BooleanSetImpl)((omni.impl.set.BooleanSetImpl)obj).clone();
@@ -185,8 +235,8 @@ final class FieldAndMethodAccessor{
       public static omni.impl.set.BooleanSetImpl.Checked clone(Object obj){
         return (omni.impl.set.BooleanSetImpl.Checked)((omni.impl.set.BooleanSetImpl.Checked)obj).clone();
       }
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        oos.writeObject(obj);
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
       }
       public static int state(Object obj){
         return ((omni.impl.set.BooleanSetImpl)obj).state;
@@ -196,8 +246,8 @@ final class FieldAndMethodAccessor{
       public static omni.impl.set.BooleanSetImpl.Descending clone(Object obj){
         return (omni.impl.set.BooleanSetImpl.Descending)((omni.impl.set.BooleanSetImpl.Descending)obj).clone();
       }
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        oos.writeObject(obj);
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
       }
       public static int state(Object obj){
         return ((omni.impl.set.BooleanSetImpl)obj).state;
@@ -206,8 +256,8 @@ final class FieldAndMethodAccessor{
         public static omni.impl.set.BooleanSetImpl.Descending.Checked clone(Object obj){
           return (omni.impl.set.BooleanSetImpl.Descending.Checked)((omni.impl.set.BooleanSetImpl.Descending.Checked)obj).clone();
         }
-        public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-          oos.writeObject(obj);
+        public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+          ((Externalizable)obj).writeExternal(oos);
         }
         public static int state(Object obj){
           return ((omni.impl.set.BooleanSetImpl)obj).state;
@@ -221,23 +271,25 @@ final class FieldAndMethodAccessor{
       }
     }
     static interface DescendingView extends AbstractFullView{
+      static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"DescendingView","writeReplace");
       public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"DescendingView","clone");
       public static omni.impl.set.BooleanSetImpl.Descending clone(Object obj){
         return (omni.impl.set.BooleanSetImpl.Descending)callMethod(cloneMethod,obj);
       }
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        oos.writeObject(obj);
-      }
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+          writeReplaceHelper(obj,oos,writeReplaceMethod);
+        }
       static omni.impl.set.BooleanSetImpl root(Object obj){
         return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
       }
       static interface Checked extends DescendingView{
+        static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked","writeReplace");
         public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked","clone");
         public static omni.impl.set.BooleanSetImpl.Descending.Checked clone(Object obj){
           return (omni.impl.set.BooleanSetImpl.Descending.Checked)callMethod(cloneMethod,obj);
         }
-        public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-          oos.writeObject(obj);
+        public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+          writeReplaceHelper(obj,oos,writeReplaceMethod);
         }
         static omni.impl.set.BooleanSetImpl root(Object obj){
           return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
@@ -245,23 +297,25 @@ final class FieldAndMethodAccessor{
       }
     }
     static interface AscendingView extends AbstractFullView{
+      static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AscendingView","writeReplace");
       public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AscendingView","clone");
       public static omni.impl.set.BooleanSetImpl clone(Object obj){
         return (omni.impl.set.BooleanSetImpl)callMethod(cloneMethod,obj);
       }
-      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-        oos.writeObject(obj);
-      }
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+          writeReplaceHelper(obj,oos,writeReplaceMethod);
+        }
       static omni.impl.set.BooleanSetImpl root(Object obj){
         return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
       }
       static interface Checked extends AscendingView{
+        static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked","writeReplace");
         public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.BooleanSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked","clone");
         public static omni.impl.set.BooleanSetImpl.Checked clone(Object obj){
           return (omni.impl.set.BooleanSetImpl.Checked)callMethod(cloneMethod,obj);
         }
-        public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
-          oos.writeObject(obj);
+        public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+          writeReplaceHelper(obj,oos,writeReplaceMethod);
         }
         static omni.impl.set.BooleanSetImpl root(Object obj){
           return (omni.impl.set.BooleanSetImpl)getValue(rootField,obj);
