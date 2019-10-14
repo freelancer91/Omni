@@ -5237,7 +5237,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }catch(ConcurrentModificationException e){
         throw e;
       }catch(RuntimeException e){
-        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
+        throw CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
       this.itrState=0b100;
     }
@@ -5259,7 +5259,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }catch(ConcurrentModificationException e){
         throw e;
       }catch(RuntimeException e){
-        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
+        throw CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
       this.itrState=0b100;
     }
@@ -5402,7 +5402,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }catch(ConcurrentModificationException e){
         throw e;
       }catch(RuntimeException e){
-        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
+        throw CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
       this.itrState=0b100;
     }
@@ -5424,7 +5424,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }catch(ConcurrentModificationException e){
         throw e;
       }catch(RuntimeException e){
-        CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
+        throw CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
       }
       this.itrState=0b100;
     }

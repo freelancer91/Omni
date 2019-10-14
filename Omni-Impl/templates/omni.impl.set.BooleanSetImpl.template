@@ -2786,7 +2786,7 @@ ERROR the direction DIRECTION cannot be matched with the view VIEW
   }catch(ConcurrentModificationException e){
     throw e;
   }catch(RuntimeException e){
-    CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
+    throw CheckedCollection.checkModCount(expectedRootState,root.state,itrState,this.itrState,e);
   }
   this.itrState=0b100;
   #ELSEIFSWITCH CHECKED==False

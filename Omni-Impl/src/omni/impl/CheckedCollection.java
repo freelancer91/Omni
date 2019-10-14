@@ -4,10 +4,12 @@ public interface CheckedCollection{
     static void checkLo(int index) throws IndexOutOfBoundsException{
         if(index<0){ throw new IndexOutOfBoundsException(index); }
     }
-    static <X extends RuntimeException> void checkModCount(int expectedModCount,int actualModCount,int expectedCursor,int actualCursor,X e)
+    static <X extends RuntimeException> ConcurrentModificationException checkModCount(int expectedModCount,int actualModCount,int expectedCursor,int actualCursor,X e)
             throws X{
-    	checkModCount(expectedModCount,actualModCount,e);
-    	checkModCount(expectedCursor,actualCursor,e);
+      if(expectedModCount==actualModCount) {
+        return checkModCount(expectedCursor,actualCursor,e);
+      }
+      return new ConcurrentModificationException(getCMEMessage(expectedCursor,actualCursor),e);
     }
     static void checkModCount(int expectedModCount,int actualModCount,int expectedCursor,int actualCursor)
             throws ConcurrentModificationException{

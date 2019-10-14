@@ -720,40 +720,21 @@ public class BooleanSetImplTest{
         public void modCollection(){
             switch(expectedState) {
             case 0b00:
-                switch(sortOrder) {
-                case Ascending:
-                    set.add(false);
-                    expectedState=0b01;
-                    break;
-                case Descending:
-                    set.add(true);
-                    expectedState=0b10;
-                    break;
-                default:
-                    throw sortOrder.invalid();
-                }
+                set.add(false);
+                expectedState=0b01;
                 break;
             case 0b01:
+                set.removeVal(false);
                 set.add(true);
-                expectedState=0b11;
+                expectedState=0b10;
                 break;
             case 0b10:
                 set.add(false);
                 expectedState=0b11;
                 break;
             case 0b11:
-                switch(sortOrder) {
-                case Ascending:
-                    set.removeVal(false);
-                    expectedState=0b10;
-                    break;
-                case Descending:
-                    set.removeVal(true);
-                    expectedState=0b01;
-                    break;
-                default:
-                    throw sortOrder.invalid();
-                }
+                set.clear();
+                expectedState=0b00;
                 break;
             default:
                 throw illegalState();
@@ -2066,67 +2047,76 @@ public class BooleanSetImplTest{
                                 if(initSet == SetInitialization.AddTrueAndFalse){
                                     itrScenarioMax=2;
                                 }
-                                IntStream.rangeClosed(0,itrScenarioMax).forEach(itrScenario->{
-                                    LongStream
-                                    .rangeClosed(0,
-                                            preMod.expectedException == null && functionGen.randomized
-                                            && initSet == SetInitialization.AddTrueAndFalse
-                                            && itrScenario == 0?100:0)
-                                    .forEach(randSeed->{
-                                        for(final var functionCallType:FunctionCallType.values()){
-                                            TestExecutorService.submitTest(()->{
-                                                final var setMonitor=initSet
-                                                        .initialize(new BooleanSetImplMonitor(checkedType));
-                                                final var itrMonitor=setMonitor.getMonitoredIterator();
-                                                int adjustedState;
-                                                switch(itrScenario){
-                                                case 1:
-                                                    itrMonitor.iterateForward();
-                                                    adjustedState=0b10;
-                                                    break;
-                                                case 2:
-                                                    itrMonitor.iterateForward();
-                                                    itrMonitor.remove();
-                                                    adjustedState=0b10;
-                                                    break;
-                                                default:
-                                                    switch(initSet){
-                                                    case AddFalse:
-                                                        adjustedState=0b01;
-                                                        break;
-                                                    case AddTrue:
-                                                        adjustedState=0b10;
-                                                        break;
-                                                    case AddTrueAndFalse:
-                                                        adjustedState=0b11;
-                                                        break;
-                                                    case Empty:
-                                                        adjustedState=0b00;
-                                                        break;
-                                                    default:
-                                                        throw initSet.invalid();
-                                                    }
-                                                }
-                                                itrMonitor.illegalMod(preMod);
-                                                final Class<? extends Throwable> expectedException=adjustedState == 0b00
-                                                        ?null
-                                                                :preMod.expectedException == null
-                                                                ?functionGen.expectedException
-                                                                        :preMod.expectedException;
-                                                if(expectedException == null){
-                                                    itrMonitor.verifyForEachRemaining(functionGen,
-                                                            functionCallType,randSeed);
-                                                }else{
-                                                    Assertions.assertThrows(expectedException,
-                                                            ()->itrMonitor.verifyForEachRemaining(functionGen,
-                                                                    functionCallType,randSeed));
-                                                    itrMonitor.verifyIteratorState();
-                                                    setMonitor.verifyCollectionState();
-                                                }
-                                            });
-                                        }
-                                    });
-                                });
+                                for(int tmpItrScenario=0;tmpItrScenario<=itrScenarioMax;++tmpItrScenario) {
+                                  final int itrScenario=tmpItrScenario;
+                                  final long randMax= preMod.expectedException == null && functionGen.randomized
+                                      && initSet == SetInitialization.AddTrueAndFalse
+                                      && itrScenario == 0?100:0;
+                                  for(long tmpRandSeed=0;tmpRandSeed<=randMax;++tmpRandSeed) {
+                                    final long randSeed=tmpRandSeed;
+                                    for(final var functionCallType:FunctionCallType.values()){
+                                      //TestExecutorService.submitTest(()->{
+                                      if(checkedType.checked
+                                          &&initSet==SetInitialization.AddFalse
+                                          &&functionGen==MonitoredFunctionGen.ModCollection
+                                          &&preMod==IllegalModification.ModCollection
+                                          &&itrScenario==0
+                                          &&randSeed==0
+                                          &&functionCallType==FunctionCallType.Boxed) {
+                                        TestExecutorService.suspend();
+                                      }
+                                          final var setMonitor=initSet
+                                                  .initialize(new BooleanSetImplMonitor(checkedType));
+                                          final var itrMonitor=setMonitor.getMonitoredIterator();
+                                          int adjustedState;
+                                          switch(itrScenario){
+                                          case 1:
+                                              itrMonitor.iterateForward();
+                                              adjustedState=0b10;
+                                              break;
+                                          case 2:
+                                              itrMonitor.iterateForward();
+                                              itrMonitor.remove();
+                                              adjustedState=0b10;
+                                              break;
+                                          default:
+                                              switch(initSet){
+                                              case AddFalse:
+                                                  adjustedState=0b01;
+                                                  break;
+                                              case AddTrue:
+                                                  adjustedState=0b10;
+                                                  break;
+                                              case AddTrueAndFalse:
+                                                  adjustedState=0b11;
+                                                  break;
+                                              case Empty:
+                                                  adjustedState=0b00;
+                                                  break;
+                                              default:
+                                                  throw initSet.invalid();
+                                              }
+                                          }
+                                          itrMonitor.illegalMod(preMod);
+                                          final Class<? extends Throwable> expectedException=adjustedState == 0b00
+                                                  ?null
+                                                          :preMod.expectedException == null
+                                                          ?functionGen.expectedException
+                                                                  :preMod.expectedException;
+                                          if(expectedException == null){
+                                              itrMonitor.verifyForEachRemaining(functionGen,
+                                                      functionCallType,randSeed);
+                                          }else{
+                                              Assertions.assertThrows(expectedException,
+                                                      ()->itrMonitor.verifyForEachRemaining(functionGen,
+                                                              functionCallType,randSeed));
+                                              itrMonitor.verifyIteratorState();
+                                              setMonitor.verifyCollectionState();
+                                          }
+                                      //});
+                                  }
+                                  }
+                                }
                             }
                         }
                     }
