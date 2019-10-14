@@ -1388,6 +1388,158 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override public OmniNavigableSet.OfBoolean descendingSet(){
       return new DescendingView.Checked(this);
     }
+    @Override public void forEach(BooleanConsumer action){
+      final int state;
+      switch(state=this.state){ 
+        default:
+          return;
+        case 0b11:
+          try{
+            action.accept(false);
+            action.accept(true);
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          break;
+        case 0b01:
+          try{
+            action.accept(false);
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          break;
+        case 0b10:
+          try{
+            action.accept(true);
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+      }
+    }
+    @Override public void forEach(Consumer<? super Boolean> action){
+      final int state;
+      switch(state=this.state){ 
+        default:
+          return;
+        case 0b11:
+          try{
+            action.accept(Boolean.FALSE);
+            action.accept(Boolean.TRUE);
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          break;
+        case 0b01:
+          try{
+            action.accept(Boolean.FALSE);
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          break;
+        case 0b10:
+          try{
+            action.accept(Boolean.TRUE);
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+      }
+    }
+    @Override public boolean removeIf(BooleanPredicate filter){
+      final int state;
+      switch(state=this.state){
+        default:
+          return false;
+        case 0b11:
+          final int newState;
+          try{
+            if(filter.test(false)){
+              if(filter.test(true)){
+                newState=0b00;
+              }else{
+                newState=0b10;
+              }
+            }else{
+              if(filter.test(true)){
+                newState=0b01;
+              }else{
+                return false;
+              }
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          this.state=newState;
+          break;
+        case 0b01:
+          try{
+            if(!filter.test(false)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          this.state=0b00;
+          break;
+        case 0b10:
+          try{
+            if(!filter.test(true)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          this.state=0b00;
+      }
+      return true;
+    }
+    @Override public boolean removeIf(Predicate<? super Boolean> filter){
+      final int state;
+      switch(state=this.state){
+        default:
+          return false;
+        case 0b11:
+          final int newState;
+          try{
+            if(filter.test(Boolean.FALSE)){
+              if(filter.test(Boolean.TRUE)){
+                newState=0b00;
+              }else{
+                newState=0b10;
+              }
+            }else{
+              if(filter.test(Boolean.TRUE)){
+                newState=0b01;
+              }else{
+                return false;
+              }
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          this.state=newState;
+          break;
+        case 0b01:
+          try{
+            if(!filter.test(Boolean.FALSE)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          this.state=0b00;
+          break;
+        case 0b10:
+          try{
+            if(!filter.test(Boolean.TRUE)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,this.state);
+          }
+          this.state=0b00;
+      }
+      return true;
+    }
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final int state=this.state;
       final T[] dst;
@@ -2008,6 +2160,158 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
           return EMPTY_ITR;
         }
         return new CheckedDescendingFullItr(this,state);
+      }
+      @Override public void forEach(BooleanConsumer action){
+        final int state;
+        switch(state=this.state){ 
+          default:
+            return;
+          case 0b11:
+            try{
+              action.accept(true);
+              action.accept(false);
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            break;
+          case 0b01:
+            try{
+              action.accept(false);
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            break;
+          case 0b10:
+            try{
+              action.accept(true);
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+        }
+      }
+      @Override public void forEach(Consumer<? super Boolean> action){
+        final int state;
+        switch(state=this.state){ 
+          default:
+            return;
+          case 0b11:
+            try{
+              action.accept(Boolean.TRUE);
+              action.accept(Boolean.FALSE);
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            break;
+          case 0b01:
+            try{
+              action.accept(Boolean.FALSE);
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            break;
+          case 0b10:
+            try{
+              action.accept(Boolean.TRUE);
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+        }
+      }
+      @Override public boolean removeIf(BooleanPredicate filter){
+        final int state;
+        switch(state=this.state){
+          default:
+            return false;
+          case 0b11:
+            final int newState;
+            try{
+              if(filter.test(false)){
+                if(filter.test(true)){
+                  newState=0b00;
+                }else{
+                  newState=0b10;
+                }
+              }else{
+                if(filter.test(true)){
+                  newState=0b01;
+                }else{
+                  return false;
+                }
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            this.state=newState;
+            break;
+          case 0b01:
+            try{
+              if(!filter.test(false)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            this.state=0b00;
+            break;
+          case 0b10:
+            try{
+              if(!filter.test(true)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            this.state=0b00;
+        }
+        return true;
+      }
+      @Override public boolean removeIf(Predicate<? super Boolean> filter){
+        final int state;
+        switch(state=this.state){
+          default:
+            return false;
+          case 0b11:
+            final int newState;
+            try{
+              if(filter.test(Boolean.FALSE)){
+                if(filter.test(Boolean.TRUE)){
+                  newState=0b00;
+                }else{
+                  newState=0b10;
+                }
+              }else{
+                if(filter.test(Boolean.TRUE)){
+                  newState=0b01;
+                }else{
+                  return false;
+                }
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            this.state=newState;
+            break;
+          case 0b01:
+            try{
+              if(!filter.test(Boolean.FALSE)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            this.state=0b00;
+            break;
+          case 0b10:
+            try{
+              if(!filter.test(Boolean.TRUE)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,this.state);
+            }
+            this.state=0b00;
+        }
+        return true;
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
 	      final int state=this.state;
@@ -2800,6 +3104,162 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
         return root;
       }
+      @Override public void forEach(BooleanConsumer action){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return;
+          case 0b11:
+            try{
+              action.accept(true);
+              action.accept(false);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b01:
+            try{
+              action.accept(false);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b10:
+            try{
+              action.accept(true);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+        }
+      }
+      @Override public void forEach(Consumer<? super Boolean> action){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return;
+          case 0b11:
+            try{
+              action.accept(Boolean.TRUE);
+              action.accept(Boolean.FALSE);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b01:
+            try{
+              action.accept(Boolean.FALSE);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b10:
+            try{
+              action.accept(Boolean.TRUE);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+        }
+      }
+      @Override public boolean removeIf(BooleanPredicate filter){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return false;
+          case 0b11:
+            final int newState;
+            try{
+              if(filter.test(false)){
+                if(filter.test(true)){
+                  newState=0b00;
+                }else{
+                  newState=0b10;
+                }
+              }else{
+                if(filter.test(true)){
+                  newState=0b01;
+                }else{
+                  return false;
+                }
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=newState;
+            break;
+          case 0b01:
+            try{
+              if(!filter.test(false)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+            break;
+          case 0b10:
+            try{
+              if(!filter.test(true)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+        }
+        return true;
+      }
+      @Override public boolean removeIf(Predicate<? super Boolean> filter){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return false;
+          case 0b11:
+            final int newState;
+            try{
+              if(filter.test(Boolean.FALSE)){
+                if(filter.test(Boolean.TRUE)){
+                  newState=0b00;
+                }else{
+                  newState=0b10;
+                }
+              }else{
+                if(filter.test(Boolean.TRUE)){
+                  newState=0b01;
+                }else{
+                  return false;
+                }
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=newState;
+            break;
+          case 0b01:
+            try{
+              if(!filter.test(Boolean.FALSE)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+            break;
+          case 0b10:
+            try{
+              if(!filter.test(Boolean.TRUE)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+        }
+        return true;
+      }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
 	      final int state=(root=this.root).state;
@@ -3385,6 +3845,162 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       private static final long serialVersionUID=1L;
       private Checked(BooleanSetImpl root){
         super(root);
+      }
+      @Override public void forEach(BooleanConsumer action){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return;
+          case 0b11:
+            try{
+              action.accept(false);
+              action.accept(true);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b01:
+            try{
+              action.accept(false);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b10:
+            try{
+              action.accept(true);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+        }
+      }
+      @Override public void forEach(Consumer<? super Boolean> action){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return;
+          case 0b11:
+            try{
+              action.accept(Boolean.FALSE);
+              action.accept(Boolean.TRUE);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b01:
+            try{
+              action.accept(Boolean.FALSE);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            break;
+          case 0b10:
+            try{
+              action.accept(Boolean.TRUE);
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+        }
+      }
+      @Override public boolean removeIf(BooleanPredicate filter){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return false;
+          case 0b11:
+            final int newState;
+            try{
+              if(filter.test(false)){
+                if(filter.test(true)){
+                  newState=0b00;
+                }else{
+                  newState=0b10;
+                }
+              }else{
+                if(filter.test(true)){
+                  newState=0b01;
+                }else{
+                  return false;
+                }
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=newState;
+            break;
+          case 0b01:
+            try{
+              if(!filter.test(false)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+            break;
+          case 0b10:
+            try{
+              if(!filter.test(true)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+        }
+        return true;
+      }
+      @Override public boolean removeIf(Predicate<? super Boolean> filter){
+        final int state;
+        final BooleanSetImpl root;
+        switch(state=(root=this.root).state){
+          default:
+            return false;
+          case 0b11:
+            final int newState;
+            try{
+              if(filter.test(Boolean.FALSE)){
+                if(filter.test(Boolean.TRUE)){
+                  newState=0b00;
+                }else{
+                  newState=0b10;
+                }
+              }else{
+                if(filter.test(Boolean.TRUE)){
+                  newState=0b01;
+                }else{
+                  return false;
+                }
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=newState;
+            break;
+          case 0b01:
+            try{
+              if(!filter.test(Boolean.FALSE)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+            break;
+          case 0b10:
+            try{
+              if(!filter.test(Boolean.TRUE)){
+                return false;
+              }
+            }finally{
+              CheckedCollection.checkModCount(state,root.state);
+            }
+            root.state=0b00;
+        }
+        return true;
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
@@ -4170,6 +4786,60 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       private Checked(BooleanSetImpl root){
         super(root);
       }
+      @Override public void forEach(BooleanConsumer action){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b10)!=0){
+          try{
+            action.accept(true);
+          }finally{
+             CheckedCollection.checkModCount(state,root.state);
+          }
+        }
+      }
+      @Override public void forEach(Consumer<? super Boolean> action){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b10)!=0){
+          try{
+            action.accept(Boolean.TRUE);
+          }finally{
+             CheckedCollection.checkModCount(state,root.state);
+          }
+        }
+      }
+      @Override public boolean removeIf(BooleanPredicate filter){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b10)!=0){
+          try{
+            if(!filter.test(true)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,root.state);
+          }
+          root.state=state&0b01;
+          return true;
+        }
+        return false;
+      }
+      @Override public boolean removeIf(Predicate<? super Boolean> filter){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b10)!=0){
+          try{
+            if(!filter.test(Boolean.TRUE)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,root.state);
+          }
+          root.state=state&0b01;
+          return true;
+        }
+        return false;
+      }
       @Override public boolean firstBoolean(){
         if((root.state&0b10)==0){
           throw new NoSuchElementException();
@@ -4931,6 +5601,60 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     private static class Checked extends UncheckedFalseView{
       private Checked(BooleanSetImpl root){
         super(root);
+      }
+      @Override public void forEach(BooleanConsumer action){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b01)!=0){
+          try{
+            action.accept(false);
+          }finally{
+             CheckedCollection.checkModCount(state,root.state);
+          }
+        }
+      }
+      @Override public void forEach(Consumer<? super Boolean> action){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b01)!=0){
+          try{
+            action.accept(Boolean.FALSE);
+          }finally{
+             CheckedCollection.checkModCount(state,root.state);
+          }
+        }
+      }
+      @Override public boolean removeIf(BooleanPredicate filter){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b01)!=0){
+        	try{
+            if(!filter.test(false)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,root.state);
+          }
+          root.state=state&0b10;
+          return true;
+        }
+        return false;
+      }
+      @Override public boolean removeIf(Predicate<? super Boolean> filter){
+        final BooleanSetImpl root;
+        final int state;
+        if(((state=(root=this.root).state)&0b01)!=0){
+        	try{
+            if(!filter.test(Boolean.FALSE)){
+              return false;
+            }
+          }finally{
+            CheckedCollection.checkModCount(state,root.state);
+          }
+          root.state=state&0b10;
+          return true;
+        }
+        return false;
       }
       @Override public boolean firstBoolean(){
         if((root.state&0b01)==0){

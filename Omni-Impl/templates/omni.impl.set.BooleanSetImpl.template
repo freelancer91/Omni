@@ -33,10 +33,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   #MACRO AccessMethods<this,Full,Ascending>()
   #MACRO EqualsMethod<this,Full>()
   #MACRO SizeClearHashCodeIsEmpty<this,Full>()
-  #MACRO ForEach<this,Full,Ascending>(BooleanConsumer,true,false)
-  #MACRO ForEach<this,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
-  #MACRO RemoveIf<this,Full>(BooleanPredicate,true,false)
-  #MACRO RemoveIf<this,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  #MACRO ForEach<False,this,Full,Ascending>(BooleanConsumer,true,false)
+  #MACRO ForEach<False,this,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+  #MACRO RemoveIf<False,this,Full>(BooleanPredicate,true,false)
+  #MACRO RemoveIf<False,this,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
   #MACRO AddRemoveContains<this,Full,True>(10)
   #MACRO AddRemoveContains<this,Full,False>(01)
   #MACRO ToArray<this,Ascending,Full>()
@@ -61,6 +61,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override public OmniNavigableSet.OfBoolean descendingSet(){
       return new DescendingView.Checked(this);
     }
+    #MACRO ForEach<True,this,Full,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<True,this,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO RemoveIf<True,this,Full>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<True,this,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final int state=this.state;
       final T[] dst;
@@ -113,8 +117,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     #MACRO Constructors<Descending>()
     #MACRO Comparator<Descending>()
     #MACRO ToString<this,Descending,Full>()
-    #MACRO ForEach<this,Full,Descending>(BooleanConsumer,true,false)
-    #MACRO ForEach<this,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO ForEach<False,this,Full,Descending>(BooleanConsumer,true,false)
+    #MACRO ForEach<False,this,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO ToArray<this,Descending,Full>()
     #MACRO AccessMethods<this,Full,Descending>()
     @Override public OmniIterator.OfBoolean iterator(){
@@ -145,6 +149,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         }
         return new CheckedDescendingFullItr(this,state);
       }
+      #MACRO ForEach<True,this,Full,Descending>(BooleanConsumer,true,false)
+      #MACRO ForEach<True,this,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      #MACRO RemoveIf<True,this,Full>(BooleanPredicate,true,false)
+      #MACRO RemoveIf<True,this,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
 	      final int state=this.state;
 	      final T[] dst;
@@ -247,8 +255,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     }
     #MACRO AddRemoveContains<root,Full,True>(10)
     #MACRO AddRemoveContains<root,Full,False>(01)
-    #MACRO RemoveIf<root,Full>(BooleanPredicate,true,false)
-    #MACRO RemoveIf<root,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO RemoveIf<False,root,Full>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<False,root,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO SizeClearHashCodeIsEmpty<root,Full>()
     #MACRO EqualsMethod<root,Full>()
   }
@@ -269,8 +277,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     }
     #MACRO Comparator<Descending>()
     #MACRO ToArray<root,Descending,Full>()
-    #MACRO ForEach<root,Full,Descending>(BooleanConsumer,true,false)
-    #MACRO ForEach<root,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO ForEach<False,root,Full,Descending>(BooleanConsumer,true,false)
+    #MACRO ForEach<False,root,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Descending,False,Full>()
     #MACRO ToString<root,Descending,Full>()
     #MACRO AccessMethods<root,Full,Descending>()
@@ -299,6 +307,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
         return root;
       }
+      #MACRO ForEach<True,root,Full,Descending>(BooleanConsumer,true,false)
+      #MACRO ForEach<True,root,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      #MACRO RemoveIf<True,root,Full>(BooleanPredicate,true,false)
+      #MACRO RemoveIf<True,root,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
 	      final int state=(root=this.root).state;
@@ -362,8 +374,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     }
     #MACRO Comparator<Ascending>()
     #MACRO ToArray<root,Ascending,Full>()
-    #MACRO ForEach<root,Full,Ascending>(BooleanConsumer,true,false)
-    #MACRO ForEach<root,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO ForEach<False,root,Full,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<False,root,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Ascending,False,Full>()
     #MACRO AccessMethods<root,Full,Ascending>()
     #MACRO ToString<root,Ascending,Full>()
@@ -393,6 +405,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       private Checked(BooleanSetImpl root){
         super(root);
       }
+      #MACRO ForEach<True,root,Full,Ascending>(BooleanConsumer,true,false)
+      #MACRO ForEach<True,root,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      #MACRO RemoveIf<True,root,Full>(BooleanPredicate,true,false)
+      #MACRO RemoveIf<True,root,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
 	      final int state=(root=this.root).state;
@@ -459,13 +475,13 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     }
     #MACRO AddRemoveContains<root,True,True>(10)
     #MACRO AddRemoveContains<root,True,False>(01)
-    #MACRO RemoveIf<root,True>(BooleanPredicate,true,false)
-    #MACRO RemoveIf<root,True>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO RemoveIf<False,root,True>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<False,root,True>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO SizeClearHashCodeIsEmpty<root,True>()
     #MACRO EqualsMethod<root,True>()
     #MACRO ToArray<root,Ascending,True>()
-    #MACRO ForEach<root,True,Ascending>(BooleanConsumer,true,false)
-    #MACRO ForEach<root,True,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO ForEach<False,root,True,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<False,root,True,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Ascending,False,True>()
     #MACRO ToString<root,Ascending,True>()
     #MACRO AccessMethods<root,True,Ascending>()
@@ -501,6 +517,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       private Checked(BooleanSetImpl root){
         super(root);
       }
+      #MACRO ForEach<True,root,True,Ascending>(BooleanConsumer,true,false)
+      #MACRO ForEach<True,root,True,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      #MACRO RemoveIf<True,root,True>(BooleanPredicate,true,false)
+      #MACRO RemoveIf<True,root,True>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       #MACRO FirstAndLastBoolean<root,Ascending,True,True>()
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         final BooleanSetImpl root;
@@ -554,13 +574,13 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     }
     #MACRO AddRemoveContains<root,False,True>(10)
     #MACRO AddRemoveContains<root,False,False>(01)
-    #MACRO RemoveIf<root,False>(BooleanPredicate,true,false)
-    #MACRO RemoveIf<root,False>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO RemoveIf<False,root,False>(BooleanPredicate,true,false)
+    #MACRO RemoveIf<False,root,False>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO SizeClearHashCodeIsEmpty<root,False>()
     #MACRO EqualsMethod<root,False>()
     #MACRO ToArray<root,Ascending,False>()
-    #MACRO ForEach<root,False,Ascending>(BooleanConsumer,true,false)
-    #MACRO ForEach<root,False,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    #MACRO ForEach<False,root,False,Ascending>(BooleanConsumer,true,false)
+    #MACRO ForEach<False,root,False,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO FirstAndLastBoolean<root,Ascending,False,False>()
     #MACRO ToString<root,Ascending,False>()
     #MACRO AccessMethods<root,False,Ascending>()
@@ -598,6 +618,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       private Checked(BooleanSetImpl root){
         super(root);
       }
+      #MACRO ForEach<True,root,False,Ascending>(BooleanConsumer,true,false)
+      #MACRO ForEach<True,root,False,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      #MACRO RemoveIf<True,root,False>(BooleanPredicate,true,false)
+      #MACRO RemoveIf<True,root,False>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       #MACRO FirstAndLastBoolean<root,Ascending,True,False>()
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
           return new UncheckedFalseView.Checked.Descending(root);
@@ -2528,7 +2552,7 @@ ERROR the source SOURCE cannot be matched with the view VIEW
 #ENDIF
 }
 #ENDDEF
-#MACRODEF RemoveIf<SOURCE,VIEW>(PREDICATE,TRUEVAL,FALSEVAL)
+#MACRODEF RemoveIf<CHECKED,SOURCE,VIEW>(PREDICATE,TRUEVAL,FALSEVAL)
 #IFNOTSWITCH SOURCE==root,this
 ERROR unknown source SOURCE
 #ENDIF
@@ -2537,6 +2561,7 @@ ERROR unknown source SOURCE
 ERROR source SOURCE cannot be matched with the view VIEW
   #ENDIF
 #ENDIF
+#IFSWITCH CHECKED==False
 @Override public boolean removeIf(PREDICATE filter){
 #IFSWITCH VIEW==Full
   #IFSWITCH SOURCE==root
@@ -2590,8 +2615,99 @@ ERROR source SOURCE cannot be matched with the view VIEW
   return false;
 #ENDIF
 }
+#ELSE
+  #IFSWITCH VIEW==Full,True,False
+@Override public boolean removeIf(PREDICATE filter){
+    #IFSWITCH VIEW==Full
+      #IFSWITCH SOURCE==root
+  final int state;
+  final BooleanSetImpl SOURCE;
+  switch(state=(SOURCE=this.SOURCE).state){
+      #ELSEIFSWITCH SOURCE==this
+  final int state;
+  switch(state=SOURCE.state){
+      #ENDIF
+    default:
+      return false;
+    case 0b11:
+      final int newState;
+      try{
+        if(filter.test(FALSEVAL)){
+          if(filter.test(TRUEVAL)){
+            newState=0b00;
+          }else{
+            newState=0b10;
+          }
+        }else{
+          if(filter.test(TRUEVAL)){
+            newState=0b01;
+          }else{
+            return false;
+          }
+        }
+      }finally{
+        CheckedCollection.checkModCount(state,SOURCE.state);
+      }
+      SOURCE.state=newState;
+      break;
+    case 0b01:
+      try{
+        if(!filter.test(FALSEVAL)){
+          return false;
+        }
+      }finally{
+        CheckedCollection.checkModCount(state,SOURCE.state);
+      }
+      SOURCE.state=0b00;
+      break;
+    case 0b10:
+      try{
+        if(!filter.test(TRUEVAL)){
+          return false;
+        }
+      }finally{
+        CheckedCollection.checkModCount(state,SOURCE.state);
+      }
+      SOURCE.state=0b00;
+  }
+  return true;
+    #ELSEIFSWITCH VIEW==True
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b10)!=0){
+    try{
+      if(!filter.test(TRUEVAL)){
+        return false;
+      }
+    }finally{
+      CheckedCollection.checkModCount(state,SOURCE.state);
+    }
+    SOURCE.state=state&0b01;
+    return true;
+  }
+  return false;
+    #ELSEIFSWITCH VIEW==False
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b01)!=0){
+  	try{
+      if(!filter.test(FALSEVAL)){
+        return false;
+      }
+    }finally{
+      CheckedCollection.checkModCount(state,SOURCE.state);
+    }
+    SOURCE.state=state&0b10;
+    return true;
+  }
+  return false;
+    #ENDIF
+  
+}
+  #ENDIF
+#ENDIF
 #ENDDEF
-#MACRODEF ForEach<SOURCE,VIEW,DIRECTION>(CONSUMER,TRUEVAL,FALSEVAL)
+#MACRODEF ForEach<CHECKED,SOURCE,VIEW,DIRECTION>(CONSUMER,TRUEVAL,FALSEVAL)
 #IFNOTSWITCH VIEW==Full,True,False
 ERROR unknown view VIEW
 #ENDIF
@@ -2610,34 +2726,95 @@ ERROR the direction DIRECTION cannot be matched with the view VIEW
   #ENDIF
 #ENDIF
 @Override public void forEach(CONSUMER action){
-#IFSWITCH VIEW==Full
+#IFSWITCH CHECKED==False
+  #IFSWITCH VIEW==Full
   switch(SOURCE.state){
     case 0b11:
-  #IFSWITCH DIRECTION==Ascending
+    #IFSWITCH DIRECTION==Ascending
       action.accept(FALSEVAL);
     case 0b10:
       action.accept(TRUEVAL);
       break;
     case 0b01:
       action.accept(FALSEVAL);
-  #ELSEIFSWITCH DIRECTION==Descending
+    #ELSEIFSWITCH DIRECTION==Descending
       action.accept(TRUEVAL);
     case 0b01:
       action.accept(FALSEVAL);
       break;
     case 0b10:
       action.accept(TRUEVAL);
-  #ENDIF
+    #ENDIF
     default:
   }
-#ELSEIFSWITCH VIEW==True
+  #ELSEIFSWITCH VIEW==True
   if((SOURCE.state&0b10)!=0){
     action.accept(TRUEVAL);
   }
-#ELSEIFSWITCH VIEW==False
+  #ELSEIFSWITCH VIEW==False
   if((SOURCE.state&0b01)!=0){
     action.accept(FALSEVAL);
   }
+  #ENDIF
+#ELSE
+  #IFSWITCH VIEW==Full
+  final int state;
+    #IFSWITCH SOURCE==root
+  final BooleanSetImpl SOURCE;
+  switch(state=(SOURCE=this.SOURCE).state){
+    #ELSEIFSWITCH SOURCE==this
+  switch(state=this.state){ 
+    #ENDIF
+    default:
+      return;
+    case 0b11:
+      try{
+      #IFSWITCH DIRECTION==Ascending
+        action.accept(FALSEVAL);
+        action.accept(TRUEVAL);
+      #ELSEIFSWITCH DIRECTION==Descending
+        action.accept(TRUEVAL);
+        action.accept(FALSEVAL);
+      #ENDIF
+      }finally{
+        CheckedCollection.checkModCount(state,SOURCE.state);
+      }
+      break;
+    case 0b01:
+      try{
+        action.accept(FALSEVAL);
+      }finally{
+        CheckedCollection.checkModCount(state,SOURCE.state);
+      }
+      break;
+    case 0b10:
+      try{
+        action.accept(TRUEVAL);
+      }finally{
+        CheckedCollection.checkModCount(state,SOURCE.state);
+      }
+  }
+  #ELSEIFSWITCH VIEW==True
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b10)!=0){
+    try{
+      action.accept(TRUEVAL);
+    }finally{
+       CheckedCollection.checkModCount(state,SOURCE.state);
+    }
+  }
+  #ELSEIFSWITCH VIEW==False
+  final BooleanSetImpl SOURCE;
+  final int state;
+  if(((state=(SOURCE=this.SOURCE).state)&0b01)!=0){
+    try{
+      action.accept(FALSEVAL);
+    }finally{
+       CheckedCollection.checkModCount(state,SOURCE.state);
+    }
+  }
+  #ENDIF
 #ENDIF
 }
 #ENDDEF
