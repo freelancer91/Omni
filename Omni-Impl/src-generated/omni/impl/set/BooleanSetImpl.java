@@ -1666,7 +1666,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
           }else{
             return this;
           }
-        }else if(fromElement){
+        }else if(!fromElement){
           return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
         }
       }
@@ -4132,7 +4132,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
             }else{
               return this;
             }
-          }else if(fromElement){
+          }else if(!fromElement){
             return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_HEAD;
           }
         }
@@ -4156,8 +4156,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override boolean addTrue(){
       final BooleanSetImpl root;
       final int state;
-      if(((state=(root=this.root).state)&(10))==0){
-        root.state=state+10;
+      if(((state=(root=this.root).state)&(0b10))==0){
+        root.state=state+0b10;
         return true;
       }
       return false;
@@ -4168,8 +4168,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override boolean removeTrue(){
       final BooleanSetImpl root;
       final int state;
-      if(((state=(root=this.root).state)&(10))!=0){
-        root.state=state-10;
+      if(((state=(root=this.root).state)&(0b10))!=0){
+        root.state=state-0b10;
         return true;
       }
       return false;
@@ -5013,8 +5013,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override boolean addFalse(){
       final BooleanSetImpl root;
       final int state;
-      if(((state=(root=this.root).state)&(01))==0){
-        root.state=state+01;
+      if(((state=(root=this.root).state)&(0b01))==0){
+        root.state=state+0b01;
         return true;
       }
       return false;
@@ -5025,8 +5025,8 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override boolean removeFalse(){
       final BooleanSetImpl root;
       final int state;
-      if(((state=(root=this.root).state)&(01))!=0){
-        root.state=state-01;
+      if(((state=(root=this.root).state)&(0b01))!=0){
+        root.state=state-0b01;
         return true;
       }
       return false;

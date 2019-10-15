@@ -30,6 +30,7 @@ import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
+import omni.impl.set.BooleanSetImpl.Checked;
 import omni.impl.SortOrder;
 import omni.impl.StructType;
 import omni.util.NotYetImplementedException;
@@ -525,13 +526,27 @@ public class BooleanSetImplTest{
     
     private static class BooleanSetImplMonitor extends AbstractBooleanSetMonitor{
         int expectedState;
-        private static BooleanSetImpl getCopyConstructorSet(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
+        private static BooleanSetImpl getCopyConstructorSet(CheckedType checkedType,SortOrder sortOrder,Collection<?> collection,Class<? extends Collection<?>> collectionClass) {
           Class<? extends BooleanSetImpl> clazz;
-          if(checkedType.checked) {
-              clazz=BooleanSetImpl.Checked.class;
-          }else {
-              clazz=BooleanSetImpl.class;
+          switch(sortOrder) {
+          case Ascending:
+        	  if(checkedType.checked) {
+                  clazz=BooleanSetImpl.Checked.class;
+              }else {
+                  clazz=BooleanSetImpl.class;
+              }
+        	  break;
+          case Descending:
+        	  if(checkedType.checked) {
+                  clazz=BooleanSetImpl.Descending.Checked.class;
+              }else {
+                  clazz=BooleanSetImpl.Descending.class;
+              }
+        	  break;
+          default:
+        	  throw sortOrder.invalid();
           }
+         
           try{
               return clazz.getDeclaredConstructor(collectionClass).newInstance(collection);
           }catch(InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -540,13 +555,50 @@ public class BooleanSetImplTest{
           }
         }
         
-      BooleanSetImplMonitor(CheckedType checkedType,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
-          super(getCopyConstructorSet(checkedType,collection,collectionClass),checkedType,SortOrder.Ascending);
+        private static BooleanSetImpl getRoot(CheckedType checkedType,SortOrder sortOrder, int expectedState) {
+        	switch(sortOrder) {
+        	case Ascending:
+        		if(checkedType.checked) {
+        			return new BooleanSetImpl.Checked(expectedState);
+        		}else {
+        			return new BooleanSetImpl(expectedState);
+        		}
+        	case Descending:
+        		if(checkedType.checked) {
+        			return new BooleanSetImpl.Descending.Checked(expectedState);
+        		}else {
+        			return new BooleanSetImpl.Descending(expectedState);
+        		}
+        	default:
+        		throw sortOrder.invalid();
+        	}
+        }
+        private static BooleanSetImpl getRoot(CheckedType checkedType,SortOrder sortOrder) {
+        	switch(sortOrder) {
+        	case Ascending:
+        		if(checkedType.checked) {
+        			return new BooleanSetImpl.Checked();
+        		}else {
+        			return new BooleanSetImpl();
+        		}
+        	case Descending:
+        		if(checkedType.checked) {
+        			return new BooleanSetImpl.Descending.Checked();
+        		}else {
+        			return new BooleanSetImpl.Descending();
+        		}
+        	default:
+        		throw sortOrder.invalid();
+        	}
+        }
+        
+      BooleanSetImplMonitor(CheckedType checkedType,SortOrder sortOrder,Collection<?> collection,Class<? extends Collection<?>> collectionClass){
+          super(getCopyConstructorSet(checkedType,sortOrder,collection,collectionClass),checkedType,sortOrder);
           this.updateCollectionState();
       
       }
       BooleanSetImplMonitor(CheckedType checkedType,SortOrder sortOrder){
-    	  this(checkedType.checked?sortOrder==SortOrder.Ascending?new BooleanSetImpl.Checked():new BooleanSetImpl.Checked.Descending():sortOrder==SortOrder.Ascending?new BooleanSetImpl():new BooleanSetImpl.Descending(),0,checkedType,sortOrder);
+    	  this(getRoot(checkedType,sortOrder),0,checkedType,sortOrder);
       }
       private void validateAscendingHigher(Object actual,Object input,DataType outputType) {
     	  switch(expectedState) {
@@ -1498,8 +1550,8 @@ public class BooleanSetImplTest{
             return clone;
           }
         
-        BooleanSetImplMonitor(CheckedType checkedType,int expectedState){
-            this(checkedType.checked?new BooleanSetImpl.Checked(expectedState):new BooleanSetImpl(expectedState),expectedState,checkedType,SortOrder.Ascending);
+        BooleanSetImplMonitor(CheckedType checkedType,SortOrder sortOrder,int expectedState){
+        	this(getRoot(checkedType,sortOrder,expectedState),expectedState,checkedType,sortOrder);
         }
         BooleanSetImplMonitor(CheckedType checkedType){
             this(checkedType.checked?new BooleanSetImpl.Checked():new BooleanSetImpl(),0,checkedType,SortOrder.Ascending);
@@ -1998,7 +2050,7 @@ public class BooleanSetImplTest{
 		}
 
 		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> descendingSet() {
+		public AbstractBooleanSetMonitor descendingSet() {
 			return new FullViewMonitor(set.descendingSet(),this,checkedType,sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
 		}
 
@@ -2016,9 +2068,9 @@ public class BooleanSetImplTest{
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, this,1, checkedType, sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet,2,checkedType,sortOrder);
+								return new EmptyViewMonitor(subSet,this,2,checkedType,sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2027,9 +2079,9 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder){
 							case Ascending:
-								return new EmptyViewMonitor(subSet,2,checkedType,sortOrder);
+								return new EmptyViewMonitor(subSet,this,2,checkedType,sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();	
 							}
@@ -2042,7 +2094,7 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder){
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, this,1, checkedType, sortOrder);
 							case Descending:
 								Assertions.assertSame(subSet, set);
 								return this;
@@ -2074,7 +2126,7 @@ public class BooleanSetImplTest{
 							case Ascending:
 								throw new UnsupportedOperationException();
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2090,7 +2142,7 @@ public class BooleanSetImplTest{
 								Assertions.assertSame(subSet, set);
 								return this;
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2117,7 +2169,7 @@ public class BooleanSetImplTest{
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
 							case Descending:
 								throw new UnsupportedOperationException();
 							default:
@@ -2132,9 +2184,9 @@ public class BooleanSetImplTest{
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 0, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, this,0, checkedType, sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2143,9 +2195,9 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet, 0, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,this, 0, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2177,7 +2229,7 @@ public class BooleanSetImplTest{
 					case Ascending:
 						return new SingleViewMonitor(headSet, this, StructType.BooleanSetFalseView, checkedType, sortOrder);
 					case Descending:
-						return new EmptyViewMonitor(headSet, 2, checkedType, sortOrder);
+						return new EmptyViewMonitor(headSet, this,2, checkedType, sortOrder);
 					default:
 						throw sortOrder.invalid();
 					}
@@ -2196,7 +2248,7 @@ public class BooleanSetImplTest{
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new EmptyViewMonitor(headSet, 0, checkedType, sortOrder);
+						return new EmptyViewMonitor(headSet,this, 0, checkedType, sortOrder);
 					case Descending:
 						return new SingleViewMonitor(headSet, this, StructType.BooleanSetTrueView, checkedType, sortOrder);
 					default:
@@ -2224,7 +2276,7 @@ public class BooleanSetImplTest{
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new EmptyViewMonitor(tailSet, 2, checkedType, sortOrder);
+						return new EmptyViewMonitor(tailSet,this, 2, checkedType, sortOrder);
 					case Descending:
 						return new SingleViewMonitor(tailSet, this, StructType.BooleanSetFalseView, checkedType, sortOrder);
 					default:
@@ -2247,7 +2299,7 @@ public class BooleanSetImplTest{
 					case Ascending:
 						return new SingleViewMonitor(tailSet, this, StructType.BooleanSetTrueView, checkedType, sortOrder);
 					case Descending:
-						return new EmptyViewMonitor(tailSet, 0, checkedType, sortOrder);
+						return new EmptyViewMonitor(tailSet, this,0, checkedType, sortOrder);
 					default:
 						throw sortOrder.invalid();
 					}
@@ -2262,6 +2314,34 @@ public class BooleanSetImplTest{
             super(set,checkedType,sortOrder);
             this.root=root;
         }
+        public Object verifyClone(){
+            final Object clone;
+            try{
+            	switch(this.sortOrder) {
+            	case Ascending:
+            		if(checkedType.checked) {
+            			clone=FieldAndMethodAccessor.BooleanSetImpl.AscendingView.Checked.clone(set);
+            		}else {
+            			clone=FieldAndMethodAccessor.BooleanSetImpl.AscendingView.clone(set);
+            		}
+            		break;
+            	case Descending:
+            		if(checkedType.checked) {
+            			clone=FieldAndMethodAccessor.BooleanSetImpl.DescendingView.Checked.clone(set);
+            		}else {
+            			clone=FieldAndMethodAccessor.BooleanSetImpl.DescendingView.clone(set);
+            		}
+            		break;
+            	default:
+            		throw sortOrder.invalid();
+            	}
+                
+            }finally{
+                verifyCollectionState();
+            }
+            verifyClone(clone);
+            return clone;
+          }
         @Override
         public void updateAddState(Object inputVal,DataType inputType,boolean result){
             root.updateAddState(inputVal,inputType,result);
@@ -2513,7 +2593,7 @@ public class BooleanSetImplTest{
             return new FullItrMonitor(root,itr,iType,root.expectedState);
 		}
 		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> descendingSet() {
+		public AbstractBooleanSetMonitor descendingSet() {
 			Assertions.assertSame(set.descendingSet(), root.set);
 			return root;
 		}
@@ -2531,9 +2611,9 @@ public class BooleanSetImplTest{
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet,2,checkedType,sortOrder);
+								return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2542,9 +2622,9 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder){
 							case Ascending:
-								return new EmptyViewMonitor(subSet,2,checkedType,sortOrder);
+								return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();	
 							}
@@ -2557,7 +2637,7 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder){
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							case Descending:
 								Assertions.assertSame(subSet, set);
 								return this;
@@ -2589,7 +2669,7 @@ public class BooleanSetImplTest{
 							case Ascending:
 								throw new UnsupportedOperationException();
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2605,7 +2685,7 @@ public class BooleanSetImplTest{
 								Assertions.assertSame(subSet, set);
 								return this;
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2632,7 +2712,7 @@ public class BooleanSetImplTest{
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							case Descending:
 								throw new UnsupportedOperationException();
 							default:
@@ -2647,9 +2727,9 @@ public class BooleanSetImplTest{
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 0, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,0, checkedType, sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2658,9 +2738,9 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							case Descending:
-								return new EmptyViewMonitor(subSet, 0, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,0, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -2691,7 +2771,7 @@ public class BooleanSetImplTest{
 					case Ascending:
 						return new SingleViewMonitor(headSet, root, StructType.BooleanSetFalseView, checkedType, sortOrder);
 					case Descending:
-						return new EmptyViewMonitor(headSet, 2, checkedType, sortOrder);
+						return new EmptyViewMonitor(headSet, root,2, checkedType, sortOrder);
 					default:
 						throw sortOrder.invalid();
 					}
@@ -2710,7 +2790,7 @@ public class BooleanSetImplTest{
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new EmptyViewMonitor(headSet, 0, checkedType, sortOrder);
+						return new EmptyViewMonitor(headSet,root, 0, checkedType, sortOrder);
 					case Descending:
 						return new SingleViewMonitor(headSet, root, StructType.BooleanSetTrueView, checkedType, sortOrder);
 					default:
@@ -2737,7 +2817,7 @@ public class BooleanSetImplTest{
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new EmptyViewMonitor(tailSet, 2, checkedType, sortOrder);
+						return new EmptyViewMonitor(tailSet, root,2, checkedType, sortOrder);
 					case Descending:
 						return new SingleViewMonitor(tailSet, root, StructType.BooleanSetFalseView, checkedType, sortOrder);
 					default:
@@ -2760,7 +2840,7 @@ public class BooleanSetImplTest{
 					case Ascending:
 						return new SingleViewMonitor(tailSet, root, StructType.BooleanSetTrueView, checkedType, sortOrder);
 					case Descending:
-						return new EmptyViewMonitor(tailSet, 0, checkedType, sortOrder);
+						return new EmptyViewMonitor(tailSet,root, 0, checkedType, sortOrder);
 					default:
 						throw sortOrder.invalid();
 					}
@@ -2829,9 +2909,11 @@ public class BooleanSetImplTest{
     }
     private static class EmptyViewMonitor extends AbstractBooleanSetMonitor{
         final int position;
-        EmptyViewMonitor(OmniNavigableSet.OfBoolean set,int position,CheckedType checkedType,SortOrder sortOrder){
+        final BooleanSetImplMonitor root;
+        EmptyViewMonitor(OmniNavigableSet.OfBoolean set,BooleanSetImplMonitor root,int position,CheckedType checkedType,SortOrder sortOrder){
             super(set,checkedType,sortOrder);
             this.position=position;
+            this.root=root;
         }
        
         @Override
@@ -2934,13 +3016,13 @@ public class BooleanSetImplTest{
                 if(checkedType.checked) {
                     switch(position) {
                     case 0:
-                        Assertions.assertSame(set,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD);
+                        Assertions.assertSame(set,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL);
                         break;
                     case 1:
                         Assertions.assertSame(set,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_MIDDLE);
                         break;
                     case 2:
-                        Assertions.assertSame(set,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL);
+                        Assertions.assertSame(set,AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD);
                         break;
                     default:
                         throw new IllegalStateException();
@@ -3023,8 +3105,8 @@ public class BooleanSetImplTest{
 		}
 
 		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> descendingSet() {
-			return new EmptyViewMonitor(set,position,checkedType,sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
+		public AbstractBooleanSetMonitor descendingSet() {
+			return new EmptyViewMonitor(set.descendingSet(),root,position,checkedType,sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
 		}
 
 		@Override
@@ -3857,7 +3939,7 @@ public class BooleanSetImplTest{
 			}
 		}
 		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> descendingSet() {
+		public AbstractBooleanSetMonitor descendingSet() {
 			return new SingleViewMonitor(set.descendingSet(), root, structType, checkedType, sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
 		}
 		@Override
@@ -3880,10 +3962,10 @@ public class BooleanSetImplTest{
 							switch(sortOrder) {
 							case Ascending:
 								
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
 							case Descending:
 								if(structType==StructType.BooleanSetTrueView) {
-									return new EmptyViewMonitor(subSet,2,checkedType,sortOrder);
+									return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
 								}else {
 									throw new UnsupportedOperationException();
 								}
@@ -3897,12 +3979,12 @@ public class BooleanSetImplTest{
 							switch(sortOrder){
 							case Ascending:
 								if(structType==StructType.BooleanSetTrueView) {
-									return new EmptyViewMonitor(subSet,2,checkedType,sortOrder);
+									return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
 								}else {
 									throw new UnsupportedOperationException();
 								}
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();	
 							}
@@ -3915,7 +3997,7 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder){
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
 							case Descending:
 								throw new UnsupportedOperationException();
 							default:
@@ -3957,7 +4039,7 @@ public class BooleanSetImplTest{
 							case Ascending:
 								throw new UnsupportedOperationException();
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -3972,7 +4054,7 @@ public class BooleanSetImplTest{
 							case Ascending:
 								throw new UnsupportedOperationException();
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -4009,7 +4091,7 @@ public class BooleanSetImplTest{
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							case Descending:
 								throw new UnsupportedOperationException();
 							default:
@@ -4033,11 +4115,11 @@ public class BooleanSetImplTest{
 									throw new UnsupportedOperationException();
 
 								}else {
-									return new EmptyViewMonitor(subSet, 0, checkedType, sortOrder);
+									return new EmptyViewMonitor(subSet,root, 0, checkedType, sortOrder);
 								}
 								
 							case Descending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
 							default:
 								throw sortOrder.invalid();
 							}
@@ -4046,12 +4128,12 @@ public class BooleanSetImplTest{
 						if(toInclusive) {
 							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, 1, checkedType, sortOrder);
+								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
 							case Descending:
 								if(structType==StructType.BooleanSetTrueView) {
 									throw new UnsupportedOperationException();
 								}else {
-									return new EmptyViewMonitor(subSet, 0, checkedType, sortOrder);
+									return new EmptyViewMonitor(subSet, root,0, checkedType, sortOrder);
 
 								}
 							default:
@@ -4095,7 +4177,7 @@ public class BooleanSetImplTest{
 						}
 					case Descending:
 						if(structType==StructType.BooleanSetTrueView) {
-							return new EmptyViewMonitor(headSet, 2, checkedType, sortOrder);
+							return new EmptyViewMonitor(headSet, root,2, checkedType, sortOrder);
 
 						}else {
 							throw new UnsupportedOperationException();
@@ -4128,7 +4210,7 @@ public class BooleanSetImplTest{
 						if(structType==StructType.BooleanSetTrueView) {
 							throw new UnsupportedOperationException();
 						}else {
-							return new EmptyViewMonitor(headSet, 0, checkedType, sortOrder);
+							return new EmptyViewMonitor(headSet,root, 0, checkedType, sortOrder);
 						}
 						
 					case Descending:
@@ -4168,7 +4250,7 @@ public class BooleanSetImplTest{
 					switch(sortOrder) {
 					case Ascending:
 						if(structType==StructType.BooleanSetTrueView) {
-							return new EmptyViewMonitor(tailSet, 2, checkedType, sortOrder);
+							return new EmptyViewMonitor(tailSet,root, 2, checkedType, sortOrder);
 						}else {
 							throw new UnsupportedOperationException();
 						}
@@ -4213,7 +4295,7 @@ public class BooleanSetImplTest{
 						if(structType==StructType.BooleanSetTrueView) {
 							throw new UnsupportedOperationException();
 						}else {
-							return new EmptyViewMonitor(tailSet, 0, checkedType, sortOrder);
+							return new EmptyViewMonitor(tailSet, root,0, checkedType, sortOrder);
 						}
 						
 					default:
@@ -4245,6 +4327,10 @@ public class BooleanSetImplTest{
             this.checkedType=checkedType;
             this.sortOrder=sortOrder;
            
+        }
+        public abstract AbstractBooleanSetMonitor descendingSet();
+        Object verifyClone() {
+        	throw new UnsupportedOperationException();
         }
         @Override
         public Object verifyComparator() {
@@ -4444,50 +4530,56 @@ public class BooleanSetImplTest{
     
     @Test
     public void testclear_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .verifyClear();
-        test.runAllTests("BooleanSetImplTest.testclear_void");
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).verifyClear();
+    	test.runAllTests("BooleanSetImplTest.testclear_void");
     }
     
     @Test
     public void testclone_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .verifyClone();
-        test.runAllTests("BooleanSetImplTest.testclone_void");
+    	for(var checkedType:CheckedType.values()) {
+    		for(var sortOrder:SortOrder.values()) {
+    			for(int tmpState=0b00;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					TestExecutorService.submitTest(()->{
+    						AbstractBooleanSetMonitor monitor=new BooleanSetImplMonitor(checkedType,sortOrder,state);
+    						if(invert==1) {
+    							monitor=monitor.descendingSet();
+    						}
+    						monitor.verifyClone();
+    					});
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testclone_void");
     }
     
     
     
     @Test
     public void testConstructor_int(){
-        BasicTest test=(checkedType,initSet)->{
-            int state;
-            switch(initSet){
-            case Empty:
-                state=0b00;
-                break;
-            case AddFalse:
-                state=0b01;
-                break;
-            case AddTrue:
-                state=0b10;
-                break;
-            case AddTrueAndFalse:
-                state=0b11;
-                break;
-            default:
-                throw initSet.invalid();
-            }
-            initSet.initialize(new BooleanSetImplMonitor(checkedType,state)).verifyCollectionState();
-        };
-        test.runAllTests("BooleanSetImplTest.testConstructor_int");
+    	for(var checkedType:CheckedType.values()) {
+    		for(var sortOrder:SortOrder.values()) {
+    			for(int tmpState=0b00;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				TestExecutorService.submitTest(()->{
+    					new BooleanSetImplMonitor(checkedType,sortOrder,state).verifyCollectionState();
+    				});
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testConstructor_int");
     }
     
     @Test
     public void testConstructor_void(){
-        for(final var checkedType:CheckedType.values()){
-            TestExecutorService.submitTest(()->new BooleanSetImplMonitor(checkedType).verifyCollectionState());
-        }
+    	for(var sortOrder:SortOrder.values()) {
+    		for(final var checkedType:CheckedType.values()){
+                TestExecutorService.submitTest(()->new BooleanSetImplMonitor(checkedType,sortOrder).verifyCollectionState());
+            }
+    	}
         TestExecutorService.completeAllTests("BooleanSetImplTest.testConstructor_void");
     }
     
@@ -4495,12 +4587,14 @@ public class BooleanSetImplTest{
     @Test
     public void testConstructor_Collection() {
         for(var checkedType:CheckedType.values()) {
-            for(var collectionClass:DataType.BOOLEAN.validCollectionConstructorClasses) {
-                TestExecutorService.submitTest(()->{
-                    Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(DataType.BOOLEAN,(Class<? extends Collection<?>>)collectionClass);
-                    new BooleanSetImplMonitor(checkedType,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
-                });
-            }
+        	for(var sortOrder:SortOrder.values()) {
+	            for(var collectionClass:DataType.BOOLEAN.validCollectionConstructorClasses) {
+	                TestExecutorService.submitTest(()->{
+	                    Collection<?> collectionParam=MonitoredCollection.getConstructorCollectionParam(DataType.BOOLEAN,(Class<? extends Collection<?>>)collectionClass);
+	                    new BooleanSetImplMonitor(checkedType,sortOrder,collectionParam,(Class<? extends Collection<?>>)collectionClass).verifyCollectionState();
+	                });
+	            }
+        	}
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testConstructor_Collection");
     }
@@ -4523,16 +4617,30 @@ public class BooleanSetImplTest{
                         if(checkedType.checked || functionGen.expectedException == null || initSet.isEmpty){
                             for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed) {
                             	final long randSeed=tmpRandSeed;
-                            	TestExecutorService.submitTest(()->{
-                                    final var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
-                                    if(functionGen.expectedException == null || initSet.isEmpty){
-                                        monitor.verifyForEach(functionGen,functionCallType,randSeed);
-                                    }else{
-                                        Assertions.assertThrows(functionGen.expectedException,
-                                                ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
-                                        monitor.verifyCollectionState();
-                                    }
-                                });
+                            	for(var sortOrder:SortOrder.values()) {
+                            		for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+                            			final int invert=tmpInvert;
+                            			for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+                        					final int inclusiveLo=tmpInclLo;
+                        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+                        						final int inclusiveHi=tmpInclHi;
+                        						TestExecutorService.submitTest(()->{
+                    								var monitor=getMonitoredSet(initSet.initialize(new BooleanSetImplMonitor(checkedType,sortOrder)),invert,inclusiveLo,inclusiveHi);
+                                                    if(functionGen.expectedException == null || monitor.isEmpty()){
+                                                        monitor.verifyForEach(functionGen,functionCallType,randSeed);
+                                                    }else{
+                                                        Assertions.assertThrows(functionGen.expectedException,
+                                                                ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
+                                                        monitor.verifyCollectionState();
+                                                    }
+                                                });
+                        					}
+                            			}
+                            			
+                            		}
+                            		
+                            	}
+                            	
                             }
                         }
                     }
@@ -4545,23 +4653,22 @@ public class BooleanSetImplTest{
     
     @Test
     public void testhashCode_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .verifyHashCode();
-        test.runAllTests("BooleanSetImplTest.testhashCode_void");
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).verifyHashCode();
+    	test.runAllTests("BooleanSetImplTest.testhashCode_void");
     }
     
     @Test
     public void testisEmpty_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .verifyIsEmpty();
-        test.runAllTests("BooleanSetImplTest.testisEmpty_void");
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).verifyIsEmpty();
+    	test.runAllTests("BooleanSetImplTest.testisEmpty_void");
     }
     
     @Test
     public void testequals_Object(){
-        final BasicTest test=(checkedType,initSet)->{
+    	//TODO flesh this out
+        final BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->{
             try {
-                Assertions.assertFalse(initSet.initialize(new BooleanSetImplMonitor(checkedType))
+                Assertions.assertFalse(getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi)
                         .getCollection().equals(null));
             }catch(NotYetImplementedException e) {
                 //do nothing
@@ -4573,22 +4680,21 @@ public class BooleanSetImplTest{
     
     @Test
     public void testiterator_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .getMonitoredIterator()
-                .verifyIteratorState();
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).getMonitoredIterator().verifyIteratorState();
+
         test.runAllTests("BooleanSetImplTest.testiterator_void");
     }
     
     @Test
     public void testItrclone_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .getMonitoredIterator()
-                .verifyClone();
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).getMonitoredIterator().verifyClone();
+
         test.runAllTests("BooleanSetImplTest.testItrclone_void");
     }
     
     @Test
     public void testItrforEachRemaining_Consumer(){
+    	//TODO subsets and descending sets
         for(final var checkedType:CheckedType.values()){
             for(var initSet:VALID_INIT_SEQS){
                 for(final var functionGen:IteratorType.AscendingItr.validMonitoredFunctionGens){
@@ -4689,21 +4795,22 @@ public class BooleanSetImplTest{
     
     @Test
     public void testItrhasNext_void(){
-        BasicTest test=(checkedType,initSet)->{
-            final var setMonitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
-            final var itrMonitor=setMonitor.getMonitoredIterator();
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->{
+    		final var setMonitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi);
+			final var itrMonitor=setMonitor.getMonitoredIterator();
             final var setSize=setMonitor.size();
             for(int i=0;i < setSize;++i){
                 Assertions.assertTrue(itrMonitor.verifyHasNext());
                 itrMonitor.iterateForward();
             }
             Assertions.assertFalse(itrMonitor.verifyHasNext());
-        };
+    	};
         test.runAllTests("BooleanSetImplTest.testItrhasNext_void");
     }
     
     @Test
     public void testItrnext_void(){
+    	//TODO subsets and descending sets
         var outputTypes=DataType.BOOLEAN.validOutputTypes();
         for(var checkedType:CheckedType.values()) {
             for(var preMod:IteratorType.AscendingItr.validPreMods) {
@@ -4742,6 +4849,7 @@ public class BooleanSetImplTest{
     
     @Test
     public void testItrremove_void(){
+    	//TODO subsets and descending sets
         for(final var checkedType:CheckedType.values()){
             for(var initSet:VALID_INIT_SEQS){
                 final int setSize;
@@ -4813,21 +4921,37 @@ public class BooleanSetImplTest{
     
     @Test
     public void testReadAndWrite(){
-        TestExecutorService.setNumWorkers(1);
-        MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
-            var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
-            if(functionGen.expectedException==null) {
-                Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
-            }else {
-                
-                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
+    	
+    	for(final var functionGen:StructType.BooleanSetImpl.validMonitoredFunctionGens){
+            for(final var checkedType:CheckedType.values()){
+                if(checkedType.checked || functionGen.expectedException == null){
+                	for(var sortOrder:SortOrder.values()) {
+                		for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+            				final int invert=tmpInvert;
+    						for(final var initSet:VALID_INIT_SEQS){
+                                TestExecutorService.submitTest(()->{
+                                	var monitor=getMonitoredSet(initSet.initialize(new BooleanSetImplMonitor(checkedType,sortOrder)),invert,0,1);
+                                    if(functionGen.expectedException==null) {
+                                        Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
+                                    }else {
+                                        
+                                        Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
+                                    }
+                                });
+                            }
+                		}
+                		
+                	}
+                    
+                }
             }
-        };
-        test.runAllTests("BooleanSetImplTest.testReadAndWrite");
+        }
+        TestExecutorService.completeAllTests("BooleanSetImplTest.testReadAndWrite");
     }
     
     @Test
     public void testremoveIf_Predicate(){
+    	//TODO subsets and descending sets
         for(final var filterGen:StructType.BooleanSetImpl.validMonitoredRemoveIfPredicateGens){
             for(final var initSet:VALID_INIT_SEQS){
                 for(final var functionCallType:FunctionCallType.values()){
@@ -4893,15 +5017,14 @@ public class BooleanSetImplTest{
     
     @Test
     public void testsize_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .verifySize();
-        test.runAllTests("BooleanSetImplTest.testsize_void");
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).verifySize();
+    	test.runAllTests("BooleanSetImplTest.testsize_void");
     }
     
     @Test
     public void testtoArray_IntFunction(){
-        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
-            final var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
+        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet,sortOrder,invert,inclusiveLo,inclusiveHi)->{
+        	var monitor=getMonitoredSet(initSet.initialize(new BooleanSetImplMonitor(checkedType,sortOrder)),invert,inclusiveLo,inclusiveHi);
             if(functionGen.expectedException == null){
                 monitor.verifyToArray(functionGen);
             }else{
@@ -4914,34 +5037,49 @@ public class BooleanSetImplTest{
     
     @Test
     public void testtoArray_ObjectArray(){
-        final BasicTest test=(checkedType,initSet)->{
-            int bound;
-            switch(initSet){
-            case Empty:
-                bound=2;
-                break;
-            case AddTrue:
-            case AddFalse:
-                bound=3;
-                break;
-            case AddTrueAndFalse:
-                bound=4;
-                break;
-            default:
-                throw initSet.invalid();
-            }
-            var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
-            for(int arrSize=0;arrSize <= bound;++arrSize){
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->{
+    		int bound;
+    		switch(state) {
+    		case 0b00:
+    			bound=2;
+    			break;
+    		case 0b01:
+    			
+    		case 0b10:
+    			bound=3;
+    			break;
+    		case 0b11:
+    			bound=4;
+    			break;
+    		default:
+    			throw new IllegalStateException("state = "+state);
+    		}
+    		var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi);
+    		switch(monitor.getStructType()) {
+    		case BooleanSetEmpty:
+    			bound=2;
+    			break;
+    		case BooleanSetTrueView:
+    		case BooleanSetFalseView:
+    			if(bound>3) {
+    				bound=3;
+    			}
+    			break;
+    		default:
+    			
+    		}
+    		for(int arrSize=0;arrSize <= bound;++arrSize){
                 monitor.verifyToArray(new Object[arrSize]);
             }
-        };
+    	
+    	};
         test.runAllTests("BooleanSetImplTest.testtoArray_ObjectArray");
     }
     
     @Test
     public void testtoArray_void(){
-        final BasicTest test=(checkedType,initSet)->{
-            var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->{
+    		var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi);
             for(var outputType:DataType.BOOLEAN.validOutputTypes()) {
                 outputType.verifyToArray(monitor);
             }
@@ -4951,38 +5089,74 @@ public class BooleanSetImplTest{
     
     @Test
     public void testtoString_void(){
-        final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                .verifyToString();
+    	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).verifyToString();
+
         test.runAllTests("BooleanSetImplTest.testtoString_void");
     }
     private static interface BasicTest{
         private void runAllTests(String testName){
-            for(final var checkedType:CheckedType.values()){
-                for(final var initSet:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->runTest(checkedType,initSet));
-                }
-            }
+        	for(var checkedType:CheckedType.values()) {
+        		for(var sortOrder:SortOrder.values()) {
+        			for(int tmpState=0b00;tmpState<=0b11;++tmpState) {
+        				final int state=tmpState;
+        				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+        					final int invert=tmpInvert;
+        					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+            					final int inclusiveLo=tmpInclLo;
+            					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+            						final int inclusiveHi=tmpInclHi;
+            						TestExecutorService.submitTest(()->runTest(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi));
+            						//TestExecutorService.submitTest(()->{
+            						//	var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi);
+            						//	monitor.verifyClear();
+            						//});
+            					}
+        					}
+        				}
+        			}
+        		}
+        	}
+        	
+        	
+//            for(final var checkedType:CheckedType.values()){
+//                for(final var initSet:VALID_INIT_SEQS){
+//                    TestExecutorService.submitTest(()->runTest(checkedType,initSet));
+//                }
+//            }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(CheckedType checkedType,SetInitialization initSet);
+        void runTest(CheckedType checkedType,SortOrder sortOrder,int state,int invert,int inclusiveLo,int inclusiveHi);
     }
     private static interface MonitoredFunctionGenTest{
         private void runAllTests(String testName){
             for(final var functionGen:StructType.BooleanSetImpl.validMonitoredFunctionGens){
                 for(final var checkedType:CheckedType.values()){
                     if(checkedType.checked || functionGen.expectedException == null){
-                        for(final var initSet:VALID_INIT_SEQS){
-                            TestExecutorService.submitTest(()->runTest(functionGen,checkedType,initSet));
-                        }
+                    	for(var sortOrder:SortOrder.values()) {
+                    		for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+                				final int invert=tmpInvert;
+                				for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+                					final int inclusiveLo=tmpInclLo;
+                					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+                						final int inclusiveHi=tmpInclHi;
+                						for(final var initSet:VALID_INIT_SEQS){
+                                            TestExecutorService.submitTest(()->runTest(functionGen,checkedType,initSet,sortOrder,invert,inclusiveLo,inclusiveHi));
+                                        }
+                					}
+                				}
+                    		}
+                    		
+                    	}
+                        
                     }
                 }
             }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(MonitoredFunctionGen functionGen,CheckedType checkedType,SetInitialization initSet);
+        void runTest(MonitoredFunctionGen functionGen,CheckedType checkedType,SetInitialization initSet,SortOrder sortOrder,int invert,int inclusiveLo,int inclusiveHi);
     }
     private static interface QueryTest{
-        boolean callMethod(BooleanSetImplMonitor monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
+        boolean callMethod(MonitoredNavigableSet<OmniNavigableSet.OfBoolean,Boolean> monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
                 QueryVal.QueryValModification modification);
         private void runAllTests(String testName){
             for(final var queryVal:QueryVal.values()){
@@ -4993,10 +5167,24 @@ public class BooleanSetImplTest{
                                 final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
                                         inputType,DataType.BOOLEAN);
                                 for(final var checkedType:CheckedType.values()){
-                                    for(final var initSet:VALID_INIT_SEQS){
-                                        TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,
-                                                modification,inputType,castType,checkedType,initSet));
-                                    }
+                                	for(var sortOrder:SortOrder.values()) {
+                                		for(final var initSet:VALID_INIT_SEQS){
+                                			for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+                                				final int invert=tmpInvert;
+                                				for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+                                					final int inclusiveLo=tmpInclLo;
+                                					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+                                						final int inclusiveHi=tmpInclHi;
+                                						TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,
+                                                                modification,inputType,castType,checkedType,sortOrder,invert,inclusiveLo,inclusiveHi,initSet));
+                                					}
+                                				}
+                                				
+                                			}
+                                            
+                                        }
+                                	}
+                                    
                                 }
                             });
                         });
@@ -5006,10 +5194,11 @@ public class BooleanSetImplTest{
             TestExecutorService.completeAllTests(testName);
         }
         private void runTest(boolean queryCanReturnTrue,QueryVal queryVal,QueryVal.QueryValModification modification,
-                DataType inputType,QueryCastType castType,CheckedType checkedType,SetInitialization initSet){
+                DataType inputType,QueryCastType castType,CheckedType checkedType,SortOrder sortOrder,int invert,int inclusiveLo,int inclusiveHi,SetInitialization initSet){
             boolean expectedResult;
+            final boolean booleanInputVal;
             if(queryCanReturnTrue){
-                final boolean booleanInputVal=queryVal.getBooleanVal(modification);
+                booleanInputVal=queryVal.getBooleanVal(modification);
                 switch(initSet){
                 case Empty:
                     expectedResult=false;
@@ -5026,10 +5215,28 @@ public class BooleanSetImplTest{
                 default:
                     throw initSet.invalid();
                 }
+                
             }else{
+            	booleanInputVal=false;
                 expectedResult=false;
             }
-            final boolean actualResult=callMethod(initSet.initialize(new BooleanSetImplMonitor(checkedType)),queryVal,
+            MonitoredNavigableSet<OmniNavigableSet.OfBoolean,Boolean> monitor=getMonitoredSet(initSet.initialize(new BooleanSetImplMonitor(checkedType,sortOrder)), invert, inclusiveLo, inclusiveHi);
+            if(expectedResult) {
+            	switch(monitor.getStructType()) {
+            	case BooleanSetEmpty:
+            		expectedResult=false;
+            		break;
+            	case BooleanSetTrueView:
+            		expectedResult=booleanInputVal;
+            		break;
+            	case BooleanSetFalseView:
+            		expectedResult=!booleanInputVal;
+            	default:
+            	}
+            }
+           
+            
+            final boolean actualResult=callMethod(monitor,queryVal,
                     inputType,
                     castType,modification);
             Assertions.assertEquals(expectedResult,actualResult);
