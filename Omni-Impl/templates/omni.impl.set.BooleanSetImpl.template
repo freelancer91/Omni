@@ -12,6 +12,8 @@ import omni.function.BooleanPredicate;
 import java.util.function.Predicate;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.function.IntFunction;
 import omni.util.OmniArray;
@@ -266,6 +268,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     private DescendingView(BooleanSetImpl root){
       super(root);
     }
+    private DescendingView(){
+      //used by serialization
+      super(null);
+    }
     @Override public Object clone(){
       return new Descending(root.state);
     }
@@ -337,8 +343,31 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public Object clone(){
         return new Descending.Checked(root.state);
       }
+      private static class SerializationIntermediate implements Serializable{
+        private static final long serialVersionUID=1L;
+        private BooleanSetImpl root;
+        private SerializationIntermediate(BooleanSetImpl root){
+          this.root=root;
+        }
+        private void readObject(ObjectInputStream ois) throws IOException{
+          this.root=new Descending.Checked(ois.readUnsignedByte());
+        }
+        private void writeObject(ObjectOutputStream oos) throws IOException{
+          final BooleanSetImpl root;
+          final int expectedState=(root=this.root).state;
+          try{
+            oos.writeByte(expectedState);
+          }finally{
+            CheckedCollection.checkModCount(expectedState,root.state);
+          }
+        }
+        private Object readResolve(){
+          return root;
+        }
+      }
+      
       private Object writeReplace(){
-        return new Descending.Checked(root.state);
+        return new SerializationIntermediate(root);
       }
       #MACRO FirstAndLastBoolean<root,Descending,True,Full>()
       @Override public OmniIterator.OfBoolean iterator(){
@@ -438,8 +467,31 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public Object clone(){
         return new BooleanSetImpl.Checked(root.state);
       }
+      private static class SerializationIntermediate implements Serializable{
+        private static final long serialVersionUID=1L;
+        private BooleanSetImpl root;
+        private SerializationIntermediate(BooleanSetImpl root){
+          this.root=root;
+        }
+        private void readObject(ObjectInputStream ois) throws IOException{
+          this.root=new BooleanSetImpl.Checked(ois.readUnsignedByte());
+        }
+        private void writeObject(ObjectOutputStream oos) throws IOException{
+          final BooleanSetImpl root;
+          final int expectedState=(root=this.root).state;
+          try{
+            oos.writeByte(expectedState);
+          }finally{
+            CheckedCollection.checkModCount(expectedState,root.state);
+          }
+        }
+        private Object readResolve(){
+          return root;
+        }
+      }
+      
       private Object writeReplace(){
-        return new BooleanSetImpl.Checked(root.state);
+        return new SerializationIntermediate(root);
       }
       #MACRO FirstAndLastBoolean<root,Ascending,True,Full>()
       @Override public OmniIterator.OfBoolean iterator(){
@@ -487,14 +539,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     #MACRO AccessMethods<root,True,Ascending>()
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b10)==0){
         return EMPTY_ITR;
       }
       return new UncheckedTrueItr(root,0b1);
     }
     @Override public OmniIterator.OfBoolean descendingIterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b10)==0){
         return EMPTY_ITR;
       }
       return new UncheckedTrueItr(root,0b1);
@@ -539,14 +591,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b10)==0){
           return EMPTY_ITR;
         }
         return new CheckedTrueItr(root,0b10);
       }
       @Override public OmniIterator.OfBoolean descendingIterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b10)==0){
           return EMPTY_ITR;
         }
         return new CheckedTrueItr(root,0b10);
@@ -586,14 +638,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     #MACRO AccessMethods<root,False,Ascending>()
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b01)==0){
         return EMPTY_ITR;
       }
       return new UncheckedFalseItr(root,0b1);
     }
     @Override public OmniIterator.OfBoolean descendingIterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b01)==0){
         return EMPTY_ITR;
       }
       return new UncheckedFalseItr(root,0b1);
@@ -643,14 +695,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b01)==0){
           return EMPTY_ITR;
         }
         return new CheckedFalseItr(root,0b10);
       }
       @Override public OmniIterator.OfBoolean descendingIterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b01)==0){
           return EMPTY_ITR;
         }
         return new CheckedFalseItr(root,0b10);
@@ -2269,29 +2321,29 @@ ERROR the source SOURCE cannot be matched with the view VIEW
     #IFSWITCH CHECKED_TYPE==True
   if(fromElement){
     if(toElement){
-      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
-    }else{
       return new UncheckedTrueView.Checked(SOURCE);
+    }else{
+      return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
     }
   }else{
     if(toElement){
-      return new UncheckedFalseView.Checked(SOURCE);
-    }else{
       return this;
+    }else{
+      return new UncheckedFalseView.Checked(SOURCE);
     }
   }
     #ELSEIFSWITCH CHECKED_TYPE==False
   if(fromElement){
     if(toElement){
-      return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
-    }else{
       return new UncheckedTrueView(SOURCE);
+    }else{
+      return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     }
   }else{
     if(toElement){
-      return new UncheckedFalseView(SOURCE);
-    }else{
       return this;
+    }else{
+      return new UncheckedFalseView(SOURCE);
     }
   } 
     #ENDIF

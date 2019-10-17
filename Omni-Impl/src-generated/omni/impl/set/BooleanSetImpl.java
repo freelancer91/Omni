@@ -11,6 +11,8 @@ import omni.function.BooleanPredicate;
 import java.util.function.Predicate;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.util.function.IntFunction;
 import omni.util.OmniArray;
@@ -1336,15 +1338,15 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
     if(fromElement){
       if(toElement){
-        return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
-      }else{
         return new UncheckedTrueView(this);
+      }else{
+        return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
       }
     }else{
       if(toElement){
-        return new UncheckedFalseView(this);
-      }else{
         return this;
+      }else{
+        return new UncheckedFalseView(this);
       }
     } 
   }
@@ -1636,15 +1638,15 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
       if(fromElement){
         if(toElement){
-          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
-        }else{
           return new UncheckedTrueView.Checked(this);
+        }else{
+          return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
         }
       }else{
         if(toElement){
-          return new UncheckedFalseView.Checked(this);
-        }else{
           return this;
+        }else{
+          return new UncheckedFalseView.Checked(this);
         }
       }
     }
@@ -2653,6 +2655,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     private DescendingView(BooleanSetImpl root){
       super(root);
     }
+    private DescendingView(){
+      //used by serialization
+      super(null);
+    }
     @Override public Object clone(){
       return new Descending(root.state);
     }
@@ -3286,8 +3292,30 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public Object clone(){
         return new Descending.Checked(root.state);
       }
+      private static class SerializationIntermediate implements Serializable{
+        private static final long serialVersionUID=1L;
+        private BooleanSetImpl root;
+        private SerializationIntermediate(BooleanSetImpl root){
+          this.root=root;
+        }
+        private void readObject(ObjectInputStream ois) throws IOException{
+          this.root=new Descending.Checked(ois.readUnsignedByte());
+        }
+        private void writeObject(ObjectOutputStream oos) throws IOException{
+          final BooleanSetImpl root;
+          final int expectedState=(root=this.root).state;
+          try{
+            oos.writeByte(expectedState);
+          }finally{
+            CheckedCollection.checkModCount(expectedState,root.state);
+          }
+        }
+        private Object readResolve(){
+          return root;
+        }
+      }
       private Object writeReplace(){
-        return new Descending.Checked(root.state);
+        return new SerializationIntermediate(root);
       }
       @Override public boolean firstBoolean(){
         switch(root.state){
@@ -3815,15 +3843,15 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
       if(fromElement){
         if(toElement){
-          return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
-        }else{
           return new UncheckedTrueView(root);
+        }else{
+          return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
         }
       }else{
         if(toElement){
-          return new UncheckedFalseView(root);
-        }else{
           return this;
+        }else{
+          return new UncheckedFalseView(root);
         }
       } 
     }
@@ -4031,8 +4059,30 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public Object clone(){
         return new BooleanSetImpl.Checked(root.state);
       }
+      private static class SerializationIntermediate implements Serializable{
+        private static final long serialVersionUID=1L;
+        private BooleanSetImpl root;
+        private SerializationIntermediate(BooleanSetImpl root){
+          this.root=root;
+        }
+        private void readObject(ObjectInputStream ois) throws IOException{
+          this.root=new BooleanSetImpl.Checked(ois.readUnsignedByte());
+        }
+        private void writeObject(ObjectOutputStream oos) throws IOException{
+          final BooleanSetImpl root;
+          final int expectedState=(root=this.root).state;
+          try{
+            oos.writeByte(expectedState);
+          }finally{
+            CheckedCollection.checkModCount(expectedState,root.state);
+          }
+        }
+        private Object readResolve(){
+          return root;
+        }
+      }
       private Object writeReplace(){
-        return new BooleanSetImpl.Checked(root.state);
+        return new SerializationIntermediate(root);
       }
       @Override public boolean firstBoolean(){
         switch(root.state){
@@ -4102,15 +4152,15 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
         if(fromElement){
           if(toElement){
-            return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
-          }else{
             return new UncheckedTrueView.Checked(root);
+          }else{
+            return AbstractBooleanSet.CHECKED_EMPTY_ASCENDING_MIDDLE;
           }
         }else{
           if(toElement){
-            return new UncheckedFalseView.Checked(root);
-          }else{
             return this;
+          }else{
+            return new UncheckedFalseView.Checked(root);
           }
         }
       }
@@ -4690,14 +4740,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     }
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b10)==0){
         return EMPTY_ITR;
       }
       return new UncheckedTrueItr(root,0b1);
     }
     @Override public OmniIterator.OfBoolean descendingIterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b10)==0){
         return EMPTY_ITR;
       }
       return new UncheckedTrueItr(root,0b1);
@@ -4869,14 +4919,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b10)==0){
           return EMPTY_ITR;
         }
         return new CheckedTrueItr(root,0b10);
       }
       @Override public OmniIterator.OfBoolean descendingIterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b10)==0){
           return EMPTY_ITR;
         }
         return new CheckedTrueItr(root,0b10);
@@ -5506,14 +5556,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     }
     @Override public OmniIterator.OfBoolean iterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b01)==0){
         return EMPTY_ITR;
       }
       return new UncheckedFalseItr(root,0b1);
     }
     @Override public OmniIterator.OfBoolean descendingIterator(){
       final BooleanSetImpl root;
-      if(((root=this.root).state)==0b00){
+      if((((root=this.root).state)&0b01)==0){
         return EMPTY_ITR;
       }
       return new UncheckedFalseItr(root,0b1);
@@ -5688,14 +5738,14 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
       @Override public OmniIterator.OfBoolean iterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b01)==0){
           return EMPTY_ITR;
         }
         return new CheckedFalseItr(root,0b10);
       }
       @Override public OmniIterator.OfBoolean descendingIterator(){
         final BooleanSetImpl root;
-        if(((root=this.root).state)==0b00){
+      	if((((root=this.root).state)&0b01)==0){
           return EMPTY_ITR;
         }
         return new CheckedFalseItr(root,0b10);

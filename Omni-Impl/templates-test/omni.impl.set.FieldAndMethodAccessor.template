@@ -297,13 +297,14 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
     }
     static interface Checked extends DescendingView{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked","writeReplace");
+	  static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked"+DOLLARSIGN+"SerializationIntermediate","writeObject",ObjectOutputStream.class);
       
       public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"DescendingView"+DOLLARSIGN+"Checked","clone");
       public static omni.impl.set.CLASSPREFIXSetImpl.Descending.Checked clone(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl.Descending.Checked)callMethod(cloneMethod,obj);
       }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
-        writeReplaceHelper(obj,oos,writeReplaceMethod);
+        writeReplaceHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
       static omni.impl.set.CLASSPREFIXSetImpl root(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl)getValue(rootField,obj);
@@ -325,13 +326,13 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
     }
     static interface Checked extends AscendingView{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked","writeReplace");
-  
+  	  static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked"+DOLLARSIGN+"SerializationIntermediate","writeObject",ObjectOutputStream.class);
       public static Method cloneMethod=prepareMethodForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"AscendingView"+DOLLARSIGN+"Checked","clone");
       public static omni.impl.set.CLASSPREFIXSetImpl.Checked clone(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl.Checked)callMethod(cloneMethod,obj);
       }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
-        writeReplaceHelper(obj,oos,writeReplaceMethod);
+        writeReplaceHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
       static omni.impl.set.CLASSPREFIXSetImpl root(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl)getValue(rootField,obj);

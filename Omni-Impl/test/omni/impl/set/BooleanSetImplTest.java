@@ -27,6 +27,7 @@ import omni.impl.MonitoredNavigableSet;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
+import omni.impl.MonitoredSortedSet;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
@@ -519,6 +520,13 @@ public class BooleanSetImplTest{
                 }
             }
             
+        }
+    
+        @Override
+        public void verifyCloneHelper(Object clone){
+          Assertions.assertEquals(this.expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.UncheckedAscendingFullItr.itrState(itr));
+          Assertions.assertSame(this.root.set,FieldAndMethodAccessor.BooleanSetImpl.UncheckedAscendingFullItr.root(itr));
+
         }
     }
     
@@ -2051,85 +2059,86 @@ public class BooleanSetImplTest{
 
 		@Override
 		public AbstractBooleanSetMonitor descendingSet() {
-			return new FullViewMonitor(set.descendingSet(),this,checkedType,sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
+			try
+			{  
+				var descendingSet=new FullViewMonitor(set.descendingSet(),this,checkedType,sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
+				descendingSet.verifyCollectionState();
+				return descendingSet;
+			}finally {
+				verifyCollectionState();
+			}
 		}
 
 		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> subSetHelper(OfBoolean subSet, Object fromElement,
-				boolean fromInclusive, Object toElement, boolean toInclusive, DataType inputType,
-				FunctionCallType functionCallType) {
+		public MonitoredNavigableSet<OfBoolean, Boolean> subSet(Object fromElement, boolean fromInclusive,
+				Object toElement, boolean toInclusive, DataType inputType, FunctionCallType functionCallType) {
 			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
 			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
-			if(fromB) {
+			AbstractBooleanSetMonitor subSetMonitor;
+			if(fromB){
 				if(toB) {
 					if(fromInclusive) {
+						var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
 						if(toInclusive) {
-							return new SingleViewMonitor(subSet, this, StructType.BooleanSetTrueView, checkedType, sortOrder);
+							subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
 						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, this,1, checkedType, sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet,this,2,checkedType,sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
+							subSetMonitor=new EmptyViewMonitor(subSet,this,sortOrder==SortOrder.Ascending?1:2,checkedType,sortOrder);
 						}
 					}else {
 						if(toInclusive) {
-							switch(sortOrder){
-							case Ascending:
-								return new EmptyViewMonitor(subSet,this,2,checkedType,sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();	
-							}
+							subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),this,sortOrder==SortOrder.Ascending?2:1,checkedType,sortOrder);
 						}else {
-							throw new UnsupportedOperationException();
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+							}
+							return null;
 						}
 					}
 				}else {
 					if(fromInclusive) {
 						if(toInclusive) {
-							switch(sortOrder){
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+							switch(sortOrder) {
 							case Ascending:
-								return new EmptyViewMonitor(subSet, this,1, checkedType, sortOrder);
+								subSetMonitor=new EmptyViewMonitor(subSet,this,1,checkedType,sortOrder);
+								break;
 							case Descending:
-								Assertions.assertSame(subSet, set);
+								Assertions.assertSame(subSet,set);
 								return this;
 							default:
-								throw sortOrder.invalid();	
+								throw sortOrder.invalid();
 							}
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								throw new UnsupportedOperationException();
+								if(checkedType.checked) {
+									Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+								}
+								return null;
 							case Descending:
-								return new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+								subSetMonitor=new SingleViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+								break;
 							default:
 								throw sortOrder.invalid();
 							}
 						}
 					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								return new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
-							default:
-								throw sortOrder.invalid();
+						switch(sortOrder) {
+						case Ascending:
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
 							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
+							return null;
+						case Descending:
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+							if(toInclusive) {
+								subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+							}else {
+								subSetMonitor=new EmptyViewMonitor(subSet,this,1,checkedType,sortOrder);
 							}
+							break;
+						default:
+							throw sortOrder.invalid();
 						}
 					}
 				}
@@ -2137,99 +2146,101 @@ public class BooleanSetImplTest{
 				if(toB) {
 					if(fromInclusive) {
 						if(toInclusive) {
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
 							switch(sortOrder) {
 							case Ascending:
-								Assertions.assertSame(subSet, set);
+								Assertions.assertSame(subSet,set);
 								return this;
 							case Descending:
-								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
+								subSetMonitor=new EmptyViewMonitor(subSet,this,1,checkedType,sortOrder);
+								break;
 							default:
 								throw sortOrder.invalid();
 							}
 						}else {
 							switch(sortOrder) {
 							case Ascending:
-								return new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+								subSetMonitor=new SingleViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+								break;
 							case Descending:
-								throw new UnsupportedOperationException();
+								if(checkedType.checked) {
+									Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+								}
+								return null;
 							default:
 								throw sortOrder.invalid();
 							}
 						}
 					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								return new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
+						switch(sortOrder) {
+						case Ascending:
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+							if(toInclusive) {
+								subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+							}else {
+								subSetMonitor=new EmptyViewMonitor(subSet,this,1,checkedType,sortOrder);
 							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
+							break;
+						case Descending:
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
 							}
+							return null;
+						default:
+							throw sortOrder.invalid();
 						}
 					}
 				}else {
 					if(fromInclusive) {
+						var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
 						if(toInclusive) {
-							return new SingleViewMonitor(subSet, this, StructType.BooleanSetFalseView, checkedType, sortOrder);
+							subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+							
 						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, this,0, checkedType, sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
+							subSetMonitor=new EmptyViewMonitor(subSet,this,sortOrder==SortOrder.Ascending?0:1,checkedType,sortOrder);
 						}
 					}else {
 						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet,this, 1, checkedType, sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet,this, 0, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
+							subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),this,sortOrder==SortOrder.Ascending?1:0,checkedType,sortOrder);
 						}else {
-							throw new UnsupportedOperationException();
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+							}
+							return null;
 						}
 					}
 				}
 			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
 		}
 
 		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> headSetHelper(OfBoolean headSet, Object toElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
+		public MonitoredNavigableSet<OfBoolean, Boolean> headSet(Object toElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
 			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callHeadSet(toB,inclusive,functionCallType);
 			if(toB) {
 				if(inclusive) {
 					switch(sortOrder) {
 					case Ascending:
-						Assertions.assertSame(headSet, set);
+						Assertions.assertSame(subSet,set);
 						return this;
 					case Descending:
-						return new SingleViewMonitor(headSet, this, StructType.BooleanSetTrueView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
 					default:
 						throw sortOrder.invalid();
 					}
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new SingleViewMonitor(headSet, this, StructType.BooleanSetFalseView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
 					case Descending:
-						return new EmptyViewMonitor(headSet, this,2, checkedType, sortOrder);
+						subSetMonitor=new EmptyViewMonitor(subSet,this,2,checkedType,sortOrder);
+						break;
 					default:
 						throw sortOrder.invalid();
 					}
@@ -2238,9 +2249,10 @@ public class BooleanSetImplTest{
 				if(inclusive) {
 					switch(sortOrder) {
 					case Ascending:
-						return new SingleViewMonitor(headSet, this, StructType.BooleanSetFalseView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
 					case Descending:
-						Assertions.assertSame(headSet, set);
+						Assertions.assertSame(subSet,set);
 						return this;
 					default:
 						throw sortOrder.invalid();
@@ -2248,37 +2260,47 @@ public class BooleanSetImplTest{
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new EmptyViewMonitor(headSet,this, 0, checkedType, sortOrder);
+						subSetMonitor=new EmptyViewMonitor(subSet,this,0,checkedType,sortOrder);
+						break;
 					case Descending:
-						return new SingleViewMonitor(headSet, this, StructType.BooleanSetTrueView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
 					default:
 						throw sortOrder.invalid();
 					}
 				}
 			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
 		}
 
 		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> tailSetHelper(OfBoolean tailSet, Object fromElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
+		public MonitoredNavigableSet<OfBoolean, Boolean> tailSet(Object fromElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
 			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callTailSet(fromB,inclusive,functionCallType);
 			if(fromB) {
 				if(inclusive) {
 					switch(sortOrder) {
 					case Ascending:
-						return new SingleViewMonitor(tailSet, this, StructType.BooleanSetTrueView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
 					case Descending:
-						Assertions.assertSame(tailSet, set);
+						Assertions.assertSame(subSet,set);
 						return this;
+						
 					default:
 						throw sortOrder.invalid();
 					}
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new EmptyViewMonitor(tailSet,this, 2, checkedType, sortOrder);
+						subSetMonitor=new EmptyViewMonitor(subSet,this,2,checkedType,sortOrder);
+						break;
 					case Descending:
-						return new SingleViewMonitor(tailSet, this, StructType.BooleanSetFalseView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
 					default:
 						throw sortOrder.invalid();
 					}
@@ -2287,25 +2309,141 @@ public class BooleanSetImplTest{
 				if(inclusive) {
 					switch(sortOrder) {
 					case Ascending:
-						Assertions.assertSame(tailSet, set);
+						Assertions.assertSame(subSet,set);
 						return this;
 					case Descending:
-						return new SingleViewMonitor(tailSet, this, StructType.BooleanSetFalseView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
 					default:
 						throw sortOrder.invalid();
 					}
 				}else {
 					switch(sortOrder) {
 					case Ascending:
-						return new SingleViewMonitor(tailSet, this, StructType.BooleanSetTrueView, checkedType, sortOrder);
+						subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
 					case Descending:
-						return new EmptyViewMonitor(tailSet, this,0, checkedType, sortOrder);
+						subSetMonitor=new EmptyViewMonitor(subSet,this,0,checkedType,sortOrder);
+						break;
 					default:
 						throw sortOrder.invalid();
 					}
 				}
 			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
 		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean,Boolean> subSet(Object fromElement, Object toElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callSubSet(fromB,toB,functionCallType);
+
+			if(fromB){
+				if(toB) {
+					subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+				}else {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new EmptyViewMonitor(subSet,this,1,checkedType,sortOrder);
+						break;
+					case Descending:
+						Assertions.assertSame(subSet,set);
+						return this;
+					default:
+						throw sortOrder.invalid();
+					}
+				}
+			}else {
+				if(toB) {
+					switch(sortOrder) {
+					case Ascending:
+						Assertions.assertSame(subSet,set);
+						return this;
+					case Descending:
+						subSetMonitor=new EmptyViewMonitor(subSet,this,1,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}else {
+					subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean,Boolean> headSet(Object toElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callHeadSet(toB,functionCallType);
+			if(toB) {
+				switch(sortOrder) {
+				case Ascending:
+					Assertions.assertSame(subSet,set);
+					return this;
+				case Descending:
+					subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+					break;
+				default:
+					throw sortOrder.invalid();
+				}
+			}else {
+				switch(sortOrder) {
+				case Ascending:
+					subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+					break;
+				case Descending:
+					Assertions.assertSame(subSet,set);
+					return this;
+				default:
+					throw sortOrder.invalid();
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean,Boolean> tailSet(Object fromElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callTailSet(fromB,functionCallType);
+			if(fromB) {
+				switch(sortOrder) {
+				case Ascending:
+					subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetTrueView,checkedType,sortOrder);
+					break;
+				case Descending:
+					Assertions.assertSame(subSet,set);
+					return this;
+					
+				default:
+					throw sortOrder.invalid();
+				}
+			}else {
+				switch(sortOrder) {
+				case Ascending:
+					Assertions.assertSame(subSet,set);
+					return this;
+				case Descending:
+					subSetMonitor=new SingleViewMonitor(subSet,this,StructType.BooleanSetFalseView,checkedType,sortOrder);
+					break;
+				default:
+					throw sortOrder.invalid();
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
         
     }
     private static class FullViewMonitor extends AbstractBooleanSetMonitor{
@@ -2594,259 +2732,14 @@ public class BooleanSetImplTest{
 		}
 		@Override
 		public AbstractBooleanSetMonitor descendingSet() {
-			Assertions.assertSame(set.descendingSet(), root.set);
+			try {
+				Assertions.assertSame(set.descendingSet(), root.set);
+			}finally {
+				verifyCollectionState();
+			}
 			return root;
 		}
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> subSetHelper(OfBoolean subSet, Object fromElement,
-				boolean fromInclusive, Object toElement, boolean toInclusive, DataType inputType,
-				FunctionCallType functionCallType) {
-			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
-			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
-			if(fromB) {
-				if(toB) {
-					if(fromInclusive) {
-						if(toInclusive) {
-							return new SingleViewMonitor(subSet, root, StructType.BooleanSetTrueView, checkedType, sortOrder);
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder){
-							case Ascending:
-								return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();	
-							}
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					}
-				}else {
-					if(fromInclusive) {
-						if(toInclusive) {
-							switch(sortOrder){
-							case Ascending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							case Descending:
-								Assertions.assertSame(subSet, set);
-								return this;
-							default:
-								throw sortOrder.invalid();	
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								return new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								return new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}
-				}
-			}else {
-				if(toB) {
-					if(fromInclusive) {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								Assertions.assertSame(subSet, set);
-								return this;
-							case Descending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								return new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}
-				}else {
-					if(fromInclusive) {
-						if(toInclusive) {
-							return new SingleViewMonitor(subSet, root, StructType.BooleanSetFalseView, checkedType, sortOrder);
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, root,0, checkedType, sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							case Descending:
-								return new EmptyViewMonitor(subSet, root,0, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					}
-				}
-			}
-		}
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> headSetHelper(OfBoolean headSet, Object toElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
-			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
-			if(toB) {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						Assertions.assertSame(headSet, set);
-						return this;
-					case Descending:
-						return new SingleViewMonitor(headSet, root, StructType.BooleanSetTrueView, checkedType, sortOrder);
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						return new SingleViewMonitor(headSet, root, StructType.BooleanSetFalseView, checkedType, sortOrder);
-					case Descending:
-						return new EmptyViewMonitor(headSet, root,2, checkedType, sortOrder);
-					default:
-						throw sortOrder.invalid();
-					}
-				}
-			}else {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						return new SingleViewMonitor(headSet, root, StructType.BooleanSetFalseView, checkedType, sortOrder);
-					case Descending:
-						Assertions.assertSame(headSet, set);
-						return this;
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						return new EmptyViewMonitor(headSet,root, 0, checkedType, sortOrder);
-					case Descending:
-						return new SingleViewMonitor(headSet, root, StructType.BooleanSetTrueView, checkedType, sortOrder);
-					default:
-						throw sortOrder.invalid();
-					}
-				}
-			}
-		}
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> tailSetHelper(OfBoolean tailSet, Object fromElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
-			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
-			if(fromB) {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						return new SingleViewMonitor(tailSet, root, StructType.BooleanSetTrueView, checkedType, sortOrder);
-					case Descending:
-						Assertions.assertSame(tailSet, set);
-						return this;
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						return new EmptyViewMonitor(tailSet, root,2, checkedType, sortOrder);
-					case Descending:
-						return new SingleViewMonitor(tailSet, root, StructType.BooleanSetFalseView, checkedType, sortOrder);
-					default:
-						throw sortOrder.invalid();
-					}
-				}
-			}else {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						Assertions.assertSame(tailSet, set);
-						return this;
-					case Descending:
-						return new SingleViewMonitor(tailSet, root, StructType.BooleanSetFalseView, checkedType, sortOrder);
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						return new SingleViewMonitor(tailSet, root, StructType.BooleanSetTrueView, checkedType, sortOrder);
-					case Descending:
-						return new EmptyViewMonitor(tailSet,root, 0, checkedType, sortOrder);
-					default:
-						throw sortOrder.invalid();
-					}
-				}
-			}
-		}
+		
 		@Override
 		public Object verifyFirst(DataType outputType) {
 	    	  Object actualFirst=callFirst(outputType);
@@ -2905,6 +2798,382 @@ public class BooleanSetImplTest{
 	    	  Assertions.assertEquals(outputType.convertVal(expected),actualLast);
 	          return actualLast;
 	      }
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> subSet(Object fromElement, boolean fromInclusive,
+				Object toElement, boolean toInclusive, DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			if(fromB){
+				if(toB) {
+					if(fromInclusive) {
+						var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+						if(toInclusive) {
+							subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						}else {
+							subSetMonitor=new EmptyViewMonitor(subSet,root,sortOrder==SortOrder.Ascending?1:2,checkedType,sortOrder);
+						}
+					}else {
+						if(toInclusive) {
+							subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,sortOrder==SortOrder.Ascending?2:1,checkedType,sortOrder);
+						}else {
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+							}
+							return null;
+						}
+					}
+				}else {
+					if(fromInclusive) {
+						if(toInclusive) {
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+							switch(sortOrder) {
+							case Ascending:
+								subSetMonitor=new EmptyViewMonitor(subSet,root,1,checkedType,sortOrder);
+								break;
+							case Descending:
+								Assertions.assertSame(subSet,set);
+								return this;
+							default:
+								throw sortOrder.invalid();
+							}
+						}else {
+							switch(sortOrder) {
+							case Ascending:
+								if(checkedType.checked) {
+									Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+								}
+								return null;
+							case Descending:
+								subSetMonitor=new SingleViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+								break;
+							default:
+								throw sortOrder.invalid();
+							}
+						}
+					}else {
+						switch(sortOrder) {
+						case Ascending:
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+							}
+							return null;
+						case Descending:
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+							if(toInclusive) {
+								subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+							}else {
+								subSetMonitor=new EmptyViewMonitor(subSet,root,1,checkedType,sortOrder);
+							}
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+				}
+			}else {
+				if(toB) {
+					if(fromInclusive) {
+						if(toInclusive) {
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+							switch(sortOrder) {
+							case Ascending:
+								Assertions.assertSame(subSet,set);
+								return this;
+							case Descending:
+								subSetMonitor=new EmptyViewMonitor(subSet,root,1,checkedType,sortOrder);
+								break;
+							default:
+								throw sortOrder.invalid();
+							}
+						}else {
+							switch(sortOrder) {
+							case Ascending:
+								subSetMonitor=new SingleViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+								break;
+							case Descending:
+								if(checkedType.checked) {
+									Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+								}
+								return null;
+							default:
+								throw sortOrder.invalid();
+							}
+						}
+					}else {
+						switch(sortOrder) {
+						case Ascending:
+							var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+							if(toInclusive) {
+								subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+							}else {
+								subSetMonitor=new EmptyViewMonitor(subSet,root,1,checkedType,sortOrder);
+							}
+							break;
+						case Descending:
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+							}
+							return null;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+				}else {
+					if(fromInclusive) {
+						var subSet=callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType);
+						if(toInclusive) {
+							subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+							
+						}else {
+							subSetMonitor=new EmptyViewMonitor(subSet,root,sortOrder==SortOrder.Ascending?0:1,checkedType,sortOrder);
+						}
+					}else {
+						if(toInclusive) {
+							subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,sortOrder==SortOrder.Ascending?1:0,checkedType,sortOrder);
+						}else {
+							if(checkedType.checked) {
+								Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+							}
+							return null;
+						}
+					}
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> headSet(Object toElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callHeadSet(toB,inclusive,functionCallType);
+			if(toB) {
+				if(inclusive) {
+					switch(sortOrder) {
+					case Ascending:
+						Assertions.assertSame(subSet,set);
+						return this;
+					case Descending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}else {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
+					case Descending:
+						subSetMonitor=new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}
+			}else {
+				if(inclusive) {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
+					case Descending:
+						Assertions.assertSame(subSet,set);
+						return this;
+					default:
+						throw sortOrder.invalid();
+					}
+				}else {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new EmptyViewMonitor(subSet,root,0,checkedType,sortOrder);
+						break;
+					case Descending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> tailSet(Object fromElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callTailSet(fromB,inclusive,functionCallType);
+			if(fromB) {
+				if(inclusive) {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
+					case Descending:
+						Assertions.assertSame(subSet,set);
+						return this;
+						
+					default:
+						throw sortOrder.invalid();
+					}
+				}else {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
+						break;
+					case Descending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}
+			}else {
+				if(inclusive) {
+					switch(sortOrder) {
+					case Ascending:
+						Assertions.assertSame(subSet,set);
+						return this;
+					case Descending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}else {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+						break;
+					case Descending:
+						subSetMonitor=new EmptyViewMonitor(subSet,root,0,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean,Boolean> subSet(Object fromElement, Object toElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callSubSet(fromB,toB,functionCallType);
+
+			if(fromB){
+				if(toB) {
+					subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+				}else {
+					switch(sortOrder) {
+					case Ascending:
+						subSetMonitor=new EmptyViewMonitor(subSet,root,1,checkedType,sortOrder);
+						break;
+					case Descending:
+						Assertions.assertSame(subSet,set);
+						return this;
+					default:
+						throw sortOrder.invalid();
+					}
+				}
+			}else {
+				if(toB) {
+					switch(sortOrder) {
+					case Ascending:
+						Assertions.assertSame(subSet,set);
+						return this;
+					case Descending:
+						subSetMonitor=new EmptyViewMonitor(subSet,root,1,checkedType,sortOrder);
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+				}else {
+					subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean,Boolean> headSet(Object toElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callHeadSet(toB,functionCallType);
+			if(toB) {
+				switch(sortOrder) {
+				case Ascending:
+					Assertions.assertSame(subSet,set);
+					return this;
+				case Descending:
+					subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+					break;
+				default:
+					throw sortOrder.invalid();
+				}
+			}else {
+				switch(sortOrder) {
+				case Ascending:
+					subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+					break;
+				case Descending:
+					Assertions.assertSame(subSet,set);
+					return this;
+				default:
+					throw sortOrder.invalid();
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean,Boolean> tailSet(Object fromElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			AbstractBooleanSetMonitor subSetMonitor;
+			var subSet=callTailSet(fromB,functionCallType);
+			if(fromB) {
+				switch(sortOrder) {
+				case Ascending:
+					subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetTrueView,checkedType,sortOrder);
+					break;
+				case Descending:
+					Assertions.assertSame(subSet,set);
+					return this;
+					
+				default:
+					throw sortOrder.invalid();
+				}
+			}else {
+				switch(sortOrder) {
+				case Ascending:
+					Assertions.assertSame(subSet,set);
+					return this;
+				case Descending:
+					subSetMonitor=new SingleViewMonitor(subSet,root,StructType.BooleanSetFalseView,checkedType,sortOrder);
+					break;
+				default:
+					throw sortOrder.invalid();
+				}
+			}
+			subSetMonitor.verifyCollectionState();
+			return subSetMonitor;
+		}
+
         
     }
     private static class EmptyViewMonitor extends AbstractBooleanSetMonitor{
@@ -2915,7 +3184,7 @@ public class BooleanSetImplTest{
             this.position=position;
             this.root=root;
         }
-       
+        
         @Override
         public void updateAddState(Object inputVal,DataType inputType,boolean result){
             throw new UnsupportedOperationException();
@@ -3106,29 +3375,13 @@ public class BooleanSetImplTest{
 
 		@Override
 		public AbstractBooleanSetMonitor descendingSet() {
-			return new EmptyViewMonitor(set.descendingSet(),root,position,checkedType,sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
-		}
-
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> subSetHelper(OfBoolean subSet, Object fromElement,
-				boolean fromInclusive, Object toElement, boolean toInclusive, DataType inputType,
-				FunctionCallType functionCallType) {
-			Assertions.assertSame(subSet, this.set);
-			return this;
-		}
-
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> headSetHelper(OfBoolean headSet, Object toElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
-			Assertions.assertSame(headSet, this.set);
-			return this;
-		}
-
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> tailSetHelper(OfBoolean tailSet, Object fromElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
-			Assertions.assertSame(tailSet, this.set);
-			return this;
+			try {
+				var descendingSet=new EmptyViewMonitor(set.descendingSet(),root,position,checkedType,sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
+				descendingSet.verifyCollectionState();
+				return descendingSet;
+			}finally {
+				verifyCollectionState();
+			}
 		}
 
 		@Override
@@ -3141,6 +3394,343 @@ public class BooleanSetImplTest{
 		public Object verifyLast(DataType outputType) {
 			callLast(outputType);
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> subSet(Object fromElement, Object toElement,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			outer: for(;;) {
+				switch(position) {
+				case 0:
+				case 2:
+					break;
+				case 1:
+					switch(sortOrder) {
+					case Ascending:
+						if(fromB && !toB) {
+							break outer;
+						}
+						break;
+					case Descending:
+						if(!fromB && toB) {
+							break outer;
+						}
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+					break;
+				default:
+					throw new IllegalStateException("position = "+position);
+				}
+				if(checkedType.checked) {
+					Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,toB,functionCallType));
+				}
+				return null;
+			}
+			Assertions.assertSame(callSubSet(fromB,toB,functionCallType), set);
+			return this;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> headSet(Object toElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			outer: for(;;) {
+				switch(position) {
+				case 0:
+					if(!toB && sortOrder==SortOrder.Descending) {
+						break outer;
+					}
+					break;
+				case 1:
+					switch(sortOrder) {
+					case Ascending:
+						if(!toB) {
+							break outer;
+						}
+						break;
+					case Descending:
+						if(toB) {
+							break outer;
+						}
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+					break;
+				case 2:
+					if(toB && sortOrder==SortOrder.Ascending) {
+						break outer;
+					}
+					break;
+				default:
+					throw new IllegalStateException("position = "+position);
+				}
+				if(checkedType.checked) {
+					Assertions.assertThrows(IllegalArgumentException.class, ()->callHeadSet(toB,functionCallType));
+				}
+				return null;
+			}
+			Assertions.assertSame(callHeadSet(toB,functionCallType), set);
+			return this;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> tailSet(Object fromElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			outer: for(;;) {
+				switch(position) {
+				case 0:
+					if(!fromB && sortOrder==SortOrder.Ascending) {
+						break outer;
+					}
+					break;
+				case 1:
+					switch(sortOrder) {
+					case Ascending:
+						if(fromB) {
+							break outer;
+						}
+						break;
+					case Descending:
+						if(!fromB) {
+							break outer;
+						}
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+					break;
+				case 2:
+					if(fromB && sortOrder==SortOrder.Descending) {
+						break outer;
+					}
+					break;
+				default:
+					throw new IllegalStateException("position = "+position);
+				}
+				if(checkedType.checked) {
+					Assertions.assertThrows(IllegalArgumentException.class, ()->callTailSet(fromB,functionCallType));
+				}
+				return null;
+			}
+			Assertions.assertSame(callTailSet(fromB,functionCallType), set);
+			return this;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> subSet(Object fromElement, boolean fromInclusive,
+				Object toElement, boolean toInclusive, DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			outer: for(;;) {
+				switch(position) {
+				case 0:
+					if(!toB && !fromB) {
+						switch(sortOrder) {
+						case Ascending:
+							if(fromInclusive && !toInclusive) {
+								break outer;
+							}
+							break;
+						case Descending:
+							if(!fromInclusive && toInclusive) {
+								break outer;
+							}
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					break;
+				case 1:
+					switch(sortOrder) {
+					case Ascending:
+						if(fromB == fromInclusive && toB ^ toInclusive) {
+							break outer;
+						}
+						break;
+					case Descending:
+						if(fromB ^ fromInclusive && toB == toInclusive) {
+							break outer;
+						}
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+					break;
+				case 2:
+					if(toB && fromB) {
+						switch(sortOrder) {
+						case Ascending:
+							if(!fromInclusive && toInclusive) {
+								break outer;
+							}
+							break;
+						case Descending:
+							if(fromInclusive && !toInclusive) {
+								break outer;
+							}
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					break;
+				default:
+					throw new IllegalStateException("position = "+position);
+				}
+				if(checkedType.checked) {
+					Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+				}
+				return null;
+			}
+			Assertions.assertSame(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType), set);
+			return this;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> headSet(Object toElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			outer: for(;;) {
+				switch(position) {
+				case 0:
+					if(!toB) {
+						switch(sortOrder) {
+						case Ascending:
+							if(!inclusive) {
+								break outer;
+							}
+							break;
+						case Descending:
+							if(inclusive) {
+								break outer;
+							}
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					break;
+				case 1:
+					switch(sortOrder) {
+					case Ascending:
+						if(toB ^ inclusive) {
+							break outer;
+						}
+						break;
+					case Descending:
+						if(toB == inclusive) {
+							break outer;
+						}
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+					break;
+				case 2:
+					if(toB) {
+						switch(sortOrder) {
+						case Ascending:
+							if(inclusive) {
+								break outer;
+							}
+							break;
+						case Descending:
+							if(!inclusive) {
+								break outer;
+							}
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					break;
+				default:
+					throw new IllegalStateException("position = "+position);
+				}
+				if(checkedType.checked) {
+					Assertions.assertThrows(IllegalArgumentException.class, ()->callHeadSet(toB,inclusive,functionCallType));
+				}
+				return null;
+			}
+			Assertions.assertSame(callHeadSet(toB,inclusive,functionCallType), set);
+			return this;
+		}
+
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> tailSet(Object fromElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			outer: for(;;) {
+				switch(position) {
+				case 0:
+					if(!fromB) {
+						switch(sortOrder) {
+						case Ascending:
+							if(inclusive) {
+								break outer;
+							}
+							break;
+						case Descending:
+							if(!inclusive) {
+								break outer;
+							}
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					break;
+				case 1:
+					switch(sortOrder) {
+					case Ascending:
+						if(fromB == inclusive) {
+							break outer;
+						}
+						break;
+					case Descending:
+						if(fromB ^ inclusive) {
+							break outer;
+						}
+						break;
+					default:
+						throw sortOrder.invalid();
+					}
+					break;
+				case 2:
+					if(fromB) {
+						switch(sortOrder) {
+						case Ascending:
+							if(!inclusive) {
+								break outer;
+							}
+							break;
+						case Descending:
+							if(inclusive) {
+								break outer;
+							}
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					break;
+				default:
+					throw new IllegalStateException("position = "+position);
+				}
+				if(checkedType.checked) {
+					Assertions.assertThrows(IllegalArgumentException.class, ()->callTailSet(fromB,inclusive,functionCallType));
+				}
+				return null;
+			}
+			Assertions.assertSame(callTailSet(fromB,inclusive,functionCallType), set);
+			return this;
 		}
         
     }
@@ -3940,368 +4530,12 @@ public class BooleanSetImplTest{
 		}
 		@Override
 		public AbstractBooleanSetMonitor descendingSet() {
-			return new SingleViewMonitor(set.descendingSet(), root, structType, checkedType, sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
-		}
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> subSetHelper(OfBoolean subSet, Object fromElement,
-				boolean fromInclusive, Object toElement, boolean toInclusive, DataType inputType,
-				FunctionCallType functionCallType) {
-			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
-			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
-			if(fromB) {
-				if(toB) {
-					if(fromInclusive) {
-						if(toInclusive) {
-							if(structType==StructType.BooleanSetTrueView) {
-								Assertions.assertSame(subSet, set);
-								return this;
-							}else {
-								throw new UnsupportedOperationException();
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								
-								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
-							case Descending:
-								if(structType==StructType.BooleanSetTrueView) {
-									return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
-								}else {
-									throw new UnsupportedOperationException();
-								}
-								
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder){
-							case Ascending:
-								if(structType==StructType.BooleanSetTrueView) {
-									return new EmptyViewMonitor(subSet,root,2,checkedType,sortOrder);
-								}else {
-									throw new UnsupportedOperationException();
-								}
-							case Descending:
-								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();	
-							}
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					}
-				}else {
-					if(fromInclusive) {
-						if(toInclusive) {
-							switch(sortOrder){
-							case Ascending:
-								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();	
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								if(structType==StructType.BooleanSetTrueView) {
-									Assertions.assertSame(subSet, set);
-									return this;
-								}else {
-									throw new UnsupportedOperationException();
-								}
-								
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								if(structType==StructType.BooleanSetTrueView) {
-									throw new UnsupportedOperationException();
-								}else {
-									Assertions.assertSame(subSet, set);
-									return this;
-								}
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}
-				}
-			}else {
-				if(toB) {
-					if(fromInclusive) {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								throw new UnsupportedOperationException();
-							case Descending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								if(structType==StructType.BooleanSetTrueView) {
-									throw new UnsupportedOperationException();
-								}else {
-									Assertions.assertSame(subSet, set);
-									return this;
-								}
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								if(structType==StructType.BooleanSetTrueView) {
-									Assertions.assertSame(subSet, set);
-									return this;
-								}else {
-									throw new UnsupportedOperationException();
-								}
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							case Descending:
-								throw new UnsupportedOperationException();
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}
-				}else {
-					if(fromInclusive) {
-						if(toInclusive) {
-							if(structType==StructType.BooleanSetTrueView) {
-								throw new UnsupportedOperationException();
-							}else {
-								Assertions.assertSame(subSet, set);
-								return this;
-							}
-						}else {
-							switch(sortOrder) {
-							case Ascending:
-								if(structType==StructType.BooleanSetTrueView) {
-									throw new UnsupportedOperationException();
-
-								}else {
-									return new EmptyViewMonitor(subSet,root, 0, checkedType, sortOrder);
-								}
-								
-							case Descending:
-								return new EmptyViewMonitor(subSet,root, 1, checkedType, sortOrder);
-							default:
-								throw sortOrder.invalid();
-							}
-						}
-					}else {
-						if(toInclusive) {
-							switch(sortOrder) {
-							case Ascending:
-								return new EmptyViewMonitor(subSet, root,1, checkedType, sortOrder);
-							case Descending:
-								if(structType==StructType.BooleanSetTrueView) {
-									throw new UnsupportedOperationException();
-								}else {
-									return new EmptyViewMonitor(subSet, root,0, checkedType, sortOrder);
-
-								}
-							default:
-								throw sortOrder.invalid();
-							}
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					}
-				}
-			}
-		}
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> headSetHelper(OfBoolean headSet, Object toElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
-			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
-			if(toB) {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						throw new UnsupportedOperationException();
-					case Descending:
-						if(structType==StructType.BooleanSetTrueView) {
-							Assertions.assertSame(headSet, set);
-							return this;
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						if(structType==StructType.BooleanSetTrueView) {
-							throw new UnsupportedOperationException();
-
-						}else {
-							Assertions.assertSame(headSet, set);
-							return this;
-						}
-					case Descending:
-						if(structType==StructType.BooleanSetTrueView) {
-							return new EmptyViewMonitor(headSet, root,2, checkedType, sortOrder);
-
-						}else {
-							throw new UnsupportedOperationException();
-
-						}
-					default:
-						throw sortOrder.invalid();
-					}
-				}
-			}else {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						if(structType==StructType.BooleanSetTrueView) {
-							throw new UnsupportedOperationException();
-
-						}else {
-							Assertions.assertSame(headSet, set);
-							return this;
-						}
-					case Descending:
-						throw new UnsupportedOperationException();
-
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						if(structType==StructType.BooleanSetTrueView) {
-							throw new UnsupportedOperationException();
-						}else {
-							return new EmptyViewMonitor(headSet,root, 0, checkedType, sortOrder);
-						}
-						
-					case Descending:
-						if(structType==StructType.BooleanSetTrueView) {
-							Assertions.assertSame(headSet, set);
-							return this;
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					default:
-						throw sortOrder.invalid();
-					}
-				}
-			}
-		}
-		@Override
-		public MonitoredNavigableSet<OfBoolean, Boolean> tailSetHelper(OfBoolean tailSet, Object fromElement,
-				boolean inclusive, DataType inputType, FunctionCallType functionCallType) {
-			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
-			if(fromB) {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						if(structType==StructType.BooleanSetTrueView) {
-							Assertions.assertSame(tailSet, set);
-							return this;
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					case Descending:
-						throw new UnsupportedOperationException();
-
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						if(structType==StructType.BooleanSetTrueView) {
-							return new EmptyViewMonitor(tailSet,root, 2, checkedType, sortOrder);
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					case Descending:
-						if(structType==StructType.BooleanSetTrueView) {
-							throw new UnsupportedOperationException();
-						}else {
-							Assertions.assertSame(tailSet, set);
-							return this;
-						}
-					default:
-						throw sortOrder.invalid();
-					}
-				}
-			}else {
-				if(inclusive) {
-					switch(sortOrder) {
-					case Ascending:
-						throw new UnsupportedOperationException();
-
-					case Descending:
-						if(structType==StructType.BooleanSetTrueView) {
-							throw new UnsupportedOperationException();
-
-						}else {
-							Assertions.assertSame(tailSet, set);
-							return this;
-						}
-					default:
-						throw sortOrder.invalid();
-					}
-				}else {
-					switch(sortOrder) {
-					case Ascending:
-						if(structType==StructType.BooleanSetTrueView) {
-							Assertions.assertSame(tailSet, set);
-							return this;
-						}else {
-							throw new UnsupportedOperationException();
-						}
-					case Descending:
-						if(structType==StructType.BooleanSetTrueView) {
-							throw new UnsupportedOperationException();
-						}else {
-							return new EmptyViewMonitor(tailSet, root,0, checkedType, sortOrder);
-						}
-						
-					default:
-						throw sortOrder.invalid();
-					}
-				}
+			try {
+				var descendingSet= new SingleViewMonitor(set.descendingSet(), root, structType, checkedType, sortOrder==SortOrder.Ascending?SortOrder.Descending:SortOrder.Ascending);
+				descendingSet.verifyCollectionState();
+				return descendingSet;
+			}finally {
+				verifyCollectionState();
 			}
 		}
 		@Override
@@ -4315,6 +4549,522 @@ public class BooleanSetImplTest{
 			Object ret=callLast(outputType);
 			Assertions.assertEquals(outputType.convertVal(structType==StructType.BooleanSetTrueView),ret);
 			return ret;
+		}
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> subSet(Object fromElement, Object toElement,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			throwIAE:for(;;) {
+				isSame:for(;;) {
+					AbstractBooleanSetMonitor subSetMonitor;
+					if(fromB){
+						if(toB) {
+							if(structType==StructType.BooleanSetTrueView) {
+								break isSame;
+							}else {
+								break throwIAE;
+							}
+						}else {
+							switch(sortOrder) {
+							case Ascending:
+								subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,toB,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							case Descending:
+								break throwIAE;
+							default:
+								throw sortOrder.invalid();
+							}
+						}
+					}else {
+						if(toB) {
+							switch(sortOrder) {
+							case Ascending:
+								break throwIAE;
+							case Descending:
+								subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,toB,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							default:
+								throw sortOrder.invalid();
+							}
+						}else {
+							if(structType==StructType.BooleanSetFalseView) {
+								break isSame;
+
+							}
+							break throwIAE;						
+						}
+					}
+					subSetMonitor.verifyCollectionState();
+					return subSetMonitor;
+				}
+				Assertions.assertSame(callSubSet(fromB,toB,functionCallType),set);
+				return this;
+			}
+			if(checkedType.checked) {
+				Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,toB,functionCallType));
+			}
+			return null;
+			
+		}
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> headSet(Object toElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			throwIAE:for(;;) {
+				isSame:for(;;) {
+					AbstractBooleanSetMonitor subSetMonitor;
+					if(toB) {
+						if(structType==StructType.BooleanSetTrueView) {
+							break isSame;
+						}
+						switch(sortOrder) {
+						case Ascending:
+							break throwIAE;
+						case Descending:
+							subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,functionCallType),root,1,checkedType,sortOrder);
+							break;
+						default:
+							throw sortOrder.invalid();
+						}
+					}else {
+						switch(sortOrder) {
+						case Ascending:
+							if(structType==StructType.BooleanSetFalseView) {
+								break isSame;
+							}
+							subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,functionCallType),root,1,checkedType,sortOrder);
+							break;
+						case Descending:
+							if(structType==StructType.BooleanSetFalseView) {
+								break isSame;
+							}
+							break throwIAE;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					subSetMonitor.verifyCollectionState();
+					return subSetMonitor;
+				}
+				Assertions.assertSame(callHeadSet(toB,functionCallType),set);
+				return this;
+			}
+			if(checkedType.checked) {
+				Assertions.assertThrows(IllegalArgumentException.class, ()->callHeadSet(toB,functionCallType));
+			}
+			return null;
+			
+		}
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> tailSet(Object fromElement, DataType inputType,
+				FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			throwIAE:for(;;) {
+				isSame:for(;;) {
+					AbstractBooleanSetMonitor subSetMonitor;
+					if(fromB) {
+						switch(sortOrder) {
+						case Ascending:
+							if(structType==StructType.BooleanSetTrueView) {
+								break isSame;
+							}
+							subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,functionCallType),root,1,checkedType,sortOrder);
+							break;
+						case Descending:
+							if(structType==StructType.BooleanSetTrueView) {
+								break isSame;
+							}
+							break throwIAE;
+						default:
+							throw sortOrder.invalid();
+						}
+					}else {
+						switch(sortOrder) {
+						case Descending:
+							if(structType==StructType.BooleanSetFalseView) {
+								break isSame;
+							}
+							subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,functionCallType),root,1,checkedType,sortOrder);
+							break;
+						case Ascending:
+							if(structType==StructType.BooleanSetFalseView) {
+								break isSame;
+							}
+							break throwIAE;
+						default:
+							throw sortOrder.invalid();
+						}
+					}
+					subSetMonitor.verifyCollectionState();
+					return subSetMonitor;
+				}
+				Assertions.assertSame(callTailSet(fromB,functionCallType),set);
+				return this;
+			}
+			if(checkedType.checked) {
+				Assertions.assertThrows(IllegalArgumentException.class, ()->callTailSet(fromB,functionCallType));
+			}
+			return null;
+			
+		}
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> subSet(Object fromElement, boolean fromInclusive,
+				Object toElement, boolean toInclusive, DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType, fromElement);
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			throwIAE:for(;;) {
+				isSame:for(;;) {
+					AbstractBooleanSetMonitor subSetMonitor;
+					if(fromB){
+						if(toB) {
+							if(fromInclusive) {
+								if(toInclusive) {
+									if(structType==StructType.BooleanSetTrueView) {
+										break isSame;
+									}else {
+										break throwIAE;
+									}
+								}else {
+									if(structType==StructType.BooleanSetTrueView) {
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,sortOrder==SortOrder.Ascending?1:2,checkedType,sortOrder);
+									}else {
+										if(sortOrder==SortOrder.Ascending) {
+											subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+										}else {
+											break throwIAE;
+										}
+									}
+								}
+							}else {
+								if(toInclusive) {
+									if(structType==StructType.BooleanSetTrueView) {
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,sortOrder==SortOrder.Ascending?2:1,checkedType,sortOrder);
+									}else {
+										if(sortOrder==SortOrder.Descending) {
+											subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+										}else {
+											break throwIAE;
+										}
+									}
+								}else {
+									break throwIAE;
+								}
+							}
+						}else {
+							if(fromInclusive) {
+								if(toInclusive) {
+									switch(sortOrder) {
+									case Ascending:
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+										break;
+									case Descending:
+										break throwIAE;
+									default:
+										throw sortOrder.invalid();
+									}
+								}else {
+									switch(sortOrder) {
+									case Descending:
+										if(structType==StructType.BooleanSetTrueView) {
+											break isSame;
+										}
+									case Ascending:
+										break throwIAE;
+									default:
+										throw sortOrder.invalid();
+									}
+								}
+							}else {
+								switch(sortOrder) {
+								case Descending:
+									if(toInclusive) {
+										if(structType==StructType.BooleanSetFalseView) {
+											break isSame;
+										}
+									}else {
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+										break;
+									}
+								case Ascending:
+									break throwIAE;	
+								default:
+									throw sortOrder.invalid();
+								}
+							}
+						}
+					}else {
+						if(toB) {
+							if(fromInclusive) {
+								if(toInclusive) {
+									switch(sortOrder) {
+									case Ascending:
+										break throwIAE;
+									case Descending:
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+										break;
+									default:
+										throw sortOrder.invalid();
+									}
+								}else {
+									switch(sortOrder) {
+									case Ascending:
+										if(structType==StructType.BooleanSetFalseView) {
+											break isSame;
+
+										}
+									case Descending:
+										break throwIAE;
+									default:
+										throw sortOrder.invalid();
+									}
+								}
+							}else {
+								switch(sortOrder) {
+								case Ascending:
+									if(!toInclusive) {
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+										break;
+									}
+									if(structType==StructType.BooleanSetTrueView) {
+										break isSame;
+
+									}
+								case Descending:
+									break throwIAE;
+								default:
+									throw sortOrder.invalid();
+								}
+							}
+						}else {
+							if(fromInclusive) {
+								if(toInclusive) {
+									if(structType==StructType.BooleanSetFalseView) {
+										break isSame;
+
+									}
+									break throwIAE;						
+								}else {
+									if(structType==StructType.BooleanSetFalseView) {
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,sortOrder==SortOrder.Ascending?0:1,checkedType,sortOrder);
+
+									}else {
+										if(sortOrder==SortOrder.Descending) {
+											subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+
+										}else {
+											break throwIAE;
+										}
+									}
+								}
+							}else {
+								if(toInclusive) {
+									if(structType==StructType.BooleanSetFalseView) {
+										subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,sortOrder==SortOrder.Ascending?1:0,checkedType,sortOrder);
+
+									}else {
+										if(sortOrder==SortOrder.Ascending) {
+											subSetMonitor=new EmptyViewMonitor(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),root,1,checkedType,sortOrder);
+
+										}else {
+											break throwIAE;
+
+										}
+									}
+								}else {
+									break throwIAE;
+								}
+							}
+						}
+					}
+					subSetMonitor.verifyCollectionState();
+					return subSetMonitor;
+				}
+				Assertions.assertSame(callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType),set);
+				return this;
+			}
+			if(checkedType.checked) {
+				Assertions.assertThrows(IllegalArgumentException.class, ()->callSubSet(fromB,fromInclusive,toB,toInclusive,functionCallType));
+			}
+			return null;
+			
+		}
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> headSet(Object toElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean toB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,toElement);
+			throwIAE:for(;;) {
+				isSame:for(;;) {
+					AbstractBooleanSetMonitor subSetMonitor;
+					if(toB) {
+						if(inclusive) {
+							if(structType==StructType.BooleanSetTrueView) {
+								break isSame;
+							}
+							switch(sortOrder) {
+							case Ascending:
+								break throwIAE;
+							case Descending:
+								subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							default:
+								throw sortOrder.invalid();
+							}
+						}else {
+							switch(sortOrder) {
+							case Ascending:
+								if(structType==StructType.BooleanSetFalseView) {
+									break isSame;
+								}
+								subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							case Descending:
+								if(structType==StructType.BooleanSetTrueView) {
+									subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,inclusive,functionCallType),root,2,checkedType,sortOrder);
+									break;
+								}
+								break throwIAE;
+							default:
+								throw sortOrder.invalid();
+							}
+						}
+					}else {
+						if(inclusive) {
+							switch(sortOrder) {
+							case Ascending:
+								if(structType==StructType.BooleanSetFalseView) {
+									break isSame;
+								}
+								subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							case Descending:
+								if(structType==StructType.BooleanSetFalseView) {
+									break isSame;
+								}
+								break throwIAE;
+							default:
+								throw sortOrder.invalid();
+							}
+						}else {
+							switch(sortOrder) {
+							case Ascending:
+								if(structType==StructType.BooleanSetFalseView) {
+									subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,inclusive,functionCallType),root,0,checkedType,sortOrder);
+									break;
+								}
+								break throwIAE;
+							case Descending:
+								if(structType==StructType.BooleanSetTrueView) {
+									break isSame;
+								}
+								subSetMonitor=new EmptyViewMonitor(callHeadSet(toB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							default:
+								throw sortOrder.invalid();
+							}
+						}
+					}
+					subSetMonitor.verifyCollectionState();
+					return subSetMonitor;
+				}
+				Assertions.assertSame(callHeadSet(toB,inclusive,functionCallType),set);
+				return this;
+			}
+			if(checkedType.checked) {
+				Assertions.assertThrows(IllegalArgumentException.class, ()->callHeadSet(toB,inclusive,functionCallType));
+			}
+			return null;
+			
+		}
+		@Override
+		public MonitoredNavigableSet<OfBoolean, Boolean> tailSet(Object fromElement, boolean inclusive,
+				DataType inputType, FunctionCallType functionCallType) {
+			boolean fromB=(boolean)DataType.BOOLEAN.convertValUnchecked(inputType,fromElement);
+			throwIAE:for(;;) {
+				isSame:for(;;) {
+					AbstractBooleanSetMonitor subSetMonitor;
+					if(fromB) {
+						if(inclusive) {
+							switch(sortOrder) {
+							case Ascending:
+								if(structType==StructType.BooleanSetTrueView) {
+									break isSame;
+								}
+								subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							case Descending:
+								if(structType==StructType.BooleanSetTrueView) {
+									break isSame;
+								}
+								break throwIAE;
+							default:
+								throw sortOrder.invalid();
+							}
+						}else {
+							switch(sortOrder) {
+							case Ascending:
+								if(structType==StructType.BooleanSetTrueView) {
+									subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,inclusive,functionCallType),root,2,checkedType,sortOrder);
+									break;
+								}
+								break throwIAE;
+							case Descending:
+								if(structType==StructType.BooleanSetFalseView) {
+									break isSame;
+								}
+								subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							default:
+								throw sortOrder.invalid();
+							}
+						}
+					}else {
+						if(inclusive) {
+							switch(sortOrder) {
+							case Descending:
+								if(structType==StructType.BooleanSetFalseView) {
+									break isSame;
+								}
+								subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							case Ascending:
+								if(structType==StructType.BooleanSetFalseView) {
+									break isSame;
+								}
+								break throwIAE;
+							default:
+								throw sortOrder.invalid();
+							}
+						}else {
+							switch(sortOrder) {
+							case Ascending:
+								if(structType==StructType.BooleanSetTrueView) {
+									break isSame;
+								}
+								subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,inclusive,functionCallType),root,1,checkedType,sortOrder);
+								break;
+							case Descending:
+								if(structType==StructType.BooleanSetFalseView) {
+									subSetMonitor=new EmptyViewMonitor(callTailSet(fromB,inclusive,functionCallType),root,0,checkedType,sortOrder);
+									break;
+								}
+								break throwIAE;
+							default:
+								throw sortOrder.invalid();
+							}
+						}
+					}
+					subSetMonitor.verifyCollectionState();
+					return subSetMonitor;
+				}
+				Assertions.assertSame(callTailSet(fromB,inclusive,functionCallType),set);
+				return this;
+			}
+			if(checkedType.checked) {
+				Assertions.assertThrows(IllegalArgumentException.class, ()->callTailSet(fromB,inclusive,functionCallType));
+			}
+			return null;
+			
 		}
         
     }
@@ -4489,7 +5239,6 @@ public class BooleanSetImplTest{
     
     
     
-    
     @Test
     public void testadd_val(){
         final var mayBeAddedTo=DataType.BOOLEAN.mayBeAddedTo();
@@ -4605,7 +5354,6 @@ public class BooleanSetImplTest{
                 inputType,castType,modification);
         test.runAllTests("BooleanSetImplTest.testcontains_val");
     }
-    
     @Test
     public void testforEach_Consumer(){
         for(final var initSet:VALID_INIT_SEQS){
@@ -4651,6 +5399,218 @@ public class BooleanSetImplTest{
         TestExecutorService.completeAllTests("BooleanSetImplTest.testforEach_Consumer");
     }
     
+    
+    @Test
+    public void testsubSet_valbooleanvalboolean() {
+    	for(var sortOrder:SortOrder.values()) {
+    		for(var checkedType:CheckedType.values()) {
+    			for(int tmpState=0;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+        					final int inclusiveLo=tmpInclLo;
+        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+        						final int inclusiveHi=tmpInclHi;
+        						TestExecutorService.submitTest(()->{
+        							var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state),invert,inclusiveLo,inclusiveHi);
+        							for(var functionCallType:FunctionCallType.values()) {
+        								for(var from=0;from<=1;++from) {
+        									for(var fromInclusive=0;fromInclusive<=1;++fromInclusive) {
+        										for(var to=0;to<=1;++to) {
+        											for(var toInclusive=0;toInclusive<=1;++toInclusive) {
+            											monitor.subSet(from==1, fromInclusive==1, to==1, toInclusive==1, DataType.BOOLEAN, functionCallType);
+            										}
+        										}
+        										
+        									}
+        								}
+        							}
+        						});
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testsubSet_valbooleanvalboolean");
+    }
+    
+    @Test
+    public void testheadSet_valboolean() {
+    	for(var sortOrder:SortOrder.values()) {
+    		for(var checkedType:CheckedType.values()) {
+    			for(int tmpState=0;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+        					final int inclusiveLo=tmpInclLo;
+        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+        						final int inclusiveHi=tmpInclHi;
+        						TestExecutorService.submitTest(()->{
+        							var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state),invert,inclusiveLo,inclusiveHi);
+        							for(var functionCallType:FunctionCallType.values()) {
+										for(var to=0;to<=1;++to) {
+											for(var inclusive=0;inclusive<=1;++inclusive) {
+												monitor.headSet(to==1, inclusive==1, DataType.BOOLEAN, functionCallType);
+											}
+										}
+        							}
+        						});
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testheadSet_valboolean");
+    }
+    @Test
+    public void testtailSet_valboolean() {
+    	for(var sortOrder:SortOrder.values()) {
+    		for(var checkedType:CheckedType.values()) {
+    			for(int tmpState=0;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+        					final int inclusiveLo=tmpInclLo;
+        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+        						final int inclusiveHi=tmpInclHi;
+        						TestExecutorService.submitTest(()->{
+        							var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state),invert,inclusiveLo,inclusiveHi);
+        							for(var functionCallType:FunctionCallType.values()) {
+										for(var from=0;from<=1;++from) {
+											for(var inclusive=0;inclusive<=1;++inclusive) {
+												monitor.tailSet(from==1, inclusive==1, DataType.BOOLEAN, functionCallType);
+											}
+										}
+        							}
+        						});
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testtailSet_valboolean");
+    }
+    @Test
+    public void testheadSet_val() {
+    	for(var sortOrder:SortOrder.values()) {
+    		for(var checkedType:CheckedType.values()) {
+    			for(int tmpState=0;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+        					final int inclusiveLo=tmpInclLo;
+        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+        						final int inclusiveHi=tmpInclHi;
+        						TestExecutorService.submitTest(()->{
+        							var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state),invert,inclusiveLo,inclusiveHi);
+        							for(var functionCallType:FunctionCallType.values()) {
+										for(var to=0;to<=1;++to) {
+											monitor.headSet(to==1, DataType.BOOLEAN, functionCallType);
+										}
+        							}
+        						});
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testheadSet_val");
+    }
+    @Test
+    public void testtailSet_val() {
+    	for(var sortOrder:SortOrder.values()) {
+    		for(var checkedType:CheckedType.values()) {
+    			for(int tmpState=0;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+        					final int inclusiveLo=tmpInclLo;
+        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+        						final int inclusiveHi=tmpInclHi;
+        						TestExecutorService.submitTest(()->{
+        							var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state),invert,inclusiveLo,inclusiveHi);
+        							for(var functionCallType:FunctionCallType.values()) {
+										for(var from=0;from<=1;++from) {
+											monitor.tailSet(from==1, DataType.BOOLEAN, functionCallType);
+										}
+        							}
+        						});
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testtailSet_val");
+    }
+    
+    @Test
+    public void testdescendingSet_void() {
+    	for(var sortOrder:SortOrder.values()) {
+    		for(var checkedType:CheckedType.values()) {
+    			for(int tmpState=0;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+        					final int inclusiveLo=tmpInclLo;
+        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+        						final int inclusiveHi=tmpInclHi;
+        						TestExecutorService.submitTest(()->{
+        							var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state),invert,inclusiveLo,inclusiveHi);
+									monitor.descendingSet();
+        						});
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testdescendingSet_void");
+    }
+    
+    @Test
+    public void testsubSet_valval() {
+    	for(var sortOrder:SortOrder.values()) {
+    		for(var checkedType:CheckedType.values()) {
+    			for(int tmpState=0;tmpState<=0b11;++tmpState) {
+    				final int state=tmpState;
+    				for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
+    					final int invert=tmpInvert;
+    					for(int tmpInclLo=0;tmpInclLo<=2;++tmpInclLo) {
+        					final int inclusiveLo=tmpInclLo;
+        					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
+        						final int inclusiveHi=tmpInclHi;
+        						TestExecutorService.submitTest(()->{
+        							var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state),invert,inclusiveLo,inclusiveHi);
+        							for(var functionCallType:FunctionCallType.values()) {
+        								for(var from=0;from<=1;++from) {
+    										for(var to=0;to<=1;++to) {
+        										monitor.subSet(from==1,to==1, DataType.BOOLEAN, functionCallType);
+    										}
+        								}
+        							}
+        						});
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	TestExecutorService.completeAllTests("BooleanSetImplTest.testsubSet_valval");
+    }
+    
+    
+    
     @Test
     public void testhashCode_void(){
     	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).verifyHashCode();
@@ -4684,7 +5644,6 @@ public class BooleanSetImplTest{
 
         test.runAllTests("BooleanSetImplTest.testiterator_void");
     }
-    
     @Test
     public void testItrclone_void(){
     	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).getMonitoredIterator().verifyClone();
@@ -4929,7 +5888,14 @@ public class BooleanSetImplTest{
                 		for(int tmpInvert=0;tmpInvert<=1;++tmpInvert) {
             				final int invert=tmpInvert;
     						for(final var initSet:VALID_INIT_SEQS){
-                                TestExecutorService.submitTest(()->{
+    							if(functionGen==MonitoredFunctionGen.ModCollection
+    									&& checkedType.checked
+    									&& sortOrder==SortOrder.Ascending
+    									&& invert==1
+    									&& initSet==SetInitialization.Empty) {
+    								TestExecutorService.suspend();
+    							}
+                                //TestExecutorService.submitTest(()->{
                                 	var monitor=getMonitoredSet(initSet.initialize(new BooleanSetImplMonitor(checkedType,sortOrder)),invert,0,1);
                                     if(functionGen.expectedException==null) {
                                         Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
@@ -4937,7 +5903,7 @@ public class BooleanSetImplTest{
                                         
                                         Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
                                     }
-                                });
+                                //});
                             }
                 		}
                 		
@@ -5034,7 +6000,6 @@ public class BooleanSetImplTest{
         };
         test.runAllTests("BooleanSetImplTest.testtoArray_IntFunction");
     }
-    
     @Test
     public void testtoArray_ObjectArray(){
     	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->{
@@ -5075,7 +6040,6 @@ public class BooleanSetImplTest{
     	};
         test.runAllTests("BooleanSetImplTest.testtoArray_ObjectArray");
     }
-    
     @Test
     public void testtoArray_void(){
     	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->{
@@ -5086,7 +6050,6 @@ public class BooleanSetImplTest{
         };
         test.runAllTests("BooleanSetImplTest.testtoArray_void");
     }
-    
     @Test
     public void testtoString_void(){
     	BasicTest test=(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi)->getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi).verifyToString();
@@ -5106,23 +6069,12 @@ public class BooleanSetImplTest{
             					for(int tmpInclHi=inclusiveLo-1;tmpInclHi<=1;++tmpInclHi) {
             						final int inclusiveHi=tmpInclHi;
             						TestExecutorService.submitTest(()->runTest(checkedType,sortOrder,state,invert,inclusiveLo,inclusiveHi));
-            						//TestExecutorService.submitTest(()->{
-            						//	var monitor=getMonitoredSet(new BooleanSetImplMonitor(checkedType,sortOrder,state), invert, inclusiveLo, inclusiveHi);
-            						//	monitor.verifyClear();
-            						//});
             					}
         					}
         				}
         			}
         		}
         	}
-        	
-        	
-//            for(final var checkedType:CheckedType.values()){
-//                for(final var initSet:VALID_INIT_SEQS){
-//                    TestExecutorService.submitTest(()->runTest(checkedType,initSet));
-//                }
-//            }
             TestExecutorService.completeAllTests(testName);
         }
         void runTest(CheckedType checkedType,SortOrder sortOrder,int state,int invert,int inclusiveLo,int inclusiveHi);

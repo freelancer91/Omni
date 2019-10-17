@@ -243,7 +243,7 @@ public enum StructType{
     private static EnumSet<MonitoredFunctionGen> initValidMonitoredFunctionGens(StructType structType){
         switch(structType.name){
         case "BooleanSetEmpty":
-          return EnumSet.noneOf(MonitoredFunctionGen.class);
+          return EnumSet.of(MonitoredFunctionGen.NoThrow);
         case "ArrDeq":
         case "ArrList":
         case "ArrStack":
