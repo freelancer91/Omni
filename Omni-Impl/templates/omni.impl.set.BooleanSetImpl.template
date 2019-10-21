@@ -67,6 +67,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     #MACRO ForEach<True,this,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
     #MACRO RemoveIf<True,this,Full>(BooleanPredicate,true,false)
     #MACRO RemoveIf<True,this,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+    @SuppressWarnings("unchecked")
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final int state=this.state;
       final T[] dst;
@@ -155,6 +156,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       #MACRO ForEach<True,this,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       #MACRO RemoveIf<True,this,Full>(BooleanPredicate,true,false)
       #MACRO RemoveIf<True,this,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
 	      final int state=this.state;
 	      final T[] dst;
@@ -268,10 +270,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     private DescendingView(BooleanSetImpl root){
       super(root);
     }
-    private DescendingView(){
-      //used by serialization
-      super(null);
-    }
     @Override public Object clone(){
       return new Descending(root.state);
     }
@@ -317,6 +315,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       #MACRO ForEach<True,root,Full,Descending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       #MACRO RemoveIf<True,root,Full>(BooleanPredicate,true,false)
       #MACRO RemoveIf<True,root,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
 	      final int state=(root=this.root).state;
@@ -438,6 +437,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       #MACRO ForEach<True,root,Full,Ascending>(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       #MACRO RemoveIf<True,root,Full>(BooleanPredicate,true,false)
       #MACRO RemoveIf<True,root,Full>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
 	      final int state=(root=this.root).state;
@@ -564,6 +564,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         return new UncheckedTrueView(root);
       }
       #MACRO SubSetMethods<root,True,Descending,False>()
+      #MACRO AccessMethods<root,True,Descending>()
     }
     private static class Checked extends UncheckedTrueView{
       private Checked(BooleanSetImpl root){
@@ -574,6 +575,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       #MACRO RemoveIf<True,root,True>(BooleanPredicate,true,false)
       #MACRO RemoveIf<True,root,True>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       #MACRO FirstAndLastBoolean<root,Ascending,True,True>()
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         final BooleanSetImpl root;
         final int state;
@@ -616,7 +618,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
           return new UncheckedTrueView.Checked(root);
         }
         #MACRO SubSetMethods<root,True,Descending,True>()
-        
+        #MACRO AccessMethods<root,True,Descending>()
       }
     }
   }
@@ -664,7 +666,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
       #MACRO Comparator<Descending>()
       #MACRO SubSetMethods<root,False,Descending,False>()
-      
+      #MACRO AccessMethods<root,False,Descending>()
     }
     private static class Checked extends UncheckedFalseView{
       private Checked(BooleanSetImpl root){
@@ -676,8 +678,9 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       #MACRO RemoveIf<True,root,False>(Predicate<? super Boolean>,Boolean.TRUE,Boolean.FALSE)
       #MACRO FirstAndLastBoolean<root,Ascending,True,False>()
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
-          return new UncheckedFalseView.Checked.Descending(root);
-        }
+        return new UncheckedFalseView.Checked.Descending(root);
+      }
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         final BooleanSetImpl root;
         final int state;
@@ -717,7 +720,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
           return new UncheckedFalseView.Checked(root);
         }
         #MACRO SubSetMethods<root,False,Descending,True>()
-        
+        #MACRO AccessMethods<root,False,Descending>()
       }
     }
   }
@@ -894,12 +897,25 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
 #IFSWITCH VIEW==Full
   #IFSWITCH SOURCE==this
     #IFSWITCH DIRECTION==Ascending
-      #IFSWITCH RETTYPE==boolean,Boolean
+      #IFSWITCH RETTYPE==boolean
   switch(SOURCE.state){
     case 0b11:
       return val;
     case 0b10:
       return TRUEVAL;
+    default:
+  }
+  return DEFAULTVAL;
+      #ELSEIFSWITCH RETTYPE==Boolean
+  switch(SOURCE.state){
+    case 0b11:
+      return val;
+    case 0b10:
+      return TRUEVAL;
+    case 0b01:
+      if(!val){
+        return FALSEVAL;
+      }
     default:
   }
   return DEFAULTVAL;
@@ -1055,18 +1071,23 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       #ELSEIFSWITCH RETTYPE==float,double
   switch(SOURCE.state){
   case 0b11:
-    if(val>=TRUEVAL){
-      return TRUEVAL;
-    }
-  case 0b01:
-    if(val>=FALSEVAL){
+    if(val<TRUEVAL){
+      if(val<FALSEVAL){
+        break;
+      }
       return FALSEVAL;
     }
-    break;
-  case 0b10:
-    if(val>=TRUEVAL){
-      return TRUEVAL;
+    return TRUEVAL;
+  case 0b01:
+    if(val<FALSEVAL){
+      break;
     }
+    return FALSEVAL;
+  case 0b10:
+    if(val<TRUEVAL){
+      break;
+    }
+    return TRUEVAL;
   default:
   }
   return DEFAULTVAL;
@@ -1122,10 +1143,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   }
   return DEFAULTVAL;
     #ELSE
-   if(val>=TRUEVAL && (SOURCE.state&0b10)!=0){
-    return TRUEVAL;
+   if(val<TRUEVAL || (SOURCE.state&0b10)==0){
+    return DEFAULTVAL; 
   }
-  return DEFAULTVAL; 
+  return TRUEVAL;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
     #IFSWITCH RETTYPE==Boolean
@@ -1144,10 +1165,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   }
   return DEFAULTVAL;  
     #ELSE
-  if(val>=FALSEVAL && (SOURCE.state&0b01)!=0){
-    return FALSEVAL;
+  if(val<FALSEVAL || (SOURCE.state&0b01)==0){
+    return DEFAULTVAL;
   }
-  return DEFAULTVAL;
+  return FALSEVAL;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
     #IFSWITCH RETTYPE==Boolean
@@ -1177,18 +1198,23 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       #ELSEIFSWITCH RETTYPE==float,double
   switch(SOURCE.state){
   case 0b11:
-    if(val>TRUEVAL){
-      return TRUEVAL;
-    }
-  case 0b01:
-    if(val>FALSEVAL){
+    if(val<=TRUEVAL){
+      if(val<=FALSEVAL){
+        break;
+      }
       return FALSEVAL;
     }
-    break;
-  case 0b10:
-    if(val>TRUEVAL){
-      return TRUEVAL;
+    return TRUEVAL;
+  case 0b01:
+    if(val<=FALSEVAL){
+      break;
     }
+    return FALSEVAL;
+  case 0b10:
+    if(val<=TRUEVAL){
+      break;
+    }
+    return TRUEVAL;
   default:
   }
   return DEFAULTVAL;
@@ -1231,10 +1257,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     #IFSWITCH RETTYPE==boolean,Boolean
   return DEFAULTVAL;
     #ELSE
-  if(val>TRUEVAL && (SOURCE.state&0b10)!=0){
-    return TRUEVAL;
+  if(val<=TRUEVAL || (SOURCE.state&0b10)==0){
+    return DEFAULTVAL;
   }
-  return DEFAULTVAL;
+  return TRUEVAL;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
     return super.higherCLASSPREFIX(val);
@@ -1249,10 +1275,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   }
   return DEFAULTVAL;
     #ELSE
-  if(val>FALSEVAL && (SOURCE.state&0b01)!=0){
-    return FALSEVAL;
+  if(val<=FALSEVAL || (SOURCE.state&0b01)==0){
+    return DEFAULTVAL;
   }  
-  return DEFAULTVAL;
+  return FALSEVAL;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
   return super.higherCLASSPREFIX(val);
@@ -1357,7 +1383,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     #ELSE
   if(val<FALSEVAL && (SOURCE.state&0b01)!=0){
     return FALSEVAL;
-  } 
+  }
   return DEFAULTVAL;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
@@ -2390,7 +2416,7 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   }
   throw new IllegalArgumentException("out of bounds");
     #ELSEIFSWITCH CHECKED_TYPE==False
-  if(fromElement && toElement){
+  if(toElement){
     return this;
   }
   return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
@@ -2406,7 +2432,7 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   }
   throw new IllegalArgumentException("out of bounds"); 
     #ELSEIFSWITCH CHECKED_TYPE==False
-  if(fromElement && toElement){
+  if(fromElement){
     return this;
   } 
   return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
@@ -2424,10 +2450,10 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   }
   throw new IllegalArgumentException("out of bounds"); 
     #ELSEIFSWITCH CHECKED_TYPE==False
-  if(!toElement && !fromElement){
-    return this;
+  if(fromElement){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
   }
-  return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+  return this;
     #ENDIF
   #ELSEIFSWITCH DIRECTION==Descending
     #IFSWITCH CHECKED_TYPE==True
@@ -2440,10 +2466,10 @@ ERROR the source SOURCE cannot be matched with the view VIEW
   }
   throw new IllegalArgumentException("out of bounds"); 
     #ELSEIFSWITCH CHECKED_TYPE==False
-  if(!fromElement && !toElement){
-    return this;
+  if(toElement){
+    return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
   }
-  return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+  return this;
     #ENDIF
   #ENDIF
 #ENDIF
@@ -2480,9 +2506,7 @@ ERROR the source SOURCE cannot be matched with the view VIEW
       return new UncheckedTrueView(SOURCE);
     }
   }else if(toElement^toInclusive){
-    if(fromInclusive){
-      return new UncheckedFalseView(SOURCE);
-    }
+    return new UncheckedFalseView(SOURCE);
   }else if(toElement && !fromElement){
     return this;
   }
@@ -3043,14 +3067,17 @@ ERROR the direction DIRECTION cannot be matched with the view VIEW
   #ENDIF
 #ELSEIFSWITCH VIEW==True
   #IFSWITCH CHECKED==True
-  switch((itrState<<1)|(root.state>>>1)){
-  default:
-    throw new ConcurrentModificationException();
-  case 0b101:
-    action.accept(TRUEVAL);
+  if(this.itrState==0b10){
+    final BooleanSetImpl root;
+    final int rootState=(root=this.root).state;
+    try{
+      action.accept(TRUEVAL);
+    }finally{
+      if((rootState&0b10)==0 || root.state!=rootState || this.itrState!=0b10){
+        throw new ConcurrentModificationException();
+      }
+    }
     itrState=0b01;
-  case 0b000:
-  case 0b011:
   }
   #ELSEIFSWITCH CHECKED==False
   if(itrState==0b1){
@@ -3060,14 +3087,17 @@ ERROR the direction DIRECTION cannot be matched with the view VIEW
   #ENDIF
 #ELSEIFSWITCH VIEW==False
   #IFSWITCH CHECKED==True
-  switch((itrState<<1)|(root.state&0b01)){
-  default:
-    throw new ConcurrentModificationException();
-  case 0b101:
-    action.accept(FALSEVAL);
+  if(this.itrState==0b10){
+    final BooleanSetImpl root;
+    final int rootState=(root=this.root).state;
+    try{
+      action.accept(FALSEVAL);
+    }finally{
+      if((rootState&0b01)==0 || root.state!=rootState || this.itrState!=0b10){
+        throw new ConcurrentModificationException();
+      }
+    }
     itrState=0b01;
-  case 0b000:
-  case 0b011:
   }
   #ELSEIFSWITCH CHECKED==False
   if(itrState==0b1){

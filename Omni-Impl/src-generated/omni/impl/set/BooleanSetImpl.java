@@ -78,6 +78,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         return val;
       case 0b10:
         return Boolean.TRUE;
+      case 0b01:
+        if(!val){
+          return Boolean.FALSE;
+        }
       default:
     }
     return null;
@@ -773,18 +777,23 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   @Override public float floatFloor(float val){
     switch(this.state){
     case 0b11:
-      if(val>=1F){
-        return 1F;
-      }
-    case 0b01:
-      if(val>=0F){
+      if(val<1F){
+        if(val<0F){
+          break;
+        }
         return 0F;
       }
-      break;
-    case 0b10:
-      if(val>=1F){
-        return 1F;
+      return 1F;
+    case 0b01:
+      if(val<0F){
+        break;
       }
+      return 0F;
+    case 0b10:
+      if(val<1F){
+        break;
+      }
+      return 1F;
     default:
     }
     return Float.NaN;
@@ -792,18 +801,23 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   @Override public float lowerFloat(float val){
     switch(this.state){
     case 0b11:
-      if(val>1F){
-        return 1F;
-      }
-    case 0b01:
-      if(val>0F){
+      if(val<=1F){
+        if(val<=0F){
+          break;
+        }
         return 0F;
       }
-      break;
-    case 0b10:
-      if(val>1F){
-        return 1F;
+      return 1F;
+    case 0b01:
+      if(val<=0F){
+        break;
       }
+      return 0F;
+    case 0b10:
+      if(val<=1F){
+        break;
+      }
+      return 1F;
     default:
     }
     return Float.NaN;
@@ -880,18 +894,23 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   @Override public double doubleFloor(double val){
     switch(this.state){
     case 0b11:
-      if(val>=1D){
-        return 1D;
-      }
-    case 0b01:
-      if(val>=0D){
+      if(val<1D){
+        if(val<0D){
+          break;
+        }
         return 0D;
       }
-      break;
-    case 0b10:
-      if(val>=1D){
-        return 1D;
+      return 1D;
+    case 0b01:
+      if(val<0D){
+        break;
       }
+      return 0D;
+    case 0b10:
+      if(val<1D){
+        break;
+      }
+      return 1D;
     default:
     }
     return Double.NaN;
@@ -899,18 +918,23 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
   @Override public double lowerDouble(double val){
     switch(this.state){
     case 0b11:
-      if(val>1D){
-        return 1D;
-      }
-    case 0b01:
-      if(val>0D){
+      if(val<=1D){
+        if(val<=0D){
+          break;
+        }
         return 0D;
       }
-      break;
-    case 0b10:
-      if(val>1D){
-        return 1D;
+      return 1D;
+    case 0b01:
+      if(val<=0D){
+        break;
       }
+      return 0D;
+    case 0b10:
+      if(val<=1D){
+        break;
+      }
+      return 1D;
     default:
     }
     return Double.NaN;
@@ -1356,9 +1380,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         return new UncheckedTrueView(this);
       }
     }else if(toElement^toInclusive){
-      if(fromInclusive){
-        return new UncheckedFalseView(this);
-      }
+      return new UncheckedFalseView(this);
     }else if(toElement && !fromElement){
       return this;
     }
@@ -1542,6 +1564,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
       return true;
     }
+    @SuppressWarnings("unchecked")
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final int state=this.state;
       final T[] dst;
@@ -2315,6 +2338,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         }
         return true;
       }
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
 	      final int state=this.state;
 	      final T[] dst;
@@ -2654,10 +2678,6 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
     private static final long serialVersionUID=1L;
     private DescendingView(BooleanSetImpl root){
       super(root);
-    }
-    private DescendingView(){
-      //used by serialization
-      super(null);
     }
     @Override public Object clone(){
       return new Descending(root.state);
@@ -3266,6 +3286,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         }
         return true;
       }
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
 	      final int state=(root=this.root).state;
@@ -3861,9 +3882,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
           return new UncheckedTrueView(root);
         }
       }else if(toElement^toInclusive){
-        if(fromInclusive){
-          return new UncheckedFalseView(root);
-        }
+        return new UncheckedFalseView(root);
       }else if(toElement && !fromElement){
         return this;
       }
@@ -4030,6 +4049,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         }
         return true;
       }
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
          final BooleanSetImpl root;
 	      final int state=(root=this.root).state;
@@ -4451,16 +4471,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Byte.MIN_VALUE;
     }
     @Override public byte byteFloor(byte val){
-       if(val>=1 && (root.state&0b10)!=0){
-        return 1;
+       if(val<1 || (root.state&0b10)==0){
+        return Byte.MIN_VALUE; 
       }
-      return Byte.MIN_VALUE; 
+      return 1;
     }
     @Override public byte lowerByte(byte val){
-      if(val>1 && (root.state&0b10)!=0){
-        return 1;
+      if(val<=1 || (root.state&0b10)==0){
+        return Byte.MIN_VALUE;
       }
-      return Byte.MIN_VALUE;
+      return 1;
     }
     @Override public byte higherByte(byte val){
       if(val<1 && (root.state&0b10)!=0){
@@ -4493,16 +4513,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Character.MIN_VALUE;
     }
     @Override public char charFloor(char val){
-       if(val>=1 && (root.state&0b10)!=0){
-        return 1;
+       if(val<1 || (root.state&0b10)==0){
+        return Character.MIN_VALUE; 
       }
-      return Character.MIN_VALUE; 
+      return 1;
     }
     @Override public char lowerChar(char val){
-      if(val>1 && (root.state&0b10)!=0){
-        return 1;
+      if(val<=1 || (root.state&0b10)==0){
+        return Character.MIN_VALUE;
       }
-      return Character.MIN_VALUE;
+      return 1;
     }
     @Override public char higherChar(char val){
       if(val==0 && (root.state&0b10)!=0){
@@ -4535,16 +4555,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Short.MIN_VALUE;
     }
     @Override public short shortFloor(short val){
-       if(val>=1 && (root.state&0b10)!=0){
-        return 1;
+       if(val<1 || (root.state&0b10)==0){
+        return Short.MIN_VALUE; 
       }
-      return Short.MIN_VALUE; 
+      return 1;
     }
     @Override public short lowerShort(short val){
-      if(val>1 && (root.state&0b10)!=0){
-        return 1;
+      if(val<=1 || (root.state&0b10)==0){
+        return Short.MIN_VALUE;
       }
-      return Short.MIN_VALUE;
+      return 1;
     }
     @Override public short higherShort(short val){
       if(val<1 && (root.state&0b10)!=0){
@@ -4577,16 +4597,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Integer.MIN_VALUE;
     }
     @Override public int intFloor(int val){
-       if(val>=1 && (root.state&0b10)!=0){
-        return 1;
+       if(val<1 || (root.state&0b10)==0){
+        return Integer.MIN_VALUE; 
       }
-      return Integer.MIN_VALUE; 
+      return 1;
     }
     @Override public int lowerInt(int val){
-      if(val>1 && (root.state&0b10)!=0){
-        return 1;
+      if(val<=1 || (root.state&0b10)==0){
+        return Integer.MIN_VALUE;
       }
-      return Integer.MIN_VALUE;
+      return 1;
     }
     @Override public int higherInt(int val){
       if(val<1 && (root.state&0b10)!=0){
@@ -4619,16 +4639,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Long.MIN_VALUE;
     }
     @Override public long longFloor(long val){
-       if(val>=1L && (root.state&0b10)!=0){
-        return 1L;
+       if(val<1L || (root.state&0b10)==0){
+        return Long.MIN_VALUE; 
       }
-      return Long.MIN_VALUE; 
+      return 1L;
     }
     @Override public long lowerLong(long val){
-      if(val>1L && (root.state&0b10)!=0){
-        return 1L;
+      if(val<=1L || (root.state&0b10)==0){
+        return Long.MIN_VALUE;
       }
-      return Long.MIN_VALUE;
+      return 1L;
     }
     @Override public long higherLong(long val){
       if(val<1L && (root.state&0b10)!=0){
@@ -4661,16 +4681,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Float.NaN;
     }
     @Override public float floatFloor(float val){
-       if(val>=1F && (root.state&0b10)!=0){
-        return 1F;
+       if(val<1F || (root.state&0b10)==0){
+        return Float.NaN; 
       }
-      return Float.NaN; 
+      return 1F;
     }
     @Override public float lowerFloat(float val){
-      if(val>1F && (root.state&0b10)!=0){
-        return 1F;
+      if(val<=1F || (root.state&0b10)==0){
+        return Float.NaN;
       }
-      return Float.NaN;
+      return 1F;
     }
     @Override public float higherFloat(float val){
       if(val<1F && (root.state&0b10)!=0){
@@ -4703,16 +4723,16 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Double.NaN;
     }
     @Override public double doubleFloor(double val){
-       if(val>=1D && (root.state&0b10)!=0){
-        return 1D;
+       if(val<1D || (root.state&0b10)==0){
+        return Double.NaN; 
       }
-      return Double.NaN; 
+      return 1D;
     }
     @Override public double lowerDouble(double val){
-      if(val>1D && (root.state&0b10)!=0){
-        return 1D;
+      if(val<=1D || (root.state&0b10)==0){
+        return Double.NaN;
       }
-      return Double.NaN;
+      return 1D;
     }
     @Override public double higherDouble(double val){
       if(val<1D && (root.state&0b10)!=0){
@@ -4777,7 +4797,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     }
     @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      if(fromElement && toElement){
+      if(toElement){
         return this;
       }
       return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
@@ -4820,7 +4840,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
       }
       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-        if(fromElement && toElement){
+        if(fromElement){
           return this;
         } 
         return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
@@ -4830,6 +4850,168 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
           return this;
         }
         return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+      }
+      @Override public Boolean ceiling(boolean val){
+        return super.floor(val);
+      }
+      @Override public Boolean floor(boolean val){
+        return super.ceiling(val);
+      }
+      @Override public Boolean lower(boolean val){
+          return super.higher(val);
+      }
+      @Override public Boolean higher(boolean val){
+        return super.lower(val);
+      }
+      @Override public Boolean pollFirst(){
+        return super.pollLast();
+      }
+      @Override public Boolean pollLast(){
+        return super.pollFirst();
+      }
+      @Override public boolean booleanCeiling(boolean val){
+        return super.booleanFloor(val);
+      }
+      @Override public boolean booleanFloor(boolean val){
+        return super.booleanCeiling(val);
+      }
+      @Override public boolean lowerBoolean(boolean val){
+          return super.higherBoolean(val);
+      }
+      @Override public boolean higherBoolean(boolean val){
+        return super.lowerBoolean(val);
+      }
+      @Override public boolean pollFirstBoolean(){
+        return super.pollLastBoolean();
+      }
+      @Override public boolean pollLastBoolean(){
+        return super.pollFirstBoolean();
+      }
+      @Override public byte byteCeiling(byte val){
+        return super.byteFloor(val);
+      }
+      @Override public byte byteFloor(byte val){
+        return super.byteCeiling(val);
+      }
+      @Override public byte lowerByte(byte val){
+          return super.higherByte(val);
+      }
+      @Override public byte higherByte(byte val){
+        return super.lowerByte(val);
+      }
+      @Override public byte pollFirstByte(){
+        return super.pollLastByte();
+      }
+      @Override public byte pollLastByte(){
+        return super.pollFirstByte();
+      }
+      @Override public char charCeiling(char val){
+        return super.charFloor(val);
+      }
+      @Override public char charFloor(char val){
+        return super.charCeiling(val);
+      }
+      @Override public char lowerChar(char val){
+          return super.higherChar(val);
+      }
+      @Override public char higherChar(char val){
+        return super.lowerChar(val);
+      }
+      @Override public char pollFirstChar(){
+        return super.pollLastChar();
+      }
+      @Override public char pollLastChar(){
+        return super.pollFirstChar();
+      }
+      @Override public short shortCeiling(short val){
+        return super.shortFloor(val);
+      }
+      @Override public short shortFloor(short val){
+        return super.shortCeiling(val);
+      }
+      @Override public short lowerShort(short val){
+          return super.higherShort(val);
+      }
+      @Override public short higherShort(short val){
+        return super.lowerShort(val);
+      }
+      @Override public short pollFirstShort(){
+        return super.pollLastShort();
+      }
+      @Override public short pollLastShort(){
+        return super.pollFirstShort();
+      }
+      @Override public int intCeiling(int val){
+        return super.intFloor(val);
+      }
+      @Override public int intFloor(int val){
+        return super.intCeiling(val);
+      }
+      @Override public int lowerInt(int val){
+          return super.higherInt(val);
+      }
+      @Override public int higherInt(int val){
+        return super.lowerInt(val);
+      }
+      @Override public int pollFirstInt(){
+        return super.pollLastInt();
+      }
+      @Override public int pollLastInt(){
+        return super.pollFirstInt();
+      }
+      @Override public long longCeiling(long val){
+        return super.longFloor(val);
+      }
+      @Override public long longFloor(long val){
+        return super.longCeiling(val);
+      }
+      @Override public long lowerLong(long val){
+          return super.higherLong(val);
+      }
+      @Override public long higherLong(long val){
+        return super.lowerLong(val);
+      }
+      @Override public long pollFirstLong(){
+        return super.pollLastLong();
+      }
+      @Override public long pollLastLong(){
+        return super.pollFirstLong();
+      }
+      @Override public float floatCeiling(float val){
+        return super.floatFloor(val);
+      }
+      @Override public float floatFloor(float val){
+        return super.floatCeiling(val);
+      }
+      @Override public float lowerFloat(float val){
+          return super.higherFloat(val);
+      }
+      @Override public float higherFloat(float val){
+        return super.lowerFloat(val);
+      }
+      @Override public float pollFirstFloat(){
+        return super.pollLastFloat();
+      }
+      @Override public float pollLastFloat(){
+        return super.pollFirstFloat();
+      }
+      @Override public double doubleCeiling(double val){
+        return super.doubleFloor(val);
+      }
+      @Override public double doubleFloor(double val){
+        return super.doubleCeiling(val);
+      }
+      @Override public double lowerDouble(double val){
+          return super.higherDouble(val);
+      }
+      @Override public double higherDouble(double val){
+        return super.lowerDouble(val);
+      }
+      @Override public double pollFirstDouble(){
+        return super.pollLastDouble();
+      }
+      @Override public double pollLastDouble(){
+        return super.pollFirstDouble();
       }
     }
     private static class Checked extends UncheckedTrueView{
@@ -4902,6 +5084,7 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         }
         return true;
       }
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         final BooleanSetImpl root;
         final int state;
@@ -5043,6 +5226,168 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
             return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_HEAD;
           }
           throw new IllegalArgumentException("out of bounds");
+        }
+        @Override public Boolean ceiling(boolean val){
+          return super.floor(val);
+        }
+        @Override public Boolean floor(boolean val){
+          return super.ceiling(val);
+        }
+        @Override public Boolean lower(boolean val){
+            return super.higher(val);
+        }
+        @Override public Boolean higher(boolean val){
+          return super.lower(val);
+        }
+        @Override public Boolean pollFirst(){
+          return super.pollLast();
+        }
+        @Override public Boolean pollLast(){
+          return super.pollFirst();
+        }
+        @Override public boolean booleanCeiling(boolean val){
+          return super.booleanFloor(val);
+        }
+        @Override public boolean booleanFloor(boolean val){
+          return super.booleanCeiling(val);
+        }
+        @Override public boolean lowerBoolean(boolean val){
+            return super.higherBoolean(val);
+        }
+        @Override public boolean higherBoolean(boolean val){
+          return super.lowerBoolean(val);
+        }
+        @Override public boolean pollFirstBoolean(){
+          return super.pollLastBoolean();
+        }
+        @Override public boolean pollLastBoolean(){
+          return super.pollFirstBoolean();
+        }
+        @Override public byte byteCeiling(byte val){
+          return super.byteFloor(val);
+        }
+        @Override public byte byteFloor(byte val){
+          return super.byteCeiling(val);
+        }
+        @Override public byte lowerByte(byte val){
+            return super.higherByte(val);
+        }
+        @Override public byte higherByte(byte val){
+          return super.lowerByte(val);
+        }
+        @Override public byte pollFirstByte(){
+          return super.pollLastByte();
+        }
+        @Override public byte pollLastByte(){
+          return super.pollFirstByte();
+        }
+        @Override public char charCeiling(char val){
+          return super.charFloor(val);
+        }
+        @Override public char charFloor(char val){
+          return super.charCeiling(val);
+        }
+        @Override public char lowerChar(char val){
+            return super.higherChar(val);
+        }
+        @Override public char higherChar(char val){
+          return super.lowerChar(val);
+        }
+        @Override public char pollFirstChar(){
+          return super.pollLastChar();
+        }
+        @Override public char pollLastChar(){
+          return super.pollFirstChar();
+        }
+        @Override public short shortCeiling(short val){
+          return super.shortFloor(val);
+        }
+        @Override public short shortFloor(short val){
+          return super.shortCeiling(val);
+        }
+        @Override public short lowerShort(short val){
+            return super.higherShort(val);
+        }
+        @Override public short higherShort(short val){
+          return super.lowerShort(val);
+        }
+        @Override public short pollFirstShort(){
+          return super.pollLastShort();
+        }
+        @Override public short pollLastShort(){
+          return super.pollFirstShort();
+        }
+        @Override public int intCeiling(int val){
+          return super.intFloor(val);
+        }
+        @Override public int intFloor(int val){
+          return super.intCeiling(val);
+        }
+        @Override public int lowerInt(int val){
+            return super.higherInt(val);
+        }
+        @Override public int higherInt(int val){
+          return super.lowerInt(val);
+        }
+        @Override public int pollFirstInt(){
+          return super.pollLastInt();
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public long longCeiling(long val){
+          return super.longFloor(val);
+        }
+        @Override public long longFloor(long val){
+          return super.longCeiling(val);
+        }
+        @Override public long lowerLong(long val){
+            return super.higherLong(val);
+        }
+        @Override public long higherLong(long val){
+          return super.lowerLong(val);
+        }
+        @Override public long pollFirstLong(){
+          return super.pollLastLong();
+        }
+        @Override public long pollLastLong(){
+          return super.pollFirstLong();
+        }
+        @Override public float floatCeiling(float val){
+          return super.floatFloor(val);
+        }
+        @Override public float floatFloor(float val){
+          return super.floatCeiling(val);
+        }
+        @Override public float lowerFloat(float val){
+            return super.higherFloat(val);
+        }
+        @Override public float higherFloat(float val){
+          return super.lowerFloat(val);
+        }
+        @Override public float pollFirstFloat(){
+          return super.pollLastFloat();
+        }
+        @Override public float pollLastFloat(){
+          return super.pollFirstFloat();
+        }
+        @Override public double doubleCeiling(double val){
+          return super.doubleFloor(val);
+        }
+        @Override public double doubleFloor(double val){
+          return super.doubleCeiling(val);
+        }
+        @Override public double lowerDouble(double val){
+            return super.higherDouble(val);
+        }
+        @Override public double higherDouble(double val){
+          return super.lowerDouble(val);
+        }
+        @Override public double pollFirstDouble(){
+          return super.pollLastDouble();
+        }
+        @Override public double pollLastDouble(){
+          return super.pollFirstDouble();
         }
       }
     }
@@ -5289,21 +5634,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Byte.MIN_VALUE;
     }
     @Override public byte byteFloor(byte val){
-      if(val>=0 && (root.state&0b01)!=0){
-        return 0;
+      if(val<0 || (root.state&0b01)==0){
+        return Byte.MIN_VALUE;
       }
-      return Byte.MIN_VALUE;
+      return 0;
     }
     @Override public byte lowerByte(byte val){
-      if(val>0 && (root.state&0b01)!=0){
-        return 0;
+      if(val<=0 || (root.state&0b01)==0){
+        return Byte.MIN_VALUE;
       }  
-      return Byte.MIN_VALUE;
+      return 0;
     }
     @Override public byte higherByte(byte val){
       if(val<0 && (root.state&0b01)!=0){
         return 0;
-      } 
+      }
       return Byte.MIN_VALUE;
     }
     @Override public byte pollFirstByte(){
@@ -5351,21 +5696,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Short.MIN_VALUE;
     }
     @Override public short shortFloor(short val){
-      if(val>=0 && (root.state&0b01)!=0){
-        return 0;
+      if(val<0 || (root.state&0b01)==0){
+        return Short.MIN_VALUE;
       }
-      return Short.MIN_VALUE;
+      return 0;
     }
     @Override public short lowerShort(short val){
-      if(val>0 && (root.state&0b01)!=0){
-        return 0;
+      if(val<=0 || (root.state&0b01)==0){
+        return Short.MIN_VALUE;
       }  
-      return Short.MIN_VALUE;
+      return 0;
     }
     @Override public short higherShort(short val){
       if(val<0 && (root.state&0b01)!=0){
         return 0;
-      } 
+      }
       return Short.MIN_VALUE;
     }
     @Override public short pollFirstShort(){
@@ -5393,21 +5738,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Integer.MIN_VALUE;
     }
     @Override public int intFloor(int val){
-      if(val>=0 && (root.state&0b01)!=0){
-        return 0;
+      if(val<0 || (root.state&0b01)==0){
+        return Integer.MIN_VALUE;
       }
-      return Integer.MIN_VALUE;
+      return 0;
     }
     @Override public int lowerInt(int val){
-      if(val>0 && (root.state&0b01)!=0){
-        return 0;
+      if(val<=0 || (root.state&0b01)==0){
+        return Integer.MIN_VALUE;
       }  
-      return Integer.MIN_VALUE;
+      return 0;
     }
     @Override public int higherInt(int val){
       if(val<0 && (root.state&0b01)!=0){
         return 0;
-      } 
+      }
       return Integer.MIN_VALUE;
     }
     @Override public int pollFirstInt(){
@@ -5435,21 +5780,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Long.MIN_VALUE;
     }
     @Override public long longFloor(long val){
-      if(val>=0L && (root.state&0b01)!=0){
-        return 0L;
+      if(val<0L || (root.state&0b01)==0){
+        return Long.MIN_VALUE;
       }
-      return Long.MIN_VALUE;
+      return 0L;
     }
     @Override public long lowerLong(long val){
-      if(val>0L && (root.state&0b01)!=0){
-        return 0L;
+      if(val<=0L || (root.state&0b01)==0){
+        return Long.MIN_VALUE;
       }  
-      return Long.MIN_VALUE;
+      return 0L;
     }
     @Override public long higherLong(long val){
       if(val<0L && (root.state&0b01)!=0){
         return 0L;
-      } 
+      }
       return Long.MIN_VALUE;
     }
     @Override public long pollFirstLong(){
@@ -5477,21 +5822,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Float.NaN;
     }
     @Override public float floatFloor(float val){
-      if(val>=0F && (root.state&0b01)!=0){
-        return 0F;
+      if(val<0F || (root.state&0b01)==0){
+        return Float.NaN;
       }
-      return Float.NaN;
+      return 0F;
     }
     @Override public float lowerFloat(float val){
-      if(val>0F && (root.state&0b01)!=0){
-        return 0F;
+      if(val<=0F || (root.state&0b01)==0){
+        return Float.NaN;
       }  
-      return Float.NaN;
+      return 0F;
     }
     @Override public float higherFloat(float val){
       if(val<0F && (root.state&0b01)!=0){
         return 0F;
-      } 
+      }
       return Float.NaN;
     }
     @Override public float pollFirstFloat(){
@@ -5519,21 +5864,21 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return Double.NaN;
     }
     @Override public double doubleFloor(double val){
-      if(val>=0D && (root.state&0b01)!=0){
-        return 0D;
+      if(val<0D || (root.state&0b01)==0){
+        return Double.NaN;
       }
-      return Double.NaN;
+      return 0D;
     }
     @Override public double lowerDouble(double val){
-      if(val>0D && (root.state&0b01)!=0){
-        return 0D;
+      if(val<=0D || (root.state&0b01)==0){
+        return Double.NaN;
       }  
-      return Double.NaN;
+      return 0D;
     }
     @Override public double higherDouble(double val){
       if(val<0D && (root.state&0b01)!=0){
         return 0D;
-      } 
+      }
       return Double.NaN;
     }
     @Override public double pollFirstDouble(){
@@ -5593,10 +5938,10 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
     }
     @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-      if(!toElement && !fromElement){
-        return this;
+      if(fromElement){
+        return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
       }
-      return AbstractBooleanSet.UNCHECKED_EMPTY_ASCENDING;
+      return this;
     }
     @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
       if(fromInclusive && !fromElement && toElement^toInclusive){
@@ -5636,16 +5981,178 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         return this;
       }
       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean toElement){
-        if(!fromElement && !toElement){
-          return this;
+        if(toElement){
+          return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
         }
-        return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;
+        return this;
       }
       @Override public OmniNavigableSet.OfBoolean subSet(boolean fromElement,boolean fromInclusive,boolean toElement,boolean toInclusive){
         if(toInclusive && !toElement && fromElement^fromInclusive){
           return this;
         }
         return AbstractBooleanSet.UNCHECKED_EMPTY_DESCENDING;    
+      }
+      @Override public Boolean ceiling(boolean val){
+        return super.floor(val); 
+      }
+      @Override public Boolean floor(boolean val){
+        return super.ceiling(val); 
+      }
+      @Override public Boolean lower(boolean val){
+        return super.higher(val);
+      }
+      @Override public Boolean higher(boolean val){
+        return super.lower(val);
+      }
+      @Override public Boolean pollFirst(){
+        return super.pollLast();
+      }
+      @Override public Boolean pollLast(){
+        return super.pollFirst();
+      }
+      @Override public boolean booleanCeiling(boolean val){
+        return super.booleanFloor(val);
+      }
+      @Override public boolean booleanFloor(boolean val){
+        return super.booleanCeiling(val);
+      }
+      @Override public boolean lowerBoolean(boolean val){
+        return super.higherBoolean(val);
+      }
+      @Override public boolean higherBoolean(boolean val){
+        return super.lowerBoolean(val);
+      }
+      @Override public boolean pollFirstBoolean(){
+        return super.pollLastBoolean();
+      }
+      @Override public boolean pollLastBoolean(){
+        return super.pollFirstBoolean();
+      }
+      @Override public byte byteCeiling(byte val){
+        return super.byteFloor(val);
+      }
+      @Override public byte byteFloor(byte val){
+        return super.byteCeiling(val);
+      }
+      @Override public byte lowerByte(byte val){
+        return super.higherByte(val);
+      }
+      @Override public byte higherByte(byte val){
+        return super.lowerByte(val);
+      }
+      @Override public byte pollFirstByte(){
+        return super.pollLastByte();
+      }
+      @Override public byte pollLastByte(){
+        return super.pollFirstByte();
+      }
+      @Override public char charCeiling(char val){
+        return super.charFloor(val);
+      }
+      @Override public char charFloor(char val){
+        return super.charCeiling(val);
+      }
+      @Override public char lowerChar(char val){
+        return super.higherChar(val);
+      }
+      @Override public char higherChar(char val){
+        return super.lowerChar(val);
+      }
+      @Override public char pollFirstChar(){
+        return super.pollLastChar();
+      }
+      @Override public char pollLastChar(){
+        return super.pollFirstChar();
+      }
+      @Override public short shortCeiling(short val){
+        return super.shortFloor(val);
+      }
+      @Override public short shortFloor(short val){
+        return super.shortCeiling(val);
+      }
+      @Override public short lowerShort(short val){
+        return super.higherShort(val);
+      }
+      @Override public short higherShort(short val){
+        return super.lowerShort(val);
+      }
+      @Override public short pollFirstShort(){
+        return super.pollLastShort();
+      }
+      @Override public short pollLastShort(){
+        return super.pollFirstShort();
+      }
+      @Override public int intCeiling(int val){
+        return super.intFloor(val);
+      }
+      @Override public int intFloor(int val){
+        return super.intCeiling(val);
+      }
+      @Override public int lowerInt(int val){
+        return super.higherInt(val);
+      }
+      @Override public int higherInt(int val){
+        return super.lowerInt(val);
+      }
+      @Override public int pollFirstInt(){
+        return super.pollLastInt();
+      }
+      @Override public int pollLastInt(){
+        return super.pollFirstInt();
+      }
+      @Override public long longCeiling(long val){
+        return super.longFloor(val);
+      }
+      @Override public long longFloor(long val){
+        return super.longCeiling(val);
+      }
+      @Override public long lowerLong(long val){
+        return super.higherLong(val);
+      }
+      @Override public long higherLong(long val){
+        return super.lowerLong(val);
+      }
+      @Override public long pollFirstLong(){
+        return super.pollLastLong();
+      }
+      @Override public long pollLastLong(){
+        return super.pollFirstLong();
+      }
+      @Override public float floatCeiling(float val){
+        return super.floatFloor(val);
+      }
+      @Override public float floatFloor(float val){
+        return super.floatCeiling(val);
+      }
+      @Override public float lowerFloat(float val){
+        return super.higherFloat(val);
+      }
+      @Override public float higherFloat(float val){
+        return super.lowerFloat(val);
+      }
+      @Override public float pollFirstFloat(){
+        return super.pollLastFloat();
+      }
+      @Override public float pollLastFloat(){
+        return super.pollFirstFloat();
+      }
+      @Override public double doubleCeiling(double val){
+        return super.doubleFloor(val);
+      }
+      @Override public double doubleFloor(double val){
+        return super.doubleCeiling(val);
+      }
+      @Override public double lowerDouble(double val){
+        return super.higherDouble(val);
+      }
+      @Override public double higherDouble(double val){
+        return super.lowerDouble(val);
+      }
+      @Override public double pollFirstDouble(){
+        return super.pollLastDouble();
+      }
+      @Override public double pollLastDouble(){
+        return super.pollFirstDouble();
       }
     }
     private static class Checked extends UncheckedFalseView{
@@ -5719,8 +6226,9 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
         return false;
       }
       @Override public OmniNavigableSet.OfBoolean descendingSet(){
-          return new UncheckedFalseView.Checked.Descending(root);
-        }
+        return new UncheckedFalseView.Checked.Descending(root);
+      }
+      @SuppressWarnings("unchecked")
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
         final BooleanSetImpl root;
         final int state;
@@ -5859,6 +6367,168 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
             return AbstractBooleanSet.CHECKED_EMPTY_DESCENDING_TAIL;
           }
           throw new IllegalArgumentException("out of bounds");
+        }
+        @Override public Boolean ceiling(boolean val){
+          return super.floor(val); 
+        }
+        @Override public Boolean floor(boolean val){
+          return super.ceiling(val); 
+        }
+        @Override public Boolean lower(boolean val){
+          return super.higher(val);
+        }
+        @Override public Boolean higher(boolean val){
+          return super.lower(val);
+        }
+        @Override public Boolean pollFirst(){
+          return super.pollLast();
+        }
+        @Override public Boolean pollLast(){
+          return super.pollFirst();
+        }
+        @Override public boolean booleanCeiling(boolean val){
+          return super.booleanFloor(val);
+        }
+        @Override public boolean booleanFloor(boolean val){
+          return super.booleanCeiling(val);
+        }
+        @Override public boolean lowerBoolean(boolean val){
+          return super.higherBoolean(val);
+        }
+        @Override public boolean higherBoolean(boolean val){
+          return super.lowerBoolean(val);
+        }
+        @Override public boolean pollFirstBoolean(){
+          return super.pollLastBoolean();
+        }
+        @Override public boolean pollLastBoolean(){
+          return super.pollFirstBoolean();
+        }
+        @Override public byte byteCeiling(byte val){
+          return super.byteFloor(val);
+        }
+        @Override public byte byteFloor(byte val){
+          return super.byteCeiling(val);
+        }
+        @Override public byte lowerByte(byte val){
+          return super.higherByte(val);
+        }
+        @Override public byte higherByte(byte val){
+          return super.lowerByte(val);
+        }
+        @Override public byte pollFirstByte(){
+          return super.pollLastByte();
+        }
+        @Override public byte pollLastByte(){
+          return super.pollFirstByte();
+        }
+        @Override public char charCeiling(char val){
+          return super.charFloor(val);
+        }
+        @Override public char charFloor(char val){
+          return super.charCeiling(val);
+        }
+        @Override public char lowerChar(char val){
+          return super.higherChar(val);
+        }
+        @Override public char higherChar(char val){
+          return super.lowerChar(val);
+        }
+        @Override public char pollFirstChar(){
+          return super.pollLastChar();
+        }
+        @Override public char pollLastChar(){
+          return super.pollFirstChar();
+        }
+        @Override public short shortCeiling(short val){
+          return super.shortFloor(val);
+        }
+        @Override public short shortFloor(short val){
+          return super.shortCeiling(val);
+        }
+        @Override public short lowerShort(short val){
+          return super.higherShort(val);
+        }
+        @Override public short higherShort(short val){
+          return super.lowerShort(val);
+        }
+        @Override public short pollFirstShort(){
+          return super.pollLastShort();
+        }
+        @Override public short pollLastShort(){
+          return super.pollFirstShort();
+        }
+        @Override public int intCeiling(int val){
+          return super.intFloor(val);
+        }
+        @Override public int intFloor(int val){
+          return super.intCeiling(val);
+        }
+        @Override public int lowerInt(int val){
+          return super.higherInt(val);
+        }
+        @Override public int higherInt(int val){
+          return super.lowerInt(val);
+        }
+        @Override public int pollFirstInt(){
+          return super.pollLastInt();
+        }
+        @Override public int pollLastInt(){
+          return super.pollFirstInt();
+        }
+        @Override public long longCeiling(long val){
+          return super.longFloor(val);
+        }
+        @Override public long longFloor(long val){
+          return super.longCeiling(val);
+        }
+        @Override public long lowerLong(long val){
+          return super.higherLong(val);
+        }
+        @Override public long higherLong(long val){
+          return super.lowerLong(val);
+        }
+        @Override public long pollFirstLong(){
+          return super.pollLastLong();
+        }
+        @Override public long pollLastLong(){
+          return super.pollFirstLong();
+        }
+        @Override public float floatCeiling(float val){
+          return super.floatFloor(val);
+        }
+        @Override public float floatFloor(float val){
+          return super.floatCeiling(val);
+        }
+        @Override public float lowerFloat(float val){
+          return super.higherFloat(val);
+        }
+        @Override public float higherFloat(float val){
+          return super.lowerFloat(val);
+        }
+        @Override public float pollFirstFloat(){
+          return super.pollLastFloat();
+        }
+        @Override public float pollLastFloat(){
+          return super.pollFirstFloat();
+        }
+        @Override public double doubleCeiling(double val){
+          return super.doubleFloor(val);
+        }
+        @Override public double doubleFloor(double val){
+          return super.doubleCeiling(val);
+        }
+        @Override public double lowerDouble(double val){
+          return super.higherDouble(val);
+        }
+        @Override public double higherDouble(double val){
+          return super.lowerDouble(val);
+        }
+        @Override public double pollFirstDouble(){
+          return super.pollLastDouble();
+        }
+        @Override public double pollLastDouble(){
+          return super.pollFirstDouble();
         }
       }
     }
@@ -6306,25 +6976,31 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
     }
     @Override public void forEachRemaining(BooleanConsumer action){
-      switch((itrState<<1)|(root.state>>>1)){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b101:
-        action.accept(true);
+      if(this.itrState==0b10){
+        final BooleanSetImpl root;
+        final int rootState=(root=this.root).state;
+        try{
+          action.accept(true);
+        }finally{
+          if((rootState&0b10)==0 || root.state!=rootState || this.itrState!=0b10){
+            throw new ConcurrentModificationException();
+          }
+        }
         itrState=0b01;
-      case 0b000:
-      case 0b011:
       }
     }
     @Override public void forEachRemaining(Consumer<? super Boolean> action){
-      switch((itrState<<1)|(root.state>>>1)){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b101:
-        action.accept(Boolean.TRUE);
+      if(this.itrState==0b10){
+        final BooleanSetImpl root;
+        final int rootState=(root=this.root).state;
+        try{
+          action.accept(Boolean.TRUE);
+        }finally{
+          if((rootState&0b10)==0 || root.state!=rootState || this.itrState!=0b10){
+            throw new ConcurrentModificationException();
+          }
+        }
         itrState=0b01;
-      case 0b000:
-      case 0b011:
       }
     }
   }
@@ -6366,25 +7042,31 @@ public class BooleanSetImpl extends AbstractBooleanSet implements Externalizable
       }
     }
     @Override public void forEachRemaining(BooleanConsumer action){
-      switch((itrState<<1)|(root.state&0b01)){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b101:
-        action.accept(false);
+      if(this.itrState==0b10){
+        final BooleanSetImpl root;
+        final int rootState=(root=this.root).state;
+        try{
+          action.accept(false);
+        }finally{
+          if((rootState&0b01)==0 || root.state!=rootState || this.itrState!=0b10){
+            throw new ConcurrentModificationException();
+          }
+        }
         itrState=0b01;
-      case 0b000:
-      case 0b011:
       }
     }
     @Override public void forEachRemaining(Consumer<? super Boolean> action){
-      switch((itrState<<1)|(root.state&0b01)){
-      default:
-        throw new ConcurrentModificationException();
-      case 0b101:
-        action.accept(Boolean.FALSE);
+      if(this.itrState==0b10){
+        final BooleanSetImpl root;
+        final int rootState=(root=this.root).state;
+        try{
+          action.accept(Boolean.FALSE);
+        }finally{
+          if((rootState&0b01)==0 || root.state!=rootState || this.itrState!=0b10){
+            throw new ConcurrentModificationException();
+          }
+        }
         itrState=0b01;
-      case 0b000:
-      case 0b011:
       }
     }
   }
