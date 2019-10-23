@@ -15,6 +15,9 @@ public interface $ClassPrefix$Comparator extends Comparator<$BoxedType$>
   public default int compare(final $BoxedType$ val1,final $BoxedType$ val2){
     return compare(($exposedType$)val1,($exposedType$)val2);
   }
+  @Override public default $ClassPrefix$Comparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare($exposedType$ val1,$exposedType$ val2){
 #IF OfBoolean
     if(val1==val2){

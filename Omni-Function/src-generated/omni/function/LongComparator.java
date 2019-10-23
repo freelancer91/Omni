@@ -7,6 +7,9 @@ public interface LongComparator extends Comparator<Long>
   public default int compare(final Long val1,final Long val2){
     return compare((long)val1,(long)val2);
   }
+  @Override public default LongComparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare(long val1,long val2){
     if(val1>val2){
       return -1;

@@ -7,6 +7,9 @@ public interface CharComparator extends Comparator<Character>
   public default int compare(final Character val1,final Character val2){
     return compare((char)val1,(char)val2);
   }
+  @Override public default CharComparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare(char val1,char val2){
     return val2-val1;
   }

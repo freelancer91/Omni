@@ -7,6 +7,9 @@ public interface DoubleComparator extends Comparator<Double>
   public default int compare(final Double val1,final Double val2){
     return compare((double)val1,(double)val2);
   }
+  @Override public default DoubleComparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare(double val1,double val2){
     if(val1>val2){
       return -1;

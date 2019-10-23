@@ -7,6 +7,9 @@ public interface FloatComparator extends Comparator<Float>
   public default int compare(final Float val1,final Float val2){
     return compare((float)val1,(float)val2);
   }
+  @Override public default FloatComparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare(float val1,float val2){
     if(val1>val2){
       return -1;

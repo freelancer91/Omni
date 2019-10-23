@@ -7,6 +7,9 @@ public interface ByteComparator extends Comparator<Byte>
   public default int compare(final Byte val1,final Byte val2){
     return compare((byte)val1,(byte)val2);
   }
+  @Override public default ByteComparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare(byte val1,byte val2){
     return val2-val1;
   }

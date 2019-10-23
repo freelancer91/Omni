@@ -7,6 +7,9 @@ public interface BooleanComparator extends Comparator<Boolean>
   public default int compare(final Boolean val1,final Boolean val2){
     return compare((boolean)val1,(boolean)val2);
   }
+  @Override public default BooleanComparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare(boolean val1,boolean val2){
     if(val1==val2){
       return 0;

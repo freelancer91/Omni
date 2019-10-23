@@ -7,6 +7,9 @@ public interface IntComparator extends Comparator<Integer>
   public default int compare(final Integer val1,final Integer val2){
     return compare((int)val1,(int)val2);
   }
+  @Override public default IntComparator reversed(){
+    return (val1,val2)->compare(val2,val1);
+  }
   public static int descendingCompare(int val1,int val2){
     if(val1>val2){
       return -1;
