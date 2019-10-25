@@ -273,7 +273,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         return -1;
     }
-    private int uncheckedRemoveIfImpl(int size,BooleanPredicate filter,
+    int uncheckedRemoveIfImpl(int size,BooleanPredicate filter,
             CheckedCollection.AbstractModCountChecker modCountChecker){
         final long[] words;
         final int wordBound;
@@ -362,11 +362,11 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         words[rootBound]=BitSetUtil.pullDownLoop(words,word,wordOffset,rootBound)>>>1;
       }
     }
-    private void uncheckedRemoveIndexNoRet(int index){
+    void uncheckedRemoveIndexNoRet(int index){
       final long[] words;
       removeIndexShiftDown(words=this.words,index,index>>=6,words[index],--size>>6);
     }
-    private long uncheckedRemoveIndex(int index,int bound){
+    long uncheckedRemoveIndex(int index,int bound){
       final long[] words;
       final long retWord;
       removeIndexShiftDown(words=this.words,index,index>>=6,retWord=words[index],bound>>6);
@@ -566,7 +566,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             CheckedCollection.checkWriteHi(index,size=this.size);
             ++modCount;
             if(size != 0){
-                ((UncheckedList)this).uncheckedInsert(index,size,val);
+                super.uncheckedInsert(index,size,val);
             }else{
                 super.uncheckedInit(val);
             }
@@ -753,7 +753,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int size;
             CheckedCollection.checkReadHi(index,size=this.size);
             ++modCount;
-            return (((PackedBooleanArrSeq)this).uncheckedRemoveIndex(index,size - 1) & 1L << index) != 0;
+            return (super.uncheckedRemoveIndex(index,size - 1) & 1L << index) != 0;
         }
         @Override
         public void replaceAll(BooleanPredicate operator){
@@ -876,7 +876,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         boolean uncheckedRemoveIf(int size,BooleanPredicate filter){
             final int modCount=this.modCount;
             try{
-                if(size != (size-=((PackedBooleanArrSeq)this).uncheckedRemoveIfImpl(size,filter,
+                if(size != (size-=super.uncheckedRemoveIfImpl(size,filter,
                         new ModCountChecker(modCount)))){
                     this.modCount=modCount + 1;
                     this.size=size;
@@ -932,7 +932,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 if((cursor=this.cursor) < (bound=(parent=this.parent).size)){
                     final int modCount=this.modCount;
                     try{
-                        ((UncheckedList)parent).uncheckedForEach(cursor,bound,action::accept);
+                        parent.uncheckedForEach(cursor,bound,action::accept);
                     }finally{
                         CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
                     }
@@ -948,7 +948,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 if((cursor=this.cursor) < (bound=(parent=this.parent).size)){
                     final int modCount=this.modCount;
                     try{
-                        ((UncheckedList)parent).uncheckedForEach(cursor,bound,action::accept);
+                        parent.uncheckedForEach(cursor,bound,action::accept);
                     }finally{
                         CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
                     }
@@ -981,7 +981,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     CheckedCollection.checkModCount(modCount=this.modCount,(root=parent).modCount);
                     root.modCount=++modCount;
                     this.modCount=modCount;
-                    ((PackedBooleanArrSeq)root).uncheckedRemoveIndexNoRet(lastRet);
+                    root.uncheckedRemoveIndexNoRet(lastRet);
                     cursor=lastRet;
                     this.lastRet=-1;
                     return;
@@ -1009,7 +1009,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 lastRet=-1;
                 final int rootSize;
                 if((rootSize=root.size) != 0){
-                    ((UncheckedList)root).uncheckedInsert(cursor++,rootSize,val);
+                    root.uncheckedInsert(cursor++,rootSize,val);
                 }else{
                     root.uncheckedInit(val);
                     ++cursor;
@@ -1252,7 +1252,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         boolean uncheckedRemoveIf(int size,BooleanPredicate filter){
             final int modCount=this.modCount;
             try{
-                if(size != (size-=((PackedBooleanArrSeq)this).uncheckedRemoveIfImpl(size,filter,
+                if(size != (size-=super.uncheckedRemoveIfImpl(size,filter,
                         new ModCountChecker(modCount)))){
                     this.modCount=modCount + 1;
                     this.size=size;
@@ -1349,7 +1349,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     CheckedCollection.checkModCount(modCount=this.modCount,(root=parent).modCount);
                     root.modCount=++modCount;
                     this.modCount=modCount;
-                    ((PackedBooleanArrSeq)root).uncheckedRemoveIndexNoRet(lastRet);
+                    root.uncheckedRemoveIndexNoRet(lastRet);
                     this.lastRet=-1;
                     return;
                 }
@@ -1403,9 +1403,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             this.modCount=modCount;
             for(var curr=parent;curr != null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
             if((modCount=root.size) != 0){
-                ((UncheckedList)root).uncheckedInsert(rootOffset + size++,modCount,val);
+                root.uncheckedInsert(rootOffset + size++,modCount,val);
             }else{
-                ((PackedBooleanArrSeq)root).uncheckedInit(val);
+                root.uncheckedInit(val);
                 ++size;
             }
             return true;
@@ -1423,9 +1423,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             for(var curr=parent;curr != null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
             this.size=size + 1;
             if((modCount=root.size) != 0){
-                ((UncheckedList)root).uncheckedInsert(rootOffset + index,modCount,val);
+                root.uncheckedInsert(rootOffset + index,modCount,val);
             }else{
-                ((PackedBooleanArrSeq)root).uncheckedInit(val);
+                root.uncheckedInit(val);
             }
         }
         @Override
@@ -1719,7 +1719,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
               }else {
                 final int rootOffset;
-                return ((UncheckedList)root).isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
+                return root.isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
               }
             }finally {
               CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1736,7 +1736,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 final int size;
                 if((size=this.size) != 0){
                     final int rootOffset;
-                    ((UncheckedList)root).uncheckedForEach(rootOffset=this.rootOffset,rootOffset + size,action);
+                    root.uncheckedForEach(rootOffset=this.rootOffset,rootOffset + size,action);
                 }
             }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1750,7 +1750,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 final int size;
                 if((size=this.size) != 0){
                     final int rootOffset;
-                    ((UncheckedList)root).uncheckedForEach(rootOffset=this.rootOffset,rootOffset + size,action::accept);
+                    root.uncheckedForEach(rootOffset=this.rootOffset,rootOffset + size,action::accept);
                 }
             }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1771,7 +1771,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final int size;
             if((size=this.size) != 0){
                 final int rootOffset;
-                return ((UncheckedList)root).uncheckedHashCode(rootOffset=this.rootOffset,rootOffset + size);
+                return root.uncheckedHashCode(rootOffset=this.rootOffset,rootOffset + size);
             }
             return 1;
         }
@@ -1783,7 +1783,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 try{
                     final int size;
                     if((size=this.size) != 0){
-                        return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,BitSetUtil.getWordFlipper(val));
+                        return root.uncheckedindexOf(rootOffset,size,BitSetUtil.getWordFlipper(val));
                     } // end size check
                 } // end checked sublist try modcount
                 finally{
@@ -1810,7 +1810,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else{
                                 break returnFalse;
                             }
-                            return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedindexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1840,7 +1840,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             case TypeUtil.FLT_TRUE_BITS:
                                 wordFlipper=LongUnaryOperator.identity();
                             }
-                            return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedindexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1869,7 +1869,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             case 1:
                                 wordFlipper=LongUnaryOperator.identity();
                             }
-                            return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedindexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1896,7 +1896,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else{
                                 break returnFalse;
                             }
-                            return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedindexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1971,7 +1971,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else{
                                 break returnFalse;
                             }
-                            return ((UncheckedList)root).uncheckedindexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedindexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1999,7 +1999,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 try{
                     final int size;
                     if((size=this.size) != 0){
-                        return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,
+                        return root.uncheckedlastIndexOf(rootOffset,size,
                                 BitSetUtil.getWordFlipper(val));
                     } // end size check
                 } // end checked sublist try modcount
@@ -2027,7 +2027,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else{
                                 break returnFalse;
                             }
-                            return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -2057,7 +2057,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             case TypeUtil.FLT_TRUE_BITS:
                                 wordFlipper=LongUnaryOperator.identity();
                             }
-                            return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -2086,7 +2086,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             case 1:
                                 wordFlipper=LongUnaryOperator.identity();
                             }
-                            return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -2113,7 +2113,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else{
                                 break returnFalse;
                             }
-                            return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -2188,7 +2188,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else{
                                 break returnFalse;
                             }
-                            return ((UncheckedList)root).uncheckedlastIndexOf(rootOffset,size,wordFlipper);
+                            return root.uncheckedlastIndexOf(rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -2305,7 +2305,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             root.modCount=++modCount;
             this.modCount=modCount;
             for(var curr=parent;curr!=null;curr.modCount=modCount,--curr.size,curr=curr.parent){}
-            final var ret=((PackedBooleanArrSeq)root).uncheckedRemoveIndex(index+=rootOffset,root.size-1);
+            final var ret=root.uncheckedRemoveIndex(index+=rootOffset,root.size-1);
             this.size=size-1;
             return (ret>>index&1)!=0;
           }
@@ -2497,7 +2497,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     return;
                 }
                 final int rootOffset;
-                ((UncheckedList)root).uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset + size,operator);
+                root.uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset + size,operator);
             }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
             }
@@ -2517,7 +2517,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     return;
                 }
                 final int rootOffset;
-                ((UncheckedList)root).uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset + size,operator::apply);
+                root.uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset + size,operator::apply);
             }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
             }
@@ -2565,7 +2565,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int modCount=this.modCount;
             if(sorter==null){
               CheckedCollection.checkModCount(modCount,root.modCount);
-              ((UncheckedList)root).uncheckedStableAscendingSort(rootOffset,size);
+              root.uncheckedStableAscendingSort(rootOffset,size);
               root.modCount=++modCount;
               this.modCount=modCount;
               for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
@@ -2576,9 +2576,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                   final int wordBound;
                   final int offset;
                   if((wordOffset=(offset=this.rootOffset)>>6)==(wordBound=(bound=offset+size)-1>>6)) {
-                      ((UncheckedList)root).singleWordSort(offset,size,bound,wordBound,sorter);
+                      root.singleWordSort(offset,size,bound,wordBound,sorter);
                   }else {
-                      ((UncheckedList)root). multiWordSort(offset,wordOffset,bound,wordBound,sorter);
+                      root. multiWordSort(offset,wordOffset,bound,wordBound,sorter);
                   }
               }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
@@ -2599,7 +2599,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int modCount=this.modCount;
             if(sorter==null){
               CheckedCollection.checkModCount(modCount,root.modCount);
-              ((UncheckedList)root).uncheckedStableAscendingSort(rootOffset,size);
+              root.uncheckedStableAscendingSort(rootOffset,size);
               root.modCount=++modCount;
               this.modCount=modCount;
               for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
@@ -2610,9 +2610,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                   final int wordBound;
                   final int offset;
                   if((wordOffset=(offset=this.rootOffset)>>6)==(wordBound=(bound=offset+size)-1>>6)) {
-                      ((UncheckedList)root).singleWordSort(offset,size,bound,wordBound,sorter::compare);
+                      root.singleWordSort(offset,size,bound,wordBound,sorter::compare);
                   }else {
-                      ((UncheckedList)root). multiWordSort(offset,wordOffset,bound,wordBound,sorter::compare);
+                      root. multiWordSort(offset,wordOffset,bound,wordBound,sorter::compare);
                   }
               }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
@@ -2632,7 +2632,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int modCount=this.modCount;
             final var root=this.root;
             try{
-              ((UncheckedList)root).uncheckedStableAscendingSort(rootOffset,size);
+              root.uncheckedStableAscendingSort(rootOffset,size);
             }finally{
               CheckedCollection.checkModCount(modCount,root.modCount);
               root.modCount=++modCount;
@@ -2650,7 +2650,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int modCount=this.modCount;
             final var root=this.root;
             try{
-                ((UncheckedList)root).uncheckedStableDescendingSort(rootOffset,size);
+                root.uncheckedStableDescendingSort(rootOffset,size);
             }finally{
               CheckedCollection.checkModCount(modCount,root.modCount);
               root.modCount=++modCount;
@@ -2927,7 +2927,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     final int modCount=this.modCount;
                     final var root=parent.root;
                     try{
-                        ((UncheckedList)root).uncheckedForEach(cursor,bound,action);
+                        root.uncheckedForEach(cursor,bound,action);
                     }finally{
                         CheckedCollection.checkModCount(modCount,root.modCount,cursor,this.cursor);
                     }
@@ -2944,7 +2944,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     final int modCount=this.modCount;
                     final var root=parent.root;
                     try{
-                        ((UncheckedList)root).uncheckedForEach(cursor,bound,action::accept);
+                        root.uncheckedForEach(cursor,bound,action::accept);
                     }finally{
                         CheckedCollection.checkModCount(modCount,root.modCount,cursor,this.cursor);
                     }
@@ -2984,7 +2984,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         --parent.size;
                     }while((parent=parent.parent) != null);
                     this.modCount=modCount;
-                    ((PackedBooleanArrSeq)root).uncheckedRemoveIndexNoRet(lastRet);
+                    root.uncheckedRemoveIndexNoRet(lastRet);
                     cursor=lastRet;
                     this.lastRet=-1;
                     return;
@@ -3017,9 +3017,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 lastRet=-1;
                 final int rootSize;
                 if((rootSize=root.size) != 0){
-                    ((UncheckedList)root).uncheckedInsert(cursor++,rootSize,val);
+                    root.uncheckedInsert(cursor++,rootSize,val);
                 }else{
-                    ((PackedBooleanArrSeq)root).uncheckedInit(val);
+                    root.uncheckedInit(val);
                     ++cursor;
                 }
             }
@@ -3303,7 +3303,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             words[wordOffset]=word;
         }
-        private void multiWordSort(int offset,final int wordOffset,final int bound,
+        void multiWordSort(int offset,final int wordOffset,final int bound,
                 int wordBound,BooleanComparator sorter){
             final var words=this.words;
             int i;
@@ -3364,7 +3364,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 trueComesFirst(words,bitCount+countRemainingBits(words,i+1,wordBound)+Long.bitCount(words[wordBound]<<-bound),offset,bound);
             }
         }
-        private void singleWordSort(int offset,int size,final int bound,int wordBound,BooleanComparator sorter){
+        void singleWordSort(int offset,int size,final int bound,int wordBound,BooleanComparator sorter){
             final var words=this.words;
             final long mask,word;
             final int bitCount;
@@ -3385,7 +3385,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             setRange(words,0,wordIndex,0);
             setRange(words,wordIndex+1,wordBound+1,-1L);
         }
-        private void uncheckedStableDescendingSort(int offset,int size) {
+        void uncheckedStableDescendingSort(int offset,int size) {
             final var words=this.words;
             int wordBound;
             final int bound,wordOffset;
@@ -3405,7 +3405,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
             }
         }
-        private void uncheckedStableAscendingSort(int offset,int size){
+        void uncheckedStableAscendingSort(int offset,int size){
             final var words=this.words;
             int wordOffset;
             final int bound,wordBound;
@@ -3747,7 +3747,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             return this.isEqualToHelperUnaligned(thisOffset,that.words,thatOffset,shiftDiff,size);  
           }
         }
-        private boolean isEqualTo(ListIterator<?> itr,int rootOffset,int rootBound) {
+        boolean isEqualTo(ListIterator<?> itr,int rootOffset,int rootBound) {
           Object val;
           if(itr.hasNext() && (val=itr.next()) instanceof Boolean){
             final long[] words;
@@ -4031,7 +4031,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         void uncheckedToString(int size,OmniStringBuilderByte builder){
             uncheckedToString(words,0,size,builder);
         }
-        private void uncheckedForEach(int offset,int bound,BooleanConsumer action){
+        void uncheckedForEach(int offset,int bound,BooleanConsumer action){
             for(final var words=this.words;;){
                 final var word=words[offset >> 6];
                 do{
@@ -4042,7 +4042,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }while((offset & 63) != 0);
             }
         }
-        private int uncheckedHashCode(int offset,int bound){
+        int uncheckedHashCode(int offset,int bound){
             final long[] words;
             long word;
             int hash=((word=(words=this.words)[offset >> 6]) >> offset & 1) != 0?31 + 1231:31 + 1237;
@@ -4054,7 +4054,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             return hash;
         }
-        private int uncheckedindexOf(int offset,int size,LongUnaryOperator wordFlipper){
+        int uncheckedindexOf(int offset,int size,LongUnaryOperator wordFlipper){
             final var words=this.words;
             final int bound;
             final var wordBound=(bound=offset + size - 1) >> 6;
@@ -4086,7 +4086,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             return -1;
         }
-        private void uncheckedInsert(int index,int size,boolean val){
+        void uncheckedInsert(int index,int size,boolean val){
             if(size == index){
                 super.uncheckedAppend(size,val);
             }else{
@@ -4099,7 +4099,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 }
             }
         }
-        private int uncheckedlastIndexOf(int offset,int size,LongUnaryOperator wordFlipper){
+        int uncheckedlastIndexOf(int offset,int size,LongUnaryOperator wordFlipper){
             final var words=this.words;
             int bound;
             var wordBound=(bound=offset + size) - 1 >> 6;
@@ -4129,7 +4129,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             return -1;
         }
-        private void uncheckedReplaceAll(int offset,int bound,BooleanPredicate operator){
+        void uncheckedReplaceAll(int offset,int bound,BooleanPredicate operator){
             final long[] words;
             int wordOffset;
             for(var word=(words=this.words)[wordOffset=offset >> 6];;){
@@ -4295,7 +4295,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             @Override
             public void remove(){
-                ((PackedBooleanArrSeq)parent).uncheckedRemoveIndexNoRet(--cursor);
+                parent.uncheckedRemoveIndexNoRet(--cursor);
             }
         }
         private static class ListItr extends Itr implements OmniListIterator.OfBoolean{
@@ -4317,7 +4317,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 if((rootSize=(root=parent).size) != 0){
                     root.uncheckedInsert(cursor++,rootSize,val);
                 }else{
-                    ((PackedBooleanArrSeq)root).uncheckedInit(val);
+                    root.uncheckedInit(val);
                     ++cursor;
                 }
             }
@@ -4374,7 +4374,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             @Override
             public void remove(){
                 final int lastRet;
-                ((PackedBooleanArrSeq)parent).uncheckedRemoveIndexNoRet(lastRet=this.lastRet);
+                parent.uncheckedRemoveIndexNoRet(lastRet=this.lastRet);
                 cursor=lastRet;
             }
             @Override
@@ -4844,7 +4844,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
             @Override
             public void remove(){
-                ((PackedBooleanArrSeq)parent).uncheckedRemoveIndexNoRet(cursor);
+                parent.uncheckedRemoveIndexNoRet(cursor);
             }
         }
     }
@@ -4881,7 +4881,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             if((rootSize=(root=this.root).size) != 0){
                 root.uncheckedInsert(rootOffset + size++,rootSize,val);
             }else{
-                ((PackedBooleanArrSeq)root).uncheckedInit(val);
+                root.uncheckedInit(val);
                 ++size;
             }
             return true;
@@ -4895,7 +4895,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             if((rootSize=(root=this.root).size) != 0){
                 root.uncheckedInsert(rootOffset + index,rootSize,val);
             }else{
-                ((PackedBooleanArrSeq)root).uncheckedInit(val);
+                root.uncheckedInit(val);
             }
         }
         @Override
@@ -6217,7 +6217,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 if((rootSize=(root=(parent=this.parent).root).size) != 0){
                     root.uncheckedInsert(cursor++,rootSize,val);
                 }else{
-                    ((PackedBooleanArrSeq)root).uncheckedInit(val);
+                    root.uncheckedInit(val);
                     ++cursor;
                 }
                 do{

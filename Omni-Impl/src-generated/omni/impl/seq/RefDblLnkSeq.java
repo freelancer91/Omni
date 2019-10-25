@@ -307,7 +307,7 @@ AbstractOmniCollection<E>
     before.next=newNode;
     after.prev=newNode;
   }
-  private void insertNode(int index,Node<E> newNode){
+  void insertNode(int index,Node<E> newNode){
     int tailDist;
     if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
@@ -364,7 +364,7 @@ AbstractOmniCollection<E>
       }
     }
   }
-  private Node<E> getNode(int index,int size){
+  Node<E> getNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       return Node.iterateDescending(tail,size-1);
@@ -373,7 +373,7 @@ AbstractOmniCollection<E>
       return Node.iterateAscending(head,index);
     }
   }
-  private Node<E> getItrNode(int index,int size){
+  Node<E> getItrNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       switch(size){
@@ -1371,7 +1371,7 @@ AbstractOmniCollection<E>
         currParent.head=newNode;
         currParent.tail=newNode;
       }
-      ((RefDblLnkSeq<E>)root).insertNode(curr.parentOffset,newNode);
+      root.insertNode(curr.parentOffset,newNode);
     }
     @Override public void add(int index,E val){
       final UncheckedList<E> root;
@@ -2219,7 +2219,7 @@ AbstractOmniCollection<E>
       return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(int index){
-      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr<E>(this,super.getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       final int subListSize;
@@ -2727,7 +2727,7 @@ AbstractOmniCollection<E>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,size),index);
+      return new BidirectionalItr<E>(this,super.getItrNode(index,size),index);
     }
     private static class BidirectionalItr<E>
       implements OmniListIterator.OfRef<E>{
@@ -4806,7 +4806,7 @@ AbstractOmniCollection<E>
         currParent.head=newNode;
         currParent.tail=newNode;
       }
-      ((RefDblLnkSeq<E>)root).insertNode(curr.parentOffset,newNode);
+      root.insertNode(curr.parentOffset,newNode);
     }
     @Override public void add(int index,E val){
       final CheckedList<E> root;
@@ -4866,7 +4866,7 @@ AbstractOmniCollection<E>
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
       final Node<E> node;
-      final var ret=(node=((RefDblLnkSeq<E>)this).getNode(index,size)).val;
+      final var ret=(node=super.getNode(index,size)).val;
       node.val=val;
       return ret;
     }
@@ -4875,14 +4875,14 @@ AbstractOmniCollection<E>
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      ((RefDblLnkSeq<E>)this).getNode(index,size).val=val;
+      super.getNode(index,size).val=val;
     }
     @Override public E get(int index){
       CheckedCollection.checkModCount(modCount,root.modCount);
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      return ((RefDblLnkSeq<E>)this).getNode(index,size).val;
+      return super.getNode(index,size).val;
     }
     @Override public int size(){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5140,21 +5140,21 @@ AbstractOmniCollection<E>
             if(list instanceof OmniList.OfRef){
               return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
             }else if(list instanceof OmniList.OfInt){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfInt)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfInt)list);
             }else if(list instanceof OmniList.OfFloat){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfFloat)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfFloat)list);
             }else if(list instanceof OmniList.OfLong){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfLong)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfLong)list);
             }else if(list instanceof OmniList.OfDouble){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfDouble)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfDouble)list);
             }else if(list instanceof OmniList.OfByte){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfByte)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfByte)list);
             }else if(list instanceof OmniList.OfChar){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfChar)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfChar)list);
             }else if(list instanceof OmniList.OfShort){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfShort)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfShort)list);
             }else{
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfBoolean)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfBoolean)list);
             }
           }else{
             return UncheckedList.isEqualTo(list.listIterator(),this.head,this.tail);
@@ -5326,7 +5326,7 @@ AbstractOmniCollection<E>
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
       Node<E> tmp;
-      final var ret=(tmp=((RefDblLnkSeq<E>)this).getNode(index,size)).val;
+      final var ret=(tmp=super.getNode(index,size)).val;
       tmp.val=val;
       return ret;
     }
@@ -5334,13 +5334,13 @@ AbstractOmniCollection<E>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      ((RefDblLnkSeq<E>)this).getNode(index,size).val=val;
+      super.getNode(index,size).val=val;
     }
     @Override public E get(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      return ((RefDblLnkSeq<E>)this).getNode(index,size).val;
+      return super.getNode(index,size).val;
     }
     @Override public E getLast(){
       final Node<E> tail;
@@ -5867,7 +5867,7 @@ AbstractOmniCollection<E>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,size),index);
+      return new BidirectionalItr<E>(this,super.getItrNode(index,size),index);
     }
     @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       int tailDist;
@@ -6708,7 +6708,7 @@ AbstractOmniCollection<E>
         }
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfBoolean list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfBoolean list){
       if(list instanceof AbstractBooleanArrSeq){
         final AbstractBooleanArrSeq abstractArrSeq;
         if(size!=(abstractArrSeq=(AbstractBooleanArrSeq)list).size){
@@ -6749,7 +6749,7 @@ AbstractOmniCollection<E>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfByte list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfByte list){
       if(list instanceof ByteArrSeq.UncheckedList){
         final ByteArrSeq.UncheckedList that;
         return size==(that=(ByteArrSeq.UncheckedList)list).size && SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
@@ -6773,7 +6773,7 @@ AbstractOmniCollection<E>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfChar list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfChar list){
       if(list instanceof CharArrSeq.UncheckedList){
         final CharArrSeq.UncheckedList that;
         return size==(that=(CharArrSeq.UncheckedList)list).size && SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
@@ -6797,7 +6797,7 @@ AbstractOmniCollection<E>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfShort list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfShort list){
       if(list instanceof ShortArrSeq.UncheckedList){
         final ShortArrSeq.UncheckedList that;
         return size==(that=(ShortArrSeq.UncheckedList)list).size && SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
@@ -6821,7 +6821,7 @@ AbstractOmniCollection<E>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfInt list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfInt list){
       if(list instanceof IntArrSeq.UncheckedList){
         final IntArrSeq.UncheckedList that;
         return size==(that=(IntArrSeq.UncheckedList)list).size && SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
@@ -6845,7 +6845,7 @@ AbstractOmniCollection<E>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfLong list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfLong list){
       if(list instanceof LongArrSeq.UncheckedList){
         final LongArrSeq.UncheckedList that;
         return size==(that=(LongArrSeq.UncheckedList)list).size && SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
@@ -6869,7 +6869,7 @@ AbstractOmniCollection<E>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfFloat list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfFloat list){
       if(list instanceof FloatArrSeq.UncheckedList){
         final FloatArrSeq.UncheckedList that;
         return size==(that=(FloatArrSeq.UncheckedList)list).size && SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
@@ -6893,7 +6893,7 @@ AbstractOmniCollection<E>
         return subList.size==size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,rootOffset=subList.rootOffset,rootOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfDouble list){
+    boolean isEqualTo(Node<E> thisHead,int size,OmniList.OfDouble list){
       if(list instanceof DoubleArrSeq.UncheckedList){
         final DoubleArrSeq.UncheckedList that;
         return size==(that=(DoubleArrSeq.UncheckedList)list).size && SequenceEqualityUtil.isEqualTo(that.arr,0,size,thisHead);
@@ -7292,7 +7292,7 @@ AbstractOmniCollection<E>
       return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(int index){
-      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr<E>(this,super.getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       final int subListSize;

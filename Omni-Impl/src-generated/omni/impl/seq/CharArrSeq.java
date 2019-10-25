@@ -626,7 +626,6 @@ AbstractOmniCollection<Character>
     arr[size]=val;
     this.size=size+1;
   }
-  private
   void uncheckedInit(char val){
     char[] arr;
     if((arr=this.arr)==null){
@@ -1132,7 +1131,7 @@ AbstractOmniCollection<Character>
     UncheckedList(int size,char[] arr){
       super(size,arr);
     }
-    private boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
+    boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
       Object val;
       if(itr.hasNext() && (val=itr.next()) instanceof Character){
         for(final var arr=this.arr;(char)val==arr[thisOffset];){
@@ -1713,9 +1712,9 @@ AbstractOmniCollection<Character>
         final int rootSize;
         if((rootSize=(root=this.parent).size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((CharArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -1726,7 +1725,7 @@ AbstractOmniCollection<Character>
     @Override public OmniListIterator.OfChar listIterator(int index){
       return new ListItr(this,index);
     }
-      private void uncheckedInsert(int index,int size,char val){
+      void uncheckedInsert(int index,int size,char val){
         final int tailDist;
         if((tailDist=size-index)==0){
           super.uncheckedAppend(size,val);
@@ -1747,9 +1746,10 @@ AbstractOmniCollection<Character>
     @Override public void add(int index,char val){
       final int size;
       if((size=this.size)!=0){
-        ((UncheckedList)this).uncheckedInsert(index,size,val);
+        this
+        .uncheckedInsert(index,size,val);
       }else{
-        ((CharArrSeq)this).uncheckedInit(val);
+        super.uncheckedInit(val);
       }
     }
     @Override void uncheckedCopyInto(char[] dst,int length){
@@ -2756,9 +2756,9 @@ AbstractOmniCollection<Character>
         UncheckedSubList parent;
         if((rootSize=(root=(parent=this.parent).root).size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((CharArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
         do{
@@ -2777,9 +2777,9 @@ AbstractOmniCollection<Character>
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
+        root.uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
       }else{
-        ((CharArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
         ++this.size;
       }
       return true;
@@ -2790,9 +2790,9 @@ AbstractOmniCollection<Character>
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
+        root.uncheckedInsert(this.rootOffset+index,rootSize,val);
       }else{
-        ((CharArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
       }
     }
     @Override  public <T> T[] toArray(T[] arr){
@@ -3631,9 +3631,9 @@ AbstractOmniCollection<Character>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((CharArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -3656,9 +3656,10 @@ AbstractOmniCollection<Character>
       CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
-        ((UncheckedList)this).uncheckedInsert(index,size,val);
+        super
+        .uncheckedInsert(index,size,val);
       }else{
-        ((CharArrSeq)this).uncheckedInit(val);
+        super.uncheckedInit(val);
       }
     }
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
@@ -3922,7 +3923,7 @@ AbstractOmniCollection<Character>
             }
           }else{
             final int rootOffset;
-            return ((UncheckedList)root).isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
+            return root.isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
           }
         }finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4970,9 +4971,9 @@ AbstractOmniCollection<Character>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((CharArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -4995,9 +4996,9 @@ AbstractOmniCollection<Character>
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       if((modCount=root.size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
+        root.uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
       }else{
-        ((CharArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
         ++this.size;
       }
       return true;
@@ -5014,9 +5015,9 @@ AbstractOmniCollection<Character>
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       this.size=size+1;
       if((modCount=root.size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,modCount,val);
+        root.uncheckedInsert(this.rootOffset+index,modCount,val);
       }else{
-        ((CharArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
       }
     }
     @Override  public <T> T[] toArray(T[] arr){

@@ -588,7 +588,6 @@ AbstractOmniCollection<Double>
     arr[size]=val;
     this.size=size+1;
   }
-  private
   void uncheckedInit(double val){
     double[] arr;
     if((arr=this.arr)==null){
@@ -1079,7 +1078,7 @@ AbstractOmniCollection<Double>
     UncheckedList(int size,double[] arr){
       super(size,arr);
     }
-    private boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
+    boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
       Object val;
       if(itr.hasNext() && (val=itr.next()) instanceof Double){
         for(final var arr=this.arr;TypeUtil.doubleEquals((double)val,arr[thisOffset]);){
@@ -1678,9 +1677,9 @@ AbstractOmniCollection<Double>
         final int rootSize;
         if((rootSize=(root=this.parent).size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((DoubleArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -1691,7 +1690,7 @@ AbstractOmniCollection<Double>
     @Override public OmniListIterator.OfDouble listIterator(int index){
       return new ListItr(this,index);
     }
-      private void uncheckedInsert(int index,int size,double val){
+      void uncheckedInsert(int index,int size,double val){
         final int tailDist;
         if((tailDist=size-index)==0){
           super.uncheckedAppend(size,val);
@@ -1712,9 +1711,10 @@ AbstractOmniCollection<Double>
     @Override public void add(int index,double val){
       final int size;
       if((size=this.size)!=0){
-        ((UncheckedList)this).uncheckedInsert(index,size,val);
+        this
+        .uncheckedInsert(index,size,val);
       }else{
-        ((DoubleArrSeq)this).uncheckedInit(val);
+        super.uncheckedInit(val);
       }
     }
     @Override void uncheckedCopyInto(double[] dst,int length){
@@ -2702,9 +2702,9 @@ AbstractOmniCollection<Double>
         UncheckedSubList parent;
         if((rootSize=(root=(parent=this.parent).root).size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((DoubleArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
         do{
@@ -2723,9 +2723,9 @@ AbstractOmniCollection<Double>
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
+        root.uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
       }else{
-        ((DoubleArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
         ++this.size;
       }
       return true;
@@ -2736,9 +2736,9 @@ AbstractOmniCollection<Double>
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
+        root.uncheckedInsert(this.rootOffset+index,rootSize,val);
       }else{
-        ((DoubleArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
       }
     }
     @Override  public <T> T[] toArray(T[] arr){
@@ -3605,9 +3605,9 @@ AbstractOmniCollection<Double>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((DoubleArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -3630,9 +3630,10 @@ AbstractOmniCollection<Double>
       CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
-        ((UncheckedList)this).uncheckedInsert(index,size,val);
+        super
+        .uncheckedInsert(index,size,val);
       }else{
-        ((DoubleArrSeq)this).uncheckedInit(val);
+        super.uncheckedInit(val);
       }
     }
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
@@ -3896,7 +3897,7 @@ AbstractOmniCollection<Double>
             }
           }else{
             final int rootOffset;
-            return ((UncheckedList)root).isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
+            return root.isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
           }
         }finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4900,9 +4901,9 @@ AbstractOmniCollection<Double>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((DoubleArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -4925,9 +4926,9 @@ AbstractOmniCollection<Double>
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       if((modCount=root.size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
+        root.uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
       }else{
-        ((DoubleArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
         ++this.size;
       }
       return true;
@@ -4944,9 +4945,9 @@ AbstractOmniCollection<Double>
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       this.size=size+1;
       if((modCount=root.size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,modCount,val);
+        root.uncheckedInsert(this.rootOffset+index,modCount,val);
       }else{
-        ((DoubleArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
       }
     }
     @Override  public <T> T[] toArray(T[] arr){

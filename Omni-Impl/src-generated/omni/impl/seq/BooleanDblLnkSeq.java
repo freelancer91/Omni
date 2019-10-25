@@ -328,7 +328,7 @@ AbstractOmniCollection<Boolean>
     before.next=newNode;
     after.prev=newNode;
   }
-  private void insertNode(int index,Node newNode){
+  void insertNode(int index,Node newNode){
     int tailDist;
     if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
@@ -356,7 +356,7 @@ AbstractOmniCollection<Boolean>
       }
     }
   }
-  private Node getNode(int index,int size){
+  Node getNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       return Node.iterateDescending(tail,size-1);
@@ -365,7 +365,7 @@ AbstractOmniCollection<Boolean>
       return Node.iterateAscending(head,index);
     }
   }
-  private Node getItrNode(int index,int size){
+  Node getItrNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       switch(size){
@@ -1268,7 +1268,7 @@ AbstractOmniCollection<Boolean>
         currParent.head=newNode;
         currParent.tail=newNode;
       }
-      ((BooleanDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+      root.insertNode(curr.parentOffset,newNode);
     }
     @Override public void add(int index,boolean val){
       final UncheckedList root;
@@ -2126,7 +2126,7 @@ AbstractOmniCollection<Boolean>
       return new BidirectionalItr(this);
     }
     @Override public OmniListIterator.OfBoolean listIterator(int index){
-      return new BidirectionalItr(this,((BooleanDblLnkSeq)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr(this,super.getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfBoolean subList(int fromIndex,int toIndex){
       final int subListSize;
@@ -2436,7 +2436,7 @@ AbstractOmniCollection<Boolean>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr(this,((BooleanDblLnkSeq)this).getItrNode(index,size),index);
+      return new BidirectionalItr(this,super.getItrNode(index,size),index);
     }
     private static class BidirectionalItr
       extends AbstractBooleanItr
@@ -4227,7 +4227,7 @@ AbstractOmniCollection<Boolean>
         currParent.head=newNode;
         currParent.tail=newNode;
       }
-      ((BooleanDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+      root.insertNode(curr.parentOffset,newNode);
     }
     @Override public void add(int index,boolean val){
       final CheckedList root;
@@ -4287,7 +4287,7 @@ AbstractOmniCollection<Boolean>
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
       final Node node;
-      final var ret=(node=((BooleanDblLnkSeq)this).getNode(index,size)).val;
+      final var ret=(node=super.getNode(index,size)).val;
       node.val=val;
       return ret;
     }
@@ -4296,14 +4296,14 @@ AbstractOmniCollection<Boolean>
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      ((BooleanDblLnkSeq)this).getNode(index,size).val=val;
+      super.getNode(index,size).val=val;
     }
     @Override public boolean getBoolean(int index){
       CheckedCollection.checkModCount(modCount,root.modCount);
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      return ((BooleanDblLnkSeq)this).getNode(index,size).val;
+      return super.getNode(index,size).val;
     }
     @Override public int size(){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4541,7 +4541,7 @@ AbstractOmniCollection<Boolean>
             if(list instanceof OmniList.OfBoolean){
               return root.isEqualTo(this.head,size,(OmniList.OfBoolean)list);
             }else if(list instanceof OmniList.OfRef){
-              return ((UncheckedList)root).isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
             }
           }else{
             return UncheckedList.isEqualTo(list.listIterator(),this.head,this.tail);
@@ -4716,7 +4716,7 @@ AbstractOmniCollection<Boolean>
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
       Node tmp;
-      final var ret=(tmp=((BooleanDblLnkSeq)this).getNode(index,size)).val;
+      final var ret=(tmp=super.getNode(index,size)).val;
       tmp.val=val;
       return ret;
     }
@@ -4724,13 +4724,13 @@ AbstractOmniCollection<Boolean>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      ((BooleanDblLnkSeq)this).getNode(index,size).val=val;
+      super.getNode(index,size).val=val;
     }
     @Override public boolean getBoolean(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      return ((BooleanDblLnkSeq)this).getNode(index,size).val;
+      return super.getNode(index,size).val;
     }
     @Override public boolean getLastBoolean(){
       final Node tail;
@@ -5121,7 +5121,7 @@ AbstractOmniCollection<Boolean>
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr(this,((BooleanDblLnkSeq)this).getItrNode(index,size),index);
+      return new BidirectionalItr(this,super.getItrNode(index,size),index);
     }
     @Override public OmniList.OfBoolean subList(int fromIndex,int toIndex){
       int tailDist;
@@ -6022,7 +6022,7 @@ AbstractOmniCollection<Boolean>
         return size==subList.size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node thisHead,int size,OmniList.OfRef<?> list){
+    boolean isEqualTo(Node thisHead,int size,OmniList.OfRef<?> list){
       //TODO
       if(list instanceof RefArrSeq.UncheckedList){
         final RefArrSeq.UncheckedList<?> that;
@@ -6294,7 +6294,7 @@ AbstractOmniCollection<Boolean>
       return new BidirectionalItr(this);
     }
     @Override public OmniListIterator.OfBoolean listIterator(int index){
-      return new BidirectionalItr(this,((BooleanDblLnkSeq)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr(this,super.getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfBoolean subList(int fromIndex,int toIndex){
       final int subListSize;

@@ -700,7 +700,6 @@ AbstractOmniCollection<Float>
     arr[size]=val;
     this.size=size+1;
   }
-  private
   void uncheckedInit(float val){
     float[] arr;
     if((arr=this.arr)==null){
@@ -1253,7 +1252,7 @@ AbstractOmniCollection<Float>
     UncheckedList(int size,float[] arr){
       super(size,arr);
     }
-    private boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
+    boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
       Object val;
       if(itr.hasNext() && (val=itr.next()) instanceof Float){
         for(final var arr=this.arr;TypeUtil.floatEquals((float)val,arr[thisOffset]);){
@@ -1947,9 +1946,9 @@ AbstractOmniCollection<Float>
         final int rootSize;
         if((rootSize=(root=this.parent).size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((FloatArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -1960,7 +1959,7 @@ AbstractOmniCollection<Float>
     @Override public OmniListIterator.OfFloat listIterator(int index){
       return new ListItr(this,index);
     }
-      private void uncheckedInsert(int index,int size,float val){
+      void uncheckedInsert(int index,int size,float val){
         final int tailDist;
         if((tailDist=size-index)==0){
           super.uncheckedAppend(size,val);
@@ -1981,9 +1980,10 @@ AbstractOmniCollection<Float>
     @Override public void add(int index,float val){
       final int size;
       if((size=this.size)!=0){
-        ((UncheckedList)this).uncheckedInsert(index,size,val);
+        this
+        .uncheckedInsert(index,size,val);
       }else{
-        ((FloatArrSeq)this).uncheckedInit(val);
+        super.uncheckedInit(val);
       }
     }
     @Override void uncheckedCopyInto(float[] dst,int length){
@@ -3173,9 +3173,9 @@ AbstractOmniCollection<Float>
         UncheckedSubList parent;
         if((rootSize=(root=(parent=this.parent).root).size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((FloatArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
         do{
@@ -3194,9 +3194,9 @@ AbstractOmniCollection<Float>
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
+        root.uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
       }else{
-        ((FloatArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
         ++this.size;
       }
       return true;
@@ -3207,9 +3207,9 @@ AbstractOmniCollection<Float>
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
+        root.uncheckedInsert(this.rootOffset+index,rootSize,val);
       }else{
-        ((FloatArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
       }
     }
     @Override  public <T> T[] toArray(T[] arr){
@@ -4089,9 +4089,9 @@ AbstractOmniCollection<Float>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((FloatArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -4114,9 +4114,10 @@ AbstractOmniCollection<Float>
       CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
-        ((UncheckedList)this).uncheckedInsert(index,size,val);
+        super
+        .uncheckedInsert(index,size,val);
       }else{
-        ((FloatArrSeq)this).uncheckedInit(val);
+        super.uncheckedInit(val);
       }
     }
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
@@ -4380,7 +4381,7 @@ AbstractOmniCollection<Float>
             }
           }else{
             final int rootOffset;
-            return ((UncheckedList)root).isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
+            return root.isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
           }
         }finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5621,9 +5622,9 @@ AbstractOmniCollection<Float>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
+          root.uncheckedInsert(this.cursor++,rootSize,val);
         }else{
-          ((FloatArrSeq)root).uncheckedInit(val);
+          root.uncheckedInit(val);
           ++this.cursor;
         }
       }
@@ -5646,9 +5647,9 @@ AbstractOmniCollection<Float>
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       if((modCount=root.size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
+        root.uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
       }else{
-        ((FloatArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
         ++this.size;
       }
       return true;
@@ -5665,9 +5666,9 @@ AbstractOmniCollection<Float>
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       this.size=size+1;
       if((modCount=root.size)!=0){
-        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,modCount,val);
+        root.uncheckedInsert(this.rootOffset+index,modCount,val);
       }else{
-        ((FloatArrSeq)root).uncheckedInit(val);
+        root.uncheckedInit(val);
       }
     }
     @Override  public <T> T[] toArray(T[] arr){

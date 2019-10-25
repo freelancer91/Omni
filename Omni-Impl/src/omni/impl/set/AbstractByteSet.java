@@ -14,22 +14,9 @@ import omni.function.BytePredicate;
 import omni.impl.AbstractByteItr;
 import omni.util.OmniArray;
 
-abstract class AbstractByteSet implements OmniNavigableSet.OfByte{
-  
+abstract class AbstractByteSet implements OmniNavigableSet.OfByte{  
 	
-	@Override public boolean equals(Object val) {
-		if(val==this) {
-			return true;
-		}
-		if(val instanceof OmniSet.OfByte) {
-			final OmniSet.OfByte that;
-			if(this.size()!=(that=(OmniSet.OfByte)val).size()) {
-				final var thisItr
-			}
-		}
-		return false;
-	}
-    
+
     
     static abstract class ComparatorlessImpl extends AbstractByteSet{
     

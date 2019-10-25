@@ -417,7 +417,7 @@ AbstractOmniCollection<$BoxedType$>
     before.next=newNode;
     after.prev=newNode;
   }
-  private void insertNode(int index,Node$<E>$ newNode){
+  void insertNode(int index,Node$<E>$ newNode){
     int tailDist;
     if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
@@ -476,7 +476,7 @@ AbstractOmniCollection<$BoxedType$>
     }
   }
 #ENDIF
-  private Node$<E>$ getNode(int index,int size){
+  Node$<E>$ getNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       return Node.iterateDescending(tail,size-1);
@@ -485,7 +485,7 @@ AbstractOmniCollection<$BoxedType$>
       return Node.iterateAscending(head,index);
     }
   }
-  private Node$<E>$ getItrNode(int index,int size){
+  Node$<E>$ getItrNode(int index,int size){
     if((size-=index)<=index){
       //the node is closer to the tail
       switch(size){
@@ -981,7 +981,7 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       return new BidirectionalItr$<E>$(this);
     }
     @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index){
-      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr$<E>$(this,super.getItrNode(index,this.size),index);
     }
     @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
       final int subListSize;
@@ -1070,7 +1070,7 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getItrNode(index,size),index);
+      return new BidirectionalItr$<E>$(this,super.getItrNode(index,size),index);
     }
     private static class BidirectionalItr$<E>$
 #IFNOT OfRef
@@ -1395,7 +1395,7 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
       final Node$<E>$ node;
-      final var ret=(node=(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size)).val;
+      final var ret=(node=super.getNode(index,size)).val;
       node.val=val;
       return ret;
     }
@@ -1404,14 +1404,14 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val=val;
+      super.getNode(index,size).val=val;
     }
     @Override public $exposedType$ get$TypeNameModifier$(int index){
       CheckedCollection.checkModCount(modCount,root.modCount);
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      return (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val;
+      return super.getNode(index,size).val;
     }
     @Override public int size(){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1585,27 +1585,27 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
             if(list instanceof OmniList.OfRef){
               return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
             }else if(list instanceof OmniList.OfInt){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfInt)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfInt)list);
             }else if(list instanceof OmniList.OfFloat){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfFloat)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfFloat)list);
             }else if(list instanceof OmniList.OfLong){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfLong)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfLong)list);
             }else if(list instanceof OmniList.OfDouble){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfDouble)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfDouble)list);
             }else if(list instanceof OmniList.OfByte){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfByte)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfByte)list);
             }else if(list instanceof OmniList.OfChar){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfChar)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfChar)list);
             }else if(list instanceof OmniList.OfShort){
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfShort)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfShort)list);
             }else{
-              return ((UncheckedList<E>)root).isEqualTo(this.head,size,(OmniList.OfBoolean)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfBoolean)list);
             }
 #ELSE
             if(list instanceof OmniList.Of$ClassPrefix$){
               return root.isEqualTo(this.head,size,(OmniList.Of$ClassPrefix$)list);
             }else if(list instanceof OmniList.OfRef){
-              return ((UncheckedList$<E>$)root).isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
+              return root.isEqualTo(this.head,size,(OmniList.OfRef<?>)list);
             }
 #ENDIF
           }else{
@@ -1700,7 +1700,7 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
       Node$<E>$ tmp;
-      final var ret=(tmp=(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size)).val;
+      final var ret=(tmp=super.getNode(index,size)).val;
       tmp.val=val;
       return ret;
     }
@@ -1708,13 +1708,13 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val=val;
+      super.getNode(index,size).val=val;
     }
     @Override public $exposedType$ get$TypeNameModifier$(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
-      return (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val;
+      return super.getNode(index,size).val;
     }
     @Override public $exposedType$ getLast$TypeNameModifier$(){
       final Node$<E>$ tail;
@@ -2361,7 +2361,7 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getItrNode(index,size),index);
+      return new BidirectionalItr$<E>$(this,super.getItrNode(index,size),index);
     }
     @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
       int tailDist;
@@ -2974,7 +2974,7 @@ private static $<E>$ int collapseBodyHelper(Node$<E>$ newHead,Node$<E>$ newTail,
       }
     }
 #MACRODEF RefUncheckedisEqualToNodeIntOmniList<CLASSPREFIX>()
-private boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfCLASSPREFIX list){
+boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfCLASSPREFIX list){
 #IFSWITCH CLASSPREFIX==Boolean
   if(list instanceof AbstractCLASSPREFIXArrSeq){
     final AbstractCLASSPREFIXArrSeq abstractArrSeq;
@@ -3132,7 +3132,7 @@ private boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfCLASSPREFIX lis
         return size==subList.size && SequenceEqualityUtil.isEqualTo(thatRoot.arr,thatOffset=subList.rootOffset,thatOffset+size,thisHead);
       }
     }
-    private boolean isEqualTo(Node thisHead,int size,OmniList.OfRef<?> list){
+    boolean isEqualTo(Node thisHead,int size,OmniList.OfRef<?> list){
       //TODO
       if(list instanceof RefArrSeq.UncheckedList){
         final RefArrSeq.UncheckedList<?> that;
@@ -3238,7 +3238,7 @@ private boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfCLASSPREFIX lis
       return new BidirectionalItr$<E>$(this);
     }
     @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index){
-      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr$<E>$(this,super.getItrNode(index,this.size),index);
     }
     @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
       final int subListSize;
@@ -5273,7 +5273,7 @@ private void bubbleUpInit(Node$<E>$ newNode){
     currParent.head=newNode;
     currParent.tail=newNode;
   }
-  (($ClassPrefix$DblLnkSeq$<E>$)root).insertNode(curr.parentOffset,newNode);
+  root.insertNode(curr.parentOffset,newNode);
 }
 @Override public void add(int index,$exposedType$ val){
   final CHECKEDList$<E>$ root;

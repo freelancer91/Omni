@@ -533,8 +533,6 @@ AbstractOmniCollection<$BoxedType$>
   }
 #IF OfBoolean
   @Override
-#ELSE
-  private
 #ENDIF
   void uncheckedInit($exposedType$ val){
     $ArrayType$[] arr;
@@ -1268,7 +1266,7 @@ public
     return false;
   }
 #ELSEIFSWITCH STRUCTNAME==UncheckedList
-  private boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
+  boolean isEqualTo(ListIterator<?> itr,int thisOffset,int thisBound){
   #IF OfRef
     if(itr.hasNext()){
       for(final var arr=this.arr;Objects.equals(arr[thisOffset],itr.next());){
@@ -1642,21 +1640,21 @@ public
           if(list instanceof OmniList.OfRef){
             return root.isEqualTo(rootOffset,size,(OmniList.OfRef<?>)list);
           }else if(list instanceof OmniList.OfInt){
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfInt)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfInt)list);
           }else if(list instanceof OmniList.OfFloat){
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfFloat)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfFloat)list);
           }else if(list instanceof OmniList.OfLong){
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfLong)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfLong)list);
           }else if(list instanceof OmniList.OfDouble){
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfDouble)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfDouble)list);
           }else if(list instanceof OmniList.OfByte){
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfByte)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfByte)list);
           }else if(list instanceof OmniList.OfChar){
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfChar)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfChar)list);
           }else if(list instanceof OmniList.OfShort){
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfShort)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfShort)list);
           }else{
-            return ((UncheckedList<?>)root).isEqualTo(rootOffset,size,(OmniList.OfBoolean)list);
+            return root.isEqualTo(rootOffset,size,(OmniList.OfBoolean)list);
           }
   #ELSE
           if(list instanceof OmniList.Of$ClassPrefix$){
@@ -1667,7 +1665,7 @@ public
   #ENDIF
         }else{
           final int rootOffset;
-          return ((UncheckedList$<E>$)root).isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
+          return root.isEqualTo(list.listIterator(),rootOffset=this.rootOffset,rootOffset+size);
         }
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
@@ -2389,9 +2387,9 @@ public
       #ENDIF
     #ENDIF
       {
-        ((UncheckedList$<E>$)root).uncheckedInsert(this.cursor++,rootSize,val);
+        root.uncheckedInsert(this.cursor++,rootSize,val);
       }else{
-        (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
+        root.uncheckedInit(val);
         ++this.cursor;
       }
     #IFSWITCH STRUCTNAME==UncheckedSubList
@@ -2423,7 +2421,7 @@ public
   }
   #ENDIF
   #IFSWITCH STRUCTNAME==UncheckedList
-    private void uncheckedInsert(int index,int size,$exposedType$ val){
+    void uncheckedInsert(int index,int size,$exposedType$ val){
       final int tailDist;
       if((tailDist=size-index)==0){
         super.uncheckedAppend(size,val);
@@ -2466,13 +2464,14 @@ public
     #ELSE
     if((size=this.size)!=0){
     #ENDIF
-      ((UncheckedList$<E>$)this).uncheckedInsert(index,size,val);
-    }else{
-      #IF OfBoolean
-      super.uncheckedInit(val);
+      #IFSWITCH STRUCTNAME==CheckedList
+      super
       #ELSE
-      (($ClassPrefix$ArrSeq$<E>$)this).uncheckedInit(val);
+      this
       #ENDIF
+      .uncheckedInsert(index,size,val);
+    }else{
+      super.uncheckedInit(val);
       
     }
   }
@@ -2487,16 +2486,16 @@ public
     this.modCount=modCount;
     for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
     if((modCount=root.size)!=0){
-      ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
+      root.uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
     #ELSE
     for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
     final UncheckedList$<E>$ root;
     final int rootSize;
     if((rootSize=(root=this.root).size)!=0){
-      ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
+      root.uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
     #ENDIF
     }else{
-      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
+      root.uncheckedInit(val);
       ++this.size;
     }
     return true;
@@ -2514,17 +2513,17 @@ public
     for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
     this.size=size+1;
     if((modCount=root.size)!=0){
-      ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+index,modCount,val);
+      root.uncheckedInsert(this.rootOffset+index,modCount,val);
     #ELSE
     for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
     ++this.size;
     final UncheckedList$<E>$ root;
     final int rootSize;
     if((rootSize=(root=this.root).size)!=0){
-      ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
+      root.uncheckedInsert(this.rootOffset+index,rootSize,val);
     #ENDIF
     }else{
-      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
+      root.uncheckedInit(val);
     }
   }
   #ENDIF
@@ -4630,7 +4629,7 @@ private boolean uncheckedremoveValSUFFIX(int size
 #ENDIF
 #ENDDEF
 #MACRODEF UncheckedListRefEqualsImpl<CLASSPREFIX>()
-private boolean isEqualTo(int rootOffset,int size,OmniList.OfCLASSPREFIX list){
+boolean isEqualTo(int rootOffset,int size,OmniList.OfCLASSPREFIX list){
 #IFSWITCH CLASSPREFIX==Boolean
   if(list instanceof AbstractBooleanArrSeq){
     final AbstractBooleanArrSeq abstractBooleanArrSeq;
