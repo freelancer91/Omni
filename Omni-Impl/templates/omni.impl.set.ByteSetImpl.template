@@ -761,13 +761,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int lastInt(){
         return super.getThisOrLower();
       }
-      #MACRO UncheckedFullToArray<byte,super>(Byte,Ascending)
-      #MACRO UncheckedFullToArray<short,super>(Short,Ascending)
-      #MACRO UncheckedFullToArray<int,super>(Int,Ascending)
-      #MACRO UncheckedFullToArray<long,super>(Long,Ascending)
-      #MACRO UncheckedFullToArray<float,super>(Float,Ascending)
-      #MACRO UncheckedFullToArray<double,super>(Double,Ascending)
-      #MACRO UncheckedFullToArray<Byte,super>(,Ascending)
+      #MACRO FullToArray<Unchecked,byte,super>(Byte,Ascending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,short,super>(Short,Ascending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,int,super>(Int,Ascending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,long,super>(Long,Ascending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,float,super>(Float,Ascending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,double,super>(Double,Ascending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,Byte,super>(,Ascending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         return super.headSetAscending((int)toElement);
       }
@@ -855,13 +855,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int lastInt(){
         return super.getThisOrHigher();
       }
-      #MACRO UncheckedFullToArray<byte,super>(Byte,Descending)
-      #MACRO UncheckedFullToArray<short,super>(Short,Descending)
-      #MACRO UncheckedFullToArray<int,super>(Int,Descending)
-      #MACRO UncheckedFullToArray<long,super>(Long,Descending)
-      #MACRO UncheckedFullToArray<float,super>(Float,Descending)
-      #MACRO UncheckedFullToArray<double,super>(Double,Descending)
-      #MACRO UncheckedFullToArray<Byte,super>(,Descending)
+      #MACRO FullToArray<Unchecked,byte,super>(Byte,Descending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,short,super>(Short,Descending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,int,super>(Int,Descending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,long,super>(Long,Descending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,float,super>(Float,Descending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,double,super>(Double,Descending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,Byte,super>(,Descending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         int inclusiveTo=toElement;
         if(!inclusive){
@@ -1116,6 +1116,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public Object clone(){
         return new Ascending(this);
       }
+      #MACRO FullToArray<Checked,byte,super>(Byte,Ascending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,short,super>(Short,Ascending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,int,super>(Int,Ascending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,long,super>(Long,Ascending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,float,super>(Float,Ascending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,double,super>(Double,Ascending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,Byte,super>(,Ascending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
       @Override public String toString(){
         int modCountAndSize;
         if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
@@ -1217,6 +1224,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public Object clone(){
         return new Descending(this);
       }
+      #MACRO FullToArray<Checked,byte,super>(Byte,Descending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,short,super>(Short,Descending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,int,super>(Int,Descending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,long,super>(Long,Descending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,float,super>(Float,Descending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,double,super>(Double,Descending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,Byte,super>(,Descending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
       @Override public String toString(){
         int modCountAndSize;
         if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
@@ -1331,6 +1345,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public boolean contains(double val){
       return root.contains(val);
     }
+
+    
+    
     private static class Ascending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
       private Ascending(ByteSetImpl.Unchecked.Descending root){
@@ -1389,13 +1406,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Ascending(this.root);
       }
-      #MACRO UncheckedFullToArray<byte,root>(Byte,Ascending)
-      #MACRO UncheckedFullToArray<short,root>(Short,Ascending)
-      #MACRO UncheckedFullToArray<int,root>(Int,Ascending)
-      #MACRO UncheckedFullToArray<long,root>(Long,Ascending)
-      #MACRO UncheckedFullToArray<float,root>(Float,Ascending)
-      #MACRO UncheckedFullToArray<double,root>(Double,Ascending)
-      #MACRO UncheckedFullToArray<Byte,root>(,Ascending)
+      #MACRO FullToArray<Unchecked,byte,root>(Byte,Ascending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,short,root>(Short,Ascending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,int,root>(Int,Ascending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,long,root>(Long,Ascending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,float,root>(Float,Ascending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,double,root>(Double,Ascending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,Byte,root>(,Ascending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
     }
     private static class Descending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
@@ -1459,13 +1476,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Descending(this.root);
       }
-      #MACRO UncheckedFullToArray<byte,root>(Byte,Descending)
-      #MACRO UncheckedFullToArray<short,root>(Short,Descending)
-      #MACRO UncheckedFullToArray<int,root>(Int,Descending)
-      #MACRO UncheckedFullToArray<long,root>(Long,Descending)
-      #MACRO UncheckedFullToArray<float,root>(Float,Descending)
-      #MACRO UncheckedFullToArray<double,root>(Double,Descending)
-      #MACRO UncheckedFullToArray<Byte,root>(,Descending)
+      #MACRO FullToArray<Unchecked,byte,root>(Byte,Descending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,short,root>(Short,Descending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,int,root>(Int,Descending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,long,root>(Long,Descending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,float,root>(Float,Descending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,double,root>(Double,Descending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Unchecked,Byte,root>(,Descending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
     }
   }
   private static abstract class CheckedFullView extends AbstractByteSet.ComparatorlessImpl{
@@ -1597,6 +1614,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Object writeReplace(){
         return new SerializationIntermediate(this.root);
       }
+      #MACRO FullToArray<Checked,byte,root>(Byte,Ascending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,short,root>(Short,Ascending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,int,root>(Int,Ascending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,long,root>(Long,Ascending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,float,root>(Float,Ascending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,double,root>(Double,Ascending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,Byte,root>(,Ascending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
         private SerializationIntermediate(ByteSetImpl.Checked root){
@@ -1685,6 +1709,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Object writeReplace(){
         return new SerializationIntermediate(this.root);
       }
+      #MACRO FullToArray<Checked,byte,root>(Byte,Descending,OmniArray.OfByte.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,short,root>(Short,Descending,OmniArray.OfShort.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,int,root>(Int,Descending,OmniArray.OfInt.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,long,root>(Long,Descending,OmniArray.OfLong.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,float,root>(Float,Descending,OmniArray.OfFloat.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,double,root>(Double,Descending,OmniArray.OfDouble.DEFAULT_ARR)
+      #MACRO FullToArray<Checked,Byte,root>(,Descending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
         private SerializationIntermediate(ByteSetImpl.Checked root){
@@ -1732,6 +1763,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return false;
     }
+    #MACRO SubSetToArray<Unchecked,byte>(Byte,OmniArray.OfByte.DEFAULT_ARR)
+    #MACRO SubSetToArray<Unchecked,short>(Short,OmniArray.OfShort.DEFAULT_ARR)
+    #MACRO SubSetToArray<Unchecked,int>(Int,OmniArray.OfInt.DEFAULT_ARR)
+    #MACRO SubSetToArray<Unchecked,long>(Long,OmniArray.OfLong.DEFAULT_ARR)
+    #MACRO SubSetToArray<Unchecked,float>(Float,OmniArray.OfFloat.DEFAULT_ARR)
+    #MACRO SubSetToArray<Unchecked,double>(Double,OmniArray.OfDouble.DEFAULT_ARR)
+    #MACRO SubSetToArray<Unchecked,Byte>(,OmniArray.OfByte.DEFAULT_BOXED_ARR)
+    
     abstract boolean isInBounds(byte val);
     abstract boolean isInBounds(char val);
     abstract boolean isInBounds(int val);
@@ -1889,6 +1928,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(TailSet parent,int size,int inclusiveLo){
           super(parent,size,inclusiveLo);
         }
+        #MACRO SubSetToArrayCopy<Unchecked,byte,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,short,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,int,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,long,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,float,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,double,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Byte,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Object,TailSet,Ascending>()
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -1953,6 +2000,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(TailSet parent,int size,int inclusiveLo){
           super(parent,size,inclusiveLo);
         }
+        #MACRO SubSetToArrayCopy<Unchecked,byte,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,short,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,int,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,long,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,float,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,double,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Byte,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Object,TailSet,Descending>()
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2122,6 +2177,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(HeadSet parent,int size,int inclusiveHi){
           super(parent,size,inclusiveHi);
         }
+        #MACRO SubSetToArrayCopy<Unchecked,byte,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,short,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,int,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,long,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,float,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,double,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Byte,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Object,HeadSet,Ascending>()
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2186,6 +2249,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(HeadSet parent,int size,int inclusiveHi){
           super(parent,size,inclusiveHi);
         }
+        #MACRO SubSetToArrayCopy<Unchecked,byte,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,short,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,int,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,long,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,float,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,double,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Byte,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Object,HeadSet,Descending>()
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2361,6 +2432,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(UncheckedSubSet parent,int size,int boundInfo){
           super(parent,size,boundInfo);
         }
+        #MACRO SubSetToArrayCopy<Unchecked,byte,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,short,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,int,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,long,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,float,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,double,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Byte,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Object,BodySet,Ascending>()
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2422,6 +2501,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(UncheckedSubSet parent,int size,int boundInfo){
           super(parent,size,boundInfo);
         }
+        #MACRO SubSetToArrayCopy<Unchecked,byte,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,short,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,int,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,long,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,float,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,double,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Byte,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Unchecked,Object,BodySet,Descending>()
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2500,6 +2587,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         curr.modCountAndSize+=((1<<9)+1);
       }while((curr=curr.parent)!=null);
     }
+    #MACRO SubSetToArray<Checked,byte>(Byte,OmniArray.OfByte.DEFAULT_ARR)
+    #MACRO SubSetToArray<Checked,short>(Short,OmniArray.OfShort.DEFAULT_ARR)
+    #MACRO SubSetToArray<Checked,int>(Int,OmniArray.OfInt.DEFAULT_ARR)
+    #MACRO SubSetToArray<Checked,long>(Long,OmniArray.OfLong.DEFAULT_ARR)
+    #MACRO SubSetToArray<Checked,float>(Float,OmniArray.OfFloat.DEFAULT_ARR)
+    #MACRO SubSetToArray<Checked,double>(Double,OmniArray.OfDouble.DEFAULT_ARR)
+    #MACRO SubSetToArray<Checked,Byte>(,OmniArray.OfByte.DEFAULT_BOXED_ARR)
+    
     @Override public boolean contains(boolean val){
       final ByteSetImpl.Checked root;
       final int modCountAndSize;
@@ -2785,6 +2880,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(TailSet parent,int modCountAndSize,int inclusiveLo){
           super(parent,modCountAndSize,inclusiveLo);
         }
+        #MACRO SubSetToArrayCopy<Checked,byte,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,short,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,int,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,long,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,float,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,double,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,Byte,TailSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,Object,TailSet,Ascending>()
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -2885,6 +2988,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(TailSet parent,int modCountAndSize,int inclusiveLo){
           super(parent,modCountAndSize,inclusiveLo);
         }
+        #MACRO SubSetToArrayCopy<Checked,byte,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,short,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,int,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,long,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,float,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,double,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,Byte,TailSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,Object,TailSet,Descending>()
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -3127,6 +3238,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(HeadSet parent,int modCountAndSize,int inclusiveHi){
           super(parent,modCountAndSize,inclusiveHi);
         }
+        #MACRO SubSetToArrayCopy<Checked,byte,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,short,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,int,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,long,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,float,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,double,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,Byte,HeadSet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,Object,HeadSet,Ascending>()
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -3227,6 +3346,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(HeadSet parent,int modCountAndSize,int inclusiveHi){
           super(parent,modCountAndSize,inclusiveHi);
         }
+        #MACRO SubSetToArrayCopy<Checked,byte,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,short,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,int,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,long,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,float,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,double,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,Byte,HeadSet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,Object,HeadSet,Descending>()
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -3536,6 +3663,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(CheckedSubSet parent,int modCountAndSize,int boundInfo){
           super(parent,modCountAndSize,boundInfo);
         }
+        #MACRO SubSetToArrayCopy<Checked,byte,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,short,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,int,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,long,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,float,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,double,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,Byte,BodySet,Ascending>()
+        #MACRO SubSetToArrayCopy<Checked,Object,BodySet,Ascending>()
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -3613,6 +3748,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(CheckedSubSet parent,int modCountAndSize,int boundInfo){
           super(parent,modCountAndSize,boundInfo);
         }
+        #MACRO SubSetToArrayCopy<Checked,byte,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,short,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,int,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,long,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,float,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,double,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,Byte,BodySet,Descending>()
+        #MACRO SubSetToArrayCopy<Checked,Object,BodySet,Descending>()
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -6106,22 +6249,196 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   */
   
 }
-#MACRODEF CheckedFullToArray<ARRTYPE,SOURCE>(CLASSPREFIX,DIRECTION)
-#MACRO NYI()
+
+
+
+
+#MACRODEF SubSetToArrayCopy<CHECKED,ARRTYPE,VIEW,DIRECTION>()
+#IFSWITCH CHECKED==Checked
+@Override void copyToArray(ByteSetImpl.CHECKED root,int size,ARRTYPE[] dst){
+#ELSEIFSWITCH CHECKED==Unchecked
+@Override void copyToArray(int size,ARRTYPE[] dst){
+#ELSE
+ERROR unknown checked type CHECKED
+#ENDIF
+  root.copyToArrayDIRECTION(
+#IFSWITCH VIEW==HeadSet
+  #IFSWITCH DIRECTION==Ascending
+  this.inclusiveHi,
+  #ENDIF
+#ELSEIFSWITCH VIEW==TailSet
+  #IFSWITCH DIRECTION==Descending
+  this.inclusiveLo,
+  #ENDIF
+#ELSEIFSWITCH VIEW==BodySet
+  #IFSWITCH DIRECTION==Ascending
+  (byte)(this.boundInfo&0xff),
+  #ELSEIFSWITCH DIRECTION==Descending
+  this.boundInfo>>8,
+  #ELSE
+ERROR unknown direction DIRECTION
+  #ENDIF
+#ELSE
+ERROR unknown view VIEW
+#ENDIF
+  size,dst);
+}
 #ENDDEF
-#MACRODEF UncheckedFullToArray<ARRTYPE,SOURCE>(CLASSPREFIX,DIRECTION)
+
+
+#MACRODEF SubSetToArray<CHECKED,ARRTYPE>(CLASSPREFIX,DEFAULTARR)
+#IFSWITCH CHECKED==Checked
+abstract void copyToArray(ByteSetImpl.CHECKED root,int size,ARRTYPE[] dst);
+#ELSEIFSWITCH CHECKED==Unchecked
+abstract void copyToArray(int size,ARRTYPE[] dst);
+#ELSE
+ERROR unknown checked type CHECKED
+#ENDIF
 @Override public ARRTYPE[] toCLASSPREFIXArray(){
-  return SOURCE.toCLASSPREFIXArrayDIRECTION();
+#IFSWITCH CHECKED==Checked
+  final ByteSetImpl.CHECKED root;
+  int size;
+  CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((size&=0x1ff)!=0){
+    final ARRTYPE[] dst
+    copyToArray(root,size,dst=new ARRTYPE[size]);
+#ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
+    final ARRTYPE[] dst
+    copyToArray(size,dst=new ARRTYPE[size]);
+#ELSE
+ERROR unknown checked type CHECKED
+#ENDIF
+    return dst;
+  }
+  return DEFAULTARR;
 }
 #IFSWITCH ARRTYPE==Byte
+#IFSWITCH CHECKED==Checked
+abstract void copyToArray(ByteSetImpl.CHECKED root,int size,Object[] dst);
+#ELSEIFSWITCH CHECKED==Unchecked
+abstract void copyToArray(int size,Object[] dst);
+#ELSE
+ERROR unknown checked type CHECKED
+#ENDIF
 @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-  return SOURCE.toArrayDIRECTION(arrConstructor);
+  final T[] dst;
+  final int size;
+  #IFSWITCH CHECKED==Checked
+  final int modCountAndSize=this.modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  try{
+    dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+  }finally{
+    CheckedCollection.checkModCount(modCountAndSize>>9,(root=this.root).modCountAndSize>>9);
+  }
+  if(size!=0){
+    copyToArray(root,size,dst);
+  #ELSEIFSWITCH CHECKED==Unchecked
+  dst=arrConstructor.apply(size=this.size);
+  if(size!=0){
+    copyToArray(size,dst);
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+  }
+  return dst;
 }
 @Override public <T> T[] toArray(T[] dst){
-  return SOURCE.toArrayDIRECTION(dst);
+  #IFSWITCH CHECKED==Checked
+  int size;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9)
+  if((size&=0x1ff)!=0){
+    copyToArray(root,size,dst=OmniArray.uncheckedArrResize(size,dst);
+  #ELSEIFSWITCH CHECKED==Unchecked
+  final int size;
+  if((size=this.size)!=0){
+    copyToArray(size,dst=OmniArray.uncheckedArrResize(size,dst);
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+  }else if(dst.length!=0){
+    dst[0]=null;
+  }
+  return dst;
 }
 #ENDIF
 #ENDDEF
+#MACRODEF FullToArray<CHECKED,ARRTYPE,SOURCE>(CLASSPREFIX,DIRECTION,DEFAULTARR)
+@Override public ARRTYPE[] toCLASSPREFIXArray(){
+#IFSWITCH CHECKED==Checked
+  final int size;
+  #IFSWITCH SOURCE==super
+  if((size=this.modCountAndSize&0x1ff)!=0){
+  #ELSEIFSWITCH SOURCE==root
+  final ByteSetImpl.CHECKED SOURCE;
+  if((size=(SOURCE=this.SOURCE).modCountAndSize&0x1ff)!=0){
+  #ELSE
+ERROR unknown source SOURCE
+  #ENDIF
+    final ARRTYPE[] dst;
+    SOURCE.copyToArrayDIRECTION(size,dst=new ARRTYPE[size]);
+    return dst;
+  }
+  return DEFAULTARR;
+#ELSEIFSWITCH CHECKED==Unchecked
+  return SOURCE.toCLASSPREFIXArrayDIRECTION();
+#ELSE
+ERROR unknown checked type CHECKED
+#ENDIF
+}
+#IFSWITCH ARRTYPE==Byte
+@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH SOURCE==super
+  final int modCountAndSize=SOURCE.modCountAndSize,size;
+    #ELSEIFSWITCH SOURCE==root
+  final ByteSetImpl.CHECKED SOURCE;
+  final int modCountAndSize=(SOURCE=this.SOURCE).modCountAndSize,size;
+    #ELSE
+ERROR unknown source SOURCE
+    #ENDIF
+  final T[] dst;
+  try{
+    dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+  }finally{
+    CheckedCollection.checkModCount(modCountAndSize,SOURCE.modCountAndSize);
+  }
+  if(size!=0){
+    SOURCE.copyToArrayDIRECTION(size,dst);
+  }
+  return dst;
+  #ELSEIFSWITCH CHECKED==Unchecked
+  return SOURCE.toArrayDIRECTION(arrConstructor);
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+}
+@Override public <T> T[] toArray(T[] dst){
+  #IFSWITCH CHECKED==Checked
+  final int size;
+    #IFSWITCH SOURCE==super
+  if((size=SOURCE.modCountAndSize&0x1ff)!=0){
+    #ELSEIFSWITCH SOURCE==root
+  final ByteSetImpl.CHECKED SOURCE;
+  if((size=(SOURCE=this.SOURCE).modCountAndSize&0x1ff)!=0){
+    #ELSE
+ERROR unknown source SOURCE
+    #ENDIF
+    SOURCE.copyToArrayDIRECTION(size,dst);
+  }
+  return dst;
+  #ELSEIFSWITCH CHECKED==Unchecked
+  return SOURCE.toArrayDIRECTION(dst);
+  #ELSE
+ERROR unknown checked type CHECKED
+  #ENDIF
+}
+#ENDIF
+#ENDDEF
+
 #MACRODEF WordForEach<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND)
 #IFSWITCH LASTWORD==True
 for(WORDDEF;;INCREMENToffset){
@@ -6292,7 +6609,7 @@ ARRTYPE[] toCLASSPREFIXArrayDescending(){
       #MACRO WordToArray<False>(,word1,--,-65,(T)CAST)
       #MACRO WordToArray<True>(,word0,--,-129,(T)CAST)
     }
-  }else if(dst.length!=0{
+  }else if(dst.length!=0){
     dst[0]=null;
   }
   return dst;
@@ -6308,7 +6625,7 @@ ARRTYPE[] toCLASSPREFIXArrayDescending(){
       #MACRO WordToArray<False>(,word2,++,64,(T)CAST)
       #MACRO WordToArray<True>(,word3,++,128,(T)CAST)
     }
-  }else if(dst.length!=0{
+  }else if(dst.length!=0){
     dst[0]=null;
   }
   return dst;

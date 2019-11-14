@@ -174,6 +174,2446 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     return (v=(int)val)==val && contains(v);
   }
   //TODO equals
+  void copyToArrayAscending(int size,byte[] dst){
+    done:for(int offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,byte[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,byte[] dst){
+    done:for(int offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,byte[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  byte[] toByteArrayAscending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new byte[size];
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfByte.DEFAULT_ARR;
+  }
+  byte[] toByteArrayDescending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new byte[size];
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfByte.DEFAULT_ARR;
+  }
+  void copyToArrayAscending(int size,short[] dst){
+    done:for(int offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,short[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,short[] dst){
+    done:for(int offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(short)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,short[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  short[] toShortArrayAscending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new short[size];
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfShort.DEFAULT_ARR;
+  }
+  short[] toShortArrayDescending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new short[size];
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(short)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfShort.DEFAULT_ARR;
+  }
+  void copyToArrayAscending(int size,int[] dst){
+    done:for(int offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,int[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,int[] dst){
+    done:for(int offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,int[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  int[] toIntArrayAscending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new int[size];
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfInt.DEFAULT_ARR;
+  }
+  int[] toIntArrayDescending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new int[size];
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfInt.DEFAULT_ARR;
+  }
+  void copyToArrayAscending(int size,long[] dst){
+    done:for(long offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,long[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,long[] dst){
+    done:for(long offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,long[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  long[] toLongArrayAscending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new long[size];
+      done:for(long offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfLong.DEFAULT_ARR;
+  }
+  long[] toLongArrayDescending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new long[size];
+      done:for(long offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfLong.DEFAULT_ARR;
+  }
+  void copyToArrayAscending(int size,float[] dst){
+    done:for(int offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,float[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,float[] dst){
+    done:for(int offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,float[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  float[] toFloatArrayAscending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new float[size];
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfFloat.DEFAULT_ARR;
+  }
+  float[] toFloatArrayDescending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new float[size];
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfFloat.DEFAULT_ARR;
+  }
+  void copyToArrayAscending(int size,double[] dst){
+    done:for(int offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,double[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,double[] dst){
+    done:for(int offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,double[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  double[] toDoubleArrayAscending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new double[size];
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfDouble.DEFAULT_ARR;
+  }
+  double[] toDoubleArrayDescending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new double[size];
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfDouble.DEFAULT_ARR;
+  }
+  void copyToArrayAscending(int size,Object[] dst){
+    done:for(int offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,Object[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,Object[] dst){
+    done:for(int offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,Object[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayAscending(int size,Byte[] dst){
+    done:for(int offset=Byte.MAX_VALUE;;){
+      for(final var word=word3;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==63){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-1){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(--offset==-65){
+          break;
+        }
+      }
+      for(final var word=word0;;--offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayAscending(int offset,int size,Byte[] dst){
+    done:switch(offset>>6){
+      case 1:
+        for(final var word=word3;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+      default:
+        for(final var word=word0;;--offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  void copyToArrayDescending(int size,Byte[] dst){
+    done:for(int offset=Byte.MIN_VALUE;;){
+      for(final var word=word0;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==-64){
+          break;
+        }
+      }
+      for(final var word=word1;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==0){
+          break;
+        }
+      }
+      for(final var word=word2;;){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+        if(++offset==64){
+          break;
+        }
+      }
+      for(final var word=word3;;++offset){
+        if(wordContains(word,1L<<offset)){
+          dst[--size]=(Byte)(byte)(offset);
+          if(size==0){
+            break done;
+          }
+        }
+      }
+    }
+  }
+  void copyToArrayDescending(int offset,int size,Byte[] dst){
+    done:switch(offset>>6){
+      case -2:
+        for(final var word=word0;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+      case -1:
+        for(final var word=word1;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+      case 0:
+        for(final var word=word2;;){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+      default:
+        for(final var word=word3;;++offset){
+          if(wordContains(word,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+    }
+  }
+  Byte[] toArrayAscending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new Byte[size];
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+  }
+  Byte[] toArrayDescending(){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      final var dst=new Byte[size];
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+      return dst;
+    }
+    return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+  }
+  <T> T[] toArrayAscending(IntFunction<T[]> arrConstructor){
+    int size;
+    final long word0,word1,word2,word3;
+    final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
+    if(size!=0){
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+    }
+    return dst;
+  }
+  <T> T[] toArrayDescending(IntFunction<T[]> arrConstructor){
+    int size;
+    final long word0,word1,word2,word3;
+    final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
+    if(size!=0){
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+    }
+    return dst;
+  }
+  <T> T[] toArrayAscending(T[] dst){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      dst=OmniArray.uncheckedArrResize(size,dst);
+      done:for(int offset=Byte.MAX_VALUE;;){
+        for(;;){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(;;--offset){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
+  }
+  <T> T[] toArrayDescending(T[] dst){
+    int size;
+    final long word0,word1,word2,word3;
+    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+      dst=OmniArray.uncheckedArrResize(size,dst);
+      done:for(int offset=Byte.MIN_VALUE;;){
+        for(;;){
+          if(wordContains(word0,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word1,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(;;){
+          if(wordContains(word2,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(;;++offset){
+          if(wordContains(word3,1L<<offset)){
+            dst[--size]=(T)(Byte)(byte)(offset);
+            if(size==0){
+              break done;
+            }
+          }
+        }
+      }
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
+  }
   int toStringAscending(int size,byte[] buffer){
     int bufferOffset=0;
     done:for(int offset=Byte.MIN_VALUE;;){
@@ -1269,6 +3709,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int lastInt(){
         return super.getThisOrLower();
       }
+      @Override public byte[] toByteArray(){
+        return super.toByteArrayAscending();
+      }
+      @Override public short[] toShortArray(){
+        return super.toShortArrayAscending();
+      }
+      @Override public int[] toIntArray(){
+        return super.toIntArrayAscending();
+      }
+      @Override public long[] toLongArray(){
+        return super.toLongArrayAscending();
+      }
+      @Override public float[] toFloatArray(){
+        return super.toFloatArrayAscending();
+      }
+      @Override public double[] toDoubleArray(){
+        return super.toDoubleArrayAscending();
+      }
+      @Override public Byte[] toArray(){
+        return super.toArrayAscending();
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        return super.toArrayAscending(arrConstructor);
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        return super.toArrayAscending(dst);
+      }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         return super.headSetAscending((int)toElement);
       }
@@ -1352,6 +3819,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override public int lastInt(){
         return super.getThisOrHigher();
+      }
+      @Override public byte[] toByteArray(){
+        return super.toByteArrayDescending();
+      }
+      @Override public short[] toShortArray(){
+        return super.toShortArrayDescending();
+      }
+      @Override public int[] toIntArray(){
+        return super.toIntArrayDescending();
+      }
+      @Override public long[] toLongArray(){
+        return super.toLongArrayDescending();
+      }
+      @Override public float[] toFloatArray(){
+        return super.toFloatArrayDescending();
+      }
+      @Override public double[] toDoubleArray(){
+        return super.toDoubleArrayDescending();
+      }
+      @Override public Byte[] toArray(){
+        return super.toArrayDescending();
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        return super.toArrayDescending(arrConstructor);
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        return super.toArrayDescending(dst);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         int inclusiveTo=toElement;
@@ -1605,6 +4099,89 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public Object clone(){
         return new Ascending(this);
       }
+      @Override public byte[] toByteArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final byte[] dst;
+          super.copyToArrayAscending(size,dst=new byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_ARR;
+      }
+      @Override public short[] toShortArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final short[] dst;
+          super.copyToArrayAscending(size,dst=new short[size]);
+          return dst;
+        }
+        return OmniArray.OfShort.DEFAULT_ARR;
+      }
+      @Override public int[] toIntArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final int[] dst;
+          super.copyToArrayAscending(size,dst=new int[size]);
+          return dst;
+        }
+        return OmniArray.OfInt.DEFAULT_ARR;
+      }
+      @Override public long[] toLongArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final long[] dst;
+          super.copyToArrayAscending(size,dst=new long[size]);
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_ARR;
+      }
+      @Override public float[] toFloatArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final float[] dst;
+          super.copyToArrayAscending(size,dst=new float[size]);
+          return dst;
+        }
+        return OmniArray.OfFloat.DEFAULT_ARR;
+      }
+      @Override public double[] toDoubleArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final double[] dst;
+          super.copyToArrayAscending(size,dst=new double[size]);
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public Byte[] toArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final Byte[] dst;
+          super.copyToArrayAscending(size,dst=new Byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        final int modCountAndSize=super.modCountAndSize,size;
+        final T[] dst;
+        try{
+          dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndSize,super.modCountAndSize);
+        }
+        if(size!=0){
+          super.copyToArrayAscending(size,dst);
+        }
+        return dst;
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        final int size;
+        if((size=super.modCountAndSize&0x1ff)!=0){
+          super.copyToArrayAscending(size,dst);
+        }
+        return dst;
+      }
       @Override public String toString(){
         int modCountAndSize;
         if((modCountAndSize=this.modCountAndSize&0x1ff)!=0){
@@ -1704,6 +4281,89 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override public Object clone(){
         return new Descending(this);
+      }
+      @Override public byte[] toByteArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final byte[] dst;
+          super.copyToArrayDescending(size,dst=new byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_ARR;
+      }
+      @Override public short[] toShortArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final short[] dst;
+          super.copyToArrayDescending(size,dst=new short[size]);
+          return dst;
+        }
+        return OmniArray.OfShort.DEFAULT_ARR;
+      }
+      @Override public int[] toIntArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final int[] dst;
+          super.copyToArrayDescending(size,dst=new int[size]);
+          return dst;
+        }
+        return OmniArray.OfInt.DEFAULT_ARR;
+      }
+      @Override public long[] toLongArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final long[] dst;
+          super.copyToArrayDescending(size,dst=new long[size]);
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_ARR;
+      }
+      @Override public float[] toFloatArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final float[] dst;
+          super.copyToArrayDescending(size,dst=new float[size]);
+          return dst;
+        }
+        return OmniArray.OfFloat.DEFAULT_ARR;
+      }
+      @Override public double[] toDoubleArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final double[] dst;
+          super.copyToArrayDescending(size,dst=new double[size]);
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public Byte[] toArray(){
+        final int size;
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          final Byte[] dst;
+          super.copyToArrayDescending(size,dst=new Byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        final int modCountAndSize=super.modCountAndSize,size;
+        final T[] dst;
+        try{
+          dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndSize,super.modCountAndSize);
+        }
+        if(size!=0){
+          super.copyToArrayDescending(size,dst);
+        }
+        return dst;
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        final int size;
+        if((size=super.modCountAndSize&0x1ff)!=0){
+          super.copyToArrayDescending(size,dst);
+        }
+        return dst;
       }
       @Override public String toString(){
         int modCountAndSize;
@@ -1874,6 +4534,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Ascending(this.root);
       }
+      @Override public byte[] toByteArray(){
+        return root.toByteArrayAscending();
+      }
+      @Override public short[] toShortArray(){
+        return root.toShortArrayAscending();
+      }
+      @Override public int[] toIntArray(){
+        return root.toIntArrayAscending();
+      }
+      @Override public long[] toLongArray(){
+        return root.toLongArrayAscending();
+      }
+      @Override public float[] toFloatArray(){
+        return root.toFloatArrayAscending();
+      }
+      @Override public double[] toDoubleArray(){
+        return root.toDoubleArrayAscending();
+      }
+      @Override public Byte[] toArray(){
+        return root.toArrayAscending();
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        return root.toArrayAscending(arrConstructor);
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        return root.toArrayAscending(dst);
+      }
     }
     private static class Descending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
@@ -1934,6 +4621,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Descending(this.root);
+      }
+      @Override public byte[] toByteArray(){
+        return root.toByteArrayDescending();
+      }
+      @Override public short[] toShortArray(){
+        return root.toShortArrayDescending();
+      }
+      @Override public int[] toIntArray(){
+        return root.toIntArrayDescending();
+      }
+      @Override public long[] toLongArray(){
+        return root.toLongArrayDescending();
+      }
+      @Override public float[] toFloatArray(){
+        return root.toFloatArrayDescending();
+      }
+      @Override public double[] toDoubleArray(){
+        return root.toDoubleArrayDescending();
+      }
+      @Override public Byte[] toArray(){
+        return root.toArrayDescending();
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        return root.toArrayDescending(arrConstructor);
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        return root.toArrayDescending(dst);
       }
     }
   }
@@ -2066,6 +4780,98 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Object writeReplace(){
         return new SerializationIntermediate(this.root);
       }
+      @Override public byte[] toByteArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final byte[] dst;
+          root.copyToArrayAscending(size,dst=new byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_ARR;
+      }
+      @Override public short[] toShortArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final short[] dst;
+          root.copyToArrayAscending(size,dst=new short[size]);
+          return dst;
+        }
+        return OmniArray.OfShort.DEFAULT_ARR;
+      }
+      @Override public int[] toIntArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final int[] dst;
+          root.copyToArrayAscending(size,dst=new int[size]);
+          return dst;
+        }
+        return OmniArray.OfInt.DEFAULT_ARR;
+      }
+      @Override public long[] toLongArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final long[] dst;
+          root.copyToArrayAscending(size,dst=new long[size]);
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_ARR;
+      }
+      @Override public float[] toFloatArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final float[] dst;
+          root.copyToArrayAscending(size,dst=new float[size]);
+          return dst;
+        }
+        return OmniArray.OfFloat.DEFAULT_ARR;
+      }
+      @Override public double[] toDoubleArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final double[] dst;
+          root.copyToArrayAscending(size,dst=new double[size]);
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public Byte[] toArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final Byte[] dst;
+          root.copyToArrayAscending(size,dst=new Byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize=(root=this.root).modCountAndSize,size;
+        final T[] dst;
+        try{
+          dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
+        }
+        if(size!=0){
+          root.copyToArrayAscending(size,dst);
+        }
+        return dst;
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          root.copyToArrayAscending(size,dst);
+        }
+        return dst;
+      }
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
         private SerializationIntermediate(ByteSetImpl.Checked root){
@@ -2154,6 +4960,98 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Object writeReplace(){
         return new SerializationIntermediate(this.root);
       }
+      @Override public byte[] toByteArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final byte[] dst;
+          root.copyToArrayDescending(size,dst=new byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_ARR;
+      }
+      @Override public short[] toShortArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final short[] dst;
+          root.copyToArrayDescending(size,dst=new short[size]);
+          return dst;
+        }
+        return OmniArray.OfShort.DEFAULT_ARR;
+      }
+      @Override public int[] toIntArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final int[] dst;
+          root.copyToArrayDescending(size,dst=new int[size]);
+          return dst;
+        }
+        return OmniArray.OfInt.DEFAULT_ARR;
+      }
+      @Override public long[] toLongArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final long[] dst;
+          root.copyToArrayDescending(size,dst=new long[size]);
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_ARR;
+      }
+      @Override public float[] toFloatArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final float[] dst;
+          root.copyToArrayDescending(size,dst=new float[size]);
+          return dst;
+        }
+        return OmniArray.OfFloat.DEFAULT_ARR;
+      }
+      @Override public double[] toDoubleArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final double[] dst;
+          root.copyToArrayDescending(size,dst=new double[size]);
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public Byte[] toArray(){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          final Byte[] dst;
+          root.copyToArrayDescending(size,dst=new Byte[size]);
+          return dst;
+        }
+        return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize=(root=this.root).modCountAndSize,size;
+        final T[] dst;
+        try{
+          dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
+        }
+        if(size!=0){
+          root.copyToArrayDescending(size,dst);
+        }
+        return dst;
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        final int size;
+        final ByteSetImpl.Checked root;
+        if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
+          root.copyToArrayDescending(size,dst);
+        }
+        return dst;
+      }
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
         private SerializationIntermediate(ByteSetImpl.Checked root){
@@ -2200,6 +5098,95 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return true;
       }
       return false;
+    }
+    abstract void copyToArray(int size,byte[] dst);
+    @Override public byte[] toByteArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final byte[] dst
+        copyToArray(size,dst=new byte[size]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    abstract void copyToArray(int size,short[] dst);
+    @Override public short[] toShortArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final short[] dst
+        copyToArray(size,dst=new short[size]);
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    abstract void copyToArray(int size,int[] dst);
+    @Override public int[] toIntArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final int[] dst
+        copyToArray(size,dst=new int[size]);
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    abstract void copyToArray(int size,long[] dst);
+    @Override public long[] toLongArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final long[] dst
+        copyToArray(size,dst=new long[size]);
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    abstract void copyToArray(int size,float[] dst);
+    @Override public float[] toFloatArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final float[] dst
+        copyToArray(size,dst=new float[size]);
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    abstract void copyToArray(int size,double[] dst);
+    @Override public double[] toDoubleArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final double[] dst
+        copyToArray(size,dst=new double[size]);
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    abstract void copyToArray(int size,Byte[] dst);
+    @Override public Byte[] toArray(){
+      final int size;
+      if((size=this.size)!=0){
+        final Byte[] dst
+        copyToArray(size,dst=new Byte[size]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    abstract void copyToArray(int size,Object[] dst);
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      final T[] dst;
+      final int size;
+      dst=arrConstructor.apply(size=this.size);
+      if(size!=0){
+        copyToArray(size,dst);
+      }
+      return dst;
+    }
+    @Override public <T> T[] toArray(T[] dst){
+      final int size;
+      if((size=this.size)!=0){
+        copyToArray(size,dst=OmniArray.uncheckedArrResize(size,dst);
+      }else if(dst.length!=0){
+        dst[0]=null;
+      }
+      return dst;
     }
     abstract boolean isInBounds(byte val);
     abstract boolean isInBounds(char val);
@@ -2358,6 +5345,38 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(TailSet parent,int size,int inclusiveLo){
           super(parent,size,inclusiveLo);
         }
+        @Override void copyToArray(int size,byte[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,short[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,int[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,long[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,float[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,double[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,Byte[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,Object[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2421,6 +5440,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(TailSet parent,int size,int inclusiveLo){
           super(parent,size,inclusiveLo);
+        }
+        @Override void copyToArray(int size,byte[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(int size,short[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(int size,int[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(int size,long[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(int size,float[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(int size,double[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(int size,Byte[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(int size,Object[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
         }
         @Override public String toString(){
           int size;
@@ -2590,6 +5649,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(HeadSet parent,int size,int inclusiveHi){
           super(parent,size,inclusiveHi);
         }
+        @Override void copyToArray(int size,byte[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(int size,short[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(int size,int[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(int size,long[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(int size,float[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(int size,double[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(int size,Byte[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(int size,Object[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2653,6 +5752,38 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(HeadSet parent,int size,int inclusiveHi){
           super(parent,size,inclusiveHi);
+        }
+        @Override void copyToArray(int size,byte[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,short[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,int[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,long[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,float[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,double[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,Byte[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(int size,Object[] dst){
+          root.copyToArrayDescending(
+          size,dst);
         }
         @Override public String toString(){
           int size;
@@ -2829,6 +5960,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(UncheckedSubSet parent,int size,int boundInfo){
           super(parent,size,boundInfo);
         }
+        @Override void copyToArray(int size,byte[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(int size,short[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(int size,int[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(int size,long[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(int size,float[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(int size,double[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(int size,Byte[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(int size,Object[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
         @Override public String toString(){
           int size;
           if((size=this.size)!=0){
@@ -2889,6 +6060,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(UncheckedSubSet parent,int size,int boundInfo){
           super(parent,size,boundInfo);
+        }
+        @Override void copyToArray(int size,byte[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(int size,short[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(int size,int[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(int size,long[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(int size,float[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(int size,double[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(int size,Byte[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(int size,Object[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
         }
         @Override public String toString(){
           int size;
@@ -2967,6 +6178,117 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       do{
         curr.modCountAndSize+=((1<<9)+1);
       }while((curr=curr.parent)!=null);
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst);
+    @Override public byte[] toByteArray(){
+      final ByteSetImpl.Checked root;
+      int size;
+      CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((size&=0x1ff)!=0){
+        final byte[] dst
+        copyToArray(root,size,dst=new byte[size]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,short[] dst);
+    @Override public short[] toShortArray(){
+      final ByteSetImpl.Checked root;
+      int size;
+      CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((size&=0x1ff)!=0){
+        final short[] dst
+        copyToArray(root,size,dst=new short[size]);
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,int[] dst);
+    @Override public int[] toIntArray(){
+      final ByteSetImpl.Checked root;
+      int size;
+      CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((size&=0x1ff)!=0){
+        final int[] dst
+        copyToArray(root,size,dst=new int[size]);
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,long[] dst);
+    @Override public long[] toLongArray(){
+      final ByteSetImpl.Checked root;
+      int size;
+      CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((size&=0x1ff)!=0){
+        final long[] dst
+        copyToArray(root,size,dst=new long[size]);
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,float[] dst);
+    @Override public float[] toFloatArray(){
+      final ByteSetImpl.Checked root;
+      int size;
+      CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((size&=0x1ff)!=0){
+        final float[] dst
+        copyToArray(root,size,dst=new float[size]);
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,double[] dst);
+    @Override public double[] toDoubleArray(){
+      final ByteSetImpl.Checked root;
+      int size;
+      CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((size&=0x1ff)!=0){
+        final double[] dst
+        copyToArray(root,size,dst=new double[size]);
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst);
+    @Override public Byte[] toArray(){
+      final ByteSetImpl.Checked root;
+      int size;
+      CheckedCollection.checkModCountAndSize((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((size&=0x1ff)!=0){
+        final Byte[] dst
+        copyToArray(root,size,dst=new Byte[size]);
+        return dst;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    abstract void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst);
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      final T[] dst;
+      final int size;
+      final int modCountAndSize=this.modCountAndSize;
+      final ByteSetImpl.Checked root;
+      try{
+        dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
+      }finally{
+        CheckedCollection.checkModCount(modCountAndSize>>9,(root=this.root).modCountAndSize>>9);
+      }
+      if(size!=0){
+        copyToArray(root,size,dst);
+      }
+      return dst;
+    }
+    @Override public <T> T[] toArray(T[] dst){
+      int size;
+      final ByteSetImpl.Checked root;
+      CheckedCollection.checkModCount((size=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9)
+      if((size&=0x1ff)!=0){
+        copyToArray(root,size,dst=OmniArray.uncheckedArrResize(size,dst);
+      }else if(dst.length!=0){
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override public boolean contains(boolean val){
       final ByteSetImpl.Checked root;
@@ -3253,6 +6575,38 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(TailSet parent,int modCountAndSize,int inclusiveLo){
           super(parent,modCountAndSize,inclusiveLo);
         }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
+          root.copyToArrayAscending(
+          size,dst);
+        }
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -3352,6 +6706,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(TailSet parent,int modCountAndSize,int inclusiveLo){
           super(parent,modCountAndSize,inclusiveLo);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
+          root.copyToArrayDescending(
+          this.inclusiveLo,
+          size,dst);
         }
         @Override public String toString(){
           int modCountAndSize;
@@ -3595,6 +6989,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(HeadSet parent,int modCountAndSize,int inclusiveHi){
           super(parent,modCountAndSize,inclusiveHi);
         }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
+          root.copyToArrayAscending(
+          this.inclusiveHi,
+          size,dst);
+        }
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -3694,6 +7128,38 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(HeadSet parent,int modCountAndSize,int inclusiveHi){
           super(parent,modCountAndSize,inclusiveHi);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
+          root.copyToArrayDescending(
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
+          root.copyToArrayDescending(
+          size,dst);
         }
         @Override public String toString(){
           int modCountAndSize;
@@ -4002,6 +7468,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Ascending(CheckedSubSet parent,int modCountAndSize,int boundInfo){
           super(parent,modCountAndSize,boundInfo);
         }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
+          root.copyToArrayAscending(
+          (byte)(this.boundInfo&0xff),
+          size,dst);
+        }
         @Override public String toString(){
           int modCountAndSize;
           final ByteSetImpl.Checked root;
@@ -4078,6 +7584,46 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         private Descending(CheckedSubSet parent,int modCountAndSize,int boundInfo){
           super(parent,modCountAndSize,boundInfo);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
+        }
+        @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
+          root.copyToArrayDescending(
+          this.boundInfo>>8,
+          size,dst);
         }
         @Override public String toString(){
           int modCountAndSize;
