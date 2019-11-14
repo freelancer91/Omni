@@ -181,27 +181,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     return (v=(int)val)==val && contains(v);
   }
   //TODO equals
-#MACRODEF WordToString<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND)
-#IFSWITCH LASTWORD==True
-for(WORDDEF;;INCREMENToffset){
-#ELSE
-for(WORDDEF;;){
-#ENDIF
-  if(wordContains(WORDREF,1L<<offset)){
-    bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
-    if(--size==0){
-      break done;
-    }
-    buffer[bufferOffset]=',';
-    buffer[++bufferOffset]=' ';
-  }
-#IFNOTSWITCH LASTWORD==True
-  if(INCREMENToffset==BOUND){
-    break;
-  }
-#ENDIF
-}
-#ENDDEF
+  
+  #MACRO ToArrayCopy<byte>(Byte,OmniArray.OfByte.DEFAULT_ARR,(byte),int)
+  #MACRO ToArrayCopy<short>(Short,OmniArray.OfShort.DEFAULT_ARR,(short),int)
+  #MACRO ToArrayCopy<int>(Int,OmniArray.OfInt.DEFAULT_ARR,,int)
+  #MACRO ToArrayCopy<long>(Long,OmniArray.OfLong.DEFAULT_ARR,,long)
+  #MACRO ToArrayCopy<float>(Float,OmniArray.OfFloat.DEFAULT_ARR,,int)
+  #MACRO ToArrayCopy<double>(Double,OmniArray.OfDouble.DEFAULT_ARR,,int)
+  #MACRO ToArrayCopy<Object>(UNUSED,UNUSED,(Byte)(byte),int)
+  #MACRO ToArrayCopy<Byte>(,OmniArray.OfByte.DEFAULT_BOXED_ARR,(Byte)(byte),int)
+  
+
   int toStringAscending(int size,byte[] buffer){
     int bufferOffset=0;
     done:for(int offset=Byte.MIN_VALUE;;){
@@ -286,25 +276,7 @@ for(WORDDEF;;){
     }
     return "[]";
   }
-#MACRODEF WordForEach<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND)
-#IFSWITCH LASTWORD==True
-for(WORDDEF;;INCREMENToffset){
-#ELSE
-for(WORDDEF;;){
-#ENDIF
-  if(wordContains(WORDREF,1L<<offset)){
-    action.accept((byte)offset);
-    if(--size==0){
-      break done;
-    }
-  }
-#IFNOTSWITCH LASTWORD==True
-  if(INCREMENToffset==BOUND){
-    break;
-  }
-#ENDIF
-}
-#ENDDEF
+
   void forEachAscending(int size,ByteConsumer action){
     done:for(int offset=Byte.MIN_VALUE;;){
       #MACRO WordForEach<False>(final var word=word0,word,++,-64)
@@ -345,25 +317,7 @@ for(WORDDEF;;){
       #MACRO WordForEach<True>(final var word=word0,word,--,-129)
     }
   }
-#MACRODEF WordHashCode<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND)
-#IFSWITCH LASTWORD==True
-for(WORDDEF;;INCREMENToffset){
-#ELSE
-for(WORDDEF;;){
-#ENDIF
-  if(wordContains(WORDREF,1L<<offset)){
-    hash+=offset;
-    if(--size==0){
-      break done;
-    }
-  }
-#IFNOTSWITCH LASTWORD==True
-  if(INCREMENToffset==BOUND){
-    break;
-  }
-#ENDIF
-}
-#ENDDEF
+
   int countElementsAscending(int inclHiBound){
     switch(inclHiBound>>6){
       case -2:
@@ -807,7 +761,13 @@ for(WORDDEF;;){
       @Override public int lastInt(){
         return super.getThisOrLower();
       }
-      
+      #MACRO UncheckedFullToArray<byte,super>(Byte,Ascending)
+      #MACRO UncheckedFullToArray<short,super>(Short,Ascending)
+      #MACRO UncheckedFullToArray<int,super>(Int,Ascending)
+      #MACRO UncheckedFullToArray<long,super>(Long,Ascending)
+      #MACRO UncheckedFullToArray<float,super>(Float,Ascending)
+      #MACRO UncheckedFullToArray<double,super>(Double,Ascending)
+      #MACRO UncheckedFullToArray<Byte,super>(,Ascending)
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
         return super.headSetAscending((int)toElement);
       }
@@ -895,6 +855,13 @@ for(WORDDEF;;){
       @Override public int lastInt(){
         return super.getThisOrHigher();
       }
+      #MACRO UncheckedFullToArray<byte,super>(Byte,Descending)
+      #MACRO UncheckedFullToArray<short,super>(Short,Descending)
+      #MACRO UncheckedFullToArray<int,super>(Int,Descending)
+      #MACRO UncheckedFullToArray<long,super>(Long,Descending)
+      #MACRO UncheckedFullToArray<float,super>(Float,Descending)
+      #MACRO UncheckedFullToArray<double,super>(Double,Descending)
+      #MACRO UncheckedFullToArray<Byte,super>(,Descending)
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         int inclusiveTo=toElement;
         if(!inclusive){
@@ -1422,6 +1389,13 @@ for(WORDDEF;;){
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Ascending(this.root);
       }
+      #MACRO UncheckedFullToArray<byte,root>(Byte,Ascending)
+      #MACRO UncheckedFullToArray<short,root>(Short,Ascending)
+      #MACRO UncheckedFullToArray<int,root>(Int,Ascending)
+      #MACRO UncheckedFullToArray<long,root>(Long,Ascending)
+      #MACRO UncheckedFullToArray<float,root>(Float,Ascending)
+      #MACRO UncheckedFullToArray<double,root>(Double,Ascending)
+      #MACRO UncheckedFullToArray<Byte,root>(,Ascending)
     }
     private static class Descending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
@@ -1485,6 +1459,13 @@ for(WORDDEF;;){
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Descending(this.root);
       }
+      #MACRO UncheckedFullToArray<byte,root>(Byte,Descending)
+      #MACRO UncheckedFullToArray<short,root>(Short,Descending)
+      #MACRO UncheckedFullToArray<int,root>(Int,Descending)
+      #MACRO UncheckedFullToArray<long,root>(Long,Descending)
+      #MACRO UncheckedFullToArray<float,root>(Float,Descending)
+      #MACRO UncheckedFullToArray<double,root>(Double,Descending)
+      #MACRO UncheckedFullToArray<Byte,root>(,Descending)
     }
   }
   private static abstract class CheckedFullView extends AbstractByteSet.ComparatorlessImpl{
@@ -6125,302 +6106,236 @@ for(WORDDEF;;){
   */
   
 }
-
-#MACRODEF UncheckedDescendingToArrayCopy(OFFSETTYPE,CAST)
-done:for(OFFSETTYPE offset=Byte.MIN_VALUE;;){
-  do{
-    if((word0&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }while(++offset!=-64);
-  do{
-    if((word1&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }while(++offset!=0);
-  do{
-    if((word2&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }while(++offset!=64);
-  for(;;++offset){
-    if((word3&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }
-}
-#ENDDEF      
-#MACRODEF UncheckedAscendingToArrayCopy(OFFSETTYPE,CAST)
-done:for(OFFSETTYPE offset=Byte.MAX_VALUE;;){
-  do{
-    if((word3&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }while(--offset!=63);
-  do{
-    if((word2&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }while(--offset!=-1);
-  do{
-    if((word1&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }while(--offset!=-65);
-  for(;;--offset){
-    if((word0&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        break done;
-      }
-    }
-  }
-}
+#MACRODEF CheckedFullToArray<ARRTYPE,SOURCE>(CLASSPREFIX,DIRECTION)
+#MACRO NYI()
 #ENDDEF
-#MACRODEF UncheckedToArray<RETTYPE>(DIRECTION,REVERSE,CLASSPREFIX,DEFAULTARR,CAST,OFFSETTYPE)
-#IFSWITCH RETTYPE==Byte
-@SuppressWarnings("unchecked")
-@Override public <T> T[] toArray(T[] dst){
-  int size;
-  final long word0,word1,word2,word3;
-  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
-    dst=OmniArray.uncheckedArrResize(size,dst);
-    #MACRO UncheckedDIRECTIONToArrayCopy(OFFSETTYPE,(T)CAST)
-  }else if(dst.length!=0){
-    dst[0]=null;
-  }
-  return dst;
-}
-@SuppressWarnings("unchecked")
-@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-  int size;
-  final long word0,word1,word2,word3;
-  final T[] dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
-  if(size!=0){
-    #MACRO UncheckedDIRECTIONToArrayCopy(OFFSETTYPE,(T)CAST)
-  }
-  return dst;
-}
-@SuppressWarnings("unchecked")
-@Override <T> T[] toReverseArray(T[] dst){
-  int size;
-  final long word0,word1,word2,word3;
-  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
-    dst=OmniArray.uncheckedArrResize(size,dst);
-    #MACRO UncheckedREVERSEToArrayCopy(OFFSETTYPE,(T)CAST)
-  }else if(dst.length!=0){
-    dst[0]=null;
-  }
-  return dst;
-}
-@SuppressWarnings("unchecked")
-@Override <T> T[] toReverseArray(IntFunction<T[]> arrConstructor){
-  int size;
-  final long word0,word1,word2,word3;
-  final T[] dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
-  if(size!=0){
-    #MACRO UncheckedREVERSEToArrayCopy(OFFSETTYPE,(T)CAST)
-  }
-  return dst;
-}
-
-
-#ENDIF
-@Override public RETTYPE[] toCLASSPREFIXArray(){
-  int size;
-  long word0,word1,word2,word3;
-  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
-    final RETTYPE[] dst=new RETTYPE[size];
-    #MACRO UncheckedDIRECTIONToArrayCopy(OFFSETTYPE,CAST)
-    return dst;
-  }
-  return DEFAULTARR;
-}
-@Override RETTYPE[] toReverseCLASSPREFIXArray(){
-  int size;
-  long word0,word1,word2,word3;
-  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
-    final RETTYPE[] dst=new RETTYPE[size];
-    #MACRO UncheckedREVERSEToArrayCopy(OFFSETTYPE,CAST)
-    return dst;
-  }
-  return DEFAULTARR;
-}
-#ENDDEF
-
-
-#MACRODEF CheckedToArray<ARRTYPE>(CLASSPREFIX,CAST,OFFSETTYPE,DEFAULTARR)
-#IFSWITCH ARRTYPE==Object
-@Override public <T> T[] toArray(T[] dst){
-  final int size;
-  if((size=this.modCountAndSize&0x1ff)!=0){
-    uncheckedToArray(size,dst=OmniArray.uncheckedArrResize(size,dst));
-  }else if(dst.length!=0){
-    dst[0]=null;
-  }
-  return dst;
-}
-@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-  final int modCountAndSize=this.modCountAndSize;
-  final int size;
-  final T[] dst;
-  try{
-    dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
-  }finally{
-    CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
-  }
-  if(size!=0){
-    uncheckedToArray(size,dst);
-  }
-  return dst;
-}
-@Override public <T> T[] toReverseArray(T[] dst){
-  final int size;
-  if((size=this.modCountAndSize&0x1ff)!=0){
-    uncheckedReverseToArray(size,dst=OmniArray.uncheckedArrResize(size,dst));
-  }else if(dst.length!=0){
-    dst[0]=null;
-  }
-  return dst;
-}
-@Override public <T> T[] toReverseArray(IntFunction<T[]> arrConstructor){
-  final int modCountAndSize=this.modCountAndSize;
-  final int size;
-  final T[] dst;
-  try{
-    dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
-  }finally{
-    CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
-  }
-  if(size!=0){
-    uncheckedReverseToArray(size,dst);
-  }
-  return dst;
-}
-#ELSE
+#MACRODEF UncheckedFullToArray<ARRTYPE,SOURCE>(CLASSPREFIX,DIRECTION)
 @Override public ARRTYPE[] toCLASSPREFIXArray(){
-  final int size;
-  if((size=this.modCountAndSize&0x1ff)!=0){
-    final ARRTYPE[] dst;
-    uncheckedToArray(size,dst=new ARRTYPE[size]);
+  return SOURCE.toCLASSPREFIXArrayDIRECTION();
+}
+#IFSWITCH ARRTYPE==Byte
+@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+  return SOURCE.toArrayDIRECTION(arrConstructor);
+}
+@Override public <T> T[] toArray(T[] dst){
+  return SOURCE.toArrayDIRECTION(dst);
+}
+#ENDIF
+#ENDDEF
+#MACRODEF WordForEach<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND)
+#IFSWITCH LASTWORD==True
+for(WORDDEF;;INCREMENToffset){
+#ELSE
+for(WORDDEF;;){
+#ENDIF
+  if(wordContains(WORDREF,1L<<offset)){
+    action.accept((byte)offset);
+    if(--size==0){
+      break done;
+    }
+  }
+#IFNOTSWITCH LASTWORD==True
+  if(INCREMENToffset==BOUND){
+    break;
+  }
+#ENDIF
+}
+#ENDDEF
+#MACRODEF WordHashCode<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND)
+#IFSWITCH LASTWORD==True
+for(WORDDEF;;INCREMENToffset){
+#ELSE
+for(WORDDEF;;){
+#ENDIF
+  if(wordContains(WORDREF,1L<<offset)){
+    hash+=offset;
+    if(--size==0){
+      break done;
+    }
+  }
+#IFNOTSWITCH LASTWORD==True
+  if(INCREMENToffset==BOUND){
+    break;
+  }
+#ENDIF
+}
+#ENDDEF
+#MACRODEF WordToArray<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND,CAST)
+#IFSWITCH LASTWORD==True
+for(WORDDEF;;INCREMENToffset){
+#ELSE
+for(WORDDEF;;){
+#ENDIF
+  if(wordContains(WORDREF,1L<<offset)){
+    dst[--size]=CAST(offset);
+    if(size==0){
+      break done;
+    }
+  }
+#IFNOTSWITCH LASTWORD==True
+  if(INCREMENToffset==BOUND){
+    break;
+  }
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ToArrayCopy<ARRTYPE>(CLASSPREFIX,DEFAULTARR,CAST,OFFSETTYPE)
+void copyToArrayAscending(int size,ARRTYPE[] dst){
+  done:for(OFFSETTYPE offset=Byte.MAX_VALUE;;){
+    #MACRO WordToArray<False>(final var word=word3,word,--,63,CAST)
+    #MACRO WordToArray<False>(final var word=word2,word,--,-1,CAST)
+    #MACRO WordToArray<False>(final var word=word1,word,--,-65,CAST)
+    #MACRO WordToArray<True>(final var word=word0,word,--,-129,CAST)
+  }
+}
+void copyToArrayAscending(int offset,int size,ARRTYPE[] dst){
+  done:switch(offset>>6){
+    case 1:
+      #MACRO WordToArray<False>(final var word=word3,word,--,63,CAST)
+    case 0:
+      #MACRO WordToArray<False>(final var word=word2,word,--,-1,CAST)
+    case -1:
+      #MACRO WordToArray<False>(final var word=word1,word,--,-65,CAST)
+    default:
+      #MACRO WordToArray<True>(final var word=word0,word,--,-129,CAST)
+  }
+}
+void copyToArrayDescending(int size,ARRTYPE[] dst){
+  done:for(OFFSETTYPE offset=Byte.MIN_VALUE;;){
+    #MACRO WordToArray<False>(final var word=word0,word,++,-64,CAST)
+    #MACRO WordToArray<False>(final var word=word1,word,++,0,CAST)
+    #MACRO WordToArray<False>(final var word=word2,word,++,64,CAST)
+    #MACRO WordToArray<True>(final var word=word3,word,++,128,CAST)
+  }
+}
+void copyToArrayDescending(int offset,int size,ARRTYPE[] dst){
+  done:switch(offset>>6){
+    case -2:
+      #MACRO WordToArray<False>(final var word=word0,word,++,-64,CAST)
+    case -1:
+      #MACRO WordToArray<False>(final var word=word1,word,++,0,CAST)
+    case 0:
+      #MACRO WordToArray<False>(final var word=word2,word,++,64,CAST)
+    default:
+      #MACRO WordToArray<True>(final var word=word3,word,++,128,CAST)
+  }
+}
+#IFNOTSWITCH ARRTYPE==Object
+ARRTYPE[] toCLASSPREFIXArrayAscending(){
+  int size;
+  final long word0,word1,word2,word3;
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    final var dst=new ARRTYPE[size];
+    done:for(OFFSETTYPE offset=Byte.MAX_VALUE;;){
+      #MACRO WordToArray<False>(,word3,--,63,CAST)
+      #MACRO WordToArray<False>(,word2,--,-1,CAST)
+      #MACRO WordToArray<False>(,word1,--,-65,CAST)
+      #MACRO WordToArray<True>(,word0,--,-129,CAST)
+    }
     return dst;
   }
   return DEFAULTARR;
 }
-@Override ARRTYPE[] toReverseCLASSPREFIXArray(){
-  final int size;
-  if((size=this.modCountAndSize&0x1ff)!=0){
-    final ARRTYPE[] dst;
-    uncheckedReverseToArray(size,dst=new ARRTYPE[size]);
+ARRTYPE[] toCLASSPREFIXArrayDescending(){
+  int size;
+  final long word0,word1,word2,word3;
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    final var dst=new ARRTYPE[size];
+    done:for(OFFSETTYPE offset=Byte.MIN_VALUE;;){
+      #MACRO WordToArray<False>(,word0,++,-64,CAST)
+      #MACRO WordToArray<False>(,word1,++,0,CAST)
+      #MACRO WordToArray<False>(,word2,++,64,CAST)
+      #MACRO WordToArray<True>(,word3,++,128,CAST)
+    }
     return dst;
   }
   return DEFAULTARR;
 }
 #ENDIF
-void uncheckedReverseToArray(int size,ARRTYPE[] dst){
-  OFFSETTYPE offset=Byte.MIN_VALUE;
-  long word=this.word0;
-  do{
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
-    }
-  }while(++offset!=-64);
-  word=this.word1;
-  do{
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
-    }
-  }while(++offset!=0);
-  word=this.word2;
-  do{
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
-    }
-  }while(++offset!=64);
-  for(word=this.word3;;++offset){
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
+#IFSWITCH ARRTYPE==Byte
+<T> T[] toArrayAscending(IntFunction<T[]> arrConstructor){
+  int size;
+  final long word0,word1,word2,word3;
+  final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
+  if(size!=0){
+    done:for(OFFSETTYPE offset=Byte.MAX_VALUE;;){
+      #MACRO WordToArray<False>(,word3,--,63,(T)CAST)
+      #MACRO WordToArray<False>(,word2,--,-1,(T)CAST)
+      #MACRO WordToArray<False>(,word1,--,-65,(T)CAST)
+      #MACRO WordToArray<True>(,word0,--,-129,(T)CAST)
     }
   }
+  return dst;
 }
-void uncheckedToArray(int size,ARRTYPE[] dst){
-  OFFSETTYPE offset=Byte.MAX_VALUE;
-  long word=this.word3;
-  do{
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
-    }
-  }while(--offset!=63);
-  word=this.word2;
-  do{
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
-    }
-  }while(--offset!=-1);
-  word=this.word1;
-  do{
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
-    }
-  }while(--offset!=-65);
-  for(word=this.word0;;--offset){
-    if((word&(1L<<offset))!=0){
-      dst[--size]=CAST(offset);
-      if(size==0){
-        return;
-      }
+<T> T[] toArrayDescending(IntFunction<T[]> arrConstructor){
+  int size;
+  final long word0,word1,word2,word3;
+  final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
+  if(size!=0){
+    done:for(OFFSETTYPE offset=Byte.MIN_VALUE;;){
+      #MACRO WordToArray<False>(,word0,++,-64,(T)CAST)
+      #MACRO WordToArray<False>(,word1,++,0,(T)CAST)
+      #MACRO WordToArray<False>(,word2,++,64,(T)CAST)
+      #MACRO WordToArray<True>(,word3,++,128,(T)CAST)
     }
   }
+  return dst;
+}
+<T> T[] toArrayAscending(T[] dst){
+  int size;
+  final long word0,word1,word2,word3;
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    dst=OmniArray.uncheckedArrResize(size,dst);
+    done:for(OFFSETTYPE offset=Byte.MAX_VALUE;;){
+      #MACRO WordToArray<False>(,word3,--,63,(T)CAST)
+      #MACRO WordToArray<False>(,word2,--,-1,(T)CAST)
+      #MACRO WordToArray<False>(,word1,--,-65,(T)CAST)
+      #MACRO WordToArray<True>(,word0,--,-129,(T)CAST)
+    }
+  }else if(dst.length!=0{
+    dst[0]=null;
+  }
+  return dst;
+}
+<T> T[] toArrayDescending(T[] dst){
+  int size;
+  final long word0,word1,word2,word3;
+  if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    dst=OmniArray.uncheckedArrResize(size,dst);
+    done:for(OFFSETTYPE offset=Byte.MIN_VALUE;;){
+      #MACRO WordToArray<False>(,word0,++,-64,(T)CAST)
+      #MACRO WordToArray<False>(,word1,++,0,(T)CAST)
+      #MACRO WordToArray<False>(,word2,++,64,(T)CAST)
+      #MACRO WordToArray<True>(,word3,++,128,(T)CAST)
+    }
+  }else if(dst.length!=0{
+    dst[0]=null;
+  }
+  return dst;
+}
+#ENDIF
+#ENDDEF
+#MACRODEF WordToString<LASTWORD>(WORDDEF,WORDREF,INCREMENT,BOUND)
+#IFSWITCH LASTWORD==True
+for(WORDDEF;;INCREMENToffset){
+#ELSE
+for(WORDDEF;;){
+#ENDIF
+  if(wordContains(WORDREF,1L<<offset)){
+    bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
+    if(--size==0){
+      break done;
+    }
+    buffer[bufferOffset]=',';
+    buffer[++bufferOffset]=' ';
+  }
+#IFNOTSWITCH LASTWORD==True
+  if(INCREMENToffset==BOUND){
+    break;
+  }
+#ENDIF
 }
 #ENDDEF
-
-
-
-
-
-
 
 
 
