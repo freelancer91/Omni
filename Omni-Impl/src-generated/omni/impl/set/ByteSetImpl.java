@@ -106,110 +106,94 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   private static boolean wordContains(long word,long mask){
     return (word&mask)!=0;
   }
-  boolean uncheckedContains(boolean val){
-    return wordContains(this.word2,val?2L:1L);
+  private static boolean contains(ByteSetImpl set,boolean val){
+    return wordContains(set.word2,val?2L:1L);
   }
-  boolean uncheckedContains(byte val){
-    final long word;
-    switch(val>>6){
-      case -2:
-        word=word0;
-        break;
-      case -1:
-        word=word1;
-        break;
-      case 0:
-        word=word2;
-        break;
-      default:
-        word=word3;
-    }
-    return wordContains(word,1L<<val);
-  }
-  boolean uncheckedContains(char val){
-    final long word;
-    switch(val>>6){
-      default:
-        return false;
-      case 0:
-        word=word2;
-        break;
-      case 1:
-        word=word3;
-    }
-    return wordContains(word,1L<<val);
-  }
-  boolean uncheckedContains(int val){
+  private static boolean contains(ByteSetImpl set,int val){
     final long word;
     switch(val>>6){
       default:
         return false;
       case -2:
-        word=word0;
+        word=set.word0;
         break;
       case -1:
-        word=word1;
+        word=set.word1;
         break;
       case 0:
-        word=word2;
+        word=set.word2;
         break;
       case 1:
-        word=word3;
+        word=set.word3;
     }
     return wordContains(word,1L<<val);
   }
-  boolean uncheckedRemoveVal(boolean val){
+  private static boolean contains(ByteSetImpl set,long val){
+    final int v;
+    return (v=(int)val)==val && contains(set,v);
+  }
+  private static boolean contains(ByteSetImpl set,float val){
+    final int v;
+    return (v=(int)val)==val && contains(set,v);
+  }
+  private static boolean contains(ByteSetImpl set,double val){
+    final int v;
+    return (v=(int)val)==val && contains(set,v);
+  }
+  private static boolean contains(ByteSetImpl set,Object val){
+    final int v;
+    if(val instanceof Byte){
+      v=(byte)val;
+    }else if(val instanceof Integer || val instanceof Short){
+      v=((Number)val).intValue();
+    }else if(val instanceof Long){
+      return contains(set,(long)val);
+    }else if(val instanceof Float){
+      return contains(set,(float)val);
+    }else if(val instanceof Double){
+      return contains(set,(double)val);
+    }else if(val instanceof Character){
+      v=(char)val;
+    }else if(val instanceof Boolean){
+      return contains(set,(boolean)val);
+    }else{
+      return false;
+    }
+    return contains(set,v);
+  }
+  private static boolean removeVal(ByteSetImpl set,boolean val){
     long word;
-    if((word=this.word2)!=(word&=(val?~2L:~1L))){
-      this.word2=word;
+    if((word=set.word2)!=(word&=(val?~2L:~1L))){
+      set.word2=word;
       return true;
     }
     return false;
   }
-  boolean uncheckedRemoveVal(byte val){
+  private static boolean removeVal(ByteSetImpl set,int val){
     returnTrue:for(;;){
       switch(val>>6){
         case -2:
           long word;
-          if((word=this.word0)!=(word&=(~(1L<<val)))){
-            this.word0=word;
+          if((word=set.word0)!=(word&=~(1L<<val))){
+            set.word0=word;
             break returnTrue;
           }
           break;
         case -1:
-          if((word=this.word1)!=(word&=(~(1L<<val)))){
-            this.word1=word;
+          if((word=set.word1)!=(word&=~(1L<<val))){
+            set.word1=word;
             break returnTrue;
           }
           break;
         case 0:
-          if((word=this.word2)!=(word&=(~(1L<<val)))){
-            this.word2=word;
-            break returnTrue;
-          }
-          break;
-        default:
-          if((word=this.word3)!=(word&=(~(1L<<val)))){
-            this.word3=word;
-            break returnTrue;
-          }
-      }
-      return false;
-    }
-    return true;
-  }
-  boolean uncheckedRemoveVal(char val){
-    returnTrue:for(;;){
-      switch(val>>6){
-        case 0:
-          if((word=this.word2)!=(word&=(~(1L<<val)))){
-            this.word2=word;
+          if((word=set.word2)!=(word&=~(1L<<val))){
+            set.word2=word;
             break returnTrue;
           }
           break;
         case 1:
-          if((word=this.word3)!=(word&=(~(1L<<val)))){
-            this.word3=word;
+          if((word=set.word3)!=(word&=~(1L<<val))){
+            set.word3=word;
             break returnTrue;
           }
         default:
@@ -218,38 +202,86 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return true;
   }
-  boolean uncheckedRemoveVal(int val){
-    returnTrue:for(;;){
-      switch(val>>6){
-        case -2:
-          long word;
-          if((word=this.word0)!=(word&=(~(1L<<val)))){
-            this.word0=word;
-            break returnTrue;
-          }
-          break;
-        case -1:
-          if((word=this.word1)!=(word&=(~(1L<<val)))){
-            this.word1=word;
-            break returnTrue;
-          }
-          break;
-        case 0:
-          if((word=this.word2)!=(word&=(~(1L<<val)))){
-            this.word2=word;
-            break returnTrue;
-          }
-          break;
-        case 1:
-          if((word=this.word3)!=(word&=(~(1L<<val)))){
-            this.word3=word;
-            break returnTrue;
-          }
-        default:
-      }
+  private static boolean removeVal(ByteSetImpl set,long val){
+    final int v;
+    return (v=(int)val)==val && removeVal(set,v);
+  }
+  private static boolean removeVal(ByteSetImpl set,float val){
+    final int v;
+    return (v=(int)val)==val && removeVal(set,v);
+  }
+  private static boolean removeVal(ByteSetImpl set,double val){
+    final int v;
+    return (v=(int)val)==val && removeVal(set,v);
+  }
+  private static boolean removeVal(ByteSetImpl set,Object val){
+    final int v;
+    if(val instanceof Byte){
+      v=(byte)val;
+    }else if(val instanceof Integer || val instanceof Short){
+      v=((Number)val).intValue();
+    }else if(val instanceof Long){
+      return removeVal(set,(long)val);
+    }else if(val instanceof Float){
+      return removeVal(set,(float)val);
+    }else if(val instanceof Double){
+      return removeVal(set,(double)val);
+    }else if(val instanceof Character){
+      v=(char)val;
+    }else if(val instanceof Boolean){
+      return removeVal(set,(boolean)val);
+    }else{
       return false;
     }
-    return true;
+    return removeVal(set,v);
+  }
+  @Override public boolean contains(boolean val){
+    return contains(this,val);
+  }
+  @Override public boolean contains(byte val){
+    return contains(this,val);
+  }
+  @Override public boolean contains(char val){
+    return contains(this,val);
+  }
+  @Override public boolean contains(int val){
+    return contains(this,val);
+  }
+  @Override public boolean contains(long val){
+    return contains(this,val);
+  }
+  @Override public boolean contains(float val){
+    return contains(this,val);
+  }
+  @Override public boolean contains(double val){
+    return contains(this,val);
+  }
+  @Override public boolean contains(Object val){
+    return contains(this,val);
+  }
+  @Override public boolean removeVal(boolean val){
+    return removeVal(this,val);
+  }
+  @Override public boolean removeVal(byte val){
+    return removeVal(this,val);
+  }
+  @Override public boolean removeVal(char val){
+    return removeVal(this,val);
+  }
+  @Override public boolean removeVal(int val){
+    return removeVal(this,val);
+  }
+  @Override public boolean removeVal(long val){
+    return removeVal(this,val);
+  }
+  @Override public boolean removeVal(float val){
+    return removeVal(this,val);
+  }
+  @Override public boolean removeVal(double val){
+    return removeVal(this,val);
+  }
+  @Override public boolean remove(Object val){
+    return removeVal(this,val);
   }
   //TODO equals
   void copyToArrayAscending(int size,byte[] dst){
@@ -4015,70 +4047,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     }
-    @Override public boolean contains(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean remove(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
     private static long wordRemoveIf(long word,int inclHi,BytePredicate filter){
       for(;;--inclHi){
         final long mask;
@@ -4446,69 +4414,77 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     private Checked(OmniCollection.ByteOutput<?> that){
       super(that);
     }
-    @Override public boolean contains(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
     @Override public boolean contains(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(this,val);
     }
     @Override public boolean contains(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(this,val);
     }
     @Override public boolean contains(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(this,val);
     }
     @Override public boolean contains(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(this,val);
     }
     @Override public boolean removeVal(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean remove(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(this,val)){
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     private class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
       ModCountChecker(int modCountAndSize){
@@ -5075,68 +5051,52 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       forEach((ByteConsumer)action::accept);
     }
     @Override public boolean contains(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean removeVal(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     @Override public boolean removeVal(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     @Override public boolean removeVal(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     @Override public boolean removeVal(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     @Override public boolean removeVal(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     @Override public boolean removeVal(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     @Override public boolean removeVal(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     @Override public boolean remove(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.removeVal(root,val);
     }
     private static class Ascending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
@@ -5326,68 +5286,100 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       return root.hashCode();
     }
     @Override public boolean contains(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      return ((root=this.root).modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      return ((root=this.root).modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      return ((root=this.root).modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      return ((root=this.root).modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,val);
     }
     @Override public boolean removeVal(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      if(ByteSetImpl.removeVal(root=this.root,val)){
+        root.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      if(ByteSetImpl.removeVal(root=this.root,val)){
+        root.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      if(ByteSetImpl.removeVal(root=this.root,val)){
+        root.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      if(ByteSetImpl.removeVal(root=this.root,val)){
+        root.modCountAndSize+=((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      final ByteSetImpl.Checked root;
+      if(((modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(root,val)){
+        root.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      final ByteSetImpl.Checked root;
+      if(((modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(root,val)){
+        root.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      final ByteSetImpl.Checked root;
+      if(((modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(root,val)){
+        root.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean remove(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int modCountAndSize;
+      final ByteSetImpl.Checked root;
+      if(((modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0 && ByteSetImpl.removeVal(root,val)){
+        root.modCountAndSize=modCountAndSize+((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeIf(BytePredicate filter){
       final int modCountAndSize;
@@ -5850,6 +5842,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       this.parent=parent;
       this.size=size;
     }
+    private void bubbleUpDecrementSize(){
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        --parent.size;
+      }
+    }
     private void bubbleUpIncrementSize(){
       var curr=this;
       do{
@@ -5983,69 +5980,81 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         forEachImpl(size,action::accept);
       }
     }
-    @Override public boolean contains(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
+    abstract boolean isInRange(int val);
+    abstract int isInRange(long val);
+    abstract int isInRange(float val);
+    abstract int isInRange(double val);
     @Override public boolean contains(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return this.size!=0 && isInRange(val) && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return this.size!=0 && isInRange(val) && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return this.size!=0 && isInRange(val) && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return this.size!=0 && ByteSetImpl.contains(root,isInRange(val));
     }
     @Override public boolean contains(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return this.size!=0 && ByteSetImpl.contains(root,isInRange(val));
     }
     @Override public boolean contains(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean removeVal(boolean val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return this.size!=0 && ByteSetImpl.contains(root,isInRange(val));
     }
     @Override public boolean removeVal(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int size;
+      if((size=this.size)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
+        this.size=size-1;
+        bubbleUpDecrementSize();
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int size;
+      if((size=this.size)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
+        this.size=size-1;
+        bubbleUpDecrementSize();
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int size;
+      if((size=this.size)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
+        this.size=size-1;
+        bubbleUpDecrementSize();
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int size;
+      if((size=this.size)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
+        this.size=size-1;
+        bubbleUpDecrementSize();
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int size;
+      if((size=this.size)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
+        this.size=size-1;
+        bubbleUpDecrementSize();
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean remove(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final int size;
+      if((size=this.size)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
+        this.size=size-1;
+        bubbleUpDecrementSize();
+        return true;
+      }
+      return false;
     }
     private static abstract class TailSet extends UncheckedSubSet{
       transient final int inclusiveLo;
@@ -6056,6 +6065,188 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private TailSet(TailSet parent,int size,int inclusiveLo){
         super(parent,size);
         this.inclusiveLo=inclusiveLo;
+      }
+      @Override boolean isInRange(int val){
+        return val>=inclusiveLo;
+      }
+      @Override int isInRange(long val){
+        final int v;
+        if((v=(int)val)==val && v>=inclusiveLo){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(float val){
+        final int v;
+        if((v=(int)val)==val && v>=inclusiveLo){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(double val){
+        final int v;
+        if((v=(int)val)==val && v>=inclusiveLo){
+          return v;
+        }
+        return 128;
+      }
+      @Override public boolean contains(boolean val){
+        if(this.size!=0){
+          for(;;){
+            final long mask;
+            if(val){
+              if(1<inclusiveLo){
+                break;
+              }
+              mask=2L;
+            }else{
+              if(0<inclusiveLo){
+                break;
+              }
+              mask=1L;
+            }
+            return wordContains(root.word2,mask);
+          }
+        }
+        return false;
+      }
+      @Override public boolean contains(Object val){
+        if(this.size!=0){
+          for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              final long mask;
+              if((boolean)val){
+                if(1<inclusiveLo){
+                  break;
+                }
+                mask=2L;
+              }else{
+                if(0<inclusiveLo){
+                  break;
+                }
+                mask=1L;
+              }
+              return wordContains(root.word2,mask);
+            }else{
+              break;
+            }
+            return v>=inclusiveLo && ByteSetImpl.contains(root,v);
+          }
+        }
+        return false;
+      }
+      @Override public boolean removeVal(boolean val){
+        final int size;
+        if((size=this.size)!=0){
+          for(;;){
+            final long mask;
+            if(val){
+              if(1<inclusiveLo){
+                break;
+              }
+              mask=~2L;
+            }else{
+              if(0<inclusiveLo){
+                break;
+              }
+              mask=~1L;
+            }
+            long word;
+            final ByteSetImpl.Unchecked root;
+            if((word=(root=this.root).word2)!=(word&=mask)){
+              root.word2=word;
+              this.size=size-1;
+              super.bubbleUpDecrementSize();
+              return true;
+            }
+            break;
+          }
+        }
+        return false;
+      }
+      @Override public boolean remove(Object val){
+        final int size;
+        if((size=this.size)!=0){
+          returnFalse:for(;;){
+            returnTrue:for(;;){
+              final int v;
+              if(val instanceof Byte){
+                v=(byte)val;
+              }else if(val instanceof Integer || val instanceof Short){
+                v=((Number)val).intValue();
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=(v=(int)l)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Float){
+                final float f;
+                if((f=(float)val)!=(v=(int)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if((d=(double)val)!=(v=(int)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                v=(char)val;
+              }else if(val instanceof Boolean){
+                final long mask;
+                if((boolean)val){
+                  if(1<inclusiveLo){
+                    break returnFalse;
+                  }
+                  mask=~2L;
+                }else{
+                  if(0<inclusiveLo){
+                    break returnFalse;
+                  }
+                  mask=~1L;
+                }
+                long word;
+                final ByteSetImpl.Unchecked root;
+                if((word=(root=this.root).word2)!=(word&=mask)){
+                  root.word2=word;
+                  break returnTrue;
+                }
+                break returnFalse;
+              }else{
+                break returnFalse;
+              }
+              if(v>=inclusiveLo && ByteSetImpl.removeVal(root,v)){
+                break returnTrue;
+              }
+              break returnFalse;
+            }
+            this.size=size-1;
+            super.bubbleUpDecrementSize();
+            return true;
+          }
+        }
+        return false;
       }
       @Override public int hashCode(){
         final int size;
@@ -6323,6 +6514,187 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(parent,size);
         this.inclusiveHi=inclusiveHi;
       }
+      @Override boolean isInRange(int val){
+        return val<=inclusiveHi;
+      }
+      @Override int isInRange(long val){
+        final int v;
+        if((v=(int)val)==val && v<=inclusiveHi){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(float val){
+        final int v;
+        if((v=(int)val)==val && v<=inclusiveHi){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(double val){
+        final int v;
+        if((v=(int)val)==val && v<=inclusiveHi){
+          return v;
+        }
+        return 128;
+      }
+      @Override public boolean contains(boolean val){
+        if(this.size!=0){
+          for(;;){
+            final long mask;
+            if(val){
+              if(1>inclusiveHi){
+                break;
+              }
+              mask=2L;
+            }else{
+              if(0>inclusiveHi){
+                break;
+              }
+              mask=1L;
+            }
+            return wordContains(root.word2,mask);
+          }
+        }
+        return false;
+      }
+      @Override public boolean contains(Object val){
+        if(this.size!=0){
+          for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              final long mask;
+              if((boolean)val){
+                if(1>inclusiveHi){
+                  break;
+                }
+                mask=2L;
+              }else{
+                if(0>inclusiveHi){
+                  break;
+                }
+                mask=1L;
+              }
+              return wordContains(root.word2,mask);
+            }else{
+              break;
+            }
+            return v<=inclusiveHi && ByteSetImpl.contains(root,v);
+          }
+        }
+        return false;
+      }
+      @Override public boolean removeVal(boolean val){
+        final int size;
+        if((size=this.size)!=0){
+          for(;;){
+            final long mask;
+            if(val){
+              if(1>inclusiveHi){
+                break;
+              }
+              mask=~2L;
+            }else{
+              if(0>inclusiveHi){
+                break;
+              }
+              mask=~1L;
+            }
+            long word;
+            final ByteSetImpl.Unchecked root;
+            if((word=(root=this.root).word2)!=(word&=mask)){
+              root.word2=word;
+              this.size=size-1;
+              super.bubbleUpDecrementSize();
+              return true;
+            }
+            break;
+          }
+        }
+        return false;
+      }
+      @Override public boolean remove(Object val){
+        final int size;
+        if((size=this.size)!=0){
+          returnFalse:for(;;){
+            returnTrue:for(;;){
+              final int v;
+              if(val instanceof Byte){
+                v=(byte)val;
+              }else if(val instanceof Integer || val instanceof Short){
+                v=((Number)val).intValue();
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=(v=(int)l)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Float){
+                final float f;
+                if((f=(float)val)!=(v=(int)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if((d=(double)val)!=(v=(int)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                v=(char)val;
+              }else if(val instanceof Boolean){
+                final long mask;
+                if((boolean)val){
+                  if(1>inclusiveHi){
+                    break returnFalse;
+                  }
+                  mask=~2L;
+                }else{
+                  if(0>inclusiveHi){
+                    break returnFalse;
+                  }
+                  mask=~1L;
+                }
+                long word;
+                final ByteSetImpl.Unchecked root;
+                if((word=(root=this.root).word2)!=(word&=mask)){
+                  root.word2=word;
+                  break returnTrue;
+                }
+                break returnFalse;
+              }else{
+                break returnFalse;
+              }
+              if(v<=inclusiveHi && ByteSetImpl.removeVal(root,v)){
+              }
+              break returnFalse;
+            }
+            this.size=size-1;
+            super.bubbleUpDecrementSize();
+            return true;
+          }
+        }
+        return false;
+      }
       @Override public int hashCode(){
         final int size;
         if((size=this.size)!=0){
@@ -6588,6 +6960,195 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private BodySet(UncheckedSubSet parent,int size,int boundInfo){
         super(parent,size);
         this.boundInfo=boundInfo;
+      }
+      @Override boolean isInRange(int val){
+        final int boundInfo;
+        return val>=(boundInfo=this.boundInfo)>>8 && val<=((byte)(boundInfo&0xff));
+      }
+      @Override int isInRange(long val){
+        final int boundInfo;
+        if(val>=(boundInfo=this.boundInfo)>>8 && val<=((byte)(boundInfo&0xff))){
+          return (int)val;
+        }
+        return 128;
+      }
+      @Override int isInRange(float val){
+        final int boundInfo,v;
+        if((v=(int)val)==val && v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff))){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(double val){
+        final int boundInfo,v;
+        if((v=(int)val)==val && v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff))){
+          return v;
+        }
+        return 128;
+      }
+      @Override public boolean contains(boolean val){
+        if(this.size!=0){
+          for(;;){
+            final long mask;
+            final int boundInfo=this.boundInfo;
+            if(val){
+              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=2L;
+            }else{
+              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=1L;
+            }
+            return wordContains(root.word2,mask);
+          }
+        }
+        return false;
+      }
+      @Override public boolean contains(Object val){
+        if(this.size!=0){
+          for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              final long mask;
+              final int boundInfo=this.boundInfo;
+              if((boolean)val){
+                if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                  break;
+                }
+                mask=2L;
+              }else{
+                if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                  break;
+                }
+                mask=1L;
+              }
+              return wordContains(root.word2,mask);
+            }else{
+              break;
+            }
+            final int boundInfo;
+            return v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.contains(root,v);
+          }
+        }
+        return false;
+      }
+      @Override public boolean removeVal(boolean val){
+        final int size;
+        if((size=this.size)!=0){
+          for(;;){
+            final long mask;
+            final int boundInfo=this.boundInfo;
+            if(val){
+              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=~2L;
+            }else{
+              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=~1L;
+            }
+            long word;
+            final ByteSetImpl.Unchecked root;
+            if((word=(root=this.root).word2)!=(word&=mask)){
+              root.word2=word;
+              this.size=size-1;
+              super.bubbleUpDecrementSize();
+              return true;
+            }
+            break;
+          }
+        }
+        return false;
+      }
+      @Override public boolean remove(Object val){
+        final int size;
+        if((size=this.size)!=0){
+          returnFalse:for(;;){
+            returnTrue:for(;;){
+              final int v;
+              if(val instanceof Byte){
+                v=(byte)val;
+              }else if(val instanceof Integer || val instanceof Short){
+                v=((Number)val).intValue();
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=(v=(int)l)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Float){
+                final float f;
+                if((f=(float)val)!=(v=(int)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if((d=(double)val)!=(v=(int)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                v=(char)val;
+              }else if(val instanceof Boolean){
+                final long mask;
+                final int boundInfo=this.boundInfo;
+                if((boolean)val){
+                  if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                    break returnFalse;
+                  }
+                  mask=~2L;
+                }else{
+                  if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                    break returnFalse;
+                  }
+                  mask=~1L;
+                }
+                long word;
+                final ByteSetImpl.Unchecked root;
+                if((word=(root=this.root).word2)!=(word&=mask)){
+                  root.word2=word;
+                  break returnTrue;
+                }
+                break returnFalse;
+              }else{
+                break returnFalse;
+              }
+              final int boundInfo;
+              if(v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.removeVal(root,v)){
+                break returnTrue;
+              }
+              break returnFalse;
+            }
+            this.size=size-1;
+            super.bubbleUpDecrementSize();
+            return true;
+          }
+        }
+        return false;
       }
       @Override public int hashCode(){
         final int size;
@@ -6879,62 +7440,117 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         curr.modCountAndSize+=modCountDiff;
       }
     }
-    abstract boolean isInBounds(byte val);
+    abstract boolean isInRange(int val);
+    abstract int isInRange(long val);
+    abstract int isInRange(float val);
+    abstract int isInRange(double val);
     @Override public boolean contains(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.contains(root,val);
     }
     @Override public boolean contains(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,isInRange(val));
     }
     @Override public boolean contains(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,isInRange(val));
     }
     @Override public boolean contains(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean contains(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,isInRange(val));
     }
     @Override public boolean removeVal(byte val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        bubbleUpRemove((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(char val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        bubbleUpRemove((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(int val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        bubbleUpRemove((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(long val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        bubbleUpRemove((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(float val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        bubbleUpRemove((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(double val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public boolean remove(Object val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        bubbleUpRemove((1<<9)-1);
+        return true;
+      }
+      return false;
     }
     abstract void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst);
     @Override public byte[] toByteArray(){
@@ -7139,7 +7755,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       throw new NoSuchElementException();
     }
     private void checkAddBounds(byte val){
-      if(!isInBounds(val)){
+      if(!isInRange(val)){
         throw new IllegalArgumentException("cannot add "+val+" : out of bounds");
       }
     }
@@ -7220,6 +7836,30 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(parent,modCountAndSize);
         this.inclusiveLo=inclusiveLo;
       }
+      @Override boolean isInRange(int val){
+        return val>=inclusiveLo;
+      }
+      @Override int isInRange(long val){
+        final int v;
+        if((v=(int)val)==val && v>=inclusiveLo){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(float val){
+        final int v;
+        if((v=(int)val)==val && v>=inclusiveLo){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(double val){
+        final int v;
+        if((v=(int)val)==val && v>=inclusiveLo){
+          return v;
+        }
+        return 128;
+      }
       @Override public boolean contains(boolean val){
         final ByteSetImpl.Checked root;
         final int modCountAndSize;
@@ -7243,10 +7883,59 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return false;
       }
-      @Override public boolean removeVal(boolean val){
+      @Override public boolean contains(Object val){
         final ByteSetImpl.Checked root;
         final int modCountAndSize;
-        final int rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              final long mask;
+              if((boolean)val){
+                if(1<inclusiveLo){
+                  break;
+                }
+                mask=2L;
+              }else{
+                if(0<inclusiveLo){
+                  break;
+                }
+                mask=1L;
+              }
+              return wordContains(root.word2,mask);
+            }else{
+              break;
+            }
+            return v>=inclusiveLo && ByteSetImpl.contains(root,v);
+          }
+        }
+        return false;
+      }
+      @Override public boolean removeVal(boolean val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize,rootModCountAndSize;
         CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
         if((modCountAndSize&0x1ff)!=0){
           for(;;){
@@ -7275,8 +7964,69 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return false;
       }
-      @Override boolean isInBounds(byte val){
-        return val>=inclusiveLo;
+      @Override public boolean remove(Object val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize,rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          returnFalse:for(;;){
+            returnTrue:for(;;){
+              final int v;
+              if(val instanceof Byte){
+                v=(byte)val;
+              }else if(val instanceof Integer || val instanceof Short){
+                v=((Number)val).intValue();
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=(v=(int)l)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Float){
+                final float f;
+                if((f=(float)val)!=(v=(int)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if((d=(double)val)!=(v=(int)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                v=(char)val;
+              }else if(val instanceof Boolean){
+                final long mask;
+                if((boolean)val){
+                  if(1<inclusiveLo){
+                    break;
+                  }
+                  mask=~2L;
+                }else{
+                  if(0<inclusiveLo){
+                    break;
+                  }
+                  mask=~1L;
+                }
+                long word;
+                if((word=root.word2)!=(word&=mask)){
+                  root.word2=word;
+                  break returnTrue;
+                }
+                break returnFalse;
+              }else{
+                break returnFalse;
+              }
+              if(v>=inclusiveLo && ByteSetImpl.removeVal(root,v)){
+                break returnTrue;
+              }
+              break returnFalse;
+            }
+            root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+            this.modCountAndSize=modCountAndSize+((1<<9)-1);
+            super.bubbleUpRemove((1<<9)-1);
+            return true;
+          }
+        }
+        return false;
       }
       @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
         return root.removeIfImplStartWord3Descending(Byte.MAX_VALUE,size,filter,modCountChecker);
@@ -7629,6 +8379,198 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(parent,modCountAndSize);
         this.inclusiveHi=inclusiveHi;
       }
+      @Override boolean isInRange(int val){
+        return val<=inclusiveHi;
+      }
+      @Override int isInRange(long val){
+        final int v;
+        if((v=(int)val)==val && v<=inclusiveHi){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(float val){
+        final int v;
+        if((v=(int)val)==val && v<=inclusiveHi){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(double val){
+        final int v;
+        if((v=(int)val)==val && v<=inclusiveHi){
+          return v;
+        }
+        return 128;
+      }
+      @Override public boolean contains(boolean val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          for(;;){
+            final long mask;
+            if(val){
+              if(1>inclusiveHi){
+                break;
+              }
+              mask=2L;
+            }else{
+              if(0>inclusiveHi){
+                break;
+              }
+              mask=1L;
+            }
+            return wordContains(root.word2,mask);
+          }
+        }
+        return false;
+      }
+      @Override public boolean contains(Object val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              final long mask;
+              if((boolean)val){
+                if(1>inclusiveHi){
+                  break;
+                }
+                mask=2L;
+              }else{
+                if(0>inclusiveHi){
+                  break;
+                }
+                mask=1L;
+              }
+              return wordContains(root.word2,mask);
+            }else{
+              break;
+            }
+            return v<=inclusiveHi && ByteSetImpl.contains(root,v);
+          }
+        }
+        return false;
+      }
+      @Override public boolean removeVal(boolean val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize,rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          for(;;){
+            final long mask;
+            if(val){
+              if(1>inclusiveHi){
+                break;
+              }
+              mask=~2L;
+            }else{
+              if(0>inclusiveHi){
+                break;
+              }
+              mask=~1L;
+            }
+            long word;
+            if((word=root.word2)!=(word&=mask)){
+              root.word2=word;
+              root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+              this.modCountAndSize=modCountAndSize+((1<<9)-1);
+              super.bubbleUpRemove((1<<9)-1);
+              return true;
+            }
+            break;
+          }
+        }
+        return false;
+      }
+      @Override public boolean remove(Object val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize,rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          returnFalse:for(;;){
+            returnTrue:for(;;){
+              final int v;
+              if(val instanceof Byte){
+                v=(byte)val;
+              }else if(val instanceof Integer || val instanceof Short){
+                v=((Number)val).intValue();
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=(v=(int)l)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Float){
+                final float f;
+                if((f=(float)val)!=(v=(int)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if((d=(double)val)!=(v=(int)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                v=(char)val;
+              }else if(val instanceof Boolean){
+                final long mask;
+                if((boolean)val){
+                  if(1>inclusiveHi){
+                    break;
+                  }
+                  mask=~2L;
+                }else{
+                  if(0>inclusiveHi){
+                    break;
+                  }
+                  mask=~1L;
+                }
+                long word;
+                if((word=root.word2)!=(word&=mask)){
+                  root.word2=word;
+                  break returnTrue;
+                }
+                break returnFalse;
+              }else{
+                break returnFalse;
+              }
+              if(v<=inclusiveHi && ByteSetImpl.removeVal(root,v)){
+                break returnTrue;
+              }
+              break returnFalse;
+            }
+            root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+            this.modCountAndSize=modCountAndSize+((1<<9)-1);
+            super.bubbleUpRemove((1<<9)-1);
+            return true;
+          }
+        }
+        return false;
+      }
       @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
         return root.removeIfImplStartWord0Ascending(Byte.MIN_VALUE,size,filter,modCountChecker);
       }
@@ -7732,9 +8674,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           default:
         }
         throw new IllegalArgumentException("out of bounds");
-      }
-      @Override boolean isInBounds(byte val){
-        return val<=inclusiveHi;
       }
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int inclusiveHi){
@@ -7983,9 +8922,204 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(parent,modCountAndSize);
         this.boundInfo=boundInfo;
       }
-      @Override boolean isInBounds(byte val){
+      @Override boolean isInRange(int val){
         final int boundInfo;
         return val>=(boundInfo=this.boundInfo)>>8 && val<=((byte)(boundInfo&0xff));
+      }
+      @Override int isInRange(long val){
+        final int boundInfo;
+        if(val>=(boundInfo=this.boundInfo)>>8 && val<=((byte)(boundInfo&0xff))){
+          return (int)val;
+        }
+        return 128;
+      }
+      @Override int isInRange(float val){
+        final int boundInfo,v;
+        if((v=(int)val)==val && v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff))){
+          return v;
+        }
+        return 128;
+      }
+      @Override int isInRange(double val){
+        final int boundInfo,v;
+        if((v=(int)val)==val && v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff))){
+          return v;
+        }
+        return 128;
+      }
+      @Override public boolean contains(boolean val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          for(;;){
+            final long mask;
+            final int boundInfo=this.boundInfo;
+            if(val){
+              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=2L;
+            }else{
+              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=1L;
+            }
+            return wordContains(root.word2,mask);
+          }
+        }
+        return false;
+      }
+      @Override public boolean contains(Object val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              final long mask;
+              final int boundInfo=this.boundInfo;
+              if((boolean)val){
+                if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                  break;
+                }
+                mask=2L;
+              }else{
+                if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                  break;
+                }
+                mask=1L;
+              }
+              return wordContains(root.word2,mask);
+            }else{
+              break;
+            }
+            final int boundInfo;
+            return v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.contains(root,v);
+          }
+        }
+        return false;
+      }
+      @Override public boolean removeVal(boolean val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize,rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          for(;;){
+            final long mask;
+            final int boundInfo=this.boundInfo;
+            if(val){
+              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=~2L;
+            }else{
+              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                break;
+              }
+              mask=~1L;
+            }
+            long word;
+            if((word=root.word2)!=(word&=mask)){
+              root.word2=word;
+              root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+              this.modCountAndSize=modCountAndSize+((1<<9)-1);
+              super.bubbleUpRemove((1<<9)-1);
+              return true;
+            }
+            break;
+          }
+        }
+        return false;
+      }
+      @Override public boolean remove(Object val){
+        final ByteSetImpl.Checked root;
+        final int modCountAndSize,rootModCountAndSize;
+        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+        if((modCountAndSize&0x1ff)!=0){
+          returnFalse:for(;;){
+            returnTrue:for(;;){
+              final int v;
+              if(val instanceof Byte){
+                v=(byte)val;
+              }else if(val instanceof Integer || val instanceof Short){
+                v=((Number)val).intValue();
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=(v=(int)l)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Float){
+                final float f;
+                if((f=(float)val)!=(v=(int)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if((d=(double)val)!=(v=(int)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                v=(char)val;
+              }else if(val instanceof Boolean){
+                final long mask;
+                final int boundInfo=this.boundInfo;
+                if((boolean)val){
+                  if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
+                    break returnFalse;
+                  }
+                  mask=~2L;
+                }else{
+                  if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
+                    break returnFalse;
+                  }
+                  mask=~1L;
+                }
+                long word;
+                if((word=root.word2)!=(word&=mask)){
+                  root.word2=word;
+                  break returnTrue;
+                }
+                break returnFalse;
+              }else{
+                break returnFalse;
+              }
+              final int boundInfo;
+              if(v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.removeVal(root,v)){
+                break returnTrue;
+              }
+              break returnFalse;
+            }
+            root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+            this.modCountAndSize=modCountAndSize+((1<<9)-1);
+            super.bubbleUpRemove((1<<9)-1);
+            return true;
+          }
+        }
+        return false;
       }
       @Override public int hashCode(){
         int modCountAndSize;
