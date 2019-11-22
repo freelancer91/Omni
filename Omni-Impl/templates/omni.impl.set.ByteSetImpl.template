@@ -294,6 +294,79 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   }
   
   
+  void clearHeadSet(int inclHi){
+    switch(inclHi>>6){
+      case 1:
+        this.word3&=(-1L>>>(-inclHi-1));
+        inclHi=-1;
+      case 0:
+        this.word2&=(-1L>>>(-inclHi-1));
+        inclHi=-1;
+      case -1:
+        this.word1&=(-1L>>>(-inclHi-1));
+        inclHi=-1;
+      default:
+        this.word0&=(-1L>>>(-inclHi-1));
+    }
+  }
+  void clearTailSet(int inclLo){
+    switch(inclLo>>6){
+      case -2:
+        this.word0&=(-1L<<inclLo);
+        inclLo=0;
+      case -1:
+        this.word1&=(-1L<<inclLo);
+        inclLo=0;
+      case 0:
+        this.word2&=(-1L<<inclLo);
+        inclLo=0;
+      default:
+        this.word3&=(-1L<<inclLo);
+    }
+  }
+  void clearBodySet(int boundInfo){
+    int inclLo=boundInfo>>8;
+    final int inclHi;
+    switch((inclHi=(byte)(boundInfo&0xff))>>6){
+      case 1:
+        switch(inclLo>>6){
+          case -2:
+            this.word0&=(-1L<<inclLo);
+            inclLo=0;
+          case -1:
+            this.word1&=(-1L<<inclLo);
+            inclLo=0;
+          case 0:
+            this.word2&=(-1L<<inclLo);
+            inclLo=0;
+          default:
+        }
+        this.word3&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        break;
+      case 0:
+        switch(inclLo>>6){
+          case -2:
+            this.word0&=(-1L<<inclLo);
+            inclLo=0;
+          case -1:
+            this.word1&=(-1L<<inclLo);
+            inclLo=0;
+          default:
+        }
+        this.word2&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        break;
+      case -1:
+        if(inclLo>>6==-2){
+          this.word0&=(-1L<<inclLo);
+          inclLo=0;
+        }
+        this.word1&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        break;
+      default:
+        this.word0&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+    }
+  }
+  
   
   //TODO equals
   
@@ -437,6 +510,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return numRemoved;
   }
+  
+  
+  
   int removeIfImplStartWord3Descending(int offset,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker  modCountChecker){
     int numRemoved=0;
     outer:for(;;){
@@ -522,6 +598,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return numRemoved;
   }
+  
+ 
+  
   int removeIfImplStartWord0Ascending(int offset,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
     int numRemoved=0;
     outer:for(;;){
@@ -907,11 +986,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         val=0;
       default:
-        return Long.numberOfTrailingZeros(word2&(-1L<<val))+64;
+        return Long.numberOfTrailingZeros(word3&(-1L<<val))+64;
     }
   }
-  int getThisOrHigher(int bound,int val){
-    switch(bound>>6){
+  int getThisOrHigher(int inclHiBound,int val){
+    switch(inclHiBound>>6){
       case 1:
         switch(val>>6){
           case -2:
@@ -930,7 +1009,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             val=64;
           default:
-            if((val+=Long.numberOfTrailingZeros(word3>>>val))<=bound){
+            if((val+=Long.numberOfTrailingZeros(word3>>>val))<=inclHiBound){
               return val;
             }
             return 128;
@@ -948,7 +1027,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             val=0;
           default:
-            if((val+=Long.numberOfTrailingZeros(word2>>>val))<=bound){
+            if((val+=Long.numberOfTrailingZeros(word2>>>val))<=inclHiBound){
               return val;
             }
             return 128;
@@ -961,12 +1040,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
           val=-64;
         }
-        if((val+=Long.numberOfTrailingZeros(word1>>>val))<=bound){
+        if((val+=Long.numberOfTrailingZeros(word1>>>val))<=inclHiBound){
           return val;
         }
         return 128;
       default:
-        if((val+=Long.numberOfTrailingZeros(word0>>>val))<=bound){
+        if((val+=Long.numberOfTrailingZeros(word0>>>val))<=inclHiBound){
           return val;
         }
         return 128;
@@ -1004,8 +1083,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return -65-Long.numberOfLeadingZeros(word0&(-1L>>>(-val-1)));
     }
   }
-  int getThisOrLower(int bound,int val){
-    switch(bound>>6){
+  int getThisOrLower(int inclLoBound,int val){
+    switch(inclLoBound>>6){
       case -2:
         switch(val>>6){
           case 1:
@@ -1024,7 +1103,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             val=-65;
           default:
-            if((val-=Long.numberOfLeadingZeros(word0<<(-val-1)))>=bound){
+            if((val-=Long.numberOfLeadingZeros(word0<<(-val-1)))>=inclLoBound){
               return val;
             }
             return -129;
@@ -1042,7 +1121,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             val=-1;
           default:
-            if((val-=Long.numberOfLeadingZeros(word1<<(-val-1)))>=bound){
+            if((val-=Long.numberOfLeadingZeros(word1<<(-val-1)))>=inclLoBound){
               return val;
             }
             return -129;
@@ -1054,17 +1133,37 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
           val=63;
         }
-        if((val-=Long.numberOfLeadingZeros(word2<<(-val-1)))>=bound){
+        if((val-=Long.numberOfLeadingZeros(word2<<(-val-1)))>=inclLoBound){
           return val;
         }
         return -129;
       default:
-        if((val-=Long.numberOfLeadingZeros(word3<<(-val-1)))>=bound){
+        if((val-=Long.numberOfLeadingZeros(word3<<(-val-1)))>=inclLoBound){
           return val;
         }
         return -129;
     }
   }
+  @Override public void clear(){
+    word0=0;
+    word1=0;
+    word2=0;
+    word3=0;
+  }
+  private static long wordRemoveIf(long word,int inclHi,BytePredicate filter){
+    for(;;--inclHi){
+      final long mask;
+      if(wordContains(word,mask=1L<<inclHi)){
+        if(filter.test((byte)inclHi)){
+          word-=mask;
+        }
+      }
+      if(mask==1L){
+        return word;
+      }
+    }
+  }
+
   
   public static abstract class Unchecked extends ByteSetImpl{
     private static final long serialVersionUID=1L;
@@ -1092,6 +1191,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     private Unchecked(OmniCollection.ByteOutput<?> that){
       super(that);
     }
+    @Override public int size(){
+      return SetCommonImpl.size(word0,word1,word2,word3);
+    }
+    @Override public boolean isEmpty(){
+      return SetCommonImpl.size(word0,word1,word2,word3)==0;
+    }
+    #MACRO FullRootAscendingAccessMethods<Unchecked>()
     private static int hashCodeForWord(long word,int inclLo,int exclHi){
       for(int hash=0;;){
         if(wordContains(word,1L<<inclLo)){
@@ -1103,19 +1209,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
     
-    private static long wordRemoveIf(long word,int inclHi,BytePredicate filter){
-      for(;;--inclHi){
-        final long mask;
-        if(wordContains(word,mask=1L<<inclHi)){
-          if(filter.test((byte)inclHi)){
-            word-=mask;
-          }
-        }
-        if(mask==1L){
-          return word;
-        }
-      }
-    }
+    
     
     @Override public boolean removeIf(BytePredicate filter){
       long word;
@@ -1200,9 +1294,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return headSetDescending(inclusiveTo);
       }
     }
-   
-    
-    
+    #MACRO PollFirstAndLastInt<Ascending,this,Full,Unchecked>()
+
     public static class Ascending extends Unchecked implements Cloneable{
       private static final long serialVersionUID=1L;
       public Ascending(){
@@ -1241,7 +1334,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int lastInt(){
         return super.getThisOrLower();
       }
-      
       @Override public void forEach(ByteConsumer action){
         super.forEachAscending(action);
       }
@@ -1303,6 +1395,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new UncheckedFullView.Descending(this);
       }
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
     }
     public static class Descending extends Unchecked implements Cloneable{
       private static final long serialVersionUID=1L;
@@ -1342,6 +1440,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int lastInt(){
         return super.getThisOrHigher();
       }
+      
+      #MACRO DescendingAccessMethods()
       
       @Override public void forEach(ByteConsumer action){
         super.forEachDescending(action);
@@ -1407,6 +1507,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new UncheckedFullView.Ascending(this);
       }
+      #MACRO PollFirstAndLastInt<Descending,this,Full,Unchecked>()
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
     }
   }
   public static abstract class Checked extends ByteSetImpl{
@@ -1441,6 +1548,21 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     private Checked(OmniCollection.ByteOutput<?> that){
       super(that);
+    }
+    
+    @Override public int size(){
+      return this.modCountAndSize&0x1ff;
+    }
+    @Override public boolean isEmpty(){
+      return (this.modCountAndSize&0x1ff)==0;
+    }
+    @Override public void clear(){
+      final int modCountAndSize;
+      if(((modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+        this.modCountAndSize=(modCountAndSize+(1<<9))&(~0x1ff);
+        super.clear();
+      }
+      
     }
     @Override public boolean contains(long val){
       return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(this,val);
@@ -1714,6 +1836,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       throw new NoSuchElementException();
     }
+    #MACRO FullRootAscendingAccessMethods<Checked>()
+    #MACRO PollFirstAndLastInt<Ascending,this,Full,Checked>()
     public static class Ascending extends Checked implements Cloneable{
       private static final long serialVersionUID=1L;
       public Ascending(){
@@ -1749,6 +1873,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override void forEachImpl(int size,ByteConsumer action){
         super.forEachAscending(size,action);
       }
+      
+      
       #MACRO FullToArray<Checked,byte,super>(Byte,Ascending,OmniArray.OfByte.DEFAULT_ARR)
       #MACRO FullToArray<Checked,short,super>(Short,Ascending,OmniArray.OfShort.DEFAULT_ARR)
       #MACRO FullToArray<Checked,int,super>(Int,Ascending,OmniArray.OfInt.DEFAULT_ARR)
@@ -1804,6 +1930,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new CheckedFullView.Descending(this);
       }
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
     }
     public static class Descending extends Checked implements Cloneable{
       private static final long serialVersionUID=1L;
@@ -1834,6 +1966,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       public Descending(OmniCollection.ByteOutput<?> that){
         super(that);
       }
+      #MACRO DescendingAccessMethods()
       @Override public Object clone(){
         return new Descending(this);
       }
@@ -1902,6 +2035,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new CheckedFullView.Ascending(this);
       }
+      #MACRO PollFirstAndLastInt<Descending,this,Full,Checked>()
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
     }
   }
   private static abstract class UncheckedFullView extends AbstractByteSet.ComparatorlessImpl{
@@ -1915,6 +2055,18 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public int lastInt(){
       return root.firstInt();
     }
+    #MACRO FullViewAscendingAccessMethods()
+    @Override public int size(){
+      final ByteSetImpl.Unchecked root;
+      return SetCommonImpl.size((root=this.root).word0,root.word1,root.word2,root.word3);
+    }
+    @Override public boolean isEmpty(){
+      final ByteSetImpl.Unchecked root;
+      return SetCommonImpl.size((root=this.root).word0,root.word1,root.word2,root.word3)==0;
+    }
+    @Override public void clear(){
+      root.clear();
+    }
     @Override public int hashCode(){
       return root.hashCode();
     }
@@ -1926,10 +2078,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     @Override public boolean add(byte val){
       return root.add(val);
-    }
-    
-    @Override public void forEach(Consumer<? super Byte> action){
-      forEach((ByteConsumer)action::accept);
     }
     @Override public boolean contains(boolean val){
       return ByteSetImpl.contains(root,val);
@@ -1978,6 +2126,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     @Override public boolean remove(Object val){
       return ByteSetImpl.removeVal(root,val);
+    }
+    #MACRO PollFirstAndLastInt<Ascending,root,Full,Unchecked>()
+    @Override public boolean removeIf(BytePredicate filter){
+      return root.removeIf(filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Byte> filter){
+      return root.removeIf((BytePredicate)filter::test);
     }
     private static class Ascending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
@@ -2042,12 +2197,25 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       #MACRO FullToArray<Unchecked,float,root>(Float,Ascending,OmniArray.OfFloat.DEFAULT_ARR)
       #MACRO FullToArray<Unchecked,double,root>(Double,Ascending,OmniArray.OfDouble.DEFAULT_ARR)
       #MACRO FullToArray<Unchecked,Byte,root>(,Ascending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
+      @Override public void forEach(ByteConsumer action){
+        root.forEachAscending(action);
+      }
+      @Override public void forEach(Consumer<? super Byte> action){
+        root.forEachAscending(action::accept);
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
     }
     private static class Descending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
       private Descending(ByteSetImpl.Unchecked.Ascending root){
         super(root);
       }
+      #MACRO DescendingAccessMethods()
       @Override public String toString(){
         return root.toStringDescending();
       }
@@ -2112,6 +2280,19 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       #MACRO FullToArray<Unchecked,float,root>(Float,Descending,OmniArray.OfFloat.DEFAULT_ARR)
       #MACRO FullToArray<Unchecked,double,root>(Double,Descending,OmniArray.OfDouble.DEFAULT_ARR)
       #MACRO FullToArray<Unchecked,Byte,root>(,Descending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
+      #MACRO PollFirstAndLastInt<Descending,root,Full,Unchecked>()
+      @Override public void forEach(ByteConsumer action){
+        root.forEachDescending(action);
+      }
+      @Override public void forEach(Consumer<? super Byte> action){
+        root.forEachDescending(action::accept);
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
     }
   }
   private static abstract class CheckedFullView extends AbstractByteSet.ComparatorlessImpl{
@@ -2125,7 +2306,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public boolean add(byte val){
       return root.add(val);
     }
-    
+    @Override public int size(){
+      return root.modCountAndSize&0x1ff;
+    }
+    @Override public boolean isEmpty(){
+      return (root.modCountAndSize&0x1ff)==0;
+    }
+    @Override public void clear(){
+      root.clear();
+    }
     @Override public int hashCode(){
       return root.hashCode();
     }
@@ -2261,7 +2450,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public OmniNavigableSet.OfByte descendingSet(){
       return root;
     }
-    
+    #MACRO FullViewAscendingAccessMethods()
+    #MACRO PollFirstAndLastInt<Ascending,root,Full,Checked>()
     private static class Ascending extends CheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
       private Ascending(ByteSetImpl.Checked.Descending root){
@@ -2371,6 +2561,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       #MACRO FullToArray<Checked,float,root>(Float,Ascending,OmniArray.OfFloat.DEFAULT_ARR)
       #MACRO FullToArray<Checked,double,root>(Double,Ascending,OmniArray.OfDouble.DEFAULT_ARR)
       #MACRO FullToArray<Checked,Byte,root>(,Ascending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
         private SerializationIntermediate(ByteSetImpl.Checked root){
@@ -2386,6 +2582,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private Descending(ByteSetImpl.Checked.Ascending root){
         super(root);
       }
+      #MACRO DescendingAccessMethods()
       @Override public String toString(){
         final ByteSetImpl.Checked root;
         int modCountAndSize;
@@ -2490,6 +2687,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       #MACRO FullToArray<Checked,float,root>(Float,Descending,OmniArray.OfFloat.DEFAULT_ARR)
       #MACRO FullToArray<Checked,double,root>(Double,Descending,OmniArray.OfDouble.DEFAULT_ARR)
       #MACRO FullToArray<Checked,Byte,root>(,Descending,OmniArray.OfByte.DEFAULT_BOXED_ARR)
+      #MACRO PollFirstAndLastInt<Descending,root,Full,Checked>()
+      @Override public OmniIterator.OfByte iterator(){
+        #MACRO NYI();
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        #MACRO NYI()
+      }
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
         private SerializationIntermediate(ByteSetImpl.Checked root){
@@ -2517,9 +2721,23 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       this.parent=parent;
       this.size=size;
     }
+    abstract void clearImpl();
+    @Override public void clear(){
+      final int size;
+      if((size=this.size)!=0){
+        clearImpl();
+        this.size=0;
+        bubbleUpModifySize(-size);
+      }
+    }
     private void bubbleUpDecrementSize(){
       for(var parent=this.parent;parent!=null;parent=parent.parent){
         --parent.size;
+      }
+    }
+    private void bubbleUpModifySize(int delta){
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        parent.size+=delta;
       }
     }
     private void bubbleUpIncrementSize(){
@@ -2534,6 +2752,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return true;
       }
       return false;
+    }
+    @Override public int size(){
+      return this.size;
+    }
+    @Override public boolean isEmpty(){
+      return this.size==0;
     }
     @Override public boolean add(byte val){
       if(root.add(val)){
@@ -2573,10 +2797,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         forEachImpl(size,action::accept);
       }
     }
+    abstract long isInRange(boolean val);
     abstract boolean isInRange(int val);
     abstract int isInRange(long val);
     abstract int isInRange(float val);
     abstract int isInRange(double val);
+    @Override public boolean contains(boolean val){
+      return this.size!=0 && wordContains(root.word2,isInRange(val));
+    }
     @Override public boolean contains(byte val){
       return this.size!=0 && isInRange(val) && ByteSetImpl.contains(root,val);
     }
@@ -2594,6 +2822,55 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     @Override public boolean contains(double val){
       return this.size!=0 && ByteSetImpl.contains(root,isInRange(val));
+    }
+ 
+    @Override public boolean contains(Object val){
+      if(this.size!=0){
+        for(;;){
+          final int v;
+          if(val instanceof Byte){
+            v=(byte)val;
+          }else if(val instanceof Integer || val instanceof Short){
+            v=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(v=(int)l)){
+              break;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(v=(int)f)){
+              break;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(v=(int)d)){
+              break;
+            }
+          }else if(val instanceof Character){
+            v=(char)val;
+          }else if(val instanceof Boolean){
+            return wordContains(root.word2,isInRange((boolean)val));
+          }else{
+            break;
+          }
+          return isInRange(v) && ByteSetImpl.contains(root,v);
+        }
+      }
+      return false;
+    }
+    
+    @Override public boolean removeVal(boolean val){
+      final int size;
+      final ByteSetImpl.Unchecked root;
+      long word;
+      if((size=this.size)!=0 && (word=(root=this.root).word2)!=(word&=~isInRange(val))){
+        root.word2=word;
+        this.size=size-1;
+        bubbleUpDecrementSize();
+        return true;
+      }
+      return false;
     }
     @Override public boolean removeVal(byte val){
       final int size;
@@ -2649,8 +2926,77 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return false;
     }
-    
-   
+
+      
+    @Override public boolean remove(Object val){
+      final int size;
+      if((size=this.size)!=0){
+        returnFalse:for(;;){
+          returnTrue:for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break returnFalse;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break returnFalse;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break returnFalse;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              long word;
+              final ByteSetImpl.Unchecked root;
+              if((word=(root=this.root).word2)!=(word&=~isInRange((boolean)val))){
+                root.word2=word;
+                break returnTrue;
+              }
+              break returnFalse;
+            }else{
+              break returnFalse;
+            }
+            if(isInRange(v) && ByteSetImpl.removeVal(root,v)){
+              break returnTrue;
+            }
+            break returnFalse;
+          }
+          this.size=size-1;
+          bubbleUpDecrementSize();
+          return true;
+        }
+      }
+      return false;
+    }
+    abstract int removeIfImpl(int size,BytePredicate filter);
+    @Override public boolean removeIf(BytePredicate filter){
+      final int size,numRemoved;
+      if((size=this.size)!=0 && (numRemoved=removeIfImpl(size,filter))!=0){
+        this.size=size-numRemoved;
+        bubbleUpModifySize(-numRemoved);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeIf(Predicate<? super Byte> filter){
+      final int size,numRemoved;
+      if((size=this.size)!=0 && (numRemoved=removeIfImpl(size,filter::test))!=0){
+        this.size=size-numRemoved;
+        bubbleUpModifySize(-numRemoved);
+        return true;
+      }
+      return false;
+    }
     
     
    
@@ -2664,6 +3010,24 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private TailSet(TailSet parent,int size,int inclusiveLo){
         super(parent,size);
         this.inclusiveLo=inclusiveLo;
+      }
+      @Override void clearImpl(){
+        root.clearTailSet(inclusiveLo);
+      }
+      @Override int removeIfImpl(int size,BytePredicate filter){
+        #MACRO NYI();
+      }
+      @Override long isInRange(boolean val){
+        if(val){
+          if(1>=inclusiveLo){
+            return 2L;
+          }
+        }else{
+          if(0>=inclusiveLo){
+            return 1L;
+          }
+        }
+        return 0L;
       }
       @Override boolean isInRange(int val){
         return val>=inclusiveLo;
@@ -2689,165 +3053,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 128;
       }
-      @Override public boolean contains(boolean val){
-        if(this.size!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1<inclusiveLo){
-                break;
-              }
-              mask=2L;
-            }else{
-              if(0<inclusiveLo){
-                break;
-              }
-              mask=1L;
-            }
-            return wordContains(root.word2,mask);
-          }
-        }
-        return false;
-      }
-      @Override public boolean contains(Object val){
-        if(this.size!=0){
-          for(;;){
-            final int v;
-            if(val instanceof Byte){
-              v=(byte)val;
-            }else if(val instanceof Integer || val instanceof Short){
-              v=((Number)val).intValue();
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=(v=(int)l)){
-                break;
-              }
-            }else if(val instanceof Float){
-              final float f;
-              if((f=(float)val)!=(v=(int)f)){
-                break;
-              }
-            }else if(val instanceof Double){
-              final double d;
-              if((d=(double)val)!=(v=(int)d)){
-                break;
-              }
-            }else if(val instanceof Character){
-              v=(char)val;
-            }else if(val instanceof Boolean){
-              final long mask;
-              if((boolean)val){
-                if(1<inclusiveLo){
-                  break;
-                }
-                mask=2L;
-              }else{
-                if(0<inclusiveLo){
-                  break;
-                }
-                mask=1L;
-              }
-              return wordContains(root.word2,mask);
-            }else{
-              break;
-            }
-            return v>=inclusiveLo && ByteSetImpl.contains(root,v);
-          }
-        }
-        return false;
-      }
-      @Override public boolean removeVal(boolean val){
-        final int size;
-        if((size=this.size)!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1<inclusiveLo){
-                break;
-              }
-              mask=~2L;
-            }else{
-              if(0<inclusiveLo){
-                break;
-              }
-              mask=~1L;
-            }
-            long word;
-            final ByteSetImpl.Unchecked root;
-            if((word=(root=this.root).word2)!=(word&=mask)){
-              root.word2=word;
-              this.size=size-1;
-              super.bubbleUpDecrementSize();
-              return true;
-            }
-            break;
-          }
-        }
-        return false;
-      }
-      
-      @Override public boolean remove(Object val){
-        final int size;
-        if((size=this.size)!=0){
-          returnFalse:for(;;){
-            returnTrue:for(;;){
-              final int v;
-              if(val instanceof Byte){
-                v=(byte)val;
-              }else if(val instanceof Integer || val instanceof Short){
-                v=((Number)val).intValue();
-              }else if(val instanceof Long){
-                final long l;
-                if((l=(long)val)!=(v=(int)l)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Float){
-                final float f;
-                if((f=(float)val)!=(v=(int)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if((d=(double)val)!=(v=(int)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                v=(char)val;
-              }else if(val instanceof Boolean){
-                final long mask;
-                if((boolean)val){
-                  if(1<inclusiveLo){
-                    break returnFalse;
-                  }
-                  mask=~2L;
-                }else{
-                  if(0<inclusiveLo){
-                    break returnFalse;
-                  }
-                  mask=~1L;
-                }
-                long word;
-                final ByteSetImpl.Unchecked root;
-                if((word=(root=this.root).word2)!=(word&=mask)){
-                  root.word2=word;
-                  break returnTrue;
-                }
-                break returnFalse;
-              }else{
-                break returnFalse;
-              }
-              if(v>=inclusiveLo && ByteSetImpl.removeVal(root,v)){
-                break returnTrue;
-              }
-              break returnFalse;
-            }
-            this.size=size-1;
-            super.bubbleUpDecrementSize();
-            return true;
-          }
-        }
-        return false;
-      }
+
       @Override public int hashCode(){
         final int size;
         if((size=this.size)!=0){
@@ -2855,6 +3061,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 0;
       }
+      
+      
       private OmniNavigableSet.OfByte headSetAscending(int inclusiveTo){
         final int inclusiveFrom;
         if((inclusiveFrom=this.inclusiveLo)<=inclusiveTo){
@@ -2911,6 +3119,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return this;
       }
+      #MACRO TailSetAscendingAccessMethods<Unchecked>()
+      #MACRO PollFirstAndLastInt<Ascending,root,TailSet,Unchecked>()
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Unchecked root,int size,int inclusiveLo){
           super(root,size,inclusiveLo);
@@ -2978,6 +3188,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.TailSet.Descending(this,size,inclusiveLo);
         }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Unchecked root,int size,int inclusiveLo){
@@ -2986,6 +3202,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(TailSet parent,int size,int inclusiveLo){
           super(parent,size,inclusiveLo);
         }
+        #MACRO DescendingAccessMethods()
         #MACRO SubSetToArrayCopy<Unchecked,byte,TailSet,Descending>()
         #MACRO SubSetToArrayCopy<Unchecked,short,TailSet,Descending>()
         #MACRO SubSetToArrayCopy<Unchecked,int,TailSet,Descending>()
@@ -3046,6 +3263,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.TailSet.Ascending(this,size,inclusiveLo);
         }
+        #MACRO PollFirstAndLastInt<Descending,root,TailSet,Unchecked>()
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
       
     }
@@ -3058,6 +3282,24 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private HeadSet(HeadSet parent,int size,int inclusiveHi){
         super(parent,size);
         this.inclusiveHi=inclusiveHi;
+      }
+      @Override int removeIfImpl(int size,BytePredicate filter){
+        #MACRO NYI();
+      }
+      @Override void clearImpl(){
+        root.clearHeadSet(inclusiveHi);
+      }
+      @Override long isInRange(boolean val){
+        if(val){
+          if(1<=inclusiveHi){
+            return 2L;
+          }
+        }else{
+          if(0<=inclusiveHi){
+            return 1L;
+          }
+        }
+        return 0L;
       }
       @Override boolean isInRange(int val){
         return val<=inclusiveHi;
@@ -3083,165 +3325,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 128;
       }
-      @Override public boolean contains(boolean val){
-        if(this.size!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1>inclusiveHi){
-                break;
-              }
-              mask=2L;
-            }else{
-              if(0>inclusiveHi){
-                break;
-              }
-              mask=1L;
-            }
-            return wordContains(root.word2,mask);
-          }
-        }
-        return false;
-      }
-      @Override public boolean contains(Object val){
-        if(this.size!=0){
-          for(;;){
-            final int v;
-            if(val instanceof Byte){
-              v=(byte)val;
-            }else if(val instanceof Integer || val instanceof Short){
-              v=((Number)val).intValue();
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=(v=(int)l)){
-                break;
-              }
-            }else if(val instanceof Float){
-              final float f;
-              if((f=(float)val)!=(v=(int)f)){
-                break;
-              }
-            }else if(val instanceof Double){
-              final double d;
-              if((d=(double)val)!=(v=(int)d)){
-                break;
-              }
-            }else if(val instanceof Character){
-              v=(char)val;
-            }else if(val instanceof Boolean){
-              final long mask;
-              if((boolean)val){
-                if(1>inclusiveHi){
-                  break;
-                }
-                mask=2L;
-              }else{
-                if(0>inclusiveHi){
-                  break;
-                }
-                mask=1L;
-              }
-              return wordContains(root.word2,mask);
-            }else{
-              break;
-            }
-            return v<=inclusiveHi && ByteSetImpl.contains(root,v);
-          }
-        }
-        return false;
-      }
-      @Override public boolean removeVal(boolean val){
-        final int size;
-        if((size=this.size)!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1>inclusiveHi){
-                break;
-              }
-              mask=~2L;
-            }else{
-              if(0>inclusiveHi){
-                break;
-              }
-              mask=~1L;
-            }
-            long word;
-            final ByteSetImpl.Unchecked root;
-            if((word=(root=this.root).word2)!=(word&=mask)){
-              root.word2=word;
-              this.size=size-1;
-              super.bubbleUpDecrementSize();
-              return true;
-            }
-            break;
-          }
-        }
-        return false;
-      }
-      
-      @Override public boolean remove(Object val){
-        final int size;
-        if((size=this.size)!=0){
-          returnFalse:for(;;){
-            returnTrue:for(;;){
-              final int v;
-              if(val instanceof Byte){
-                v=(byte)val;
-              }else if(val instanceof Integer || val instanceof Short){
-                v=((Number)val).intValue();
-              }else if(val instanceof Long){
-                final long l;
-                if((l=(long)val)!=(v=(int)l)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Float){
-                final float f;
-                if((f=(float)val)!=(v=(int)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if((d=(double)val)!=(v=(int)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                v=(char)val;
-              }else if(val instanceof Boolean){
-                final long mask;
-                if((boolean)val){
-                  if(1>inclusiveHi){
-                    break returnFalse;
-                  }
-                  mask=~2L;
-                }else{
-                  if(0>inclusiveHi){
-                    break returnFalse;
-                  }
-                  mask=~1L;
-                }
-                long word;
-                final ByteSetImpl.Unchecked root;
-                if((word=(root=this.root).word2)!=(word&=mask)){
-                  root.word2=word;
-                  break returnTrue;
-                }
-                break returnFalse;
-              }else{
-                break returnFalse;
-              }
-              if(v<=inclusiveHi && ByteSetImpl.removeVal(root,v)){
-                
-              }
-              break returnFalse;
-            }
-            this.size=size-1;
-            super.bubbleUpDecrementSize();
-            return true;
-          }
-        }
-        return false;
-      }
+
       @Override public int hashCode(){
         final int size;
         if((size=this.size)!=0){
@@ -3305,6 +3389,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return this;
       }
+      #MACRO HeadSetAscendingAccessMethods<Unchecked>()
+      #MACRO PollFirstAndLastInt<Ascending,root,HeadSet,Unchecked>()
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Unchecked root,int size,int inclusiveHi){
           super(root,size,inclusiveHi);
@@ -3372,6 +3458,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.HeadSet.Descending(this,size,inclusiveHi);
         }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Unchecked root,int size,int inclusiveHi){
@@ -3380,6 +3472,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(HeadSet parent,int size,int inclusiveHi){
           super(parent,size,inclusiveHi);
         }
+        #MACRO DescendingAccessMethods()
         #MACRO SubSetToArrayCopy<Unchecked,byte,HeadSet,Descending>()
         #MACRO SubSetToArrayCopy<Unchecked,short,HeadSet,Descending>()
         #MACRO SubSetToArrayCopy<Unchecked,int,HeadSet,Descending>()
@@ -3440,6 +3533,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.HeadSet.Ascending(this,size,inclusiveHi);
         }
+        #MACRO PollFirstAndLastInt<Descending,root,HeadSet,Unchecked>()
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
     }
     private static abstract class BodySet extends UncheckedSubSet{
@@ -3451,6 +3551,25 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private BodySet(UncheckedSubSet parent,int size,int boundInfo){
         super(parent,size);
         this.boundInfo=boundInfo;
+      }
+      @Override int removeIfImpl(int size,BytePredicate filter){
+        #MACRO NYI();
+      }
+      @Override void clearImpl(){
+        root.clearBodySet(boundInfo);
+      }
+      @Override long isInRange(boolean val){
+        final int boundInfo=this.boundInfo;
+        if(val){
+          if(1<=(boundInfo>>8) && 1>=((byte)(boundInfo&0xff))){
+            return 2L;
+          }
+        }else{
+          if(0<=(boundInfo>>8) && 0>=((byte)(boundInfo&0xff))){
+            return 1L;
+          }
+        }
+        return 0L;
       }
       @Override boolean isInRange(int val){
         final int boundInfo;
@@ -3477,171 +3596,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 128;
       }
-      @Override public boolean contains(boolean val){
-        if(this.size!=0){
-          for(;;){
-            final long mask;
-            final int boundInfo=this.boundInfo;
-            if(val){
-              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=2L;
-            }else{
-              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=1L;
-            }
-            return wordContains(root.word2,mask);
-          }
-        }
-        return false;
-      }
-      @Override public boolean contains(Object val){
-        if(this.size!=0){
-          for(;;){
-            final int v;
-            if(val instanceof Byte){
-              v=(byte)val;
-            }else if(val instanceof Integer || val instanceof Short){
-              v=((Number)val).intValue();
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=(v=(int)l)){
-                break;
-              }
-            }else if(val instanceof Float){
-              final float f;
-              if((f=(float)val)!=(v=(int)f)){
-                break;
-              }
-            }else if(val instanceof Double){
-              final double d;
-              if((d=(double)val)!=(v=(int)d)){
-                break;
-              }
-            }else if(val instanceof Character){
-              v=(char)val;
-            }else if(val instanceof Boolean){
-              final long mask;
-              final int boundInfo=this.boundInfo;
-              if((boolean)val){
-                if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                  break;
-                }
-                mask=2L;
-              }else{
-                if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                  break;
-                }
-                mask=1L;
-              }
-              return wordContains(root.word2,mask);
-            }else{
-              break;
-            }
-            final int boundInfo;
-            return v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.contains(root,v);
-          }
-        }
-        return false;
-      }
-      @Override public boolean removeVal(boolean val){
-        final int size;
-        if((size=this.size)!=0){
-          for(;;){
-            final long mask;
-            final int boundInfo=this.boundInfo;
-            if(val){
-              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=~2L;
-            }else{
-              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=~1L;
-            }
-            long word;
-            final ByteSetImpl.Unchecked root;
-            if((word=(root=this.root).word2)!=(word&=mask)){
-              root.word2=word;
-              this.size=size-1;
-              super.bubbleUpDecrementSize();
-              return true;
-            }
-            break;
-          }
-        }
-        return false;
-      }
-      
-      @Override public boolean remove(Object val){
-        final int size;
-        if((size=this.size)!=0){
-          returnFalse:for(;;){
-            returnTrue:for(;;){
-              final int v;
-              if(val instanceof Byte){
-                v=(byte)val;
-              }else if(val instanceof Integer || val instanceof Short){
-                v=((Number)val).intValue();
-              }else if(val instanceof Long){
-                final long l;
-                if((l=(long)val)!=(v=(int)l)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Float){
-                final float f;
-                if((f=(float)val)!=(v=(int)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if((d=(double)val)!=(v=(int)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                v=(char)val;
-              }else if(val instanceof Boolean){
-                final long mask;
-                final int boundInfo=this.boundInfo;
-                if((boolean)val){
-                  if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                    break returnFalse;
-                  }
-                  mask=~2L;
-                }else{
-                  if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                    break returnFalse;
-                  }
-                  mask=~1L;
-                }
-                long word;
-                final ByteSetImpl.Unchecked root;
-                if((word=(root=this.root).word2)!=(word&=mask)){
-                  root.word2=word;
-                  break returnTrue;
-                }
-                break returnFalse;
-              }else{
-                break returnFalse;
-              }
-              final int boundInfo;
-              if(v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.removeVal(root,v)){
-                break returnTrue;
-              }
-              break returnFalse;
-            }
-            this.size=size-1;
-            super.bubbleUpDecrementSize();
-            return true;
-          }
-        }
-        return false;
-      }
+
       @Override public int hashCode(){
         final int size;
         if((size=this.size)!=0){
@@ -3709,6 +3664,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return AbstractByteSet.EmptyView.DESCENDING;
       }
+      #MACRO BodySetAscendingAccessMethods<Unchecked>()
+      #MACRO PollFirstAndLastInt<Ascending,root,BodySet,Unchecked>()
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Unchecked root,int size,int boundInfo){
           super(root,size,boundInfo);
@@ -3773,6 +3730,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.BodySet.Descending(this,size,boundInfo);
         }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Unchecked root,int size,int boundInfo){
@@ -3781,6 +3744,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(UncheckedSubSet parent,int size,int boundInfo){
           super(parent,size,boundInfo);
         }
+        #MACRO DescendingAccessMethods()
         #MACRO SubSetToArrayCopy<Unchecked,byte,BodySet,Descending>()
         #MACRO SubSetToArrayCopy<Unchecked,short,BodySet,Descending>()
         #MACRO SubSetToArrayCopy<Unchecked,int,BodySet,Descending>()
@@ -3838,6 +3802,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.BodySet.Ascending(this,size,boundInfo);
         }
+        #MACRO PollFirstAndLastInt<Descending,root,BodySet,Unchecked>()
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
     }    
   }
@@ -3857,21 +3828,51 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       this.parent=parent;
       this.modCountAndSize=modCountAndSize;
     }
+    abstract void clearImpl(ByteSetImpl.Checked root);
+    @Override public void clear(){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      int size;
+      if((size=modCountAndSize&0x1ff)!=0){
+        clearImpl(root);
+        root.modCountAndSize=rootModCountAndSize+(size=(1<<9)-size);
+        this.modCountAndSize=modCountAndSize+size;
+        bubbleUpModify(size);
+      }
+    }
     private void incrementModCountAndSize(){
       var curr=this;
       do{
         curr.modCountAndSize+=((1<<9)+1);
       }while((curr=curr.parent)!=null);
     }
-    private void bubbleUpRemove(int modCountDiff){
+    private void bubbleUpModify(int modCountDiff){
       for(var curr=parent;curr!=null;curr=curr.parent){
         curr.modCountAndSize+=modCountDiff;
       }
+    }
+    @Override public int size(){
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,root.modCountAndSize>>9);
+      return modCountAndSize&0x1ff;
+    }
+    @Override public boolean isEmpty(){
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,root.modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)==0;
     }
     abstract boolean isInRange(int val);
     abstract int isInRange(long val);
     abstract int isInRange(float val);
     abstract int isInRange(double val);
+    abstract long isInRange(boolean val);
+    @Override public boolean contains(boolean val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      return (modCountAndSize&0x1ff)!=0 && wordContains(root.word2,isInRange(val));
+    }
     @Override public boolean contains(byte val){
       final ByteSetImpl.Checked root;
       final int modCountAndSize;
@@ -3908,7 +3909,58 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
       return (modCountAndSize&0x1ff)!=0 && ByteSetImpl.contains(root,isInRange(val));
     }
-
+    @Override public boolean contains(Object val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+      if((modCountAndSize&0x1ff)!=0){
+        for(;;){
+          final int v;
+          if(val instanceof Byte){
+            v=(byte)val;
+          }else if(val instanceof Integer || val instanceof Short){
+            v=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(v=(int)l)){
+              break;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(v=(int)f)){
+              break;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(v=(int)d)){
+              break;
+            }
+          }else if(val instanceof Character){
+            v=(char)val;
+          }else if(val instanceof Boolean){
+            return wordContains(root.word2,isInRange((boolean)val));
+          }else{
+            break;
+          }
+          return isInRange(v) && ByteSetImpl.contains(root,v);
+        }
+      }
+      return false;
+    }
+    @Override public boolean removeVal(boolean val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      long word;
+      if((modCountAndSize&0x1ff)!=0 && (word=root.word2)!=(word&=~isInRange(val))){
+        root.word2=word;
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndSize=modCountAndSize+((1<<9)-1);
+        bubbleUpModify((1<<9)-1);
+        return true;
+      }
+      return false;
+    }
     @Override public boolean removeVal(byte val){
       final ByteSetImpl.Checked root;
       final int modCountAndSize,rootModCountAndSize;
@@ -3916,7 +3968,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpRemove((1<<9)-1);
+        bubbleUpModify((1<<9)-1);
         return true;
       }
       return false;
@@ -3928,7 +3980,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpRemove((1<<9)-1);
+        bubbleUpModify((1<<9)-1);
         return true;
       }
       return false;
@@ -3940,7 +3992,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpRemove((1<<9)-1);
+        bubbleUpModify((1<<9)-1);
         return true;
       }
       return false;
@@ -3952,7 +4004,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpRemove((1<<9)-1);
+        bubbleUpModify((1<<9)-1);
         return true;
       }
       return false;
@@ -3964,7 +4016,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpRemove((1<<9)-1);
+        bubbleUpModify((1<<9)-1);
         return true;
       }
       return false;
@@ -3976,12 +4028,63 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpRemove((1<<9)-1);
+        bubbleUpModify((1<<9)-1);
         return true;
       }
       return false;
     }
-
+    @Override public boolean remove(Object val){
+      final ByteSetImpl.Checked root;
+      final int modCountAndSize,rootModCountAndSize;
+      CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+      if((modCountAndSize&0x1ff)!=0){
+        returnFalse:for(;;){
+          returnTrue:for(;;){
+            final int v;
+            if(val instanceof Byte){
+              v=(byte)val;
+            }else if(val instanceof Integer || val instanceof Short){
+              v=((Number)val).intValue();
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=(v=(int)l)){
+                break returnFalse;
+              }
+            }else if(val instanceof Float){
+              final float f;
+              if((f=(float)val)!=(v=(int)f)){
+                break returnFalse;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if((d=(double)val)!=(v=(int)d)){
+                break returnFalse;
+              }
+            }else if(val instanceof Character){
+              v=(char)val;
+            }else if(val instanceof Boolean){
+              long word;
+              if((word=root.word2)!=(word&=~isInRange((boolean)val))){
+                root.word2=word;
+                break returnTrue;
+              }
+              break returnFalse;
+            }else{
+              break returnFalse;
+            }
+            if(isInRange(v) && ByteSetImpl.removeVal(root,v)){
+              break returnTrue;
+            }
+            break returnFalse;
+          }
+          root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+          this.modCountAndSize=modCountAndSize+((1<<9)-1);
+          bubbleUpModify((1<<9)-1);
+          return true;
+        }
+      }
+      return false;
+    }
     
     #MACRO SubSetToArray<Checked,byte>(Byte,OmniArray.OfByte.DEFAULT_ARR)
     #MACRO SubSetToArray<Checked,short>(Short,OmniArray.OfShort.DEFAULT_ARR)
@@ -4001,7 +4104,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if((size=removeIfImpl(root=this.root,size,filter,root.new ModCountChecker(modCountAndSize)))!=0){
           root.modCountAndSize+=(size=(1<<9)-size);
           this.modCountAndSize=modCountAndSize+size;
-          bubbleUpRemove(size);
+          bubbleUpModify(size);
           return true;
         }
       }else{
@@ -4017,7 +4120,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if((size=removeIfImpl(root=this.root,size,filter::test,root.new ModCountChecker(modCountAndSize)))!=0){
           root.modCountAndSize+=(size=(1<<9)-size);
           this.modCountAndSize=modCountAndSize+size;
-          bubbleUpRemove(size);
+          bubbleUpModify(size);
           return true;
         }
       }else{
@@ -4098,10 +4201,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final long mask;
       if(val){
         checkAddBounds((byte)1);
-        mask=1L<<1;
+        mask=2L;
       }else{
         checkAddBounds((byte)1);
-        mask=1L<<0;
+        mask=1L;
       }
       final ByteSetImpl.Checked root;
       final int modCountAndSize,rootModCountAndSize;
@@ -4171,6 +4274,21 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(parent,modCountAndSize);
         this.inclusiveLo=inclusiveLo;
       }
+      @Override void clearImpl(ByteSetImpl.Checked root){
+        root.clearTailSet(inclusiveLo);
+      }
+      @Override long isInRange(boolean val){
+        if(val){
+          if(1>=inclusiveLo){
+            return 2L;
+          }
+        }else{
+          if(0>=inclusiveLo){
+            return 1L;
+          }
+        }
+        return 0L;
+      }
       @Override boolean isInRange(int val){
         return val>=inclusiveLo;
       }
@@ -4194,175 +4312,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return v;
         }
         return 128;
-      }
-      @Override public boolean contains(boolean val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1<inclusiveLo){
-                break;
-              }
-              mask=2L;
-            }else{
-              if(0<inclusiveLo){
-                break;
-              }
-              mask=1L;
-            }
-            return wordContains(root.word2,mask);
-          }
-        }
-        return false;
-      }
-      @Override public boolean contains(Object val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final int v;
-            if(val instanceof Byte){
-              v=(byte)val;
-            }else if(val instanceof Integer || val instanceof Short){
-              v=((Number)val).intValue();
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=(v=(int)l)){
-                break;
-              }
-            }else if(val instanceof Float){
-              final float f;
-              if((f=(float)val)!=(v=(int)f)){
-                break;
-              }
-            }else if(val instanceof Double){
-              final double d;
-              if((d=(double)val)!=(v=(int)d)){
-                break;
-              }
-            }else if(val instanceof Character){
-              v=(char)val;
-            }else if(val instanceof Boolean){
-              final long mask;
-              if((boolean)val){
-                if(1<inclusiveLo){
-                  break;
-                }
-                mask=2L;
-              }else{
-                if(0<inclusiveLo){
-                  break;
-                }
-                mask=1L;
-              }
-              return wordContains(root.word2,mask);
-            }else{
-              break;
-            }
-            return v>=inclusiveLo && ByteSetImpl.contains(root,v);
-          }
-        }
-        return false;
-      }
-      @Override public boolean removeVal(boolean val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize,rootModCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1<inclusiveLo){
-                break;
-              }
-              mask=~2L;
-            }else{
-              if(0<inclusiveLo){
-                break;
-              }
-              mask=~1L;
-            }
-            long word;
-            if((word=root.word2)!=(word&=mask)){
-              root.word2=word;
-              root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
-              this.modCountAndSize=modCountAndSize+((1<<9)-1);
-              super.bubbleUpRemove((1<<9)-1);
-              return true;
-            }
-            break;
-          }
-        }
-        return false;
-      }
-      
-      @Override public boolean remove(Object val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize,rootModCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          returnFalse:for(;;){
-            returnTrue:for(;;){
-              final int v;
-              if(val instanceof Byte){
-                v=(byte)val;
-              }else if(val instanceof Integer || val instanceof Short){
-                v=((Number)val).intValue();
-              }else if(val instanceof Long){
-                final long l;
-                if((l=(long)val)!=(v=(int)l)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Float){
-                final float f;
-                if((f=(float)val)!=(v=(int)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if((d=(double)val)!=(v=(int)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                v=(char)val;
-              }else if(val instanceof Boolean){
-                final long mask;
-                if((boolean)val){
-                  if(1<inclusiveLo){
-                    break;
-                  }
-                  mask=~2L;
-                }else{
-                  if(0<inclusiveLo){
-                    break;
-                  }
-                  mask=~1L;
-                }
-                long word;
-                if((word=root.word2)!=(word&=mask)){
-                  root.word2=word;
-                  break returnTrue;
-                }
-                break returnFalse;
-              }else{
-                break returnFalse;
-              }
-              if(v>=inclusiveLo && ByteSetImpl.removeVal(root,v)){
-                break returnTrue;
-              }
-              break returnFalse;
-            }
-            root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
-            this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpRemove((1<<9)-1);
-            return true;
-          }
-        }
-        return false;
       }
       @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
         return root.removeIfImplStartWord3Descending(Byte.MAX_VALUE,size,filter,modCountChecker);
@@ -4469,6 +4418,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         throw new IllegalArgumentException("out of bounds");
       }
+      #MACRO TailSetAscendingAccessMethods<Checked>()
+      #MACRO PollFirstAndLastInt<Ascending,root,TailSet,Checked>()
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int inclusiveLo){
           super(root,modCountAndSize,inclusiveLo);
@@ -4558,6 +4509,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.TailSet.Descending(this,modCountAndSize,this.inclusiveLo);
         }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends TailSet{
         private Descending(ByteSetImpl.Checked root,int modCountAndSize,int inclusiveLo){
@@ -4566,6 +4523,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(TailSet parent,int modCountAndSize,int inclusiveLo){
           super(parent,modCountAndSize,inclusiveLo);
         }
+        #MACRO DescendingAccessMethods()
         #MACRO SubSetToArrayCopy<Checked,byte,TailSet,Descending>()
         #MACRO SubSetToArrayCopy<Checked,short,TailSet,Descending>()
         #MACRO SubSetToArrayCopy<Checked,int,TailSet,Descending>()
@@ -4648,6 +4606,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.TailSet.Ascending(this,modCountAndSize,this.inclusiveLo);
         }
+        #MACRO PollFirstAndLastInt<Descending,root,TailSet,Checked>()
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
     }
     private static abstract class HeadSet extends CheckedSubSet{
@@ -4659,6 +4624,21 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private HeadSet(HeadSet parent,int modCountAndSize,int inclusiveHi){
         super(parent,modCountAndSize);
         this.inclusiveHi=inclusiveHi;
+      }
+      @Override void clearImpl(ByteSetImpl.Checked root){
+        root.clearHeadSet(inclusiveHi);
+      }
+      @Override long isInRange(boolean val){
+        if(val){
+          if(1<=inclusiveHi){
+            return 2L;
+          }
+        }else{
+          if(0<=inclusiveHi){
+            return 1L;
+          }
+        }
+        return 0L;
       }
       @Override boolean isInRange(int val){
         return val<=inclusiveHi;
@@ -4684,175 +4664,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 128;
       }
-      @Override public boolean contains(boolean val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1>inclusiveHi){
-                break;
-              }
-              mask=2L;
-            }else{
-              if(0>inclusiveHi){
-                break;
-              }
-              mask=1L;
-            }
-            return wordContains(root.word2,mask);
-          }
-        }
-        return false;
-      }
-      @Override public boolean contains(Object val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final int v;
-            if(val instanceof Byte){
-              v=(byte)val;
-            }else if(val instanceof Integer || val instanceof Short){
-              v=((Number)val).intValue();
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=(v=(int)l)){
-                break;
-              }
-            }else if(val instanceof Float){
-              final float f;
-              if((f=(float)val)!=(v=(int)f)){
-                break;
-              }
-            }else if(val instanceof Double){
-              final double d;
-              if((d=(double)val)!=(v=(int)d)){
-                break;
-              }
-            }else if(val instanceof Character){
-              v=(char)val;
-            }else if(val instanceof Boolean){
-              final long mask;
-              if((boolean)val){
-                if(1>inclusiveHi){
-                  break;
-                }
-                mask=2L;
-              }else{
-                if(0>inclusiveHi){
-                  break;
-                }
-                mask=1L;
-              }
-              return wordContains(root.word2,mask);
-            }else{
-              break;
-            }
-            return v<=inclusiveHi && ByteSetImpl.contains(root,v);
-          }
-        }
-        return false;
-      }
-      @Override public boolean removeVal(boolean val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize,rootModCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final long mask;
-            if(val){
-              if(1>inclusiveHi){
-                break;
-              }
-              mask=~2L;
-            }else{
-              if(0>inclusiveHi){
-                break;
-              }
-              mask=~1L;
-            }
-            long word;
-            if((word=root.word2)!=(word&=mask)){
-              root.word2=word;
-              root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
-              this.modCountAndSize=modCountAndSize+((1<<9)-1);
-              super.bubbleUpRemove((1<<9)-1);
-              return true;
-            }
-            break;
-          }
-        }
-        return false;
-      }
-      
-      @Override public boolean remove(Object val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize,rootModCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          returnFalse:for(;;){
-            returnTrue:for(;;){
-              final int v;
-              if(val instanceof Byte){
-                v=(byte)val;
-              }else if(val instanceof Integer || val instanceof Short){
-                v=((Number)val).intValue();
-              }else if(val instanceof Long){
-                final long l;
-                if((l=(long)val)!=(v=(int)l)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Float){
-                final float f;
-                if((f=(float)val)!=(v=(int)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if((d=(double)val)!=(v=(int)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                v=(char)val;
-              }else if(val instanceof Boolean){
-                final long mask;
-                if((boolean)val){
-                  if(1>inclusiveHi){
-                    break;
-                  }
-                  mask=~2L;
-                }else{
-                  if(0>inclusiveHi){
-                    break;
-                  }
-                  mask=~1L;
-                }
-                long word;
-                if((word=root.word2)!=(word&=mask)){
-                  root.word2=word;
-                  break returnTrue;
-                }
-                break returnFalse;
-              }else{
-                break returnFalse;
-              }
-              if(v<=inclusiveHi && ByteSetImpl.removeVal(root,v)){
-                break returnTrue;
-              }
-              break returnFalse;
-            }
-            root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
-            this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpRemove((1<<9)-1);
-            return true;
-          }
-        }
-        return false;
-      }
+     
       @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
         return root.removeIfImplStartWord0Ascending(Byte.MIN_VALUE,size,filter,modCountChecker);
       }
@@ -4957,6 +4769,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         throw new IllegalArgumentException("out of bounds");
       }
+      #MACRO HeadSetAscendingAccessMethods<Checked>()
+      #MACRO PollFirstAndLastInt<Ascending,root,HeadSet,Checked>()
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int inclusiveHi){
           super(root,modCountAndSize,inclusiveHi);
@@ -5046,6 +4860,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize,this.inclusiveHi);
         }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends HeadSet{
         private Descending(ByteSetImpl.Checked root,int modCountAndSize,int inclusiveHi){
@@ -5054,6 +4874,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(HeadSet parent,int modCountAndSize,int inclusiveHi){
           super(parent,modCountAndSize,inclusiveHi);
         }
+        #MACRO DescendingAccessMethods()
         #MACRO SubSetToArrayCopy<Checked,byte,HeadSet,Descending>()
         #MACRO SubSetToArrayCopy<Checked,short,HeadSet,Descending>()
         #MACRO SubSetToArrayCopy<Checked,int,HeadSet,Descending>()
@@ -5136,6 +4957,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.HeadSet.Ascending(this,modCountAndSize,this.inclusiveHi);
         }
+        #MACRO PollFirstAndLastInt<Descending,root,HeadSet,Checked>()
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
     }
     private static abstract class BodySet extends CheckedSubSet{
@@ -5147,6 +4975,22 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private BodySet(CheckedSubSet parent,int modCountAndSize,int boundInfo){
         super(parent,modCountAndSize);
         this.boundInfo=boundInfo;
+      }
+      @Override void clearImpl(ByteSetImpl.Checked root){
+        root.clearBodySet(boundInfo);
+      }
+      @Override long isInRange(boolean val){
+        final int boundInfo=this.boundInfo;
+        if(val){
+          if(1<=(boundInfo>>8) && 1>=((byte)(boundInfo&0xff))){
+            return 2L;
+          }
+        }else{
+          if(0<=(boundInfo>>8) && 0>=((byte)(boundInfo&0xff))){
+            return 1L;
+          }
+        }
+        return 0L;
       }
       @Override boolean isInRange(int val){
         final int boundInfo;
@@ -5173,182 +5017,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 128;
       }
-      @Override public boolean contains(boolean val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final long mask;
-            final int boundInfo=this.boundInfo;
-            if(val){
-              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=2L;
-            }else{
-              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=1L;
-            }
-            return wordContains(root.word2,mask);
-          }
-        }
-        return false;
-      }
-      @Override public boolean contains(Object val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final int v;
-            if(val instanceof Byte){
-              v=(byte)val;
-            }else if(val instanceof Integer || val instanceof Short){
-              v=((Number)val).intValue();
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=(v=(int)l)){
-                break;
-              }
-            }else if(val instanceof Float){
-              final float f;
-              if((f=(float)val)!=(v=(int)f)){
-                break;
-              }
-            }else if(val instanceof Double){
-              final double d;
-              if((d=(double)val)!=(v=(int)d)){
-                break;
-              }
-            }else if(val instanceof Character){
-              v=(char)val;
-            }else if(val instanceof Boolean){
-              final long mask;
-              final int boundInfo=this.boundInfo;
-              if((boolean)val){
-                if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                  break;
-                }
-                mask=2L;
-              }else{
-                if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                  break;
-                }
-                mask=1L;
-              }
-              return wordContains(root.word2,mask);
-            }else{
-              break;
-            }
-            final int boundInfo;
-            return v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.contains(root,v);
-          }
-        }
-        return false;
-      }
-      @Override public boolean removeVal(boolean val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize,rootModCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          for(;;){
-            final long mask;
-            final int boundInfo=this.boundInfo;
-            if(val){
-              if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=~2L;
-            }else{
-              if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                break;
-              }
-              mask=~1L;
-            }
-            long word;
-            if((word=root.word2)!=(word&=mask)){
-              root.word2=word;
-              root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
-              this.modCountAndSize=modCountAndSize+((1<<9)-1);
-              super.bubbleUpRemove((1<<9)-1);
-              return true;
-            }
-            break;
-          }
-        }
-        return false;
-      }
-      
-      @Override public boolean remove(Object val){
-        final ByteSetImpl.Checked root;
-        final int modCountAndSize,rootModCountAndSize;
-        CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
-        if((modCountAndSize&0x1ff)!=0){
-          returnFalse:for(;;){
-            returnTrue:for(;;){
-              final int v;
-              if(val instanceof Byte){
-                v=(byte)val;
-              }else if(val instanceof Integer || val instanceof Short){
-                v=((Number)val).intValue();
-              }else if(val instanceof Long){
-                final long l;
-                if((l=(long)val)!=(v=(int)l)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Float){
-                final float f;
-                if((f=(float)val)!=(v=(int)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if((d=(double)val)!=(v=(int)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                v=(char)val;
-              }else if(val instanceof Boolean){
-                final long mask;
-                final int boundInfo=this.boundInfo;
-                if((boolean)val){
-                  if(1>(boundInfo>>8) || 1<((byte)(boundInfo&0xff))){
-                    break returnFalse;
-                  }
-                  mask=~2L;
-                }else{
-                  if(0>(boundInfo>>8) || 0<((byte)(boundInfo&0xff))){
-                    break returnFalse;
-                  }
-                  mask=~1L;
-                }
-                long word;
-                if((word=root.word2)!=(word&=mask)){
-                  root.word2=word;
-                  break returnTrue;
-                }
-                break returnFalse;
-              }else{
-                break returnFalse;
-              }
-              final int boundInfo;
-              if(v>=(boundInfo=this.boundInfo)>>8 && v<=((byte)(boundInfo&0xff)) && ByteSetImpl.removeVal(root,v)){
-                break returnTrue;
-              }
-              break returnFalse;
-            }
-            root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
-            this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpRemove((1<<9)-1);
-            return true;
-          }
-        }
-        return false;
-      }
-      
       @Override public int hashCode(){
         int modCountAndSize;
         final ByteSetImpl.Checked root;
@@ -5527,6 +5195,8 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         throw new IllegalArgumentException("out of bounds");
       }
+      #MACRO BodySetAscendingAccessMethods<Checked>()
+      #MACRO PollFirstAndLastInt<Ascending,root,BodySet,Checked>()
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int boundInfo){
           super(root,modCountAndSize,boundInfo);
@@ -5593,6 +5263,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.BodySet.Descending(this,modCountAndSize,this.boundInfo);
         }
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
       private static class Descending extends BodySet{
         private Descending(ByteSetImpl.Checked root,int modCountAndSize,int boundInfo){
@@ -5601,6 +5277,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         private Descending(CheckedSubSet parent,int modCountAndSize,int boundInfo){
           super(parent,modCountAndSize,boundInfo);
         }
+        #MACRO DescendingAccessMethods()
         #MACRO SubSetToArrayCopy<Checked,byte,BodySet,Descending>()
         #MACRO SubSetToArrayCopy<Checked,short,BodySet,Descending>()
         #MACRO SubSetToArrayCopy<Checked,int,BodySet,Descending>()
@@ -5660,15 +5337,844 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize,this.boundInfo);
         }
+        #MACRO PollFirstAndLastInt<Descending,root,BodySet,Checked>()
+        
+        @Override public OmniIterator.OfByte iterator(){
+          #MACRO NYI();
+        }
+        @Override public OmniIterator.OfByte descendingIterator(){
+          #MACRO NYI()
+        }
       }
     }
   }
   
   
 }
+#MACRODEF PollFirstAndLastInt<DIRECTION,SOURCE,VIEW,CHECKED>()
+@Override public int pollFirstInt(){
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH SOURCE==this
+
+  
+  #IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  if(((modCountAndSize=SOURCE.modCountAndSize)&0x1ff)!=0)  
+    #ENDIF
+  {
+    #IFSWITCH CHECKED==Unchecked
+    returnNotFound:for(;;)
+    #ENDIF
+    {
+      int tail0s;
+      for(;;){
+        long word;
+        if((tail0s=Long.numberOfTrailingZeros(word=SOURCE.word0))!=64){
+          SOURCE.word0=word&(~(1L<<(tail0s+=Byte.MIN_VALUE)));
+          break;
+        }
+        if((tail0s=Long.numberOfTrailingZeros(word=SOURCE.word1))!=64){
+          SOURCE.word1=word&(~(1L<<(tail0s-=64)));
+          break;
+        }
+        if((tail0s=Long.numberOfTrailingZeros(word=SOURCE.word2))!=64){
+          SOURCE.word2=word&(~(1L<<(tail0s)));
+          break;
+        }
+    #IFSWITCH CHECKED==Checked
+        SOURCE.word3=(word=SOURCE.word3)&(~(1L<<(tail0s=Long.numberOfTrailingZeros(word)+64)));
+        break;
+    #ELSE
+        if((tail0s=Long.numberOfTrailingZeros(word=SOURCE.word3))!=64){
+          SOURCE.word2=word&(~(1L<<(tail0s+=64)));
+          break;
+        }
+        break returnNotFound;
+    #ENDIF
+      }
+    #IFSWITCH CHECKED==Checked
+      SOURCE.modCountAndSize=modCountAndSize+((1<<9)-1);
+    #ENDIF
+      return tail0s;
+    }
+  }
+  return Integer.MIN_VALUE;
+  
+  #ELSE
+    #IFSWITCH VIEW==Full
+  return SOURCE.pollFirstInt();
+    #ELSE
+      #IFSWITCH CHECKED==Checked
+    final ByteSetImpl.CHECKED SOURCE;
+    final int rootModCountAndSize,modCountAndSize;
+    CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(SOURCE=this.SOURCE).modCountAndSize)>>9);
+    if((modCountAndSize&0x1ff)!=0){
+      #ELSE
+    final int size;
+    if((size=this.size)!=0){
+      final var SOURCE=this.SOURCE;
+      #ENDIF
+      int tail0s;
+      #IFSWITCH VIEW==HeadSet
+      for(;;){
+        long word;
+        if((tail0s=Long.numberOfTrailingZeros(word=SOURCE.word0))!=64){
+          SOURCE.word0=word&(~(1L<<(tail0s+=Byte.MIN_VALUE)));
+          break;
+        }
+        if((tail0s=Long.numberOfTrailingZeros(word=SOURCE.word1))!=64){
+          SOURCE.word1=word&(~(1L<<(tail0s-=64)));
+          break;
+        }
+        if((tail0s=Long.numberOfTrailingZeros(word=SOURCE.word2))!=64){
+          SOURCE.word2=word&(~(1L<<(tail0s)));
+          break;
+        }
+        SOURCE.word3=(word=SOURCE.word3)&(~(1L<<(tail0s=Long.numberOfTrailingZeros(word)+64)));
+        break;
+      }
+      #ELSE
+        #IFSWITCH VIEW==TailSet
+      switch((tail0s=this.inclusiveLo)>>6){  
+        #ELSE
+      switch((tail0s=this.boundInfo>>8)>>6){  
+        #ENDIF
+        case -2:
+          long word;
+          if((tail0s=Long.numberOfTrailingZeros((word=SOURCE.word0)&(-1L<<tail0s)))!=64){
+            SOURCE.word0=word&(~(1L<<(tail0s+=Byte.MIN_VALUE)));
+            break;
+          }
+        case -1:
+          if((tail0s=Long.numberOfTrailingZeros((word=SOURCE.word1)&(-1L<<tail0s)))!=64){
+            SOURCE.word1=word&(~(1L<<(tail0s-=64)));
+            break;
+          }
+        case 0:
+          if((tail0s=Long.numberOfTrailingZeros((word=SOURCE.word2)&(-1L<<tail0s)))!=64){
+            SOURCE.word2=word&(~(1L<<(tail0s)));
+            break; 
+          }
+        default:
+          SOURCE.word3=(word=SOURCE.word3)&(~(1L<<(tail0s=64+Long.numberOfTrailingZeros(word&(-1L<<tail0s)))));
+      }
+      #ENDIF
+      #IFSWITCH CHECKED==Checked
+      SOURCE.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+      this.modCountAndSize=modCountAndSize+((1<<9)-1);
+      super.bubbleUpModify((1<<9)-1);
+      #ELSE
+      this.size=size-1;
+      super.bubbleUpDecrementSize();
+      #ENDIF
+      return tail0s;
+      
+    }
+    return Integer.MIN_VALUE;
+    
+    #ENDIF
+  #ENDIF
+#ELSE
+  return super.pollLastInt();
+#ENDIF
+}
+@Override public int pollLastInt(){
+#IFSWITCH DIRECTION==Ascending
+  #IFSWITCH SOURCE==this
+    #IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  if(((modCountAndSize=SOURCE.modCountAndSize)&0x1ff)!=0)  
+    #ENDIF
+  {
+    #IFSWITCH CHECKED==Unchecked
+    returnNotFound:for(;;)
+    #ENDIF
+    {
+      int lead0s;
+      for(;;){
+        long word;
+        if((lead0s=Long.numberOfLeadingZeros(word=SOURCE.word3))!=64){
+          SOURCE.word3=word&(~(1L<<(lead0s=Byte.MAX_VALUE-lead0s)));
+          break;
+        }
+        if((lead0s=Long.numberOfLeadingZeros(word=SOURCE.word2))!=64){
+          SOURCE.word2=word&(~(1L<<(lead0s=63-lead0s)));
+          break;
+        }
+        if((lead0s=Long.numberOfLeadingZeros(word=SOURCE.word1))!=64){
+          SOURCE.word1=word&(~(1L<<(lead0s=-1-lead0s)));
+          break;
+        }
+    #IFSWITCH CHECKED==Checked
+        SOURCE.word0=(word=SOURCE.word0)&(~(1L<<(lead0s=-65-Long.numberOfLeadingZeros(word))));
+        break;
+    #ELSE
+        if((lead0s=Long.numberOfLeadingZeros(word=SOURCE.word0))!=64){
+          SOURCE.word0=word&(~(1L<<(lead0s=-65-lead0s)));
+          break;
+        }
+        break returnNotFound;
+    #ENDIF
+      }
+    #IFSWITCH CHECKED==Checked
+      SOURCE.modCountAndSize=modCountAndSize+((1<<9)-1);
+    #ENDIF
+      return lead0s;
+    }
+  }
+  return Integer.MIN_VALUE;
+  #ELSE
+    #IFSWITCH VIEW==Full
+  return SOURCE.pollLastInt();
+    #ELSE
+      #IFSWITCH CHECKED==Checked
+    final ByteSetImpl.CHECKED root;
+    final int rootModCountAndSize,modCountAndSize;
+    CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(rootModCountAndSize=(root=this.root).modCountAndSize)>>9);
+    if((modCountAndSize&0x1ff)!=0){
+      #ELSE
+    final int size;
+    if((size=this.size)!=0){
+      final var root=this.root;
+      #ENDIF
+      int lead0s;
+      #IFSWITCH VIEW==TailSet
+      for(;;){
+        long word;
+        if((lead0s=Long.numberOfLeadingZeros(word=SOURCE.word3))!=64){
+          SOURCE.word3=word&(~(1L<<(lead0s=Byte.MAX_VALUE-lead0s)));
+          break;
+        }
+        if((lead0s=Long.numberOfLeadingZeros(word=SOURCE.word2))!=64){
+          SOURCE.word2=word&(~(1L<<(lead0s=63-lead0s)));
+          break;
+        }
+        if((lead0s=Long.numberOfLeadingZeros(word=SOURCE.word1))!=64){
+          SOURCE.word1=word&(~(1L<<(lead0s=-1-lead0s)));
+          break;
+        }
+        SOURCE.word0=(word=SOURCE.word0)&(~(1L<<(lead0s=-65-Long.numberOfLeadingZeros(word))));
+        break;
+      }
+      #ELSE
+        #IFSWITCH VIEW==HeadSet
+      switch((lead0s=this.inclusiveHi)>>6){
+        #ELSE
+      switch((lead0s=(byte)(this.boundInfo&0xff))>>6){  
+        #ENDIF
+        case 1:
+          long word;
+          if((lead0s=Long.numberOfLeadingZeros((word=SOURCE.word3)&(-1L>>>(-lead0s-1)))-1)!=63){
+            SOURCE.word3=word&(~(1L<<(lead0s=128-lead0s)));
+            break; 
+          }
+        case -1:
+          if((lead0s=Long.numberOfLeadingZeros((word=SOURCE.word2)&(-1L>>>(-lead0s-1)))-1)!=63){
+            SOURCE.word2=word&(~(1L<<(lead0s=64-lead0s)));
+            break; 
+          }
+        case 0:
+          if((lead0s=Long.numberOfLeadingZeros((word=SOURCE.word1)&(-1L>>>(-lead0s-1)))-1)!=63){
+            SOURCE.word1=word&(~(1L<<(lead0s=-lead0s)));
+            break; 
+          }
+        default:
+          SOURCE.word0=(word=SOURCE.word0)&(~(1L<<(lead0s=-64-Long.numberOfLeadingZeros(word&(-1L>>>(-lead0s-1))))));
+      }
+      #ENDIF
+      #IFSWITCH CHECKED==Checked
+      root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+      this.modCountAndSize=modCountAndSize+((1<<9)-1);
+      super.bubbleUpModify((1<<9)-1);
+      #ELSE
+      this.size=size-1;
+      super.bubbleUpDecrementSize();
+      #ENDIF
+      return lead0s;
+    }
+    return Integer.MIN_VALUE;
+    #ENDIF
+  #ENDIF
+#ELSE
+  return super.pollFirstInt();
+#ENDIF
+}
+#ENDDEF
 
 
+#MACRODEF BodySetAscendingAccessMethods<CHECKED>()
+#MACRO BodySetAscendingAccessMethodsHelper<Byte>(,ceiling,floor,byte,null,(int),(int),1+(int),-1+(int))
+#MACRO BodySetAscendingAccessMethodsHelper<byte>(Byte,byteCeiling,byteFloor,byte,Byte.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO BodySetAscendingAccessMethodsHelper<short>(Short,shortCeiling,shortFloor,short,Short.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO BodySetAscendingAccessMethodsHelper<int>(Int,intCeiling,intFloor,int,Integer.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO BodySetAscendingAccessMethodsHelper<long>(Long,longCeiling,longFloor,long,Long.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO BodySetAscendingAccessMethodsHelper<float>(Float,floatCeiling,floatFloor,float,Float.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#MACRO BodySetAscendingAccessMethodsHelper<double>(Double,doubleCeiling,doubleFloor,double,Double.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#ENDDEF
+#MACRODEF BodySetAscendingAccessMethodsHelper<RETTYPE>(CLASSPREFIX,CEILINGNAME,FLOORNAME,INPUTTYPE,DEFAULTVAL,CEILINGCAST,FLOORCAST,HIGHERCAST,LOWERCAST)
+@Override public RETTYPE CEILINGNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveHi;
+    int boundInfo;
+    if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?CEILINGCAST(val):boundInfo))!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?CEILINGCAST(val):boundInfo))!=128){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE FLOORNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveLo;
+    int boundInfo;
+    if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?FLOORCAST(val):boundInfo))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?FLOORCAST(val):boundInfo))!=-129){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveHi;
+    int boundInfo;
+    if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?HIGHERCAST(val):boundInfo))!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?HIGHERCAST(val):boundInfo))!=128){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveLo;
+    int boundInfo;
+    if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?LOWERCAST(val):boundInfo))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?LOWERCAST(val):boundInfo))!=-129){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+#ENDDEF
 
+
+#MACRODEF HeadSetAscendingAccessMethods<CHECKED>()
+#MACRO HeadSetAscendingAccessMethodsHelper<Byte>(,ceiling,floor,byte,null,(int),(int),1+(int),-1+(int))
+#MACRO HeadSetAscendingAccessMethodsHelper<byte>(Byte,byteCeiling,byteFloor,byte,Byte.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO HeadSetAscendingAccessMethodsHelper<short>(Short,shortCeiling,shortFloor,short,Short.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO HeadSetAscendingAccessMethodsHelper<int>(Int,intCeiling,intFloor,int,Integer.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO HeadSetAscendingAccessMethodsHelper<long>(Long,longCeiling,longFloor,long,Long.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO HeadSetAscendingAccessMethodsHelper<float>(Float,floatCeiling,floatFloor,float,Float.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#MACRO HeadSetAscendingAccessMethodsHelper<double>(Double,doubleCeiling,doubleFloor,double,Double.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#ENDDEF
+#MACRODEF HeadSetAscendingAccessMethodsHelper<RETTYPE>(CLASSPREFIX,CEILINGNAME,FLOORNAME,INPUTTYPE,DEFAULTVAL,CEILINGCAST,FLOORCAST,HIGHERCAST,LOWERCAST)
+@Override public RETTYPE CEILINGNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveHi;
+    if(val<=(inclusiveHi=this.inclusiveHi)){
+  #IFSWITCH RETTYPE==int
+      if((val=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,CEILINGCAST(val)):root.getThisOrHigher()))!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,CEILINGCAST(val)):root.getThisOrHigher()))!=128){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE FLOORNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+  #IFNOTSWITCH RETTYPE==byte,Byte
+    if(!(val<Byte.MIN_VALUE))
+  #ENDIF
+    {
+      final int inclusiveHi;
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?FLOORCAST(val):inclusiveHi))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?FLOORCAST(val):inclusiveHi))!=-129){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveHi;
+    if(val<(inclusiveHi=this.inclusiveHi)){
+  #IFSWITCH RETTYPE==int
+      if((val=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,HIGHERCAST(val)):root.getThisOrHigher()))!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+    #IFSWITCH RETTYPE==byte,Byte
+      if((v=root.getThisOrHigher(inclusiveHi,HIGHERCAST(val)))!=128){
+    #ELSE
+      if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,HIGHERCAST(val)):root.getThisOrHigher()))!=128){
+    #ENDIF
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    if(!(val<=Byte.MIN_VALUE))
+    {
+      final int inclusiveHi;
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?LOWERCAST(val):inclusiveHi))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?LOWERCAST(val):inclusiveHi))!=-129){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+#ENDDEF
+
+
+#MACRODEF TailSetAscendingAccessMethods<CHECKED>()
+#MACRO TailSetAscendingAccessMethodsHelper<Byte>(,ceiling,floor,byte,null,(int),(int),1+(int),-1+(int))
+#MACRO TailSetAscendingAccessMethodsHelper<byte>(Byte,byteCeiling,byteFloor,byte,Byte.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO TailSetAscendingAccessMethodsHelper<short>(Short,shortCeiling,shortFloor,short,Short.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO TailSetAscendingAccessMethodsHelper<int>(Int,intCeiling,intFloor,int,Integer.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO TailSetAscendingAccessMethodsHelper<long>(Long,longCeiling,longFloor,long,Long.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO TailSetAscendingAccessMethodsHelper<float>(Float,floatCeiling,floatFloor,float,Float.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#MACRO TailSetAscendingAccessMethodsHelper<double>(Double,doubleCeiling,doubleFloor,double,Double.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#ENDDEF
+#MACRODEF TailSetAscendingAccessMethodsHelper<RETTYPE>(CLASSPREFIX,CEILINGNAME,FLOORNAME,INPUTTYPE,DEFAULTVAL,CEILINGCAST,FLOORCAST,HIGHERCAST,LOWERCAST)
+@Override public RETTYPE CEILINGNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+  #IFNOTSWITCH RETTYPE==byte,Byte
+    if(val<=Byte.MAX_VALUE)
+  #ENDIF
+    {
+      final int inclusiveLo;
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?CEILINGCAST(val):inclusiveLo))!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?CEILINGCAST(val):inclusiveLo))!=128){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE FLOORNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveLo;
+    if(!(val<(inclusiveLo=this.inclusiveLo))){
+  #IFSWITCH RETTYPE==int
+       if((val=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,FLOORCAST(val)):root.getThisOrLower()))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+       if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,FLOORCAST(val)):root.getThisOrLower()))!=-129){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    if(val<Byte.MAX_VALUE)
+    {
+      final int inclusiveLo;
+  #IFSWITCH RETTYPE==int
+      if((val=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?HIGHERCAST(val):inclusiveLo))!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?HIGHERCAST(val):inclusiveLo))!=128){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  final int modCountAndSize;
+  final ByteSetImpl.CHECKED root;
+  CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>9,(root=this.root).modCountAndSize>>9);
+  if((modCountAndSize&0x1ff)!=0)
+#ELSE
+  if(this.size!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    final int inclusiveLo;
+    if(!(val<=(inclusiveLo=this.inclusiveLo))){
+  #IFSWITCH RETTYPE==int
+       if((val=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,LOWERCAST(val)):root.getThisOrLower()))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+    #IFSWITCH RETTYPE==Byte,byte
+       if((v=root.getThisOrLower(inclusiveLo,LOWERCAST(val)))!=-129){
+    #ELSE
+       if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,LOWERCAST(val)):root.getThisOrLower()))!=-129){
+    #ENDIF
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+#ENDDEF
+
+#MACRODEF FullViewAscendingAccessMethods()
+#MACRO FullViewAscendingAccessMethodsHelper<Byte>(,ceiling,floor,byte)
+#MACRO FullViewAscendingAccessMethodsHelper<byte>(Byte,byteCeiling,byteFloor,byte)
+#MACRO FullViewAscendingAccessMethodsHelper<short>(Short,shortCeiling,shortFloor,short)
+#MACRO FullViewAscendingAccessMethodsHelper<int>(Int,intCeiling,intFloor,int)
+#MACRO FullViewAscendingAccessMethodsHelper<long>(Long,longCeiling,longFloor,long)
+#MACRO FullViewAscendingAccessMethodsHelper<float>(Float,floatCeiling,floatFloor,float)
+#MACRO FullViewAscendingAccessMethodsHelper<double>(Double,doubleCeiling,doubleFloor,double)
+#ENDDEF
+#MACRODEF FullViewAscendingAccessMethodsHelper<RETTYPE>(CLASSPREFIX,CEILINGNAME,FLOORNAME,INPUTTYPE)
+@Override public RETTYPE CEILINGNAME(INPUTTYPE val){
+  return root.FLOORNAME(val);
+}
+@Override public RETTYPE FLOORNAME(INPUTTYPE val){
+  return root.CEILINGNAME(val);
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+  return root.lowerCLASSPREFIX(val);
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+  return root.higherCLASSPREFIX(val);
+}
+#ENDDEF
+
+#MACRODEF FullRootAscendingAccessMethods<CHECKED>()
+#MACRO FullRootAscendingAccessMethodsHelper<Byte>(,ceiling,floor,byte,null,(int),(int),1+(int),-1+(int))
+#MACRO FullRootAscendingAccessMethodsHelper<byte>(Byte,byteCeiling,byteFloor,byte,Byte.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO FullRootAscendingAccessMethodsHelper<short>(Short,shortCeiling,shortFloor,short,Short.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO FullRootAscendingAccessMethodsHelper<int>(Int,intCeiling,intFloor,int,Integer.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO FullRootAscendingAccessMethodsHelper<long>(Long,longCeiling,longFloor,long,Long.MIN_VALUE,(int),(int),1+(int),-1+(int))
+#MACRO FullRootAscendingAccessMethodsHelper<float>(Float,floatCeiling,floatFloor,float,Float.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#MACRO FullRootAscendingAccessMethodsHelper<double>(Double,doubleCeiling,doubleFloor,double,Double.NaN,TypeUtil.intCeiling,TypeUtil.intFloor,TypeUtil.higherInt,TypeUtil.lowerInt)
+#ENDDEF
+
+#MACRODEF FullRootAscendingAccessMethodsHelper<RETTYPE>(CLASSPREFIX,CEILINGNAME,FLOORNAME,INPUTTYPE,DEFAULTVAL,CEILINGCAST,FLOORCAST,HIGHERCAST,LOWERCAST)
+@Override public RETTYPE CEILINGNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+  #IFNOTSWITCH RETTYPE==byte,Byte
+    if(val<=Byte.MAX_VALUE)
+  #ENDIF
+    {
+  #IFSWITCH RETTYPE==int
+      if((val=val>Byte.MIN_VALUE?super.getThisOrHigher(CEILINGCAST(val)):super.getThisOrHigher())!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=val>Byte.MIN_VALUE?super.getThisOrHigher(CEILINGCAST(val)):super.getThisOrHigher())!=128){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE FLOORNAME(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+  #IFNOTSWITCH RETTYPE==Byte,byte
+    if(!(val<(Byte.MIN_VALUE)))
+  #ENDIF
+    {
+  #IFSWITCH RETTYPE==int
+      if((val=(val<Byte.MAX_VALUE?super.getThisOrLower(FLOORCAST(val)):super.getThisOrLower()))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+      if((v=(val<Byte.MAX_VALUE?super.getThisOrLower(FLOORCAST(val)):super.getThisOrLower()))!=-129){
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    if(val<Byte.MAX_VALUE)
+    {
+  #IFSWITCH RETTYPE==int
+      if((val=val>=Byte.MIN_VALUE?super.getThisOrHigher(HIGHERCAST(val)):super.getThisOrHigher())!=128){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+    #IFSWITCH RETTYPE==byte,Byte
+      if((v=super.getThisOrHigher(HIGHERCAST(val)))!=129){
+    #ELSE
+      if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(HIGHERCAST(val)):super.getThisOrHigher())!=128){
+    #ENDIF
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+#IFSWITCH CHECKED==Checked
+  if((modCountAndSize&0x1ff)!=0)
+#ENDIF
+  {
+#IFSWITCH RETTYPE==double,float,long,short,int,byte,Byte
+    if(!(val<=(Byte.MIN_VALUE)))
+    {
+  #IFSWITCH RETTYPE==int
+      if((val=(val<=Byte.MAX_VALUE?super.getThisOrLower(LOWERCAST(val)):super.getThisOrLower()))!=-129){
+        return (RETTYPE)val;
+  #ELSE
+      final int v;
+    #IFSWITCH RETTYPE==Byte,byte
+      if((v=super.getThisOrLower(LOWERCAST(val)))!=-129){
+    #ELSE
+      if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(LOWERCAST(val)):super.getThisOrLower()))!=-129){
+    #ENDIF
+        return (INPUTTYPE)v;
+  #ENDIF
+      }
+    }
+#ELSE
+ERROR unknown return type RETTYPE
+#ENDIF
+  }
+  return DEFAULTVAL;
+}
+#ENDDEF
+#MACRODEF DescendingAccessMethods()
+#MACRO DescendingAccessMethodsHelper<Byte>(,ceiling,floor,byte)
+#MACRO DescendingAccessMethodsHelper<byte>(Byte,byteCeiling,byteFloor,byte)
+#MACRO DescendingAccessMethodsHelper<short>(Short,shortCeiling,shortFloor,short)
+#MACRO DescendingAccessMethodsHelper<int>(Int,intCeiling,intFloor,int)
+#MACRO DescendingAccessMethodsHelper<long>(Long,longCeiling,longFloor,long)
+#MACRO DescendingAccessMethodsHelper<float>(Float,floatCeiling,floatFloor,float)
+#MACRO DescendingAccessMethodsHelper<double>(Double,doubleCeiling,doubleFloor,double)
+#ENDDEF
+#MACRODEF DescendingAccessMethodsHelper<RETTYPE>(CLASSPREFIX,CEILINGNAME,FLOORNAME,INPUTTYPE)
+@Override public RETTYPE CEILINGNAME(INPUTTYPE val){
+  return super.FLOORNAME(val);
+}
+@Override public RETTYPE FLOORNAME(INPUTTYPE val){
+  return super.CEILINGNAME(val);
+}
+@Override public RETTYPE higherCLASSPREFIX(INPUTTYPE val){
+  return super.lowerCLASSPREFIX(val);
+}
+@Override public RETTYPE lowerCLASSPREFIX(INPUTTYPE val){
+  return super.higherCLASSPREFIX(val);
+}
+#ENDDEF
 
 #MACRODEF SubSetToArrayCopy<CHECKED,ARRTYPE,VIEW,DIRECTION>()
 #IFSWITCH CHECKED==Checked
