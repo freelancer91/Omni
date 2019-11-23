@@ -283,82 +283,82 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
   @Override public boolean remove(Object val){
     return removeVal(this,val);
   }
-  void clearHeadSet(int inclHi){
+  private static void clearHeadSet(ByteSetImpl set,int inclHi){
     switch(inclHi>>6){
       case 1:
-        this.word3&=(-1L>>>(-inclHi-1));
+        set.word3&=(-1L>>>(-inclHi-1));
         inclHi=-1;
       case 0:
-        this.word2&=(-1L>>>(-inclHi-1));
+        set.word2&=(-1L>>>(-inclHi-1));
         inclHi=-1;
       case -1:
-        this.word1&=(-1L>>>(-inclHi-1));
+        set.word1&=(-1L>>>(-inclHi-1));
         inclHi=-1;
       default:
-        this.word0&=(-1L>>>(-inclHi-1));
+        set.word0&=(-1L>>>(-inclHi-1));
     }
   }
-  void clearTailSet(int inclLo){
+  private static void clearTailSet(ByteSetImpl set,int inclLo){
     switch(inclLo>>6){
       case -2:
-        this.word0&=(-1L<<inclLo);
+        set.word0&=(-1L<<inclLo);
         inclLo=0;
       case -1:
-        this.word1&=(-1L<<inclLo);
+        set.word1&=(-1L<<inclLo);
         inclLo=0;
       case 0:
-        this.word2&=(-1L<<inclLo);
+        set.word2&=(-1L<<inclLo);
         inclLo=0;
       default:
-        this.word3&=(-1L<<inclLo);
+        set.word3&=(-1L<<inclLo);
     }
   }
-  void clearBodySet(int boundInfo){
+  private static void clearBodySet(ByteSetImpl set,int boundInfo){
     int inclLo=boundInfo>>8;
     final int inclHi;
     switch((inclHi=(byte)(boundInfo&0xff))>>6){
       case 1:
         switch(inclLo>>6){
           case -2:
-            this.word0&=(-1L<<inclLo);
+            set.word0&=(-1L<<inclLo);
             inclLo=0;
           case -1:
-            this.word1&=(-1L<<inclLo);
+            set.word1&=(-1L<<inclLo);
             inclLo=0;
           case 0:
-            this.word2&=(-1L<<inclLo);
+            set.word2&=(-1L<<inclLo);
             inclLo=0;
           default:
         }
-        this.word3&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        set.word3&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
         break;
       case 0:
         switch(inclLo>>6){
           case -2:
-            this.word0&=(-1L<<inclLo);
+            set.word0&=(-1L<<inclLo);
             inclLo=0;
           case -1:
-            this.word1&=(-1L<<inclLo);
+            set.word1&=(-1L<<inclLo);
             inclLo=0;
           default:
         }
-        this.word2&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        set.word2&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
         break;
       case -1:
         if(inclLo>>6==-2){
-          this.word0&=(-1L<<inclLo);
+          set.word0&=(-1L<<inclLo);
           inclLo=0;
         }
-        this.word1&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        set.word1&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
         break;
       default:
-        this.word0&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        set.word0&=((-1L<<inclLo)&(-1L>>>(-inclHi-1)));
     }
   }
   //TODO equals
-  void copyToArrayAscending(int size,byte[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,byte[] dst){
     done:for(int offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -369,7 +369,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -380,7 +380,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -391,7 +391,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -401,10 +401,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,byte[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,byte[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -416,7 +416,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -428,7 +428,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -440,7 +440,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -450,9 +450,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,byte[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,byte[] dst){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -463,7 +463,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -474,7 +474,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -485,7 +485,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(byte)(offset);
           if(size==0){
@@ -495,10 +495,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,byte[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,byte[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -510,7 +510,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -522,7 +522,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -534,7 +534,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(byte)(offset);
             if(size==0){
@@ -544,10 +544,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  byte[] toByteArrayAscending(){
+  private static byte[] toByteArrayAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new byte[size];
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -596,10 +596,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfByte.DEFAULT_ARR;
   }
-  byte[] toByteArrayDescending(){
+  private static byte[] toByteArrayDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new byte[size];
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -648,9 +648,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfByte.DEFAULT_ARR;
   }
-  void copyToArrayAscending(int size,short[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,short[] dst){
     done:for(int offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -661,7 +661,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -672,7 +672,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -683,7 +683,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -693,10 +693,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,short[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,short[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -708,7 +708,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -720,7 +720,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -732,7 +732,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -742,9 +742,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,short[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,short[] dst){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -755,7 +755,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -766,7 +766,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -777,7 +777,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(short)(offset);
           if(size==0){
@@ -787,10 +787,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,short[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,short[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -802,7 +802,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -814,7 +814,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -826,7 +826,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(short)(offset);
             if(size==0){
@@ -836,10 +836,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  short[] toShortArrayAscending(){
+  private static short[] toShortArrayAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new short[size];
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -888,10 +888,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
-  short[] toShortArrayDescending(){
+  private static short[] toShortArrayDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new short[size];
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -940,9 +940,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
-  void copyToArrayAscending(int size,int[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,int[] dst){
     done:for(int offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -953,7 +953,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -964,7 +964,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -975,7 +975,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -985,10 +985,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,int[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,int[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1000,7 +1000,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1012,7 +1012,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1024,7 +1024,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1034,9 +1034,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,int[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,int[] dst){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1047,7 +1047,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1058,7 +1058,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1069,7 +1069,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1079,10 +1079,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,int[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,int[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1094,7 +1094,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1106,7 +1106,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1118,7 +1118,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1128,10 +1128,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  int[] toIntArrayAscending(){
+  private static int[] toIntArrayAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new int[size];
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -1180,10 +1180,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfInt.DEFAULT_ARR;
   }
-  int[] toIntArrayDescending(){
+  private static int[] toIntArrayDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new int[size];
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -1232,9 +1232,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfInt.DEFAULT_ARR;
   }
-  void copyToArrayAscending(int size,long[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,long[] dst){
     done:for(long offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1245,7 +1245,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1256,7 +1256,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1267,7 +1267,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1277,10 +1277,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,long[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,long[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1292,7 +1292,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1304,7 +1304,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1316,7 +1316,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1326,9 +1326,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,long[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,long[] dst){
     done:for(long offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1339,7 +1339,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1350,7 +1350,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1361,7 +1361,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1371,10 +1371,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,long[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,long[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1386,7 +1386,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1398,7 +1398,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1410,7 +1410,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1420,10 +1420,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  long[] toLongArrayAscending(){
+  private static long[] toLongArrayAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new long[size];
       done:for(long offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -1472,10 +1472,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
-  long[] toLongArrayDescending(){
+  private static long[] toLongArrayDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new long[size];
       done:for(long offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -1524,9 +1524,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
-  void copyToArrayAscending(int size,float[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,float[] dst){
     done:for(int offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1537,7 +1537,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1548,7 +1548,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1559,7 +1559,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1569,10 +1569,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,float[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,float[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1584,7 +1584,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1596,7 +1596,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1608,7 +1608,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1618,9 +1618,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,float[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,float[] dst){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1631,7 +1631,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1642,7 +1642,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1653,7 +1653,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1663,10 +1663,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,float[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,float[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1678,7 +1678,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1690,7 +1690,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1702,7 +1702,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1712,10 +1712,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  float[] toFloatArrayAscending(){
+  private static float[] toFloatArrayAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new float[size];
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -1764,10 +1764,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
-  float[] toFloatArrayDescending(){
+  private static float[] toFloatArrayDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new float[size];
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -1816,9 +1816,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
-  void copyToArrayAscending(int size,double[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,double[] dst){
     done:for(int offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1829,7 +1829,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1840,7 +1840,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1851,7 +1851,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1861,10 +1861,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,double[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,double[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1876,7 +1876,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1888,7 +1888,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1900,7 +1900,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1910,9 +1910,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,double[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,double[] dst){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1923,7 +1923,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1934,7 +1934,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1945,7 +1945,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(offset);
           if(size==0){
@@ -1955,10 +1955,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,double[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,double[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1970,7 +1970,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1982,7 +1982,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -1994,7 +1994,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(offset);
             if(size==0){
@@ -2004,10 +2004,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  double[] toDoubleArrayAscending(){
+  private static double[] toDoubleArrayAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new double[size];
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -2056,10 +2056,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
-  double[] toDoubleArrayDescending(){
+  private static double[] toDoubleArrayDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new double[size];
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -2108,9 +2108,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
-  void copyToArrayAscending(int size,Object[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,Object[] dst){
     done:for(int offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2121,7 +2121,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2132,7 +2132,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2143,7 +2143,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2153,10 +2153,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,Object[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,Object[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2168,7 +2168,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2180,7 +2180,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2192,7 +2192,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2202,9 +2202,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,Object[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,Object[] dst){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2215,7 +2215,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2226,7 +2226,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2237,7 +2237,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2247,10 +2247,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,Object[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,Object[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2262,7 +2262,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2274,7 +2274,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2286,7 +2286,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2296,9 +2296,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayAscending(int size,Byte[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int size,Byte[] dst){
     done:for(int offset=Byte.MAX_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2309,7 +2309,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2320,7 +2320,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2331,7 +2331,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2341,10 +2341,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayAscending(int offset,int size,Byte[] dst){
+  private static void copyToArrayAscending(ByteSetImpl set,int offset,int size,Byte[] dst){
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2356,7 +2356,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2368,7 +2368,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2380,7 +2380,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2390,9 +2390,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  void copyToArrayDescending(int size,Byte[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int size,Byte[] dst){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2403,7 +2403,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2414,7 +2414,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2425,7 +2425,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           dst[--size]=(Byte)(byte)(offset);
           if(size==0){
@@ -2435,10 +2435,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void copyToArrayDescending(int offset,int size,Byte[] dst){
+  private static void copyToArrayDescending(ByteSetImpl set,int offset,int size,Byte[] dst){
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2450,7 +2450,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2462,7 +2462,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2474,7 +2474,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             dst[--size]=(Byte)(byte)(offset);
             if(size==0){
@@ -2484,10 +2484,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
     }
   }
-  Byte[] toArrayAscending(){
+  private static Byte[] toArrayAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new Byte[size];
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -2536,10 +2536,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return OmniArray.OfByte.DEFAULT_BOXED_ARR;
   }
-  Byte[] toArrayDescending(){
+  private static Byte[] toArrayDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final var dst=new Byte[size];
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -2589,10 +2589,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     return OmniArray.OfByte.DEFAULT_BOXED_ARR;
   }
   @SuppressWarnings("unchecked")
-  <T> T[] toArrayAscending(IntFunction<T[]> arrConstructor){
+  private static <T> T[] toArrayAscending(ByteSetImpl set,IntFunction<T[]> arrConstructor){
     int size;
     final long word0,word1,word2,word3;
-    final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
+    final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3));
     if(size!=0){
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -2641,10 +2641,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     return dst;
   }
   @SuppressWarnings("unchecked")
-  <T> T[] toArrayDescending(IntFunction<T[]> arrConstructor){
+  private static <T> T[] toArrayDescending(ByteSetImpl set,IntFunction<T[]> arrConstructor){
     int size;
     final long word0,word1,word2,word3;
-    final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3));
+    final var dst=arrConstructor.apply(size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3));
     if(size!=0){
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -2693,10 +2693,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     return dst;
   }
   @SuppressWarnings("unchecked")
-  <T> T[] toArrayAscending(T[] dst){
+  private static <T> T[] toArrayAscending(ByteSetImpl set,T[] dst){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       dst=OmniArray.uncheckedArrResize(size,dst);
       done:for(int offset=Byte.MAX_VALUE;;){
         for(;;){
@@ -2747,10 +2747,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     return dst;
   }
   @SuppressWarnings("unchecked")
-  <T> T[] toArrayDescending(T[] dst){
+  private static <T> T[] toArrayDescending(ByteSetImpl set,T[] dst){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       dst=OmniArray.uncheckedArrResize(size,dst);
       done:for(int offset=Byte.MIN_VALUE;;){
         for(;;){
@@ -2800,9 +2800,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return dst;
   }
-  int removeIfImplStartWord0Descending(int offset,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
+  private static int removeIfImplStartWord0Descending(ByteSetImpl.Checked set,int offset,int size,BytePredicate filter,int expectedModCount){
     int numRemoved=0;
-    for(var word0=this.word0;;--offset){
+    for(var word0=set.word0;;--offset){
       final long mask;
       if(wordContains(word0,mask=1L<<offset)){
         if(filter.test((byte)offset)){
@@ -2810,9 +2810,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           word0-=mask;
         }
         if(--size==0){
-          modCountChecker.checkModCount();
+          CheckedCollection.checkModCount(set.modCountAndSize>>9,expectedModCount>>9);
           if(numRemoved!=0){
-            this.word0=word0;
+            set.word0=word0;
           }
           break;
         }
@@ -2820,10 +2820,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return numRemoved;
   }
-  int removeIfImplStartWord1Descending(int offset,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
+  private static int removeIfImplStartWord1Descending(ByteSetImpl.Checked set,int offset,int size,BytePredicate filter,int expectedModCount){
     int numRemoved=0;
     outer:for(;;){
-      var word1=this.word1;
+      var word1=set.word1;
       for(;;){
         long mask;
         if(wordContains(word1,mask=1L<<offset)){
@@ -2832,7 +2832,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             word1-=mask;
           }
           if(--size==0){
-            modCountChecker.checkModCount();
+            CheckedCollection.checkModCount(set.modCountAndSize>>9,expectedModCount>>9);
             if(numRemoved==0){
               break outer;
             }
@@ -2840,7 +2840,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
         if(--offset==-65){
-          var word0=this.word0;
+          var word0=set.word0;
           for(;;--offset){
             if(wordContains(word0,mask=1L<<offset)){
               if(filter.test((byte)offset)){
@@ -2848,7 +2848,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 word0-=mask;
               }
               if(--size==0){
-                modCountChecker.checkModCount();
+                CheckedCollection.checkModCount(set.modCountAndSize>>9,expectedModCount>>9);
                 if(numRemoved==0){
                   break outer;
                 }
@@ -2856,19 +2856,19 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
           }
-          this.word0=word0;
+          set.word0=word0;
           break;
         }
       }
-      this.word1=word1;
+      set.word1=word1;
       break;
     }
     return numRemoved;
   }
-  int removeIfImplStartWord2Descending(int offset,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
+  private static int removeIfImplStartWord2Descending(ByteSetImpl.Checked set,int offset,int size,BytePredicate filter,int expectedModCount){
     int numRemoved=0;
     outer:for(;;){
-      var word2=this.word2;
+      var word2=set.word2;
       for(;;){
         long mask;
         if(wordContains(word2,mask=1L<<offset)){
@@ -2877,7 +2877,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             word2-=mask;
           }
           if(--size==0){
-            modCountChecker.checkModCount();
+            CheckedCollection.checkModCount(set.modCountAndSize>>9,expectedModCount>>9);
             if(numRemoved==0){
               break outer;
             }
@@ -2885,7 +2885,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
         if(--offset==-1){
-          var word1=this.word1;
+          var word1=set.word1;
           for(;;){
             if(wordContains(word1,mask=1L<<offset)){
               if(filter.test((byte)offset)){
@@ -2893,7 +2893,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 word1-=mask;
               }
               if(--size==0){
-                modCountChecker.checkModCount();
+                CheckedCollection.checkModCount(set.modCountAndSize>>9,expectedModCount>>9);
                 if(numRemoved==0){
                   break outer;
                 }
@@ -2901,7 +2901,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
             if(--offset==-65){
-              var word0=this.word0;
+              var word0=set.word0;
               for(;;--offset){
                 if(wordContains(word0,mask=1L<<offset)){
                   if(filter.test((byte)offset)){
@@ -2909,7 +2909,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                     word0-=mask;
                   }
                   if(--size==0){
-                    modCountChecker.checkModCount();
+                    CheckedCollection.checkModCount(set.modCountAndSize>>9,expectedModCount>>9);
                     if(numRemoved==0){
                       break outer;
                     }
@@ -2917,23 +2917,203 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                   }
                 }
               }
-              this.word0=word0;
+              set.word0=word0;
               break;
             }
           }
-          this.word1=word1;
+          set.word1=word1;
           break;
         }
       }
-      this.word2=word2;
+      set.word2=word2;
       break;
     }
     return numRemoved;
   }
-  int removeIfImplStartWord3Descending(int offset,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker  modCountChecker){
+  private static int word0RemoveIfAscending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word0;;){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word0=word;
+          }
+          return numRemoved;
+        }
+      }
+      if(++offset==-64){
+        if(numRemoved!=0){
+          set.word0=word;
+        }
+        return (size<<9)+numRemoved;
+      }
+    }
+  }
+  private static int word1RemoveIfAscending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word1;;){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word1=word;
+          }
+          return numRemoved;
+        }
+      }
+      if(++offset==0){
+        if(numRemoved!=0){
+          set.word1=word;
+        }
+        return (size<<9)+numRemoved;
+      }
+    }
+  }
+  private static int word2RemoveIfAscending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word2;;){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word2=word;
+          }
+          return numRemoved;
+        }
+      }
+      if(++offset==64){
+        if(numRemoved!=0){
+          set.word2=word;
+        }
+        return (size<<9)+numRemoved;
+      }
+    }
+  }
+  private static int word3RemoveIfAscending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word3;;++offset){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word3=word;
+          }
+          return numRemoved;
+        }
+      }
+    }
+  }
+  private static int word0RemoveIfDescending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word0;;--offset){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word0=word;
+          }
+          return numRemoved;
+        }
+      }
+    }
+  }
+  private static int word1RemoveIfDescending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word1;;){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word1=word;
+          }
+          return numRemoved;
+        }
+      }
+      if(--offset==-65){
+        if(numRemoved!=0){
+          set.word1=word;
+        }
+        return (size<<9)+numRemoved;
+      }
+    }
+  }
+  private static int word2RemoveIfDescending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word2;;){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word2=word;
+          }
+          return numRemoved;
+        }
+      }
+      if(--offset==-1){
+        if(numRemoved!=0){
+          set.word2=word;
+        }
+        return (size<<9)+numRemoved;
+      }
+    }
+  }
+  private static int word3RemoveIfDescending(ByteSetImpl set,int offset,int size,BytePredicate filter){
+    int numRemoved=0;
+    for(var word=set.word3;;){
+      final long mask;
+      if(wordContains(word,mask=1L<<offset)){
+        if(filter.test((byte)offset)){
+          ++numRemoved;
+          word-=mask;
+        }
+        if(--size==0){
+          if(numRemoved!=0){
+            set.word3=word;
+          }
+          return numRemoved;
+        }
+      }
+      if(--offset==63){
+        if(numRemoved!=0){
+          set.word3=word;
+        }
+        return (size<<9)+numRemoved;
+      }
+    }
+  }
+  private static int removeIfImplStartWord3Descending(ByteSetImpl.Checked set,int offset,int size,BytePredicate filter,int expectedModCount){
     int numRemoved=0;
     outer:for(;;){
-      var word3=this.word3;
+      var word3=set.word3;
       for(;;){
         long mask;
         if(wordContains(word3,mask=1L<<offset)){
@@ -2942,7 +3122,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             word3-=mask;
           }
           if(--size==0){
-            modCountChecker.checkModCount();
+            CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
             if(numRemoved==0){
               break outer;
             }
@@ -2950,7 +3130,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
         if(--offset==63){
-          var word2=this.word2;
+          var word2=set.word2;
           for(;;){
             if(wordContains(word2,mask=1L<<offset)){
               if(filter.test((byte)offset)){
@@ -2958,7 +3138,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 word2-=mask;
               }
               if(--size==0){
-                modCountChecker.checkModCount();
+                CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
                 if(numRemoved==0){
                   break outer;
                 }
@@ -2966,7 +3146,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
             if(--offset==-1){
-              var word1=this.word1;
+              var word1=set.word1;
               for(;;){
                 if(wordContains(word1,mask=1L<<offset)){
                   if(filter.test((byte)offset)){
@@ -2974,7 +3154,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                     word1-=mask;
                   }
                   if(--size==0){
-                    modCountChecker.checkModCount();
+                    CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
                     if(numRemoved==0){
                       break outer;
                     }
@@ -2982,7 +3162,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                   }
                 }
                 if(--offset==-65){
-                  var word0=this.word0;
+                  var word0=set.word0;
                   for(;;--offset){
                     if(wordContains(word0,mask=1L<<offset)){
                       if(filter.test((byte)offset)){
@@ -2990,7 +3170,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                         word0-=mask;
                       }
                       if(--size==0){
-                        modCountChecker.checkModCount();
+                        CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
                         if(numRemoved==0){
                           break outer;
                         }
@@ -2998,27 +3178,27 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                       }
                     }
                   }
-                  this.word0=word0;
+                  set.word0=word0;
                   break;
                 }
               }
-              this.word1=word1;
+              set.word1=word1;
               break;
             }
           }
-          this.word2=word2;
+          set.word2=word2;
           break;
         }
       }
-      this.word3=word3;
+      set.word3=word3;
       break;
     }
     return numRemoved;
   }
-  int removeIfImplStartWord0Ascending(int offset,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
+  private static int removeIfImplStartWord0Ascending(ByteSetImpl.Checked set,int offset,int size,BytePredicate filter,int expectedModCount){
     int numRemoved=0;
     outer:for(;;){
-      var word0=this.word0;
+      var word0=set.word0;
       for(;;){
         long mask;
         if(wordContains(word0,mask=1L<<offset)){
@@ -3027,7 +3207,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             word0-=mask;
           }
           if(--size==0){
-            modCountChecker.checkModCount();
+            CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
             if(numRemoved==0){
               break outer;
             }
@@ -3035,7 +3215,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
         if(++offset==-64){
-          var word1=this.word1;
+          var word1=set.word1;
           for(;;){
             if(wordContains(word1,mask=1L<<offset)){
               if(filter.test((byte)offset)){
@@ -3043,7 +3223,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 word1-=mask;
               }
               if(--size==0){
-                modCountChecker.checkModCount();
+                CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
                 if(numRemoved==0){
                   break outer;
                 }
@@ -3051,7 +3231,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               }
             }
             if(++offset==0){
-              var word2=this.word2;
+              var word2=set.word2;
               for(;;){
                 if(wordContains(word2,mask=1L<<offset)){
                   if(filter.test((byte)offset)){
@@ -3059,7 +3239,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                     word2-=mask;
                   }
                   if(--size==0){
-                    modCountChecker.checkModCount();
+                    CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
                     if(numRemoved==0){
                       break outer;
                     }
@@ -3067,7 +3247,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                   }
                 }
                 if(++offset==64){
-                  var word3=this.word3;
+                  var word3=set.word3;
                   for(;;++offset){
                     if(wordContains(word3,mask=1L<<offset)){
                       if(filter.test((byte)offset)){
@@ -3075,7 +3255,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                         word3-=mask;
                       }
                       if(--size==0){
-                        modCountChecker.checkModCount();
+                        CheckedCollection.checkModCount(set.modCountAndSize>>8,expectedModCount>>9);
                         if(numRemoved==0){
                           break outer;
                         }
@@ -3083,27 +3263,27 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                       }
                     }
                   }
-                  this.word3=word3;
+                  set.word3=word3;
                   break;
                 }
               }
-              this.word2=word2;
+              set.word2=word2;
               break;
             }
           }
-          this.word1=word1;
+          set.word1=word1;
           break;
         }
       }
-      this.word0=word0;
+      set.word0=word0;
       break;
     }
     return numRemoved;
   }
-  int toStringAscending(int size,byte[] buffer){
+  private static int toStringAscending(ByteSetImpl set,int size,byte[] buffer){
     int bufferOffset=0;
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3116,7 +3296,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3129,7 +3309,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3142,7 +3322,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3155,11 +3335,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return bufferOffset;
   }
-  int toStringAscending(int offset,int size,byte[] buffer){
+  private static int toStringAscending(ByteSetImpl set,int offset,int size,byte[] buffer){
     int bufferOffset=0;
     done:switch(offset>>6){
       case -2:
-        for(final var word=word0;;){
+        for(final var word=set.word0;;){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3173,7 +3353,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3187,7 +3367,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3201,7 +3381,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word3;;++offset){
+        for(final var word=set.word3;;++offset){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3214,10 +3394,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return bufferOffset;
   }
-  int toStringDescending(int size,byte[] buffer){
+  private static int toStringDescending(ByteSetImpl set,int size,byte[] buffer){
     int bufferOffset=0;
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3230,7 +3410,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3243,7 +3423,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3256,7 +3436,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
           if(--size==0){
@@ -3269,11 +3449,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return bufferOffset;
   }
-  int toStringDescending(int offset,int size,byte[] buffer){
+  private static int toStringDescending(ByteSetImpl set,int offset,int size,byte[] buffer){
     int bufferOffset=0;
     done:switch(offset>>6){
       case 1:
-        for(final var word=word3;;){
+        for(final var word=set.word3;;){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3287,7 +3467,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case 0:
-        for(final var word=word2;;){
+        for(final var word=set.word2;;){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3301,7 +3481,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       case -1:
-        for(final var word=word1;;){
+        for(final var word=set.word1;;){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3315,7 +3495,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
         }
       default:
-        for(final var word=word0;;--offset){
+        for(final var word=set.word0;;--offset){
           if(wordContains(word,1L<<offset)){
             bufferOffset=ToStringUtil.getStringShort(offset,buffer,++bufferOffset);
             if(--size==0){
@@ -3328,10 +3508,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return bufferOffset;
   }
-  String toStringAscending(){
+  private static String toStringAscending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final byte[] buffer;
       int bufferOffset;
       (buffer=new byte[size*6])[bufferOffset=0]='[';
@@ -3391,10 +3571,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return "[]";
   }
-  String toStringDescending(){
+  private static String toStringDescending(ByteSetImpl set){
     int size;
     final long word0,word1,word2,word3;
-    if((size=SetCommonImpl.size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3))!=0){
+    if((size=SetCommonImpl.size(word0=set.word0,word1=set.word1,word2=set.word2,word3=set.word3))!=0){
       final byte[] buffer;
       int bufferOffset;
       (buffer=new byte[size*6])[bufferOffset=0]='[';
@@ -3454,9 +3634,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return "[]";
   }
-  void forEachAscending(int size,ByteConsumer action){
+  private static void forEachAscending(ByteSetImpl set,int size,ByteConsumer action){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3467,7 +3647,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3478,7 +3658,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3489,7 +3669,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3499,10 +3679,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void forEachAscending(int offset,int size,ByteConsumer action){
+  private static void forEachAscending(ByteSetImpl set,int offset,int size,ByteConsumer action){
     done:switch(offset>>6){
     case -2:
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3514,7 +3694,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     case -1:
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3526,7 +3706,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     case 0:
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3538,7 +3718,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     default:
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3548,9 +3728,9 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void forEachDescending(int size,ByteConsumer action){
+  private static void forEachDescending(ByteSetImpl set,int size,ByteConsumer action){
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3561,7 +3741,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3572,7 +3752,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3583,7 +3763,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3593,10 +3773,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void forEachDescending(int offset,int size,ByteConsumer action){
+  private static void forEachDescending(ByteSetImpl set,int offset,int size,ByteConsumer action){
     done:switch(offset>>6){
     case 1:
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3608,7 +3788,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     case 0:
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3620,7 +3800,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     case -1:
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3632,7 +3812,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     default:
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           action.accept((byte)offset);
           if(--size==0){
@@ -3642,17 +3822,17 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  void forEachAscending(ByteConsumer action){
-    wordForEachAscending(word0,Byte.MIN_VALUE,action);
-    wordForEachAscending(word1,-64,action);
-    wordForEachAscending(word2,0,action);
-    wordForEachAscending(word3,64,action);
+  private static void forEachAscending(ByteSetImpl set,ByteConsumer action){
+    wordForEachAscending(set.word0,Byte.MIN_VALUE,action);
+    wordForEachAscending(set.word1,-64,action);
+    wordForEachAscending(set.word2,0,action);
+    wordForEachAscending(set.word3,64,action);
   }
-  void forEachDescending(ByteConsumer action){
-    wordForEachDescending(word3,Byte.MAX_VALUE,action);
-    wordForEachDescending(word2,63,action);
-    wordForEachDescending(word1,-1,action);
-    wordForEachDescending(word0,-65,action);
+  private static void forEachDescending(ByteSetImpl set,ByteConsumer action){
+    wordForEachDescending(set.word3,Byte.MAX_VALUE,action);
+    wordForEachDescending(set.word2,63,action);
+    wordForEachDescending(set.word1,-1,action);
+    wordForEachDescending(set.word0,-65,action);
   }
   private static void wordForEachDescending(long word,int inclHi,ByteConsumer action){
     for(;;--inclHi){
@@ -3676,86 +3856,86 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  int countElementsAscending(int inclHiBound){
+  private static int countElementsAscending(ByteSetImpl set,int inclHiBound){
     switch(inclHiBound>>6){
       case -2:
-        return Long.bitCount(word0&(-1L>>>(-inclHiBound-1)));
+        return Long.bitCount(set.word0&(-1L>>>(-inclHiBound-1)));
       case -1:
-        return Long.bitCount(word0)
-          +Long.bitCount(word1&(-1L>>>(-inclHiBound-1)));
+        return Long.bitCount(set.word0)
+          +Long.bitCount(set.word1&(-1L>>>(-inclHiBound-1)));
       case 0:
-        return Long.bitCount(word0)
-          +Long.bitCount(word1)
-          +Long.bitCount(word2&(-1L>>>(-inclHiBound-1)));
+        return Long.bitCount(set.word0)
+          +Long.bitCount(set.word1)
+          +Long.bitCount(set.word2&(-1L>>>(-inclHiBound-1)));
       default:
-        return Long.bitCount(word0)
-          +Long.bitCount(word1)
-          +Long.bitCount(word2)
-          +Long.bitCount(word3&(-1L>>>(-inclHiBound-1)));
+        return Long.bitCount(set.word0)
+          +Long.bitCount(set.word1)
+          +Long.bitCount(set.word2)
+          +Long.bitCount(set.word3&(-1L>>>(-inclHiBound-1)));
     }
   }
-  int countElementsDescending(int inclLoBound){
+  private static int countElementsDescending(ByteSetImpl set,int inclLoBound){
     switch(inclLoBound>>6){
       case 1:
-        return Long.bitCount(word3&(-1L<<inclLoBound));
+        return Long.bitCount(set.word3&(-1L<<inclLoBound));
       case 0:
-        return Long.bitCount(word3)
-          +Long.bitCount(word2&(-1L<<inclLoBound));
+        return Long.bitCount(set.word3)
+          +Long.bitCount(set.word2&(-1L<<inclLoBound));
       case -1:
-        return Long.bitCount(word3)
-          +Long.bitCount(word2)
-          +Long.bitCount(word1&(-1L<<inclLoBound));
+        return Long.bitCount(set.word3)
+          +Long.bitCount(set.word2)
+          +Long.bitCount(set.word1&(-1L<<inclLoBound));
       default:
-        return Long.bitCount(word3)
-          +Long.bitCount(word2)
-          +Long.bitCount(word1)
-          +Long.bitCount(word0&(-1L<<inclLoBound));
+        return Long.bitCount(set.word3)
+          +Long.bitCount(set.word2)
+          +Long.bitCount(set.word1)
+          +Long.bitCount(set.word0&(-1L<<inclLoBound));
     }
   }
-  int countElements(int inclLo,int inclHi){
+  private static int countElements(ByteSetImpl set,int inclLo,int inclHi){
     switch(inclHi>>6){
       case 1:
         int count=0;
         switch(inclLo>>6){
           case -2:
-            count+=Long.bitCount(word0&(-1L<<inclLo));
+            count+=Long.bitCount(set.word0&(-1L<<inclLo));
             inclLo=0;
           case -1:
-            count+=Long.bitCount(word1&(-1L<<inclLo));
+            count+=Long.bitCount(set.word1&(-1L<<inclLo));
             inclLo=0;
           case 0:
-            count+=Long.bitCount(word2&(-1L<<inclLo));
+            count+=Long.bitCount(set.word2&(-1L<<inclLo));
             inclLo=0;
           default:
-            return count+Long.bitCount(word3&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+            return count+Long.bitCount(set.word3&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
         }
       case 0:
         count=0;
         switch(inclLo>>6){
           case -2:
-            count+=Long.bitCount(word0&(-1L<<inclLo));
+            count+=Long.bitCount(set.word0&(-1L<<inclLo));
             inclLo=0;
           case -1:
-            count+=Long.bitCount(word1&(-1L<<inclLo));
+            count+=Long.bitCount(set.word1&(-1L<<inclLo));
             inclLo=0;
           default:
-            return count+Long.bitCount(word2&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+            return count+Long.bitCount(set.word2&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
         }
       case -1:
         count=0;
         if(inclLo<-64){
-          count+=Long.bitCount(word0&(-1L<<inclLo));
+          count+=Long.bitCount(set.word0&(-1L<<inclLo));
           inclLo=0;
         }
-        return count+Long.bitCount(word1&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        return count+Long.bitCount(set.word1&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
       default:
-        return Long.bitCount(word0&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
+        return Long.bitCount(set.word0&(-1L<<inclLo)&(-1L>>>(-inclHi-1)));
     }
   }
-  int hashCodeAscending(int size){
+  private static int hashCodeAscending(ByteSetImpl set,int size){
     int hash=0;
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word0;;){
+      for(final var word=set.word0;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3766,7 +3946,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3777,7 +3957,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3788,7 +3968,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word3;;++offset){
+      for(final var word=set.word3;;++offset){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3799,10 +3979,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return hash;
   }
-  int hashCodeDescending(int size){
+  private static int hashCodeDescending(ByteSetImpl set,int size){
     int hash=0;
     done:for(int offset=Byte.MIN_VALUE;;){
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3813,7 +3993,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3824,7 +4004,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3835,7 +4015,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           break;
         }
       }
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3846,11 +4026,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return hash;
   }
-  int hashCodeDescending(int offset,int size){
+  private static int hashCodeDescending(ByteSetImpl set,int offset,int size){
     int hash=0;
     done:switch(offset>>6){
     case 1:
-      for(final var word=word3;;){
+      for(final var word=set.word3;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3862,7 +4042,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     case 0:
-      for(final var word=word2;;){
+      for(final var word=set.word2;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3874,7 +4054,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     case -1:
-      for(final var word=word1;;){
+      for(final var word=set.word1;;){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3886,7 +4066,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     default:
-      for(final var word=word0;;--offset){
+      for(final var word=set.word0;;--offset){
         if(wordContains(word,1L<<offset)){
           hash+=offset;
           if(--size==0){
@@ -3897,59 +4077,59 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     return hash;
   }
-  int getThisOrHigher(){
+  private static int getThisOrHigher(ByteSetImpl set){
     int tail0s;
-    if((tail0s=Long.numberOfTrailingZeros(word0))==64){
-      if((tail0s+=Long.numberOfTrailingZeros(word1))==128){
-        if((tail0s+=Long.numberOfTrailingZeros(word2))==192){
-          tail0s+=Long.numberOfTrailingZeros(word3);
+    if((tail0s=Long.numberOfTrailingZeros(set.word0))==64){
+      if((tail0s+=Long.numberOfTrailingZeros(set.word1))==128){
+        if((tail0s+=Long.numberOfTrailingZeros(set.word2))==192){
+          tail0s+=Long.numberOfTrailingZeros(set.word3);
         }
       }
     }
     return tail0s+Byte.MIN_VALUE;
   }
-  int getThisOrHigher(int val){
+  private static int getThisOrHigher(ByteSetImpl set,int val){
     switch(val>>6){
       case -2:
-        if((val=Long.numberOfTrailingZeros(word0&(-1L<<val)))!=64){
+        if((val=Long.numberOfTrailingZeros(set.word0&(-1L<<val)))!=64){
           return val-128;
         }
         val=0;
       case -1:
-        if((val=Long.numberOfTrailingZeros(word1&(-1L<<val)))!=64){
+        if((val=Long.numberOfTrailingZeros(set.word1&(-1L<<val)))!=64){
           return val-64;
         }
         val=0;
       case 0:
-        if((val=Long.numberOfTrailingZeros(word2&(-1L<<val)))!=64){
+        if((val=Long.numberOfTrailingZeros(set.word2&(-1L<<val)))!=64){
           return val;
         }
         val=0;
       default:
-        return Long.numberOfTrailingZeros(word3&(-1L<<val))+64;
+        return Long.numberOfTrailingZeros(set.word3&(-1L<<val))+64;
     }
   }
-  int getThisOrHigher(int inclHiBound,int val){
+  private static int getThisOrHigher(ByteSetImpl set,int inclHiBound,int val){
     switch(inclHiBound>>6){
       case 1:
         switch(val>>6){
           case -2:
-            if((val+=Long.numberOfTrailingZeros(word0>>>val))<-64){
+            if((val+=Long.numberOfTrailingZeros(set.word0>>>val))<-64){
               return val;
             }
             val=-64;
           case -1:
-            if((val+=Long.numberOfTrailingZeros(word1>>>val))<0){
+            if((val+=Long.numberOfTrailingZeros(set.word1>>>val))<0){
               return val;
             }
             val=0;
           case 0:
-            if((val+=Long.numberOfTrailingZeros(word2>>>val))<64){
+            if((val+=Long.numberOfTrailingZeros(set.word2>>>val))<64){
               return val;
             }
             val=64;
           default:
-            if((val+=Long.numberOfTrailingZeros(word3>>>val))<=inclHiBound){
+            if((val+=Long.numberOfTrailingZeros(set.word3>>>val))<=inclHiBound){
               return val;
             }
             return 128;
@@ -3957,92 +4137,92 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       case 0:
         switch(val>>6){
           case -2:
-            if((val+=Long.numberOfTrailingZeros(word0>>>val))<-64){
+            if((val+=Long.numberOfTrailingZeros(set.word0>>>val))<-64){
               return val;
             }
             val=-64;
           case -1:
-            if((val+=Long.numberOfTrailingZeros(word1>>>val))<0){
+            if((val+=Long.numberOfTrailingZeros(set.word1>>>val))<0){
               return val;
             }
             val=0;
           default:
-            if((val+=Long.numberOfTrailingZeros(word2>>>val))<=inclHiBound){
+            if((val+=Long.numberOfTrailingZeros(set.word2>>>val))<=inclHiBound){
               return val;
             }
             return 128;
         }
       case -1:
         if(val<-64){
-          if((val+=Long.numberOfTrailingZeros(word0>>>val))<-64){
+          if((val+=Long.numberOfTrailingZeros(set.word0>>>val))<-64){
             return val;
           }
           val=-64;
         }
-        if((val+=Long.numberOfTrailingZeros(word1>>>val))<=inclHiBound){
+        if((val+=Long.numberOfTrailingZeros(set.word1>>>val))<=inclHiBound){
           return val;
         }
         return 128;
       default:
-        if((val+=Long.numberOfTrailingZeros(word0>>>val))<=inclHiBound){
+        if((val+=Long.numberOfTrailingZeros(set.word0>>>val))<=inclHiBound){
           return val;
         }
         return 128;
     }
   }
-  int getThisOrLower(){
+  private static int getThisOrLower(ByteSetImpl set){
     int lead0s;
-    if((lead0s=Long.numberOfLeadingZeros(word3))==64){
-      if((lead0s+=Long.numberOfLeadingZeros(word2))==128){
-        if((lead0s+=Long.numberOfLeadingZeros(word1))==192){
-          lead0s+=Long.numberOfLeadingZeros(word0);
+    if((lead0s=Long.numberOfLeadingZeros(set.word3))==64){
+      if((lead0s+=Long.numberOfLeadingZeros(set.word2))==128){
+        if((lead0s+=Long.numberOfLeadingZeros(set.word1))==192){
+          lead0s+=Long.numberOfLeadingZeros(set.word0);
         }
       }
     }
     return Byte.MAX_VALUE-lead0s;
   }
-  int getThisOrLower(int val){
+  private static int getThisOrLower(ByteSetImpl set,int val){
     switch(val>>6){
       case 1:
-        if((val=Long.numberOfLeadingZeros(word3&(-1L>>>(-val-1))))!=64){
+        if((val=Long.numberOfLeadingZeros(set.word3&(-1L>>>(-val-1))))!=64){
           return 127-val;
         }
         val=-1;
       case 0:
-        if((val=Long.numberOfLeadingZeros(word2&(-1L>>>(-val-1))))!=64){
+        if((val=Long.numberOfLeadingZeros(set.word2&(-1L>>>(-val-1))))!=64){
           return 63-val;
         }
         val=-1;
       case -1:
-        if((val=Long.numberOfLeadingZeros(word1&(-1L>>>(-val-1))))!=64){
+        if((val=Long.numberOfLeadingZeros(set.word1&(-1L>>>(-val-1))))!=64){
           return -1-val;
         }
         val=-1;
       default:
-        return -65-Long.numberOfLeadingZeros(word0&(-1L>>>(-val-1)));
+        return -65-Long.numberOfLeadingZeros(set.word0&(-1L>>>(-val-1)));
     }
   }
-  int getThisOrLower(int inclLoBound,int val){
+  private static int getThisOrLower(ByteSetImpl set,int inclLoBound,int val){
     switch(inclLoBound>>6){
       case -2:
         switch(val>>6){
           case 1:
-            if((val-=Long.numberOfLeadingZeros(word3<<(-val-1)))>63){
+            if((val-=Long.numberOfLeadingZeros(set.word3<<(-val-1)))>63){
               return val;
             }
             val=63;
           case 0:
-            if((val-=Long.numberOfLeadingZeros(word2<<(-val-1)))>-1){
+            if((val-=Long.numberOfLeadingZeros(set.word2<<(-val-1)))>-1){
               return val;
             }
             val=-1;
           case -1:
-            if((val-=Long.numberOfLeadingZeros(word1<<(-val-1)))>-65){
+            if((val-=Long.numberOfLeadingZeros(set.word1<<(-val-1)))>-65){
               return val;
             }
             val=-65;
           default:
-            if((val-=Long.numberOfLeadingZeros(word0<<(-val-1)))>=inclLoBound){
+            if((val-=Long.numberOfLeadingZeros(set.word0<<(-val-1)))>=inclLoBound){
               return val;
             }
             return -129;
@@ -4050,34 +4230,34 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       case -1:
         switch(val>>6){
           case 1:
-            if((val-=Long.numberOfLeadingZeros(word3<<(-val-1)))>63){
+            if((val-=Long.numberOfLeadingZeros(set.word3<<(-val-1)))>63){
               return val;
             }
             val=63;
           case 0:
-            if((val-=Long.numberOfLeadingZeros(word2<<(-val-1)))>-1){
+            if((val-=Long.numberOfLeadingZeros(set.word2<<(-val-1)))>-1){
               return val;
             }
             val=-1;
           default:
-            if((val-=Long.numberOfLeadingZeros(word1<<(-val-1)))>=inclLoBound){
+            if((val-=Long.numberOfLeadingZeros(set.word1<<(-val-1)))>=inclLoBound){
               return val;
             }
             return -129;
         }
       case 0:
         if(val>63){
-          if((val-=Long.numberOfLeadingZeros(word3<<(-val-1)))>63){
+          if((val-=Long.numberOfLeadingZeros(set.word3<<(-val-1)))>63){
             return val;
           }
           val=63;
         }
-        if((val-=Long.numberOfLeadingZeros(word2<<(-val-1)))>=inclLoBound){
+        if((val-=Long.numberOfLeadingZeros(set.word2<<(-val-1)))>=inclLoBound){
           return val;
         }
         return -129;
       default:
-        if((val-=Long.numberOfLeadingZeros(word3<<(-val-1)))>=inclLoBound){
+        if((val-=Long.numberOfLeadingZeros(set.word3<<(-val-1)))>=inclLoBound){
           return val;
         }
         return -129;
@@ -4100,6 +4280,124 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if(mask==1L){
         return word;
       }
+    }
+  }
+  private static OmniNavigableSet.OfByte headSetAscending(ByteSetImpl.Checked set,int inclusiveTo){
+    if(inclusiveTo!=Byte.MAX_VALUE){
+      return new CheckedSubSet.HeadSet.Ascending(set,(set.modCountAndSize&(~0x1ff))|countElementsAscending(set,inclusiveTo),inclusiveTo);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte tailSetAscending(ByteSetImpl.Checked set,int inclusiveFrom){
+    if(inclusiveFrom!=Byte.MIN_VALUE){
+      return new CheckedSubSet.TailSet.Ascending(set,(set.modCountAndSize&(~0x1ff))|countElementsDescending(set,inclusiveFrom),inclusiveFrom);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte subSetAscending(ByteSetImpl.Checked set,int inclusiveFrom,int inclusiveTo){
+    switch(Integer.signum(inclusiveTo+1-inclusiveFrom)){
+      case 1:
+        if(inclusiveFrom!=Byte.MIN_VALUE){
+          if(inclusiveTo!=Byte.MAX_VALUE){
+            return new CheckedSubSet.BodySet.Ascending(set,(set.modCountAndSize&(~0x1ff))|countElements(set,inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|(inclusiveTo&0xff));
+          }else{
+            return new CheckedSubSet.TailSet.Ascending(set,(set.modCountAndSize&(~0x1ff))|countElementsDescending(set,inclusiveFrom),inclusiveFrom);
+          }
+        }else{
+          return headSetAscending(set,inclusiveTo);
+        }
+      case 0:
+        return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
+      default:
+        throw new IllegalArgumentException("out of bounds");
+    }
+  }
+  private static OmniNavigableSet.OfByte headSetDescending(ByteSetImpl.Checked set,int inclusiveTo){
+    if(inclusiveTo!=Byte.MIN_VALUE){
+      return new CheckedSubSet.TailSet.Descending(set,(set.modCountAndSize&(~0x1ff))|countElementsDescending(set,inclusiveTo),inclusiveTo);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte tailSetDescending(ByteSetImpl.Checked set,int inclusiveFrom){
+    if(inclusiveFrom!=Byte.MAX_VALUE){
+      return new CheckedSubSet.HeadSet.Descending(set,(set.modCountAndSize&(~0x1ff))|countElementsAscending(set,inclusiveFrom),inclusiveFrom);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte subSetDescending(ByteSetImpl.Checked set,int inclusiveFrom,int inclusiveTo){
+    switch(Integer.signum(inclusiveFrom+1-inclusiveTo)){
+      case 1:
+        if(inclusiveFrom!=Byte.MAX_VALUE){
+          if(inclusiveTo!=Byte.MIN_VALUE){
+            return new CheckedSubSet.BodySet.Descending(set,(set.modCountAndSize&(~0x1ff))|countElements(set,inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff));
+          }else{
+            return new CheckedSubSet.HeadSet.Descending(set,(set.modCountAndSize&(~0x1ff))|countElementsAscending(set,inclusiveFrom),inclusiveFrom);
+          }
+        }else{
+          return headSetDescending(set,inclusiveTo);
+        }
+      case 0:
+        return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
+      default:
+        throw new IllegalArgumentException("out of bounds");
+    }
+  }
+  private static OmniNavigableSet.OfByte headSetAscending(ByteSetImpl.Unchecked set,int inclusiveTo){
+    if(inclusiveTo!=Byte.MAX_VALUE){
+      return new UncheckedSubSet.HeadSet.Ascending(set,countElementsAscending(set,inclusiveTo),inclusiveTo);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte tailSetAscending(ByteSetImpl.Unchecked set,int inclusiveFrom){
+    if(inclusiveFrom!=Byte.MIN_VALUE){
+      return new UncheckedSubSet.TailSet.Ascending(set,countElementsDescending(set,inclusiveFrom),inclusiveFrom);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte subSetAscending(ByteSetImpl.Unchecked set,int inclusiveFrom,int inclusiveTo){
+    if(inclusiveFrom<=inclusiveTo){
+      if(inclusiveFrom!=Byte.MIN_VALUE){
+        if(inclusiveTo!=Byte.MAX_VALUE){
+          return new UncheckedSubSet.BodySet.Ascending(set,countElements(set,inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|(inclusiveTo&0xff));
+        }else{
+          return new UncheckedSubSet.TailSet.Ascending(set,countElementsDescending(set,inclusiveFrom),inclusiveFrom);
+        }
+      }else{
+        return headSetAscending(set,inclusiveTo);
+      }
+    }else{
+      return AbstractByteSet.EmptyView.ASCENDING;
+    }
+  }
+  private static OmniNavigableSet.OfByte headSetDescending(ByteSetImpl.Unchecked set,int inclusiveTo){
+    if(inclusiveTo!=Byte.MIN_VALUE){
+      return new UncheckedSubSet.TailSet.Descending(set,countElementsDescending(set,inclusiveTo),inclusiveTo);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte tailSetDescending(ByteSetImpl.Unchecked set,int inclusiveFrom){
+    if(inclusiveFrom!=Byte.MAX_VALUE){
+      return new UncheckedSubSet.HeadSet.Descending(set,countElementsAscending(set,inclusiveFrom),inclusiveFrom);
+    }else{
+      return set;
+    }
+  }
+  private static OmniNavigableSet.OfByte subSetDescending(ByteSetImpl.Unchecked set,int inclusiveFrom,int inclusiveTo){
+    if(inclusiveFrom!=Byte.MAX_VALUE){
+      if(inclusiveTo!=Byte.MIN_VALUE){
+        return new UncheckedSubSet.BodySet.Descending(set,countElements(set,inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff)); 
+      }else{
+        return new UncheckedSubSet.HeadSet.Descending(set,countElementsAscending(set,inclusiveFrom),inclusiveFrom);
+      }
+    }else{
+      return headSetDescending(set,inclusiveTo);
     }
   }
   public static abstract class Unchecked extends ByteSetImpl{
@@ -4138,7 +4436,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (byte)v;
           }
         }
@@ -4149,7 +4447,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (byte)v;
           }
         }
@@ -4161,7 +4459,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=super.getThisOrHigher(1+(int)(val)))!=129){
+          if((v=getThisOrHigher(this,1+(int)(val)))!=129){
             return (byte)v;
           }
         }
@@ -4173,7 +4471,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=super.getThisOrLower(-1+(int)(val)))!=-129){
+          if((v=getThisOrLower(this,-1+(int)(val)))!=-129){
             return (byte)v;
           }
         }
@@ -4184,7 +4482,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (byte)v;
           }
         }
@@ -4195,7 +4493,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (byte)v;
           }
         }
@@ -4207,7 +4505,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=super.getThisOrHigher(1+(int)(val)))!=129){
+          if((v=getThisOrHigher(this,1+(int)(val)))!=129){
             return (byte)v;
           }
         }
@@ -4219,7 +4517,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=super.getThisOrLower(-1+(int)(val)))!=-129){
+          if((v=getThisOrLower(this,-1+(int)(val)))!=-129){
             return (byte)v;
           }
         }
@@ -4231,7 +4529,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (short)v;
           }
         }
@@ -4243,7 +4541,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (short)v;
           }
         }
@@ -4255,7 +4553,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(1+(int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,1+(int)(val)):getThisOrHigher(this))!=128){
             return (short)v;
           }
         }
@@ -4267,7 +4565,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(-1+(int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,-1+(int)(val)):getThisOrLower(this)))!=-129){
             return (short)v;
           }
         }
@@ -4278,7 +4576,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(val<=Byte.MAX_VALUE)
         {
-          if((val=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((val=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (int)val;
           }
         }
@@ -4289,7 +4587,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(!(val<(Byte.MIN_VALUE)))
         {
-          if((val=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((val=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (int)val;
           }
         }
@@ -4300,7 +4598,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(val<Byte.MAX_VALUE)
         {
-          if((val=val>=Byte.MIN_VALUE?super.getThisOrHigher(1+(int)(val)):super.getThisOrHigher())!=128){
+          if((val=val>=Byte.MIN_VALUE?getThisOrHigher(this,1+(int)(val)):getThisOrHigher(this))!=128){
             return (int)val;
           }
         }
@@ -4311,7 +4609,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(!(val<=(Byte.MIN_VALUE)))
         {
-          if((val=(val<=Byte.MAX_VALUE?super.getThisOrLower(-1+(int)(val)):super.getThisOrLower()))!=-129){
+          if((val=(val<=Byte.MAX_VALUE?getThisOrLower(this,-1+(int)(val)):getThisOrLower(this)))!=-129){
             return (int)val;
           }
         }
@@ -4323,7 +4621,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (long)v;
           }
         }
@@ -4335,7 +4633,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (long)v;
           }
         }
@@ -4347,7 +4645,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(1+(int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,1+(int)(val)):getThisOrHigher(this))!=128){
             return (long)v;
           }
         }
@@ -4359,7 +4657,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(-1+(int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,-1+(int)(val)):getThisOrLower(this)))!=-129){
             return (long)v;
           }
         }
@@ -4371,7 +4669,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.intCeiling(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.intCeiling(val)):getThisOrHigher(this))!=128){
             return (float)v;
           }
         }
@@ -4383,7 +4681,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.intFloor(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.intFloor(val)):getThisOrLower(this)))!=-129){
             return (float)v;
           }
         }
@@ -4395,7 +4693,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.higherInt(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.higherInt(val)):getThisOrHigher(this))!=128){
             return (float)v;
           }
         }
@@ -4407,7 +4705,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.lowerInt(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.lowerInt(val)):getThisOrLower(this)))!=-129){
             return (float)v;
           }
         }
@@ -4419,7 +4717,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.intCeiling(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.intCeiling(val)):getThisOrHigher(this))!=128){
             return (double)v;
           }
         }
@@ -4431,7 +4729,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.intFloor(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.intFloor(val)):getThisOrLower(this)))!=-129){
             return (double)v;
           }
         }
@@ -4443,7 +4741,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.higherInt(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.higherInt(val)):getThisOrHigher(this))!=128){
             return (double)v;
           }
         }
@@ -4455,7 +4753,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.lowerInt(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.lowerInt(val)):getThisOrLower(this)))!=-129){
             return (double)v;
           }
         }
@@ -4499,60 +4797,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       word1=in.readLong();
       word2=in.readLong();
       word3=in.readLong();
-    }
-    private OmniNavigableSet.OfByte headSetAscending(int inclusiveTo){
-      if(inclusiveTo!=Byte.MAX_VALUE){
-        return new UncheckedSubSet.HeadSet.Ascending(this,super.countElementsAscending(inclusiveTo),inclusiveTo);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte tailSetAscending(int inclusiveFrom){
-      if(inclusiveFrom!=Byte.MIN_VALUE){
-        return new UncheckedSubSet.TailSet.Ascending(this,super.countElementsDescending(inclusiveFrom),inclusiveFrom);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte subSetAscending(int inclusiveFrom,int inclusiveTo){
-      if(inclusiveFrom<=inclusiveTo){
-        if(inclusiveFrom!=Byte.MIN_VALUE){
-          if(inclusiveTo!=Byte.MAX_VALUE){
-            return new UncheckedSubSet.BodySet.Ascending(this,super.countElements(inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|(inclusiveTo&0xff));
-          }else{
-            return new UncheckedSubSet.TailSet.Ascending(this,super.countElementsDescending(inclusiveFrom),inclusiveFrom);
-          }
-        }else{
-          return headSetAscending(inclusiveTo);
-        }
-      }else{
-        return AbstractByteSet.EmptyView.ASCENDING;
-      }
-    }
-    private OmniNavigableSet.OfByte headSetDescending(int inclusiveTo){
-      if(inclusiveTo!=Byte.MIN_VALUE){
-        return new UncheckedSubSet.TailSet.Descending(this,super.countElementsDescending(inclusiveTo),inclusiveTo);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte tailSetDescending(int inclusiveFrom){
-      if(inclusiveFrom!=Byte.MAX_VALUE){
-        return new UncheckedSubSet.HeadSet.Descending(this,super.countElementsAscending(inclusiveFrom),inclusiveFrom);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte subSetDescending(int inclusiveFrom,int inclusiveTo){
-      if(inclusiveFrom!=Byte.MAX_VALUE){
-        if(inclusiveTo!=Byte.MIN_VALUE){
-          return new UncheckedSubSet.BodySet.Descending(this,super.countElements(inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff)); 
-        }else{
-          return new UncheckedSubSet.HeadSet.Descending(this,super.countElementsAscending(inclusiveFrom),inclusiveFrom);
-        }
-      }else{
-        return headSetDescending(inclusiveTo);
-      }
     }
     @Override public int pollFirstInt(){
       {
@@ -4644,49 +4888,49 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new Ascending(this);
       }
       @Override public String toString(){
-        return super.toStringAscending();
+        return toStringAscending(this);
       }
       @Override public int firstInt(){
-        return super.getThisOrHigher();
+        return getThisOrHigher(this);
       }
       @Override public int lastInt(){
-        return super.getThisOrLower();
+        return getThisOrLower(this);
       }
       @Override public void forEach(ByteConsumer action){
-        super.forEachAscending(action);
+        forEachAscending(this,action);
       }
       @Override public void forEach(Consumer<? super Byte> action){
-        super.forEachAscending(action::accept);
+        forEachAscending(this,action::accept);
       }
       @Override public byte[] toByteArray(){
-        return super.toByteArrayAscending();
+        return toByteArrayAscending(this);
       }
       @Override public short[] toShortArray(){
-        return super.toShortArrayAscending();
+        return toShortArrayAscending(this);
       }
       @Override public int[] toIntArray(){
-        return super.toIntArrayAscending();
+        return toIntArrayAscending(this);
       }
       @Override public long[] toLongArray(){
-        return super.toLongArrayAscending();
+        return toLongArrayAscending(this);
       }
       @Override public float[] toFloatArray(){
-        return super.toFloatArrayAscending();
+        return toFloatArrayAscending(this);
       }
       @Override public double[] toDoubleArray(){
-        return super.toDoubleArrayAscending();
+        return toDoubleArrayAscending(this);
       }
       @Override public Byte[] toArray(){
-        return super.toArrayAscending();
+        return toArrayAscending(this);
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-        return super.toArrayAscending(arrConstructor);
+        return toArrayAscending(this,arrConstructor);
       }
       @Override public <T> T[] toArray(T[] dst){
-        return super.toArrayAscending(dst);
+        return toArrayAscending(this,dst);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return super.headSetAscending((int)toElement);
+        return headSetAscending(this,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         int inclusiveTo=toElement;
@@ -4694,13 +4938,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveTo;
         }
         if(inclusiveTo!=-129){
-          return super.headSetAscending(inclusiveTo);
+          return headSetAscending(this,inclusiveTo);
         }else{
           return AbstractByteSet.EmptyView.ASCENDING;
         }
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return super.tailSetAscending((int)fromElement);
+        return tailSetAscending(this,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         int inclusiveFrom=fromElement;
@@ -4708,13 +4952,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveFrom;
         }
         if(inclusiveFrom!=128){
-          return super.tailSetAscending(inclusiveFrom);
+          return tailSetAscending(this,inclusiveFrom);
         }else{
           return AbstractByteSet.EmptyView.ASCENDING;
         }
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return super.subSetAscending((int)fromElement,(int)toElement);
+        return subSetAscending(this,(int)fromElement,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
         int inclusiveFrom=fromElement;
@@ -4725,7 +4969,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!toInclusive){
           --inclusiveTo;
         }
-        return super.subSetAscending(inclusiveFrom,inclusiveTo);
+        return subSetAscending(this,inclusiveFrom,inclusiveTo);
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new UncheckedFullView.Descending(this);
@@ -4769,13 +5013,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new Descending(this);
       }
       @Override public String toString(){
-        return super.toStringDescending();
+        return toStringDescending(this);
       }
       @Override public int firstInt(){
-        return super.getThisOrLower();
+        return getThisOrLower(this);
       }
       @Override public int lastInt(){
-        return super.getThisOrHigher();
+        return getThisOrHigher(this);
       }
       @Override public Byte ceiling(byte val){
         return super.floor(val);
@@ -4861,38 +5105,41 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      @Override public ByteComparator comparator(){
+        return ByteComparator::descendingCompare;
+      }
       @Override public void forEach(ByteConsumer action){
-        super.forEachDescending(action);
+        forEachDescending(this,action);
       }
       @Override public void forEach(Consumer<? super Byte> action){
-        super.forEachDescending(action::accept);
+        forEachDescending(this,action::accept);
       }
       @Override public byte[] toByteArray(){
-        return super.toByteArrayDescending();
+        return toByteArrayDescending(this);
       }
       @Override public short[] toShortArray(){
-        return super.toShortArrayDescending();
+        return toShortArrayDescending(this);
       }
       @Override public int[] toIntArray(){
-        return super.toIntArrayDescending();
+        return toIntArrayDescending(this);
       }
       @Override public long[] toLongArray(){
-        return super.toLongArrayDescending();
+        return toLongArrayDescending(this);
       }
       @Override public float[] toFloatArray(){
-        return super.toFloatArrayDescending();
+        return toFloatArrayDescending(this);
       }
       @Override public double[] toDoubleArray(){
-        return super.toDoubleArrayDescending();
+        return toDoubleArrayDescending(this);
       }
       @Override public Byte[] toArray(){
-        return super.toArrayDescending();
+        return toArrayDescending(this);
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-        return super.toArrayDescending(arrConstructor);
+        return toArrayDescending(this,arrConstructor);
       }
       @Override public <T> T[] toArray(T[] dst){
-        return super.toArrayDescending(dst);
+        return toArrayDescending(this,dst);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         int inclusiveTo=toElement;
@@ -4900,7 +5147,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveTo;
         }
         if(inclusiveTo!=128){
-          return super.headSetDescending(inclusiveTo);
+          return headSetDescending(this,inclusiveTo);
         }else{
           return AbstractByteSet.EmptyView.DESCENDING;
         }
@@ -4911,7 +5158,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveFrom;
         }
         if(inclusiveFrom!=-129){
-          return super.tailSetDescending(inclusiveFrom);
+          return tailSetDescending(this,inclusiveFrom);
         }else{
           return AbstractByteSet.EmptyView.DESCENDING;
         }
@@ -4926,19 +5173,19 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveTo;
         }
         if(inclusiveFrom>=inclusiveTo){
-          return super.subSetDescending(inclusiveFrom,inclusiveTo);
+          return subSetDescending(this,inclusiveFrom,inclusiveTo);
         }else{
           return AbstractByteSet.EmptyView.DESCENDING;
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return super.headSetDescending((int)toElement);
+        return headSetDescending(this,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return super.tailSetDescending((int)fromElement);
+        return tailSetDescending(this,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return super.subSetDescending((int)fromElement,(int)toElement);
+        return subSetDescending(this,(int)fromElement,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new UncheckedFullView.Ascending(this);
@@ -5077,18 +5324,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return false;
     }
-    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
-      ModCountChecker(int modCountAndSize){
-        super(modCountAndSize>>9);
-      }
-      @Override protected int getActualModCount(){
-        return Checked.this.modCountAndSize>>9;
-      }
-    }
     @Override public boolean removeIf(BytePredicate filter){
       final int modCountAndSize;
       int size;
-      if((size=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0  && (size=super.removeIfImplStartWord3Descending(Byte.MAX_VALUE,size,filter,new ModCountChecker(modCountAndSize)))!=0){
+      if((size=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0  && (size=removeIfImplStartWord3Descending(this,Byte.MAX_VALUE,size,filter,modCountAndSize))!=0){
         this.modCountAndSize=modCountAndSize+((1<<9)-size);
         return true;
       }
@@ -5097,7 +5336,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public boolean removeIf(Predicate<? super Byte> filter){
       final int modCountAndSize;
       int size;
-      if((size=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0  && (size=super.removeIfImplStartWord3Descending(Byte.MAX_VALUE,size,filter::test,new ModCountChecker(modCountAndSize)))!=0){
+      if((size=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0  && (size=removeIfImplStartWord3Descending(this,Byte.MAX_VALUE,size,filter::test,modCountAndSize))!=0){
         this.modCountAndSize=modCountAndSize+((1<<9)-size);
         return true;
       }
@@ -5120,7 +5359,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public int hashCode(){
       final int size;
       if((size=this.modCountAndSize&0x1ff)!=0){
-        return super.hashCodeDescending(size);
+        return hashCodeDescending(this,size);
       }
       return 0;
     }
@@ -5163,70 +5402,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
       }
     }
-    private OmniNavigableSet.OfByte headSetAscending(int inclusiveTo){
-      if(inclusiveTo!=Byte.MAX_VALUE){
-        return new CheckedSubSet.HeadSet.Ascending(this,(this.modCountAndSize&(~0x1ff))|super.countElementsAscending(inclusiveTo),inclusiveTo);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte tailSetAscending(int inclusiveFrom){
-      if(inclusiveFrom!=Byte.MIN_VALUE){
-        return new CheckedSubSet.TailSet.Ascending(this,(this.modCountAndSize&(~0x1ff))|super.countElementsDescending(inclusiveFrom),inclusiveFrom);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte subSetAscending(int inclusiveFrom,int inclusiveTo){
-      switch(Integer.signum(inclusiveTo+1-inclusiveFrom)){
-        case 1:
-          if(inclusiveFrom!=Byte.MIN_VALUE){
-            if(inclusiveTo!=Byte.MAX_VALUE){
-              return new CheckedSubSet.BodySet.Ascending(this,(this.modCountAndSize&(~0x1ff))|super.countElements(inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|(inclusiveTo&0xff));
-            }else{
-              return new CheckedSubSet.TailSet.Ascending(this,(this.modCountAndSize&(~0x1ff))|super.countElementsDescending(inclusiveFrom),inclusiveFrom);
-            }
-          }else{
-            return headSetAscending(inclusiveTo);
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
-        default:
-          throw new IllegalArgumentException("out of bounds");
-      }
-    }
-    private OmniNavigableSet.OfByte headSetDescending(int inclusiveTo){
-      if(inclusiveTo!=Byte.MIN_VALUE){
-        return new CheckedSubSet.TailSet.Descending(this,(this.modCountAndSize&(~0x1ff))|super.countElementsDescending(inclusiveTo),inclusiveTo);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte tailSetDescending(int inclusiveFrom){
-      if(inclusiveFrom!=Byte.MAX_VALUE){
-        return new CheckedSubSet.HeadSet.Descending(this,(this.modCountAndSize&(~0x1ff))|super.countElementsAscending(inclusiveFrom),inclusiveFrom);
-      }else{
-        return this;
-      }
-    }
-    private OmniNavigableSet.OfByte subSetDescending(int inclusiveFrom,int inclusiveTo){
-      switch(Integer.signum(inclusiveFrom+1-inclusiveTo)){
-        case 1:
-          if(inclusiveFrom!=Byte.MAX_VALUE){
-            if(inclusiveTo!=Byte.MIN_VALUE){
-              return new CheckedSubSet.BodySet.Descending(this,(this.modCountAndSize&(~0x1ff))|super.countElements(inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff));
-            }else{
-              return new CheckedSubSet.HeadSet.Descending(this,(this.modCountAndSize&(~0x1ff))|super.countElementsAscending(inclusiveFrom),inclusiveFrom);
-            }
-          }else{
-            return headSetDescending(inclusiveTo);
-          }
-        case 0:
-          return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
-        default:
-          throw new IllegalArgumentException("out of bounds");
-      }
-    }
     abstract void forEachImpl(int size,ByteConsumer action);
     @Override public void forEach(ByteConsumer action){
       final int modCountAndSize;
@@ -5234,7 +5409,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((size=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
         try{
           forEachImpl(size,action);
-          super.forEachAscending(size,action);
         }finally{
           CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
         }
@@ -5264,13 +5438,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     @Override public int firstInt(){
       if((modCountAndSize&0x1ff)!=0){
-        return super.getThisOrHigher();
+        return getThisOrHigher(this);
       }
       throw new NoSuchElementException();
     }
     @Override public int lastInt(){
       if((modCountAndSize&0x1ff)!=0){
-        return super.getThisOrLower();
+        return getThisOrLower(this);
       }
       throw new NoSuchElementException();
     }
@@ -5279,7 +5453,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (byte)v;
           }
         }
@@ -5291,7 +5465,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (byte)v;
           }
         }
@@ -5304,7 +5478,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=super.getThisOrHigher(1+(int)(val)))!=129){
+          if((v=getThisOrHigher(this,1+(int)(val)))!=129){
             return (byte)v;
           }
         }
@@ -5317,7 +5491,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=super.getThisOrLower(-1+(int)(val)))!=-129){
+          if((v=getThisOrLower(this,-1+(int)(val)))!=-129){
             return (byte)v;
           }
         }
@@ -5329,7 +5503,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (byte)v;
           }
         }
@@ -5341,7 +5515,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (byte)v;
           }
         }
@@ -5354,7 +5528,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=super.getThisOrHigher(1+(int)(val)))!=129){
+          if((v=getThisOrHigher(this,1+(int)(val)))!=129){
             return (byte)v;
           }
         }
@@ -5367,7 +5541,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=super.getThisOrLower(-1+(int)(val)))!=-129){
+          if((v=getThisOrLower(this,-1+(int)(val)))!=-129){
             return (byte)v;
           }
         }
@@ -5380,7 +5554,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (short)v;
           }
         }
@@ -5393,7 +5567,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (short)v;
           }
         }
@@ -5406,7 +5580,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(1+(int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,1+(int)(val)):getThisOrHigher(this))!=128){
             return (short)v;
           }
         }
@@ -5419,7 +5593,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(-1+(int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,-1+(int)(val)):getThisOrLower(this)))!=-129){
             return (short)v;
           }
         }
@@ -5431,7 +5605,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(val<=Byte.MAX_VALUE)
         {
-          if((val=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((val=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (int)val;
           }
         }
@@ -5443,7 +5617,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(!(val<(Byte.MIN_VALUE)))
         {
-          if((val=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((val=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (int)val;
           }
         }
@@ -5455,7 +5629,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(val<Byte.MAX_VALUE)
         {
-          if((val=val>=Byte.MIN_VALUE?super.getThisOrHigher(1+(int)(val)):super.getThisOrHigher())!=128){
+          if((val=val>=Byte.MIN_VALUE?getThisOrHigher(this,1+(int)(val)):getThisOrHigher(this))!=128){
             return (int)val;
           }
         }
@@ -5467,7 +5641,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       {
         if(!(val<=(Byte.MIN_VALUE)))
         {
-          if((val=(val<=Byte.MAX_VALUE?super.getThisOrLower(-1+(int)(val)):super.getThisOrLower()))!=-129){
+          if((val=(val<=Byte.MAX_VALUE?getThisOrLower(this,-1+(int)(val)):getThisOrLower(this)))!=-129){
             return (int)val;
           }
         }
@@ -5480,7 +5654,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher((int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,(int)(val)):getThisOrHigher(this))!=128){
             return (long)v;
           }
         }
@@ -5493,7 +5667,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower((int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,(int)(val)):getThisOrLower(this)))!=-129){
             return (long)v;
           }
         }
@@ -5506,7 +5680,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(1+(int)(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,1+(int)(val)):getThisOrHigher(this))!=128){
             return (long)v;
           }
         }
@@ -5519,7 +5693,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(-1+(int)(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,-1+(int)(val)):getThisOrLower(this)))!=-129){
             return (long)v;
           }
         }
@@ -5532,7 +5706,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.intCeiling(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.intCeiling(val)):getThisOrHigher(this))!=128){
             return (float)v;
           }
         }
@@ -5545,7 +5719,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.intFloor(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.intFloor(val)):getThisOrLower(this)))!=-129){
             return (float)v;
           }
         }
@@ -5558,7 +5732,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.higherInt(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.higherInt(val)):getThisOrHigher(this))!=128){
             return (float)v;
           }
         }
@@ -5571,7 +5745,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.lowerInt(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.lowerInt(val)):getThisOrLower(this)))!=-129){
             return (float)v;
           }
         }
@@ -5584,7 +5758,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<=Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.intCeiling(val)):super.getThisOrHigher())!=128){
+          if((v=val>Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.intCeiling(val)):getThisOrHigher(this))!=128){
             return (double)v;
           }
         }
@@ -5597,7 +5771,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.intFloor(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.intFloor(val)):getThisOrLower(this)))!=-129){
             return (double)v;
           }
         }
@@ -5610,7 +5784,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(val<Byte.MAX_VALUE)
         {
           final int v;
-          if((v=val>=Byte.MIN_VALUE?super.getThisOrHigher(TypeUtil.higherInt(val)):super.getThisOrHigher())!=128){
+          if((v=val>=Byte.MIN_VALUE?getThisOrHigher(this,TypeUtil.higherInt(val)):getThisOrHigher(this))!=128){
             return (double)v;
           }
         }
@@ -5623,7 +5797,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!(val<=(Byte.MIN_VALUE)))
         {
           final int v;
-          if((v=(val<=Byte.MAX_VALUE?super.getThisOrLower(TypeUtil.lowerInt(val)):super.getThisOrLower()))!=-129){
+          if((v=(val<=Byte.MAX_VALUE?getThisOrLower(this,TypeUtil.lowerInt(val)):getThisOrLower(this)))!=-129){
             return (double)v;
           }
         }
@@ -5721,13 +5895,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return new Ascending(this);
       }
       @Override void forEachImpl(int size,ByteConsumer action){
-        super.forEachAscending(size,action);
+        forEachAscending(this,size,action);
       }
       @Override public byte[] toByteArray(){
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final byte[] dst;
-          super.copyToArrayAscending(size,dst=new byte[size]);
+          copyToArrayAscending(this,size,dst=new byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -5736,7 +5910,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final short[] dst;
-          super.copyToArrayAscending(size,dst=new short[size]);
+          copyToArrayAscending(this,size,dst=new short[size]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -5745,7 +5919,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final int[] dst;
-          super.copyToArrayAscending(size,dst=new int[size]);
+          copyToArrayAscending(this,size,dst=new int[size]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -5754,7 +5928,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final long[] dst;
-          super.copyToArrayAscending(size,dst=new long[size]);
+          copyToArrayAscending(this,size,dst=new long[size]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -5763,7 +5937,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final float[] dst;
-          super.copyToArrayAscending(size,dst=new float[size]);
+          copyToArrayAscending(this,size,dst=new float[size]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -5772,7 +5946,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final double[] dst;
-          super.copyToArrayAscending(size,dst=new double[size]);
+          copyToArrayAscending(this,size,dst=new double[size]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -5781,33 +5955,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final Byte[] dst;
-          super.copyToArrayAscending(size,dst=new Byte[size]);
+          copyToArrayAscending(this,size,dst=new Byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-        final int modCountAndSize=super.modCountAndSize,size;
+        final int modCountAndSize=this.modCountAndSize,size;
         final T[] dst;
         try{
           dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
         }finally{
-          CheckedCollection.checkModCount(modCountAndSize,super.modCountAndSize);
+          CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
         }
         if(size!=0){
-          super.copyToArrayAscending(size,dst);
+          copyToArrayAscending(this,size,dst);
         }
         return dst;
       }
       @Override public <T> T[] toArray(T[] dst){
         final int size;
-        if((size=super.modCountAndSize&0x1ff)!=0){
-          super.copyToArrayAscending(size,dst);
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          copyToArrayAscending(this,size,dst);
         }
         return dst;
       }
       @Override int toStringImpl(int size,byte[] buffer){
-        return super.toStringAscending(size,buffer);
+        return toStringAscending(this,size,buffer);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         int inclusiveTo=toElement;
@@ -5815,7 +5989,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveTo;
         }
         if(inclusiveTo!=-129){
-          return super.headSetAscending(inclusiveTo);
+          return headSetAscending(this,inclusiveTo);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
         }
@@ -5826,16 +6000,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveFrom;
         }
         if(inclusiveFrom!=128){
-          return super.tailSetAscending(inclusiveFrom);
+          return tailSetAscending(this,inclusiveFrom);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return super.headSetAscending((int)toElement);
+        return headSetAscending(this,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return super.tailSetAscending((int)fromElement);
+        return tailSetAscending(this,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
         int inclusiveFrom=fromElement;
@@ -5846,10 +6020,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!toInclusive){
           --inclusiveTo;
         }
-        return super.subSetAscending(inclusiveFrom,inclusiveTo);
+        return subSetAscending(this,inclusiveFrom,inclusiveTo);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return super.subSetAscending((int)fromElement,(int)toElement);
+        return subSetAscending(this,(int)fromElement,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new CheckedFullView.Descending(this);
@@ -5976,17 +6150,20 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      @Override public ByteComparator comparator(){
+        return ByteComparator::descendingCompare;
+      }
       @Override public Object clone(){
         return new Descending(this);
       }
       @Override void forEachImpl(int size,ByteConsumer action){
-        super.forEachDescending(size,action);
+        forEachDescending(this,size,action);
       }
       @Override public byte[] toByteArray(){
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final byte[] dst;
-          super.copyToArrayDescending(size,dst=new byte[size]);
+          copyToArrayDescending(this,size,dst=new byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -5995,7 +6172,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final short[] dst;
-          super.copyToArrayDescending(size,dst=new short[size]);
+          copyToArrayDescending(this,size,dst=new short[size]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -6004,7 +6181,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final int[] dst;
-          super.copyToArrayDescending(size,dst=new int[size]);
+          copyToArrayDescending(this,size,dst=new int[size]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -6013,7 +6190,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final long[] dst;
-          super.copyToArrayDescending(size,dst=new long[size]);
+          copyToArrayDescending(this,size,dst=new long[size]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -6022,7 +6199,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final float[] dst;
-          super.copyToArrayDescending(size,dst=new float[size]);
+          copyToArrayDescending(this,size,dst=new float[size]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -6031,7 +6208,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final double[] dst;
-          super.copyToArrayDescending(size,dst=new double[size]);
+          copyToArrayDescending(this,size,dst=new double[size]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -6040,33 +6217,33 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         if((size=this.modCountAndSize&0x1ff)!=0){
           final Byte[] dst;
-          super.copyToArrayDescending(size,dst=new Byte[size]);
+          copyToArrayDescending(this,size,dst=new Byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-        final int modCountAndSize=super.modCountAndSize,size;
+        final int modCountAndSize=this.modCountAndSize,size;
         final T[] dst;
         try{
           dst=arrConstructor.apply(size=modCountAndSize&0x1ff);
         }finally{
-          CheckedCollection.checkModCount(modCountAndSize,super.modCountAndSize);
+          CheckedCollection.checkModCount(modCountAndSize,this.modCountAndSize);
         }
         if(size!=0){
-          super.copyToArrayDescending(size,dst);
+          copyToArrayDescending(this,size,dst);
         }
         return dst;
       }
       @Override public <T> T[] toArray(T[] dst){
         final int size;
-        if((size=super.modCountAndSize&0x1ff)!=0){
-          super.copyToArrayDescending(size,dst);
+        if((size=this.modCountAndSize&0x1ff)!=0){
+          copyToArrayDescending(this,size,dst);
         }
         return dst;
       }
       @Override int toStringImpl(int size,byte[] buffer){
-        return super.toStringDescending(size,buffer);
+        return toStringDescending(this,size,buffer);
       }
       @Override public int firstInt(){
         return super.lastInt();
@@ -6080,7 +6257,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveTo;
         }
         if(inclusiveTo!=128){
-          return super.headSetDescending(inclusiveTo);
+          return headSetDescending(this,inclusiveTo);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveTo);
         }
@@ -6091,16 +6268,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveFrom;
         }
         if(inclusiveFrom!=-129){
-          return super.tailSetDescending(inclusiveFrom);
+          return tailSetDescending(this,inclusiveFrom);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return super.headSetDescending((int)toElement);
+        return headSetDescending(this,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return super.tailSetDescending((int)fromElement);
+        return tailSetDescending(this,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
         int inclusiveFrom=fromElement;
@@ -6111,10 +6288,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!toInclusive){
           ++inclusiveTo;
         }
-        return super.subSetDescending(inclusiveFrom,inclusiveTo);
+        return subSetDescending(this,inclusiveFrom,inclusiveTo);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return super.subSetDescending((int)fromElement,(int)toElement);
+        return subSetDescending(this,(int)fromElement,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new CheckedFullView.Ascending(this);
@@ -6319,13 +6496,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         super(root);
       }
       @Override public String toString(){
-        return root.toStringAscending();
+        return toStringAscending(root);
       }
       @Override public Object clone(){
         return new ByteSetImpl.Unchecked.Ascending(this.root);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return root.headSetAscending((int)toElement);
+        return headSetAscending(root,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
         int inclusiveTo=toElement;
@@ -6333,13 +6510,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveTo;
         }
         if(inclusiveTo!=-129){
-          return root.headSetAscending(inclusiveTo);
+          return headSetAscending(root,inclusiveTo);
         }else{
           return AbstractByteSet.EmptyView.ASCENDING;
         }
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return root.tailSetAscending((int)fromElement);
+        return tailSetAscending(root,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement,boolean inclusive){
         int inclusiveFrom=fromElement;
@@ -6347,13 +6524,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveFrom;
         }
         if(inclusiveFrom!=128){
-          return root.tailSetAscending(inclusiveFrom);
+          return tailSetAscending(root,inclusiveFrom);
         }else{
           return AbstractByteSet.EmptyView.ASCENDING;
         }
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return root.subSetAscending((int)fromElement,(int)toElement);
+        return subSetAscending(root,(int)fromElement,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
         int inclusiveFrom=fromElement;
@@ -6364,43 +6541,43 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!toInclusive){
           --inclusiveTo;
         }
-        return root.subSetAscending(inclusiveFrom,inclusiveTo);
+        return subSetAscending(root,inclusiveFrom,inclusiveTo);
       }
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Ascending(this.root);
       }
       @Override public byte[] toByteArray(){
-        return root.toByteArrayAscending();
+        return toByteArrayAscending(root);
       }
       @Override public short[] toShortArray(){
-        return root.toShortArrayAscending();
+        return toShortArrayAscending(root);
       }
       @Override public int[] toIntArray(){
-        return root.toIntArrayAscending();
+        return toIntArrayAscending(root);
       }
       @Override public long[] toLongArray(){
-        return root.toLongArrayAscending();
+        return toLongArrayAscending(root);
       }
       @Override public float[] toFloatArray(){
-        return root.toFloatArrayAscending();
+        return toFloatArrayAscending(root);
       }
       @Override public double[] toDoubleArray(){
-        return root.toDoubleArrayAscending();
+        return toDoubleArrayAscending(root);
       }
       @Override public Byte[] toArray(){
-        return root.toArrayAscending();
+        return toArrayAscending(root);
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-        return root.toArrayAscending(arrConstructor);
+        return toArrayAscending(root,arrConstructor);
       }
       @Override public <T> T[] toArray(T[] dst){
-        return root.toArrayAscending(dst);
+        return toArrayAscending(root,dst);
       }
       @Override public void forEach(ByteConsumer action){
-        root.forEachAscending(action);
+        forEachAscending(root,action);
       }
       @Override public void forEach(Consumer<? super Byte> action){
-        root.forEachAscending(action::accept);
+        forEachAscending(root,action::accept);
       }
       @Override public OmniIterator.OfByte iterator(){
         //TODO
@@ -6500,8 +6677,11 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      @Override public ByteComparator comparator(){
+        return ByteComparator::descendingCompare;
+      }
       @Override public String toString(){
-        return root.toStringDescending();
+        return toStringDescending(root);
       }
       @Override public Object clone(){
         return new ByteSetImpl.Unchecked.Descending(this.root);
@@ -6512,7 +6692,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveTo;
         }
         if(inclusiveTo!=128){
-          return root.headSetDescending(inclusiveTo);
+          return headSetDescending(root,inclusiveTo);
         }else{
           return AbstractByteSet.EmptyView.DESCENDING;
         }
@@ -6523,7 +6703,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveFrom;
         }
         if(inclusiveFrom!=-129){
-          return root.tailSetDescending(inclusiveFrom);
+          return tailSetDescending(root,inclusiveFrom);
         }else{
           return AbstractByteSet.EmptyView.DESCENDING;
         }
@@ -6538,49 +6718,49 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveTo;
         }
         if(inclusiveFrom>=inclusiveTo){
-          return root.subSetDescending(inclusiveFrom,inclusiveTo);
+          return subSetDescending(root,inclusiveFrom,inclusiveTo);
         }else{
           return AbstractByteSet.EmptyView.DESCENDING;
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return root.headSetDescending((int)toElement);
+        return headSetDescending(root,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return root.tailSetDescending((int)fromElement);
+        return tailSetDescending(root,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return root.subSetDescending((int)fromElement,(int)toElement);
+        return subSetDescending(root,(int)fromElement,(int)toElement);
       }
       private Object writeReplace(){
         return new ByteSetImpl.Unchecked.Descending(this.root);
       }
       @Override public byte[] toByteArray(){
-        return root.toByteArrayDescending();
+        return toByteArrayDescending(root);
       }
       @Override public short[] toShortArray(){
-        return root.toShortArrayDescending();
+        return toShortArrayDescending(root);
       }
       @Override public int[] toIntArray(){
-        return root.toIntArrayDescending();
+        return toIntArrayDescending(root);
       }
       @Override public long[] toLongArray(){
-        return root.toLongArrayDescending();
+        return toLongArrayDescending(root);
       }
       @Override public float[] toFloatArray(){
-        return root.toFloatArrayDescending();
+        return toFloatArrayDescending(root);
       }
       @Override public double[] toDoubleArray(){
-        return root.toDoubleArrayDescending();
+        return toDoubleArrayDescending(root);
       }
       @Override public Byte[] toArray(){
-        return root.toArrayDescending();
+        return toArrayDescending(root);
       }
       @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-        return root.toArrayDescending(arrConstructor);
+        return toArrayDescending(root,arrConstructor);
       }
       @Override public <T> T[] toArray(T[] dst){
-        return root.toArrayDescending(dst);
+        return toArrayDescending(root,dst);
       }
       @Override public int pollFirstInt(){
         return super.pollLastInt();
@@ -6589,10 +6769,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return super.pollFirstInt();
       }
       @Override public void forEach(ByteConsumer action){
-        root.forEachDescending(action);
+        forEachDescending(root,action);
       }
       @Override public void forEach(Consumer<? super Byte> action){
-        root.forEachDescending(action::accept);
+        forEachDescending(root,action::accept);
       }
       @Override public OmniIterator.OfByte iterator(){
         //TODO
@@ -6727,7 +6907,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int modCountAndSize;
       int size;
       final ByteSetImpl.Checked root;
-      if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0  && (size=root.removeIfImplStartWord3Descending(Byte.MAX_VALUE,size,filter,root.new ModCountChecker(modCountAndSize)))!=0){
+      if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0  && (size=removeIfImplStartWord3Descending(root,Byte.MAX_VALUE,size,filter,modCountAndSize))!=0){
         root.modCountAndSize=modCountAndSize+((1<<9)-size);
         return true;
       }
@@ -6737,7 +6917,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int modCountAndSize;
       int size;
       final ByteSetImpl.Checked root;
-      if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0  && (size=root.removeIfImplStartWord3Descending(Byte.MAX_VALUE,size,filter::test,root.new ModCountChecker(modCountAndSize)))!=0){
+      if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0  && (size=removeIfImplStartWord3Descending(root,Byte.MAX_VALUE,size,filter::test,modCountAndSize))!=0){
         root.modCountAndSize=modCountAndSize+((1<<9)-size);
         return true;
       }
@@ -6860,7 +7040,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if((modCountAndSize=(root=this.root).modCountAndSize&0x1ff)!=0){
           final byte[] buffer;
           (buffer=new byte[modCountAndSize*6])[0]='[';
-          buffer[modCountAndSize=root.toStringAscending(modCountAndSize,buffer)]=']';
+          buffer[modCountAndSize=toStringAscending(root,modCountAndSize,buffer)]=']';
           return new String(buffer,0,modCountAndSize+1,ToStringUtil.IOS8859CharSet);
         }
         return "[]";
@@ -6871,7 +7051,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.forEachAscending(size,action);
+            forEachAscending(root,size,action);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -6883,7 +7063,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.forEachAscending(size,action::accept);
+            forEachAscending(root,size,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -6895,14 +7075,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int firstInt(){
         final ByteSetImpl.Checked root;
         if(((root=this.root).modCountAndSize&0x1ff)!=0){
-          return root.getThisOrHigher();
+          return getThisOrHigher(root);
         }
         throw new NoSuchElementException();
       }
       @Override public int lastInt(){
         final ByteSetImpl.Checked root;
         if(((root=this.root).modCountAndSize&0x1ff)!=0){
-          return root.getThisOrLower();
+          return getThisOrLower(root);
         }
         throw new NoSuchElementException();
       }
@@ -6912,7 +7092,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveTo;
         }
         if(inclusiveTo!=-129){
-          return root.headSetAscending(inclusiveTo);
+          return headSetAscending(root,inclusiveTo);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
         }
@@ -6923,16 +7103,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveFrom;
         }
         if(inclusiveFrom!=128){
-          return root.tailSetAscending(inclusiveFrom);
+          return tailSetAscending(root,inclusiveFrom);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return root.headSetAscending((int)toElement);
+        return headSetAscending(root,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return root.tailSetAscending((int)fromElement);
+        return tailSetAscending(root,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
         int inclusiveFrom=fromElement;
@@ -6943,10 +7123,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!toInclusive){
           --inclusiveTo;
         }
-        return root.subSetAscending(inclusiveFrom,inclusiveTo);
+        return subSetAscending(root,inclusiveFrom,inclusiveTo);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return root.subSetAscending((int)fromElement,(int)toElement);
+        return subSetAscending(root,(int)fromElement,(int)toElement);
       }
       private Object writeReplace(){
         return new SerializationIntermediate(this.root);
@@ -6956,7 +7136,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final byte[] dst;
-          root.copyToArrayAscending(size,dst=new byte[size]);
+          copyToArrayAscending(root,size,dst=new byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -6966,7 +7146,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final short[] dst;
-          root.copyToArrayAscending(size,dst=new short[size]);
+          copyToArrayAscending(root,size,dst=new short[size]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -6976,7 +7156,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final int[] dst;
-          root.copyToArrayAscending(size,dst=new int[size]);
+          copyToArrayAscending(root,size,dst=new int[size]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -6986,7 +7166,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final long[] dst;
-          root.copyToArrayAscending(size,dst=new long[size]);
+          copyToArrayAscending(root,size,dst=new long[size]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -6996,7 +7176,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final float[] dst;
-          root.copyToArrayAscending(size,dst=new float[size]);
+          copyToArrayAscending(root,size,dst=new float[size]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -7006,7 +7186,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final double[] dst;
-          root.copyToArrayAscending(size,dst=new double[size]);
+          copyToArrayAscending(root,size,dst=new double[size]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -7016,7 +7196,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final Byte[] dst;
-          root.copyToArrayAscending(size,dst=new Byte[size]);
+          copyToArrayAscending(root,size,dst=new Byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -7031,7 +7211,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
         }
         if(size!=0){
-          root.copyToArrayAscending(size,dst);
+          copyToArrayAscending(root,size,dst);
         }
         return dst;
       }
@@ -7039,7 +7219,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
-          root.copyToArrayAscending(size,dst);
+          copyToArrayAscending(root,size,dst);
         }
         return dst;
       }
@@ -7150,13 +7330,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      @Override public ByteComparator comparator(){
+        return ByteComparator::descendingCompare;
+      }
       @Override public String toString(){
         final ByteSetImpl.Checked root;
         int modCountAndSize;
         if((modCountAndSize=(root=this.root).modCountAndSize&0x1ff)!=0){
           final byte[] buffer;
           (buffer=new byte[modCountAndSize*6])[0]='[';
-          buffer[modCountAndSize=root.toStringDescending(modCountAndSize,buffer)]=']';
+          buffer[modCountAndSize=toStringDescending(root,modCountAndSize,buffer)]=']';
           return new String(buffer,0,modCountAndSize+1,ToStringUtil.IOS8859CharSet);
         }
         return "[]";
@@ -7167,7 +7350,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.forEachDescending(size,action);
+            forEachDescending(root,size,action);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -7179,7 +7362,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(modCountAndSize=(root=this.root).modCountAndSize)&0x1ff)!=0){
           try{
-            root.forEachDescending(size,action::accept);
+            forEachDescending(root,size,action::accept);
           }finally{
             CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
           }
@@ -7191,14 +7374,14 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int firstInt(){
         final ByteSetImpl.Checked root;
         if(((root=this.root).modCountAndSize&0x1ff)!=0){
-          return root.getThisOrLower();
+          return getThisOrLower(root);
         }
         throw new NoSuchElementException();
       }
       @Override public int lastInt(){
         final ByteSetImpl.Checked root;
         if(((root=this.root).modCountAndSize&0x1ff)!=0){
-          return root.getThisOrHigher();
+          return getThisOrHigher(root);
         }
         throw new NoSuchElementException();
       }
@@ -7208,7 +7391,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           ++inclusiveTo;
         }
         if(inclusiveTo!=128){
-          return root.headSetDescending(inclusiveTo);
+          return headSetDescending(root,inclusiveTo);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveTo);
         }
@@ -7219,16 +7402,16 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           --inclusiveFrom;
         }
         if(inclusiveFrom!=-129){
-          return root.tailSetDescending(inclusiveFrom);
+          return tailSetDescending(root,inclusiveFrom);
         }else{
           return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
         }
       }
       @Override public OmniNavigableSet.OfByte headSet(byte toElement){
-        return root.headSetDescending((int)toElement);
+        return headSetDescending(root,(int)toElement);
       }
       @Override public OmniNavigableSet.OfByte tailSet(byte fromElement){
-        return root.tailSetDescending((int)fromElement);
+        return tailSetDescending(root,(int)fromElement);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,boolean fromInclusive,byte toElement,boolean toInclusive){
         int inclusiveFrom=fromElement;
@@ -7239,10 +7422,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(!toInclusive){
           ++inclusiveTo;
         }
-        return root.subSetDescending(inclusiveFrom,inclusiveTo);
+        return subSetDescending(root,inclusiveFrom,inclusiveTo);
       }
       @Override public OmniNavigableSet.OfByte subSet(byte fromElement,byte toElement){
-        return root.subSetDescending((int)fromElement,(int)toElement);
+        return subSetDescending(root,(int)fromElement,(int)toElement);
       }
       private Object writeReplace(){
         return new SerializationIntermediate(this.root);
@@ -7252,7 +7435,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final byte[] dst;
-          root.copyToArrayDescending(size,dst=new byte[size]);
+          copyToArrayDescending(root,size,dst=new byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_ARR;
@@ -7262,7 +7445,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final short[] dst;
-          root.copyToArrayDescending(size,dst=new short[size]);
+          copyToArrayDescending(root,size,dst=new short[size]);
           return dst;
         }
         return OmniArray.OfShort.DEFAULT_ARR;
@@ -7272,7 +7455,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final int[] dst;
-          root.copyToArrayDescending(size,dst=new int[size]);
+          copyToArrayDescending(root,size,dst=new int[size]);
           return dst;
         }
         return OmniArray.OfInt.DEFAULT_ARR;
@@ -7282,7 +7465,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final long[] dst;
-          root.copyToArrayDescending(size,dst=new long[size]);
+          copyToArrayDescending(root,size,dst=new long[size]);
           return dst;
         }
         return OmniArray.OfLong.DEFAULT_ARR;
@@ -7292,7 +7475,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final float[] dst;
-          root.copyToArrayDescending(size,dst=new float[size]);
+          copyToArrayDescending(root,size,dst=new float[size]);
           return dst;
         }
         return OmniArray.OfFloat.DEFAULT_ARR;
@@ -7302,7 +7485,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final double[] dst;
-          root.copyToArrayDescending(size,dst=new double[size]);
+          copyToArrayDescending(root,size,dst=new double[size]);
           return dst;
         }
         return OmniArray.OfDouble.DEFAULT_ARR;
@@ -7312,7 +7495,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
           final Byte[] dst;
-          root.copyToArrayDescending(size,dst=new Byte[size]);
+          copyToArrayDescending(root,size,dst=new Byte[size]);
           return dst;
         }
         return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -7327,7 +7510,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize,root.modCountAndSize);
         }
         if(size!=0){
-          root.copyToArrayDescending(size,dst);
+          copyToArrayDescending(root,size,dst);
         }
         return dst;
       }
@@ -7335,7 +7518,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int size;
         final ByteSetImpl.Checked root;
         if((size=(root=this.root).modCountAndSize&0x1ff)!=0){
-          root.copyToArrayDescending(size,dst);
+          copyToArrayDescending(root,size,dst);
         }
         return dst;
       }
@@ -7745,11 +7928,21 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         this.inclusiveLo=inclusiveLo;
       }
       @Override void clearImpl(){
-        root.clearTailSet(inclusiveLo);
+        clearTailSet(root,inclusiveLo);
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        final ByteSetImpl root;
+        int numRemoved=(size=word3RemoveIfDescending(root=this.root,Byte.MAX_VALUE,size,filter))&0x1ff;
+        if(size>=1<<9){
+          numRemoved+=((size=word2RemoveIfDescending(root,63,size>>9,filter))&0x1ff);
+          if(size>=1<<9){
+            numRemoved+=((size=word1RemoveIfDescending(root,-1,size>>9,filter))&0x1ff);
+            if(size>=1<<9){
+              numRemoved+=word0RemoveIfDescending(root,-65,size>>9,filter);
+            }
+          }
+        }
+        return numRemoved;
       }
       @Override long isInRange(boolean val){
         if(val){
@@ -7790,7 +7983,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int hashCode(){
         final int size;
         if((size=this.size)!=0){
-          return root.hashCodeDescending(size);
+          return hashCodeDescending(root,size);
         }
         return 0;
       }
@@ -7798,7 +7991,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int inclusiveFrom;
         if((inclusiveFrom=this.inclusiveLo)<=inclusiveTo){
           if(inclusiveTo!=Byte.MAX_VALUE){
-            return new UncheckedSubSet.BodySet.Ascending(this,root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new UncheckedSubSet.BodySet.Ascending(this,countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           }
           return this;
         }
@@ -7807,10 +8000,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private OmniNavigableSet.OfByte subSetAscending(int inclusiveFrom,int inclusiveTo){
         if(inclusiveTo>=inclusiveFrom){
           if(inclusiveTo!=Byte.MAX_VALUE){
-            return new UncheckedSubSet.BodySet.Ascending(this,root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new UncheckedSubSet.BodySet.Ascending(this,countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           }
           if(this.inclusiveLo!=inclusiveFrom){
-            return new UncheckedSubSet.TailSet.Ascending(this,root.countElementsDescending(inclusiveFrom),inclusiveFrom);
+            return new UncheckedSubSet.TailSet.Ascending(this,countElementsDescending(root,inclusiveFrom),inclusiveFrom);
           }
           return this;
         }
@@ -7820,7 +8013,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int inclusiveTo;
         if((inclusiveTo=this.inclusiveLo)<=inclusiveFrom){
           if(inclusiveFrom!=Byte.MAX_VALUE){
-            return new UncheckedSubSet.BodySet.Descending(this,root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+            return new UncheckedSubSet.BodySet.Descending(this,countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
           }
           return this;
         }
@@ -7829,10 +8022,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private OmniNavigableSet.OfByte subSetDescending(int inclusiveFrom,int inclusiveTo){
         if(inclusiveFrom>=inclusiveTo){
           if(inclusiveFrom!=Byte.MAX_VALUE){
-            return new UncheckedSubSet.BodySet.Descending(this,root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+            return new UncheckedSubSet.BodySet.Descending(this,countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
           }
           if(this.inclusiveLo!=inclusiveTo){
-            return new UncheckedSubSet.TailSet.Descending(this,root.countElementsDescending(inclusiveTo),inclusiveTo);
+            return new UncheckedSubSet.TailSet.Descending(this,countElementsDescending(root,inclusiveTo),inclusiveTo);
           }
           return this;
         }
@@ -7840,13 +8033,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       private OmniNavigableSet.OfByte headSetDescending(int inclusiveTo){
         if(inclusiveTo!=this.inclusiveLo){
-          return new UncheckedSubSet.TailSet.Descending(this,root.countElementsDescending(inclusiveTo),inclusiveTo);
+          return new UncheckedSubSet.TailSet.Descending(this,countElementsDescending(root,inclusiveTo),inclusiveTo);
         }
         return this;
       }
       private OmniNavigableSet.OfByte tailSetAscending(int inclusiveFrom){
         if(inclusiveFrom!=this.inclusiveLo){
-          return new UncheckedSubSet.TailSet.Ascending(this,root.countElementsDescending(inclusiveFrom),inclusiveFrom);
+          return new UncheckedSubSet.TailSet.Ascending(this,countElementsDescending(root,inclusiveFrom),inclusiveFrom);
         }
         return this;
       }
@@ -7856,7 +8049,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -7869,7 +8062,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (byte)v;
             }
           }
@@ -7883,7 +8076,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -7896,7 +8089,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=root.getThisOrLower(inclusiveLo,-1+(int)(val)))!=-129){
+             if((v=getThisOrLower(root,inclusiveLo,-1+(int)(val)))!=-129){
               return (byte)v;
             }
           }
@@ -7909,7 +8102,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -7922,7 +8115,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (byte)v;
             }
           }
@@ -7936,7 +8129,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -7949,7 +8142,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=root.getThisOrLower(inclusiveLo,-1+(int)(val)))!=-129){
+             if((v=getThisOrLower(root,inclusiveLo,-1+(int)(val)))!=-129){
               return (byte)v;
             }
           }
@@ -7963,7 +8156,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (short)v;
             }
           }
@@ -7976,7 +8169,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (short)v;
             }
           }
@@ -7990,7 +8183,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (short)v;
             }
           }
@@ -8003,7 +8196,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,-1+(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,-1+(int)(val)):getThisOrLower(root)))!=-129){
               return (short)v;
             }
           }
@@ -8016,7 +8209,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(val<=Byte.MAX_VALUE)
           {
             final int inclusiveLo;
-            if((val=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((val=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (int)val;
             }
           }
@@ -8028,7 +8221,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
-             if((val=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((val=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (int)val;
             }
           }
@@ -8041,7 +8234,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(val<Byte.MAX_VALUE)
           {
             final int inclusiveLo;
-            if((val=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((val=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (int)val;
             }
           }
@@ -8053,7 +8246,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
-             if((val=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,-1+(int)(val)):root.getThisOrLower()))!=-129){
+             if((val=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,-1+(int)(val)):getThisOrLower(root)))!=-129){
               return (int)val;
             }
           }
@@ -8067,7 +8260,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (long)v;
             }
           }
@@ -8080,7 +8273,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (long)v;
             }
           }
@@ -8094,7 +8287,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (long)v;
             }
           }
@@ -8107,7 +8300,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,-1+(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,-1+(int)(val)):getThisOrLower(root)))!=-129){
               return (long)v;
             }
           }
@@ -8121,7 +8314,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
               return (float)v;
             }
           }
@@ -8134,7 +8327,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.intFloor(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.intFloor(val)):getThisOrLower(root)))!=-129){
               return (float)v;
             }
           }
@@ -8148,7 +8341,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
               return (float)v;
             }
           }
@@ -8161,7 +8354,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.lowerInt(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.lowerInt(val)):getThisOrLower(root)))!=-129){
               return (float)v;
             }
           }
@@ -8175,7 +8368,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
               return (double)v;
             }
           }
@@ -8188,7 +8381,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.intFloor(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.intFloor(val)):getThisOrLower(root)))!=-129){
               return (double)v;
             }
           }
@@ -8202,7 +8395,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
               return (double)v;
             }
           }
@@ -8215,7 +8408,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.lowerInt(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.lowerInt(val)):getThisOrLower(root)))!=-129){
               return (double)v;
             }
           }
@@ -8289,48 +8482,48 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           super(parent,size,inclusiveLo);
         }
         @Override void copyToArray(int size,byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(int size,short[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(int size,int[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(int size,long[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(int size,float[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(int size,double[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(int size,Byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(int size,Object[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void forEachImpl(int size,ByteConsumer action){
-          root.forEachAscending(inclusiveLo,size,action);
+          forEachAscending(root,inclusiveLo,size,action);
         }
         @Override int toStringImpl(int size,byte[] buffer){
-          return root.toStringAscending(inclusiveLo,size,buffer);
+          return toStringAscending(root,inclusiveLo,size,buffer);
         }
         @Override public int firstInt(){
-          return root.getThisOrHigher(this.inclusiveLo);
+          return getThisOrHigher(root,this.inclusiveLo);
         }
         @Override public int lastInt(){
-          return root.getThisOrLower();
+          return getThisOrLower(root);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -8472,57 +8665,60 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public double lowerDouble(double val){
           return super.higherDouble(val);
         }
+        @Override public ByteComparator comparator(){
+          return ByteComparator::descendingCompare;
+        }
         @Override void copyToArray(int size,byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(int size,short[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(int size,int[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(int size,long[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(int size,float[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(int size,double[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(int size,Byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(int size,Object[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void forEachImpl(int size,ByteConsumer action){
-          root.forEachDescending(size,action);
+          forEachDescending(root,size,action);
         }
         @Override int toStringImpl(int size,byte[] buffer){
-          return root.toStringDescending(size,buffer);
+          return toStringDescending(root,size,buffer);
         }
         @Override public int firstInt(){
-          return root.getThisOrLower();
+          return getThisOrLower(root);
         }
         @Override public int lastInt(){
-          return root.getThisOrHigher(this.inclusiveLo);
+          return getThisOrHigher(root,this.inclusiveLo);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -8591,11 +8787,21 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         this.inclusiveHi=inclusiveHi;
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        final ByteSetImpl root;
+        int numRemoved=(size=word0RemoveIfAscending(root=this.root,Byte.MIN_VALUE,size,filter))&0x1ff;
+        if(size>=1<<9){
+          numRemoved+=((size=word1RemoveIfAscending(root,-64,size>>9,filter))&0x1ff);
+          if(size>=1<<9){
+            numRemoved+=((size=word2RemoveIfAscending(root,0,size>>9,filter))&0x1ff);
+            if(size>=1<<9){
+              numRemoved+=word3RemoveIfAscending(root,64,size>>9,filter);
+            }
+          }
+        }
+        return numRemoved;
       }
       @Override void clearImpl(){
-        root.clearHeadSet(inclusiveHi);
+        clearHeadSet(root,inclusiveHi);
       }
       @Override long isInRange(boolean val){
         if(val){
@@ -8636,7 +8842,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int hashCode(){
         final int size;
         if((size=this.size)!=0){
-          return root.hashCodeAscending(size);
+          return hashCodeAscending(root,size);
         }
         return 0;
       }
@@ -8644,7 +8850,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int inclusiveTo;
         if((inclusiveTo=this.inclusiveHi)>=inclusiveFrom){
           if(inclusiveFrom!=Byte.MIN_VALUE){
-            return new UncheckedSubSet.BodySet.Ascending(this,root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new UncheckedSubSet.BodySet.Ascending(this,countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           }
           return this;
         }
@@ -8653,10 +8859,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private OmniNavigableSet.OfByte subSetAscending(int inclusiveFrom,int inclusiveTo){
         if(inclusiveTo>=inclusiveFrom){
           if(inclusiveFrom!=Byte.MIN_VALUE){
-            return new UncheckedSubSet.BodySet.Ascending(this,root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new UncheckedSubSet.BodySet.Ascending(this,countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           }
           if(this.inclusiveHi!=inclusiveTo){
-            return new UncheckedSubSet.HeadSet.Ascending(this,root.countElementsAscending(inclusiveTo),inclusiveTo);
+            return new UncheckedSubSet.HeadSet.Ascending(this,countElementsAscending(root,inclusiveTo),inclusiveTo);
           }
           return this;
         }
@@ -8666,7 +8872,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final int inclusiveFrom;
         if((inclusiveFrom=this.inclusiveHi)>=inclusiveTo){
           if(inclusiveTo!=Byte.MIN_VALUE){
-            return new UncheckedSubSet.BodySet.Descending(this,root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+            return new UncheckedSubSet.BodySet.Descending(this,countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
           }
           return this;
         }
@@ -8675,10 +8881,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       private OmniNavigableSet.OfByte subSetDescending(int inclusiveFrom,int inclusiveTo){
         if(inclusiveFrom>=inclusiveTo){
           if(inclusiveTo!=Byte.MIN_VALUE){
-            return new UncheckedSubSet.BodySet.Descending(this,root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+            return new UncheckedSubSet.BodySet.Descending(this,countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
           }
           if(this.inclusiveHi!=inclusiveFrom){
-            return new UncheckedSubSet.HeadSet.Descending(this,root.countElementsAscending(inclusiveFrom),inclusiveFrom);
+            return new UncheckedSubSet.HeadSet.Descending(this,countElementsAscending(root,inclusiveFrom),inclusiveFrom);
           }
           return this;
         }
@@ -8686,13 +8892,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       private OmniNavigableSet.OfByte headSetAscending(int inclusiveTo){
         if(inclusiveTo!=this.inclusiveHi){
-          return new UncheckedSubSet.HeadSet.Ascending(this,root.countElementsAscending(inclusiveTo),inclusiveTo);
+          return new UncheckedSubSet.HeadSet.Ascending(this,countElementsAscending(root,inclusiveTo),inclusiveTo);
         }
         return this;
       }
       private OmniNavigableSet.OfByte tailSetDescending(int inclusiveFrom){
         if(inclusiveFrom!=this.inclusiveHi){
-          return new UncheckedSubSet.HeadSet.Descending(this,root.countElementsAscending(inclusiveFrom),inclusiveFrom);
+          return new UncheckedSubSet.HeadSet.Descending(this,countElementsAscending(root,inclusiveFrom),inclusiveFrom);
         }
         return this;
       }
@@ -8702,7 +8908,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (byte)v;
             }
           }
@@ -8715,7 +8921,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -8728,7 +8934,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,1+(int)(val)))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,1+(int)(val)))!=128){
               return (byte)v;
             }
           }
@@ -8742,7 +8948,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -8755,7 +8961,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (byte)v;
             }
           }
@@ -8768,7 +8974,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -8781,7 +8987,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,1+(int)(val)))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,1+(int)(val)))!=128){
               return (byte)v;
             }
           }
@@ -8795,7 +9001,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -8808,7 +9014,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (short)v;
             }
           }
@@ -8822,7 +9028,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (short)v;
             }
           }
@@ -8835,7 +9041,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,1+(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,1+(int)(val)):getThisOrHigher(root)))!=128){
               return (short)v;
             }
           }
@@ -8849,7 +9055,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (short)v;
             }
           }
@@ -8861,7 +9067,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
-            if((val=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((val=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (int)val;
             }
           }
@@ -8874,7 +9080,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(!(val<Byte.MIN_VALUE))
           {
             final int inclusiveHi;
-            if((val=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((val=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (int)val;
             }
           }
@@ -8886,7 +9092,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
-            if((val=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,1+(int)(val)):root.getThisOrHigher()))!=128){
+            if((val=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,1+(int)(val)):getThisOrHigher(root)))!=128){
               return (int)val;
             }
           }
@@ -8899,7 +9105,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(!(val<=Byte.MIN_VALUE))
           {
             final int inclusiveHi;
-            if((val=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((val=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (int)val;
             }
           }
@@ -8912,7 +9118,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (long)v;
             }
           }
@@ -8926,7 +9132,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (long)v;
             }
           }
@@ -8939,7 +9145,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,1+(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,1+(int)(val)):getThisOrHigher(root)))!=128){
               return (long)v;
             }
           }
@@ -8953,7 +9159,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (long)v;
             }
           }
@@ -8966,7 +9172,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.intCeiling(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.intCeiling(val)):getThisOrHigher(root)))!=128){
               return (float)v;
             }
           }
@@ -8980,7 +9186,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
               return (float)v;
             }
           }
@@ -8993,7 +9199,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.higherInt(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.higherInt(val)):getThisOrHigher(root)))!=128){
               return (float)v;
             }
           }
@@ -9007,7 +9213,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
               return (float)v;
             }
           }
@@ -9020,7 +9226,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.intCeiling(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.intCeiling(val)):getThisOrHigher(root)))!=128){
               return (double)v;
             }
           }
@@ -9034,7 +9240,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
               return (double)v;
             }
           }
@@ -9047,7 +9253,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.higherInt(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.higherInt(val)):getThisOrHigher(root)))!=128){
               return (double)v;
             }
           }
@@ -9061,7 +9267,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
               return (double)v;
             }
           }
@@ -9135,56 +9341,56 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           super(parent,size,inclusiveHi);
         }
         @Override void copyToArray(int size,byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(int size,short[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(int size,int[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(int size,long[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(int size,float[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(int size,double[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(int size,Byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(int size,Object[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void forEachImpl(int size,ByteConsumer action){
-          root.forEachAscending(size,action);
+          forEachAscending(root,size,action);
         }
         @Override int toStringImpl(int size,byte[] buffer){
-          return root.toStringAscending(size,buffer);
+          return toStringAscending(root,size,buffer);
         }
         @Override public int firstInt(){
-          return root.getThisOrHigher();
+          return getThisOrHigher(root);
         }
         @Override public int lastInt(){
-          return root.getThisOrLower(this.inclusiveHi);
+          return getThisOrLower(root,this.inclusiveHi);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -9326,49 +9532,52 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public double lowerDouble(double val){
           return super.higherDouble(val);
         }
+        @Override public ByteComparator comparator(){
+          return ByteComparator::descendingCompare;
+        }
         @Override void copyToArray(int size,byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(int size,short[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(int size,int[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(int size,long[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(int size,float[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(int size,double[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(int size,Byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(int size,Object[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void forEachImpl(int size,ByteConsumer action){
-          root.forEachDescending(inclusiveHi,size,action);
+          forEachDescending(root,inclusiveHi,size,action);
         }
         @Override int toStringImpl(int size,byte[] buffer){
-          return root.toStringDescending(inclusiveHi,size,buffer);
+          return toStringDescending(root,inclusiveHi,size,buffer);
         }
         @Override public int firstInt(){
-          return root.getThisOrLower(this.inclusiveHi);
+          return getThisOrLower(root,this.inclusiveHi);
         }
         @Override public int lastInt(){
-          return root.getThisOrHigher();
+          return getThisOrHigher(root);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -9437,11 +9646,35 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         this.boundInfo=boundInfo;
       }
       @Override int removeIfImpl(int size,BytePredicate filter){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        int numRemoved=0;
+        final ByteSetImpl root=this.root;
+        int offset;
+        switch((offset=this.boundInfo>>8)>>6){
+          case -2:
+            numRemoved=(size=word0RemoveIfAscending(root,offset,size,filter))&0x1ff;
+            if((size>>=9)==0){
+              break;
+            }
+            offset=-64;
+          case -1:
+            numRemoved+=(size=word1RemoveIfAscending(root,offset,size,filter))&0x1ff;
+            if((size>>=9)==0){
+              break;
+            }
+            offset=0;
+          case 0:
+            numRemoved+=(size=word2RemoveIfAscending(root,offset,size,filter))&0x1ff;
+            if((size>>=9)==0){
+              break;
+            }
+            offset=64;
+          default:
+            numRemoved+=word3RemoveIfAscending(root,offset,size,filter);
+        }
+        return numRemoved;
       }
       @Override void clearImpl(){
-        root.clearBodySet(boundInfo);
+        clearBodySet(root,boundInfo);
       }
       @Override long isInRange(boolean val){
         final int boundInfo=this.boundInfo;
@@ -9484,7 +9717,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int hashCode(){
         final int size;
         if((size=this.size)!=0){
-          return root.hashCodeDescending((byte)(this.boundInfo&0xff),size);
+          return hashCodeDescending(root,(byte)(this.boundInfo&0xff),size);
         }
         return 0;
       }
@@ -9492,7 +9725,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int boundInfo;
         if(((byte)((boundInfo=this.boundInfo)&0xff))!=inclusiveTo){
           if(inclusiveTo>=(boundInfo>>=8)){
-            return new UncheckedSubSet.BodySet.Ascending(this,root.countElements(boundInfo,inclusiveTo),(boundInfo<<8)|(inclusiveTo&0xff));
+            return new UncheckedSubSet.BodySet.Ascending(this,countElements(root,boundInfo,inclusiveTo),(boundInfo<<8)|(inclusiveTo&0xff));
           }
           return AbstractByteSet.EmptyView.ASCENDING;
         }
@@ -9502,7 +9735,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int boundInfo;
         if(inclusiveTo!=(boundInfo=this.boundInfo)>>8){
           if(((byte)(boundInfo&=0xff))>=inclusiveTo){
-            return new UncheckedSubSet.BodySet.Descending(this,root.countElements(inclusiveTo,boundInfo),(inclusiveTo<<8)|boundInfo);
+            return new UncheckedSubSet.BodySet.Descending(this,countElements(root,inclusiveTo,boundInfo),(inclusiveTo<<8)|boundInfo);
           }
           return AbstractByteSet.EmptyView.DESCENDING;
         }
@@ -9512,7 +9745,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int boundInfo;
         if(inclusiveFrom!=(boundInfo=this.boundInfo)>>8){
           if(((byte)(boundInfo&=0xff))+1!=inclusiveFrom){
-            return new UncheckedSubSet.BodySet.Ascending(this,root.countElements(inclusiveFrom,boundInfo),(inclusiveFrom<<8)|boundInfo);
+            return new UncheckedSubSet.BodySet.Ascending(this,countElements(root,inclusiveFrom,boundInfo),(inclusiveFrom<<8)|boundInfo);
           }
           return AbstractByteSet.EmptyView.ASCENDING;
         }
@@ -9522,7 +9755,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         int boundInfo;
         if(((byte)((boundInfo=this.boundInfo)&0xff))!=inclusiveFrom){
           if(inclusiveFrom>=(boundInfo>>=8)){
-            return new UncheckedSubSet.BodySet.Descending(this,root.countElements(boundInfo,inclusiveFrom),(boundInfo<<8)|(inclusiveFrom&0xff));
+            return new UncheckedSubSet.BodySet.Descending(this,countElements(root,boundInfo,inclusiveFrom),(boundInfo<<8)|(inclusiveFrom&0xff));
           }
           return AbstractByteSet.EmptyView.DESCENDING;
         }
@@ -9532,7 +9765,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(inclusiveTo>=inclusiveFrom){
           final int boundInfo;
           if(inclusiveFrom!=(boundInfo=this.boundInfo)>>8 || inclusiveTo!=(byte)(boundInfo&0xff)){
-            return new UncheckedSubSet.BodySet.Ascending(this,root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new UncheckedSubSet.BodySet.Ascending(this,countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           }
           return this;
         }
@@ -9542,7 +9775,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if(inclusiveFrom>=inclusiveTo){
           final int boundInfo;
           if(inclusiveTo!=(boundInfo=this.boundInfo)>>8 || inclusiveFrom!=(byte)(boundInfo&0xff)){
-            return new UncheckedSubSet.BodySet.Descending(this,root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+            return new UncheckedSubSet.BodySet.Descending(this,countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
           }
           return this;
         }
@@ -9555,7 +9788,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -9569,7 +9802,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -9583,7 +9816,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -9597,7 +9830,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -9611,7 +9844,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -9625,7 +9858,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -9639,7 +9872,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -9653,7 +9886,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -9667,7 +9900,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (short)v;
             }
           }
@@ -9681,7 +9914,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (short)v;
             }
           }
@@ -9695,7 +9928,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (short)v;
             }
           }
@@ -9709,7 +9942,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (short)v;
             }
           }
@@ -9722,7 +9955,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
-            if((val=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((val=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (int)val;
             }
           }
@@ -9735,7 +9968,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
-            if((val=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((val=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (int)val;
             }
           }
@@ -9748,7 +9981,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
-            if((val=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((val=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (int)val;
             }
           }
@@ -9761,7 +9994,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
-            if((val=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((val=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (int)val;
             }
           }
@@ -9775,7 +10008,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (long)v;
             }
           }
@@ -9789,7 +10022,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (long)v;
             }
           }
@@ -9803,7 +10036,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (long)v;
             }
           }
@@ -9817,7 +10050,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (long)v;
             }
           }
@@ -9831,7 +10064,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
               return (float)v;
             }
           }
@@ -9845,7 +10078,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
               return (float)v;
             }
           }
@@ -9859,7 +10092,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
               return (float)v;
             }
           }
@@ -9873,7 +10106,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
               return (float)v;
             }
           }
@@ -9887,7 +10120,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
               return (double)v;
             }
           }
@@ -9901,7 +10134,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
               return (double)v;
             }
           }
@@ -9915,7 +10148,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
               return (double)v;
             }
           }
@@ -9929,7 +10162,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
               return (double)v;
             }
           }
@@ -10006,56 +10239,56 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           super(parent,size,boundInfo);
         }
         @Override void copyToArray(int size,byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(int size,short[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(int size,int[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(int size,long[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(int size,float[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(int size,double[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(int size,Byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(int size,Object[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void forEachImpl(int size,ByteConsumer action){
-          root.forEachAscending(boundInfo>>8,size,action);
+          forEachAscending(root,boundInfo>>8,size,action);
         }
         @Override int toStringImpl(int size,byte[] buffer){
-          return root.toStringAscending(boundInfo>>8,size,buffer);
+          return toStringAscending(root,boundInfo>>8,size,buffer);
         }
         @Override public int firstInt(){
-          return root.getThisOrHigher(this.boundInfo>>8);
+          return getThisOrHigher(root,this.boundInfo>>8);
         }
         @Override public int lastInt(){
-          return root.getThisOrLower((byte)(this.boundInfo&0xff));
+          return getThisOrLower(root,(byte)(this.boundInfo&0xff));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -10194,57 +10427,60 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public double lowerDouble(double val){
           return super.higherDouble(val);
         }
+        @Override public ByteComparator comparator(){
+          return ByteComparator::descendingCompare;
+        }
         @Override void copyToArray(int size,byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(int size,short[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(int size,int[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(int size,long[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(int size,float[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(int size,double[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(int size,Byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(int size,Object[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void forEachImpl(int size,ByteConsumer action){
-          root.forEachDescending((byte)(boundInfo&0xff),size,action);
+          forEachDescending(root,(byte)(boundInfo&0xff),size,action);
         }
         @Override int toStringImpl(int size,byte[] buffer){
-          return root.toStringDescending((byte)(boundInfo&0xff),size,buffer);
+          return toStringDescending(root,(byte)(boundInfo&0xff),size,buffer);
         }
         @Override public int firstInt(){
-          return root.getThisOrLower((byte)(this.boundInfo&0xff));
+          return getThisOrLower(root,(byte)(this.boundInfo&0xff));
         }
         @Override public int lastInt(){
-          return root.getThisOrHigher(this.boundInfo>>8);
+          return getThisOrHigher(root,this.boundInfo>>8);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -10684,13 +10920,13 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return dst;
     }
-    abstract int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker);
+    abstract int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,int expectedModCount);
     @Override public boolean removeIf(BytePredicate filter){
       final int modCountAndSize;
       int size;
       if((size=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
         final ByteSetImpl.Checked root;
-        if((size=removeIfImpl(root=this.root,size,filter,root.new ModCountChecker(modCountAndSize)))!=0){
+        if((size=removeIfImpl(root=this.root,size,filter,modCountAndSize))!=0){
           root.modCountAndSize+=(size=(1<<9)-size);
           this.modCountAndSize=modCountAndSize+size;
           bubbleUpModify(size);
@@ -10706,7 +10942,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       int size;
       if((size=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
         final ByteSetImpl.Checked root;
-        if((size=removeIfImpl(root=this.root,size,filter::test,root.new ModCountChecker(modCountAndSize)))!=0){
+        if((size=removeIfImpl(root=this.root,size,filter::test,modCountAndSize))!=0){
           root.modCountAndSize+=(size=(1<<9)-size);
           this.modCountAndSize=modCountAndSize+size;
           bubbleUpModify(size);
@@ -10858,7 +11094,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         this.inclusiveLo=inclusiveLo;
       }
       @Override void clearImpl(ByteSetImpl.Checked root){
-        root.clearTailSet(inclusiveLo);
+        clearTailSet(root,inclusiveLo);
       }
       @Override long isInRange(boolean val){
         if(val){
@@ -10896,15 +11132,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 128;
       }
-      @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
-        return root.removeIfImplStartWord3Descending(Byte.MAX_VALUE,size,filter,modCountChecker);
+      @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,int expectedModCount){
+        return removeIfImplStartWord3Descending(root,Byte.MAX_VALUE,size,filter,expectedModCount);
       }
       @Override public int hashCode(){
         int modCountAndSize;
         final ByteSetImpl.Checked root;
         CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
         if((modCountAndSize&=0x1ff)!=0){
-          return root.hashCodeDescending(modCountAndSize);
+          return hashCodeDescending(root,modCountAndSize);
         }
         return 0;
       }
@@ -10916,7 +11152,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         switch(Integer.signum(inclusiveTo+1-(inclusiveFrom=this.inclusiveLo))){
           case 1:
             if(inclusiveTo!=Byte.MAX_VALUE){
-              return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+              return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
             }
             return this;
           case 0:
@@ -10936,7 +11172,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 if(inclusiveTo!=Byte.MAX_VALUE){
                   break;
                 }
-                return new CheckedSubSet.TailSet.Ascending(this,modCountAndSize|root.countElementsDescending(inclusiveFrom),inclusiveFrom);
+                return new CheckedSubSet.TailSet.Ascending(this,modCountAndSize|countElementsDescending(root,inclusiveFrom),inclusiveFrom);
               case 0:
                 if(inclusiveTo!=Byte.MAX_VALUE){
                   break;
@@ -10945,7 +11181,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               default:
                 break throwIAE;
             }
-            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           case 0:
             if(this.inclusiveLo<=inclusiveFrom){
               return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
@@ -10962,7 +11198,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         switch(Integer.signum(inclusiveFrom+1-(inclusiveTo=this.inclusiveLo))){
           case 1:
             if(inclusiveFrom!=Byte.MAX_VALUE){
-              return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+              return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
             }
             return this;
           case 0:
@@ -10982,7 +11218,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 if(inclusiveFrom!=Byte.MAX_VALUE){
                   break;
                 }
-                return new CheckedSubSet.TailSet.Descending(this,modCountAndSize|root.countElementsDescending(inclusiveTo),inclusiveTo);
+                return new CheckedSubSet.TailSet.Descending(this,modCountAndSize|countElementsDescending(root,inclusiveTo),inclusiveTo);
               case 0:
                 if(inclusiveFrom!=Byte.MAX_VALUE){
                   break;
@@ -10991,7 +11227,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               default:
                 break throwIAE;
             }
-            return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+            return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
           case 0:
             if(this.inclusiveLo<=inclusiveTo){
               return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
@@ -11009,7 +11245,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -11025,7 +11261,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (byte)v;
             }
           }
@@ -11042,7 +11278,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -11058,7 +11294,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=root.getThisOrLower(inclusiveLo,-1+(int)(val)))!=-129){
+             if((v=getThisOrLower(root,inclusiveLo,-1+(int)(val)))!=-129){
               return (byte)v;
             }
           }
@@ -11074,7 +11310,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -11090,7 +11326,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (byte)v;
             }
           }
@@ -11107,7 +11343,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (byte)v;
             }
           }
@@ -11123,7 +11359,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=root.getThisOrLower(inclusiveLo,-1+(int)(val)))!=-129){
+             if((v=getThisOrLower(root,inclusiveLo,-1+(int)(val)))!=-129){
               return (byte)v;
             }
           }
@@ -11140,7 +11376,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (short)v;
             }
           }
@@ -11156,7 +11392,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (short)v;
             }
           }
@@ -11173,7 +11409,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (short)v;
             }
           }
@@ -11189,7 +11425,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,-1+(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,-1+(int)(val)):getThisOrLower(root)))!=-129){
               return (short)v;
             }
           }
@@ -11205,7 +11441,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(val<=Byte.MAX_VALUE)
           {
             final int inclusiveLo;
-            if((val=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((val=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (int)val;
             }
           }
@@ -11220,7 +11456,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
-             if((val=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((val=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (int)val;
             }
           }
@@ -11236,7 +11472,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(val<Byte.MAX_VALUE)
           {
             final int inclusiveLo;
-            if((val=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((val=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (int)val;
             }
           }
@@ -11251,7 +11487,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
-             if((val=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,-1+(int)(val)):root.getThisOrLower()))!=-129){
+             if((val=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,-1+(int)(val)):getThisOrLower(root)))!=-129){
               return (int)val;
             }
           }
@@ -11268,7 +11504,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?(int)(val):inclusiveLo))!=128){
               return (long)v;
             }
           }
@@ -11284,7 +11520,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,(int)(val)):getThisOrLower(root)))!=-129){
               return (long)v;
             }
           }
@@ -11301,7 +11537,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?1+(int)(val):inclusiveLo))!=128){
               return (long)v;
             }
           }
@@ -11317,7 +11553,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,-1+(int)(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,-1+(int)(val)):getThisOrLower(root)))!=-129){
               return (long)v;
             }
           }
@@ -11334,7 +11570,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
               return (float)v;
             }
           }
@@ -11350,7 +11586,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.intFloor(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.intFloor(val)):getThisOrLower(root)))!=-129){
               return (float)v;
             }
           }
@@ -11367,7 +11603,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
               return (float)v;
             }
           }
@@ -11383,7 +11619,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.lowerInt(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.lowerInt(val)):getThisOrLower(root)))!=-129){
               return (float)v;
             }
           }
@@ -11400,7 +11636,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>(inclusiveLo=this.inclusiveLo)?TypeUtil.intCeiling(val):inclusiveLo))!=128){
               return (double)v;
             }
           }
@@ -11416,7 +11652,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.intFloor(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.intFloor(val)):getThisOrLower(root)))!=-129){
               return (double)v;
             }
           }
@@ -11433,7 +11669,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveLo;
             final int v;
-            if((v=root.getThisOrHigher(val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
+            if((v=getThisOrHigher(root,val>=(inclusiveLo=this.inclusiveLo)?TypeUtil.higherInt(val):inclusiveLo))!=128){
               return (double)v;
             }
           }
@@ -11449,7 +11685,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           if(!(val<=(inclusiveLo=this.inclusiveLo))){
             final int v;
-             if((v=(val<=Byte.MAX_VALUE?root.getThisOrLower(inclusiveLo,TypeUtil.lowerInt(val)):root.getThisOrLower()))!=-129){
+             if((v=(val<=Byte.MAX_VALUE?getThisOrLower(root,inclusiveLo,TypeUtil.lowerInt(val)):getThisOrLower(root)))!=-129){
               return (double)v;
             }
           }
@@ -11527,48 +11763,48 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           super(parent,modCountAndSize,inclusiveLo);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           size,dst);
         }
         @Override void forEachImpl(ByteSetImpl.Checked root,int size,ByteConsumer action){
-          root.forEachAscending(inclusiveLo,size,action);
+          forEachAscending(root,inclusiveLo,size,action);
         }
         @Override int toStringImpl(ByteSetImpl.Checked root,int size,byte[] buffer){
-          return root.toStringAscending(inclusiveLo,size,buffer);
+          return toStringAscending(root,inclusiveLo,size,buffer);
         }
         @Override int firstIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrHigher(inclusiveLo);
+          return getThisOrHigher(root,inclusiveLo);
         }
         @Override int lastIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrLower();
+          return getThisOrLower(root);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -11588,7 +11824,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           switch(Integer.signum(inclusiveFrom-this.inclusiveLo)){
             case 1:
               if(inclusiveFrom!=Byte.MAX_VALUE+1){
-                return new CheckedSubSet.TailSet.Ascending(this,modCountAndSize|root.countElementsDescending(inclusiveFrom),inclusiveFrom);
+                return new CheckedSubSet.TailSet.Ascending(this,modCountAndSize|countElementsDescending(root,inclusiveFrom),inclusiveFrom);
               }
               return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
             case 0:
@@ -11606,7 +11842,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize=this.modCountAndSize&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
           switch(Integer.signum(fromElement-this.inclusiveLo)){
             case 1:
-              return new CheckedSubSet.TailSet.Ascending(this,modCountAndSize|root.countElementsDescending(fromElement),fromElement);
+              return new CheckedSubSet.TailSet.Ascending(this,modCountAndSize|countElementsDescending(root,fromElement),fromElement);
             case 0:
               return this;
             default:
@@ -11732,57 +11968,60 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public double lowerDouble(double val){
           return super.higherDouble(val);
         }
+        @Override public ByteComparator comparator(){
+          return ByteComparator::descendingCompare;
+        }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.inclusiveLo,
           size,dst);
         }
         @Override void forEachImpl(ByteSetImpl.Checked root,int size,ByteConsumer action){
-          root.forEachDescending(size,action);
+          forEachDescending(root,size,action);
         }
         @Override int toStringImpl(ByteSetImpl.Checked root,int size,byte[] buffer){
-          return root.toStringDescending(size,buffer);
+          return toStringDescending(root,size,buffer);
         }
         @Override int firstIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrLower();
+          return getThisOrLower(root);
         }
         @Override int lastIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrHigher(inclusiveLo);
+          return getThisOrHigher(root,inclusiveLo);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -11795,7 +12034,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           switch(Integer.signum(inclusiveTo-this.inclusiveLo)){
             case 1:
               if(inclusiveTo!=Byte.MAX_VALUE+1){
-                return new CheckedSubSet.TailSet.Descending(this,modCountAndSize|root.countElementsDescending(inclusiveTo),inclusiveTo);
+                return new CheckedSubSet.TailSet.Descending(this,modCountAndSize|countElementsDescending(root,inclusiveTo),inclusiveTo);
               }
               return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
             case 0:
@@ -11817,7 +12056,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize=this.modCountAndSize&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
           switch(Integer.signum(toElement-this.inclusiveLo)){
             case 1:
-              return new CheckedSubSet.TailSet.Descending(this,modCountAndSize|root.countElementsDescending(toElement),toElement);
+              return new CheckedSubSet.TailSet.Descending(this,modCountAndSize|countElementsDescending(root,toElement),toElement);
             case 0:
               return this;
             default:
@@ -11873,7 +12112,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         this.inclusiveHi=inclusiveHi;
       }
       @Override void clearImpl(ByteSetImpl.Checked root){
-        root.clearHeadSet(inclusiveHi);
+        clearHeadSet(root,inclusiveHi);
       }
       @Override long isInRange(boolean val){
         if(val){
@@ -11911,15 +12150,15 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         return 128;
       }
-      @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
-        return root.removeIfImplStartWord0Ascending(Byte.MIN_VALUE,size,filter,modCountChecker);
+      @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,int expectedModCount){
+        return removeIfImplStartWord0Ascending(root,Byte.MIN_VALUE,size,filter,expectedModCount);
       }
       @Override public int hashCode(){
         int modCountAndSize;
         final ByteSetImpl.Checked root;
         CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
         if((modCountAndSize&=0x1ff)!=0){
-          return root.hashCodeAscending(modCountAndSize);
+          return hashCodeAscending(root,modCountAndSize);
         }
         return 0;
       }
@@ -11931,7 +12170,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         switch(Integer.signum((inclusiveTo=this.inclusiveHi)+1-inclusiveFrom)){
         case 1:
           if(inclusiveFrom!=Byte.MIN_VALUE){
-            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           }
           return this;
         case 0:
@@ -11951,7 +12190,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 if(inclusiveFrom!=Byte.MIN_VALUE){
                   break; 
                 }
-                return new CheckedSubSet.HeadSet.Ascending(this,modCountAndSize|root.countElementsAscending(inclusiveTo),inclusiveTo);
+                return new CheckedSubSet.HeadSet.Ascending(this,modCountAndSize|countElementsAscending(root,inclusiveTo),inclusiveTo);
               case 0:
                 if(inclusiveFrom!=Byte.MIN_VALUE){
                   break;
@@ -11960,7 +12199,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               default:
                 break throwIAE;
             }
-            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|root.countElements(inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
+            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|countElements(root,inclusiveFrom,inclusiveTo),inclusiveFrom<<8|(inclusiveTo&0xff));
           case 0:
             if(inclusiveTo<=this.inclusiveHi){
               return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
@@ -11977,7 +12216,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         switch(Integer.signum((inclusiveFrom=this.inclusiveHi)+1-inclusiveTo)){
           case 1:
             if(inclusiveTo!=Byte.MIN_VALUE){
-              return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|root.countElements(inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
+              return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|countElements(root,inclusiveTo,inclusiveFrom),inclusiveTo<<8|(inclusiveFrom&0xff));
             }
             return this;
           case 0:
@@ -11997,7 +12236,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 if(inclusiveTo!=Byte.MIN_VALUE){
                   break;
                 }
-                return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize|root.countElementsAscending(inclusiveFrom),inclusiveFrom);
+                return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize|countElementsAscending(root,inclusiveFrom),inclusiveFrom);
               case 0:
                 if(inclusiveTo!=Byte.MIN_VALUE){
                   break;
@@ -12006,7 +12245,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               default:
                 break throwIAE;
             }
-            return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|root.countElements(inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff));
+            return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|countElements(root,inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff));
           case 0:
             if(inclusiveFrom<=this.inclusiveHi){
               return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
@@ -12024,7 +12263,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (byte)v;
             }
           }
@@ -12040,7 +12279,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -12056,7 +12295,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,1+(int)(val)))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,1+(int)(val)))!=128){
               return (byte)v;
             }
           }
@@ -12073,7 +12312,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -12089,7 +12328,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (byte)v;
             }
           }
@@ -12105,7 +12344,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -12121,7 +12360,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,1+(int)(val)))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,1+(int)(val)))!=128){
               return (byte)v;
             }
           }
@@ -12138,7 +12377,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (byte)v;
             }
           }
@@ -12154,7 +12393,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (short)v;
             }
           }
@@ -12171,7 +12410,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (short)v;
             }
           }
@@ -12187,7 +12426,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,1+(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,1+(int)(val)):getThisOrHigher(root)))!=128){
               return (short)v;
             }
           }
@@ -12204,7 +12443,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (short)v;
             }
           }
@@ -12219,7 +12458,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
-            if((val=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((val=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (int)val;
             }
           }
@@ -12235,7 +12474,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(!(val<Byte.MIN_VALUE))
           {
             final int inclusiveHi;
-            if((val=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((val=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (int)val;
             }
           }
@@ -12250,7 +12489,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         {
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
-            if((val=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,1+(int)(val)):root.getThisOrHigher()))!=128){
+            if((val=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,1+(int)(val)):getThisOrHigher(root)))!=128){
               return (int)val;
             }
           }
@@ -12266,7 +12505,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           if(!(val<=Byte.MIN_VALUE))
           {
             final int inclusiveHi;
-            if((val=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((val=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (int)val;
             }
           }
@@ -12282,7 +12521,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,(int)(val)):getThisOrHigher(root)))!=128){
               return (long)v;
             }
           }
@@ -12299,7 +12538,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?(int)(val):inclusiveHi))!=-129){
               return (long)v;
             }
           }
@@ -12315,7 +12554,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,1+(int)(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,1+(int)(val)):getThisOrHigher(root)))!=128){
               return (long)v;
             }
           }
@@ -12332,7 +12571,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?-1+(int)(val):inclusiveHi))!=-129){
               return (long)v;
             }
           }
@@ -12348,7 +12587,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.intCeiling(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.intCeiling(val)):getThisOrHigher(root)))!=128){
               return (float)v;
             }
           }
@@ -12365,7 +12604,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
               return (float)v;
             }
           }
@@ -12381,7 +12620,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.higherInt(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.higherInt(val)):getThisOrHigher(root)))!=128){
               return (float)v;
             }
           }
@@ -12398,7 +12637,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
               return (float)v;
             }
           }
@@ -12414,7 +12653,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<=(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.intCeiling(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.intCeiling(val)):getThisOrHigher(root)))!=128){
               return (double)v;
             }
           }
@@ -12431,7 +12670,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<(inclusiveHi=this.inclusiveHi)?TypeUtil.intFloor(val):inclusiveHi))!=-129){
               return (double)v;
             }
           }
@@ -12447,7 +12686,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           if(val<(inclusiveHi=this.inclusiveHi)){
             final int v;
-            if((v=(val>=Byte.MIN_VALUE?root.getThisOrHigher(inclusiveHi,TypeUtil.higherInt(val)):root.getThisOrHigher()))!=128){
+            if((v=(val>=Byte.MIN_VALUE?getThisOrHigher(root,inclusiveHi,TypeUtil.higherInt(val)):getThisOrHigher(root)))!=128){
               return (double)v;
             }
           }
@@ -12464,7 +12703,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           {
             final int inclusiveHi;
             final int v;
-            if((v=root.getThisOrLower(val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
+            if((v=getThisOrLower(root,val<=(inclusiveHi=this.inclusiveHi)?TypeUtil.lowerInt(val):inclusiveHi))!=-129){
               return (double)v;
             }
           }
@@ -12542,56 +12781,56 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           super(parent,modCountAndSize,inclusiveHi);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           this.inclusiveHi,
           size,dst);
         }
         @Override void forEachImpl(ByteSetImpl.Checked root,int size,ByteConsumer action){
-          root.forEachAscending(size,action);
+          forEachAscending(root,size,action);
         }
         @Override int toStringImpl(ByteSetImpl.Checked root,int size,byte[] buffer){
-          return root.toStringAscending(size,buffer);
+          return toStringAscending(root,size,buffer);
         }
         @Override int firstIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrHigher();
+          return getThisOrHigher(root);
         }
         @Override int lastIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrLower(inclusiveHi);
+          return getThisOrLower(root,inclusiveHi);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -12604,7 +12843,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           switch(Integer.signum(this.inclusiveHi-inclusiveTo)){
             case 1:
               if(inclusiveTo!=Byte.MIN_VALUE-1){
-                return new CheckedSubSet.HeadSet.Ascending(this,modCountAndSize|root.countElementsAscending(inclusiveTo),inclusiveTo);
+                return new CheckedSubSet.HeadSet.Ascending(this,modCountAndSize|countElementsAscending(root,inclusiveTo),inclusiveTo);
               }
               return new AbstractByteSet.EmptyView.Checked.Ascending(Byte.MIN_VALUE);
             case 0:
@@ -12626,7 +12865,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize=this.modCountAndSize&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
           switch(Integer.signum(this.inclusiveHi-toElement)){
             case 1:
-              return new CheckedSubSet.HeadSet.Ascending(this,modCountAndSize|root.countElementsAscending(toElement),toElement);
+              return new CheckedSubSet.HeadSet.Ascending(this,modCountAndSize|countElementsAscending(root,toElement),toElement);
             case 0:
               return this;
             default:
@@ -12755,49 +12994,52 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public double lowerDouble(double val){
           return super.higherDouble(val);
         }
+        @Override public ByteComparator comparator(){
+          return ByteComparator::descendingCompare;
+        }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           size,dst);
         }
         @Override void forEachImpl(ByteSetImpl.Checked root,int size,ByteConsumer action){
-          root.forEachDescending(inclusiveHi,size,action);
+          forEachDescending(root,inclusiveHi,size,action);
         }
         @Override int toStringImpl(ByteSetImpl.Checked root,int size,byte[] buffer){
-          return root.toStringDescending(inclusiveHi,size,buffer);
+          return toStringDescending(root,inclusiveHi,size,buffer);
         }
         @Override int firstIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrLower(inclusiveHi);
+          return getThisOrLower(root,inclusiveHi);
         }
         @Override int lastIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrHigher();
+          return getThisOrHigher(root);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -12817,7 +13059,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           switch(Integer.signum(this.inclusiveHi-inclusiveFrom)){
             case 1:
               if(inclusiveFrom!=Byte.MIN_VALUE-1){
-                return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize|root.countElementsAscending(inclusiveFrom),inclusiveFrom);
+                return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize|countElementsAscending(root,inclusiveFrom),inclusiveFrom);
               }
               return new AbstractByteSet.EmptyView.Checked.Descending(Byte.MIN_VALUE);
             case 0:
@@ -12835,7 +13077,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           CheckedCollection.checkModCount(modCountAndSize=this.modCountAndSize&(~0x1ff),(root=this.root).modCountAndSize&(~0x1ff));
           switch(Integer.signum(this.inclusiveHi-fromElement)){
             case 1:
-              return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize|root.countElementsAscending(fromElement),fromElement);
+              return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize|countElementsAscending(root,fromElement),fromElement);
             case 0:
               return this;
             default:
@@ -12888,7 +13130,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         this.boundInfo=boundInfo;
       }
       @Override void clearImpl(ByteSetImpl.Checked root){
-        root.clearBodySet(boundInfo);
+        clearBodySet(root,boundInfo);
       }
       @Override long isInRange(boolean val){
         final int boundInfo=this.boundInfo;
@@ -12933,21 +13175,21 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         final ByteSetImpl.Checked root;
         CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)>>>9,(root=this.root).modCountAndSize>>>9);
         if((modCountAndSize&=0x1ff)!=0){
-          return root.hashCodeDescending((byte)(this.boundInfo&0xff),modCountAndSize);
+          return hashCodeDescending(root,(byte)(this.boundInfo&0xff),modCountAndSize);
         }
         return 0;
       }
-      @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,ByteSetImpl.Checked.ModCountChecker modCountChecker){
+      @Override int removeIfImpl(ByteSetImpl.Checked root,int size,BytePredicate filter,int expectedModCount){
         final int inclHi;
         switch((inclHi=(byte)(this.boundInfo&0xff))>>6){
           case 1:
-            return root.removeIfImplStartWord3Descending(inclHi,size,filter,modCountChecker);
+            return removeIfImplStartWord3Descending(root,inclHi,size,filter,expectedModCount);
           case 0:
-            return root.removeIfImplStartWord2Descending(inclHi,size,filter,modCountChecker);
+            return removeIfImplStartWord2Descending(root,inclHi,size,filter,expectedModCount);
           case -1:
-            return root.removeIfImplStartWord1Descending(inclHi,size,filter,modCountChecker);
+            return removeIfImplStartWord1Descending(root,inclHi,size,filter,expectedModCount);
           default:
-            return root.removeIfImplStartWord0Descending(inclHi,size,filter,modCountChecker);
+            return removeIfImplStartWord0Descending(root,inclHi,size,filter,expectedModCount);
         }
       }
       private OmniNavigableSet.OfByte headSetAscending(int inclusiveTo){
@@ -12960,7 +13202,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             final int inclusiveFrom;
             switch(Integer.signum(inclusiveTo+1-(inclusiveFrom=boundInfo>>8))){
               case 1:
-                return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|root.countElements(inclusiveFrom,inclusiveTo),(boundInfo&(~0xff))|(inclusiveTo&0xff));
+                return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|countElements(root,inclusiveFrom,inclusiveTo),(boundInfo&(~0xff))|(inclusiveTo&0xff));
               case 0:
                 return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
               default:
@@ -12982,7 +13224,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             final int inclusiveFrom;
             switch(Integer.signum(((byte)(inclusiveFrom=boundInfo&0xff))+1-inclusiveTo)){
               case 1:
-                return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|root.countElements(inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|inclusiveFrom);
+                return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|countElements(root,inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|inclusiveFrom);
               case 0:
                 return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
               default:
@@ -13004,7 +13246,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             final int inclusiveTo;
             switch(Integer.signum(((byte)(inclusiveTo=boundInfo&0xff))+1-inclusiveFrom)){
               case 1:
-                return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|root.countElements(inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|inclusiveTo);
+                return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|countElements(root,inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|inclusiveTo);
               case 0:
                 return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
               default:
@@ -13026,7 +13268,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             final int inclusiveTo;
             switch(Integer.signum(inclusiveFrom+1-(inclusiveTo=boundInfo>>8))){
               case 1:
-                return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|root.countElements(inclusiveTo,inclusiveFrom),(boundInfo&(~0xff))|(inclusiveFrom&0xff));
+                return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|countElements(root,inclusiveTo,inclusiveFrom),(boundInfo&(~0xff))|(inclusiveFrom&0xff));
               case 0:
                 return new AbstractByteSet.EmptyView.Checked.Descending(inclusiveTo);
               default:
@@ -13062,7 +13304,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                   case 1:
                 }
             }
-            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|root.countElements(inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|(inclusiveTo&0xff));
+            return new CheckedSubSet.BodySet.Ascending(this,modCountAndSize|countElements(root,inclusiveFrom,inclusiveTo),(inclusiveFrom<<8)|(inclusiveTo&0xff));
           case 0:
             if(inclusiveFrom>=(boundInfo=this.boundInfo)>>8 && inclusiveTo<=(byte)(boundInfo&0xff)){
               return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveFrom);
@@ -13095,7 +13337,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                   case 1:
                 }
             }
-            return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|root.countElements(inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff));
+            return new CheckedSubSet.BodySet.Descending(this,modCountAndSize|countElements(root,inclusiveTo,inclusiveFrom),(inclusiveTo<<8)|(inclusiveFrom&0xff));
           case 0:
             if(inclusiveTo>=(boundInfo=this.boundInfo)>>8 && inclusiveFrom<=(byte)(boundInfo&0xff)){
               return new AbstractByteSet.EmptyView.Checked.Ascending(inclusiveTo);
@@ -13114,7 +13356,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -13131,7 +13373,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -13148,7 +13390,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -13165,7 +13407,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -13182,7 +13424,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -13199,7 +13441,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -13216,7 +13458,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (byte)v;
             }
           }
@@ -13233,7 +13475,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (byte)v;
             }
           }
@@ -13250,7 +13492,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (short)v;
             }
           }
@@ -13267,7 +13509,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (short)v;
             }
           }
@@ -13284,7 +13526,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (short)v;
             }
           }
@@ -13301,7 +13543,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (short)v;
             }
           }
@@ -13317,7 +13559,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
-            if((val=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((val=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (int)val;
             }
           }
@@ -13333,7 +13575,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
-            if((val=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((val=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (int)val;
             }
           }
@@ -13349,7 +13591,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveHi;
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
-            if((val=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((val=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (int)val;
             }
           }
@@ -13365,7 +13607,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int inclusiveLo;
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
-            if((val=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((val=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (int)val;
             }
           }
@@ -13382,7 +13624,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?(int)(val):boundInfo))!=128){
               return (long)v;
             }
           }
@@ -13399,7 +13641,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?(int)(val):boundInfo))!=-129){
               return (long)v;
             }
           }
@@ -13416,7 +13658,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?1+(int)(val):boundInfo))!=128){
               return (long)v;
             }
           }
@@ -13433,7 +13675,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?-1+(int)(val):boundInfo))!=-129){
               return (long)v;
             }
           }
@@ -13450,7 +13692,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
               return (float)v;
             }
           }
@@ -13467,7 +13709,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
               return (float)v;
             }
           }
@@ -13484,7 +13726,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
               return (float)v;
             }
           }
@@ -13501,7 +13743,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
               return (float)v;
             }
           }
@@ -13518,7 +13760,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<=(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>(boundInfo>>=8)?TypeUtil.intCeiling(val):boundInfo))!=128){
               return (double)v;
             }
           }
@@ -13535,7 +13777,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.intFloor(val):boundInfo))!=-129){
               return (double)v;
             }
           }
@@ -13552,7 +13794,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(val<(inclusiveHi=(byte)((boundInfo=this.boundInfo)&0xff))){
             final int v;
-            if((v=root.getThisOrHigher(inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
+            if((v=getThisOrHigher(root,inclusiveHi,val>=(boundInfo>>=8)?TypeUtil.higherInt(val):boundInfo))!=128){
               return (double)v;
             }
           }
@@ -13569,7 +13811,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           int boundInfo;
           if(!(val<=(inclusiveLo=((boundInfo=this.boundInfo)>>8)))){
             final int v;
-            if((v=root.getThisOrLower(inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
+            if((v=getThisOrLower(root,inclusiveLo,val<=(boundInfo=(byte)(boundInfo&0xff))?TypeUtil.lowerInt(val):boundInfo))!=-129){
               return (double)v;
             }
           }
@@ -13650,56 +13892,56 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           super(parent,modCountAndSize,boundInfo);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
-          root.copyToArrayAscending(
+          copyToArrayAscending(root,
           (byte)(this.boundInfo&0xff),
           size,dst);
         }
         @Override void forEachImpl(ByteSetImpl.Checked root,int size,ByteConsumer action){
-          root.forEachAscending(this.boundInfo>>8,size,action);
+          forEachAscending(root,this.boundInfo>>8,size,action);
         }
         @Override int toStringImpl(ByteSetImpl.Checked root,int size,byte[] buffer){
-          return root.toStringAscending(this.boundInfo>>8,size,buffer);
+          return toStringAscending(root,this.boundInfo>>8,size,buffer);
         }
         @Override int firstIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrHigher(boundInfo>>8);
+          return getThisOrHigher(root,boundInfo>>8);
         }
         @Override int lastIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrLower((byte)(boundInfo&0xff));
+          return getThisOrLower(root,(byte)(boundInfo&0xff));
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -13840,57 +14082,60 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public double lowerDouble(double val){
           return super.higherDouble(val);
         }
+        @Override public ByteComparator comparator(){
+          return ByteComparator::descendingCompare;
+        }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,short[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,int[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,long[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,float[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,double[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Byte[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void copyToArray(ByteSetImpl.Checked root,int size,Object[] dst){
-          root.copyToArrayDescending(
+          copyToArrayDescending(root,
           this.boundInfo>>8,
           size,dst);
         }
         @Override void forEachImpl(ByteSetImpl.Checked root,int size,ByteConsumer action){
-          root.forEachDescending((byte)(this.boundInfo&0xff),size,action);
+          forEachDescending(root,(byte)(this.boundInfo&0xff),size,action);
         }
         @Override int toStringImpl(ByteSetImpl.Checked root,int size,byte[] buffer){
-          return root.toStringDescending((byte)(this.boundInfo&0xff),size,buffer);
+          return toStringDescending(root,(byte)(this.boundInfo&0xff),size,buffer);
         }
         @Override int firstIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrLower((byte)(boundInfo&0xff));
+          return getThisOrLower(root,(byte)(boundInfo&0xff));
         }
         @Override int lastIntImpl(ByteSetImpl.Checked root){
-          return root.getThisOrHigher(boundInfo>>8);
+          return getThisOrHigher(root,boundInfo>>8);
         }
         @Override public OmniNavigableSet.OfByte headSet(byte toElement,boolean inclusive){
           int inclusiveTo=toElement;
@@ -13944,6 +14189,220 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         @Override public OmniIterator.OfByte descendingIterator(){
           //TODO
           throw new omni.util.NotYetImplementedException();
+        }
+      }
+    }
+  }
+  private static abstract class UncheckedFullItr extends AbstractByteItr{
+    final ByteSetImpl root;
+    int offset;
+    private UncheckedFullItr(ByteSetImpl root,int offset){
+      this.root=root;
+      this.offset=offset;
+    }
+    private void forEachRemainingAscending(int offset,ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    private void forEachRemainingDescending(int offset,ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    private static class Ascending extends UncheckedFullItr{
+      private Ascending(ByteSetImpl root,int offset){
+        super(root,offset);
+      }
+      @Override public boolean hasNext(){
+        return this.offset!=128;
+      }
+      @Override public byte nextByte(){
+        final int ret;
+        if((ret=this.offset)!=Byte.MAX_VALUE){
+          this.offset=getThisOrHigher(root,ret+1);
+        }else{
+          this.offset=128;
+        }
+        return (byte)ret;
+      }
+      @Override public void remove(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public Object clone(){
+        return new Ascending(this.root,this.offset);
+      }
+      @Override public void forEachRemaining(ByteConsumer action){
+        final int offset;
+        if((offset=this.offset)!=128){
+          super.forEachRemainingAscending(offset,action);
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Byte> action){
+        final int offset;
+        if((offset=this.offset)!=128){
+          super.forEachRemainingAscending(offset,action::accept);
+        }
+      }
+    }
+    private static class Descending extends UncheckedFullItr{
+      private Descending(ByteSetImpl root,int offset){
+        super(root,offset);
+      }
+      @Override public boolean hasNext(){
+        return this.offset!=-129;
+      }
+      @Override public byte nextByte(){
+        final int ret;
+        if((ret=this.offset)!=Byte.MIN_VALUE){
+          this.offset=getThisOrLower(root,ret-1);
+        }else{
+          this.offset=-129;
+        }
+        return (byte)ret;
+      }
+      @Override public void remove(){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      @Override public Object clone(){
+        return new Descending(this.root,this.offset);
+      }
+      @Override public void forEachRemaining(ByteConsumer action){
+        final int offset;
+        if((offset=this.offset)!=129){
+          super.forEachRemainingDescending(offset,action);
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Byte> action){
+        final int offset;
+        if((offset=this.offset)!=-129){
+          super.forEachRemainingDescending(offset,action::accept);
+        }
+      }
+    }
+  }
+  private static abstract class CheckedFullItr extends AbstractByteItr{
+    final ByteSetImpl.Checked root;
+    int modCountAndSize;
+    int offsetAndLastRet;
+    private CheckedFullItr(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
+      this.root=root;
+      this.modCountAndSize=modCountAndSize;
+      this.offsetAndLastRet=offsetAndLastRet;
+    }
+    abstract byte nextImpl(ByteSetImpl.Checked root);
+    @Override public byte nextByte(){
+      final ByteSetImpl.Checked root;
+      CheckedCollection.checkModCount(modCountAndSize,(root=this.root).modCountAndSize);
+      return nextImpl(root);
+    }
+    private void forEachRemainingAscending(int offset,ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    private void forEachRemainingDescending(int offset,ByteConsumer action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public void remove(){
+      final int offsetAndLastRet;
+      final int lastRet;
+      if((lastRet=(offsetAndLastRet=this.offsetAndLastRet)&0x1ff)!=0x1ff){
+        int modCountAndSize;
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCountAndSize=this.modCountAndSize,(root=this.root).modCountAndSize);
+        root.modCountAndSize=(modCountAndSize+=((1<<9)-1));
+        this.modCountAndSize=modCountAndSize;
+        final byte b;
+        switch((b=(byte)lastRet)>>6){
+          case -2:
+            root.word0-=(1L<<b);
+            break;
+          case -1:
+            root.word1-=(1L<<b);
+            break;
+          case 0:
+            root.word2-=(1L<<b);
+            break;
+          default:
+            root.word3-=(1L<<b);
+        }
+        this.offsetAndLastRet=offsetAndLastRet|0x1ff;
+        return;
+      }
+      throw new IllegalStateException();
+    }
+    private static class Ascending extends CheckedFullItr{
+      private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
+        super(root,modCountAndSize,offsetAndLastRet);
+      }
+      @Override public boolean hasNext(){
+        return (this.offsetAndLastRet>>9)!=128;
+      }
+      @Override public void forEachRemaining(ByteConsumer action){
+        final int offset;
+        if((offset=this.offsetAndLastRet>>9)!=128){
+          super.forEachRemainingAscending(offset,action);
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Byte> action){
+        final int offset;
+        if((offset=this.offsetAndLastRet>>9)!=128){
+          super.forEachRemainingAscending(offset,action::accept);
+        }
+      }
+      @Override public Object clone(){
+        return new Ascending(this.root,this.modCountAndSize,this.offsetAndLastRet);
+      }
+      @Override byte nextImpl(ByteSetImpl.Checked root){
+        final int offset;
+        switch(offset=(this.offsetAndLastRet)>>9){
+          case 128:
+            throw new NoSuchElementException();
+          case Byte.MAX_VALUE:
+            this.offsetAndLastRet=0x1007f;//(128<<9)|(Byte.MAX_VALUE)
+            return Byte.MAX_VALUE;
+          default:
+            final byte ret;
+            this.offsetAndLastRet=(getThisOrHigher(root,offset+1)<<9)|((ret=(byte)offset)&0x1ff);
+            return ret;
+        }
+      }
+    }
+    private static class Descending extends CheckedFullItr{
+      private Descending(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
+        super(root,modCountAndSize,offsetAndLastRet);
+      }
+      @Override public boolean hasNext(){
+        return (this.offsetAndLastRet>>9)!=-129;
+      }
+      @Override public void forEachRemaining(ByteConsumer action){
+        final int offset;
+        if((offset=this.offsetAndLastRet>>9)!=-129){
+          super.forEachRemainingDescending(offset,action);
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Byte> action){
+        final int offset;
+        if((offset=this.offsetAndLastRet>>9)!=-129){
+          super.forEachRemainingDescending(offset,action::accept);
+        }
+      }
+      @Override public Object clone(){
+        return new Descending(this.root,this.modCountAndSize,this.offsetAndLastRet);
+      }
+      @Override byte nextImpl(ByteSetImpl.Checked root){
+        final int offset;
+        switch(offset=(this.offsetAndLastRet)>>9){
+          case -129:
+            throw new NoSuchElementException();
+          case Byte.MIN_VALUE:
+            this.offsetAndLastRet=0xfffeff80;//(-129<<9)|(0x1ff&((byte)Byte.MIN_VALUE))
+            return Byte.MIN_VALUE;
+          default:
+            final byte ret;
+            this.offsetAndLastRet=(getThisOrLower(root,offset-1)<<9)|((ret=(byte)offset)&0x1ff);
+            return ret;
         }
       }
     }

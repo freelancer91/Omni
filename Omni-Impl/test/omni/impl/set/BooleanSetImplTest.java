@@ -3,11 +3,9 @@ package omni.impl.set;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
 import java.util.Random;
-import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,11 +26,9 @@ import omni.impl.MonitoredNavigableSet;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
-import omni.impl.MonitoredSortedSet;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
-import omni.impl.set.BooleanSetImpl.Checked;
 import omni.impl.SortOrder;
 import omni.impl.StructType;
 import omni.util.NotYetImplementedException;
@@ -1609,10 +1605,6 @@ public class BooleanSetImplTest{
         BooleanSetImplMonitor(CheckedType checkedType,SortOrder sortOrder,int expectedState){
         	this(getRoot(checkedType,sortOrder,expectedState),expectedState,checkedType,sortOrder);
         }
-        BooleanSetImplMonitor(CheckedType checkedType){
-            this(checkedType.checked?new BooleanSetImpl.Checked():new BooleanSetImpl(),0,checkedType,SortOrder.Ascending);
-        }
-        
         BooleanSetImplMonitor(BooleanSetImpl set,int expectedState,CheckedType checkedType,SortOrder sortOrder){
             super(set,checkedType,sortOrder);
             this.expectedState=expectedState;

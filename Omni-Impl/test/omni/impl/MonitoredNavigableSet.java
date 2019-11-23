@@ -2,7 +2,6 @@ package omni.impl;
 
 import omni.api.OmniIterator;
 import omni.api.OmniNavigableSet;
-import omni.api.OmniSortedSet;
 
 public interface MonitoredNavigableSet<SET extends OmniNavigableSet<E>,E> extends MonitoredSortedSet<SET,E>{
    @SuppressWarnings("unchecked") default Object callPollFirst(DataType outputType) {
