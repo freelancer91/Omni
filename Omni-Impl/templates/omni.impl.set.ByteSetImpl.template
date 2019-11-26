@@ -5567,217 +5567,338 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
     }
   }
-  
-  private static abstract class UncheckedFullItr extends AbstractByteItr{
-    final ByteSetImpl root;
-    int offset;
-    private UncheckedFullItr(ByteSetImpl root,int offset){
-      this.root=root;
-      this.offset=offset;
+  private static abstract class AbstractItrImpl extends AbstractByteItr{
+    int numLeftAndOffset;
+    private AbstractItrImpl(int numLeftAndOffset){
+      this.numLeftAndOffset;
     }
-    private void forEachRemainingAscending(int offset,ByteConsumer action){
-      #MACRO NYI()
+    @Override public boolean hasNext(){
+      return this.numLeftAndOffset>=(1<<8);
     }
-    private void forEachRemainingDescending(int offset,ByteConsumer action){
-      #MACRO NYI()
-    }
-    private static class Ascending extends UncheckedFullItr{
-      private Ascending(ByteSetImpl root,int offset){
-        super(root,offset);
+    
+    abstract void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action);
+    @Override public void forEachRemaining(ByteConsumer action){
+      final int numLeftAndOffset;
+      if((numLeftAndOffset=this.numLeftAndOffset)>=(1<<8)){
+        forEachRemainingImpl(numLeftAndOffset,action);
       }
-      @Override public boolean hasNext(){
-        return this.offset!=128;
+    }
+    @Override public void forEachRemaining(Consumer<? super Byte> action){
+      final int numLeftAndOffset;
+      if((numLeftAndOffset=this.numLeftAndOffset)>=(1<<8)){
+        forEachRemainingImpl(numLeftAndOffset,action::accept);
       }
-      @Override public byte nextByte(){
-        final int ret;
-        if((ret=this.offset)!=Byte.MAX_VALUE){
-          this.offset=getThisOrHigher(root,ret+1);
-        }else{
-          this.offset=128;
+    }
+    private static byte ascendingForEachRemaining(int numLeftAndOffset,ByteSetImpl root,ByteConsumer action){
+      byte lastRet;
+      int offset;
+      action.accept(lastRet=(byte)(offset=numLeftAndOffset&0xff));
+      if((numLeftAndOffset-=(1<<8)>=((1<<8)){
+        outer:switch((++offset)>>6){
+          case 2: // [-127 -> -65]
+            for(final var word=root.word0;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(++offset==192){
+                break;
+              }
+            }
+          case 3: // [ -64 ->  -1]
+            for(final var word=root.word1;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(++offset==256){
+                break;
+              }
+            }
+          case 0: // [   0 ->  63]
+            for(final var word=root.word2;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              ++offset;
+              if(mask==Long.MIN_VALUE){
+                break;
+              }
+            }
+          case 1: // [  64 -> 127]
+            for(final var word=root.word3;;++offset){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break;
+                }
+              }
+            }
         }
-        return (byte)ret;
       }
-      @Override public void remove(){
-        #MACRO NYI()
+      return lastRet;
+    }
+    private static byte descendingForEachRemaining(int offsetAndNumLeft,ByteSetImpl root,ByteConsumer action){
+      int offset;
+      byte lastRet;
+      action.accept(lastRet=(byte)(offset=numLeftAndOffset&0xff));
+      if((numLeftAndOffset-=(1<<8)>=((1<<8)){
+        final var root=this.root;
+        outer:switch((--offset)>>6){
+          case 1: // [126 -> 64]
+            for(final var word=root.word3;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(--offset==63){
+                break;
+              }
+            }
+          case 0: // [63 -> 0]
+            for(final var word=root.word2;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(--offset==-1){
+                break;
+              }
+            }
+          case 3: // [-1 -> -64]
+            for(final var word=root.word1;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              --offset;
+              if(mask==1L){
+                break;
+              }
+            }
+          case 2: // [-65 -> -128]
+            for(final var word=root.word0;;--offset){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break;
+                }
+              }
+            }
+        }
+      }
+      return lastRet;
+    }
+  }
+  
+  
+  private static abstract class UncheckedFullItr extends AbstractItrImpl{
+    final ByteSetImpl.Unchecked root;
+    int lastRet;
+    private UncheckedFullItr(ByteSetImpl.Unchecked root,int numLeftAndOffset){
+      super(numLeftAndOffset);
+      this.root=root;
+    }
+    private UncheckedFullItr(ByteSetImpl.Unchecked root,int numLeftAndOffset,int lastRet){
+      super(numLeftAndOffset);
+      this.root=root;
+      this.lastRet=lastRet;
+    }
+    @Override public void remove(){
+      final int lastRet;
+      final var mask=1L<<(lastRet=this.lastRet);
+      switch(lastRet>>6){
+        case -2:
+          root.word0-=mask;
+          break;
+        case -1:
+          root.word1-=mask;
+          break;
+        case 0:
+          root.word2-=mask;
+          break;
+        default:
+          root.word3-=mask;
+      }
+    }
+    abstract int getNextVal(int currOffset);
+    @Override public byte nextByte(){
+      final int numLeftAndOffset;
+      final var ret=(byte)(0xff&(numLeftAndOffset=this.numLeftAndOffset));
+      if(numLeftAndOffset<=(1<<8)){
+        //only one value is left, so no need to search for the next
+        this.numLeftAndOffset=0;
+      }else{
+        this.numLeftAndOffset=(numLeftAndOffset-(1<<8))|((0xff)&getNextVal(ret));
+      }
+      return ret;
+    }
+    
+    private static class Ascending extends UncheckedFullItr{
+      private Ascending(ByteSetImpl.Unchecked root,int numLeftAndOffset){
+        super(root,numLeftAndOffset);
+      }
+      private Ascending(ByteSetImpl.Unchecked root,int numLeftAndOffset,int lastRet){
+        super(root,numLeftAndOffset,lastRet);
       }
       @Override public Object clone(){
-        return new Ascending(this.root,this.offset);
+        return new Ascending(this.root,this.numLeftAndOffset,this.lastRet);
       }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offset)!=128){
-          super.forEachRemainingAscending(offset,action);
-        }
+      @Override int getNextVal(int currOffset){
+        this.lastRet=currOffset;
+        return getThisOrHigher(root,currOffset+1);
       }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offset)!=128){
-          super.forEachRemainingAscending(offset,action::accept);
-        }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        this.lastRet=ascendingForEachRemaining(numLeftAndOffset,root,action);
+        this.numLeftAndOffset=0;
       }
     }
     private static class Descending extends UncheckedFullItr{
-      private Descending(ByteSetImpl root,int offset){
-        super(root,offset);
+      private Descending(ByteSetImpl.Unchecked root,int numLeftAndOffset){
+        super(root,numLeftAndOffset);
       }
-      @Override public boolean hasNext(){
-        return this.offset!=-129;
-      }
-      @Override public byte nextByte(){
-        final int ret;
-        if((ret=this.offset)!=Byte.MIN_VALUE){
-          this.offset=getThisOrLower(root,ret-1);
-        }else{
-          this.offset=-129;
-        }
-        return (byte)ret;
-      }
-      @Override public void remove(){
-        #MACRO NYI()
+      private Descending(ByteSetImpl.Unchecked root,int numLeftAndOffset,int lastRet){
+        super(root,numLeftAndOffset,lastRet);
       }
       @Override public Object clone(){
-        return new Descending(this.root,this.offset);
+        return new Descending(this.root,this.numLeftAndOffset,this.lastRet);
       }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offset)!=129){
-          super.forEachRemainingDescending(offset,action);
-        }
+      @Override int getNextVal(int currOffset){
+        this.lastRet=currOffset;
+        return getThisOrLower(root,currOffset-1);
       }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offset)!=-129){
-          super.forEachRemainingDescending(offset,action::accept);
-        }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        this.lastRet=descendingForEachRemaining(numLeftAndOffset,root,action);
+        this.numLeftAndOffset=0;
       }
     }
   }
-  private static abstract class CheckedFullItr extends AbstractByteItr{
+  private static abstract class CheckedFullItr extends AbstractItrImpl{
     final ByteSetImpl.Checked root;
-    int modCountAndSize;
-    int offsetAndLastRet;
-    private CheckedFullItr(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
+    int modCountAndLastRet;
+    private CheckedFullItr(ByteSetImpl.Checked root,int numLeftAndOffset,int modCountAndLastRet){
+      super(numLeftAndOffset);
       this.root=root;
-      this.modCountAndSize=modCountAndSize;
-      this.offsetAndLastRet=offsetAndLastRet;
+      this.modCountAndLastRet=modCountAndLastRet;
     }
-    abstract byte nextImpl(ByteSetImpl.Checked root);
-    @Override public byte nextByte(){
-      final ByteSetImpl.Checked root;
-      CheckedCollection.checkModCount(modCountAndSize,(root=this.root).modCountAndSize);
-      return nextImpl(root);
-    }
-    private void forEachRemainingAscending(int offset,ByteConsumer action){
-      #MACRO NYI()
-    }
-    private void forEachRemainingDescending(int offset,ByteConsumer action){
-      #MACRO NYI()
-    }
+    abstract int getNextVal(ByteSetImpl.Checked root,int currOffset);
     @Override public void remove(){
-      final int offsetAndLastRet;
+      int modCountAndLastRet;
       final int lastRet;
-      if((lastRet=(offsetAndLastRet=this.offsetAndLastRet)&0x1ff)!=0x1ff){
-        int modCountAndSize;
+      if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)!=128){
         final ByteSetImpl.Checked root;
-        CheckedCollection.checkModCount(modCountAndSize=this.modCountAndSize,(root=this.root).modCountAndSize);
-        root.modCountAndSize=(modCountAndSize+=((1<<9)-1));
-        this.modCountAndSize=modCountAndSize;
-        final byte b;
-        switch((b=(byte)lastRet)>>6){
-          case -2:
-            root.word0-=(1L<<b);
-            break;
-          case -1:
-            root.word1-=(1L<<b);
-            break;
-          case 0:
-            root.word2-=(1L<<b);
-            break;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&~0x1ff);
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndlastRet=modCountAndLastRet|128;
+        final var mask=1L<<lastRet;
+        switch(lastRet>>6){
+          case 3:
+            root.word1-=mask;
+            return;
+          case 2:
+            root.word0-=mask;
+            return;
+          case 1:
+            root.word3-=mask;
+            return;
           default:
-            root.word3-=(1L<<b);
+            root.word2-=mask;
+            return;
         }
-        this.offsetAndLastRet=offsetAndLastRet|0x1ff;
-        return;
       }
       throw new IllegalStateException();
     }
+    
+    @Override public byte nextByte(){
+      final ByteSetImpl.Checked root;
+      final int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCountAndLastRet&~0x1ff),(root=this.root).modCountAndSize&~0x1ff);
+      final int numLeftAndOffset;
+      final int offset=((numLeftAndOffset=this.numLeftAndOffset)&0xff);
+      final byte ret;
+      final int numLeft;
+      switch(numLeft=numLeftAndOffset>>8){
+        case 0:
+          throw new NoSuchElementException();
+        case 1:
+          this.numLeftAndOffset=0;
+          ret=(byte)offset;
+          break;
+        default:
+          this.numLeftAndOffset=(numLeft-1)<<8|(0xff&getNextVal(root,ret=(byte)offset));
+      }
+      this.modCountAndLastRet=modCount|offset;
+      return ret;
+    }
     private static class Ascending extends CheckedFullItr{
-      private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
-        super(root,modCountAndSize,offsetAndLastRet);
-      }
-      @Override public boolean hasNext(){
-        return (this.offsetAndLastRet>>9)!=128;
-      }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=128){
-          super.forEachRemainingAscending(offset,action);
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=128){
-          super.forEachRemainingAscending(offset,action::accept);
-        }
+      private Ascending(ByteSetImpl.Checked root,int numLeftAndOffset,int modCountAndLastRet){
+        super(root,numLeftAndOffset,modCountAndLastRet);
       }
       @Override public Object clone(){
-        return new Ascending(this.root,this.modCountAndSize,this.offsetAndLastRet);
+        return new Ascending(this.root,this.numLeftAndOffset,this.modCountAndLastRet);
       }
-      @Override byte nextImpl(ByteSetImpl.Checked root){
-        final int offset;
-        switch(offset=(this.offsetAndLastRet)>>9){
-          case 128:
-            throw new NoSuchElementException();
-          case Byte.MAX_VALUE:
-            this.offsetAndLastRet=0x1007f;//(128<<9)|(Byte.MAX_VALUE)
-            return Byte.MAX_VALUE;
-          default:
-            final byte ret;
-            this.offsetAndLastRet=(getThisOrHigher(root,offset+1)<<9)|((ret=(byte)offset)&0x1ff);
-            return ret;
+      @Override int getNextVal(ByteSetImpl.Checked root,int currOffset){
+        return getThisOrHigher(root,currOffset+1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        int modCountAndLastRet=this.modCountAndLastRet;
+        final var root=this.root;
+        byte lastRet;
+        try{
+          lastRet=ascendingForEachRemaining(numLeftAndOffset,root,action);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndLastRet,this.modCountAndLastRet,modCountAndLastRet=&~0x1ff,root.modCountAndLastRet&~0x1ff);
         }
+        this.numLeftAndOffset=0;
+        this.modCountAndLastRet=modCountAndLastRet|(lastRet&0xff);
       }
     }
     private static class Descending extends CheckedFullItr{
-      private Descending(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
-        super(root,modCountAndSize,offsetAndLastRet);
-      }
-      @Override public boolean hasNext(){
-        return (this.offsetAndLastRet>>9)!=-129;
-      }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=-129){
-          super.forEachRemainingDescending(offset,action);
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=-129){
-          super.forEachRemainingDescending(offset,action::accept);
-        }
+      private Descending(ByteSetImpl.Checked root,int numLeftAndOffset,int modCountAndLastRet){
+        super(root,numLeftAndOffset,modCountAndLastRet);
       }
       @Override public Object clone(){
-        return new Descending(this.root,this.modCountAndSize,this.offsetAndLastRet);
+        return new Descending(this.root,this.numLeftAndOffset,this.modCountAndLastRet);
       }
-      @Override byte nextImpl(ByteSetImpl.Checked root){
-        final int offset;
-        switch(offset=(this.offsetAndLastRet)>>9){
-          case -129:
-            throw new NoSuchElementException();
-          case Byte.MIN_VALUE:
-            this.offsetAndLastRet=0xfffeff80;//(-129<<9)|(0x1ff&((byte)Byte.MIN_VALUE))
-            return Byte.MIN_VALUE;
-          default:
-            final byte ret;
-            this.offsetAndLastRet=(getThisOrLower(root,offset-1)<<9)|((ret=(byte)offset)&0x1ff);
-            return ret;
+      @Override int getNextVal(ByteSetImpl.Checked root,int currOffset){
+        return getThisOrLower(root,currOffset-1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        int modCountAndLastRet=this.modCountAndLastRet;
+        final var root=this.root;
+        byte lastRet;
+        try{
+          lastRet=descendingForEachRemaining(numLeftAndOffset,root,action);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndLastRet,this.modCountAndLastRet,modCountAndLastRet=&~0x1ff,root.modCountAndLastRet&~0x1ff);
         }
+        this.numLeftAndOffset=0;
+        this.modCountAndLastRet=modCountAndLastRet|(lastRet&0xff);
       }
     }
   }
-  
-  
 }
 #MACRODEF PollFirstAndLastInt<DIRECTION,SOURCE,VIEW,CHECKED>()
 @Override public int pollFirstInt(){
