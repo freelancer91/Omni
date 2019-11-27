@@ -469,6 +469,609 @@ final class FieldAndMethodAccessor{
     }
   }
   //TODO ByteSet
+  static interface AbstractByteSet{
+    static interface EmptyView extends AbstractByteSet{
+      static final omni.impl.AbstractByteItr EMPTY_ITR=omni.impl.set.AbstractByteSet.EmptyView.EMPTY_ITR;
+      static interface Checked extends EmptyView{
+        static int after(Object obj){
+          return ((omni.impl.set.AbstractByteSet.EmptyView.Checked)obj).after;
+        }
+      }
+      static final omni.impl.set.AbstractByteSet.EmptyView ASCENDING=omni.impl.set.AbstractByteSet.EmpyView.ASCENDING;
+      static final omni.impl.set.AbstractByteSet.EmptyView DESCENDING=omni.impl.set.AbstractByteSet.EmpyView.DESCENDING;
+    }
+  }
+  static interface ByteSetImpl extends AbstractByteSet{
+    static long word0(Object obj){
+      return ((omni.impl.set.ByteSetImpl)obj).word0;
+    }
+    static long word1(Object obj){
+      return ((omni.impl.set.ByteSetImpl)obj).word1;
+    }
+    static long word2(Object obj){
+      return ((omni.impl.set.ByteSetImpl)obj).word2;
+    }
+    static long word3(Object obj){
+      return ((omni.impl.set.ByteSetImpl)obj).word3;
+    }
+    static interface Unchecked extends ByteSetImpl{
+      static long word0(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Unchecked)obj).word0;
+      }
+      static long word1(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Unchecked)obj).word1;
+      }
+      static long word2(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Unchecked)obj).word2;
+      }
+      static long word3(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Unchecked)obj).word3;
+      }
+      static interface Ascending extends Unchecked{
+        static long word0(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Ascending)obj).word0;
+        }
+        static long word1(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Ascending)obj).word1;
+        }
+        static long word2(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Ascending)obj).word2;
+        }
+        static long word3(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Ascending)obj).word3;
+        }
+      }
+      static interface Descending extends Unchecked{
+        static long word0(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Descending)obj).word0;
+        }
+        static long word1(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Descending)obj).word1;
+        }
+        static long word2(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Descending)obj).word2;
+        }
+        static long word3(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Unchecked.Descending)obj).word3;
+        }
+      }
+    }
+    static interface Checked extends ByteSetImpl{
+      static int modCountAndSize(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Checked)obj).modCountAndSize;
+      }
+      static long word0(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Checked)obj).word0;
+      }
+      static long word1(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Checked)obj).word1;
+      }
+      static long word2(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Checked)obj).word2;
+      }
+      static long word3(Object obj){
+        return ((omni.impl.set.ByteSetImpl.Checked)obj).word3;
+      }
+      static interface Ascending extends Checked{
+        static int modCountAndSize(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Ascending)obj).modCountAndSize;
+        }
+        static long word0(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Ascending)obj).word0;
+        }
+        static long word1(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Ascending)obj).word1;
+        }
+        static long word2(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Ascending)obj).word2;
+        }
+        static long word3(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Ascending)obj).word3;
+        }
+      }
+      static interface Descending extends Checked{
+        static int modCountAndSize(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Descending)obj).modCountAndSize;
+        }
+        static long word0(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Descending)obj).word0;
+        }
+        static long word1(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Descending)obj).word1;
+        }
+        static long word2(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Descending)obj).word2;
+        }
+        static long word3(Object obj){
+          return ((omni.impl.set.ByteSetImpl.Checked.Descending)obj).word3;
+        }
+      }
+    }
+    static interface UncheckedFullView extends AbstractByteSet{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedFullView","root");
+      public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+        return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+      }
+      static interface Ascending extends UncheckedFullView{
+        public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+        }
+      }
+      static interface Descending extends UncheckedFullView{
+        public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+        }
+      }
+    }
+    static interface CheckedFullView extends AbstractByteSet{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedFullView","root");
+      public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+        return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+      }
+      static interface SerializationIntermediateBase{
+        static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedFullView"+DOLLARSIGN+"SerializationIntermediateBase","root");
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface Ascending extends CheckedFullView{
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+        static interface SerializationIntermediate extends SerializationIntermediateBase{
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+        }
+      }
+      static interface Descending extends CheckedFullView{
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+        static interface SerializationIntermediate extends SerializationIntermediateBase{
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+        }
+      } 
+    }
+    static interface UncheckedSubSet extends AbstractByteSet{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSet","root");
+      static final Field parentField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSet","parent");
+      static final Field sizeField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSet","size");
+      public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+        return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+      }
+      public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+        return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+      }
+      public static int size(Object obj){
+        return getIntValue(sizeField,obj);
+      }
+      static interface TailSet extends UncheckedSubSet{
+        static final Field inclusiveLoField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSet"+DOLLARSIGN+"TailSet","inclusiveLo");
+        public static int inclusiveLo(Object obj){
+          return getIntValue(inclusiveLoField,obj);
+        }
+        public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+        }
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int size(Object obj){
+          return getIntValue(sizeField,obj);
+        }
+        static interface Ascending extends TailSet{
+          public static int inclusiveLo(Object obj){
+            return getIntValue(inclusiveLoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int size(Object obj){
+            return getIntValue(sizeField,obj);
+          }
+        }
+        static interface Descending extends TailSet{
+          public static int inclusiveLo(Object obj){
+            return getIntValue(inclusiveLoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int size(Object obj){
+            return getIntValue(sizeField,obj);
+          }
+        }
+      }
+      static interface HeadSet extends UncheckedSubSet{
+        static final Field inclusiveHiField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSet"+DOLLARSIGN+"HeadSet","inclusiveHi");
+        public static int inclusiveHi(Object obj){
+          return getIntValue(inclusiveHiField,obj);
+        }
+        public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+        }
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int size(Object obj){
+          return getIntValue(sizeField,obj);
+        }
+        static interface Ascending extends HeadSet{
+          public static int inclusiveHi(Object obj){
+            return getIntValue(inclusiveHiField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int size(Object obj){
+            return getIntValue(sizeField,obj);
+          }
+        }
+        static interface Descending extends HeadSet{
+          public static int inclusiveHi(Object obj){
+            return getIntValue(inclusiveHiField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int size(Object obj){
+            return getIntValue(sizeField,obj);
+          }
+        }
+      }
+      static interface BodySet extends UncheckedSubSet{
+        static final Field boundInfoField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSet"+DOLLARSIGN+"BodySet","boundInfo");
+        public static int boundInfo(Object obj){
+          return getIntValue(boundInfoField,obj);
+        }
+        public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+        }
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int size(Object obj){
+          return getIntValue(sizeField,obj);
+        }
+        static interface Ascending extends BodySet{
+          public static int boundInfo(Object obj){
+            return getIntValue(boundInfoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int size(Object obj){
+            return getIntValue(sizeField,obj);
+          }
+        }
+        static interface Descending extends BodySet{
+          public static int boundInfo(Object obj){
+            return getIntValue(boundInfoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int size(Object obj){
+            return getIntValue(sizeField,obj);
+          }
+        }
+      }
+    }
+    static interface CheckedSubSet extends AbstractByteSet{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","root");
+      static final Field parentField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","parent");
+      static final Field modCountAndSizeFIeld=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","modCountAndSize");
+      public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+        return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+      }
+      public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+        return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+      }
+      public static int modCountAndSize(Object obj){
+        return getIntValue(modCountAndSizeField,obj);
+      }
+      static interface TailSet extends CheckedSubSet{
+        static final Field inclusiveLoField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet"+DOLLARSIGN+"TailSet","inclusiveLo");
+        public static int inclusiveLo(Object obj){
+          return getIntValue(inclusiveLoField,obj);
+        }
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int modCountAndSize(Object obj){
+          return getIntValue(modCountAndSizeField,obj);
+        }
+        static interface Ascending extends TailSet{
+          public static int inclusiveLo(Object obj){
+            return getIntValue(inclusiveLoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int modCountAndSize(Object obj){
+            return getIntValue(modCountAndSizeField,obj);
+          }
+        }
+        static interface Descending extends TailSet{
+          public static int inclusiveLo(Object obj){
+            return getIntValue(inclusiveLoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int modCountAndSize(Object obj){
+            return getIntValue(modCountAndSizeField,obj);
+          }
+        }
+      }
+      static interface HeadSet extends CheckedSubSet{
+        static final Field inclusiveHiField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet"+DOLLARSIGN+"HeadSet","inclusiveHi");
+        public static int inclusiveHi(Object obj){
+          return getIntValue(inclusiveHiField,obj);
+        }
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int modCountAndSize(Object obj){
+          return getIntValue(modCountAndSizeField,obj);
+        }
+        static interface Ascending extends HeadSet{
+          public static int inclusiveHi(Object obj){
+            return getIntValue(inclusiveHiField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int modCountAndSize(Object obj){
+            return getIntValue(modCountAndSizeField,obj);
+          }
+        }
+        static interface Descending extends HeadSet{
+          public static int inclusiveHi(Object obj){
+            return getIntValue(inclusiveHiField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int modCountAndSize(Object obj){
+            return getIntValue(modCountAndSizeField,obj);
+          }
+        }
+      }
+      static interface BodySet extends CheckedSubSet{
+        static final Field boundInfoField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet"+DOLLARSIGN+"BodySet","boundInfo");
+        public static int boundInfo(Object obj){
+          return getIntValue(boundInfoField,obj);
+        }
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int modCountAndSize(Object obj){
+          return getIntValue(modCountAndSizeField,obj);
+        }
+        static interface Ascending extends BodySet{
+          public static int boundInfo(Object obj){
+            return getIntValue(boundInfoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int modCountAndSize(Object obj){
+            return getIntValue(modCountAndSizeField,obj);
+          }
+        }
+        static interface Descending extends BodySet{
+          public static int boundInfo(Object obj){
+            return getIntValue(boundInfoField,obj);
+          }
+          public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+            return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+          }
+          public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+            return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+          }
+          public static int modCountAndSize(Object obj){
+            return getIntValue(modCountAndSizeField,obj);
+          }
+        }
+      }
+    }
+    static interface AbstractItrImpl{
+      static final Field numLeftAndOffsetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"AbstractItrImpl","numLeftAndOffset");
+      static int numLeftAndOffset(Object obj){
+        return getIntValue(numLeftAndOffsetField,obj);
+      }
+    }
+    static interface UncheckedSubSetItr extends AbstractItrImpl{
+      static final Field parentField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSetItr","parent");
+      static final Field lastRetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedSubSetItr","lastRet");
+      public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+        return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+      }
+      public static int lastRet(Object obj){
+        return getIntValue(lastRetField,obj);
+      }
+      static int numLeftAndOffset(Object obj){
+        return getIntValue(numLeftAndOffsetField,obj);
+      }
+      static interface Ascending extends UncheckedSubSetItr{
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+      }
+      static interface Descending extends UncheckedSubSetItr{
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+      }
+    }
+    static interface UncheckedFullItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedFullItr","root");
+      static final Field lastRetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedFullItr","lastRet");
+      public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+        return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+      }
+      public static int lastRet(Object obj){
+        return getIntValue(lastRetField,obj);
+      }
+      static interface Ascending extends UncheckedFullItr{
+        public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+        return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+      }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+      }
+      static interface Descending extends UncheckedFullItr{
+        public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+      }
+    }
+    static interface AbstractCheckedItr extends AbstractItrImpl{
+      static final Field modCountAndLastRetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"AbstractCheckedItr","modCountAndLastRet");
+      static int numLeftAndOffset(Object obj){
+        return getIntValue(numLeftAndOffsetField,obj);
+      }
+      static int modCountAndLastRet(Object obj){
+        return getIntValue(modCountAndLastRetField,obj);
+      }
+    }
+    static interface CheckedSubSetItr extends AbstractCheckedItr{
+      static final Field parentField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSetItr","parent");
+      public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+        return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+      }
+      static int numLeftAndOffset(Object obj){
+        return getIntValue(numLeftAndOffsetField,obj);
+      }
+      static int modCountAndLastRet(Object obj){
+        return getIntValue(modCountAndLastRetField,obj);
+      }
+      static interface Ascending extends CheckedSubSetItr{
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+        static int modCountAndLastRet(Object obj){
+          return getIntValue(modCountAndLastRetField,obj);
+        }
+      }
+      static interface Descending extends CheckedSubSetItr{
+        public static omni.impl.set.AbstractByteSet.ComparatorlessImpl parent(Object obj){
+          return (omni.impl.set.AbstractByteSet.ComparatorlessImpl)getValue(parentField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+        static int modCountAndLastRet(Object obj){
+          return getIntValue(modCountAndLastRetField,obj);
+        }
+      }
+    }
+    static interface CheckedFullItr extends AbstractCheckedItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedFullItr","root");
+      public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+        return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+      }
+      static int numLeftAndOffset(Object obj){
+        return getIntValue(numLeftAndOffsetField,obj);
+      }
+      static int modCountAndLastRet(Object obj){
+        return getIntValue(modCountAndLastRetField,obj);
+      }
+      static interface Ascending extends CheckedFullItr{
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+        static int modCountAndLastRet(Object obj){
+          return getIntValue(modCountAndLastRetField,obj);
+        }
+      }
+      static interface Descending extends CheckedFullItr{
+        public static omni.impl.set.ByteSetImpl.Checked root(Object obj){
+          return (omni.impl.set.ByteSetImpl.Checked)getValue(rootField,obj);
+        }
+        static int numLeftAndOffset(Object obj){
+          return getIntValue(numLeftAndOffsetField,obj);
+        }
+        static int modCountAndLastRet(Object obj){
+          return getIntValue(modCountAndLastRetField,obj);
+        }
+      }
+    }
+  }
   static interface CharOpenAddressHashSet
     extends AbstractIntegralTypeOpenAddressHashSet{
     public static long word0(Object obj){

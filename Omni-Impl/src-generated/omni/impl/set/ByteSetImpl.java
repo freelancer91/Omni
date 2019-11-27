@@ -4858,6 +4858,136 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Integer.MIN_VALUE;
     }
+    @Override public OmniIterator.OfByte iterator(){
+      int numLeftAndOffset;
+      outer:for(int offset=Byte.MIN_VALUE;;){
+        for(final var word=this.word0;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=-65){
+              if(wordContains(word,1L<<(++offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            numLeftAndOffset+=((Long.bitCount(this.word1)+Long.bitCount(this.word2)+Long.bitCount(this.word3))<<8);
+            break outer;
+          }
+          if(++offset==-64){
+            break;
+          }
+        }
+        for(final var word=this.word1;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=-1){
+              if(wordContains(word,1L<<(++offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            numLeftAndOffset+=((Long.bitCount(this.word2)+Long.bitCount(this.word3))<<8);
+            break outer;
+          }
+          if(++offset==0){
+            break;
+          }
+        }
+        for(final var word=this.word2;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=63){
+              if(wordContains(word,1L<<(++offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            numLeftAndOffset+=(Long.bitCount(this.word3)<<8);
+            break outer;
+          }
+          if(++offset==64){
+            break;
+          }
+        }
+        for(final var word=this.word3;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=Byte.MAX_VALUE){
+              if(wordContains(word,1L<<(++offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            break outer;
+          }
+          if(++offset==128){
+            return AbstractByteSet.EmptyView.EMPTY_ITR;
+          }
+        }
+      }
+      return new UncheckedFullItr.Ascending(this,numLeftAndOffset);
+    }
+    @Override public OmniIterator.OfByte descendingIterator(){
+      int numLeftAndOffset;
+      outer:for(int offset=Byte.MAX_VALUE;;){
+        for(final var word=this.word3;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=64){
+              if(wordContains(word,1L<<(--offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            numLeftAndOffset+=((Long.bitCount(this.word2)+Long.bitCount(this.word1)+Long.bitCount(this.word0))<<8);
+            break outer;
+          }
+          if(--offset==63){
+            break;
+          }
+        }
+        for(final var word=this.word2;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=0){
+              if(wordContains(word,1L<<(--offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            numLeftAndOffset+=((Long.bitCount(this.word1)+Long.bitCount(this.word0))<<8);
+            break outer;
+          }
+          if(--offset==-1){
+            break;
+          }
+        }
+        for(final var word=this.word1;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=-64){
+              if(wordContains(word,1L<<(--offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            numLeftAndOffset+=(Long.bitCount(this.word0)<<8);
+            break outer;
+          }
+          if(--offset==-65){
+            break;
+          }
+        }
+        for(final var word=this.word0;;){
+          if(wordContains(word,1L<<offset)){
+            numLeftAndOffset=(0xff&offset)+(1<<8);
+            while(offset!=Byte.MIN_VALUE){
+              if(wordContains(word,1L<<(--offset))){
+                numLeftAndOffset+=(1<<8);
+              }
+            }
+            break outer;
+          }
+          if(--offset==-129){
+            return AbstractByteSet.EmptyView.EMPTY_ITR;
+          }
+        }
+      }
+      return new UncheckedFullItr.Descending(this,numLeftAndOffset);
+    }
     public static class Ascending extends Unchecked implements Cloneable{
       private static final long serialVersionUID=1L;
       public Ascending(){
@@ -4973,14 +5103,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new UncheckedFullView.Descending(this);
-      }
-      @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
-      @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
       }
     }
     public static class Descending extends Unchecked implements Cloneable{
@@ -5197,12 +5319,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return super.pollFirstInt();
       }
       @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        return super.descendingIterator();
       }
       @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        return super.iterator();
       }
     }
   }
@@ -5862,6 +5982,22 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       return Integer.MIN_VALUE;
     }
+    @Override public OmniIterator.OfByte iterator(){
+      final int numLeft;
+      final int modCountAndSize;
+      if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+        return new CheckedFullItr.Ascending(this,numLeft<<8|(0xff&getThisOrHigher(this)),modCountAndSize&(~0x1ff));
+      }
+      return AbstractByteSet.EmptyView.EMPTY_ITR;
+    }
+    @Override public OmniIterator.OfByte descendingIterator(){
+      final int numLeft;
+      final int modCountAndSize;
+      if((numLeft=(modCountAndSize=this.modCountAndSize)&0x1ff)!=0){
+        return new CheckedFullItr.Descending(this,numLeft<<8|(0xff&getThisOrLower(this)),modCountAndSize&(~0x1ff));
+      }
+      return AbstractByteSet.EmptyView.EMPTY_ITR;
+    }
     public static class Ascending extends Checked implements Cloneable{
       private static final long serialVersionUID=1L;
       public Ascending(){
@@ -6027,14 +6163,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override public OmniNavigableSet.OfByte descendingSet(){
         return new CheckedFullView.Descending(this);
-      }
-      @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
-      @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
       }
     }
     public static class Descending extends Checked implements Cloneable{
@@ -6303,12 +6431,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         return super.pollFirstInt();
       }
       @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        return super.descendingIterator();
       }
       @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        return super.iterator();
       }
     }
   }
@@ -6490,6 +6616,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public boolean removeIf(Predicate<? super Byte> filter){
       return root.removeIf((BytePredicate)filter::test);
     }
+    @Override public OmniIterator.OfByte iterator(){
+      return root.descendingIterator();
+    }
+    @Override public OmniIterator.OfByte descendingIterator(){
+      return root.iterator();
+    }
     private static class Ascending extends UncheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
       private Ascending(ByteSetImpl.Unchecked.Descending root){
@@ -6578,14 +6710,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override public void forEach(Consumer<? super Byte> action){
         forEachAscending(root,action::accept);
-      }
-      @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
-      @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
       }
     }
     private static class Descending extends UncheckedFullView implements Cloneable,Serializable{
@@ -6773,14 +6897,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       @Override public void forEach(Consumer<? super Byte> action){
         forEachDescending(root,action::accept);
-      }
-      @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
-      @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
       }
     }
   }
@@ -7029,6 +7145,12 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     @Override public int pollLastInt(){
       return root.pollLastInt();
     }
+    @Override public OmniIterator.OfByte iterator(){
+      return root.descendingIterator();
+    }
+    @Override public OmniIterator.OfByte descendingIterator(){
+      return root.iterator();
+    }
     private static class Ascending extends CheckedFullView implements Cloneable,Serializable{
       private static final long serialVersionUID=1L;
       private Ascending(ByteSetImpl.Checked.Descending root){
@@ -7222,14 +7344,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           copyToArrayAscending(root,size,dst);
         }
         return dst;
-      }
-      @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
-      @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
       }
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
@@ -7528,14 +7642,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       @Override public int pollLastInt(){
         return super.pollFirstInt();
       }
-      @Override public OmniIterator.OfByte iterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
-      @Override public OmniIterator.OfByte descendingIterator(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
       private static class SerializationIntermediate extends SerializationIntermediateBase{
         private static final long serialVersionUID=1L;
         private SerializationIntermediate(ByteSetImpl.Checked root){
@@ -7563,34 +7669,39 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       this.parent=parent;
       this.size=size;
     }
+    private static void bubbleUpDecrementSize(ByteSetImpl.UncheckedSubSet curr){
+      do{
+        --curr.size;
+      }while((curr=curr.parent)!=null);
+    }
+    private static void bubbleUpIncrementSize(ByteSetImpl.UncheckedSubSet curr){
+      do{
+        ++curr.size;
+      }while((curr=curr.parent)!=null);
+    }
+    private static void checkNullAndBubbleUpDecrementSize(ByteSetImpl.UncheckedSubSet parent){
+      if(parent!=null){
+        bubbleUpDecrementSize(parent);
+      }
+    }
+    private static void checkNullAndBubbleUpModifySize(ByteSetImpl.UncheckedSubSet parent,int delta){
+      while(parent!=null){
+        parent.size+=delta;
+        parent=parent.parent;
+      }
+    }
     abstract void clearImpl();
     @Override public void clear(){
       final int size;
       if((size=this.size)!=0){
         clearImpl();
         this.size=0;
-        bubbleUpModifySize(-size);
+        checkNullAndBubbleUpModifySize(parent,-size);
       }
-    }
-    private void bubbleUpDecrementSize(){
-      for(var parent=this.parent;parent!=null;parent=parent.parent){
-        --parent.size;
-      }
-    }
-    private void bubbleUpModifySize(int delta){
-      for(var parent=this.parent;parent!=null;parent=parent.parent){
-        parent.size+=delta;
-      }
-    }
-    private void bubbleUpIncrementSize(){
-      var curr=this;
-      do{
-        ++curr.size;
-      }while((curr=curr.parent)!=null);
     }
     @Override public boolean add(boolean val){
       if(root.add(val)){
-        bubbleUpIncrementSize();
+        bubbleUpIncrementSize(this);
         return true;
       }
       return false;
@@ -7603,7 +7714,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
     }
     @Override public boolean add(byte val){
       if(root.add(val)){
-        bubbleUpIncrementSize();
+        bubbleUpIncrementSize(this);
         return true;
       }
       return false;
@@ -7789,7 +7900,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((size=this.size)!=0 && (word=(root=this.root).word2)!=(word&=~isInRange(val))){
         root.word2=word;
         this.size=size-1;
-        bubbleUpDecrementSize();
+        checkNullAndBubbleUpDecrementSize(parent);
         return true;
       }
       return false;
@@ -7798,7 +7909,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size;
       if((size=this.size)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         this.size=size-1;
-        bubbleUpDecrementSize();
+        checkNullAndBubbleUpDecrementSize(parent);
         return true;
       }
       return false;
@@ -7807,7 +7918,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size;
       if((size=this.size)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         this.size=size-1;
-        bubbleUpDecrementSize();
+        checkNullAndBubbleUpDecrementSize(parent);
         return true;
       }
       return false;
@@ -7816,7 +7927,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size;
       if((size=this.size)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         this.size=size-1;
-        bubbleUpDecrementSize();
+        checkNullAndBubbleUpDecrementSize(parent);
         return true;
       }
       return false;
@@ -7825,7 +7936,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size;
       if((size=this.size)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         this.size=size-1;
-        bubbleUpDecrementSize();
+        checkNullAndBubbleUpDecrementSize(parent);
         return true;
       }
       return false;
@@ -7834,7 +7945,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size;
       if((size=this.size)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         this.size=size-1;
-        bubbleUpDecrementSize();
+        checkNullAndBubbleUpDecrementSize(parent);
         return true;
       }
       return false;
@@ -7843,7 +7954,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size;
       if((size=this.size)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         this.size=size-1;
-        bubbleUpDecrementSize();
+        checkNullAndBubbleUpDecrementSize(parent);
         return true;
       }
       return false;
@@ -7892,7 +8003,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             break returnFalse;
           }
           this.size=size-1;
-          bubbleUpDecrementSize();
+          checkNullAndBubbleUpDecrementSize(parent);
           return true;
         }
       }
@@ -7903,7 +8014,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size,numRemoved;
       if((size=this.size)!=0 && (numRemoved=removeIfImpl(size,filter))!=0){
         this.size=size-numRemoved;
-        bubbleUpModifySize(-numRemoved);
+        checkNullAndBubbleUpModifySize(parent,-numRemoved);
         return true;
       }
       return false;
@@ -7912,7 +8023,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       final int size,numRemoved;
       if((size=this.size)!=0 && (numRemoved=removeIfImpl(size,filter::test))!=0){
         this.size=size-numRemoved;
-        bubbleUpModifySize(-numRemoved);
+        checkNullAndBubbleUpModifySize(parent,-numRemoved);
         return true;
       }
       return false;
@@ -8441,7 +8552,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 root.word3=(word=root.word3)&(~(1L<<(tail0s=64+Long.numberOfTrailingZeros(word&(-1L<<tail0s)))));
             }
             this.size=size-1;
-            super.bubbleUpDecrementSize();
+            checkNullAndBubbleUpDecrementSize(parent);
             return tail0s;
           }
           return Integer.MIN_VALUE;
@@ -8469,10 +8580,24 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               break;
             }
             this.size=size-1;
-            super.bubbleUpDecrementSize();
+            checkNullAndBubbleUpDecrementSize(parent);
             return lead0s;
           }
           return Integer.MIN_VALUE;
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        final int size;
+        if((size=this.size)!=0){
+          return new UncheckedSubSetItr.Ascending(this,(size<<8)|(0xff&getThisOrHigher(root,inclusiveLo)));
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        final int size;
+        if((size=this.size)!=0){
+          return new UncheckedSubSetItr.Descending(this,(size<<8)|(0xff&getThisOrLower(root)));
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
       }
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Unchecked root,int size,int inclusiveLo){
@@ -8564,14 +8689,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.TailSet.Descending(this,size,inclusiveLo);
-        }
-        @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-        @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
       }
       private static class Descending extends TailSet{
@@ -8767,12 +8884,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return super.pollFirstInt();
         }
         @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.descendingIterator();
         }
         @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.iterator();
         }
       }
     }
@@ -9297,7 +9412,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
               break;
             }
             this.size=size-1;
-            super.bubbleUpDecrementSize();
+            checkNullAndBubbleUpDecrementSize(parent);
             return tail0s;
           }
           return Integer.MIN_VALUE;
@@ -9328,10 +9443,24 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 root.word0=(word=root.word0)&(~(1L<<(lead0s=-64-Long.numberOfLeadingZeros(word&(-1L>>>(-lead0s-1))))));
             }
             this.size=size-1;
-            super.bubbleUpDecrementSize();
+            checkNullAndBubbleUpDecrementSize(parent);
             return lead0s;
           }
           return Integer.MIN_VALUE;
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        final int size;
+        if((size=this.size)!=0){
+          return new UncheckedSubSetItr.Ascending(this,(size<<8)|(0xff&getThisOrHigher(root)));
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        final int size;
+        if((size=this.size)!=0){
+          return new UncheckedSubSetItr.Descending(this,(size<<8)|(0xff&getThisOrLower(root,inclusiveHi)));
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
       }
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Unchecked root,int size,int inclusiveHi){
@@ -9431,14 +9560,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.HeadSet.Descending(this,size,inclusiveHi);
-        }
-        @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-        @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
       }
       private static class Descending extends HeadSet{
@@ -9626,12 +9747,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return super.pollFirstInt();
         }
         @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.descendingIterator();
         }
         @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.iterator();
         }
       }
     }
@@ -10195,7 +10314,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 root.word3=(word=root.word3)&(~(1L<<(tail0s=64+Long.numberOfTrailingZeros(word&(-1L<<tail0s)))));
             }
             this.size=size-1;
-            super.bubbleUpDecrementSize();
+            checkNullAndBubbleUpDecrementSize(parent);
             return tail0s;
           }
           return Integer.MIN_VALUE;
@@ -10226,10 +10345,24 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
                 root.word0=(word=root.word0)&(~(1L<<(lead0s=-64-Long.numberOfLeadingZeros(word&(-1L>>>(-lead0s-1))))));
             }
             this.size=size-1;
-            super.bubbleUpDecrementSize();
+            checkNullAndBubbleUpDecrementSize(parent);
             return lead0s;
           }
           return Integer.MIN_VALUE;
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        final int size;
+        if((size=this.size)!=0){
+          return new UncheckedSubSetItr.Ascending(this,(size<<8)|(0xff&getThisOrHigher(root,this.boundInfo>>8)));
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        final int size;
+        if((size=this.size)!=0){
+          return new UncheckedSubSetItr.Descending(this,(size<<8)|(0xff&getThisOrLower(root,(byte)(this.boundInfo&0xff))));
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
       }
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Unchecked root,int size,int boundInfo){
@@ -10326,14 +10459,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         }
         @Override public OmniNavigableSet.OfByte descendingSet(){
           return new UncheckedSubSet.BodySet.Descending(this,size,boundInfo);
-        }
-        @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-        @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
       }
       private static class Descending extends BodySet{
@@ -10526,12 +10651,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return super.pollFirstInt();
         }
         @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.descendingIterator();
         }
         @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.iterator();
         }
       }
     }    
@@ -10552,6 +10675,28 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       this.parent=parent;
       this.modCountAndSize=modCountAndSize;
     }
+    private static void bubbleUpDecrementModCountAndSize(ByteSetImpl.CheckedSubSet curr){
+      do{
+        curr.modCountAndSize+=((1<<9)-1);
+      }while((curr=curr.parent)!=null);
+    }
+    private static void checkNullAndBubbleUpModify(ByteSetImpl.CheckedSubSet parent,int modCountDiff){
+      while(parent!=null){
+        parent.modCountAndSize+=modCountDiff;
+        parent=parent.parent;
+      }
+    }
+    private static void checkNullAndBubbleUpIncrementModCountAndSize(ByteSetImpl.CheckedSubSet parent){
+      while(parent!=null){
+        parent.modCountAndSize+=((1<<9)+1);
+        parent=parent.parent;
+      }
+    }
+    private static void checkNullAndBubbleUpDecrementModCountAndSize(ByteSetImpl.CheckedSubSet parent){
+      if(parent!=null){
+        bubbleUpDecrementModCountAndSize(parent);
+      }
+    }
     abstract void clearImpl(ByteSetImpl.Checked root);
     @Override public void clear(){
       final ByteSetImpl.Checked root;
@@ -10562,18 +10707,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         clearImpl(root);
         root.modCountAndSize=rootModCountAndSize+(size=(1<<9)-size);
         this.modCountAndSize=modCountAndSize+size;
-        bubbleUpModify(size);
-      }
-    }
-    private void incrementModCountAndSize(){
-      var curr=this;
-      do{
-        curr.modCountAndSize+=((1<<9)+1);
-      }while((curr=curr.parent)!=null);
-    }
-    private void bubbleUpModify(int modCountDiff){
-      for(var curr=parent;curr!=null;curr=curr.parent){
-        curr.modCountAndSize+=modCountDiff;
+        checkNullAndBubbleUpModify(parent,size);
       }
     }
     @Override public int size(){
@@ -10680,7 +10814,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         root.word2=word;
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpModify((1<<9)-1);
+        checkNullAndBubbleUpDecrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -10692,7 +10826,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpModify((1<<9)-1);
+        checkNullAndBubbleUpDecrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -10704,7 +10838,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpModify((1<<9)-1);
+        checkNullAndBubbleUpDecrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -10716,7 +10850,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && isInRange(val) && ByteSetImpl.removeVal(root,val)){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpModify((1<<9)-1);
+        checkNullAndBubbleUpDecrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -10728,7 +10862,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpModify((1<<9)-1);
+        checkNullAndBubbleUpDecrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -10740,7 +10874,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpModify((1<<9)-1);
+        checkNullAndBubbleUpDecrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -10752,7 +10886,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       if((modCountAndSize&0x1ff)!=0 && ByteSetImpl.removeVal(root,isInRange(val))){
         root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
         this.modCountAndSize=modCountAndSize+((1<<9)-1);
-        bubbleUpModify((1<<9)-1);
+        checkNullAndBubbleUpDecrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -10803,7 +10937,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           }
           root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
           this.modCountAndSize=modCountAndSize+((1<<9)-1);
-          bubbleUpModify((1<<9)-1);
+          checkNullAndBubbleUpDecrementModCountAndSize(parent);
           return true;
         }
       }
@@ -10929,7 +11063,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if((size=removeIfImpl(root=this.root,size,filter,modCountAndSize))!=0){
           root.modCountAndSize+=(size=(1<<9)-size);
           this.modCountAndSize=modCountAndSize+size;
-          bubbleUpModify(size);
+          checkNullAndBubbleUpModify(parent,size);
           return true;
         }
       }else{
@@ -10945,7 +11079,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         if((size=removeIfImpl(root=this.root,size,filter::test,modCountAndSize))!=0){
           root.modCountAndSize+=(size=(1<<9)-size);
           this.modCountAndSize=modCountAndSize+size;
-          bubbleUpModify(size);
+          checkNullAndBubbleUpModify(parent,size);
           return true;
         }
       }else{
@@ -11033,10 +11167,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
         root.word2=word;
         root.modCountAndSize=rootModCountAndSize+((1<<9)+1);
         this.modCountAndSize=modCountAndSize+((1<<9)+1);
-        final CheckedSubSet parent;
-        if((parent=this.parent)!=null){
-          parent.incrementModCountAndSize();
-        }
+        checkNullAndBubbleUpIncrementModCountAndSize(parent);
         return true;
       }
       return false;
@@ -11077,10 +11208,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
       }
       root.modCountAndSize=rootModCountAndSize+((1<<9)+1);
       this.modCountAndSize=modCountAndSize+((1<<9)+1);
-      final CheckedSubSet parent;
-      if((parent=this.parent)!=null){
-        parent.incrementModCountAndSize();
-      }
+      checkNullAndBubbleUpIncrementModCountAndSize(parent);
       return true;
     }
     private static abstract class TailSet extends CheckedSubSet{
@@ -11720,7 +11848,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
             this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpModify((1<<9)-1);
+            checkNullAndBubbleUpDecrementModCountAndSize(parent);
             return tail0s;
           }
           return Integer.MIN_VALUE;
@@ -11750,10 +11878,30 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
             this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpModify((1<<9)-1);
+            checkNullAndBubbleUpDecrementModCountAndSize(parent);
             return lead0s;
           }
           return Integer.MIN_VALUE;
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        int modCountAndSize;
+        final int modCount;
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCount=(modCountAndSize=this.modCountAndSize)&~0x1ff,((root=this.root).modCountAndSize)&~0x1ff);
+        if((modCountAndSize&=0x1ff)!=0){
+          return new CheckedSubSetItr.Ascending(this,(modCountAndSize<<8)|(0xff&getThisOrHigher(root,inclusiveLo)),modCount|128);
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        int modCountAndSize;
+        final int modCount;
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCount=(modCountAndSize=this.modCountAndSize)&~0x1ff,((root=this.root).modCountAndSize)&~0x1ff);
+        if((modCountAndSize&=0x1ff)!=0){
+          return new CheckedSubSetItr.Descending(this,(modCountAndSize<<8)|(0xff&getThisOrLower(root)),modCount|128);
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
       }
       private static class Ascending extends TailSet{
         private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int inclusiveLo){
@@ -11867,14 +12015,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int modCountAndSize;
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.TailSet.Descending(this,modCountAndSize,this.inclusiveLo);
-        }
-        @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-        @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
       }
       private static class Descending extends TailSet{
@@ -12092,12 +12232,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return super.pollFirstInt();
         }
         @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.descendingIterator();
         }
         @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.iterator();
         }
       }
     }
@@ -12735,7 +12873,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
             this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpModify((1<<9)-1);
+            checkNullAndBubbleUpDecrementModCountAndSize(parent);
             return tail0s;
           }
           return Integer.MIN_VALUE;
@@ -12768,10 +12906,30 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
             this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpModify((1<<9)-1);
+            checkNullAndBubbleUpDecrementModCountAndSize(parent);
             return lead0s;
           }
           return Integer.MIN_VALUE;
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        int modCountAndSize;
+        final int modCount;
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCount=(modCountAndSize=this.modCountAndSize)&~0x1ff,((root=this.root).modCountAndSize)&~0x1ff);
+        if((modCountAndSize&=0x1ff)!=0){
+          return new CheckedSubSetItr.Ascending(this,(modCountAndSize<<8)|(0xff&getThisOrHigher(root)),modCount|128);
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        int modCountAndSize;
+        final int modCount;
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCount=(modCountAndSize=this.modCountAndSize)&~0x1ff,((root=this.root).modCountAndSize)&~0x1ff);
+        if((modCountAndSize&=0x1ff)!=0){
+          return new CheckedSubSetItr.Descending(this,(modCountAndSize<<8)|(0xff&getThisOrLower(root,inclusiveHi)),modCount|128);
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
       }
       private static class Ascending extends HeadSet{
         private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int inclusiveHi){
@@ -12893,14 +13051,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int modCountAndSize;
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.HeadSet.Descending(this,modCountAndSize,this.inclusiveHi);
-        }
-        @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-        @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
       }
       private static class Descending extends HeadSet{
@@ -13110,12 +13260,10 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return super.pollFirstInt();
         }
         @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.descendingIterator();
         }
         @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.iterator();
         }
       }
     }
@@ -13846,7 +13994,7 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
             this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpModify((1<<9)-1);
+            checkNullAndBubbleUpDecrementModCountAndSize(parent);
             return tail0s;
           }
           return Integer.MIN_VALUE;
@@ -13879,10 +14027,30 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
             }
             root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
             this.modCountAndSize=modCountAndSize+((1<<9)-1);
-            super.bubbleUpModify((1<<9)-1);
+            checkNullAndBubbleUpDecrementModCountAndSize(parent);
             return lead0s;
           }
           return Integer.MIN_VALUE;
+      }
+      @Override public OmniIterator.OfByte iterator(){
+        int modCountAndSize;
+        final int modCount;
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCount=(modCountAndSize=this.modCountAndSize)&~0x1ff,((root=this.root).modCountAndSize)&~0x1ff);
+        if((modCountAndSize&=0x1ff)!=0){
+          return new CheckedSubSetItr.Ascending(this,(modCountAndSize<<8)|(0xff&getThisOrHigher(root,this.boundInfo>>8)),modCount|128);
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
+      }
+      @Override public OmniIterator.OfByte descendingIterator(){
+        int modCountAndSize;
+        final int modCount;
+        final ByteSetImpl.Checked root;
+        CheckedCollection.checkModCount(modCount=(modCountAndSize=this.modCountAndSize)&~0x1ff,((root=this.root).modCountAndSize)&~0x1ff);
+        if((modCountAndSize&=0x1ff)!=0){
+          return new CheckedSubSetItr.Descending(this,(modCountAndSize<<8)|(0xff&getThisOrLower(root,(byte)(this.boundInfo&0xff))),modCount|128);
+        }
+        return AbstractByteSet.EmptyView.EMPTY_ITR;
       }
       private static class Ascending extends BodySet{
         private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int boundInfo){
@@ -13981,14 +14149,6 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           final int modCountAndSize;
           CheckedCollection.checkModCount((modCountAndSize=this.modCountAndSize)&(~0x1ff),root.modCountAndSize&(~0x1ff));
           return new CheckedSubSet.BodySet.Descending(this,modCountAndSize,this.boundInfo);
-        }
-        @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-        @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
         }
       }
       private static class Descending extends BodySet{
@@ -14183,227 +14343,500 @@ public abstract class ByteSetImpl extends AbstractByteSet.ComparatorlessImpl imp
           return super.pollFirstInt();
         }
         @Override public OmniIterator.OfByte iterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.descendingIterator();
         }
         @Override public OmniIterator.OfByte descendingIterator(){
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          return super.iterator();
         }
       }
     }
   }
-  private static abstract class UncheckedFullItr extends AbstractByteItr{
-    final ByteSetImpl root;
-    int offset;
-    private UncheckedFullItr(ByteSetImpl root,int offset){
-      this.root=root;
-      this.offset=offset;
+  private static abstract class AbstractItrImpl extends AbstractByteItr{
+    int numLeftAndOffset;
+    private AbstractItrImpl(int numLeftAndOffset){
+      this.numLeftAndOffset=numLeftAndOffset;
     }
-    private void forEachRemainingAscending(int offset,ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @Override public boolean hasNext(){
+      return this.numLeftAndOffset>=(1<<8);
     }
-    private void forEachRemainingDescending(int offset,ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    private static class Ascending extends UncheckedFullItr{
-      private Ascending(ByteSetImpl root,int offset){
-        super(root,offset);
+    abstract void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action);
+    @Override public void forEachRemaining(ByteConsumer action){
+      final int numLeftAndOffset;
+      if((numLeftAndOffset=this.numLeftAndOffset)>=(1<<8)){
+        forEachRemainingImpl(numLeftAndOffset,action);
       }
-      @Override public boolean hasNext(){
-        return this.offset!=128;
+    }
+    @Override public void forEachRemaining(Consumer<? super Byte> action){
+      final int numLeftAndOffset;
+      if((numLeftAndOffset=this.numLeftAndOffset)>=(1<<8)){
+        forEachRemainingImpl(numLeftAndOffset,action::accept);
       }
-      @Override public byte nextByte(){
-        final int ret;
-        if((ret=this.offset)!=Byte.MAX_VALUE){
-          this.offset=getThisOrHigher(root,ret+1);
-        }else{
-          this.offset=128;
+    }
+    private static byte ascendingForEachRemaining(int numLeftAndOffset,ByteSetImpl root,ByteConsumer action){
+      byte lastRet;
+      int offset;
+      action.accept(lastRet=(byte)(offset=numLeftAndOffset&0xff));
+      if((numLeftAndOffset-=(1<<8))>=(1<<8)){
+        outer:switch((++offset)>>6){
+          case 2: // [-127 -> -65]
+            for(final var word=root.word0;;){
+              if(wordContains(word,1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(++offset==192){
+                break;
+              }
+            }
+          case 3: // [ -64 ->  -1]
+            for(final var word=root.word1;;){
+              if(wordContains(word,1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(++offset==256){
+                break;
+              }
+            }
+          case 0: // [   0 ->  63]
+            for(final var word=root.word2;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              ++offset;
+              if(mask==Long.MIN_VALUE){
+                break;
+              }
+            }
+          case 1: // [  64 -> 127]
+            for(final var word=root.word3;;++offset){
+              if(wordContains(word,1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break;
+                }
+              }
+            }
         }
-        return (byte)ret;
       }
-      @Override public void remove(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+      return lastRet;
+    }
+    private static byte descendingForEachRemaining(int numLeftAndOffset,ByteSetImpl root,ByteConsumer action){
+      int offset;
+      byte lastRet;
+      action.accept(lastRet=(byte)(offset=numLeftAndOffset&0xff));
+      if((numLeftAndOffset-=(1<<8))>=(1<<8)){
+        outer:switch((--offset)>>6){
+          case 1: // [126 -> 64]
+            for(final var word=root.word3;;){
+              if(wordContains(word,1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(--offset==63){
+                break;
+              }
+            }
+          case 0: // [63 -> 0]
+            for(final var word=root.word2;;){
+              if(wordContains(word,1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              if(--offset==-1){
+                break;
+              }
+            }
+          case 3: // [-1 -> -64]
+            for(final var word=root.word1;;){
+              final long mask;
+              if(wordContains(word,mask=1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break outer;
+                }
+              }
+              --offset;
+              if(mask==1L){
+                break;
+              }
+            }
+          case 2: // [-65 -> -128]
+            for(final var word=root.word0;;--offset){
+              if(wordContains(word,1L<<offset)){
+                action.accept(lastRet=(byte)offset);
+                if((numLeftAndOffset-=(1<<8))<(1<<8)){
+                  break;
+                }
+              }
+            }
+        }
+      }
+      return lastRet;
+    }
+  }
+  private static abstract class AbstractUncheckedItr extends AbstractItrImpl{
+    private AbstractUncheckedItr(int numLeftAndOffset){
+      super(numLeftAndOffset);
+    }
+    abstract int getNextVal(int currOffset);
+    @Override public byte nextByte(){
+      final int numLeftAndOffset;
+      final var ret=(byte)(0xff&(numLeftAndOffset=this.numLeftAndOffset));
+      if(numLeftAndOffset<=(1<<8)){
+        //only one value is left, so no need to search for the next
+        this.numLeftAndOffset=0;
+      }else{
+        this.numLeftAndOffset=(numLeftAndOffset-(1<<8))|((0xff)&getNextVal(ret));
+      }
+      return ret;
+    }
+  }
+  private static abstract class UncheckedSubSetItr extends AbstractUncheckedItr{
+    final ByteSetImpl.UncheckedSubSet parent;
+    int lastRet;
+    private UncheckedSubSetItr(ByteSetImpl.UncheckedSubSet parent,int numLeftAndOffset){
+      super(numLeftAndOffset);
+      this.parent=parent;
+    }
+    private UncheckedSubSetItr(ByteSetImpl.UncheckedSubSet parent,int numLeftAndOffset,int lastRet){
+      super(numLeftAndOffset);
+      this.parent=parent;
+      this.lastRet=lastRet;
+    }
+    @Override public void remove(){
+      final int lastRet;
+      final var mask=1L<<(lastRet=this.lastRet);
+      final ByteSetImpl.UncheckedSubSet parent;
+      ByteSetImpl.UncheckedSubSet.bubbleUpDecrementSize(parent=this.parent);
+      switch(lastRet>>6){
+        case -2:
+          parent.root.word0-=mask;
+          break;
+        case -1:
+          parent.root.word1-=mask;
+          break;
+        case 0:
+          parent.root.word2-=mask;
+          break;
+        default:
+          parent.root.word3-=mask;
+      }
+    }
+    private static class Ascending extends UncheckedSubSetItr{
+      private Ascending(ByteSetImpl.UncheckedSubSet parent,int numLeftAndOffset){
+        super(parent,numLeftAndOffset);
+      }
+      private Ascending(ByteSetImpl.UncheckedSubSet parent,int numLeftAndOffset,int lastRet){
+        super(parent,numLeftAndOffset,lastRet);
       }
       @Override public Object clone(){
-        return new Ascending(this.root,this.offset);
+        return new Ascending(this.parent,this.numLeftAndOffset,this.lastRet);
       }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offset)!=128){
-          super.forEachRemainingAscending(offset,action);
-        }
+      @Override int getNextVal(int currOffset){
+        this.lastRet=currOffset;
+        return getThisOrHigher(parent.root,currOffset+1);
       }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offset)!=128){
-          super.forEachRemainingAscending(offset,action::accept);
-        }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        this.lastRet=AbstractItrImpl.ascendingForEachRemaining(numLeftAndOffset,parent.root,action);
+        this.numLeftAndOffset=0;
+      }
+    }
+    private static class Descending extends UncheckedSubSetItr{
+      private Descending(ByteSetImpl.UncheckedSubSet parent,int numLeftAndOffset){
+        super(parent,numLeftAndOffset);
+      }
+      private Descending(ByteSetImpl.UncheckedSubSet parent,int numLeftAndOffset,int lastRet){
+        super(parent,numLeftAndOffset,lastRet);
+      }
+      @Override public Object clone(){
+        return new Descending(this.parent,this.numLeftAndOffset,this.lastRet);
+      }
+      @Override int getNextVal(int currOffset){
+        this.lastRet=currOffset;
+        return getThisOrLower(parent.root,currOffset-1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        this.lastRet=AbstractItrImpl.descendingForEachRemaining(numLeftAndOffset,parent.root,action);
+        this.numLeftAndOffset=0;
+      }
+    }
+  }
+  private static abstract class UncheckedFullItr extends AbstractUncheckedItr{
+    final ByteSetImpl.Unchecked root;
+    int lastRet;
+    private UncheckedFullItr(ByteSetImpl.Unchecked root,int numLeftAndOffset){
+      super(numLeftAndOffset);
+      this.root=root;
+    }
+    private UncheckedFullItr(ByteSetImpl.Unchecked root,int numLeftAndOffset,int lastRet){
+      super(numLeftAndOffset);
+      this.root=root;
+      this.lastRet=lastRet;
+    }
+    @Override public void remove(){
+      final int lastRet;
+      final var mask=1L<<(lastRet=this.lastRet);
+      switch(lastRet>>6){
+        case -2:
+          root.word0-=mask;
+          break;
+        case -1:
+          root.word1-=mask;
+          break;
+        case 0:
+          root.word2-=mask;
+          break;
+        default:
+          root.word3-=mask;
+      }
+    }
+    private static class Ascending extends UncheckedFullItr{
+      private Ascending(ByteSetImpl.Unchecked root,int numLeftAndOffset){
+        super(root,numLeftAndOffset);
+      }
+      private Ascending(ByteSetImpl.Unchecked root,int numLeftAndOffset,int lastRet){
+        super(root,numLeftAndOffset,lastRet);
+      }
+      @Override public Object clone(){
+        return new Ascending(this.root,this.numLeftAndOffset,this.lastRet);
+      }
+      @Override int getNextVal(int currOffset){
+        this.lastRet=currOffset;
+        return getThisOrHigher(root,currOffset+1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        this.lastRet=AbstractItrImpl.ascendingForEachRemaining(numLeftAndOffset,root,action);
+        this.numLeftAndOffset=0;
       }
     }
     private static class Descending extends UncheckedFullItr{
-      private Descending(ByteSetImpl root,int offset){
-        super(root,offset);
+      private Descending(ByteSetImpl.Unchecked root,int numLeftAndOffset){
+        super(root,numLeftAndOffset);
       }
-      @Override public boolean hasNext(){
-        return this.offset!=-129;
-      }
-      @Override public byte nextByte(){
-        final int ret;
-        if((ret=this.offset)!=Byte.MIN_VALUE){
-          this.offset=getThisOrLower(root,ret-1);
-        }else{
-          this.offset=-129;
-        }
-        return (byte)ret;
-      }
-      @Override public void remove(){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+      private Descending(ByteSetImpl.Unchecked root,int numLeftAndOffset,int lastRet){
+        super(root,numLeftAndOffset,lastRet);
       }
       @Override public Object clone(){
-        return new Descending(this.root,this.offset);
+        return new Descending(this.root,this.numLeftAndOffset,this.lastRet);
       }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offset)!=129){
-          super.forEachRemainingDescending(offset,action);
-        }
+      @Override int getNextVal(int currOffset){
+        this.lastRet=currOffset;
+        return getThisOrLower(root,currOffset-1);
       }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offset)!=-129){
-          super.forEachRemainingDescending(offset,action::accept);
-        }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        this.lastRet=AbstractItrImpl.descendingForEachRemaining(numLeftAndOffset,root,action);
+        this.numLeftAndOffset=0;
       }
     }
   }
-  private static abstract class CheckedFullItr extends AbstractByteItr{
-    final ByteSetImpl.Checked root;
-    int modCountAndSize;
-    int offsetAndLastRet;
-    private CheckedFullItr(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
-      this.root=root;
-      this.modCountAndSize=modCountAndSize;
-      this.offsetAndLastRet=offsetAndLastRet;
+  private static abstract class AbstractCheckedItr extends AbstractItrImpl{
+    int modCountAndLastRet;
+    private AbstractCheckedItr(int numLeftAndOffset,int modCountAndLastRet){
+      super(numLeftAndOffset);
+      this.modCountAndLastRet=modCountAndLastRet;
     }
-    abstract byte nextImpl(ByteSetImpl.Checked root);
+    abstract ByteSetImpl.Checked getRoot();
+    abstract int getNextVal(ByteSetImpl.Checked root,int currOffset);
     @Override public byte nextByte(){
       final ByteSetImpl.Checked root;
-      CheckedCollection.checkModCount(modCountAndSize,(root=this.root).modCountAndSize);
-      return nextImpl(root);
+      final int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCountAndLastRet&~0x1ff,(root=getRoot()).modCountAndSize&~0x1ff);
+      final int numLeftAndOffset;
+      final int offset=((numLeftAndOffset=this.numLeftAndOffset)&0xff);
+      final byte ret;
+      final int numLeft;
+      switch(numLeft=numLeftAndOffset>>8){
+        case 0:
+          throw new NoSuchElementException();
+        case 1:
+          this.numLeftAndOffset=0;
+          ret=(byte)offset;
+          break;
+        default:
+          this.numLeftAndOffset=(numLeft-1)<<8|(0xff&getNextVal(root,ret=(byte)offset));
+      }
+      this.modCountAndLastRet=modCount|offset;
+      return ret;
     }
-    private void forEachRemainingAscending(int offset,ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    private void forEachRemainingDescending(int offset,ByteConsumer action){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+  }
+  private static abstract class CheckedSubSetItr extends AbstractCheckedItr{
+    final ByteSetImpl.CheckedSubSet parent;
+    private CheckedSubSetItr(ByteSetImpl.CheckedSubSet parent,int numLeftAndOffset,int modCountAndLastRet){
+      super(numLeftAndOffset,modCountAndLastRet);
+      this.parent=parent;
     }
     @Override public void remove(){
-      final int offsetAndLastRet;
+      int modCountAndLastRet;
       final int lastRet;
-      if((lastRet=(offsetAndLastRet=this.offsetAndLastRet)&0x1ff)!=0x1ff){
-        int modCountAndSize;
+      if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)!=128){
         final ByteSetImpl.Checked root;
-        CheckedCollection.checkModCount(modCountAndSize=this.modCountAndSize,(root=this.root).modCountAndSize);
-        root.modCountAndSize=(modCountAndSize+=((1<<9)-1));
-        this.modCountAndSize=modCountAndSize;
-        final byte b;
-        switch((b=(byte)lastRet)>>6){
-          case -2:
-            root.word0-=(1L<<b);
-            break;
-          case -1:
-            root.word1-=(1L<<b);
-            break;
-          case 0:
-            root.word2-=(1L<<b);
-            break;
+        final ByteSetImpl.CheckedSubSet parent;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),(rootModCountAndSize=(root=(parent=this.parent).root).modCountAndSize)&~0x1ff);
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        ByteSetImpl.CheckedSubSet.bubbleUpDecrementModCountAndSize(parent);
+        this.modCountAndLastRet=modCountAndLastRet|128;
+        final var mask=1L<<lastRet;
+        switch(lastRet>>6){
+          case 3:
+            root.word1-=mask;
+            return;
+          case 2:
+            root.word0-=mask;
+            return;
+          case 1:
+            root.word3-=mask;
+            return;
           default:
-            root.word3-=(1L<<b);
+            root.word2-=mask;
+            return;
         }
-        this.offsetAndLastRet=offsetAndLastRet|0x1ff;
-        return;
       }
       throw new IllegalStateException();
     }
-    private static class Ascending extends CheckedFullItr{
-      private Ascending(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
-        super(root,modCountAndSize,offsetAndLastRet);
-      }
-      @Override public boolean hasNext(){
-        return (this.offsetAndLastRet>>9)!=128;
-      }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=128){
-          super.forEachRemainingAscending(offset,action);
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=128){
-          super.forEachRemainingAscending(offset,action::accept);
-        }
+    @Override ByteSetImpl.Checked getRoot(){
+      return this.parent.root;
+    }
+    private static class Ascending extends CheckedSubSetItr{
+      private Ascending(ByteSetImpl.CheckedSubSet parent,int numLeftAndOffset,int modCountAndLastRet){
+        super(parent,numLeftAndOffset,modCountAndLastRet);
       }
       @Override public Object clone(){
-        return new Ascending(this.root,this.modCountAndSize,this.offsetAndLastRet);
+        return new Ascending(this.parent,this.numLeftAndOffset,this.modCountAndLastRet);
       }
-      @Override byte nextImpl(ByteSetImpl.Checked root){
-        final int offset;
-        switch(offset=(this.offsetAndLastRet)>>9){
-          case 128:
-            throw new NoSuchElementException();
-          case Byte.MAX_VALUE:
-            this.offsetAndLastRet=0x1007f;//(128<<9)|(Byte.MAX_VALUE)
-            return Byte.MAX_VALUE;
-          default:
-            final byte ret;
-            this.offsetAndLastRet=(getThisOrHigher(root,offset+1)<<9)|((ret=(byte)offset)&0x1ff);
-            return ret;
+      @Override int getNextVal(ByteSetImpl.Checked root,int currOffset){
+        return getThisOrHigher(root,currOffset+1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        int modCountAndLastRet=this.modCountAndLastRet;
+        final var root=this.parent.root;
+        byte lastRet;
+        try{
+          lastRet=AbstractItrImpl.ascendingForEachRemaining(numLeftAndOffset,root,action);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndLastRet,this.modCountAndLastRet,modCountAndLastRet&=~0x1ff,root.modCountAndSize&~0x1ff);
         }
+        this.numLeftAndOffset=0;
+        this.modCountAndLastRet=modCountAndLastRet|(lastRet&0xff);
+      }
+    }
+    private static class Descending extends CheckedSubSetItr{
+      private Descending(ByteSetImpl.CheckedSubSet parent,int numLeftAndOffset,int modCountAndLastRet){
+        super(parent,numLeftAndOffset,modCountAndLastRet);
+      }
+      @Override public Object clone(){
+        return new Descending(this.parent,this.numLeftAndOffset,this.modCountAndLastRet);
+      }
+      @Override int getNextVal(ByteSetImpl.Checked root,int currOffset){
+        return getThisOrLower(root,currOffset-1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        int modCountAndLastRet=this.modCountAndLastRet;
+        final var root=this.parent.root;
+        byte lastRet;
+        try{
+          lastRet=AbstractItrImpl.descendingForEachRemaining(numLeftAndOffset,root,action);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndLastRet,this.modCountAndLastRet,modCountAndLastRet&=~0x1ff,root.modCountAndSize&~0x1ff);
+        }
+        this.numLeftAndOffset=0;
+        this.modCountAndLastRet=modCountAndLastRet|(lastRet&0xff);
+      }
+    }
+  }
+  private static abstract class CheckedFullItr extends AbstractCheckedItr{
+    final ByteSetImpl.Checked root;
+    private CheckedFullItr(ByteSetImpl.Checked root,int numLeftAndOffset,int modCountAndLastRet){
+      super(numLeftAndOffset,modCountAndLastRet);
+      this.root=root;
+    }
+    @Override public void remove(){
+      int modCountAndLastRet;
+      final int lastRet;
+      if((lastRet=(modCountAndLastRet=this.modCountAndLastRet)&0x1ff)!=128){
+        final ByteSetImpl.Checked root;
+        final int rootModCountAndSize;
+        CheckedCollection.checkModCount(modCountAndLastRet&=(~0x1ff),(rootModCountAndSize=(root=this.root).modCountAndSize)&~0x1ff);
+        root.modCountAndSize=rootModCountAndSize+((1<<9)-1);
+        this.modCountAndLastRet=modCountAndLastRet|128;
+        final var mask=1L<<lastRet;
+        switch(lastRet>>6){
+          case 3:
+            root.word1-=mask;
+            return;
+          case 2:
+            root.word0-=mask;
+            return;
+          case 1:
+            root.word3-=mask;
+            return;
+          default:
+            root.word2-=mask;
+            return;
+        }
+      }
+      throw new IllegalStateException();
+    }
+    @Override ByteSetImpl.Checked getRoot(){
+      return this.root;
+    }
+    private static class Ascending extends CheckedFullItr{
+      private Ascending(ByteSetImpl.Checked root,int numLeftAndOffset,int modCountAndLastRet){
+        super(root,numLeftAndOffset,modCountAndLastRet);
+      }
+      @Override public Object clone(){
+        return new Ascending(this.root,this.numLeftAndOffset,this.modCountAndLastRet);
+      }
+      @Override int getNextVal(ByteSetImpl.Checked root,int currOffset){
+        return getThisOrHigher(root,currOffset+1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        int modCountAndLastRet=this.modCountAndLastRet;
+        final var root=this.root;
+        byte lastRet;
+        try{
+          lastRet=AbstractItrImpl.ascendingForEachRemaining(numLeftAndOffset,root,action);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndLastRet,this.modCountAndLastRet,modCountAndLastRet&=~0x1ff,root.modCountAndSize&~0x1ff);
+        }
+        this.numLeftAndOffset=0;
+        this.modCountAndLastRet=modCountAndLastRet|(lastRet&0xff);
       }
     }
     private static class Descending extends CheckedFullItr{
-      private Descending(ByteSetImpl.Checked root,int modCountAndSize,int offsetAndLastRet){
-        super(root,modCountAndSize,offsetAndLastRet);
-      }
-      @Override public boolean hasNext(){
-        return (this.offsetAndLastRet>>9)!=-129;
-      }
-      @Override public void forEachRemaining(ByteConsumer action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=-129){
-          super.forEachRemainingDescending(offset,action);
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int offset;
-        if((offset=this.offsetAndLastRet>>9)!=-129){
-          super.forEachRemainingDescending(offset,action::accept);
-        }
+      private Descending(ByteSetImpl.Checked root,int numLeftAndOffset,int modCountAndLastRet){
+        super(root,numLeftAndOffset,modCountAndLastRet);
       }
       @Override public Object clone(){
-        return new Descending(this.root,this.modCountAndSize,this.offsetAndLastRet);
+        return new Descending(this.root,this.numLeftAndOffset,this.modCountAndLastRet);
       }
-      @Override byte nextImpl(ByteSetImpl.Checked root){
-        final int offset;
-        switch(offset=(this.offsetAndLastRet)>>9){
-          case -129:
-            throw new NoSuchElementException();
-          case Byte.MIN_VALUE:
-            this.offsetAndLastRet=0xfffeff80;//(-129<<9)|(0x1ff&((byte)Byte.MIN_VALUE))
-            return Byte.MIN_VALUE;
-          default:
-            final byte ret;
-            this.offsetAndLastRet=(getThisOrLower(root,offset-1)<<9)|((ret=(byte)offset)&0x1ff);
-            return ret;
+      @Override int getNextVal(ByteSetImpl.Checked root,int currOffset){
+        return getThisOrLower(root,currOffset-1);
+      }
+      @Override void forEachRemainingImpl(int numLeftAndOffset,ByteConsumer action){
+        int modCountAndLastRet=this.modCountAndLastRet;
+        final var root=this.root;
+        byte lastRet;
+        try{
+          lastRet=AbstractItrImpl.descendingForEachRemaining(numLeftAndOffset,root,action);
+        }finally{
+          CheckedCollection.checkModCount(modCountAndLastRet,this.modCountAndLastRet,modCountAndLastRet&=~0x1ff,root.modCountAndSize&~0x1ff);
         }
+        this.numLeftAndOffset=0;
+        this.modCountAndLastRet=modCountAndLastRet|(lastRet&0xff);
       }
     }
   }
