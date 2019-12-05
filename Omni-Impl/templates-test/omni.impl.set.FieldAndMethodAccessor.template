@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import omni.impl.AbstractBooleanItr;
-import omni.impl.AbstractByteItr;
 import java.io.ObjectOutputStream;
 
 final class FieldAndMethodAccessor{
@@ -461,7 +460,7 @@ static interface CLASSPREFIXSetImpl extends AbstractCLASSPREFIXSet{
   }
 }
 #ELSEIFSWITCH CLASSPREFIX==Byte
-//TODO ByteSet
+//TODO write, read, clone
 static interface AbstractByteSet{
   static interface EmptyView extends AbstractByteSet{
     static final omni.impl.AbstractByteItr EMPTY_ITR=omni.impl.set.AbstractByteSet.EmptyView.EMPTY_ITR;
@@ -470,8 +469,8 @@ static interface AbstractByteSet{
         return ((omni.impl.set.AbstractByteSet.EmptyView.Checked)obj).after;
       }
     }
-    static final omni.impl.set.AbstractByteSet.EmptyView ASCENDING=omni.impl.set.AbstractByteSet.EmpyView.ASCENDING;
-    static final omni.impl.set.AbstractByteSet.EmptyView DESCENDING=omni.impl.set.AbstractByteSet.EmpyView.DESCENDING;
+    static final omni.impl.set.AbstractByteSet.EmptyView ASCENDING=omni.impl.set.AbstractByteSet.EmptyView.ASCENDING;
+    static final omni.impl.set.AbstractByteSet.EmptyView DESCENDING=omni.impl.set.AbstractByteSet.EmptyView.DESCENDING;
   }
 }
 static interface ByteSetImpl extends AbstractByteSet{
@@ -513,6 +512,7 @@ static interface ByteSetImpl extends AbstractByteSet{
       static long word3(Object obj){
         return ((omni.impl.set.ByteSetImpl.Unchecked.Ascending)obj).word3;
       }
+      
     }
     static interface Descending extends Unchecked{
       static long word0(Object obj){
@@ -774,7 +774,7 @@ static interface ByteSetImpl extends AbstractByteSet{
   static interface CheckedSubSet extends AbstractByteSet{
     static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","root");
     static final Field parentField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","parent");
-    static final Field modCountAndSizeFIeld=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","modCountAndSize");
+    static final Field modCountAndSizeField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","modCountAndSize");
     public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
       return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
     }
@@ -955,7 +955,7 @@ static interface ByteSetImpl extends AbstractByteSet{
       }
     }
   }
-  static interface UncheckedFullItr{
+  static interface UncheckedFullItr extends AbstractItrImpl{
     static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedFullItr","root");
     static final Field lastRetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedFullItr","lastRet");
     

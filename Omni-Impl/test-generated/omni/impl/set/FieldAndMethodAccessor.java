@@ -477,8 +477,8 @@ final class FieldAndMethodAccessor{
           return ((omni.impl.set.AbstractByteSet.EmptyView.Checked)obj).after;
         }
       }
-      static final omni.impl.set.AbstractByteSet.EmptyView ASCENDING=omni.impl.set.AbstractByteSet.EmpyView.ASCENDING;
-      static final omni.impl.set.AbstractByteSet.EmptyView DESCENDING=omni.impl.set.AbstractByteSet.EmpyView.DESCENDING;
+      static final omni.impl.set.AbstractByteSet.EmptyView ASCENDING=omni.impl.set.AbstractByteSet.EmptyView.ASCENDING;
+      static final omni.impl.set.AbstractByteSet.EmptyView DESCENDING=omni.impl.set.AbstractByteSet.EmptyView.DESCENDING;
     }
   }
   static interface ByteSetImpl extends AbstractByteSet{
@@ -781,7 +781,7 @@ final class FieldAndMethodAccessor{
     static interface CheckedSubSet extends AbstractByteSet{
       static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","parent");
-      static final Field modCountAndSizeFIeld=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","modCountAndSize");
+      static final Field modCountAndSizeField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"CheckedSubSet","modCountAndSize");
       public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
         return (omni.impl.set.ByteSetImpl.Unchecked)getValue(rootField,obj);
       }
@@ -962,7 +962,7 @@ final class FieldAndMethodAccessor{
         }
       }
     }
-    static interface UncheckedFullItr{
+    static interface UncheckedFullItr extends AbstractItrImpl{
       static final Field rootField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedFullItr","root");
       static final Field lastRetField=prepareFieldForClassName("omni.impl.set.ByteSetImpl"+DOLLARSIGN+"UncheckedFullItr","lastRet");
       public static omni.impl.set.ByteSetImpl.Unchecked root(Object obj){
