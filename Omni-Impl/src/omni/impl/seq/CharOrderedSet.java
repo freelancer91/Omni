@@ -9,201 +9,199 @@ public class CharOrderedSet {
 	int lo;
 	int hi;
 	
-	private static int getDefaultIndex(final char key) {
-		final int index;
-		if(key<=OmniArray.DEFAULT_ARR_SEQ_CAP/2)
-		{
-			return key;
-		}
-		else if((index=OmniArray.DEFAULT_ARR_SEQ_CAP-(Character.MAX_VALUE-key)-1)<OmniArray.DEFAULT_ARR_SEQ_CAP/2)
-		{
-			return OmniArray.DEFAULT_ARR_SEQ_CAP/2;
-		}
-		return index;
+	private static boolean nonFragmentedContains(char[] arr,char key,int lo,int hi) {
+		do{
+			final int mid;
+			switch(Integer.signum(key-(arr[mid=(lo+hi)>>>1]))){
+			case 0:
+				return true;
+			case 1:
+				lo=mid+1;
+				break;
+			default:
+				hi=mid-1;
+			}
+		}while(lo<=hi);
+		return false;
 	}
-	private static int getInitialIndex(final char[] arr,final char key) {
-		int arrLength;
-		final int halfArrLength;
-		if(key<=(halfArrLength=(arrLength=arr.length)>>>1)) {
-			return key;
-		}else if(halfArrLength>(arrLength-=(Character.MAX_VALUE-key)-1)) {
-			return halfArrLength;
-		}
-		return arrLength;
+	private static boolean nonFragmentedRemoveValPullDown(char[] arr,char key,int lo,int hi) {
+		var tmpHi=hi;
+		do {
+			final int mid;
+			switch(Integer.signum(arr[mid=(lo+tmpHi)>>>1]-key)) {
+			case 0:
+				ArrCopy.uncheckedSelfCopy(arr, mid, mid+1, hi-mid);
+				return true;
+			case 1:
+				tmpHi=mid-1;
+				break;
+			default:
+				lo=mid+1;
+			}
+		}while(lo<=tmpHi);
+		return false;
 	}
-	private void initialize1(final char loKey,final char hiKey)
-	{
-		this.arr=new char[] {loKey,hiKey};
-		this.lo=0;
-		this.hi=1;
+	private static boolean nonFragmentedRemoveValPullUp(char[] arr, char key,int lo,int hi) {
+		for(var tmpLo=lo;tmpLo<=hi;) {
+			final int mid;
+			switch(Integer.signum(arr[mid=(tmpLo+hi)>>>1]-key)) {
+			case 0:
+				ArrCopy.semicheckedCopy(arr, lo, arr, lo+1, mid-lo);
+				return true;
+			case 1:
+				hi=mid-1;
+				break;
+			default:
+				tmpLo=mid+1;
+			}
+		}
+		return false;
 	}
 	
-	private boolean addSize1(int occupiedIndex,final char key) {
+	private boolean nonFragmentedRemoveVal(char key,int lo,int hi) {
 		final char[] arr;
-		final char arrKey;
-		switch(Integer.signum((arrKey=(arr=this.arr)[occupiedIndex])-key))
-		{
+		final int mid;
+		switch(Integer.signum(key-(arr=this.arr)[mid=(hi+lo)>>>1])) {
 		case 0:
-			//key already exists
-			return false;
-		case -1:
-			//insert new key after arrKey
-			if(++occupiedIndex==arr.length)
-			{
-				if(occupiedIndex==1){
-					initialize1(arrKey,key);
-				}else {
-					arr[0]=key;
-					this.hi=0;
-				}
-			}else {
-				arr[occupiedIndex]=key;
-				this.hi=occupiedIndex;
+			ArrCopy.uncheckedSelfCopy(arr,mid,mid+1,hi-mid);
+			this.hi=hi-1;
+			return true;
+		case 1:
+			if(nonFragmentedRemoveValPullDown(arr,key,mid+1,hi)) {
+				this.hi=hi-1;
+				return true;
 			}
 			break;
 		default:
-			//insert new key before arrKey
-			if(--occupiedIndex==-1 && (occupiedIndex=arr.length-1)==0)
-			{
-				initialize1(key,arrKey);
-				break;
+			if(nonFragmentedRemoveValPullUp(arr,key,lo,mid-1)) {
+				this.lo=lo+1;
+				return true;
 			}
-			arr[occupiedIndex]=key;
-			this.lo=occupiedIndex;
 		}
-		return true;
+		return false;
 	}
-	private boolean addFragmented(int lo,int hi,int hiLoDist,final char key) {
+	private boolean fragmentedRemoveVal(char key,int lo,int hi) {
+		final char[] arr;
+		switch(Integer.signum(key-(arr=this.arr)[0])) {
+		case 0:
+			if(hi==0) {
+				this.hi=arr.length-1;
+			}else {
+				ArrCopy.uncheckedSelfCopy(arr, 0, 1, hi);
+				this.hi=hi-1;
+			}
+			return true;
+		case 1:
+			if(hi>0 && nonFragmentedRemoveValPullDown(arr,key,1,hi)) {
+				this.hi=hi-1;
+				return true;
+			}
+			break;
+		default:
+			if(nonFragmentedRemoveValPullUp(arr,key,lo,hi=arr.length-1)) {
+				if(lo==hi) {
+					this.lo=0;
+				}else {
+					this.lo=lo+1;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean removeVal(char key) {
+		int hi;
+		if((hi=this.hi)!=-1) {
+			int lo;
+			switch(Integer.signum(hi-(lo=this.lo))) {
+			case 0:
+				if(arr[hi]==key) {
+					this.hi=-1;
+					return true;
+				}
+				break;
+			case 1:
+				return nonFragmentedRemoveVal(key,lo,hi);
+			default:
+				return fragmentedRemoveVal(key,lo,hi);
+			}
+		}
+		return false;
+	}
+	
+	public boolean contains(char key) {
+		int hi;
+		if((hi=this.hi)!=-1) {
+			final var arr=this.arr;
+			final int lo;
+			if(hi>=(lo=this.lo)){
+				return nonFragmentedContains(arr,key,lo,hi);
+			}else{
+				switch(Integer.signum(key-arr[0])) {
+				case 0:
+					return true;
+				case 1:
+					if(1<=hi) {
+						return nonFragmentedContains(arr,key,1,hi);
+					}
+					break;
+				default:
+					return nonFragmentedContains(arr,key,lo,arr.length-1);
+				}
+			}
+		}
+		return false;
+	}
+
+	private void initialize(char val) {
+		//TODO
+		throw new omni.util.NotYetImplementedException();
+	}
+	private boolean nonfragmentedAdd(char key,int lo,int hi) {
 		//TODO
 		throw new omni.util.NotYetImplementedException();
 	}
 	
-	private boolean addNonfragmented(int lo,int hi,int hiLoDist,final char key) {
-		final char[] arr;
-		int mid;
-		char midKey=(arr=this.arr)[mid=(lo+(hiLoDist>>>1))];
-		boolean insertInLowerHalf;
-		int tmpLo;
-		int tmpHi;
-		switch(Integer.signum(midKey-key))
-		{
-		case 0:
-			return false;
-		case -1:
-			insertInLowerHalf=false;
-			tmpLo=mid+1;
-			tmpHi=hi;
-			break;
-		default:
-			insertInLowerHalf=true;
-			tmpLo=lo;
-			tmpHi=mid-1;
-		}
-		while((hiLoDist=tmpHi-tmpLo)>=0)
-		{
-			mid=tmpLo+(hiLoDist>>>1);
-			midKey=arr[mid];
-			switch(Integer.signum(midKey-key))
-			{
-			case 0:
-				return false;
-			case -1:
-				tmpLo=mid+1;
-				break;
-			default:
-				tmpHi=mid-1;
-			}
-		}
-		if(insertInLowerHalf)
-		{
-			if(lo==0)
-			{
-				if(hi==(lo=arr.length-1))
-				{
-					//grow array
-					//TODO
-					throw new omni.util.NotYetImplementedException();
-				}else {
-					if(tmpLo==0)
-					{
-						arr[lo]=key;
-					}else {
-						arr[lo]=arr[0];
-						ArrCopy.semicheckedSelfCopy(arr, 0, 1, tmpLo-1);
-						arr[tmpLo]=key;
-						
-					}
-					this.lo=lo;
-					
-				}
+	
+	
+	public boolean add(char key) {
+		int hi;
+		if((hi=this.hi)!=-1) {
+			int lo;
+			if(hi>=(lo=this.lo)) {
+				return nonfragmentedAdd(key,lo,hi);
 			}else {
-				ArrCopy.semicheckedSelfCopy(arr,hi=lo-1,lo,tmpLo-lo);
-				arr[tmpLo]=key;
-				this.lo=hi;
-			}
-		}
-		else
-		{
-			if(hi==arr.length-1)
-			{
-				if(lo==0)
-				{
-					
-					//grow array
-					//TODO
-					throw new omni.util.NotYetImplementedException();
-				}else {
-					if(tmpLo==hi+1)
-					{
-						arr[0]=key;
-					}else {
-						arr[0]=arr[hi];
-						ArrCopy.semicheckedCopy(arr, tmpLo, arr, tmpLo+1, hi-tmpLo);
-						arr[tmpLo]=key;
+				final var arr=this.arr;
+				switch(Integer.signum(key-arr[0])) {
+				case 0:
+					return false;
+				case 1:
+					if(hi==0) {
+						if(lo==1) {
+							char[] tmp;
+							this.arr=tmp=new char[OmniArray.growBy50Pct(lo=arr.length)];
+							ArrCopy.uncheckedCopy(arr, 1, tmp, 0, hi=lo-1);
+							tmp[hi]=arr[0];
+							this.lo=0;
+							arr=tmp;
+						}
+						arr[++hi]=key;
+						this.hi=hi;
+						break;
 					}
-					this.hi=0;
+					
+					
+					//TODO search in 0 -> hi span
+					throw new omni.util.NotYetImplementedException();
+				default:
+					//TODO search in lo->arr.length-1 span
+					throw new omni.util.NotYetImplementedException();
 				}
-			}else {
-				ArrCopy.semicheckedCopy(arr, tmpLo, arr, tmpLo+1,(++hi)-tmpLo);
-				this.hi=hi;
-				arr[tmpLo]=key;
 			}
+		}else {
+			initialize(val);
 		}
 		return true;
-	}
-	
-	public boolean add(final char key)
-	{
-		int hi;
-		if((hi=this.hi)!=0) {
-			final int lo,hiLoDist;
-			switch(Integer.signum(hiLoDist=hi-(lo=this.lo)))
-			{
-			case -1:
-				return addFragmented(lo,hi,hiLoDist,key);
-			case 0:
-				return addSize1(hi,key);
-			default:
-				return addNonfragmented(lo,hi,hiLoDist,key);
-			}
-		}else {
-			initialize(key);
-			return true;
-		}
-	}
-	private void initialize(final char key) {
-		int hi;
-		char[] arr;
-		if((arr=this.arr)==null){
-			hi=0;
-			this.arr=new char[] {key};
-		}else if(arr==OmniArray.OfChar.DEFAULT_ARR) {
-			this.arr=arr=new char[OmniArray.DEFAULT_ARR_SEQ_CAP];
-			arr[hi=getDefaultIndex(key)]=key;
-		}else {
-			arr[hi=getInitialIndex(arr,key)]=key;
-		}
-		this.hi=hi;
-		this.lo=hi;
 	}
 }
