@@ -1,0 +1,425 @@
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+//TODO OfFloat,OfDouble,OfRef typedefs
+package omni.impl.set;
+
+public abstract class $ClassPrefix$OrderedSet$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>${
+
+  transient int lo;
+  transient int hi;
+  transient $ArrayType$[] arr;
+  //TODO constructors
+  
+  
+  //TODO removeVal
+  
+  
+  @Override public boolean isEmpty(){
+    return this.hi==-1;
+  }
+  @Override public int size(){
+    int hi;
+    if((hi=this.hi)==-1){
+      return 0;
+    }
+    if((hi=hi+1-this.lo)<=0){
+      hi+=arr.length;
+    }
+    return hi;
+  }
+  @Override public void clear(){
+    this.hi=-1;
+  }
+#MACRODEF ContainsImpl(KEYTYPE)
+private static boolean nonfragmentedcontains($ArrayType$[] arr,int lo,int hi,KEYTYPE key){
+  do{
+    final int mid;
+    #MACRO SWITCHCOMPARE(arr[mid=(lo+hi)>>>1],key)
+    {
+    case 0:
+      return true;
+    case 1:
+      hi=mid-1;
+      break;
+    default:
+      lo=mid+1;
+    }
+  }while(lo<=hi);
+  return false;
+}
+private static boolean uncheckedcontains($ArrayType$[] arr,int lo,int hi,KEYTYPE key){
+  if(hi>=lo){
+    return nonfragmentedcontains(arr,lo,hi,key);
+  }else{
+    #MACRO SWITCHCOMPARE(arr[0],key)
+    {
+    case 0:
+      return true;
+    case 1:
+      return nonfragmentedcontains(arr,lo,arr.length-1,key);
+    default:
+      if(1<=hi) {
+        return nonfragmentedcontains(arr,1,hi,key);
+      }
+      return false;
+    }
+  }
+}
+
+#ENDDEF
+  
+#IF OfChar,OfInt,OfShort
+  #MACRO ContainsImpl(int)
+#ELSEIF OfLong
+  #MACRO ContainsImpl(long)
+#ELSE
+ERROR unknown typedef
+#ENDIF
+
+  
+  @Override public boolean contains(boolean key){
+  #IF OfChar,OfShort,OfInt
+    final int hi;
+    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,TypeUtil.castToByte(key));
+  #ELSEIF OfLong
+    final int hi;
+    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,TypeUtil.castToLong(key));
+  #ELSE
+ERROR unknown typedef  
+  #ENDIF
+  }
+  @Override public boolean contains(byte key){
+#IF OfChar
+    final int hi;
+    return key>=0 && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+#ELSEIF OfShort,OfInt,OfLong
+    final int hi;
+    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+#ELSE
+ERROR unknown typedef
+#ENDIF
+  }
+  @Override public boolean contains(char key){
+#IF OfShort
+    final int hi;
+    return key<=$BoxedType$.MAX_VALUE && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+#ELSEIF OfChar,OfInt,OfLong
+    final int hi;
+    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+#ENDIF
+  }
+#IF OfChar
+  @Override public boolean contains(short key){
+    final int hi;
+    return key>=0 && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+  }  
+#ENDIF
+  @Override public boolean contains(int key){
+#IF OfChar,OfShort
+    final int hi;
+    return (key==($exposedType$)key) && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+#ELSEIF OfInt,OfLong
+    final int hi;
+    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+#ENDIF
+  }
+  @Override public boolean contains(long key){
+#IF OfChar,OfShort,OfInt
+   final int k,hi;
+   return (k=($exposedType$)key)==key && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,k);
+#ELSEIF OfLong
+   final int hi;
+   return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+#ENDIF
+  }
+  
+
+  @Override public boolean add($exposedType$ key){
+    final int hi;
+    if((hi=this.hi)!=-1){
+      int lo,mid;
+      final var arr=this.arr;
+      if((mid=((lo=this.lo)+hi)>>>1)>=lo) {
+        #MACRO SWITCHCOMPARE(arr[mid],key)
+        {
+        case 1:
+          return nonfragmentedAddPushDown(key,arr,lo,mid-1);
+        default:
+          return nonfragmentedAddPushUp(key,arr,mid+1,hi);
+        case 0:
+        }
+      }else {
+        #MACRO SWITCHCOMPARE(arr[0],key)
+        {
+        case 1:
+          if(hi+1==lo) {
+            return fragmentedSearchHiAndExpand(key,arr,lo);
+          }else {
+            return fragmentedAddPushDown(key,arr,lo);
+          }
+          
+        default:
+          if(hi+1==lo) {
+            return fragmentedSearchLoAndExpand(key,arr,hi);
+          }else {
+            return fragmentedAddPushUp(key,arr,hi);
+          }
+        case 0:
+        }
+      }
+      return false;
+    }else{
+      initialize(key);
+      return true;
+    }
+  }
+  private boolean fragmentedAddPushUp($exposedType$ key,$ArrayType$[] arr,int hi){
+    int tmpHi=hi;
+    int tmpLo=1;
+    while(tmpLo<=tmpHi) {
+      final int mid;
+      #MACRO SWITCHCOMPARE(arr[mid=(tmpHi+tmpLo)>>>1],key)
+      {
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }
+    //insert
+    ArrCopy.semicheckedCopy(arr, tmpLo, arr, tmpLo+1, (++hi)-tmpLo);
+    arr[tmpLo]=key;
+    this.hi=hi;
+    return true;
+  }
+  private boolean fragmentedAddPushDown($exposedType$ key,$ArrayType$[] arr,int lo){
+    int tmpHi=arr.length-1;
+    int tmpLo=lo;
+    do {
+      final int mid;
+      #MACRO SWITCHCOMPARE(arr[mid=(tmpHi+tmpLo)>>>1],key)
+      {
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }while(tmpHi>=tmpLo);
+    //insert
+    ArrCopy.semicheckedSelfCopy(arr,tmpHi=lo-1,lo,tmpLo-lo);
+    arr[tmpLo]=key;
+    this.lo=tmpHi;
+    return true;
+  }
+  private boolean fragmentedSearchLoAndExpand($exposedType$ key,$ArrayType$[] arr,int hi){
+    int tmpHi=hi;
+    int tmpLo=1;
+    while(tmpLo<=tmpHi) {
+      final int mid;
+      #MACRO SWITCHCOMPARE(arr[mid=(tmpHi+tmpLo)>>>1],key)
+      {
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }
+    //grow array and insert
+    int newLo;
+    final var tmpArr=new $ArrayType$[newLo=OmniArray.growBy100Pct(tmpHi=arr.length)];
+    this.lo=newLo=(newLo-tmpHi)>>>1;
+    ArrCopy.uncheckedCopy(arr, ++hi, tmpArr, newLo, tmpHi-=hi);
+    ArrCopy.semicheckedCopy(arr, 0, tmpArr, newLo+=tmpHi, tmpLo);
+    tmpArr[newLo]=key;
+    ArrCopy.semicheckedCopy(arr, tmpLo, tmpArr, newLo+=tmpLo, hi-=tmpLo);
+    this.hi=hi-1;
+    this.arr=tmpArr;
+    return true;
+  }
+  private boolean fragmentedSearchHiAndExpand($exposedType$ key,$ArrayType$[] arr,int lo){
+    int tmpLo=lo;
+    int arrLength;
+    int tmpHi=(arrLength=arr.length)-1;
+    do {
+      final int mid;
+      #MACRO SWITCHCOMPARE(arr[mid=(tmpHi+tmpLo)>>>1],key)
+      {
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }while(tmpHi>=tmpLo);
+    //grow array and insert
+    final var tmpArr=new $ArrayType$[tmpHi=OmniArray.growBy50Pct(arrLength)];
+    this.hi=(tmpHi-=((tmpHi-arrLength)>>>1))-1;
+    ArrCopy.uncheckedCopy(arr, 0, tmpArr, tmpHi-=lo, lo);
+    ArrCopy.semicheckedCopy(arr, tmpLo, tmpArr, tmpHi-=(arrLength-=tmpLo), arrLength);
+    tmpArr[--tmpHi]=key;
+    ArrCopy.semicheckedCopy(arr, lo, tmpArr, tmpHi-=(tmpLo-=lo), tmpLo);
+    this.arr=tmpArr;
+    this.lo=tmpHi;
+    return true;
+  }
+  private boolean nonfragmentedAddPushUp($exposedType$ key,$ArrayType$[] arr,int lo,int hi){
+    int tmpHi=hi;
+    int mid;
+    while((mid=(lo+tmpHi)>>>1)>=lo) {
+      #MACRO SWITCHCOMPARE(arr[mid],key)
+      {
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        lo=mid+1;
+      }
+    }
+    //insert
+    if(hi==(tmpHi=arr.length)-1) {
+      if(this.lo==0) {
+        //grow the array
+        final var tmpArr=new $ArrayType$[hi=OmniArray.growBy50Pct(tmpHi)];
+        this.lo=(hi=(hi-tmpHi)>>>1);
+        ArrCopy.uncheckedCopy(arr, 0, tmpArr, hi, lo);
+        tmpArr[hi+=lo]=key;
+        ArrCopy.semicheckedCopy(arr, lo, tmpArr, hi+1, tmpHi-=lo);
+        this.hi=hi+tmpHi;
+        this.arr=tmpArr;
+      }else {
+        //wrap around
+        arr[0]=arr[hi];
+        ArrCopy.semicheckedCopy(arr, lo, arr, lo+1, hi-lo);
+        arr[lo]=key;
+        this.hi=0;
+      }
+    }else {
+      //simple up-shift
+      ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,hi+1-lo);
+      arr[lo]=key;
+      this.hi=hi+1;
+    }
+    return true;
+  }
+  private boolean nonfragmentedAddPushDown($exposedType$ key,$ArrayType$[] arr,int lo,int hi){
+    int tmpLo=lo;
+    int mid;
+    while((mid=(tmpLo+hi)>>>1)>=tmpLo) {
+      #MACRO SWITCHCOMPARE(arr[mid],key)
+      {
+      case 0:
+        return false;
+      case 1:
+        hi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }
+    //insert
+    if(lo==0) {
+      if((lo+=((hi=arr.length)-1))==this.hi) {
+        //grow the array
+        final var tmpArr=new $ArrayType$[lo=OmniArray.growBy50Pct(hi)];
+        this.hi=lo-1;
+        ArrCopy.uncheckedCopy(arr, tmpLo, tmpArr, lo-=(hi-=tmpLo), hi);
+        tmpArr[--lo]=key;
+        ArrCopy.semicheckedCopy(arr, 0, tmpArr, lo-=tmpLo, tmpLo);
+        this.arr=tmpArr;
+      }else {
+        //wrap around
+        arr[lo]=arr[0];
+        ArrCopy.semicheckedSelfCopy(arr, 0, 1, tmpLo-1);
+        arr[tmpLo]=key;
+      }
+      this.lo=lo;
+    }else {
+      //simple down-shift
+      ArrCopy.semicheckedSelfCopy(arr, hi=lo-1, lo, tmpLo-lo);
+      arr[tmpLo]=key;
+      this.lo=hi;
+    }
+    return true;
+  }
+  private void initialize($exposedType$ key){
+    $ArrayType$[] arr;
+    if((arr=this.arr)!=null) {
+      int arrLength;
+      if((arrLength=arr.length)==0) {
+        this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
+#IF OfChar
+        if(key<=OmniArray.DEFAULT_ARR_SEQ_CAP/2) {
+          arrLength=key;
+        }else if((arrLength=OmniArray.DEFAULT_ARR_SEQ_CAP-1-($BoxedType$.MAX_VALUE-key))<OmniArray.DEFAULT_ARR_SEQ_CAP/2) {
+          arrLength=OmniArray.DEFAULT_ARR_SEQ_CAP/2;
+        }
+#ELSEIF OfShort
+        if((arrLength=key-$BoxedType$.MIN_VALUE)>(OmniArray.DEFAULT_ARR_SEQ_CAP/2) && (arrLength=OmniArray.DEFAULT_ARR_SEQ_CAP-1-($BoxedType$.MAX_VALUE-key))<OmniArray.DEFAULT_ARR_SEQ_CAP/2){
+          arrLength=OmniArray.DEFAULT_ARR_SEQ_CAP/2;
+        }
+#ELSEIF OfInt,OfLong
+        arrLength=OmniArray.DEFAULT_ARR_SEQ_CAP/2;
+#ELSE
+ERROR unknown type def
+#ENDIF
+      }else {
+#IF OfChar
+        final int halfArrLength;
+        if(key<=(halfArrLength=arrLength>>>1)) {
+          arrLength=key;
+        }else if((arrLength-=(1+($BoxedType$.MAX_VALUE-key)))<halfArrLength) {
+          arrLength=halfArrLength;
+        }
+#ELSEIF OfShort
+        final int halfArrLength,dist;
+        if((dist=key-$BoxedType$.MIN_VALUE)<=(halfArrLength=arrLength>>>1)) {
+          arrLength=dist;
+        }else if((arrLength-=(1+($BoxedType$.MAX_VALUE-key)))<halfArrLength) {
+          arrLength=halfArrLength;
+        }
+#ELSEIF OfInt,OfLong
+        arrLength>>>=1;
+#ELSE
+ERROR unknown type def
+#ENDIF
+      }
+      arr[arrLength]=key;
+      this.lo=arrLength;
+      this.hi=arrLength;
+    }else {
+      this.arr=new $ArrayType$[]{key};
+      this.lo=0;
+      this.hi=0;
+    }
+  }
+}
+
+#MACRODEF SWITCHCOMPARE(KEY1,KEY2)
+#IF OfChar,OfShort,OfInt
+switch(Integer.signum((KEY1)-(KEY2))
+#ELSEIF OfLong
+switch(Long.signum((KEY1)-(KEY2))
+#ELSE
+ERROR unknown type def
+#ENDIF
+#ENDDEF
+
+#MACRODEF NYI()
+//TODO
+throw new omni.util.NotYetImplementedException();
+#ENDDEF
