@@ -104,6 +104,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("comparableType","char"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
+        defVars.add(new DefVar("KeyType","char"));
         return defVars;
     }
     private static List<DefVar> getOfDouble(){
@@ -136,6 +137,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("DELETED_TABLE_VAL","0x7ffc000000000000L"));
         defVars.add(new DefVar("POS0_TABLE_VAL","0xfffc000000000000L"));
         defVars.add(new DefVar("convertBitsToVal","Double.longBitsToDouble"));
+        defVars.add(new DefVar("KeyType","long"));
         return defVars;
     }
     private static List<DefVar> getOfFloat(){
@@ -169,6 +171,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("DELETED_TABLE_VAL","0x7fe00000"));
         defVars.add(new DefVar("POS0_TABLE_VAL","0xffe00000"));
         defVars.add(new DefVar("convertBitsToVal","Float.intBitsToFloat"));
+        defVars.add(new DefVar("KeyType","int"));
         return defVars;
     }
     private static List<DefVar> getOfInt(){
@@ -200,6 +203,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("comparableType","int"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
+        defVars.add(new DefVar("KeyType","int"));
         return defVars;
     }
     private static List<DefVar> getOfLong(){
@@ -230,6 +234,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("comparableType","long"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
+        defVars.add(new DefVar("KeyType","long"));
         return defVars;
     }
     private static List<DefVar> getOfString(){
@@ -277,6 +282,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("queryParameterType","Object"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","null"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","DELETED"));
+        defVars.add(new DefVar("KeyType","Object"));
         return defVars;
     }
     private static List<DefVar> getOfShort(){
@@ -309,6 +315,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("comparableType","short"));
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
+        defVars.add(new DefVar("KeyType","short"));
         return defVars;
     }
     boolean matchTypeDef(String...args){

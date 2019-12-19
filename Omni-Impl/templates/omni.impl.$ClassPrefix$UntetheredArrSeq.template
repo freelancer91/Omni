@@ -1,0 +1,31 @@
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl;
+import omni.api.OmniCollection;
+
+public abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix${
+
+  $ArrayType$[] arr;
+  int head;
+  int tail;
+  
+  protected $ClassPrefix$UntetheredArrSeq(int head,$ArrayType$[] arr,int tail){
+    super();
+    this.arr=arr;
+    this.head=head;
+    this.tail=tail;
+  }
+  protected $ClassPrefix$UntetheredArrSeq(){
+    super();
+    this.tail=-1;
+  }
+  
+  
+
+}

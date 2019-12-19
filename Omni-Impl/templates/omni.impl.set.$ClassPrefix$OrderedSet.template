@@ -32,108 +32,601 @@ public abstract class $ClassPrefix$OrderedSet$<E>$ implements OmniCollection.Of$
   @Override public void clear(){
     this.hi=-1;
   }
-#MACRODEF ContainsImpl(KEYTYPE)
-private static boolean nonfragmentedcontains($ArrayType$[] arr,int lo,int hi,KEYTYPE key){
-  do{
-    final int mid;
-    #MACRO SWITCHCOMPARE(arr[mid=(lo+hi)>>>1],key)
-    {
-    case 0:
-      return true;
-    case 1:
-      hi=mid-1;
-      break;
-    default:
-      lo=mid+1;
+  abstract int compareKeys($queryParameterType$ key1,$queryParameterType$ key2);
+  
+  @Override public boolean add(boolean val){
+#IF OfChar
+    return add(TypeUtil.castToChar(val));
+#ELSEIF OfShort,OfInt
+    return add(($exposedType$)TypeUtil.castToByte(val));
+#ELSEIF OfLong
+    return add(TypeUtil.castToLong(val));
+#ELSE
+    ERROR unknown type def
+#ENDIF
+  }
+#IF OfChar,OfShort,OfInt,OfLong
+  private void initialize(char key) {
+    char[] arr;
+    if((arr=this.arr)!=null) {
+      int arrLength;
+      if((arrLength=arr.length)==0) {
+        this.arr=arr=new char[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        if(key<=OmniArray.DEFAULT_ARR_SEQ_CAP/2) {
+          arrLength=key;
+        }else if((arrLength=OmniArray.DEFAULT_ARR_SEQ_CAP-1-(Character.MAX_VALUE-key))<OmniArray.DEFAULT_ARR_SEQ_CAP/2) {
+          arrLength=OmniArray.DEFAULT_ARR_SEQ_CAP/2;
+          
+        }
+      }else {
+        final int halfArrLength;
+        if(key<=(halfArrLength=arrLength>>>1)) {
+          arrLength=key;
+        }else if((arrLength-=(1+(Character.MAX_VALUE-key)))<halfArrLength) {
+          arrLength=halfArrLength;
+        }
+      }
+      arr[arrLength]=key;
+      this.lo=arrLength;
+      this.hi=arrLength;
+    }else {
+      this.arr=new char[]{key};
+      this.lo=0;
+      this.hi=0;
     }
-  }while(lo<=hi);
-  return false;
-}
-private static boolean uncheckedcontains($ArrayType$[] arr,int lo,int hi,KEYTYPE key){
-  if(hi>=lo){
-    return nonfragmentedcontains(arr,lo,hi,key);
-  }else{
-    #MACRO SWITCHCOMPARE(arr[0],key)
-    {
-    case 0:
-      return true;
-    case 1:
-      return nonfragmentedcontains(arr,lo,arr.length-1,key);
-    default:
-      if(1<=hi) {
-        return nonfragmentedcontains(arr,1,hi,key);
+  }
+
+
+  private boolean nonfragmentedAddPushDown($exposedType$ key,$ArrayType$[] arr,int lo,int hi) {
+    int tmpLo=lo;
+    int mid;
+    while((mid=(tmpLo+hi)>>>1)>=tmpLo) {
+      switch(compareKeys(arr[mid],key)) {
+      case 0:
+        return false;
+      case 1:
+        hi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }
+    //insert
+    if(lo==0) {
+      if((lo+=((hi=arr.length)-1))==this.hi) {
+        final var tmpArr=new $ArrayType$[lo=OmniArray.growBy50Pct(hi)];
+        this.hi=(lo-=((lo-hi)>>>1))-1;
+        ArrCopy.uncheckedCopy(arr, tmpLo, tmpArr, lo-=(hi-=tmpLo), hi);
+        tmpArr[--lo]=key;
+        ArrCopy.semicheckedCopy(arr, 0, tmpArr, lo-=tmpLo, tmpLo);
+        this.arr=tmpArr;
+      }else {
+        //wrap around
+        arr[lo]=arr[0];
+        ArrCopy.semicheckedSelfCopy(arr, 0, 1, tmpLo-1);
+        arr[tmpLo]=key;
+      }
+      this.lo=lo;
+    }else {
+      //simple down-shift
+      ArrCopy.semicheckedSelfCopy(arr, hi=lo-1, lo, tmpLo-lo);
+      arr[tmpLo]=key;
+      this.lo=hi;
+    }
+    return true;
+  }
+  private boolean nonfragmentedAddPushUp($exposedType$ key,$ArrayType$[] arr,int lo,int hi) {
+    int tmpHi=hi;
+    int mid;
+    while((mid=(lo+tmpHi)>>>1)>=lo) {
+      switch(compareKeys(arr[mid],key)) {
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        lo=mid+1;
+      }
+    }
+    //insert
+    if(hi==(tmpHi=arr.length)-1) {
+      if(this.lo==0) {
+        //grow the array
+        final var tmpArr=new $ArrayType$[hi=OmniArray.growBy50Pct(tmpHi)];
+        this.lo=(hi=(hi-tmpHi)>>>1);
+        ArrCopy.uncheckedCopy(arr, 0, tmpArr, hi, lo);
+        tmpArr[hi+=lo]=key;
+        ArrCopy.semicheckedCopy(arr, lo, tmpArr, hi+1, tmpHi-=lo);
+        this.hi=hi+tmpHi;
+        this.arr=tmpArr;
+      }else {
+        //wrap around
+        arr[0]=arr[hi];
+        ArrCopy.semicheckedCopy(arr, lo, arr, lo+1, hi-lo);
+        arr[lo]=key;
+        this.hi=0;
+      }
+    }else {
+      //simple up-shift
+      ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,hi+1-lo);
+      arr[lo]=key;
+      this.hi=hi+1;
+    }
+    return true;
+  }
+  private boolean fragmentedSearchHiAndExpand($exposedType$ key,$ArrayType$[] arr,int lo) {
+    int tmpLo=lo;
+    int arrLength;
+    int tmpHi=(arrLength=arr.length)-1;
+    do {
+      final int mid;
+      switch(compareKeys(arr[mid=(tmpHi+tmpLo)>>>1],key)){
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }while(tmpHi>=tmpLo);
+    //grow array and insert
+    final var tmpArr=new $ArrayType$[tmpHi=OmniArray.growBy50Pct(arrLength)];
+    this.hi=(tmpHi-=((tmpHi-arrLength)>>>1))-1;
+    ArrCopy.uncheckedCopy(arr, 0, tmpArr, tmpHi-=lo, lo);
+    ArrCopy.semicheckedCopy(arr, tmpLo, tmpArr, tmpHi-=(arrLength-=tmpLo), arrLength);
+    tmpArr[--tmpHi]=key;
+    ArrCopy.semicheckedCopy(arr, lo, tmpArr, tmpHi-=(tmpLo-=lo), tmpLo);
+    this.arr=tmpArr;
+    this.lo=tmpHi;
+    return true;
+  }
+  private boolean fragmentedAddPushDown($exposedType$ key,$ArrayType$[] arr,int lo) {
+    int tmpHi=arr.length-1;
+    int tmpLo=lo;
+    do {
+      final int mid;
+      switch(compareKeys(arr[mid=(tmpHi+tmpLo)>>>1],key)){
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }while(tmpHi>=tmpLo);
+    //insert
+    ArrCopy.semicheckedSelfCopy(arr,tmpHi=lo-1,lo,tmpLo-lo);
+    arr[tmpLo]=key;
+    this.lo=tmpHi;
+    return true;
+  }
+  private boolean fragmentedSearchLoAndExpand($exposedType$ key,$ArrayType$[] arr,int hi) {
+    int tmpHi=hi;
+    int tmpLo=1;
+    while(tmpLo<=tmpHi) {
+      final int mid;
+      switch(compareKeys(arr[mid=(tmpHi+tmpLo)>>>1],key)){
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }
+    //grow array and insert
+    int newLo;
+    final var tmpArr=new $ArrayType$[newLo=OmniArray.growBy100Pct(tmpHi=arr.length)];
+    this.lo=newLo=(newLo-tmpHi)>>>1;
+    ArrCopy.uncheckedCopy(arr, ++hi, tmpArr, newLo, tmpHi-=hi);
+    ArrCopy.semicheckedCopy(arr, 0, tmpArr, newLo+=tmpHi, tmpLo);
+    tmpArr[newLo]=key;
+    ArrCopy.semicheckedCopy(arr, tmpLo, tmpArr, newLo+=tmpLo, hi-=tmpLo);
+    this.hi=hi-1;
+    this.arr=tmpArr;
+    return true;
+  }
+  private boolean fragmentedAddPushUp($exposedType$ key,$ArrayType$[] arr,int hi) {
+    int tmpHi=hi;
+    int tmpLo=1;
+    while(tmpLo<=tmpHi) {
+      final int mid;
+      switch(compareKeys(arr[mid=(tmpHi+tmpLo)>>>1],key)){
+      case 0:
+        return false;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }
+    //insert
+    ArrCopy.semicheckedCopy(arr, tmpLo, arr, tmpLo+1, (++hi)-tmpLo);
+    arr[tmpLo]=key;
+    this.hi=hi;
+    return true;
+  }
+
+  @Override public boolean add($exposedType$ val){
+    final int hi;
+    if((hi=this.hi)!=-1) {
+      final var arr=this.arr;
+      final int lo,mid;
+      if((mid=((lo=this.lo)+hi)>>>1)>=lo) {
+        switch(compareKeys(arr[mid],key)){
+        case 1:
+          return nonfragmentedAddPushDown(key,arr,lo,mid-1);
+        default:
+          return nonfragmentedAddPushUp(key,arr,mid+1,hi);
+        case 0:
+        }
+      }else {
+        switch(compareKeys(arr[0],key)){
+        case 1:
+          if(hi+1==lo) {
+            return fragmentedSearchHiAndExpand(key,arr,lo);
+          }else {
+            return fragmentedAddPushDown(key,arr,lo);
+          }
+          
+        default:
+          if(hi+1==lo) {
+            return fragmentedSearchLoAndExpand(key,arr,hi);
+          }else {
+            return fragmentedAddPushUp(key,arr,hi);
+          }
+        case 0:
+        }
       }
       return false;
+    }else {
+      initialize(key);
+      return true;
     }
   }
-}
-
-#ENDDEF
+#ELSE
+  ERROR unknown type def
+#ENDIF
   
-#IF OfChar,OfInt,OfShort
-  #MACRO ContainsImpl(int)
+  
+  private boolean nonfragmentedcontains($ArrayType$[] arr,int lo,int hi,$queryParameterType$ key){
+    do{
+      final int mid;
+      switch(compareKeys(arr[mid=(lo+hi)>>>1],key)){
+        case 0:
+          return true;
+        case 1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }while(lo<=hi);
+    return false;
+  }
+  private boolean uncheckedcontains(int hi,$queryParameterType$ key){
+    final var arr=this.arr;
+    final int lo;
+    if((lo=this.lo)<=hi){
+      return nonfragmentedcontains(arr,lo,hi,key);
+    }else{
+      switch(compareKeys(arr[0],key)){
+        case 0:
+          return true;
+        case 1:
+          return nonfragmentedcontains(arr,lo,arr.length-1,key);
+        default:
+          return hi>0 && nonfragmentedcontains(arr,1,hi,key);
+      }
+    }
+  }
+  private boolean nonfragmentedremoveValPullDown($ArrayType$[] arr,int lo,int hi,$queryParameterType$ key) {
+    var tmpHi=hi;
+    do {
+      final int mid;
+      switch(compareKeys(arr[mid=(tmpLo+hi)>>>1],key)){
+      case 0:
+        ArrCopy.uncheckedSelfCopy(arr, mid, mid+1, hi-mid);
+        return true;
+      case 1:
+        tmpHi=mid-1;
+        break;
+      default:
+        lo=mid+1;
+      }
+    }while(lo<=tmpHi);
+    return false;
+  }
+  private boolean nonfragmentedremoveValPullUp($ArrayType$[] arr, int lo,int hi,$queryParameterType$ key) {
+    for(var tmpLo=lo;tmpLo<=hi;) {
+      final int mid;
+      switch(compareKeys(arr[mid=(tmpLo+hi)>>>1],key)){
+      case 0:
+        ArrCopy.semicheckedCopy(arr, lo, arr, lo+1, mid-lo);
+        return true;
+      case 1:
+        hi=mid-1;
+        break;
+      default:
+        tmpLo=mid+1;
+      }
+    }
+    return false;
+  }
+  private boolean nonfragmentedremoveVal(int lo,int hi,$queryParameterType$ key) {
+    final $ArrayType$[] arr;
+    final int mid;
+    switch(compareKeys(arr=this.arr)[mid=(hi+lo)>>>1],key)){
+    case 0:
+      ArrCopy.uncheckedSelfCopy(arr,mid,mid+1,hi-mid);
+      this.hi=hi-1;
+      return true;
+    case 1:
+      if(nonfragmentedremoveValPullUp(arr,lo,mid-1,key)) {
+        this.lo=lo+1;
+        return true;
+      }
+      break;
+    default:
+      if(nonfragmentedremoveValPullDown(arr,mid+1,hi,key)) {
+        this.hi=hi-1;
+        return true;
+      }
+    }
+    return false;
+  }
+  private boolean fragmentedremoveVal(int lo,int hi,$queryParameterType$ key) {
+    final $ArrayType$[] arr;
+    switch(compareKeys((arr=this.arr)[0],key)){
+    case 0:
+      if(hi==0) {
+        this.hi=arr.length-1;
+      }else {
+        ArrCopy.uncheckedSelfCopy(arr, 0, 1, hi);
+        this.hi=hi-1;
+      }
+      return true;
+    case 1:
+      if(nonfragmentedremoveValPullUp(arr,lo,hi=arr.length-1,key)) {
+        if(lo==hi) {
+          this.lo=0;
+        }else {
+          this.lo=lo+1;
+        }
+        return true;
+      }
+      break;
+    default:
+      if(hi>0 && nonfragmentedremoveValPullDown(arr,1,hi,key)) {
+        this.hi=hi-1;
+        return true;
+      }
+    }
+    return false;
+  }
+  private boolean uncheckedremoveVal(int hi,$queryParameterType$ key){
+    int lo;
+    switch(Integer.signum(hi-(lo=this.lo))) {
+      case 0:
+        if(arr[hi]==key){
+          this.hi=-1;
+          return true;
+        }
+        return false;
+      case 1:
+        return nonfragmentedremoveVal(lo,hi,key);
+      default:
+        return fragmentedremoveVal(lo,hi,key);
+    }
+  }
+  
+  
+  #MACRO UncheckedRootQueryMethods<contains>(boolean,false)
+  #MACRO UncheckedRootQueryMethods<removeVal>(boolean,false)
+  
+#MACRODEF UncheckedRootQueryMethods<METHODNAME>(RETTYPE,NEGATIVERET)
+  @Override public RETTYPE METHODNAME(boolean key){
+    final int hi;
+    if((hi=this.hi)!=-1){
+#IF OfChar
+      return uncheckedMETHODNAME(hi,TypeUtil.castToChar(key));
+#ELSEIF OfShort,OfInt
+      return uncheckedMETHODNAME(hi,TypeUtil.castToByte(key));
 #ELSEIF OfLong
-  #MACRO ContainsImpl(long)
+      return uncheckedMETHODNAME(hi,TypeUtil.castToLong(key));
 #ELSE
-ERROR unknown typedef
+      ERROR unknown typedef
 #ENDIF
+    }
+    return NEGATIVERET;
+  }
 
-  
-  @Override public boolean contains(boolean key){
-  #IF OfChar,OfShort,OfInt
+  @Override public RETTYPE METHODNAME(int key){
     final int hi;
-    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,TypeUtil.castToByte(key));
-  #ELSEIF OfLong
-    final int hi;
-    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,TypeUtil.castToLong(key));
-  #ELSE
-ERROR unknown typedef  
-  #ENDIF
-  }
-  @Override public boolean contains(byte key){
-#IF OfChar
-    final int hi;
-    return key>=0 && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
-#ELSEIF OfShort,OfInt,OfLong
-    final int hi;
-    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
-#ELSE
-ERROR unknown typedef
-#ENDIF
-  }
-  @Override public boolean contains(char key){
-#IF OfShort
-    final int hi;
-    return key<=$BoxedType$.MAX_VALUE && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
-#ELSEIF OfChar,OfInt,OfLong
-    final int hi;
-    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
-#ENDIF
-  }
-#IF OfChar
-  @Override public boolean contains(short key){
-    final int hi;
-    return key>=0 && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
-  }  
-#ENDIF
-  @Override public boolean contains(int key){
+    if((hi=this.hi)!=-1){
 #IF OfChar,OfShort
-    final int hi;
-    return (key==($exposedType$)key) && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
-#ELSEIF OfInt,OfLong
-    final int hi;
-    return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+      final $queryParameterType$ k;
+      if((k=($exposedType$)key)==key){
+        return uncheckedMETHODNAME(hi,k);
+      }
+#ELSEIF OfLong,OfLong
+      {
+        return uncheckedMETHODNAME(hi,key);
+      }
+#ELSE
+      ERROR unknown type def
 #ENDIF
+    }
+    return NEGATIVERET;
   }
-  @Override public boolean contains(long key){
+  @Override public RETTYPE METHODNAME(long key){
+    final int hi;
+    if((hi=this.hi)!=-1){
 #IF OfChar,OfShort,OfInt
-   final int k,hi;
-   return (k=($exposedType$)key)==key && (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,k);
+      final $queryParameterType$ k;
+      if((k=($exposedType$)key)==key){
+        return uncheckedMETHODNAME(hi,k);
+      }
 #ELSEIF OfLong
-   final int hi;
-   return (hi=this.hi)!=-1 && uncheckedcontains(arr,this.lo,hi,key);
+      {
+        return uncheckedMETHODNAME(hi,key);
+      }
+#ELSE
+      ERROR unknown type def
 #ENDIF
+    }
+    return NEGATIVERET;
   }
+  @Override public RETTYPE METHODNAME(float key){
+    final int hi;
+    if((hi=this.hi)!=-1){
+      final $queryParameterType$ k;
+#IF OfChar,OfShort
+      if((k=($exposedType$)key)==key){
+#ELSEIF OfInt
+      if((double)key==(k=(int)key)){
+#ELSEIF OfLong
+      if(TypeUtil.floatEquals(key,k=(long)key)){
+#ELSE
+      ERROR unknown type def
+#ENDIF
+        return uncheckedMETHODNAME(hi,k);
+      }
+    }
+    return NEGATIVERET;
+  }
+  @Override public RETTYPE METHODNAME(double key){
+    final int hi;
+    if((hi=this.hi)!=-1){
+      final $queryParameterType$ k;
+#IF OfChar,OfShort,OfInt
+      if((k=($exposedType$)key)==key){
+#ELSEIF OfLong
+      if(TypeUtil.doubleEquals(key,k=(long)key)){
+#ELSE
+      ERROR unknown type def
+#ENDIF
+        return uncheckedMETHODNAME(hi,k);
+      }
+    }
+    return NEGATIVERET;
+  }
+#IFSWITCH METHODNAME==removeVal
+  @Override public RETTYPE remove(Object key){
+#ELSE
+  @Override public RETTYPE METHODNAME(Object key){
+#ENDIF
+    final int hi;
+    if((hi=this.hi)!=-1){
+      returnNotFound:for(;;){
+        final $queryParameterType$ k;
+#IF OfChar
+        if(key instanceof Character){
+          k=(char)key;
+        }else if(key instanceof Integer){
+          if((k=(int)key)!=(char)k){
+            break returnNotFound;
+          }
+        }else if(key instanceof Long){
+          final long l;
+          if((l=(long)key)!=(k=(char)l)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Float){
+          final float f;
+          if((f=(float)key)!=(k=(char)f)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Double){
+          final double d;
+          if((d=(double)key)!=(k=(char)d)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Short || key instanceof Byte){
+          if((k=((Number)key).intValue())<0){
+            break returnNotFound;
+          }
+        }else if(key instanceof Boolean){
+          k=TypeUtil.castToChar((boolean)key);
+#ELSEIF OfShort
+        if(key instanceof Short || key instanceof Byte){
+          k=((Number)key).intValue()
+        }else if(key instanceof Integer){
+          if((k=(int)key)!=(short)k){
+            break returnNotFound;
+          }
+        }else if(key instanceof Long){
+          final long l;
+          if((l=(long)key)!=(k=(short)l)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Float){
+          final float f;
+          if((f=(float)key)!=(k=(short)f)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Double){
+          final double d;
+          if((d=(double)key)!=(k=(short)d)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Character){
+          if((k=(char)key)>Short.MAX_VALUE){
+            break returnNotFound;
+          }
+        }else if(key instanceof Boolean){
+          k=TypeUtil.castToByte((boolean)key);
+#ELSEIF OfInt
+        if(key instanceof Integer || key instanceof Short || key instanceof Byte){
+          k=((Number)key).intValue();
+        }else if(key instanceof Long){
+          final long l;
+          if((l=(long)key)!=(k=(int)l)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Float || key instanceof Double){
+          final double d;
+          if((d=((Number)key).doubleValue())!=(k=(int)d)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Character){
+          k=(char)key;
+        }else if(key instanceof Boolean){
+          k=TypeUtil.castToByte((boolean)key);
+#ELSEIF OfLong
+        if(key instanceof Long || key instanceof Integer || key instanceof Byte || key instanceof Short){
+          k=((Number)key).longValue();
+        }else if(key instanceof Float){
+          final float f;
+          if(!TypeUtil.floatEquals(f=(float)key,k=(long)f)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Double){
+          final double d;
+          if(!TypeUtil.doubleEquals(d=(double)key,k=(long)d)){
+            break returnNotFound;
+          }
+        }else if(key instanceof Character){
+          k=(char)key;
+        }else if(key instanceof Boolean){
+          k=TypeUtil.castToLong((boolean)key);
+#ELSE
+        ERROR unknown type def
+#ENDIF
+        }else{
+          break returnNotFound;
+        }
+        return uncheckedMETHODNAME(hi,k);
+      }
+    }
+    return NEGATIVERET;
+  }
+#ENDDEF
   
 
   @Override public boolean add($exposedType$ key){
@@ -418,7 +911,43 @@ switch(Long.signum((KEY1)-(KEY2))
 ERROR unknown type def
 #ENDIF
 #ENDDEF
+#MACRODEF ContainsImpl(KEYTYPE)
+private static boolean nonfragmentedcontains($ArrayType$[] arr,int lo,int hi,KEYTYPE key){
+  do{
+    final int mid;
+    #MACRO SWITCHCOMPARE(arr[mid=(lo+hi)>>>1],key)
+    {
+    case 0:
+      return true;
+    case 1:
+      hi=mid-1;
+      break;
+    default:
+      lo=mid+1;
+    }
+  }while(lo<=hi);
+  return false;
+}
+private static boolean uncheckedcontains($ArrayType$[] arr,int lo,int hi,KEYTYPE key){
+  if(hi>=lo){
+    return nonfragmentedcontains(arr,lo,hi,key);
+  }else{
+    #MACRO SWITCHCOMPARE(arr[0],key)
+    {
+    case 0:
+      return true;
+    case 1:
+      return nonfragmentedcontains(arr,lo,arr.length-1,key);
+    default:
+      if(1<=hi) {
+        return nonfragmentedcontains(arr,1,hi,key);
+      }
+      return false;
+    }
+  }
+}
 
+#ENDDEF
 #MACRODEF NYI()
 //TODO
 throw new omni.util.NotYetImplementedException();
