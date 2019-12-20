@@ -3,19 +3,17 @@
 #TYPEDEF OfShort
 #TYPEDEF OfInt
 #TYPEDEF OfLong
-#TYPEDEF OfFloat
-#TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl;
 import omni.api.OmniCollection;
 
-public abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix${
+public abstract class $ClassPrefix$UntetheredArrSeq$<E>$
 
-  $ArrayType$[] arr;
+  $KeyType$[] arr;
   int head;
   int tail;
   
-  protected $ClassPrefix$UntetheredArrSeq(int head,$ArrayType$[] arr,int tail){
+  protected $ClassPrefix$UntetheredArrSeq(int head,$KeyType$[] arr,int tail){
     super();
     this.arr=arr;
     this.head=head;
@@ -25,7 +23,231 @@ public abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollecti
     super();
     this.tail=-1;
   }
-  
-  
+  @Override public int size(){
+    int tail;
+    if((tail=this.tail+1)>0 && (tail-=this.head)<=0){
+      tail+=arr.length;
+    }
+    return tail;
+  }
+  @Override public boolean isEmpty(){
+    return this.tail==-1;
+  }
+  @Override public void clear(){
+#IF OfRef
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final var arr=this.arr;
+      final int head;
+      if((head=this.head)>tail){
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,arr.length-1,head);
+        head=0;
+      }
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
+    }
+#ELSE
+    this.tail=-1;
+#ENDIF
+  }
 
+
+#IF OfByte,OfChar,OfShort,OfInt
+  protected boolean uncheckedremoveMatch(int tail,final IntUnaryOperator comparator)
+#ELSEIF OfLong
+  protected boolean uncheckedremoveMatch(int tail,final LongToIntFunction comparator)
+#ELSEIF OfRef
+  protected boolean uncheckedremoveMatch(int tail,final ToIntFunction comparator)
+#ENDIF
+  {
+    final var arr=this.arr;
+    final int head;
+    if((head=this.head)<=tail)
+    {
+      //non-fragmented
+      int mid;
+      switch(comparator.applyAsInt(arr[mid=(head+tail)>>>1]))
+      {
+        default:
+          if(++mid>tail || (mid=findIndex(arr,mid,tail,comparator))==-1)
+          {
+            return false;
+          }
+          ArrCopy.semicheckedSelfCopy(arr,mid,mid+1,tail-mid);
+#IF OfRef
+          arr[tail]=null;
+#ENDIF
+          this.tail=tail-1;
+          return true;
+        case 0:
+          if(head==tail)
+          {
+            this.tail=-1;
+#IF OfRef
+            arr[head]=null
+#ENDIF
+            return true;
+          }
+          break;
+        case 1:
+          if(--mid<head || (mid=findIndex(arr,head,mid,comparator))==-1)
+          {
+            return false;
+          }
+      }
+      ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,mid-head);
+      this.head=tail;
+#IF OfRef
+      arr[head]=null;
+#ENDIF
+
+    }
+    else
+    {
+      //fragmented
+      switch(comparator.applyAsInt(arr[0]))
+      {
+        case 0:
+          if(tail==0)
+          {
+            this.tail=arr.length-1;
+          }
+          else
+          {
+            ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+            this.tail=tail-1;
+          }
+          break;
+        case 1:
+          int index;
+          if((index=findIndex(arr,head,tail=arr.length-1,comparator))==-1)
+          {
+            return false;
+          }
+          if(head==tail)
+          {
+            this.head=0;
+          }
+          else
+          {
+            ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,index-head);
+            this.head=tail;
+          }
+#IF OfRef
+          arr[head]=null;
+#ENDIF
+          return true;
+        default:
+          if(tail==0 || (index=findIndex(arr,1,tail,comparator))==-1)
+          {
+            return false;
+          }
+          ArrCopy.semicheckedSelfCopy(arr,index,index+1,tail-index);
+          this.tail=tail-1;
+      }
+#IF OfRef
+      arr[tail]=null;
+#ENDIF
+    }
+    return true;
+  }
+  
+  
+#IF OfByte,OfChar,OfShort,OfInt
+  protected static int findIndex(final $KeyType$[] arr,int head,int tail,final IntUnaryOperator comparator)
+#ELSEIF OfLong
+  protected static int findIndex(final $KeyType$[] arr,int head,int tail,final LongToIntFunction comparator)
+#ELSEIF OfRef
+  protected static int findIndex(final $KeyType$[] arr,int head,int tail,final ToIntFunction comparator)
+#ENDIF
+  {
+    do
+    {
+      final int mid
+      switch(comparator.applyAsInt(arr[mid=(head+tail)>>>1]))
+      {
+        case 0:
+          return mid;
+        case 1:
+          tail=mid-1;
+          break;
+        default:
+          head=mid+1;
+      }
+    }
+    while(head<=tail);
+    return -1;
+  }
+  
+#IF OfByte,OfChar,OfShort,OfInt
+  protected boolean uncheckedcontainsMatch(int tail,final IntUnaryOperator comparator)
+#ELSEIF OfLong
+  protected boolean uncheckedcontainsMatch(int tail,final LongToIntFunction comparator)
+#ELSEIF OfRef
+  protected boolean uncheckedcontainsMatch(int tail,final ToIntFunction comparator)
+#ENDIF
+  {
+    final var arr=this.arr;
+    int head;
+    if((head=this.head)>tail)
+    {
+      //fragmented
+      switch(comparator.applyAsInt(arr[0]))
+      {
+        case 0:
+          return true;
+        case 1:
+          //search in the head span
+          tail=arr.length-1;
+          break;
+        default:
+          //search in the tail span
+          if(tail==0)
+          {
+            return false;
+          }
+          head=1;
+      }
+    }
+    return findIndex(arr,head,tail,comparator)!=-1;
+  }
+#IF OfByte,OfChar,OfShort,OfInt
+  protected boolean uncheckedcontainsMatch(int tail,final IntPredicate tester)
+#ELSEIF OfLong
+  protected boolean uncheckedcontainsMatch(int tail,final LongPredicate tester)
+#ELSEIF OfRef
+  protected boolean uncheckedcontainsMatch(int tail,final Predicate tester)
+#ENDIF
+  {
+    final var arr=this.arr;
+    int head;
+    if((head=this.head)>tail)
+    {
+      for(;;)
+      {
+        if(tester.test(arr[tail]))
+        {
+          return true;
+        }
+        if(tail==0)
+        {
+          tail=arr.length-1;
+        }
+        --tail;
+      }
+    }
+    for(;;)
+    {
+      if(tester.test(arr[head]))
+      {
+        return true;
+      }
+      if(head==tail)
+      {
+        return false;
+      }
+      ++head;
+    }
+  }
+  
+  
 }
