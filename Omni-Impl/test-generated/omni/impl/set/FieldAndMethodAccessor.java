@@ -9,7 +9,6 @@ import java.lang.invoke.MethodHandles;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import omni.impl.AbstractBooleanItr;
-import omni.impl.AbstractByteItr;
 import java.io.ObjectOutputStream;
 final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
@@ -468,7 +467,7 @@ final class FieldAndMethodAccessor{
       }
     }
   }
-  //TODO ByteSet
+  //TODO write, read, clone
   static interface AbstractByteSet{
     static interface EmptyView extends AbstractByteSet{
       static final omni.impl.AbstractByteItr EMPTY_ITR=omni.impl.set.AbstractByteSet.EmptyView.EMPTY_ITR;

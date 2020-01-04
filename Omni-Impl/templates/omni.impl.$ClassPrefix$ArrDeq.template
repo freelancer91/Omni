@@ -1,0 +1,1167 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl;
+import omni.api.OmniDeque;
+import omni.api.OmniIterator;
+import omni.util.ArrCopy;
+import omni.util.OmniArray;
+import omni.util.TypeUtil;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.IntFunction;
+#IF OfBoolean
+import omni.function.BooleanConsumer;
+import omni.function.BooleanPredicate;
+#ENDIF
+public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$BoxedType$> implements OmniDeque.Of$ClassPrefix$$<E>$
+{
+  $ClassPrefix$ArrDeq(int head,$ArrayType$[] arr,int tail){
+    super(head,arr,tail);
+  }
+  $ClassPrefix$ArrDeq(){
+    super();
+  }
+  @Override public boolean offerFirst($exposedType$ val){
+    push(val);
+    return true;
+  }
+  @Override public boolean offerLast($exposedType$ val){
+    addLast(val);
+    return true;
+  }
+  @Override public boolean offer($exposedType$ val){
+    addLast(val);
+    return true;
+  }
+  @Override public void addFirst($exposedType$ val){
+    push(val);
+  }
+  @Override public boolean add($exposedType$ val){
+    addLast(val);
+    return true;
+  }
+  @Override public $exposedType$ $elementMethod$(){
+    return ($exposedType$)arr[head];
+  }
+  @Override public $exposedType$ getLast$TypeNameModifier$(){
+    return ($exposedType$)arr[tail];
+  }
+  @Override public $exposedType$ peek$TypeNameModifier$(){
+    if(this.tail!=-1){
+      return ($exposedType$)arr[head];
+    }
+    return $defaultVal$;
+  }
+  @Override public $exposedType$ peekLast$TypeNameModifier$(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return ($exposedType$)arr[tail];
+    }
+    return $defaultVal$;
+  }
+  @Override public $exposedType$ poll$TypeNameModifier$(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return ($exposedType$)uncheckedRemoveFirst(tail);
+    }
+    return $defaultVal$;
+  }
+  @Override public $exposedType$ pollLast$TypeNameModifier$(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return ($exposedType$)uncheckedRemoveLast(tail);
+    }
+    return $defaultVal$;
+  }
+  #MACRO ToArray<$ArrayType$>($TypeNameModifier$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+  @Override public $exposedType$ removeLast$TypeNameModifier$(){
+    return ($exposedType$)uncheckedRemoveLast(this.tail);
+  }
+  @Override public $exposedType$ pop$TypeNameModifier$(){
+    return ($exposedType$)uncheckedRemoveFirst(this.tail);
+  }
+  @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Object clone(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter);
+  }
+#IF OfBoolean
+  @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter::test);
+  }
+#ENDIF
+  @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      uncheckedForEach(tail,action);
+    }
+  }
+#IF OfBoolean
+  @Override public void forEach(Consumer<? super $BoxedType$> action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      uncheckedForEach(tail,action::accept);
+    }
+  }
+#ENDIF
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final T[] dst;
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
+      }else{
+        final $ArrayType$[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return arrConstructor.apply(0);
+  }
+  @Override public <T> T[] toArray(T[] dst){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }else{
+        final $ArrayType$[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
+  }
+#IF OfBoolean
+  #MACRO ToArray<$BoxedType$>(,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ element(){
+    return this.$elementMethod$();
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ getLast(){
+    return this.getLast$TypeNameModifier$();
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ getFirst(){
+    return this.$elementMethod$();
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ removeFirst(){
+    return uncheckedRemoveFirst(this.tail);
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ removeLast(){
+    return uncheckedRemoveLast(this.tail);
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ remove(){
+    return uncheckedRemoveFirst(this.tail);
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean offerFirst($BoxedType$ val){
+    push(($exposedType$)val);
+    return true;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean offerLast($BoxedType$ val){
+    addLast(($exposedType$)val);
+    return true;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean add($BoxedType$ val){
+    addLast(($exposedType$)val);
+    return true;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public void addLast($BoxedType$ val){
+    addLast(($exposedType$)val);
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean offer($BoxedType$ val){
+    addLast(($exposedType$)val);
+    return true;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public void addFirst($BoxedType$ val){
+    push(($exposedType$)val);
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public void push($BoxedType$ val){
+    push(($exposedType$)val);
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ peek(){
+    if(this.tail!=-1){
+      return ($BoxedType$)(arr[head]);
+    }
+    return null;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ peekFirst(){
+    if(this.tail!=-1){
+      return ($BoxedType$)(arr[head]);
+    }
+    return null;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ peekLast(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return ($BoxedType$)(arr[tail]);
+    }
+    return null;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ poll(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return ($BoxedType$)uncheckedRemoveFirst(tail);
+    }
+    return null;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ pollLast(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return ($BoxedType$)uncheckedRemoveLast(tail);
+    }
+    return null;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ pollFirst(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return ($BoxedType$)uncheckedRemoveFirst(tail);
+    }
+    return null;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public $BoxedType$ pop(){
+    return ($BoxedType$)uncheckedRemoveFirst(this.tail);
+  }
+#ENDIF 
+#IF OfBoolean
+  @Override public double peekDouble(){
+    if(this.tail!=-1){
+      return $castToDouble$(arr[head]);
+    }
+    return Double.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public double peekLastDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToDouble$(arr[tail]);
+    }
+    return Double.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public double pollDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToDouble$(uncheckedRemoveFirst(tail));
+    }
+    return Double.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public double pollLastDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToDouble$(uncheckedRemoveLast(tail));
+    }
+    return Double.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<double>(Double,OmniArray.OfDouble.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  @Override public float peekFloat(){
+    if(this.tail!=-1){
+      return $castToFloat$(arr[head]);
+    }
+    return Float.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public float pollLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToFloat$(uncheckedRemoveLast(tail));
+    }
+    return Float.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public float pollFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToFloat$(uncheckedRemoveFirst(tail));
+    }
+    return Float.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public float peekLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToFloat$(arr[tail]);
+    }
+    return Float.NaN;
+  }
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<float>(Float,OmniArray.OfFloat.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  @Override public long peekLastLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToLong$(arr[tail]);
+    }
+    return Long.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public long pollLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToLong$(uncheckedRemoveFirst(tail));
+    }
+    return Long.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public long peekLong(){
+    if(this.tail!=-1){
+      return $castToLong$(arr[head]);
+    }
+    return Long.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public long pollLastLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToLong$(uncheckedRemoveLast(tail));
+    }
+    return Long.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<long>(Long,OmniArray.OfLong.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  @Override public int peekLastInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToInt$(arr[tail]);
+    }
+    return Integer.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int pollInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToInt$(uncheckedRemoveFirst(tail));
+    }
+    return Integer.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<int>(Int,OmniArray.OfInt.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  @Override public int peekInt(){
+    if(this.tail!=-1){
+      return $castToInt$(arr[head]);
+    }
+    return Integer.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int pollLastInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToInt$(uncheckedRemoveLast(tail));
+    }
+    return Integer.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public short peekShort(){
+    if(this.tail!=-1){
+      return $castToShort$(arr[head]);
+    }
+    return Short.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public short pollShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToShort$(uncheckedRemoveFirst(tail));
+    }
+    return Short.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public short peekLastShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToShort$(arr[tail]);
+    }
+    return Short.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public short pollLastShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToShort$(uncheckedRemoveLast(tail));
+    }
+    return Short.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<short>(Short,OmniArray.OfShort.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  @Override public char peekLastChar(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToChar$(arr[tail]);
+    }
+    return Character.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public char pollLastChar(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToChar$(uncheckedRemoveLast(tail));
+    }
+    return Character.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public char peekChar(){
+    if(this.tail!=-1){
+      return $castToChar$(arr[head]);
+    }
+    return Character.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public char pollChar(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToChar$(uncheckedRemoveFirst(tail));
+    }
+    return Character.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<char>(Char,OmniArray.OfChar.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  @Override public byte pollByte(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToByte$(uncheckedRemoveFirst(tail));
+    }
+    return Byte.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public byte peekByte(){
+    if(this.tail!=-1){
+      return $castToByte$(arr[head]);
+    }
+    return Byte.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public byte peekLastByte(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToByte$(arr[tail]);
+    }
+    return Byte.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public byte pollLastByte(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return $castToByte$(uncheckedRemoveLast(tail));
+    }
+    return Byte.MIN_VALUE;
+  }
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<byte>(Byte,OmniArray.OfByte.DEFAULT_ARR)
+#ENDIF
+  @Override public void addLast($exposedType$ val){
+    var arr=this.arr;
+    int tail;
+    if((tail=this.tail)!=-1){
+      int head;
+      if((head=this.head)<=tail){
+        if(++tail==arr.length && head==0){
+          ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(tail)],0,tail);
+          this.arr=arr;
+        }
+        
+      }else if(++tail==head){
+        this.head=0;
+        final var tmp=new $ArrayType$[OmniArray.growBy50Pct(tail=arr.length)];
+        final int copyLength;
+        ArrCopy.uncheckedCopy(arr,head,tmp,0,copyLength=tail-head);
+        ArrCopy.uncheckedCopy(arr,0,tmp,copyLength,head);
+        this.arr=arr=tmp;
+      }
+      arr[tail]=val;
+      this.tail=tail;
+    }else{
+      if(arr==null){
+        this.arr=new $ArrayType$[]{val};
+      }else{
+        if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
+          this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        }
+        arr[0]=val;
+      }
+      this.head=0;
+      this.tail=0;
+    }
+  }
+
+  @Override public void push($exposedType$ val){
+    var arr=this.arr;
+    int tail;
+    if((tail=this.tail)!=-1){
+      int head;
+      if((head=this.head)<=tail){
+        if(head==0 && tail==arr.length-1){
+          final var tmp=new $ArrayType$[head=OmniArray.growBy50Pct(++tail)];
+          this.tail=head-1;
+          ArrCopy.uncheckedCopy(arr,0,tmp,head-=tail,tail);
+          this.arr=arr=tmp;
+        }
+        --head;
+      }else if(--head==tail){
+        int arrLength;
+        final var tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)];
+        this.tail=head-1;
+        ArrCopy.uncheckedCopy(arr,0,tmp,head-=(++tail),tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.arr=arr=tmp;
+        --head;
+      }
+      arr[head]=val;
+      this.head=head;
+    }else{
+      if(arr==null){
+        this.arr=new $ArrayType$[]{val};
+        this.head=0;
+        this.tail=0;
+      }else if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
+        this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
+        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+      }else{
+        arr[tail=arr.length-1]=val;
+        this.tail=tail;
+        this.head=tail;
+      }
+    }
+  }
+  boolean uncheckedRemoveIf(int tail,$TypeNameModifier$Predicate$<? super E>$ action){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  void uncheckedForEach(int tail,$TypeNameModifier$Consumer$<? super E>$ action){
+    final var arr=this.arr;
+    int head;
+    if(tail<(head=this.head)){
+      for(int bound=arr.length;;){
+        action.accept(($exposedType$)arr[head]);
+        if(++head==bound){
+          head=0;
+          break;
+        }
+      }
+    }
+    for(;;){
+      action.accept(($exposedType$)arr[head]);
+      if(head==tail){
+        break;
+      }
+      ++head;
+    }
+  }
+#IF OfBoolean
+  @Override public boolean contains(boolean queryParam){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<boolean>(false)
+      return uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean contains(int val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<int>(false)
+      return uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean contains(long val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<long>(false)
+      return uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean contains(float val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<float>(false)
+      return uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean contains(double val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<double>(false)
+      return uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean contains(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<Object>(false)
+      return uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int search(boolean queryParam){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<boolean>(-1)
+      return uncheckedSearch(tail,queryParam);
+    }
+    return -1;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int search(int val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<int>(-1)
+      return uncheckedSearch(tail,queryParam);
+    }
+    return -1;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int search(long val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<long>(-1)
+      return uncheckedSearch(tail,queryParam);
+    }
+    return -1;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int search(float val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<float>(-1)
+      return uncheckedSearch(tail,queryParam);
+    }
+    return -1;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int search(double val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<double>(-1)
+      return uncheckedSearch(tail,queryParam);
+    }
+    return -1;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public int search(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<Object>(-1)
+      return uncheckedSearch(tail,queryParam);
+    }
+    return -1;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeVal(boolean queryParam){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<boolean>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeVal(int val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<int>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeVal(long val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<long>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeVal(float val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<float>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeVal(double val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<double>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean remove(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<Object>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeFirstOccurrence(boolean queryParam){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<boolean>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeFirstOccurrence(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<Object>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveFirstMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeLastOccurrence(boolean queryParam){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<boolean>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveLastMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeLastOccurrence(int val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<int>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveLastMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeLastOccurrence(long val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<long>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveLastMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeLastOccurrence(float val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<float>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveLastMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeLastOccurrence(double val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<double>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveLastMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+#IF OfBoolean
+  @Override public boolean removeLastOccurrence(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      #MACRO InitializeQueryParameter<Object>(false)
+      final int head;
+      if((head=this.head)<=tail){
+        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
+      }else{
+        return fragmentedRemoveLastMatch(head,tail,queryParam);
+      }
+    }
+    return false;
+  }
+#ENDIF
+
+
+  $ArrayType$ uncheckedRemoveLast(int tail){
+    final $ArrayType$[] arr;
+    final var ret=(arr=this.arr)[tail];
+    #IF OfRef
+    arr[tail]=null;
+    #ENDIF
+    switch(Integer.signum(tail-this.head))
+    {
+      case 0:
+        this.tail=-1;
+        return ret;
+      case -1:
+        //fragmented
+        if(--tail==-1){
+          tail=arr.length-1;
+        }
+        break;
+      default:
+        --tail;
+    }
+    this.tail=tail;
+    return ret;
+  }
+
+  $ArrayType$ uncheckedRemoveFirst(int tail){
+    int head;
+    final $ArrayType$[] arr;
+    final var ret=(arr=this.arr)[head=this.head];
+    #IF OfRef
+    arr[head]=null;
+    #ENDIF
+    switch(Integer.signum(tail-head))
+    {
+      case 0:
+        this.tail=-1;
+        return ret;
+      case -1:
+        //fragmented
+        if(++head==arr.length){
+          head=0;
+        }
+        break;
+      default:
+        ++head;
+    }
+    this.head=head;
+    return ret;
+  }
+
+  
+
+  
+  
+
+}
+#MACRODEF InitializeQueryParameter<PARAMTYPE>(NEGRET)
+#IF OfBoolean
+  #IFSWITCH PARAMTYPE==double
+final boolean queryParam;
+final long bits;
+if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+  queryParam=false;
+}else if(bits==TypeUtil.DBL_TRUE_BITS){
+  queryParam=true;
+}else{
+  return NEGRET;
+}
+  #ENDIF
+  #IFSWITCH PARAMTYPE==float
+final boolean queryParam;
+switch(Float.floatToRawIntBits(val)){
+  default:
+    return NEGRET;
+  case 0:
+  case Integer.MIN_VALUE:
+    queryParam=false;
+    break;
+  case TypeUtil.FLT_TRUE_BITS:
+    queryParam=true;
+}
+  #ENDIF
+  #IFSWITCH PARAMTYPE==long
+final boolean queryParam;
+if(val==0L){
+  queryParam=false;
+}else if(val==1L){  
+  queryParam=true;
+}else{
+  return NEGRET;
+}
+  #ENDIF
+  #IFSWITCH PARAMTYPE==int
+final boolean queryParam;
+switch(val){
+  default:
+    return NEGRET;
+  case 0:
+    queryParam=false;
+    break;
+  case 1:
+    queryParam=true;
+}
+  #ENDIF
+  #IFSWITCH PARAMTYPE==Object
+final boolean queryParam;
+if(val instanceof Boolean){
+  queryParam=(boolean)val;
+}else if(val instanceof Integer || val instanceof Short || val instanceof Byte){
+  switch(((Number)val).intValue()){
+    default:
+      return NEGRET;
+    case 0:
+      queryParam=false;
+      break;
+    case 1:
+      queryParam=true;
+  }
+}else if(val instanceof Long){
+  final long l;
+  if((l=(long)val)==0){
+    queryParam=false;
+  }else if(l==1){
+    queryParam=true;
+  }else{
+    return NEGRET;
+  }
+}else if(val instanceof Float){
+  switch(Float.floatToRawIntBits((float)val)){
+    default:
+      return NEGRET;
+    case 0:
+    case Integer.MIN_VALUE:
+      queryParam=false;
+      break;
+    case TypeUtil.FLT_TRUE_BITS:
+      queryParam=true;
+  }
+}else if(val instanceof Double){
+  long bits;
+  if((bits=Double.doubleToRawLongBits((double)val))==0 || bits==Long.MIN_VALUE){
+    queryParam=false;
+  }else if(bits==TypeUtil.DBL_TRUE_BITS){
+    queryParam=true;
+  }else{
+    return NEGRET;
+  }
+}else if(val instanceof Character){
+  switch(((Character)val).charValue()){
+    default:
+      return NEGRET;
+    case 0:
+      queryParam=false;
+      break;
+    case 1:
+      queryParam=true;
+  }
+}else{
+  return NEGRET;
+}
+  #ENDIF
+#ENDIF
+#ENDDEF
+#MACRODEF ToArray<DSTARR>(TYPENAMEMODIFIER,DEFAULTARR)
+@Override public DSTARR[] toTYPENAMEMODIFIERArray(){
+  int tail;
+  if((tail=this.tail)!=-1){
+    DSTARR[] dst;
+    final int head;
+      int size;
+    if((size=(++tail)-(head=this.head))>0){
+      ArrCopy.uncheckedCopy(this.arr,head,dst=new DSTARR[size],0,size);
+    }else{
+      final $ArrayType$[] arr;
+      ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new DSTARR[size+=arr.length],0,size-=tail);
+      ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+    }
+    return dst;
+  }
+  return DEFAULTARR;
+}
+#ENDDEF

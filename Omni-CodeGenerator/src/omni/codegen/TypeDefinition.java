@@ -14,6 +14,7 @@ enum TypeDefinition{
     private static List<DefVar> getOfBoolean(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Boolean"));
+        defVars.add(new DefVar("KeyType","boolean"));
         //defVars.add(new DefVar("DNode","BooleanDblLnkNode"));
         //defVars.add(new DefVar("SNode","BooleanSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -46,6 +47,7 @@ enum TypeDefinition{
     private static List<DefVar> getOfByte(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Byte"));
+        defVars.add(new DefVar("KeyType","byte"));
         //defVars.add(new DefVar("DNode","ByteDblLnkNode"));
         //defVars.add(new DefVar("SNode","ByteSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
