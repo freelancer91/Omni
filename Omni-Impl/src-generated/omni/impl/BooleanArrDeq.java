@@ -17,6 +17,17 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
   BooleanArrDeq(){
     super();
   }
+  @Override public boolean add(boolean val){
+    addLast(val);
+    return true;
+  }
+  @Override public void addFirst(boolean val){
+    push(val);
+  }
+  @Override public boolean offer(boolean val){
+    addLast(val);
+    return true;
+  }
   @Override public boolean offerFirst(boolean val){
     push(val);
     return true;
@@ -25,21 +36,44 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     addLast(val);
     return true;
   }
-  @Override public boolean offer(boolean val){
-    addLast(val);
+  @Override public boolean add(Boolean val){
+    addLast((boolean)val);
     return true;
   }
-  @Override public void addFirst(boolean val){
-    push(val);
+  @Override public void addFirst(Boolean val){
+    push((boolean)val);
   }
-  @Override public boolean add(boolean val){
-    addLast(val);
+  @Override public void addLast(Boolean val){
+    addLast((boolean)val);
+  }
+  @Override public boolean offer(Boolean val){
+    addLast((boolean)val);
     return true;
+  }
+  @Override public boolean offerFirst(Boolean val){
+    push((boolean)val);
+    return true;
+  }
+  @Override public boolean offerLast(Boolean val){
+    addLast((boolean)val);
+    return true;
+  }
+  @Override public void push(Boolean val){
+    push((boolean)val);
   }
   @Override public boolean booleanElement(){
     return (boolean)arr[head];
   }
   @Override public boolean getLastBoolean(){
+    return (boolean)arr[tail];
+  }
+  @Override public Boolean element(){
+    return (boolean)arr[head];
+  }
+  @Override public Boolean getFirst(){
+    return (boolean)arr[head];
+  }
+  @Override public Boolean getLast(){
     return (boolean)arr[tail];
   }
   @Override public boolean peekBoolean(){
@@ -54,169 +88,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       return (boolean)arr[tail];
     }
     return false;
-  }
-  @Override public boolean pollBoolean(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (boolean)uncheckedRemoveFirst(tail);
-    }
-    return false;
-  }
-  @Override public boolean pollLastBoolean(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (boolean)uncheckedRemoveLast(tail);
-    }
-    return false;
-  }
-  @Override public boolean[] toBooleanArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      boolean[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new boolean[size],0,size);
-      }else{
-        final boolean[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new boolean[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfBoolean.DEFAULT_ARR;
-  }
-  @Override public boolean removeLastBoolean(){
-    return (boolean)uncheckedRemoveLast(this.tail);
-  }
-  @Override public boolean popBoolean(){
-    return (boolean)uncheckedRemoveFirst(this.tail);
-  }
-  @Override public OmniIterator.OfBoolean iterator(){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public OmniIterator.OfBoolean descendingIterator(){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Object clone(){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public boolean removeIf(BooleanPredicate filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter);
-  }
-  @Override public boolean removeIf(Predicate<? super Boolean> filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter::test);
-  }
-  @Override public void forEach(BooleanConsumer action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      uncheckedForEach(tail,action);
-    }
-  }
-  @Override public void forEach(Consumer<? super Boolean> action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      uncheckedForEach(tail,action::accept);
-    }
-  }
-  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final T[] dst;
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
-      }else{
-        final boolean[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return arrConstructor.apply(0);
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
-      }else{
-        final boolean[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-    }else if(dst.length!=0){
-      dst[0]=null;
-    }
-    return dst;
-  }
-  @Override public Boolean[] toArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      Boolean[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Boolean[size],0,size);
-      }else{
-        final boolean[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Boolean[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfBoolean.DEFAULT_BOXED_ARR;
-  }
-  @Override public Boolean element(){
-    return this.booleanElement();
-  }
-  @Override public Boolean getLast(){
-    return this.getLastBoolean();
-  }
-  @Override public Boolean getFirst(){
-    return this.booleanElement();
-  }
-  @Override public Boolean removeFirst(){
-    return uncheckedRemoveFirst(this.tail);
-  }
-  @Override public Boolean removeLast(){
-    return uncheckedRemoveLast(this.tail);
-  }
-  @Override public Boolean remove(){
-    return uncheckedRemoveFirst(this.tail);
-  }
-  @Override public boolean offerFirst(Boolean val){
-    push((boolean)val);
-    return true;
-  }
-  @Override public boolean offerLast(Boolean val){
-    addLast((boolean)val);
-    return true;
-  }
-  @Override public boolean add(Boolean val){
-    addLast((boolean)val);
-    return true;
-  }
-  @Override public void addLast(Boolean val){
-    addLast((boolean)val);
-  }
-  @Override public boolean offer(Boolean val){
-    addLast((boolean)val);
-    return true;
-  }
-  @Override public void addFirst(Boolean val){
-    push((boolean)val);
-  }
-  @Override public void push(Boolean val){
-    push((boolean)val);
   }
   @Override public Boolean peek(){
     if(this.tail!=-1){
@@ -237,30 +108,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     }
     return null;
   }
-  @Override public Boolean poll(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Boolean)uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Boolean pollLast(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Boolean)uncheckedRemoveLast(tail);
-    }
-    return null;
-  }
-  @Override public Boolean pollFirst(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Boolean)uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Boolean pop(){
-    return (Boolean)uncheckedRemoveFirst(this.tail);
-  }
   @Override public double peekDouble(){
     if(this.tail!=-1){
       return TypeUtil.castToDouble(arr[head]);
@@ -274,19 +121,268 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     }
     return Double.NaN;
   }
+  @Override public float peekFloat(){
+    if(this.tail!=-1){
+      return TypeUtil.castToFloat(arr[head]);
+    }
+    return Float.NaN;
+  }
+  @Override public float peekLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToFloat(arr[tail]);
+    }
+    return Float.NaN;
+  }
+  @Override public long peekLong(){
+    if(this.tail!=-1){
+      return TypeUtil.castToLong(arr[head]);
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public long peekLastLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToLong(arr[tail]);
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public int peekInt(){
+    if(this.tail!=-1){
+      return (int)TypeUtil.castToByte(arr[head]);
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public int peekLastInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (int)TypeUtil.castToByte(arr[tail]);
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public short peekShort(){
+    if(this.tail!=-1){
+      return (short)TypeUtil.castToByte(arr[head]);
+    }
+    return Short.MIN_VALUE;
+  }
+  @Override public short peekLastShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (short)TypeUtil.castToByte(arr[tail]);
+    }
+    return Short.MIN_VALUE;
+  }
+  @Override public char peekChar(){
+    if(this.tail!=-1){
+      return TypeUtil.castToChar(arr[head]);
+    }
+    return Character.MIN_VALUE;
+  }
+  @Override public char peekLastChar(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToChar(arr[tail]);
+    }
+    return Character.MIN_VALUE;
+  }
+  @Override public byte peekByte(){
+    if(this.tail!=-1){
+      return TypeUtil.castToByte(arr[head]);
+    }
+    return Byte.MIN_VALUE;
+  }
+  @Override public byte peekLastByte(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToByte(arr[tail]);
+    }
+    return Byte.MIN_VALUE;
+  }
+  @Override public boolean pollBoolean(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (boolean)super.uncheckedRemoveFirst(tail);
+    }
+    return false;
+  }
+  @Override public boolean pollLastBoolean(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (boolean)super.uncheckedRemoveLast(tail);
+    }
+    return false;
+  }
+  @Override public Boolean poll(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Boolean)super.uncheckedRemoveFirst(tail);
+    }
+    return null;
+  }
+  @Override public Boolean pollFirst(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Boolean)super.uncheckedRemoveFirst(tail);
+    }
+    return null;
+  }
+  @Override public Boolean pollLast(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Boolean)super.uncheckedRemoveLast(tail);
+    }
+    return null;
+  }
   @Override public double pollDouble(){
     final int tail;
     if((tail=this.tail)!=-1){
-      return TypeUtil.castToDouble(uncheckedRemoveFirst(tail));
+      return TypeUtil.castToDouble(super.uncheckedRemoveFirst(tail));
     }
     return Double.NaN;
   }
   @Override public double pollLastDouble(){
     final int tail;
     if((tail=this.tail)!=-1){
-      return TypeUtil.castToDouble(uncheckedRemoveLast(tail));
+      return TypeUtil.castToDouble(super.uncheckedRemoveLast(tail));
     }
     return Double.NaN;
+  }
+  @Override public float pollFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToFloat(super.uncheckedRemoveFirst(tail));
+    }
+    return Float.NaN;
+  }
+  @Override public float pollLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToFloat(super.uncheckedRemoveLast(tail));
+    }
+    return Float.NaN;
+  }
+  @Override public long pollLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToLong(super.uncheckedRemoveFirst(tail));
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public long pollLastLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToLong(super.uncheckedRemoveLast(tail));
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public int pollInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (int)TypeUtil.castToByte(super.uncheckedRemoveFirst(tail));
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public int pollLastInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (int)TypeUtil.castToByte(super.uncheckedRemoveLast(tail));
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public short pollShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (short)TypeUtil.castToByte(super.uncheckedRemoveFirst(tail));
+    }
+    return Short.MIN_VALUE;
+  }
+  @Override public short pollLastShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (short)TypeUtil.castToByte(super.uncheckedRemoveLast(tail));
+    }
+    return Short.MIN_VALUE;
+  }
+  @Override public char pollChar(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToChar(super.uncheckedRemoveFirst(tail));
+    }
+    return Character.MIN_VALUE;
+  }
+  @Override public char pollLastChar(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToChar(super.uncheckedRemoveLast(tail));
+    }
+    return Character.MIN_VALUE;
+  }
+  @Override public byte pollByte(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToByte(super.uncheckedRemoveFirst(tail));
+    }
+    return Byte.MIN_VALUE;
+  }
+  @Override public byte pollLastByte(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return TypeUtil.castToByte(super.uncheckedRemoveLast(tail));
+    }
+    return Byte.MIN_VALUE;
+  }
+  @Override public boolean popBoolean(){
+    return (boolean)super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public boolean removeLastBoolean(){
+    return (boolean)super.uncheckedRemoveLast(this.tail);
+  }
+  @Override public Boolean pop(){
+    return (Boolean)super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public Boolean remove(){
+    return super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public Boolean removeFirst(){
+    return super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public Boolean removeLast(){
+    return super.uncheckedRemoveLast(this.tail);
+  }
+  @Override public boolean[] toBooleanArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      boolean[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new boolean[size],0,size);
+      }else{
+        final boolean[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new boolean[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfBoolean.DEFAULT_ARR;
+  }
+  @Override public Boolean[] toArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      Boolean[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new Boolean[size],0,size);
+      }else{
+        final boolean[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Boolean[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfBoolean.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
     int tail;
@@ -305,33 +401,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
-  @Override public float peekFloat(){
-    if(this.tail!=-1){
-      return TypeUtil.castToFloat(arr[head]);
-    }
-    return Float.NaN;
-  }
-  @Override public float pollLastFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToFloat(uncheckedRemoveLast(tail));
-    }
-    return Float.NaN;
-  }
-  @Override public float pollFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToFloat(uncheckedRemoveFirst(tail));
-    }
-    return Float.NaN;
-  }
-  @Override public float peekLastFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToFloat(arr[tail]);
-    }
-    return Float.NaN;
-  }
   @Override public float[] toFloatArray(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -348,33 +417,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
-  }
-  @Override public long peekLastLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToLong(arr[tail]);
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public long pollLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToLong(uncheckedRemoveFirst(tail));
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public long peekLong(){
-    if(this.tail!=-1){
-      return TypeUtil.castToLong(arr[head]);
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public long pollLastLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToLong(uncheckedRemoveLast(tail));
-    }
-    return Long.MIN_VALUE;
   }
   @Override public long[] toLongArray(){
     int tail;
@@ -393,20 +435,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
-  @Override public int peekLastInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (int)TypeUtil.castToByte(arr[tail]);
-    }
-    return Integer.MIN_VALUE;
-  }
-  @Override public int pollInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (int)TypeUtil.castToByte(uncheckedRemoveFirst(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
   @Override public int[] toIntArray(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -423,46 +451,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       return dst;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
-  }
-  @Override public int peekInt(){
-    if(this.tail!=-1){
-      return (int)TypeUtil.castToByte(arr[head]);
-    }
-    return Integer.MIN_VALUE;
-  }
-  @Override public int pollLastInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (int)TypeUtil.castToByte(uncheckedRemoveLast(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
-  @Override public short peekShort(){
-    if(this.tail!=-1){
-      return (short)TypeUtil.castToByte(arr[head]);
-    }
-    return Short.MIN_VALUE;
-  }
-  @Override public short pollShort(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (short)TypeUtil.castToByte(uncheckedRemoveFirst(tail));
-    }
-    return Short.MIN_VALUE;
-  }
-  @Override public short peekLastShort(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (short)TypeUtil.castToByte(arr[tail]);
-    }
-    return Short.MIN_VALUE;
-  }
-  @Override public short pollLastShort(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (short)TypeUtil.castToByte(uncheckedRemoveLast(tail));
-    }
-    return Short.MIN_VALUE;
   }
   @Override public short[] toShortArray(){
     int tail;
@@ -481,33 +469,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
-  @Override public char peekLastChar(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToChar(arr[tail]);
-    }
-    return Character.MIN_VALUE;
-  }
-  @Override public char pollLastChar(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToChar(uncheckedRemoveLast(tail));
-    }
-    return Character.MIN_VALUE;
-  }
-  @Override public char peekChar(){
-    if(this.tail!=-1){
-      return TypeUtil.castToChar(arr[head]);
-    }
-    return Character.MIN_VALUE;
-  }
-  @Override public char pollChar(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToChar(uncheckedRemoveFirst(tail));
-    }
-    return Character.MIN_VALUE;
-  }
   @Override public char[] toCharArray(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -524,33 +485,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       return dst;
     }
     return OmniArray.OfChar.DEFAULT_ARR;
-  }
-  @Override public byte pollByte(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToByte(uncheckedRemoveFirst(tail));
-    }
-    return Byte.MIN_VALUE;
-  }
-  @Override public byte peekByte(){
-    if(this.tail!=-1){
-      return TypeUtil.castToByte(arr[head]);
-    }
-    return Byte.MIN_VALUE;
-  }
-  @Override public byte peekLastByte(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToByte(arr[tail]);
-    }
-    return Byte.MIN_VALUE;
-  }
-  @Override public byte pollLastByte(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return TypeUtil.castToByte(uncheckedRemoveLast(tail));
-    }
-    return Byte.MIN_VALUE;
   }
   @Override public byte[] toByteArray(){
     int tail;
@@ -569,110 +503,9 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     }
     return OmniArray.OfByte.DEFAULT_ARR;
   }
-  @Override public void addLast(boolean val){
-    var arr=this.arr;
-    int tail;
-    if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(++tail==arr.length && head==0){
-          ArrCopy.uncheckedCopy(arr,0,arr=new boolean[OmniArray.growBy50Pct(tail)],0,tail);
-          this.arr=arr;
-        }
-      }else if(++tail==head){
-        this.head=0;
-        final var tmp=new boolean[OmniArray.growBy50Pct(tail=arr.length)];
-        final int copyLength;
-        ArrCopy.uncheckedCopy(arr,head,tmp,0,copyLength=tail-head);
-        ArrCopy.uncheckedCopy(arr,0,tmp,copyLength,head);
-        this.arr=arr=tmp;
-      }
-      arr[tail]=val;
-      this.tail=tail;
-    }else{
-      if(arr==null){
-        this.arr=new boolean[]{val};
-      }else{
-        if(arr==OmniArray.OfBoolean.DEFAULT_ARR){
-          this.arr=arr=new boolean[OmniArray.DEFAULT_ARR_SEQ_CAP];
-        }
-        arr[0]=val;
-      }
-      this.head=0;
-      this.tail=0;
-    }
-  }
-  @Override public void push(boolean val){
-    var arr=this.arr;
-    int tail;
-    if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(head==0 && tail==arr.length-1){
-          final var tmp=new boolean[head=OmniArray.growBy50Pct(++tail)];
-          this.tail=head-1;
-          ArrCopy.uncheckedCopy(arr,0,tmp,head-=tail,tail);
-          this.arr=arr=tmp;
-        }
-        --head;
-      }else if(--head==tail){
-        int arrLength;
-        final var tmp=new boolean[head=OmniArray.growBy50Pct(arrLength=arr.length)];
-        this.tail=head-1;
-        ArrCopy.uncheckedCopy(arr,0,tmp,head-=(++tail),tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.arr=arr=tmp;
-        --head;
-      }
-      arr[head]=val;
-      this.head=head;
-    }else{
-      if(arr==null){
-        this.arr=new boolean[]{val};
-        this.head=0;
-        this.tail=0;
-      }else if(arr==OmniArray.OfBoolean.DEFAULT_ARR){
-        this.arr=arr=new boolean[OmniArray.DEFAULT_ARR_SEQ_CAP];
-        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
-        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
-        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
-      }else{
-        arr[tail=arr.length-1]=val;
-        this.tail=tail;
-        this.head=tail;
-      }
-    }
-  }
-  boolean uncheckedRemoveIf(int tail,BooleanPredicate action){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  void uncheckedForEach(int tail,BooleanConsumer action){
-    final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
-      for(int bound=arr.length;;){
-        action.accept((boolean)arr[head]);
-        if(++head==bound){
-          head=0;
-          break;
-        }
-      }
-    }
-    for(;;){
-      action.accept((boolean)arr[head]);
-      if(head==tail){
-        break;
-      }
-      ++head;
-    }
-  }
-  @Override public boolean contains(boolean queryParam){
+  @Override public boolean contains(boolean val){
     final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedContainsMatch(tail,queryParam);
-    }
-    return false;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,val);
   }
   @Override public boolean contains(int val){
     final int tail;
@@ -687,7 +520,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case 1:
           queryParam=true;
       }
-      return uncheckedContainsMatch(tail,queryParam);
+      return super.uncheckedContainsMatch(tail,queryParam);
     }
     return false;
   }
@@ -702,7 +535,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      return uncheckedContainsMatch(tail,queryParam);
+      return super.uncheckedContainsMatch(tail,queryParam);
     }
     return false;
   }
@@ -720,7 +553,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case TypeUtil.FLT_TRUE_BITS:
           queryParam=true;
       }
-      return uncheckedContainsMatch(tail,queryParam);
+      return super.uncheckedContainsMatch(tail,queryParam);
     }
     return false;
   }
@@ -736,7 +569,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      return uncheckedContainsMatch(tail,queryParam);
+      return super.uncheckedContainsMatch(tail,queryParam);
     }
     return false;
   }
@@ -798,14 +631,13 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      return uncheckedContainsMatch(tail,queryParam);
+      return super.uncheckedContainsMatch(tail,queryParam);
     }
     return false;
   }
-  @Override public int search(boolean queryParam){
+  @Override public int search(boolean val){
     final int tail;
-    if((tail=this.tail)!=-1){
-      return uncheckedSearch(tail,queryParam);
+    if((tail=this.tail)!=-1){return super.uncheckedSearch(tail,val);
     }
     return -1;
   }
@@ -822,7 +654,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case 1:
           queryParam=true;
       }
-      return uncheckedSearch(tail,queryParam);
+      return super.uncheckedSearch(tail,queryParam);
     }
     return -1;
   }
@@ -837,7 +669,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return -1;
       }
-      return uncheckedSearch(tail,queryParam);
+      return super.uncheckedSearch(tail,queryParam);
     }
     return -1;
   }
@@ -855,7 +687,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case TypeUtil.FLT_TRUE_BITS:
           queryParam=true;
       }
-      return uncheckedSearch(tail,queryParam);
+      return super.uncheckedSearch(tail,queryParam);
     }
     return -1;
   }
@@ -871,7 +703,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return -1;
       }
-      return uncheckedSearch(tail,queryParam);
+      return super.uncheckedSearch(tail,queryParam);
     }
     return -1;
   }
@@ -933,21 +765,13 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return -1;
       }
-      return uncheckedSearch(tail,queryParam);
+      return super.uncheckedSearch(tail,queryParam);
     }
     return -1;
   }
-  @Override public boolean removeVal(boolean queryParam){
+  @Override public boolean removeVal(boolean val){
     final int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
-    }
-    return false;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveFirstMatch(tail,val);
   }
   @Override public boolean removeVal(int val){
     final int tail;
@@ -962,12 +786,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case 1:
           queryParam=true;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
     }
     return false;
   }
@@ -982,12 +801,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
     }
     return false;
   }
@@ -1005,12 +819,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case TypeUtil.FLT_TRUE_BITS:
           queryParam=true;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
     }
     return false;
   }
@@ -1026,12 +835,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
     }
     return false;
   }
@@ -1093,24 +897,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeFirstOccurrence(boolean queryParam){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
     }
     return false;
   }
@@ -1172,26 +959,13 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveFirstMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
     }
     return false;
   }
-  @Override public boolean removeLastOccurrence(boolean queryParam){
+  @Override public boolean removeLastOccurrence(boolean val){
     final int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveLastMatch(head,tail,queryParam);
-      }
-    }
-    return false;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveLastMatch(tail,val);
   }
   @Override public boolean removeLastOccurrence(int val){
     final int tail;
@@ -1206,12 +980,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case 1:
           queryParam=true;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveLastMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveLastMatch(tail,queryParam);
     }
     return false;
   }
@@ -1226,12 +995,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveLastMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveLastMatch(tail,queryParam);
     }
     return false;
   }
@@ -1249,12 +1013,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
         case TypeUtil.FLT_TRUE_BITS:
           queryParam=true;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveLastMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveLastMatch(tail,queryParam);
     }
     return false;
   }
@@ -1270,12 +1029,7 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveLastMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveLastMatch(tail,queryParam);
     }
     return false;
   }
@@ -1337,54 +1091,103 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
       }else{
         return false;
       }
-      final int head;
-      if((head=this.head)<=tail){
-        return nonfragmentedRemoveLastMatch(head,tail,queryParam);
-      }else{
-        return fragmentedRemoveLastMatch(head,tail,queryParam);
-      }
+      return super.uncheckedRemoveLastMatch(tail,queryParam);
     }
     return false;
   }
-  boolean uncheckedRemoveLast(int tail){
-    final boolean[] arr;
-    final var ret=(arr=this.arr)[tail];
-    switch(Integer.signum(tail-this.head))
-    {
-      case 0:
-        this.tail=-1;
-        return ret;
-      case -1:
-        //fragmented
-        if(--tail==-1){
-          tail=arr.length-1;
-        }
-        break;
-      default:
-        --tail;
+  @Override public OmniIterator.OfBoolean iterator(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      int size;
+      if((size=(tail+1)-(tail=this.head))<=0){
+        size+=arr.length;
+      }
+      return new AscendingUntetheredArrSeqItr<Boolean>(this,tail,size);
     }
-    this.tail=tail;
-    return ret;
+    return new AscendingUntetheredArrSeqItr<Boolean>(this,-1,0);
   }
-  boolean uncheckedRemoveFirst(int tail){
-    int head;
-    final boolean[] arr;
-    final var ret=(arr=this.arr)[head=this.head];
-    switch(Integer.signum(tail-head))
-    {
-      case 0:
-        this.tail=-1;
-        return ret;
-      case -1:
-        //fragmented
-        if(++head==arr.length){
-          head=0;
-        }
-        break;
-      default:
-        ++head;
+  @Override public OmniIterator.OfBoolean descendingIterator(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      int size;
+      if((size=(tail+1)-this.head)<=0){
+        size+=arr.length;
+      }
+      return new DescendingUntetheredArrSeqItr<Boolean>(this,tail,size);
     }
-    this.head=head;
-    return ret;
+    return new DescendingUntetheredArrSeqItr<Boolean>(this,-1,0);
+  }
+  @Override public Object clone(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      boolean[] copy;
+      int size,head;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,copy=new boolean[size],0,size);
+        head=0;
+        tail=size-1;
+      }else{
+        final boolean[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,0,copy=new boolean[size+=arr.length],0,tail);
+        ArrCopy.uncheckedCopy(arr,head,copy,tail,size-tail);
+        head=tail--;
+      }
+      return new BooleanArrDeq(head,copy,tail);
+    }
+    return new BooleanArrDeq();
+  }
+  @Override public boolean removeIf(BooleanPredicate filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter);
+  }
+  @Override public boolean removeIf(Predicate<? super Boolean> filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter::test);
+  }
+  @Override public void forEach(BooleanConsumer action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      super.ascendingForEach(tail,action);
+    }
+  }
+  @Override public void forEach(Consumer<? super Boolean> action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      super.ascendingForEach(tail,action::accept);
+    }
+  }
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final T[] dst;
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
+      }else{
+        final boolean[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return arrConstructor.apply(0);
+  }
+  @Override public <T> T[] toArray(T[] dst){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }else{
+        final boolean[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
   }
 }

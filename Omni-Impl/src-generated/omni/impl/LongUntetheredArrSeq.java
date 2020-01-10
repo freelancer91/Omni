@@ -1,8 +1,15 @@
 package omni.impl;
 import omni.api.OmniCollection;
 import omni.util.ArrCopy;
+import omni.util.OmniArray;
+import java.util.function.LongConsumer;
+import java.util.function.LongPredicate;
 import java.util.function.LongToIntFunction;
-abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizable
 {
   long[] arr;
   int head;
@@ -29,6 +36,126 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>
   }
   @Override public void clear(){
     this.tail=-1;
+  }
+  public void addLast(long val){
+    var arr=this.arr;
+    int tail;
+    if((tail=this.tail)!=-1){
+      int head;
+      if((head=this.head)<=tail){
+        if(++tail==arr.length && head==0){
+          ArrCopy.uncheckedCopy(arr,0,arr=new long[OmniArray.growBy50Pct(tail)],0,tail);
+          this.arr=arr;
+        }
+      }else if(++tail==head){
+        this.head=0;
+        final var tmp=new long[OmniArray.growBy50Pct(tail=arr.length)];
+        final int copyLength;
+        ArrCopy.uncheckedCopy(arr,head,tmp,0,copyLength=tail-head);
+        ArrCopy.uncheckedCopy(arr,0,tmp,copyLength,head);
+        this.arr=arr=tmp;
+      }
+      arr[tail]=val;
+      this.tail=tail;
+    }else{
+      if(arr==null){
+        this.arr=new long[]{val};
+      }else{
+        if(arr==OmniArray.OfLong.DEFAULT_ARR){
+          this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        }
+        arr[0]=val;
+      }
+      this.head=0;
+      this.tail=0;
+    }
+  }
+  public void push(long val){
+    var arr=this.arr;
+    int tail;
+    if((tail=this.tail)!=-1){
+      int head;
+      if((head=this.head)<=tail){
+        if(head==0 && tail==arr.length-1){
+          final var tmp=new long[head=OmniArray.growBy50Pct(++tail)];
+          this.tail=head-1;
+          ArrCopy.uncheckedCopy(arr,0,tmp,head-=tail,tail);
+          this.arr=arr=tmp;
+        }
+        --head;
+      }else if(--head==tail){
+        int arrLength;
+        final var tmp=new long[head=OmniArray.growBy50Pct(arrLength=arr.length)];
+        this.tail=head-1;
+        ArrCopy.uncheckedCopy(arr,0,tmp,head-=(++tail),tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.arr=arr=tmp;
+        --head;
+      }
+      arr[head]=val;
+      this.head=head;
+    }else{
+      if(arr==null){
+        this.arr=new long[]{val};
+        this.head=0;
+        this.tail=0;
+      }else if(arr==OmniArray.OfLong.DEFAULT_ARR){
+        this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
+        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+      }else{
+        arr[tail=arr.length-1]=val;
+        this.tail=tail;
+        this.head=tail;
+      }
+    }
+  }
+  @Override public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int tail;
+    if((tail=this.tail)!=-1){
+      final var arr=this.arr;
+      int size;
+      final int head;
+      if((size=(tail+1)-(head=this.head))<=0){
+        out.writeInt((size+(size=arr.length-1)));
+        OmniArray.OfLong.writeArray(arr,head,size,out);
+        OmniArray.OfLong.writeArray(arr,0,tail,out);
+      }else{
+        out.writeInt(size-1);
+        OmniArray.OfLong.writeArray(arr,head,tail,out);
+      }
+    }else{
+      out.writeInt(-1);
+    }
+  }
+  @Override public void readExternal(ObjectInput in) throws IOException
+  {
+    int tail;
+    this.tail=tail=in.readInt();
+    if(tail!=-1){
+      this.head=0;
+      final long[] arr;
+      OmniArray.OfLong.readArray(arr=new long[tail+1],0,tail,in);
+      this.arr=arr;
+    }
+  }
+  boolean uncheckedRemoveLastMatch(int tail,final long queryParam)
+  {
+    final int head;
+    if((head=this.head)<=tail){
+      return nonfragmentedRemoveLastMatch(head,tail,queryParam);
+    }
+    return fragmentedRemoveLastMatch(head,tail,queryParam);
+  }
+  boolean uncheckedRemoveFirstMatch(int tail,final long queryParam)
+  {
+    final int head;
+    if((head=this.head)<=tail){
+      return nonfragmentedRemoveFirstMatch(head,tail,queryParam);
+    }
+    return fragmentedRemoveFirstMatch(head,tail,queryParam);
   }
   boolean nonfragmentedRemoveLastMatch(int head,int tail,final long searchVal)
   {
@@ -437,5 +564,411 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>
       }
     }
     return findIndex(arr,head,tail,comparator)!=-1;
+  }
+  long uncheckedRemoveLast(int tail){
+    final long[] arr;
+    final var ret=(arr=this.arr)[tail];
+    switch(Integer.signum(tail-this.head))
+    {
+      case 0:
+        this.tail=-1;
+        return ret;
+      case -1:
+        //fragmented
+        if(--tail==-1){
+          tail=arr.length-1;
+        }
+        break;
+      default:
+        --tail;
+    }
+    this.tail=tail;
+    return ret;
+  }
+  long uncheckedRemoveFirst(int tail){
+    int head;
+    final long[] arr;
+    final var ret=(arr=this.arr)[head=this.head];
+    switch(Integer.signum(tail-head))
+    {
+      case 0:
+        this.tail=-1;
+        return ret;
+      case -1:
+        //fragmented
+        if(++head==arr.length){
+          head=0;
+        }
+        break;
+      default:
+        ++head;
+    }
+    this.head=head;
+    return ret;
+  }
+  void ascendingForEach(int tail,LongConsumer action){
+    final var arr=this.arr;
+    int head;
+    if(tail<(head=this.head)){
+      for(int bound=arr.length;;){
+        action.accept((long)arr[head]);
+        if(++head==bound){
+          head=0;
+          break;
+        }
+      }
+    }
+    for(;;){
+      action.accept((long)arr[head]);
+      if(head==tail){
+        break;
+      }
+      ++head;
+    }
+  }
+  void descendingForEach(int tail,LongConsumer action){
+    final var arr=this.arr;
+    int head;
+    if(tail<(head=this.head)){
+      for(;;){
+        action.accept((long)arr[tail]);
+        if(tail==0){
+          tail=arr.length-1;
+          break;
+        }
+        --tail;
+      }
+    }
+    for(;;){
+      action.accept((long)arr[tail]);
+      if(tail==head){
+        return;
+      }
+      --tail;
+    }
+  }
+  boolean nonfragmentedRemoveIf(int head,int tail,LongPredicate filter){
+    final long[] arr;
+    if(filter.test((long)(arr=this.arr)[head])){
+      for(int src=head+1;head<=tail;++src){
+        if(!filter.test((long)arr[src])){
+          this.head=src;
+          while(++src<=tail){
+            if(filter.test((long)arr[src])){
+              head=src;
+              while(++src<=tail){
+                final long tmp;
+                if(!filter.test((long)(tmp=arr[src]))){
+                  arr[head++]=tmp;
+                }
+              }
+              this.tail=head-1;
+              break;
+            }
+          }
+          return true;
+        }
+      }
+      this.tail=-1;
+      return true;
+    }else{
+      while(++head<=tail){
+        if(filter.test((long)arr[head])){
+          int dst=head;
+          while(++head<=tail){
+            final long tmp;
+            if(!filter.test((long)(tmp=arr[head]))){
+              arr[dst++]=tmp;
+            }
+          }
+          this.tail=dst-1;
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+  boolean fragmentedRemoveIf(int head,int tail,LongPredicate filter){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  boolean uncheckedRemoveIf(int tail,LongPredicate filter){
+    int head;
+    switch(Integer.signum(tail-(head=this.head))){
+      case -1:
+      {
+        return fragmentedRemoveIf(head,tail,filter);
+      }
+      case 0:
+      {
+        if(filter.test((long)arr[head])){
+          this.tail=-1;
+          return true;
+        }
+        return false;
+      }
+      default:
+      {
+        return nonfragmentedRemoveIf(head,tail,filter);
+      }
+    }
+  }
+  static abstract class AbstractUntetheredArrSeqItr<E>{
+    transient final LongUntetheredArrSeq<E> root;
+    transient int index;
+    transient int numLeft;
+    AbstractUntetheredArrSeqItr(LongUntetheredArrSeq<E> root,int index,int numLeft){
+      this.root=root;
+      this.index=index;
+      this.numLeft=numLeft;
+    }
+    public boolean hasNext(){
+      return this.numLeft>0;
+    }
+    public long nextLong(){
+      --numLeft;
+      final long[] arr;
+      final int index;
+      iterateIndex(index=this.index,arr=this.root.arr);
+      return (long)arr[index];
+    }
+    public void remove(){
+      final LongUntetheredArrSeq<E> root;
+      final int head;
+      int tail;
+      switch(Integer.signum((tail=(root=this.root).tail)-(head=root.head))){
+        case -1:
+          fragmentedRemove(root,head,tail);
+          break;
+        case 0:
+          root.tail=-1;
+          break;
+        default:
+          nonfragmentedRemove(root,head,tail);
+      }
+    }
+    public void forEachRemaining(LongConsumer action){
+      if(numLeft!=0){
+        uncheckedForEachRemaining(action);
+      }
+    }
+    abstract void iterateIndex(int index,final long[] arr);
+    abstract void fragmentedRemove(final LongUntetheredArrSeq<E> root,int head,int tail);
+    abstract void nonfragmentedRemove(final LongUntetheredArrSeq<E> root,int head,int tail);
+    abstract void uncheckedForEachRemaining(final LongConsumer action);
+  }
+  static class AscendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
+    AscendingUntetheredArrSeqItr(LongUntetheredArrSeq<E> root,int index,int numLeft){
+      super(root,index,numLeft);
+    }
+    @Override void iterateIndex(int index,final long[] arr){
+      if(++index==arr.length){
+        index=0;
+      }
+      this.index=index;
+    }
+    @Override void nonfragmentedRemove(final LongUntetheredArrSeq<E> root,final int head,int tail){
+      final var arr=root.arr;
+      final int index,headLength,tailLength;
+      if((headLength=(index=this.index-1)-head)<=(tailLength=tail-index)){
+        ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headLength);
+        root.head=tail;
+      }else{
+        ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailLength);
+        root.tail=tail-1;
+        this.index=index;
+      }
+    }
+    @Override void fragmentedRemove(final LongUntetheredArrSeq<E> root,final int head,int tail){
+      final var arr=root.arr;
+      final int headLength;
+      int index;
+      if((index=this.index-1)==-1){
+        if((headLength=(index=arr.length-1)-head)<=1+tail){
+          if(headLength==0){
+            root.head=0;
+          }else{
+            ArrCopy.uncheckedCopy(arr,head,arr,tail=head+1,headLength);
+            root.head=tail;
+          }
+        }else{
+          arr[index]=arr[0];
+          if(tail==0){
+            root.tail=index;
+          }else{
+            ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+            root.tail=tail-1;
+          }
+          this.index=index;
+        }
+      }else{
+        int tailLength;
+        if(index<head){
+          if((headLength=arr.length-head-1)+index<(tailLength=tail-index)){
+            ArrCopy.semicheckedCopy(arr,0,arr,1,index);
+            arr[0]=arr[headLength+head];
+            if(headLength==0){
+              root.head=0;
+            }else{
+              ArrCopy.uncheckedCopy(arr,head,arr,tail=head+1,headLength);
+              root.head=tail;
+            }
+          }else{
+            if(tail==0){
+              root.tail=arr.length-1;
+            }else{
+              ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailLength);
+              root.tail=tail-1;
+            }
+            this.index=index;
+          }
+        }else{
+          if((headLength=index-head)<=(tailLength=arr.length-index)+tail){
+            if(headLength+tailLength==1){
+              root.head=0;
+            }else{
+              ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headLength);
+              root.head=tail;
+            }
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,index,index+1,--tailLength);
+            arr[tailLength+=index]=arr[0];
+            if(tail==0){
+              root.tail=tailLength;
+            }else{
+              ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+              root.tail=tail-1;
+            }
+            this.index=index;
+          }
+        }
+      }
+    }
+    @Override void uncheckedForEachRemaining(final LongConsumer action){
+      final LongUntetheredArrSeq<E> root;
+      final int tail;
+      int index;
+      final var arr=(root=this.root).arr;
+      if((index=this.index)>(tail=root.tail)){
+        for(int bound=arr.length;;){
+          action.accept((long)arr[index]);
+          if(++index==bound){
+            index=0;
+            break;
+          }
+        }
+      }
+      do{
+        action.accept((long)arr[index]);
+      }while(++index<=tail);
+      this.index=index;
+    }
+  }
+  static class DescendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
+    DescendingUntetheredArrSeqItr(LongUntetheredArrSeq<E> root,int index,int numLeft){
+      super(root,index,numLeft);
+    }
+    @Override void iterateIndex(int index,final long[] arr){
+      if(--index==-1){
+        index=arr.length-1;
+      }
+      this.index=index;
+    }
+    @Override void nonfragmentedRemove(final LongUntetheredArrSeq<E> root,final int head,int tail){
+      final var arr=root.arr;
+      final int index,headLength,tailLength;
+      if((headLength=(index=this.index+1)-head)<=(tailLength=tail-index)){
+        ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headLength);
+        root.head=tail;
+        this.index=index;
+      }else{
+        ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailLength);
+        root.tail=tail-1;
+      }
+    }
+    @Override void fragmentedRemove(final LongUntetheredArrSeq<E> root,final int head,int tail){
+      final long[] arr;
+      final int headLength;
+      int index;
+      if((index=this.index+1)==(arr=root.arr).length){
+        if((headLength=index-head-1)<tail){
+          arr[0]=arr[index-1];
+          if(headLength==0){
+            root.head=0;
+          }else{
+            ArrCopy.uncheckedCopy(arr,head,arr,tail=head+1,headLength);
+            root.head=tail;
+          }
+          this.index=0;
+        }else{
+          if(tail==0){
+            root.tail=index-1;
+          }else{
+            ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+            root.tail=tail-1;
+          }
+        }
+      }else{
+        int tailLength;
+        if(index<head){
+          if((headLength=arr.length-head-1)+index<(tailLength=tail-index)){
+            ArrCopy.semicheckedCopy(arr,0,arr,1,index);
+            arr[0]=arr[headLength+head];
+            if(headLength==0){
+              root.head=0;
+            }else{
+              ArrCopy.uncheckedCopy(arr,head,arr,tail=head+1,headLength);
+              root.head=tail;
+            }
+            this.index=index;
+          }else{
+            if(tail==0){
+              root.tail=arr.length-1;
+            }else{
+              ArrCopy.semicheckedSelfCopy(arr,index,index+1,tailLength);
+              root.tail=tail-1;
+            }
+          }
+        }else{
+          if((headLength=index-head)<=(tailLength=arr.length-index)+tail){
+            if(headLength+tailLength==1){
+              root.head=0;
+            }else{
+              ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headLength);
+              root.head=tail;
+            }
+            this.index=index;
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,index,index+1,--tailLength);
+            arr[tailLength+=index]=arr[0];
+            if(tail==0){
+              root.tail=tailLength;
+            }else{
+              ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+              root.tail=tail-1;
+            }
+          }
+        }
+      }
+    }
+    @Override void uncheckedForEachRemaining(final LongConsumer action){
+      final LongUntetheredArrSeq<E> root;
+      final int head;
+      int index;
+      final var arr=(root=this.root).arr;
+      if((index=this.index)<(head=root.head)){
+        for(;;){
+          action.accept((long)arr[index]);
+          if(--index==-1){
+            index=arr.length-1;
+            break;
+          }
+        }
+      }
+      do{
+        action.accept((long)arr[index]);
+      }while(--index>=head);
+      this.index=index;
+    }
   }
 }

@@ -111,6 +111,16 @@ public final class OmniArray
   {
     public static final boolean[] DEFAULT_ARR=new boolean[]{};
     public static final Boolean[] DEFAULT_BOXED_ARR=new Boolean[]{};
+    public static void fill(boolean[] arr,int begin,int end,boolean val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(boolean[] arr,int begin,int end,DataOutput out) throws IOException{
       for(int word=TypeUtil.castToByte(arr[begin]),marker=1;;){
         if(begin==end){
@@ -393,6 +403,16 @@ public final class OmniArray
   {
     public static final byte[] DEFAULT_ARR=new byte[]{};
     public static final Byte[] DEFAULT_BOXED_ARR=new Byte[]{};
+    public static void fill(byte[] arr,int begin,int end,byte val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static   void uncheckedReplaceAll(byte[] arr,int offset,int bound,ByteUnaryOperator operator)
     {
       for(;;)
@@ -645,6 +665,16 @@ public final class OmniArray
   {
     public static final char[] DEFAULT_ARR=new char[]{};
     public static final Character[] DEFAULT_BOXED_ARR=new Character[]{};
+    public static void fill(char[] arr,int begin,int end,char val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(char[] arr,int begin,int end,DataOutput out) throws IOException{
       for(;;++begin){
         out.writeChar(arr[begin]);
@@ -893,6 +923,16 @@ public final class OmniArray
   {
     public static final short[] DEFAULT_ARR=new short[]{};
     public static final Short[] DEFAULT_BOXED_ARR=new Short[]{};
+    public static void fill(short[] arr,int begin,int end,short val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(short[] arr,int begin,int end,DataOutput out) throws IOException{
       for(;;++begin){
         out.writeShort(arr[begin]);
@@ -1165,6 +1205,16 @@ public final class OmniArray
   {
     public static final int[] DEFAULT_ARR=new int[]{};
     public static final Integer[] DEFAULT_BOXED_ARR=new Integer[]{};
+    public static void fill(int[] arr,int begin,int end,int val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(int[] arr,int begin,int end,DataOutput out) throws IOException{
       for(;;++begin){
         out.writeInt(arr[begin]);
@@ -1437,6 +1487,16 @@ public final class OmniArray
   {
     public static final long[] DEFAULT_ARR=new long[]{};
     public static final Long[] DEFAULT_BOXED_ARR=new Long[]{};
+    public static void fill(long[] arr,int begin,int end,long val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(long[] arr,int begin,int end,DataOutput out) throws IOException{
       for(;;++begin){
         out.writeLong(arr[begin]);
@@ -1709,6 +1769,16 @@ public final class OmniArray
   {
     public static final float[] DEFAULT_ARR=new float[]{};
     public static final Float[] DEFAULT_BOXED_ARR=new Float[]{};
+    public static void fill(float[] arr,int begin,int end,float val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(float[] arr,int begin,int end,DataOutput out) throws IOException{
       for(;;++begin){
         out.writeFloat(arr[begin]);
@@ -2203,6 +2273,16 @@ public final class OmniArray
   {
     public static final double[] DEFAULT_ARR=new double[]{};
     public static final Double[] DEFAULT_BOXED_ARR=new Double[]{};
+    public static void fill(double[] arr,int begin,int end,double val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(double[] arr,int begin,int end,DataOutput out) throws IOException{
       for(;;++begin){
         out.writeDouble(arr[begin]);
@@ -2670,6 +2750,16 @@ public final class OmniArray
   public interface OfRef
   {
     public static final Object[] DEFAULT_ARR=new Object[]{};
+    public static void fill(Object[] arr,int begin,int end,Object val){
+      for(;;){
+        arr[begin]=val;
+        if(begin==end)
+        {
+          return;
+        }
+        ++begin;
+      }
+    }
     public static void writeArray(Object[] arr,int begin,int end,ObjectOutput out) throws IOException{
       for(;;++begin){
         out.writeObject(arr[begin]);

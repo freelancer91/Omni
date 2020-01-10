@@ -1,10 +1,13 @@
 package omni.util;
+import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.function.LongConsumer;
 import java.util.function.LongPredicate;
+import java.util.function.Predicate;
+
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
 public interface TypeUtil{
@@ -237,7 +240,79 @@ public interface TypeUtil{
     static LongPredicate doubleToLongBitsPredicate(DoublePredicate predicate){
         return dblBits->predicate.test(Double.longBitsToDouble(dblBits));
     }
-    static boolean equalsDbl0(double val){
+    static boolean equalsTrue(double val) {
+    	return Double.doubleToRawLongBits(val)==DBL_TRUE_BITS;
+    }
+    static boolean equalsTrue(float val) {
+    	return Float.floatToRawIntBits(val)==FLT_TRUE_BITS;
+    }
+    static FloatPredicate floatEquals(float val) {
+    	if(val==val) {
+    		return floatEqualsBits(Float.floatToRawIntBits(val));
+    	}
+    	return Float::isNaN;
+    }
+    static DoublePredicate doubleEquals(float val) {
+    	if(val==val) {
+    		return doubleEqualsBits(Double.doubleToRawLongBits(val));
+    	}
+    	return Double::isNaN;
+    }
+    static DoublePredicate doubleEquals(double val) {
+    	if(val==val) {
+    		return doubleEqualsBits(Double.doubleToRawLongBits(val));
+    	}
+    	return Double::isNaN;
+    }
+    static FloatPredicate floatEquals(boolean val) {
+    	if(val) {
+    		return TypeUtil::equalsTrue;
+    	}else {
+    		return TypeUtil::equalsFlt0;
+    	}
+    }
+    static DoublePredicate doubleEquals(boolean val) {
+    	if(val) {
+    		return TypeUtil::equalsTrue;
+    	}else {
+    		return TypeUtil::equalsDbl0;
+    	}
+    }
+    static FloatPredicate floatEquals(int val) {
+    	if(val==0) {
+    		return TypeUtil::equalsFlt0;
+    	}
+    	final int bits=Float.floatToRawIntBits(val);
+    	return v->Float.floatToRawIntBits(v)==bits;
+    }
+    static FloatPredicate floatEquals(long val) {
+    	if(val==0) {
+    		return TypeUtil::equalsFlt0;
+    	}
+    	final int bits=Float.floatToRawIntBits(val);
+    	return v->Float.floatToRawIntBits(v)==bits;
+    }
+    static FloatPredicate floatEqualsBits(int bits) {
+    	return v->Float.floatToRawIntBits(v)==bits;
+    }
+    static DoublePredicate doubleEqualsBits(long bits) {
+    	return v->Double.doubleToRawLongBits(v)==bits;
+    }
+    static DoublePredicate doubleEquals(int val) {
+    	if(val==0) {
+    		return TypeUtil::equalsDbl0;
+    	}
+    	final long bits=Double.doubleToRawLongBits(val);
+    	return v->Double.doubleToRawLongBits(v)==bits;
+    }
+    static DoublePredicate doubleEquals(long val) {
+    	if(val==0) {
+    		return TypeUtil::equalsDbl0;
+    	}
+    	final long bits=Double.doubleToRawLongBits(val);
+    	return v->Double.doubleToRawLongBits(v)==bits;
+    }
+    static boolean equalsDbl0(double val) {
         return val==0;
     }
     static boolean equalsFalse(boolean val){
@@ -305,6 +380,92 @@ public interface TypeUtil{
     }
     static DoublePredicate longBitsToDoublePredicate(LongPredicate predicate){
         return dblVal->predicate.test(Double.doubleToRawLongBits(dblVal));
+    }
+    static Predicate<Object> refEquals(Object val){
+    	if(val!=null) {
+    		return val::equals;
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(boolean val){
+    	return v->v instanceof Boolean && (boolean)v==val;
+    }
+    static Predicate<Object> refEquals(Boolean val){
+    	if(val!=null) {
+    		return refEquals((boolean)val);
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(byte val){
+    	return v->v instanceof Byte && (byte)v==val;
+    }
+    static Predicate<Object> refEquals(Byte val){
+    	if(val!=null) {
+    		return refEquals((byte)val);
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(char val){
+    	return v->v instanceof Character && (char)v==val;
+    }
+    static Predicate<Object> refEquals(Character val){
+    	if(val!=null) {
+    		return refEquals((char)val);
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(short val){
+    	return v->v instanceof Short && (short)v==val;
+    }
+    static Predicate<Object> refEquals(Short val){
+    	if(val!=null) {
+    		return refEquals((short)val);
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(int val){
+    	return v->v instanceof Integer && (int)v==val;
+    }
+    static Predicate<Object> refEquals(Integer val){
+    	if(val!=null) {
+    		return refEquals((int)val);
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(long val){
+    	return v->v instanceof Long && (long)v==val;
+    }
+    static Predicate<Object> refEquals(Long val){
+    	if(val!=null) {
+    		return refEquals((long)val);
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(float val){
+    	if(val==val) {
+    		final int bits=Float.floatToRawIntBits(val);
+    		return v->v instanceof Float && Float.floatToRawIntBits((float)v)==bits;
+    	}
+    	return v->v instanceof Float && Float.isNaN((float)v);
+    }
+    static Predicate<Object> refEquals(Float val){
+    	if(val!=null) {
+    		return refEquals((float)val);
+    	}
+    	return Objects::isNull;
+    }
+    static Predicate<Object> refEquals(double val){
+    	if(val==val) {
+    		final long bits=Double.doubleToRawLongBits(val);
+    		return v->v instanceof Double && Double.doubleToRawLongBits((double)v)==bits;
+    	}
+    	return v->v instanceof Double && Double.isNaN((double)v);
+    }
+    static Predicate<Object> refEquals(Double val){
+    	if(val!=null) {
+    		return refEquals((double)val);
+    	}
+    	return Objects::isNull;
     }
     static boolean refEquals(Object val1,boolean val2){
         return val1 instanceof Boolean&&val2==(boolean)val1;

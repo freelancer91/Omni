@@ -1,0 +1,57 @@
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl;
+import omni.api.OmniNavigableSet;
+#IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
+import omni.function.$TypeNameModifier$Comparator;
+#ELSE
+import java.util.Comparator;
+#ENDIF
+public abstract class $ClassPrefix$OrderedSet$<E>$
+  #IF OfDouble
+  extends LongUntetheredArrSeq<Double>
+  #ELSEIF OfFloat
+  extends IntUntetheredArrSeq<Float>
+  #ELSE
+  extends $ClassPrefix$UntetheredArrSeq<$BoxedType$>
+  #ENDIF
+  implements OmniNavigableSet.Of$ClassPrefix$$<E>$
+{
+  $ClassPrefix$OrderedSet(int head,$KeyType$[] arr,int tail){
+    super(head,arr,tail);
+  }
+  $ClassPrefix$OrderedSet(){
+    super();
+  }
+  abstract int compare($KeyType$ val1,$KeyType$ val2);
+  
+ 
+
+  public static class Ascending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
+    Ascending(int head,$KeyType$[] arr,int tail){
+      super(head,arr,tail);
+    }
+    Ascending(){
+      super();
+    }
+    
+    
+    
+  }
+  
+  public static class Descending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
+    Descending(int head,$KeyType$[] arr,int tail){
+      super(head,arr,tail);
+    }
+    Descending(){
+      super();
+    }
+  }
+  
+  
+}

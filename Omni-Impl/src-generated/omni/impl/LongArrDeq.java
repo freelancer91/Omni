@@ -7,6 +7,8 @@ import omni.util.TypeUtil;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.IntFunction;
+import java.util.function.LongConsumer;
+import java.util.function.LongPredicate;
 public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.OfLong
 {
   LongArrDeq(int head,long[] arr,int tail){
@@ -14,6 +16,14 @@ public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.
   }
   LongArrDeq(){
     super();
+  }
+  @Override public boolean add(long val){
+    addLast(val);
+    return true;
+  }
+  @Override public boolean offer(long val){
+    addLast(val);
+    return true;
   }
   @Override public boolean offerFirst(long val){
     push(val);
@@ -23,21 +33,60 @@ public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.
     addLast(val);
     return true;
   }
-  @Override public boolean offer(long val){
-    addLast(val);
+  @Override public boolean add(boolean val){
+    addLast((long)TypeUtil.castToLong(val));
     return true;
   }
-  @Override public void addFirst(long val){
-    push(val);
-  }
-  @Override public boolean add(long val){
-    addLast(val);
+  @Override public boolean add(byte val){
+    addLast((long)(val));
     return true;
+  }
+  @Override public boolean add(char val){
+    addLast((long)(val));
+    return true;
+  }
+  @Override public boolean add(int val){
+    addLast((long)(val));
+    return true;
+  }
+  @Override public boolean add(Long val){
+    addLast((long)val);
+    return true;
+  }
+  @Override public void addFirst(Long val){
+    push((long)val);
+  }
+  @Override public void addLast(Long val){
+    addLast((long)val);
+  }
+  @Override public boolean offer(Long val){
+    addLast((long)val);
+    return true;
+  }
+  @Override public boolean offerFirst(Long val){
+    push((long)val);
+    return true;
+  }
+  @Override public boolean offerLast(Long val){
+    addLast((long)val);
+    return true;
+  }
+  @Override public void push(Long val){
+    push((long)val);
   }
   @Override public long longElement(){
     return (long)arr[head];
   }
   @Override public long getLastLong(){
+    return (long)arr[tail];
+  }
+  @Override public Long element(){
+    return (long)arr[head];
+  }
+  @Override public Long getFirst(){
+    return (long)arr[head];
+  }
+  @Override public Long getLast(){
     return (long)arr[tail];
   }
   @Override public long peekLong(){
@@ -53,19 +102,131 @@ public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.
     }
     return Long.MIN_VALUE;
   }
+  @Override public Long peek(){
+    if(this.tail!=-1){
+      return (Long)(arr[head]);
+    }
+    return null;
+  }
+  @Override public Long peekFirst(){
+    if(this.tail!=-1){
+      return (Long)(arr[head]);
+    }
+    return null;
+  }
+  @Override public Long peekLast(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Long)(arr[tail]);
+    }
+    return null;
+  }
+  @Override public double peekDouble(){
+    if(this.tail!=-1){
+      return (double)(arr[head]);
+    }
+    return Double.NaN;
+  }
+  @Override public double peekLastDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (double)(arr[tail]);
+    }
+    return Double.NaN;
+  }
+  @Override public float peekFloat(){
+    if(this.tail!=-1){
+      return (float)(arr[head]);
+    }
+    return Float.NaN;
+  }
+  @Override public float peekLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (float)(arr[tail]);
+    }
+    return Float.NaN;
+  }
   @Override public long pollLong(){
     final int tail;
     if((tail=this.tail)!=-1){
-      return (long)uncheckedRemoveFirst(tail);
+      return (long)super.uncheckedRemoveFirst(tail);
     }
     return Long.MIN_VALUE;
   }
   @Override public long pollLastLong(){
     final int tail;
     if((tail=this.tail)!=-1){
-      return (long)uncheckedRemoveLast(tail);
+      return (long)super.uncheckedRemoveLast(tail);
     }
     return Long.MIN_VALUE;
+  }
+  @Override public Long poll(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Long)super.uncheckedRemoveFirst(tail);
+    }
+    return null;
+  }
+  @Override public Long pollFirst(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Long)super.uncheckedRemoveFirst(tail);
+    }
+    return null;
+  }
+  @Override public Long pollLast(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Long)super.uncheckedRemoveLast(tail);
+    }
+    return null;
+  }
+  @Override public double pollDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (double)(super.uncheckedRemoveFirst(tail));
+    }
+    return Double.NaN;
+  }
+  @Override public double pollLastDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (double)(super.uncheckedRemoveLast(tail));
+    }
+    return Double.NaN;
+  }
+  @Override public float pollFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (float)(super.uncheckedRemoveFirst(tail));
+    }
+    return Float.NaN;
+  }
+  @Override public float pollLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (float)(super.uncheckedRemoveLast(tail));
+    }
+    return Float.NaN;
+  }
+  @Override public long popLong(){
+    return (long)super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public long removeLastLong(){
+    return (long)super.uncheckedRemoveLast(this.tail);
+  }
+  @Override public Long pop(){
+    return (Long)super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public Long remove(){
+    return super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public Long removeFirst(){
+    return super.uncheckedRemoveFirst(this.tail);
+  }
+  @Override public Long removeLast(){
+    return super.uncheckedRemoveLast(this.tail);
   }
   @Override public long[] toLongArray(){
     int tail;
@@ -84,32 +245,418 @@ public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
-  @Override public long removeLastLong(){
-    return (long)uncheckedRemoveLast(this.tail);
+  @Override public Long[] toArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      Long[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new Long[size],0,size);
+      }else{
+        final long[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Long[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfLong.DEFAULT_BOXED_ARR;
   }
-  @Override public long popLong(){
-    return (long)uncheckedRemoveFirst(this.tail);
+  @Override public double[] toDoubleArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      double[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
+      }else{
+        final long[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfDouble.DEFAULT_ARR;
+  }
+  @Override public float[] toFloatArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      float[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
+      }else{
+        final long[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfFloat.DEFAULT_ARR;
+  }
+  @Override public boolean contains(boolean val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,TypeUtil.castToLong(val));    
+  }
+  @Override public boolean contains(byte val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,val);      
+  }
+  @Override public boolean contains(char val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,val);      
+  }
+  @Override public boolean contains(int val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,val);      
+  }
+  @Override public boolean contains(long val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,val);      
+  }
+  @Override public boolean contains(float val){
+    final int tail;
+    final long v;
+    return (tail=this.tail)!=-1 && TypeUtil.floatEquals(val,v=(long)val) && super.uncheckedContainsMatch(tail,v);
+  }
+  @Override public boolean contains(double val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final long queryParam;
+      if(!TypeUtil.doubleEquals(val,queryParam=(long)val)){
+        return false;
+      }
+      return super.uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;     
+  }
+  @Override public boolean contains(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final long queryParam;
+      if(val instanceof Long || val instanceof Integer || val instanceof Byte || val instanceof Short){
+        queryParam=((Number)val).longValue();
+      }else if(val instanceof Float){
+        final float f;
+        if(!TypeUtil.floatEquals(f=(float)val,queryParam=(long)f)){
+          return false;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if(!TypeUtil.doubleEquals(d=(double)val,queryParam=(long)d)){
+          return false;
+        }
+      }else if(val instanceof Character){
+        queryParam=(char)val;
+      }else if(val instanceof Boolean){
+        queryParam=TypeUtil.castToLong((boolean)val);
+      }else{
+        return false;
+      }
+      return super.uncheckedContainsMatch(tail,queryParam);
+    }
+    return false;     
+  }
+  @Override public int search(boolean val){
+    final int tail;
+      if((tail=this.tail)!=-1
+    ){return super.uncheckedSearch(tail,TypeUtil.castToLong(val));    
+    }
+    return -1;
+  }
+  @Override public int search(int val){
+    final int tail;
+      if((tail=this.tail)!=-1
+    ){return super.uncheckedSearch(tail,val);      
+    }
+    return -1;
+  }
+  @Override public int search(long val){
+    final int tail;
+      if((tail=this.tail)!=-1
+    ){return super.uncheckedSearch(tail,val);      
+    }
+    return -1;
+  }
+  @Override public int search(float val){
+    final int tail;
+      if((tail=this.tail)!=-1
+    ){final long v;if(TypeUtil.floatEquals(val,v=(long)val)){return super.uncheckedSearch(tail,v);}
+    }
+    return -1;
+  }
+  @Override public int search(double val){
+    final int tail;
+      if((tail=this.tail)!=-1
+    ){final long v;if(TypeUtil.doubleEquals(val,v=(long)val)){return super.uncheckedSearch(tail,v);}
+    }
+    return -1;
+  }
+  @Override public int search(Object val){
+    final int tail;
+      if((tail=this.tail)!=-1
+    ){
+      final long queryParam;
+      if(val instanceof Long || val instanceof Integer || val instanceof Byte || val instanceof Short){
+        queryParam=((Number)val).longValue();
+      }else if(val instanceof Float){
+        final float f;
+        if(!TypeUtil.floatEquals(f=(float)val,queryParam=(long)f)){
+          return -1;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if(!TypeUtil.doubleEquals(d=(double)val,queryParam=(long)d)){
+          return -1;
+        }
+      }else if(val instanceof Character){
+        queryParam=(char)val;
+      }else if(val instanceof Boolean){
+        queryParam=TypeUtil.castToLong((boolean)val);
+      }else{
+        return -1;
+      }
+      return super.uncheckedSearch(tail,queryParam);
+    }
+    return -1;
+  }
+  @Override public boolean removeVal(boolean val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveFirstMatch(tail,TypeUtil.castToLong(val));    
+  }
+  @Override public boolean removeVal(byte val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveFirstMatch(tail,val);      
+  }
+  @Override public boolean removeVal(char val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveFirstMatch(tail,val);      
+  }
+  @Override public boolean removeVal(int val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveFirstMatch(tail,val);      
+  }
+  @Override public boolean removeVal(long val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveFirstMatch(tail,val);      
+  }
+  @Override public boolean removeVal(float val){
+    final int tail;
+    final long v;
+    return (tail=this.tail)!=-1 && TypeUtil.floatEquals(val,v=(long)val) && super.uncheckedRemoveFirstMatch(tail,v);
+  }
+  @Override public boolean removeVal(double val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final long queryParam;
+      if(!TypeUtil.doubleEquals(val,queryParam=(long)val)){
+        return false;
+      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
+    }
+    return false;     
+  }
+  @Override public boolean remove(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final long queryParam;
+      if(val instanceof Long || val instanceof Integer || val instanceof Byte || val instanceof Short){
+        queryParam=((Number)val).longValue();
+      }else if(val instanceof Float){
+        final float f;
+        if(!TypeUtil.floatEquals(f=(float)val,queryParam=(long)f)){
+          return false;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if(!TypeUtil.doubleEquals(d=(double)val,queryParam=(long)d)){
+          return false;
+        }
+      }else if(val instanceof Character){
+        queryParam=(char)val;
+      }else if(val instanceof Boolean){
+        queryParam=TypeUtil.castToLong((boolean)val);
+      }else{
+        return false;
+      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
+    }
+    return false;     
+  }
+  @Override public boolean removeFirstOccurrence(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final long queryParam;
+      if(val instanceof Long || val instanceof Integer || val instanceof Byte || val instanceof Short){
+        queryParam=((Number)val).longValue();
+      }else if(val instanceof Float){
+        final float f;
+        if(!TypeUtil.floatEquals(f=(float)val,queryParam=(long)f)){
+          return false;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if(!TypeUtil.doubleEquals(d=(double)val,queryParam=(long)d)){
+          return false;
+        }
+      }else if(val instanceof Character){
+        queryParam=(char)val;
+      }else if(val instanceof Boolean){
+        queryParam=TypeUtil.castToLong((boolean)val);
+      }else{
+        return false;
+      }
+      return super.uncheckedRemoveFirstMatch(tail,queryParam);
+    }
+    return false;     
+  }
+  @Override public boolean removeLastOccurrence(boolean val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveLastMatch(tail,TypeUtil.castToLong(val));    
+  }
+  @Override public boolean removeLastOccurrence(int val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveLastMatch(tail,val);      
+  }
+  @Override public boolean removeLastOccurrence(long val){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveLastMatch(tail,val);      
+  }
+  @Override public boolean removeLastOccurrence(float val){
+    final int tail;
+    final long v;
+    return (tail=this.tail)!=-1 && TypeUtil.floatEquals(val,v=(long)val) && super.uncheckedRemoveLastMatch(tail,v);
+  }
+  @Override public boolean removeLastOccurrence(double val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final long queryParam;
+      if(!TypeUtil.doubleEquals(val,queryParam=(long)val)){
+        return false;
+      }
+      return super.uncheckedRemoveLastMatch(tail,queryParam);
+    }
+    return false;     
+  }
+  @Override public boolean removeLastOccurrence(Object val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final long queryParam;
+      if(val instanceof Long || val instanceof Integer || val instanceof Byte || val instanceof Short){
+        queryParam=((Number)val).longValue();
+      }else if(val instanceof Float){
+        final float f;
+        if(!TypeUtil.floatEquals(f=(float)val,queryParam=(long)f)){
+          return false;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if(!TypeUtil.doubleEquals(d=(double)val,queryParam=(long)d)){
+          return false;
+        }
+      }else if(val instanceof Character){
+        queryParam=(char)val;
+      }else if(val instanceof Boolean){
+        queryParam=TypeUtil.castToLong((boolean)val);
+      }else{
+        return false;
+      }
+      return super.uncheckedRemoveLastMatch(tail,queryParam);
+    }
+    return false;     
   }
   @Override public OmniIterator.OfLong iterator(){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    int tail;
+    if((tail=this.tail)!=-1){
+      int size;
+      if((size=(tail+1)-(tail=this.head))<=0){
+        size+=arr.length;
+      }
+      return new AscendingItr(this,tail,size);
+    }
+    return new AscendingItr(this,-1,0);
   }
   @Override public OmniIterator.OfLong descendingIterator(){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    int tail;
+    if((tail=this.tail)!=-1){
+      int size;
+      if((size=(tail+1)-this.head)<=0){
+        size+=arr.length;
+      }
+      return new DescendingItr(this,tail,size);
+    }
+    return new DescendingItr(this,-1,0);
+  }
+  private static interface DefaultItr extends OmniIterator.OfLong{
+    @Override public default Long next(){
+      return nextLong();
+    }
+  }
+  private static class AscendingItr extends AscendingUntetheredArrSeqItr<Long> implements DefaultItr{
+    private AscendingItr(LongUntetheredArrSeq<Long> root,int index,int numLeft){
+      super(root,index,numLeft);
+    }
+    @Override public Object clone(){
+      return new AscendingItr(root,index,numLeft);
+    }
+    @Override public void forEachRemaining(Consumer<? super Long> action){
+      if(numLeft!=0){
+        super.uncheckedForEachRemaining(action::accept);
+      }
+    }
+  }
+  private static class DescendingItr extends DescendingUntetheredArrSeqItr<Long> implements DefaultItr{
+    private DescendingItr(LongUntetheredArrSeq<Long> root,int index,int numLeft){
+      super(root,index,numLeft);
+    }
+    @Override public Object clone(){
+      return new DescendingItr(root,index,numLeft);
+    }
+    @Override public void forEachRemaining(Consumer<? super Long> action){
+      if(numLeft!=0){
+        super.uncheckedForEachRemaining(action::accept);
+      }
+    }
   }
   @Override public Object clone(){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    int tail;
+    if((tail=this.tail)!=-1){
+      long[] copy;
+      int size,head;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,copy=new long[size],0,size);
+        head=0;
+        tail=size-1;
+      }else{
+        final long[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,0,copy=new long[size+=arr.length],0,tail);
+        ArrCopy.uncheckedCopy(arr,head,copy,tail,size-tail);
+        head=tail--;
+      }
+      return new LongArrDeq(head,copy,tail);
+    }
+    return new LongArrDeq();
   }
   @Override public boolean removeIf(LongPredicate filter){
     final int tail;
-    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter);
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter);
+  }
+  @Override public boolean removeIf(Predicate<? super Long> filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter::test);
   }
   @Override public void forEach(LongConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      uncheckedForEach(tail,action);
+      super.ascendingForEach(tail,action);
+    }
+  }
+  @Override public void forEach(Consumer<? super Long> action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      super.ascendingForEach(tail,action::accept);
     }
   }
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
@@ -145,144 +692,5 @@ public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.
       dst[0]=null;
     }
     return dst;
-  }
-  @Override public void addLast(long val){
-    var arr=this.arr;
-    int tail;
-    if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(++tail==arr.length && head==0){
-          ArrCopy.uncheckedCopy(arr,0,arr=new long[OmniArray.growBy50Pct(tail)],0,tail);
-          this.arr=arr;
-        }
-      }else if(++tail==head){
-        this.head=0;
-        final var tmp=new long[OmniArray.growBy50Pct(tail=arr.length)];
-        final int copyLength;
-        ArrCopy.uncheckedCopy(arr,head,tmp,0,copyLength=tail-head);
-        ArrCopy.uncheckedCopy(arr,0,tmp,copyLength,head);
-        this.arr=arr=tmp;
-      }
-      arr[tail]=val;
-      this.tail=tail;
-    }else{
-      if(arr==null){
-        this.arr=new long[]{val};
-      }else{
-        if(arr==OmniArray.OfLong.DEFAULT_ARR){
-          this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
-        }
-        arr[0]=val;
-      }
-      this.head=0;
-      this.tail=0;
-    }
-  }
-  @Override public void push(long val){
-    var arr=this.arr;
-    int tail;
-    if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(head==0 && tail==arr.length-1){
-          final var tmp=new long[head=OmniArray.growBy50Pct(++tail)];
-          this.tail=head-1;
-          ArrCopy.uncheckedCopy(arr,0,tmp,head-=tail,tail);
-          this.arr=arr=tmp;
-        }
-        --head;
-      }else if(--head==tail){
-        int arrLength;
-        final var tmp=new long[head=OmniArray.growBy50Pct(arrLength=arr.length)];
-        this.tail=head-1;
-        ArrCopy.uncheckedCopy(arr,0,tmp,head-=(++tail),tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.arr=arr=tmp;
-        --head;
-      }
-      arr[head]=val;
-      this.head=head;
-    }else{
-      if(arr==null){
-        this.arr=new long[]{val};
-        this.head=0;
-        this.tail=0;
-      }else if(arr==OmniArray.OfLong.DEFAULT_ARR){
-        this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
-        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
-        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
-        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
-      }else{
-        arr[tail=arr.length-1]=val;
-        this.tail=tail;
-        this.head=tail;
-      }
-    }
-  }
-  boolean uncheckedRemoveIf(int tail,LongPredicate action){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  void uncheckedForEach(int tail,LongConsumer action){
-    final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
-      for(int bound=arr.length;;){
-        action.accept((long)arr[head]);
-        if(++head==bound){
-          head=0;
-          break;
-        }
-      }
-    }
-    for(;;){
-      action.accept((long)arr[head]);
-      if(head==tail){
-        break;
-      }
-      ++head;
-    }
-  }
-  long uncheckedRemoveLast(int tail){
-    final long[] arr;
-    final var ret=(arr=this.arr)[tail];
-    switch(Integer.signum(tail-this.head))
-    {
-      case 0:
-        this.tail=-1;
-        return ret;
-      case -1:
-        //fragmented
-        if(--tail==-1){
-          tail=arr.length-1;
-        }
-        break;
-      default:
-        --tail;
-    }
-    this.tail=tail;
-    return ret;
-  }
-  long uncheckedRemoveFirst(int tail){
-    int head;
-    final long[] arr;
-    final var ret=(arr=this.arr)[head=this.head];
-    switch(Integer.signum(tail-head))
-    {
-      case 0:
-        this.tail=-1;
-        return ret;
-      case -1:
-        //fragmented
-        if(++head==arr.length){
-          head=0;
-        }
-        break;
-      default:
-        ++head;
-    }
-    this.head=head;
-    return ret;
   }
 }

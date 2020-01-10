@@ -297,6 +297,16 @@ public interface OfCLASSPREFIX
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
 #ENDIF
+  public static void fill(PRIMITIVETYPE[] arr,int begin,int end,PRIMITIVETYPE val){
+    for(;;){
+      arr[begin]=val;
+      if(begin==end)
+      {
+        return;
+      }
+      ++begin;
+    }
+  }
 #IFNOTSWITCH CLASSPREFIX==Byte
 #IFSWITCH CLASSPREFIX==Ref
   public static void writeArray(PRIMITIVETYPE[] arr,int begin,int end,ObjectOutput out) throws IOException{
