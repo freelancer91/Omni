@@ -5,6 +5,7 @@ import omni.util.OmniArray;
 import java.util.function.LongConsumer;
 import java.util.function.LongPredicate;
 import java.util.function.LongToIntFunction;
+import java.util.function.Consumer;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -647,6 +648,15 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizab
       --tail;
     }
   }
+  private static  int nonfragmentedPullDown(final long[] arr,int dst,int src,int bound,final LongPredicate filter){
+    for(;src<=bound;++src){
+      final long tmp;
+      if(!filter.test((long)(tmp=arr[src]))){
+        arr[dst++]=tmp;
+      }
+    }
+    return dst;
+  }
   boolean nonfragmentedRemoveIf(int head,int tail,LongPredicate filter){
     final long[] arr;
     if(filter.test((long)(arr=this.arr)[head])){
@@ -655,14 +665,7 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizab
           this.head=src;
           while(++src<=tail){
             if(filter.test((long)arr[src])){
-              head=src;
-              while(++src<=tail){
-                final long tmp;
-                if(!filter.test((long)(tmp=arr[src]))){
-                  arr[head++]=tmp;
-                }
-              }
-              this.tail=head-1;
+              this.tail=nonfragmentedPullDown(arr,src,src+1,tail,filter)-1;
               break;
             }
           }
@@ -674,23 +677,82 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizab
     }else{
       while(++head<=tail){
         if(filter.test((long)arr[head])){
-          int dst=head;
-          while(++head<=tail){
-            final long tmp;
-            if(!filter.test((long)(tmp=arr[head]))){
-              arr[dst++]=tmp;
-            }
-          }
-          this.tail=dst-1;
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
           return true;
         }
       }
       return false;
     }
   }
+  private static  int fragmentedPullDown(final long[] arr,int src,int arrBound,int tail,final LongPredicate filter){
+    int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
+    for(src=0;;++src){
+      final long tmp;
+      if(!filter.test((long)(tmp=arr[src]))){
+        arr[dst]=tmp;
+        if(dst==arrBound){
+          return nonfragmentedPullDown(arr,0,src+1,tail,filter)-1;
+        }
+        ++dst;
+      }
+      if(src==tail){
+        return dst-1;
+      }
+    }
+  }
   boolean fragmentedRemoveIf(int head,int tail,LongPredicate filter){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final long[] arr;
+    if(filter.test((long)(arr=this.arr)[head])){
+      for(int bound=arr.length-1;;){
+        if(head==bound){
+          break;
+        }
+        if(!filter.test((long)arr[++head])){
+          this.head=head;
+          while(head!=bound){
+            if(filter.test((long)arr[++head])){
+              this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+              return true;
+            }
+          }
+          for(head=0;!filter.test((long)arr[head]);++head){
+            if(head==tail){
+              return true;
+            }
+          }
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+          return true;
+        }
+      }
+      for(head=0;filter.test((long)arr[head]);++head){
+        if(head==tail){
+          this.tail=-1;
+          return true;
+        }
+      }
+      this.head=head;
+      while(++head<=tail){
+        if(filter.test((long)arr[head])){
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+          break;
+        }
+      }
+      return true;
+    }else{
+      for(int bound=arr.length-1;++head<=bound;){
+        if(filter.test((long)arr[head])){
+          this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+          return true;
+        }
+      }
+      for(head=0;!filter.test((long)arr[head]);++head){
+        if(head==tail){
+          return false;
+        }
+      }
+      this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+      return true;
+    }
   }
   boolean uncheckedRemoveIf(int tail,LongPredicate filter){
     int head;
@@ -713,7 +775,7 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizab
       }
     }
   }
-  static abstract class AbstractUntetheredArrSeqItr<E>{
+  static abstract class AbstractUntetheredArrSeqItr<E> extends AbstractLongItr{
     transient final LongUntetheredArrSeq<E> root;
     transient int index;
     transient int numLeft;
@@ -752,6 +814,11 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizab
         uncheckedForEachRemaining(action);
       }
     }
+    public void forEachRemaining(Consumer<? super Long> action){
+      if(numLeft!=0){
+        uncheckedForEachRemaining(action::accept);
+      }
+    }
     abstract void iterateIndex(int index,final long[] arr);
     abstract void fragmentedRemove(final LongUntetheredArrSeq<E> root,int head,int tail);
     abstract void nonfragmentedRemove(final LongUntetheredArrSeq<E> root,int head,int tail);
@@ -760,6 +827,9 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizab
   static class AscendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
     AscendingUntetheredArrSeqItr(LongUntetheredArrSeq<E> root,int index,int numLeft){
       super(root,index,numLeft);
+    }
+    @Override public Object clone(){
+      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final long[] arr){
       if(++index==arr.length){
@@ -867,6 +937,9 @@ abstract class LongUntetheredArrSeq<E> implements OmniCollection<E>,Externalizab
   static class DescendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
     DescendingUntetheredArrSeqItr(LongUntetheredArrSeq<E> root,int index,int numLeft){
       super(root,index,numLeft);
+    }
+    @Override public Object clone(){
+      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final long[] arr){
       if(--index==-1){

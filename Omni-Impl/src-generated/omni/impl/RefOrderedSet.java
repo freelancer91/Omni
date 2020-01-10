@@ -11,6 +11,7 @@ public abstract class RefOrderedSet<E>
   RefOrderedSet(){
     super();
   }
+  abstract int compare(Object val1,Object val2);
   public static class Ascending<E> extends RefOrderedSet<E>{
     Ascending(int head,Object[] arr,int tail){
       super(head,arr,tail);

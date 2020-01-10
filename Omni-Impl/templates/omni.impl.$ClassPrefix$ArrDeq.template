@@ -615,7 +615,6 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
   #MACRO QueryImpl<Float,contains,boolean,uncheckedContainsMatch>(false)
   #MACRO QueryImpl<Double,contains,boolean,uncheckedContainsMatch>(false)
 #ENDIF
-
   #MACRO QueryImpl<boolean,search,int,uncheckedSearch>(-1)
 #IF OfByte,OfRef
   #MACRO QueryImpl<byte,search,int,uncheckedSearch>(-1)
@@ -641,7 +640,6 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
   #MACRO QueryImpl<Float,search,int,uncheckedSearch>(-1)
   #MACRO QueryImpl<Double,search,int,uncheckedSearch>(-1)
 #ENDIF
-
   #MACRO QueryImpl<boolean,removeVal,boolean,uncheckedRemoveFirstMatch>(false)
 #IF OfByte,OfChar,OfShort,OfInt,OfLong,OfRef
   #MACRO QueryImpl<byte,removeVal,boolean,uncheckedRemoveFirstMatch>(false)
@@ -667,7 +665,6 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
   #MACRO QueryImpl<Float,removeVal,boolean,uncheckedRemoveFirstMatch>(false)
   #MACRO QueryImpl<Double,removeVal,boolean,uncheckedRemoveFirstMatch>(false)
 #ENDIF
-
   #MACRO QueryImpl<Object,removeFirstOccurrence,boolean,uncheckedRemoveFirstMatch>(false)
   #MACRO QueryImpl<boolean,removeLastOccurrence,boolean,uncheckedRemoveLastMatch>(false)
 #IF OfByte,OfRef
@@ -701,15 +698,9 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
       if((size=(tail+1)-(tail=this.head))<=0){
         size+=arr.length;
       }
-#IF OfInt,OfLong
-      return new AscendingItr(this,tail,size);
-    }
-    return new AscendingItr(this,-1,0);
-#ELSE
       return new AscendingUntetheredArrSeqItr<$BoxedType$>(this,tail,size);
     }
     return new AscendingUntetheredArrSeqItr<$BoxedType$>(this,-1,0);
-#ENDIF
   }
   @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
     int tail;
@@ -718,50 +709,10 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
       if((size=(tail+1)-this.head)<=0){
         size+=arr.length;
       }
-#IF OfInt,OfLong
-      return new DescendingItr(this,tail,size);
-    }
-    return new DescendingItr(this,-1,0);
-#ELSE
       return new DescendingUntetheredArrSeqItr<$BoxedType$>(this,tail,size);
     }
     return new DescendingUntetheredArrSeqItr<$BoxedType$>(this,-1,0);
-#ENDIF
   }
-#IF OfInt,OfLong
-  private static interface DefaultItr extends OmniIterator.Of$ClassPrefix$$<E>${
-    @Override public default $BoxedType$ next(){
-      return next$TypeNameModifier$();
-    }
-  }
-  private static class AscendingItr extends AscendingUntetheredArrSeqItr<$BoxedType$> implements DefaultItr{
-    private AscendingItr($ClassPrefix$UntetheredArrSeq<$BoxedType$> root,int index,int numLeft){
-      super(root,index,numLeft);
-    }
-    @Override public Object clone(){
-      return new AscendingItr(root,index,numLeft);
-    }
-    @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-      if(numLeft!=0){
-        super.uncheckedForEachRemaining(action::accept);
-      }
-    }
-  }
-  private static class DescendingItr extends DescendingUntetheredArrSeqItr<$BoxedType$> implements DefaultItr{
-    private DescendingItr($ClassPrefix$UntetheredArrSeq<$BoxedType$> root,int index,int numLeft){
-      super(root,index,numLeft);
-    }
-    @Override public Object clone(){
-      return new DescendingItr(root,index,numLeft);
-    }
-    @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-      if(numLeft!=0){
-        super.uncheckedForEachRemaining(action::accept);
-      }
-    }
-  }
-#ENDIF
-
   @Override public Object clone(){
     int tail;
     if((tail=this.tail)!=-1){

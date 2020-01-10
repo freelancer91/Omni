@@ -11,6 +11,7 @@ public abstract class FloatOrderedSet
   FloatOrderedSet(){
     super();
   }
+  abstract int compare(int val1,int val2);
   public static class Ascending extends FloatOrderedSet{
     Ascending(int head,int[] arr,int tail){
       super(head,arr,tail);

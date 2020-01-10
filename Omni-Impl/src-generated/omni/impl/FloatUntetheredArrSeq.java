@@ -4,6 +4,7 @@ import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
+import omni.function.FloatToIntFunction;
 import java.util.function.Consumer;
 import java.io.Externalizable;
 import java.io.IOException;
@@ -435,6 +436,136 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       ++head;
     }
   }
+  boolean nonfragmentedRemoveMatch(int head,int tail,final FloatToIntFunction comparator)
+  {
+    final float[] arr;
+    int mid;
+    switch(comparator.applyAsInt((arr=this.arr)[mid=(head+tail)>>>1]))
+    {
+      default:
+        //search the upper half of the structure (between mid and tail)
+        if(++mid>tail || (mid=findIndex(arr,mid,tail,comparator))==-1)
+        {
+          return false;
+        }
+        //found the element, pull the tail down
+        ArrCopy.semicheckedSelfCopy(arr,mid,mid+1,tail-mid);
+        this.tail=tail-1;
+        return true;
+      case 0:
+        //the value was found on the first attempt. Remove it.
+        if(head==tail)
+        {
+          //the element is the last element
+          this.tail=-1;
+          return true;
+        }
+        break;
+      case 1:
+        //search the lower half of the structure (between head and mid)
+        if(--mid<head || (mid=findIndex(arr,head,mid,comparator))==-1)
+        {
+          return false;
+        }
+    }
+    //found the element, pull the head up
+    ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,mid-head);
+    this.head=tail;
+    return true;
+  }
+  boolean fragmentedRemoveMatch(int head,int tail,final FloatToIntFunction comparator)
+  {
+    final float[] arr;
+    switch(comparator.applyAsInt((arr=this.arr)[0]))
+    {
+      case 0:
+        //found the element at index 0, remove it
+        if(tail==0)
+        {
+          this.tail=arr.length-1;
+        }
+        else
+        {
+          //pull the tail down
+          ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+          this.tail=tail-1;
+        }
+        break;
+      case 1:
+        //search the lower half of the structure (between head and array.length)
+        int index;
+        if((index=findIndex(arr,head,tail=arr.length-1,comparator))==-1)
+        {
+          return false;
+        }
+        //found the element, pull the head up
+        if(head==tail)
+        {
+          this.head=0;
+        }
+        else
+        {
+          ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,index-head);
+          this.head=tail;
+        }
+        return true;
+      default:
+        //search the upper half of the structure (between 0 and tail)
+        if(tail==0 || (index=findIndex(arr,1,tail,comparator))==-1)
+        {
+          return false;
+        }
+        //found the element, pull the tail down
+        ArrCopy.semicheckedSelfCopy(arr,index,index+1,tail-index);
+        this.tail=tail-1;
+    }
+    return true;
+  }
+  static int findIndex(final float[] arr,int head,int tail,final FloatToIntFunction comparator)
+  {
+    do
+    {
+      final int mid;
+      switch(comparator.applyAsInt(arr[mid=(head+tail)>>>1]))
+      {
+        case 0:
+          return mid;
+        case 1:
+          tail=mid-1;
+          break;
+        default:
+          head=mid+1;
+      }
+    }
+    while(head<=tail);
+    return -1;
+  }
+  boolean uncheckedContainsMatch(int tail,final FloatToIntFunction comparator)
+  {
+    final var arr=this.arr;
+    int head;
+    if((head=this.head)>tail)
+    {
+      //fragmented
+      switch(comparator.applyAsInt(arr[0]))
+      {
+        case 0:
+          return true;
+        case 1:
+          //search in the head span
+          tail=arr.length-1;
+          break;
+        default:
+          //search in the tail span
+          if(tail==0)
+          {
+            return false;
+          }
+          head=1;
+      }
+    }
+    return findIndex(arr,head,tail,comparator)!=-1;
+  }
   float uncheckedRemoveLast(int tail){
     final float[] arr;
     final var ret=(arr=this.arr)[tail];
@@ -517,6 +648,15 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       --tail;
     }
   }
+  private static  int nonfragmentedPullDown(final float[] arr,int dst,int src,int bound,final FloatPredicate filter){
+    for(;src<=bound;++src){
+      final float tmp;
+      if(!filter.test((float)(tmp=arr[src]))){
+        arr[dst++]=tmp;
+      }
+    }
+    return dst;
+  }
   boolean nonfragmentedRemoveIf(int head,int tail,FloatPredicate filter){
     final float[] arr;
     if(filter.test((float)(arr=this.arr)[head])){
@@ -525,14 +665,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
           this.head=src;
           while(++src<=tail){
             if(filter.test((float)arr[src])){
-              head=src;
-              while(++src<=tail){
-                final float tmp;
-                if(!filter.test((float)(tmp=arr[src]))){
-                  arr[head++]=tmp;
-                }
-              }
-              this.tail=head-1;
+              this.tail=nonfragmentedPullDown(arr,src,src+1,tail,filter)-1;
               break;
             }
           }
@@ -544,23 +677,82 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
     }else{
       while(++head<=tail){
         if(filter.test((float)arr[head])){
-          int dst=head;
-          while(++head<=tail){
-            final float tmp;
-            if(!filter.test((float)(tmp=arr[head]))){
-              arr[dst++]=tmp;
-            }
-          }
-          this.tail=dst-1;
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
           return true;
         }
       }
       return false;
     }
   }
+  private static  int fragmentedPullDown(final float[] arr,int src,int arrBound,int tail,final FloatPredicate filter){
+    int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
+    for(src=0;;++src){
+      final float tmp;
+      if(!filter.test((float)(tmp=arr[src]))){
+        arr[dst]=tmp;
+        if(dst==arrBound){
+          return nonfragmentedPullDown(arr,0,src+1,tail,filter)-1;
+        }
+        ++dst;
+      }
+      if(src==tail){
+        return dst-1;
+      }
+    }
+  }
   boolean fragmentedRemoveIf(int head,int tail,FloatPredicate filter){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final float[] arr;
+    if(filter.test((float)(arr=this.arr)[head])){
+      for(int bound=arr.length-1;;){
+        if(head==bound){
+          break;
+        }
+        if(!filter.test((float)arr[++head])){
+          this.head=head;
+          while(head!=bound){
+            if(filter.test((float)arr[++head])){
+              this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+              return true;
+            }
+          }
+          for(head=0;!filter.test((float)arr[head]);++head){
+            if(head==tail){
+              return true;
+            }
+          }
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+          return true;
+        }
+      }
+      for(head=0;filter.test((float)arr[head]);++head){
+        if(head==tail){
+          this.tail=-1;
+          return true;
+        }
+      }
+      this.head=head;
+      while(++head<=tail){
+        if(filter.test((float)arr[head])){
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+          break;
+        }
+      }
+      return true;
+    }else{
+      for(int bound=arr.length-1;++head<=bound;){
+        if(filter.test((float)arr[head])){
+          this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+          return true;
+        }
+      }
+      for(head=0;!filter.test((float)arr[head]);++head){
+        if(head==tail){
+          return false;
+        }
+      }
+      this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+      return true;
+    }
   }
   boolean uncheckedRemoveIf(int tail,FloatPredicate filter){
     int head;

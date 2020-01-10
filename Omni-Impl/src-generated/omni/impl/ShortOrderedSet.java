@@ -11,6 +11,7 @@ public abstract class ShortOrderedSet
   ShortOrderedSet(){
     super();
   }
+  abstract int compare(short val1,short val2);
   public static class Ascending extends ShortOrderedSet{
     Ascending(int head,short[] arr,int tail){
       super(head,arr,tail);

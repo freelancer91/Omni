@@ -11,6 +11,7 @@ public abstract class CharOrderedSet
   CharOrderedSet(){
     super();
   }
+  abstract int compare(char val1,char val2);
   public static class Ascending extends CharOrderedSet{
     Ascending(int head,char[] arr,int tail){
       super(head,arr,tail);

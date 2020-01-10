@@ -11,6 +11,7 @@ public abstract class LongOrderedSet
   LongOrderedSet(){
     super();
   }
+  abstract int compare(long val1,long val2);
   public static class Ascending extends LongOrderedSet{
     Ascending(int head,long[] arr,int tail){
       super(head,arr,tail);

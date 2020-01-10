@@ -11,6 +11,7 @@ public abstract class IntOrderedSet
   IntOrderedSet(){
     super();
   }
+  abstract int compare(int val1,int val2);
   public static class Ascending extends IntOrderedSet{
     Ascending(int head,int[] arr,int tail){
       super(head,arr,tail);

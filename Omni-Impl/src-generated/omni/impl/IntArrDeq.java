@@ -633,9 +633,9 @@ public class IntArrDeq extends IntUntetheredArrSeq<Integer> implements OmniDeque
       if((size=(tail+1)-(tail=this.head))<=0){
         size+=arr.length;
       }
-      return new AscendingItr(this,tail,size);
+      return new AscendingUntetheredArrSeqItr<Integer>(this,tail,size);
     }
-    return new AscendingItr(this,-1,0);
+    return new AscendingUntetheredArrSeqItr<Integer>(this,-1,0);
   }
   @Override public OmniIterator.OfInt descendingIterator(){
     int tail;
@@ -644,40 +644,9 @@ public class IntArrDeq extends IntUntetheredArrSeq<Integer> implements OmniDeque
       if((size=(tail+1)-this.head)<=0){
         size+=arr.length;
       }
-      return new DescendingItr(this,tail,size);
+      return new DescendingUntetheredArrSeqItr<Integer>(this,tail,size);
     }
-    return new DescendingItr(this,-1,0);
-  }
-  private static interface DefaultItr extends OmniIterator.OfInt{
-    @Override public default Integer next(){
-      return nextInt();
-    }
-  }
-  private static class AscendingItr extends AscendingUntetheredArrSeqItr<Integer> implements DefaultItr{
-    private AscendingItr(IntUntetheredArrSeq<Integer> root,int index,int numLeft){
-      super(root,index,numLeft);
-    }
-    @Override public Object clone(){
-      return new AscendingItr(root,index,numLeft);
-    }
-    @Override public void forEachRemaining(Consumer<? super Integer> action){
-      if(numLeft!=0){
-        super.uncheckedForEachRemaining(action::accept);
-      }
-    }
-  }
-  private static class DescendingItr extends DescendingUntetheredArrSeqItr<Integer> implements DefaultItr{
-    private DescendingItr(IntUntetheredArrSeq<Integer> root,int index,int numLeft){
-      super(root,index,numLeft);
-    }
-    @Override public Object clone(){
-      return new DescendingItr(root,index,numLeft);
-    }
-    @Override public void forEachRemaining(Consumer<? super Integer> action){
-      if(numLeft!=0){
-        super.uncheckedForEachRemaining(action::accept);
-      }
-    }
+    return new DescendingUntetheredArrSeqItr<Integer>(this,-1,0);
   }
   @Override public Object clone(){
     int tail;

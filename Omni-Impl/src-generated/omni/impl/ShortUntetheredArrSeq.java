@@ -648,6 +648,15 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       --tail;
     }
   }
+  private static  int nonfragmentedPullDown(final short[] arr,int dst,int src,int bound,final ShortPredicate filter){
+    for(;src<=bound;++src){
+      final short tmp;
+      if(!filter.test((short)(tmp=arr[src]))){
+        arr[dst++]=tmp;
+      }
+    }
+    return dst;
+  }
   boolean nonfragmentedRemoveIf(int head,int tail,ShortPredicate filter){
     final short[] arr;
     if(filter.test((short)(arr=this.arr)[head])){
@@ -656,14 +665,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
           this.head=src;
           while(++src<=tail){
             if(filter.test((short)arr[src])){
-              head=src;
-              while(++src<=tail){
-                final short tmp;
-                if(!filter.test((short)(tmp=arr[src]))){
-                  arr[head++]=tmp;
-                }
-              }
-              this.tail=head-1;
+              this.tail=nonfragmentedPullDown(arr,src,src+1,tail,filter)-1;
               break;
             }
           }
@@ -675,23 +677,82 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
     }else{
       while(++head<=tail){
         if(filter.test((short)arr[head])){
-          int dst=head;
-          while(++head<=tail){
-            final short tmp;
-            if(!filter.test((short)(tmp=arr[head]))){
-              arr[dst++]=tmp;
-            }
-          }
-          this.tail=dst-1;
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
           return true;
         }
       }
       return false;
     }
   }
+  private static  int fragmentedPullDown(final short[] arr,int src,int arrBound,int tail,final ShortPredicate filter){
+    int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
+    for(src=0;;++src){
+      final short tmp;
+      if(!filter.test((short)(tmp=arr[src]))){
+        arr[dst]=tmp;
+        if(dst==arrBound){
+          return nonfragmentedPullDown(arr,0,src+1,tail,filter)-1;
+        }
+        ++dst;
+      }
+      if(src==tail){
+        return dst-1;
+      }
+    }
+  }
   boolean fragmentedRemoveIf(int head,int tail,ShortPredicate filter){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final short[] arr;
+    if(filter.test((short)(arr=this.arr)[head])){
+      for(int bound=arr.length-1;;){
+        if(head==bound){
+          break;
+        }
+        if(!filter.test((short)arr[++head])){
+          this.head=head;
+          while(head!=bound){
+            if(filter.test((short)arr[++head])){
+              this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+              return true;
+            }
+          }
+          for(head=0;!filter.test((short)arr[head]);++head){
+            if(head==tail){
+              return true;
+            }
+          }
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+          return true;
+        }
+      }
+      for(head=0;filter.test((short)arr[head]);++head){
+        if(head==tail){
+          this.tail=-1;
+          return true;
+        }
+      }
+      this.head=head;
+      while(++head<=tail){
+        if(filter.test((short)arr[head])){
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+          break;
+        }
+      }
+      return true;
+    }else{
+      for(int bound=arr.length-1;++head<=bound;){
+        if(filter.test((short)arr[head])){
+          this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+          return true;
+        }
+      }
+      for(head=0;!filter.test((short)arr[head]);++head){
+        if(head==tail){
+          return false;
+        }
+      }
+      this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+      return true;
+    }
   }
   boolean uncheckedRemoveIf(int tail,ShortPredicate filter){
     int head;

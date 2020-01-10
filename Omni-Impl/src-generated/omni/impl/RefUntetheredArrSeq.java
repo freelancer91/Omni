@@ -689,6 +689,17 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection<E>,Externalizabl
       --tail;
     }
   }
+  @SuppressWarnings("unchecked")
+  private static <E> int nonfragmentedPullDown(final Object[] arr,int dst,int src,int bound,final Predicate<? super E> filter){
+    for(;src<=bound;++src){
+      final Object tmp;
+      if(!filter.test((E)(tmp=arr[src]))){
+        arr[dst++]=tmp;
+      }
+    }
+    return dst;
+  }
+  @SuppressWarnings("unchecked")
   boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
     final Object[] arr;
     if(filter.test((E)(arr=this.arr)[head])){
@@ -698,15 +709,8 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection<E>,Externalizabl
           this.head=src;
           while(++src<=tail){
             if(filter.test((E)arr[src])){
-              head=src;
-              while(++src<=tail){
-                final Object tmp;
-                if(!filter.test((E)(tmp=arr[src]))){
-                  arr[head++]=tmp;
-                }
-              }
-              OmniArray.OfRef.nullifyRange(arr,tail,head);
-              this.tail=head-1;
+              this.tail=(src=nonfragmentedPullDown(arr,src,src+1,tail,filter))-1;
+              OmniArray.OfRef.nullifyRange(arr,tail,src);
               break;
             }
           }
@@ -719,24 +723,93 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection<E>,Externalizabl
     }else{
       while(++head<=tail){
         if(filter.test((E)arr[head])){
-          int dst=head;
-          while(++head<=tail){
-            final Object tmp;
-            if(!filter.test((E)(tmp=arr[head]))){
-              arr[dst++]=tmp;
-            }
-          }
-          OmniArray.OfRef.nullifyRange(arr,tail,dst);
-          this.tail=dst-1;
+          this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+          OmniArray.OfRef.nullifyRange(arr,tail,head);
           return true;
         }
       }
       return false;
     }
   }
+  @SuppressWarnings("unchecked")
+  private static <E> int fragmentedPullDown(final Object[] arr,int src,int arrBound,int tail,final Predicate<? super E> filter){
+    int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
+    for(src=0;;++src){
+      final Object tmp;
+      if(!filter.test((E)(tmp=arr[src]))){
+        arr[dst]=tmp;
+        if(dst==arrBound){
+          OmniArray.OfRef.nullifyRange(arr,tail,src=nonfragmentedPullDown(arr,0,src+1,tail,filter));
+          return src-1;
+        }
+        ++dst;
+      }
+      if(src==tail){
+        OmniArray.OfRef.nullifyRange(arr,tail,0);
+        OmniArray.OfRef.nullifyRange(arr,arrBound,dst);
+        return dst-1;
+      }
+    }
+  }
+  @SuppressWarnings("unchecked")
   boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final Object[] arr;
+    if(filter.test((E)(arr=this.arr)[head])){
+      for(int bound=arr.length-1;;){
+        arr[head]=null;
+        if(head==bound){
+          break;
+        }
+        if(!filter.test((E)arr[++head])){
+          this.head=head;
+          while(head!=bound){
+            if(filter.test((E)arr[++head])){
+              this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+              return true;
+            }
+          }
+          for(head=0;!filter.test((E)arr[head]);++head){
+            if(head==tail){
+              return true;
+            }
+          }
+          this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+          OmniArray.OfRef.nullifyRange(arr,tail,head);
+          return true;
+        }
+      }
+      for(head=0;filter.test((E)arr[head]);++head){
+        arr[head]=null;
+        if(head==tail){
+          this.tail=-1;
+          return true;
+        }
+      }
+      this.head=head;
+      while(++head<=tail){
+        if(filter.test((E)arr[head])){
+          this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+          OmniArray.OfRef.nullifyRange(arr,tail,head);
+          break;
+        }
+      }
+      return true;
+    }else{
+      for(int bound=arr.length-1;++head<=bound;){
+        if(filter.test((E)arr[head])){
+          this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+          return true;
+        }
+      }
+      for(head=0;!filter.test((E)arr[head]);++head){
+        if(head==tail){
+          return false;
+        }
+      }
+      this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+      OmniArray.OfRef.nullifyRange(arr,tail,head+1);
+      return true;
+    }
   }
   @SuppressWarnings("unchecked")
   boolean uncheckedRemoveIf(int tail,Predicate<? super E> filter){

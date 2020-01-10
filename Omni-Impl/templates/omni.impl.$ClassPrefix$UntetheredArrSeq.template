@@ -22,8 +22,11 @@ import omni.function.$TypeNameModifier$Predicate;
 import java.util.function.$TypeNameModifier$Consumer;
 import java.util.function.$TypeNameModifier$Predicate;
 #ENDIF
-#IF OfLong
-import java.util.function.LongToIntFunction;
+#IF OfLong,OfDouble
+import java.util.function.$BoxedType$ToIntFunction;
+#ENDIF
+#IF OfFloat
+import omni.function.FloatToIntFunction;
 #ENDIF
 #IF OfInt,OfShort,OfChar
 import java.util.function.IntUnaryOperator;
@@ -33,9 +36,7 @@ import java.util.function.Predicate;
 import omni.api.OmniIterator;
 import java.util.function.ToIntFunction;
 #ENDIF
-#IFNOT OfInt,OfLong
 import java.util.function.Consumer;
-#ENDIF
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -81,84 +82,7 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     this.tail=-1;
 #ENDIF
   }
-#IFNOT OfFloat,OfDouble
-  boolean uniqueAdd(int tail,$exposedType$ key,$TypeNameModifier$Comparator$<E>$ sorter){
-    int mid,head;
-    if((mid=((head=this.head)+tail)>>>1)<head){
-      //fragmented
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }else{
-      final $ArrayType$[] arr;
-      switch(sorter.compare(key,($exposedType$)(arr=this.arr)[mid])){
-        case 0:
-          return false;
-        case -1:
-        {
-          //search and insert in lower half
-          int lo=head;
-          int hi=mid-1;
-          while((mid=(lo+hi)>>>1)>=lo){
-            switch(sorter.compare(key,($exposedType$)arr[mid])){
-              case 0:
-                return false;
-              case -1:
-                hi=mid-1;
-                break;
-              default:
-                lo=mid+1;
-            }
-          }
-          if((mid=lo-head)==0){
-            if(--head==-1 && tail==(head=arr.length-1)){
-              //TODO grow
-              throw new omni.util.NotYetImplementedException();
-            }else{
-              arr[head]=key;
-              this.head=head;
-            }
-          }else{
-            if(head==0){
-              if(tail==(head=arr.length-1)){
-                //TODO grow
-                throw new omni.util.NotYetImplementedException();
-              }else{
-                arr[head]=arr[0];
-                ArrCopy.semicheckedSelfCopy(arr,0,1,mid-1);
-                arr[lo]=key;
-                this.head=head;
-              }
-            }else{
-              ArrCopy.uncheckedSelfCopy(arr,tail=head-1,head,mid);
-              arr[lo]=key;
-              this.head=tail;
-            }
-          }
-        }
-        default:
-        {
-          //search and insert in upper half
-          int lo=mid+1;
-          int hi=tail;
-          while((mid=(lo+hi)>>>1)>=lo){
-            switch(sorter.compare(key,($exposedType$)arr[mid])){
-              case 0:
-                return false;
-              case -1:
-                hi=mid-1;
-                break;
-              default:
-                lo=mid+1;
-            }
-          }
-          //TODO insert
-          throw new omni.util.NotYetImplementedException();
-        }
-      }
-    }
-  }
-  
-#ENDIF
+
   public void addLast($exposedType$ val){
     var arr=this.arr;
     int tail;
@@ -696,20 +620,20 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     return false;
   }
 
-  #IF OfBoolean
+#IF OfBoolean
   int uncheckedSearch(int tail,final boolean searchVal)
-  #ELSEIF OfByte,OfChar,OfShort,OfInt
+#ELSEIF OfByte,OfChar,OfShort,OfInt
   int uncheckedSearch(int tail,final int searchVal)
-  #ELSEIF OfLong
+#ELSEIF OfLong
   int uncheckedSearch(int tail,final long searchVal)
-  #ELSEIF OfFloat
+#ELSEIF OfFloat
   int uncheckedSearch(int tail,final FloatPredicate tester)
-  #ELSEIF OfDouble
+#ELSEIF OfDouble
   int uncheckedSearch(int tail,final DoublePredicate tester)
-  #ELSEIF OfRef
+#ELSEIF OfRef
   @SuppressWarnings("unchecked")
   int uncheckedSearch(int tail,@SuppressWarnings("rawtypes") final Predicate tester)
-  #ENDIF
+#ENDIF
   {
     final var arr=this.arr;
     int count=1;
@@ -717,11 +641,11 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     if((head=this.head)>tail){
       for(final int bound=arr.length;;)
       {
-  #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
+#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
         if(arr[head]==searchVal)
-  #ELSE
+#ELSE
         if(tester.test(arr[head]))
-  #ENDIF
+#ENDIF
         {
           return count;
         }
@@ -735,11 +659,11 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     }
     for(;;)
     {
-  #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
+#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
       if(arr[head]==searchVal)
-  #ELSE
+#ELSE
       if(tester.test(arr[head]))
-  #ENDIF
+#ENDIF
       {
         return count;
       }
@@ -752,20 +676,20 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     }
   }
 
-  #IF OfBoolean
+#IF OfBoolean
   boolean uncheckedContainsMatch(int tail,final boolean searchVal)
-  #ELSEIF OfByte,OfChar,OfShort,OfInt
+#ELSEIF OfByte,OfChar,OfShort,OfInt
   boolean uncheckedContainsMatch(int tail,final int searchVal)
-  #ELSEIF OfLong
+#ELSEIF OfLong
   boolean uncheckedContainsMatch(int tail,final long searchVal)
-  #ELSEIF OfFloat
+#ELSEIF OfFloat
   boolean uncheckedContainsMatch(int tail,final FloatPredicate tester)
-  #ELSEIF OfDouble
+#ELSEIF OfDouble
   boolean uncheckedContainsMatch(int tail,final DoublePredicate tester)
-  #ELSEIF OfRef
+#ELSEIF OfRef
   @SuppressWarnings("unchecked")
   boolean uncheckedContainsMatch(int tail,@SuppressWarnings("rawtypes") final Predicate tester)
-  #ENDIF
+#ENDIF
   {
     final var arr=this.arr;
     int head;
@@ -808,17 +732,21 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
   }
   
   
-#IFNOT OfBoolean,OfByte,OfFloat,OfDouble
+#IFNOT OfBoolean,OfByte
   #IF OfChar,OfShort,OfInt
   boolean nonfragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
   #ELSEIF OfLong
   boolean nonfragmentedRemoveMatch(int head,int tail,final LongToIntFunction comparator)
+  #ELSEIF OfFloat
+  boolean nonfragmentedRemoveMatch(int head,int tail,final FloatToIntFunction comparator)
+  #ELSEIF OfDouble
+  boolean nonfragmentedRemoveMatch(int head,int tail,final DoubleToIntFunction comparator)
   #ELSEIF OfRef
   @SuppressWarnings("unchecked")
   boolean nonfragmentedRemoveMatch(int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
   #ENDIF
   {
-    final $KeyType$[] arr;
+    final $ArrayType$[] arr;
     int mid;
     switch(comparator.applyAsInt((arr=this.arr)[mid=(head+tail)>>>1]))
     {
@@ -868,12 +796,16 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
   boolean fragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
   #ELSEIF OfLong
   boolean fragmentedRemoveMatch(int head,int tail,final LongToIntFunction comparator)
+  #ELSEIF OfFloat
+  boolean fragmentedRemoveMatch(int head,int tail,final FloatToIntFunction comparator)
+  #ELSEIF OfDouble
+  boolean fragmentedRemoveMatch(int head,int tail,final DoubleToIntFunction comparator)
   #ELSEIF OfRef
   @SuppressWarnings("unchecked")
   boolean fragmentedRemoveMatch(int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
   #ENDIF
   {
-    final $KeyType$[] arr;
+    final $ArrayType$[] arr;
     switch(comparator.applyAsInt((arr=this.arr)[0]))
     {
       case 0:
@@ -927,12 +859,16 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
   }
 
   #IF OfChar,OfShort,OfInt
-  static int findIndex(final $KeyType$[] arr,int head,int tail,final IntUnaryOperator comparator)
+  static int findIndex(final $ArrayType$[] arr,int head,int tail,final IntUnaryOperator comparator)
   #ELSEIF OfLong
-  static int findIndex(final $KeyType$[] arr,int head,int tail,final LongToIntFunction comparator)
+  static int findIndex(final $ArrayType$[] arr,int head,int tail,final LongToIntFunction comparator)
+  #ELSEIF OfFloat
+  static int findIndex(final $ArrayType$[] arr,int head,int tail,final FloatToIntFunction comparator)
+  #ELSEIF OfDouble
+  static int findIndex(final $ArrayType$[] arr,int head,int tail,final DoubleToIntFunction comparator)
   #ELSEIF OfRef
   @SuppressWarnings("unchecked")
-  static int findIndex(final $KeyType$[] arr,int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
+  static int findIndex(final $ArrayType$[] arr,int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
   #ENDIF
   {
     do
@@ -958,6 +894,10 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
   boolean uncheckedContainsMatch(int tail,final IntUnaryOperator comparator)
   #ELSEIF OfLong
   boolean uncheckedContainsMatch(int tail,final LongToIntFunction comparator)
+  #ELSEIF OfFloat
+  boolean uncheckedContainsMatch(int tail,final FloatToIntFunction comparator)
+  #ELSEIF OfDouble
+  boolean uncheckedContainsMatch(int tail,final DoubleToIntFunction comparator)
   #ELSEIF OfRef
   @SuppressWarnings("unchecked")
   boolean uncheckedContainsMatch(int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
@@ -1115,6 +1055,21 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     }
   }
 #ELSE
+  #IF OfRef
+  @SuppressWarnings("unchecked")
+  #ENDIF
+  private static $<E>$ int nonfragmentedPullDown(final $ArrayType$[] arr,int dst,int src,int bound,final $TypeNameModifier$Predicate$<? super E>$ filter){
+    for(;src<=bound;++src){
+      final $ArrayType$ tmp;
+      if(!filter.test(($exposedType$)(tmp=arr[src]))){
+        arr[dst++]=tmp;
+      }
+    }
+    return dst;
+  }
+  #IF OfRef
+  @SuppressWarnings("unchecked")
+  #ENDIF
   boolean nonfragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
     final $ArrayType$[] arr;
     if(filter.test(($exposedType$)(arr=this.arr)[head])){
@@ -1126,17 +1081,12 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
           this.head=src;
           while(++src<=tail){
             if(filter.test(($exposedType$)arr[src])){
-              head=src;
-              while(++src<=tail){
-                final $ArrayType$ tmp;
-                if(!filter.test(($exposedType$)(tmp=arr[src]))){
-                  arr[head++]=tmp;
-                }
-              }
 #IF OfRef
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
+              this.tail=(src=nonfragmentedPullDown(arr,src,src+1,tail,filter))-1;
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,src);
+#ELSE
+              this.tail=nonfragmentedPullDown(arr,src,src+1,tail,filter)-1;
 #ENDIF
-              this.tail=head-1;
               break;
             }
           }
@@ -1152,26 +1102,125 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     }else{
       while(++head<=tail){
         if(filter.test(($exposedType$)arr[head])){
-          int dst=head;
-          while(++head<=tail){
-            final $ArrayType$ tmp;
-            if(!filter.test(($exposedType$)(tmp=arr[head]))){
-              arr[dst++]=tmp;
-            }
-          }
+          
 #IF OfRef
-          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,dst);
+          this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
+#ELSE
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
 #ENDIF
-          this.tail=dst-1;
           return true;
         }
       }
       return false;
     }
   }
+  #IF OfRef
+  @SuppressWarnings("unchecked")
+  #ENDIF
+  private static $<E>$ int fragmentedPullDown(final $ArrayType$[] arr,int src,int arrBound,int tail,final $TypeNameModifier$Predicate$<? super E>$ filter){
+    int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
+    for(src=0;;++src){
+      final $ArrayType$ tmp;
+      if(!filter.test(($exposedType$)(tmp=arr[src]))){
+        arr[dst]=tmp;
+        if(dst==arrBound){
+#IF OfRef
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,src=nonfragmentedPullDown(arr,0,src+1,tail,filter));
+          return src-1;
+#ELSE
+          return nonfragmentedPullDown(arr,0,src+1,tail,filter)-1;
+#ENDIF
+        }
+        ++dst;
+      }
+      if(src==tail){
+#IF OfRef
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,0);
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,arrBound,dst);
+#ENDIF 
+        return dst-1;
+      }
+    }
+  }
+  #IF OfRef
+  @SuppressWarnings("unchecked")
+  #ENDIF
   boolean fragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final $ArrayType$[] arr;
+    if(filter.test(($exposedType$)(arr=this.arr)[head])){
+      for(int bound=arr.length-1;;){
+#IF OfRef
+        arr[head]=null;
+#ENDIF
+        if(head==bound){
+          break;
+        }
+        if(!filter.test(($exposedType$)arr[++head])){
+          this.head=head;
+          while(head!=bound){
+            if(filter.test(($exposedType$)arr[++head])){
+              this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+              return true;
+            }
+          }
+          for(head=0;!filter.test(($exposedType$)arr[head]);++head){
+            if(head==tail){
+              return true;
+            }
+          }
+#IF OfRef
+          this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
+#ELSE
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+#ENDIF
+          return true;
+        }
+      }
+      for(head=0;filter.test(($exposedType$)arr[head]);++head){
+#IF OfRef
+        arr[head]=null;
+#ENDIF
+        if(head==tail){
+          this.tail=-1;
+          return true;
+        }
+      }
+      this.head=head;
+      while(++head<=tail){
+        if(filter.test(($exposedType$)arr[head])){
+#IF OfRef
+          this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
+#ELSE
+          this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+#ENDIF
+          break;
+        }
+      }
+      return true;
+    }else{
+      for(int bound=arr.length-1;++head<=bound;){
+        if(filter.test(($exposedType$)arr[head])){
+          this.tail=fragmentedPullDown(arr,head,bound,tail,filter);
+          return true;
+        }
+      }
+      for(head=0;!filter.test(($exposedType$)arr[head]);++head){
+        if(head==tail){
+          return false;
+        }
+      }
+      
+#IF OfRef
+      this.tail=(head=nonfragmentedPullDown(arr,head,head+1,tail,filter))-1;
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head+1);
+#ELSE
+      this.tail=nonfragmentedPullDown(arr,head,head+1,tail,filter)-1;
+#ENDIF
+      return true;
+    }
   }
 #ENDIF
 #IF OfRef
@@ -1271,9 +1320,7 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
 #ENDIF
   }
   
-#IF OfInt,OfLong
-  static abstract class AbstractUntetheredArrSeqItr<E>{
-#ELSEIF OfRef
+#IF OfRef
   static abstract class AbstractUntetheredArrSeqItr<E> implements OmniIterator.Of$ClassPrefix$$<E>${
 #ELSE
   static abstract class AbstractUntetheredArrSeqItr<E> extends Abstract$TypeNameModifier$Itr$<E>${
@@ -1325,7 +1372,7 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
         uncheckedForEachRemaining(action);
       }
     }
-#IFNOT OfRef,OfInt,OfLong
+#IFNOT OfRef
     public void forEachRemaining(Consumer<? super $BoxedType$> action){
       if(numLeft!=0){
         uncheckedForEachRemaining(action::accept);
@@ -1341,11 +1388,9 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     AscendingUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq<E> root,int index,int numLeft){
       super(root,index,numLeft);
     }
-#IFNOT OfInt,OfLong
     @Override public Object clone(){
       return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
     }
-#ENDIF
     @Override void iterateIndex(int index,final $ArrayType$[] arr){
       if(++index==arr.length){
         index=0;
@@ -1480,11 +1525,9 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     DescendingUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq<E> root,int index,int numLeft){
       super(root,index,numLeft);
     }
-#IFNOT OfInt,OfLong
     @Override public Object clone(){
       return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
     }
-#ENDIF
     @Override void iterateIndex(int index,final $ArrayType$[] arr){
       if(--index==-1){
         index=arr.length-1;

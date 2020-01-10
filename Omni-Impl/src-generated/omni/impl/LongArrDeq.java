@@ -574,9 +574,9 @@ public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.
       if((size=(tail+1)-(tail=this.head))<=0){
         size+=arr.length;
       }
-      return new AscendingItr(this,tail,size);
+      return new AscendingUntetheredArrSeqItr<Long>(this,tail,size);
     }
-    return new AscendingItr(this,-1,0);
+    return new AscendingUntetheredArrSeqItr<Long>(this,-1,0);
   }
   @Override public OmniIterator.OfLong descendingIterator(){
     int tail;
@@ -585,40 +585,9 @@ public class LongArrDeq extends LongUntetheredArrSeq<Long> implements OmniDeque.
       if((size=(tail+1)-this.head)<=0){
         size+=arr.length;
       }
-      return new DescendingItr(this,tail,size);
+      return new DescendingUntetheredArrSeqItr<Long>(this,tail,size);
     }
-    return new DescendingItr(this,-1,0);
-  }
-  private static interface DefaultItr extends OmniIterator.OfLong{
-    @Override public default Long next(){
-      return nextLong();
-    }
-  }
-  private static class AscendingItr extends AscendingUntetheredArrSeqItr<Long> implements DefaultItr{
-    private AscendingItr(LongUntetheredArrSeq<Long> root,int index,int numLeft){
-      super(root,index,numLeft);
-    }
-    @Override public Object clone(){
-      return new AscendingItr(root,index,numLeft);
-    }
-    @Override public void forEachRemaining(Consumer<? super Long> action){
-      if(numLeft!=0){
-        super.uncheckedForEachRemaining(action::accept);
-      }
-    }
-  }
-  private static class DescendingItr extends DescendingUntetheredArrSeqItr<Long> implements DefaultItr{
-    private DescendingItr(LongUntetheredArrSeq<Long> root,int index,int numLeft){
-      super(root,index,numLeft);
-    }
-    @Override public Object clone(){
-      return new DescendingItr(root,index,numLeft);
-    }
-    @Override public void forEachRemaining(Consumer<? super Long> action){
-      if(numLeft!=0){
-        super.uncheckedForEachRemaining(action::accept);
-      }
-    }
+    return new DescendingUntetheredArrSeqItr<Long>(this,-1,0);
   }
   @Override public Object clone(){
     int tail;
