@@ -733,6 +733,123 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
   
   
 #IFNOT OfBoolean,OfByte
+  boolean fragmentedAdd(int head,int tail,$exposedType$ key,$TypeNameModifier$Comparator$<E>$ sorter){
+    //TODO
+    throw new omni.util.NotYetImplementedException();  
+  }
+  boolean nonfragmentedInsertLo($ArrayType$[] arr,int head,int hi,$exposedType$ key,$TypeNameModifier$Comparator$<E>$ sorter){
+    int lo=head;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(Integer.signum(sorter.compare(key,($exposedType$)arr[mid=(lo+hi)>>>1])))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    int headDist;
+    if((headDist=lo-head)==0){
+      if(--head==-1 && this.tail==(head=arr.length-1)){
+        ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[headDist=OmniArray.growBy50Pct(++head)],lo=headDist-head,head);
+        this.tail=headDist-1;
+        this.head=--lo;
+        arr[lo]=key;
+        this.arr=arr;
+      }else{
+        arr[head]=key;
+        this.head=head;
+      }
+    }else{
+      if(head==0){
+        if(this.tail==(head=arr.length-1)){
+          final var tmp=new $ArrayType$[headDist=OmniArray.growBy50Pct(++head)];
+          this.tail=headDist-1;
+          ArrCopy.uncheckedCopy(arr,lo,tmp,head=headDist-(headDist=head-lo),headDist);
+          tmp[--head]=key;
+          ArrCopy.uncheckedCopy(arr,0,tmp,head-=lo,lo);
+          this.arr=tmp;
+        }else{
+          arr[head]=arr[0];
+          ArrCopy.semicheckedSelfCopy(arr,0,1,headDist-1);
+          arr[lo]=key;
+        }
+        this.head=head;
+      }else{
+        ArrCopy.uncheckedSelfCopy(arr,hi=head-1,head,mid);
+        arr[lo]=key;
+        this.head=hi;
+      }
+    }
+  }
+  boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ key,$TypeNameModifier$Comparator$<E>$ sorter){
+    int hi=tail;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(Integer.signum(sorter.compare(key,($exposedType$)arr[mid=(lo+hi)>>>1])))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    int tailDist;
+    if((tailDist=(++tail-lo)==0){
+      if(tail==arr.length && head==0){
+        ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[head=OmniArray.growBy50Pct(tail)],0,tail);
+        this.tail=tail;
+        arr[lo]=key
+        this.arr=arr;
+      }else{
+        arr[0]=key;
+        this.tail=0;
+      }
+    }else{
+      if(tail==arr.length){
+        if(this.head==0){
+          final $ArrayType$[] tmp;
+          ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[hi=OmniArray.growBy50Pct(tail)],0,lo);
+          tmp[lo]=key;
+          ArrCopy.uncheckedCopy(arr,lo,tmp,lo+1,tailDist);
+          this.tail=tail;
+          this.arr=tmp;
+        }else{
+          arr[0]=arr[tail-1];
+          ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist-1);
+          arr[lo]=key;
+          this.tail=0;
+        }
+      }else{
+        ArrCopy.uncheckedCopy(arr,lo,arr,lo+1,tailDist);
+        arr[lo]=key;
+        this.tail=tail;
+      }
+    }
+  }
+  boolean nonfragmentedAdd(int head,int tail,$exposedType$ key,$TypeNameModifier$Comparator$<E>$ sorter){
+    final $ArrayType$[] arr;
+    int mid;
+    switch(Integer.signum(sorter.compare(key,($exposedType$)(arr=this.arr)[mid=(head+tail)>>>1])))
+    {
+      case 0:
+        return false;
+      case -1:
+        return nonfragmentedInsertLo(arr,head,mid-1,key,sorter);
+      default:
+        return nonfragmentedInsertHi(arr,mid+1,tail,key,sorter);
+    }
+  }
+  
   #IF OfChar,OfShort,OfInt
   boolean nonfragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
   #ELSEIF OfLong

@@ -28,7 +28,7 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   $ClassPrefix$OrderedSet(){
     super();
   }
-  abstract int compare($KeyType$ val1,$KeyType$ val2);
+  
   
  
 
