@@ -2,6 +2,7 @@ package omni.impl;
 import omni.api.OmniCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
+import omni.function.ShortComparator;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import java.util.function.IntUnaryOperator;
@@ -435,6 +436,536 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
       ++head;
     }
+  }
+  void insertMiddle(short key){
+    short[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new short[]{key};
+      this.head=0;
+      this.tail=0;
+    }else if(arr==OmniArray.OfShort.DEFAULT_ARR){
+      this.arr=arr=new short[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      arr[OmniArray.DEFAULT_ARR_SEQ_CAP/2]=key;
+      this.head=OmniArray.DEFAULT_ARR_SEQ_CAP/2;
+      this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP/2;
+    }else{
+      final int index;
+      arr[index=(arr.length>>1)]=key;
+      this.tail=index;
+      this.head=index;
+    }
+  }
+  boolean uncheckedAdd(int tail,short key,ShortComparator sorter)
+  {
+    final var arr=this.arr;
+    final int head;
+    if(tail<(head=this.head))
+    {
+      switch(sorter.compare(key,(short)arr[0]))
+      {
+        case 0:
+          return false;
+        case -1:
+          return fragmentedInsertLo(arr,head,tail,key,sorter);
+        default:
+          return fragmentedInsertHi(arr,head,tail,key,sorter);
+      }
+    }
+    else
+    {
+      final int mid;
+      switch(sorter.compare(key,(short)arr[mid=(head+tail)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          return nonfragmentedInsertLo(arr,head,mid-1,key,sorter);
+        default:
+          return nonfragmentedInsertHi(arr,mid+1,tail,key,sorter);
+      }
+    }
+  }
+  boolean fragmentedInsertHi(short[] arr,int head,int tail,short key,ShortComparator sorter){
+    int lo=1;
+    int hi=tail;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(sorter.compare(key,(short)arr[ mid=(hi+lo)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    final int arrLength;
+    final int headDist=(arrLength=arr.length)-head;
+    if(++tail==head)
+    {
+      //must grow
+      final short[] tmp;
+      //allocate a new array and assign the key
+      (tmp=new short[hi=OmniArray.growBy50Pct(arrLength)])[lo]=key;
+      if(lo==0)
+      {
+        //inserting at index 0, copy the span from [0->tail] to the right one
+        ArrCopy.uncheckedCopy(arr,0,tmp,1,tail);
+      }
+      else
+      {
+        //inserting at 0<index<=tail
+        //copy [0->index]
+        ArrCopy.uncheckedCopy(arr,0,tmp,0,lo);
+        //copy [index->tail] but move it right one
+        ArrCopy.semicheckedCopy(arr,lo,tmp,lo+1,tail-lo);
+      }
+      //copy the head span [head->arrBound]
+      ArrCopy.uncheckedCopy(arr,head,tmp,(hi-=headDist),headDist);
+      this.head=hi;
+      this.tail=tail;
+      this.arr=tmp;
+    }
+    else
+    {
+      int tailDist;
+      if((tailDist=tail-lo)<=headDist+lo)
+      {
+        //shift the elements AFTER the insertion point right
+        ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist);
+        this.tail=tail;
+      }
+      else
+      {
+        //shift the elements BEFORE the insertion point left (wrap around the break)
+        ArrCopy.uncheckedSelfCopy(arr,tail=head-1,head,headDist);
+        arr[arrLength-1]=arr[0];
+        ArrCopy.semicheckedSelfCopy(arr,0,1,lo-1);
+        this.head=tail;
+      }
+      arr[lo]=key;
+    }
+    return true;
+  }
+  boolean fragmentedInsertLo(short[] arr,int head,int tail,short key,ShortComparator sorter){
+    int arrBound;
+    int hi=(arrBound=arr.length)-1;
+    int lo=head;
+    do
+    {
+      final int mid;
+      switch(sorter.compare(key,(short)arr[mid=(hi+lo)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }while(lo<=hi);
+    final int headDist=lo-head;
+    if(++tail==head)
+    {
+      //must grow
+      final short[] tmp;
+      //Copy the span from [0->tail]
+      ArrCopy.uncheckedCopy(arr,0,tmp=new short[hi=OmniArray.growBy50Pct(arrBound)],0,tail);
+      //copy the span from [index->arrBound]
+      ArrCopy.semicheckedCopy(arr,lo,tmp,hi-=(arrBound-=lo),arrBound);
+      //insert the new key
+      tmp[--hi]=key;
+      //copy the span from [head->index]
+      ArrCopy.semicheckedCopy(arr,head,tmp,hi-=headDist,headDist);
+      this.head=hi;
+      this.arr=tmp;
+    }
+    else
+    {
+      if(headDist<=((hi=(--arrBound)-lo)+(tail)))
+      {
+        //move the elements BEFORE the insertion point left
+        ArrCopy.semicheckedSelfCopy(arr,tail=head-1,head,headDist);
+        this.head=tail; 
+      }
+      else
+      {
+        //move the points AFTER the insertion point right (wrap around the break)
+        ArrCopy.uncheckedCopy(arr,0,arr,1,tail);
+        arr[0]=arr[arrBound];
+        ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,hi);
+        this.tail=tail;
+      }
+      arr[lo]=key;
+    }
+    return true;
+  }
+  boolean nonfragmentedInsertLo(short[] arr,int head,int hi,short key,ShortComparator sorter){
+    int lo=head;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(sorter.compare(key,(short)arr[mid=(lo+hi)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    int headDist;
+    if((headDist=lo-head)==0){
+      //inserting at index==head
+      if(--head==-1 && this.tail==(head=arr.length-1)){
+        //must grow
+        ArrCopy.uncheckedCopy(arr,0,arr=new short[headDist=OmniArray.growBy50Pct(++head)],lo=headDist-head,head);
+        this.tail=headDist-1;
+        this.head=--lo;
+        arr[lo]=key;
+        this.arr=arr;
+      }else{
+        arr[head]=key;
+        this.head=head;
+      }
+    }else{
+      if(head==0){
+        if(this.tail==(head=arr.length-1)){
+          //must grow
+          final var tmp=new short[headDist=OmniArray.growBy50Pct(++head)];
+          this.tail=headDist-1;
+          ArrCopy.uncheckedCopy(arr,lo,tmp,head=headDist-(headDist=head-lo),headDist);
+          tmp[--head]=key;
+          ArrCopy.uncheckedCopy(arr,0,tmp,head-=lo,lo);
+          this.arr=tmp;
+        }else{
+          arr[head]=arr[0];
+          ArrCopy.semicheckedSelfCopy(arr,0,1,headDist-1);
+          arr[lo]=key;
+        }
+        this.head=head;
+      }else{
+        ArrCopy.uncheckedSelfCopy(arr,hi=head-1,head,headDist);
+        arr[lo]=key;
+        this.head=hi;
+      }
+    }
+    return true;
+  }
+  boolean nonfragmentedInsertHi(short[] arr,int lo,int tail,short key,ShortComparator sorter){
+    int hi=tail;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(sorter.compare(key,(short)arr[mid=(lo+hi)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    int tailDist;
+    if((tailDist=(++tail-lo))==0){
+      //inserting at index==tail+1
+      if(tail==arr.length && head==0){
+        //must grow
+        ArrCopy.uncheckedCopy(arr,0,arr=new short[head=OmniArray.growBy50Pct(tail)],0,tail);
+        this.tail=tail;
+        arr[lo]=key;
+        this.arr=arr;
+      }else{
+        arr[0]=key;
+        this.tail=0;
+      }
+    }else{
+      if(tail==arr.length){
+        if(this.head==0){
+          //must grow
+          final short[] tmp;
+          ArrCopy.uncheckedCopy(arr,0,tmp=new short[hi=OmniArray.growBy50Pct(tail)],0,lo);
+          tmp[lo]=key;
+          ArrCopy.uncheckedCopy(arr,lo,tmp,lo+1,tailDist);
+          this.tail=tail;
+          this.arr=tmp;
+        }else{
+          arr[0]=arr[tail-1];
+          ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist-1);
+          arr[lo]=key;
+          this.tail=0;
+        }
+      }else{
+        ArrCopy.uncheckedCopy(arr,lo,arr,lo+1,tailDist);
+        arr[lo]=key;
+        this.tail=tail;
+      }
+    }
+    return true;
+  }
+  boolean uncheckedAdd(int tail,short key,IntUnaryOperator sorter)
+  {
+    final var arr=this.arr;
+    final int head;
+    if(tail<(head=this.head))
+    {
+      switch(sorter.applyAsInt((short)arr[0]))
+      {
+        case 0:
+          return false;
+        case -1:
+          return fragmentedInsertLo(arr,head,tail,key,sorter);
+        default:
+          return fragmentedInsertHi(arr,head,tail,key,sorter);
+      }
+    }
+    else
+    {
+      final int mid;
+      switch(sorter.applyAsInt((short)arr[mid=(head+tail)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          return nonfragmentedInsertLo(arr,head,mid-1,key,sorter);
+        default:
+          return nonfragmentedInsertHi(arr,mid+1,tail,key,sorter);
+      }
+    }
+  }
+  boolean fragmentedInsertHi(short[] arr,int head,int tail,short key,IntUnaryOperator sorter){
+    int lo=1;
+    int hi=tail;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(sorter.applyAsInt((short)arr[ mid=(hi+lo)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    final int arrLength;
+    final int headDist=(arrLength=arr.length)-head;
+    if(++tail==head)
+    {
+      //must grow
+      final short[] tmp;
+      //allocate a new array and assign the key
+      (tmp=new short[hi=OmniArray.growBy50Pct(arrLength)])[lo]=key;
+      if(lo==0)
+      {
+        //inserting at index 0, copy the span from [0->tail] to the right one
+        ArrCopy.uncheckedCopy(arr,0,tmp,1,tail);
+      }
+      else
+      {
+        //inserting at 0<index<=tail
+        //copy [0->index]
+        ArrCopy.uncheckedCopy(arr,0,tmp,0,lo);
+        //copy [index->tail] but move it right one
+        ArrCopy.semicheckedCopy(arr,lo,tmp,lo+1,tail-lo);
+      }
+      //copy the head span [head->arrBound]
+      ArrCopy.uncheckedCopy(arr,head,tmp,(hi-=headDist),headDist);
+      this.head=hi;
+      this.tail=tail;
+      this.arr=tmp;
+    }
+    else
+    {
+      int tailDist;
+      if((tailDist=tail-lo)<=headDist+lo)
+      {
+        //shift the elements AFTER the insertion point right
+        ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist);
+        this.tail=tail;
+      }
+      else
+      {
+        //shift the elements BEFORE the insertion point left (wrap around the break)
+        ArrCopy.uncheckedSelfCopy(arr,tail=head-1,head,headDist);
+        arr[arrLength-1]=arr[0];
+        ArrCopy.semicheckedSelfCopy(arr,0,1,lo-1);
+        this.head=tail;
+      }
+      arr[lo]=key;
+    }
+    return true;
+  }
+  boolean fragmentedInsertLo(short[] arr,int head,int tail,short key,IntUnaryOperator sorter){
+    int arrBound;
+    int hi=(arrBound=arr.length)-1;
+    int lo=head;
+    do
+    {
+      final int mid;
+      switch(sorter.applyAsInt((short)arr[mid=(hi+lo)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }while(lo<=hi);
+    final int headDist=lo-head;
+    if(++tail==head)
+    {
+      //must grow
+      final short[] tmp;
+      //Copy the span from [0->tail]
+      ArrCopy.uncheckedCopy(arr,0,tmp=new short[hi=OmniArray.growBy50Pct(arrBound)],0,tail);
+      //copy the span from [index->arrBound]
+      ArrCopy.semicheckedCopy(arr,lo,tmp,hi-=(arrBound-=lo),arrBound);
+      //insert the new key
+      tmp[--hi]=key;
+      //copy the span from [head->index]
+      ArrCopy.semicheckedCopy(arr,head,tmp,hi-=headDist,headDist);
+      this.head=hi;
+      this.arr=tmp;
+    }
+    else
+    {
+      if(headDist<=((hi=(--arrBound)-lo)+(tail)))
+      {
+        //move the elements BEFORE the insertion point left
+        ArrCopy.semicheckedSelfCopy(arr,tail=head-1,head,headDist);
+        this.head=tail; 
+      }
+      else
+      {
+        //move the points AFTER the insertion point right (wrap around the break)
+        ArrCopy.uncheckedCopy(arr,0,arr,1,tail);
+        arr[0]=arr[arrBound];
+        ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,hi);
+        this.tail=tail;
+      }
+      arr[lo]=key;
+    }
+    return true;
+  }
+  boolean nonfragmentedInsertLo(short[] arr,int head,int hi,short key,IntUnaryOperator sorter){
+    int lo=head;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(sorter.applyAsInt((short)arr[mid=(lo+hi)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    int headDist;
+    if((headDist=lo-head)==0){
+      //inserting at index==head
+      if(--head==-1 && this.tail==(head=arr.length-1)){
+        //must grow
+        ArrCopy.uncheckedCopy(arr,0,arr=new short[headDist=OmniArray.growBy50Pct(++head)],lo=headDist-head,head);
+        this.tail=headDist-1;
+        this.head=--lo;
+        arr[lo]=key;
+        this.arr=arr;
+      }else{
+        arr[head]=key;
+        this.head=head;
+      }
+    }else{
+      if(head==0){
+        if(this.tail==(head=arr.length-1)){
+          //must grow
+          final var tmp=new short[headDist=OmniArray.growBy50Pct(++head)];
+          this.tail=headDist-1;
+          ArrCopy.uncheckedCopy(arr,lo,tmp,head=headDist-(headDist=head-lo),headDist);
+          tmp[--head]=key;
+          ArrCopy.uncheckedCopy(arr,0,tmp,head-=lo,lo);
+          this.arr=tmp;
+        }else{
+          arr[head]=arr[0];
+          ArrCopy.semicheckedSelfCopy(arr,0,1,headDist-1);
+          arr[lo]=key;
+        }
+        this.head=head;
+      }else{
+        ArrCopy.uncheckedSelfCopy(arr,hi=head-1,head,headDist);
+        arr[lo]=key;
+        this.head=hi;
+      }
+    }
+    return true;
+  }
+  boolean nonfragmentedInsertHi(short[] arr,int lo,int tail,short key,IntUnaryOperator sorter){
+    int hi=tail;
+    while(lo<=hi)
+    {
+      final int mid;
+      switch(sorter.applyAsInt((short)arr[mid=(lo+hi)>>>1]))
+      {
+        case 0:
+          return false;
+        case -1:
+          hi=mid-1;
+          break;
+        default:
+          lo=mid+1;
+      }
+    }
+    int tailDist;
+    if((tailDist=(++tail-lo))==0){
+      //inserting at index==tail+1
+      if(tail==arr.length && head==0){
+        //must grow
+        ArrCopy.uncheckedCopy(arr,0,arr=new short[head=OmniArray.growBy50Pct(tail)],0,tail);
+        this.tail=tail;
+        arr[lo]=key;
+        this.arr=arr;
+      }else{
+        arr[0]=key;
+        this.tail=0;
+      }
+    }else{
+      if(tail==arr.length){
+        if(this.head==0){
+          //must grow
+          final short[] tmp;
+          ArrCopy.uncheckedCopy(arr,0,tmp=new short[hi=OmniArray.growBy50Pct(tail)],0,lo);
+          tmp[lo]=key;
+          ArrCopy.uncheckedCopy(arr,lo,tmp,lo+1,tailDist);
+          this.tail=tail;
+          this.arr=tmp;
+        }else{
+          arr[0]=arr[tail-1];
+          ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist-1);
+          arr[lo]=key;
+          this.tail=0;
+        }
+      }else{
+        ArrCopy.uncheckedCopy(arr,lo,arr,lo+1,tailDist);
+        arr[lo]=key;
+        this.tail=tail;
+      }
+    }
+    return true;
   }
   boolean nonfragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
   {

@@ -36,7 +36,7 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
     addLast(val);
     return true;
   }
-#IF OfBoolean,OfRef
+#IF OfRef
   @Override public void addFirst($exposedType$ val){
     push(val);
   }

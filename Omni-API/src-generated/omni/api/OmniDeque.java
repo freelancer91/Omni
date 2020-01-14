@@ -71,10 +71,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
   public abstract boolean removeLastOccurrence(Double val);
   public abstract interface OfPrimitive<E> extends OmniCollection<E>,OmniCollection.OfPrimitive<E>,OmniStack<E>,OmniQueue<E>,OmniStack.OfPrimitive<E>,OmniDeque<E>
   {
-    public abstract void addFirst(boolean val);
-    public abstract void addLast(boolean val);
-    public abstract boolean offerFirst(boolean val);
-    public abstract boolean offerLast(boolean val);
+    //public abstract void addFirst(boolean val);
+    //public abstract void addLast(boolean val);
+    //public abstract boolean offerFirst(boolean val);
+    //public abstract boolean offerLast(boolean val);
     @Override
     public default boolean removeFirstOccurrence(Boolean val)
     {
@@ -320,6 +320,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
   public abstract interface OfBoolean extends OmniCollection<Boolean>,OmniCollection.OfPrimitive<Boolean>,OmniCollection.OfBoolean,PeekAndPollIfc.BooleanOutput<Boolean>,OmniStack<Boolean>,OmniStack.OfPrimitive<Boolean>,OmniStack.OfBoolean,OmniQueue<Boolean>,OmniQueue.OfBoolean,OmniDeque<Boolean>,OfPrimitive<Boolean>
   ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
   {
+    public default void addFirst(boolean val)
+    {
+      push(val);
+    }
     public abstract void addFirst(Boolean val);
     public abstract void addLast(boolean val);
     public abstract void addLast(Boolean val);

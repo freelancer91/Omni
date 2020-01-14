@@ -7,22 +7,24 @@
 #TYPEDEF OfRef
 package omni.impl;
 import omni.api.OmniNavigableSet;
+import omni.util.OmniArray;
+import omni.util.ArrCopy;
+#IFNOT OfRef
+import omni.util.TypeUtil;
+#ENDIF
+#IF OfFloat
+import omni.function.$TypeNameModifier$ToIntFunction;
+#ENDIF
 #IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
 import omni.function.$TypeNameModifier$Comparator;
 #ELSE
 import java.util.Comparator;
 #ENDIF
 public abstract class $ClassPrefix$OrderedSet$<E>$
-  #IF OfDouble
-  extends LongUntetheredArrSeq<Double>
-  #ELSEIF OfFloat
-  extends IntUntetheredArrSeq<Float>
-  #ELSE
   extends $ClassPrefix$UntetheredArrSeq<$BoxedType$>
-  #ENDIF
   implements OmniNavigableSet.Of$ClassPrefix$$<E>$
 {
-  $ClassPrefix$OrderedSet(int head,$KeyType$[] arr,int tail){
+  $ClassPrefix$OrderedSet(int head,$ArrayType$[] arr,int tail){
     super(head,arr,tail);
   }
   $ClassPrefix$OrderedSet(){
@@ -30,26 +32,384 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   }
   
   
- 
+#IFNOT OfRef
+  @Override public boolean add($BoxedType$ key){
+    return add(($exposedType$)key);
+  }
+#ENDIF
+  abstract int insertionCompare($exposedType$ key1,$exposedType$ key2);
+#IF OfFloat,OfDouble
+  abstract boolean uncheckedAddNaN(int tail);
+  abstract int comparePos0($exposedType$ key);
+  abstract int compareNeg0($exposedType$ key);
+  abstract boolean uncheckedAddPosInf(int tail);
+  abstract boolean uncheckedAddNegInf(int tail);
+  
+  private void insertAtTail($ArrayType$[] arr,$ArrayType$ key,int head,int tail){
+    switch(Integer.signum((++tail)-head)){
+      case 0:
+        //fragmented must grow
+        final $ArrayType$[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.head=head;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(tail==arr.length){
+          if(head==0){
+            //must grow
+            ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(tail)],0,tail);
+            this.arr=arr;
+          }else{
+            tail=0;
+          }
+        }
+      case -1:
+        //fragmented
+    }
+    arr[tail]=key;
+    this.tail=tail;
+  }
+  private void insertAtHead($ArrayType$[] arr,$ArrayType$ key,int head,int tail){
+      int newHead;
+      switch(Integer.signum(tail-(newHead=head-1))){
+        case 0:
+          //fragmented must grow
+          final $ArrayType$[] tmp;
+          int arrLength;
+          ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+          ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+          --newHead;
+          this.arr=arr=tmp;
+          break;
+        default:
+          //nonfragmented
+          if(newHead==-1 && tail==(newHead=arr.length-1)){
+            //must grow
+            this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+            ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[newHead],newHead-=(tail),tail);
+            --newHead;
+            this.arr=arr;
+          }
+        case -1:
+          //fragmented
+      }
+      arr[newHead]=key;
+      this.head=newHead;
+    }
+  @Override public boolean add($exposedType$ key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction sorter;
+        
+  #IF OfFloat
+        switch(Float.floatToRawIntBits(key)){
+          case 0x7f800000:
+            return this.uncheckedAddPosInf(tail);
+          case 0xff800000:
+            return this.uncheckedAddNegInf(tail);
+          default:
+            return super.uncheckedAdd(tail,key,this::insertionCompare);
+          case 0:
+            sorter=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            sorter=this::compareNeg0;
+            break;
+        }
+  #ELSE
+        final $KeyType$ bits;
+        if((bits=Double.doubleToRawLongBits(key)==0L){
+          sorter=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          sorter=this::compareNeg0;
+        }else if(bits==0x7ff0000000000000L){
+          return this.uncheckedAddPosInf(tail);
+        }else if(bits==0xfff0000000000000L){
+          return this.uncheckedAddNegInf(tail);
+        }else{
+          return super.uncheckedAdd(tail,key,this::insertionCompare);
+        }
+  #ENDIF
+        return super.uncheckedAdd(tail,key,sorter);
+      }
+      return this.uncheckedAddNaN(tail);
+    }else{
+      super.insertMiddle(key);
+      return true;
+    }
+  }
+#ELSE
+  
+  
+  #IFNOT OfRef
+  @Override public boolean add(boolean key){
+    return add($queryCastBoolean$(key));
+  }
+    #IFNOT OfChar
+  @Override public boolean add(byte key){
+    return add(($exposedType$)key);
+  }
+    #ENDIF
+    #IFNOT OfChar,OfShort
+  @Override public boolean add(char key){
+    return add(($exposedType$)key);
+  }
+    #ENDIF
+    #IFNOT OfChar,OfShort,OfInt
+  @Override public boolean add(int key){
+    return add(($exposedType$)key);
+  }
+    #ENDIF
+  #ENDIF
+  @Override public boolean add($exposedType$ key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle(key);
+      return true;
+    }
+  }
+#ENDIF
+  
 
   public static class Ascending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
-    Ascending(int head,$KeyType$[] arr,int tail){
+    Ascending(int head,$ArrayType$[] arr,int tail){
       super(head,arr,tail);
     }
     Ascending(){
       super();
     }
+#IF OfFloat,OfDouble
+    @Override int comparePos0($exposedType$ key){
+      if(0<key){
+        return -1;
+      }
+      if(0>key){
+        return 1;
+      }
+  #IF OfFloat
+      switch(Float.floatToRawIntBits(key)){
+        case 0:
+          return 0;
+        case Integer.MIN_VALUE:
+          return 1;
+        default:
+      }
+  #ELSE
+      final long bits;
+      if((bits=Double.doubleToRawLongBits(key))==0L){
+        return 0;
+      }
+      if(bits==Long.MIN_VALUE){
+        return 1;
+      }
+  #ENDIF
+      //must be NaN
+      return -1;
+    }
+    @Override int compareNeg0($exposedType$ key){
+      if(0<key){
+        return -1;
+      }
+      if(0>key){
+        return 1;
+      }
+   #IF OfFloat
+      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
+   #ELSE
+      if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
+   #ENDIF
+        return 0;
+      }
+      //is positive 0 or NaN
+      return -1;
+    }
+    @Override boolean uncheckedAddPosInf(int tail){
+      $ArrayType$[] arr;
+      final $ArrayType$ topVal;
+      if((topVal=(arr=this.arr)[tail])!=$BoxedType$.POSITIVE_INFINITY){
+        if(topVal==topVal){
+          super.insertAtTail(arr,$BoxedType$.POSITIVE_INFINITY,this.head,tail);
+        }else{
+          int newTail,head;
+          switch(Integer.signum((newTail=tail+1)-(head=this.head))){
+            case 0:
+              //fragmented must grow
+              final $ArrayType$[] tmp;
+              int arrLength;
+              ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+              ArrCopy.uncheckedCopy(arr,newTail,tmp,head-=(arrLength-=newTail),arrLength);
+              this.head=head;
+              this.arr=arr=tmp;
+              break;
+            default:
+              //nonfragmented
+              if(newTail==arr.length){
+                if(head==0){
+                  //must grow
+                  ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(newTail)],0,tail);
+                  this.arr=arr;
+                }else{
+                  newTail=0;
+                }
+              }
+            case -1:
+              //fragmented
+          }
+          arr[tail]=$BoxedType$.POSITIVE_INFINITY;
+          arr[newTail]=$BoxedType$.NaN;
+          this.tail=newTail;
+        }
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddNegInf(int tail){
+      $ArrayType$[] arr;
+      final int head;
+      if((arr=this.arr)[head=this.head]!=$BoxedType$.NEGATIVE_INFINITY){
+        super.insertAtHead(arr,$BoxedType$.NEGATIVE_INFINITY,head,tail);
+        return true;
+      }
+      return false;
+    }
     
-    
-    
+    @Override boolean uncheckedAddNaN(int tail){
+      $ArrayType$[] arr;
+      if(!$BoxedType$.isNaN((arr=this.arr)[tail])){
+        super.insertAtTail(arr,$BoxedType$.NaN,this.head,tail);
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
+  #IF OfChar,OfShort
+      return Integer.signum(key1-key2);
+  #ELSEIF OfInt,OfLong,OfFloat,OfDouble
+      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
+      if(key1==key2){
+        return 0;
+      }
+      if(key1>key2){
+        return 1;
+      }
+      //ok if key2 is NaN
+      return -1;
+  #ELSE
+      return Integer.signum(((Comparable)key1).compareTo((Comparable)key2));
+  #ENDIF
+    }
   }
   
   public static class Descending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
-    Descending(int head,$KeyType$[] arr,int tail){
+    Descending(int head,$ArrayType$[] arr,int tail){
       super(head,arr,tail);
     }
     Descending(){
       super();
+    }
+#IF OfFloat,OfDouble
+    @Override boolean uncheckedAddPosInf(int tail){
+      $ArrayType$[] arr;
+      final $ArrayType$ bottomVal;
+      int head;
+      if((bottomVal=(arr=this.arr)[head=this.head])!=$BoxedType$.POSITIVE_INFINITY){
+        if(bottomVal==bottomVal){
+          super.insertAtHead(arr,$BoxedType$.POSITIVE_INFINITY,head,tail);
+        }else{
+          //TODO add just to the right of head
+          throw new omni.util.NotYetImplementedException();
+        }
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddNegInf(int tail){
+      $ArrayType$[] arr;
+      if((arr=this.arr)[tail]!=$BoxedType$.NEGATIVE_INFINITY){
+        super.insertAtTail(arr,$BoxedType$.NEGATIVE_INFINITY,this.head,tail);
+        return true;
+      }
+      return false;
+    }
+    @Override int comparePos0($exposedType$ key){
+      if(0<key){
+        return 1;
+      }
+      if(0>key){
+        return -1;
+      }
+  #IF OfFloat
+      switch(Float.floatToRawIntBits(key)){
+        case 0:
+          return 0;
+        case Integer.MIN_VALUE:
+          return -1;
+        default:
+      }
+  #ELSE
+      final long bits;
+      if((bits=Double.doubleToRawLongBits(key))==0L){
+        return 0;
+      }
+      if(bits==Long.MIN_VALUE){
+        return 1;
+      }
+  #ENDIF
+      //must be NaN
+      return 1;
+    }
+    @Override int compareNeg0($exposedType$ key){
+      if(0<key){
+        return 1;
+      }
+      if(0>key){
+        return -1;
+      }
+   #IF OfFloat
+      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
+   #ELSE
+      if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
+   #ENDIF
+        return 0;
+      }
+      //is positive 0 or NaN
+      return 1;
+    }
+    
+    @Override boolean uncheckedAddNaN(int tail){
+      $ArrayType$[] arr;
+      final int head;
+      if(!$BoxedType$.isNaN((arr=this.arr)[head=this.head])){
+        super.insertAtHead(arr,$BoxedType$.NaN,head,tail);
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
+  #IF OfChar,OfShort
+      return Integer.signum(key2-key1);
+  #ELSEIF OfInt,OfLong,OfFloat,OfDouble
+      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
+      if(key1==key2){
+        return 0;
+      }
+      if(key1>key2){
+        return -1;
+      }
+      //ok if key2 is NaN
+      return 1;
+  #ELSE
+      return Integer.signum(((Comparable)key2).compareTo((Comparable)key1));
+  #ENDIF
     }
   }
   

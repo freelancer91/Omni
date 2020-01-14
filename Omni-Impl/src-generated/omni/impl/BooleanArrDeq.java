@@ -21,9 +21,6 @@ public class BooleanArrDeq extends BooleanUntetheredArrSeq<Boolean> implements O
     addLast(val);
     return true;
   }
-  @Override public void addFirst(boolean val){
-    push(val);
-  }
   @Override public boolean offer(boolean val){
     addLast(val);
     return true;

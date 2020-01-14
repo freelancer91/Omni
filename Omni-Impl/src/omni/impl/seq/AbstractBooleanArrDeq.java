@@ -67,9 +67,6 @@ abstract class AbstractBooleanArrDeq implements OmniDeque.OfBoolean,Externalizab
     addLast(val);
     return true;
   }
-  @Override public void addFirst(boolean val){
-    push(val);
-  }
   @Override public boolean offerFirst(boolean val){
     push(val);
     return true;
