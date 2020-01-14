@@ -5626,7 +5626,7 @@ AbstractOmniCollection<Float>
       }
       return false;
     }
-    @Override public float pollFloat(){
+    @Override public float pollFirstFloat(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5658,7 +5658,7 @@ AbstractOmniCollection<Float>
       }
       return Float.NaN;
     }
-    @Override public Float poll(){
+    @Override public Float pollFirst(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5690,7 +5690,7 @@ AbstractOmniCollection<Float>
       }
       return null;
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -7055,8 +7055,8 @@ AbstractOmniCollection<Float>
     @Override public Float peekFirst(){
       return peek();
     }
-    @Override public Float pollFirst(){
-      return poll();
+    @Override public Float poll(){
+      return pollFirst();
     }
     @Override public Float pop(){
       return popFloat();
@@ -7100,7 +7100,7 @@ AbstractOmniCollection<Float>
     @Override public Float getLast(){
       return getLastFloat();
     }
-    @Override public float pollFloat(){
+    @Override public float pollFirstFloat(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
@@ -7130,7 +7130,7 @@ AbstractOmniCollection<Float>
       }
       return Float.NaN;
     }
-    @Override public Float poll(){
+    @Override public Float pollFirst(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
@@ -7160,7 +7160,7 @@ AbstractOmniCollection<Float>
       }
       return null;
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);

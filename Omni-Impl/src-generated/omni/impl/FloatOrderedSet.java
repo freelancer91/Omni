@@ -6,7 +6,7 @@ import omni.util.TypeUtil;
 import omni.function.FloatToIntFunction;
 import omni.function.FloatComparator;
 public abstract class FloatOrderedSet
-  extends FloatUntetheredArrSeq<Float>
+  extends FloatUntetheredArrSeq
   implements OmniNavigableSet.OfFloat
 {
   FloatOrderedSet(int head,float[] arr,int tail){
@@ -24,61 +24,6 @@ public abstract class FloatOrderedSet
   abstract int compareNeg0(float key);
   abstract boolean uncheckedAddPosInf(int tail);
   abstract boolean uncheckedAddNegInf(int tail);
-  private void insertAtTail(float[] arr,float key,int head,int tail){
-    switch(Integer.signum((++tail)-head)){
-      case 0:
-        //fragmented must grow
-        final float[] tmp;
-        int arrLength;
-        ArrCopy.uncheckedCopy(arr,0,tmp=new float[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.head=head;
-        this.arr=arr=tmp;
-        break;
-      default:
-        //nonfragmented
-        if(tail==arr.length){
-          if(head==0){
-            //must grow
-            ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(tail)],0,tail);
-            this.arr=arr;
-          }else{
-            tail=0;
-          }
-        }
-      case -1:
-        //fragmented
-    }
-    arr[tail]=key;
-    this.tail=tail;
-  }
-  private void insertAtHead(float[] arr,float key,int head,int tail){
-      int newHead;
-      switch(Integer.signum(tail-(newHead=head-1))){
-        case 0:
-          //fragmented must grow
-          final float[] tmp;
-          int arrLength;
-          ArrCopy.uncheckedCopy(arr,0,tmp=new float[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
-          ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
-          --newHead;
-          this.arr=arr=tmp;
-          break;
-        default:
-          //nonfragmented
-          if(newHead==-1 && tail==(newHead=arr.length-1)){
-            //must grow
-            this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
-            ArrCopy.uncheckedCopy(arr,0,arr=new float[newHead],newHead-=(tail),tail);
-            --newHead;
-            this.arr=arr;
-          }
-        case -1:
-          //fragmented
-      }
-      arr[newHead]=key;
-      this.head=newHead;
-    }
   @Override public boolean add(float key){
     int tail;
     if((tail=this.tail)!=-1){
@@ -227,8 +172,35 @@ public abstract class FloatOrderedSet
         if(bottomVal==bottomVal){
           super.insertAtHead(arr,Float.POSITIVE_INFINITY,head,tail);
         }else{
-          //TODO add just to the right of head
-          throw new omni.util.NotYetImplementedException();
+          int newHead;
+          switch(Integer.signum(tail-(newHead=head-1))){
+            case 0:
+              //fragmented must grow
+              final float[] tmp;
+              int arrLength;
+              //copy [0->tail]
+              ArrCopy.uncheckedCopy(arr,0,tmp=new float[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+              //copy [head+1->arrLenth-1]
+              ArrCopy.semicheckedCopy(arr,++head,tmp,head=tail-(arrLength-=head),arrLength);
+              --head;
+              this.arr=arr=tmp;
+              break;
+            default:
+              //nonfragmented
+              if(head==0 && tail==(newHead=arr.length-1)){
+                //must grow
+                this.tail=(newHead=OmniArray.growBy50Pct(tail+1))-1;
+                ArrCopy.uncheckedCopy(arr,1,arr=new float[newHead],newHead-=tail,tail);
+                head=--newHead;
+                --newHead;
+                this.arr=arr;
+              }
+            case -1:
+              //fragmented
+          }
+          arr[head]=Float.POSITIVE_INFINITY;
+          arr[newHead]=Float.NaN;
+          this.head=newHead;
         }
         return true;
       }

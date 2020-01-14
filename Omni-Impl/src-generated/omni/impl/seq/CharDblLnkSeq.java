@@ -5072,7 +5072,7 @@ AbstractOmniCollection<Character>
       }
       return false;
     }
-    @Override public char pollChar(){
+    @Override public char pollFirstChar(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5104,7 +5104,7 @@ AbstractOmniCollection<Character>
       }
       return Character.MIN_VALUE;
     }
-    @Override public Character poll(){
+    @Override public Character pollFirst(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5136,7 +5136,7 @@ AbstractOmniCollection<Character>
       }
       return null;
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5168,7 +5168,7 @@ AbstractOmniCollection<Character>
       }
       return Double.NaN;
     }
-    @Override public float pollFloat(){
+    @Override public float pollFirstFloat(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5200,7 +5200,7 @@ AbstractOmniCollection<Character>
       }
       return Float.NaN;
     }
-    @Override public long pollLong(){
+    @Override public long pollFirstLong(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5232,7 +5232,7 @@ AbstractOmniCollection<Character>
       }
       return Long.MIN_VALUE;
     }
-    @Override public int pollInt(){
+    @Override public int pollFirstInt(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -6360,8 +6360,8 @@ AbstractOmniCollection<Character>
     @Override public Character peekFirst(){
       return peek();
     }
-    @Override public Character pollFirst(){
-      return poll();
+    @Override public Character poll(){
+      return pollFirst();
     }
     @Override public Character pop(){
       return popChar();
@@ -6405,7 +6405,7 @@ AbstractOmniCollection<Character>
     @Override public Character getLast(){
       return getLastChar();
     }
-    @Override public char pollChar(){
+    @Override public char pollFirstChar(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
@@ -6435,7 +6435,7 @@ AbstractOmniCollection<Character>
       }
       return Character.MIN_VALUE;
     }
-    @Override public Character poll(){
+    @Override public Character pollFirst(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
@@ -6465,7 +6465,7 @@ AbstractOmniCollection<Character>
       }
       return null;
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
@@ -6495,7 +6495,7 @@ AbstractOmniCollection<Character>
       }
       return Double.NaN;
     }
-    @Override public float pollFloat(){
+    @Override public float pollFirstFloat(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
@@ -6525,7 +6525,7 @@ AbstractOmniCollection<Character>
       }
       return Float.NaN;
     }
-    @Override public long pollLong(){
+    @Override public long pollFirstLong(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
@@ -6555,7 +6555,7 @@ AbstractOmniCollection<Character>
       }
       return Long.MIN_VALUE;
     }
-    @Override public int pollInt(){
+    @Override public int pollFirstInt(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);

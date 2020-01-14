@@ -5217,7 +5217,7 @@ AbstractOmniCollection<Double>
       }
       return false;
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5249,7 +5249,7 @@ AbstractOmniCollection<Double>
       }
       return Double.NaN;
     }
-    @Override public Double poll(){
+    @Override public Double pollFirst(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -6479,8 +6479,8 @@ AbstractOmniCollection<Double>
     @Override public Double peekFirst(){
       return peek();
     }
-    @Override public Double pollFirst(){
-      return poll();
+    @Override public Double poll(){
+      return pollFirst();
     }
     @Override public Double pop(){
       return popDouble();
@@ -6524,7 +6524,7 @@ AbstractOmniCollection<Double>
     @Override public Double getLast(){
       return getLastDouble();
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
@@ -6554,7 +6554,7 @@ AbstractOmniCollection<Double>
       }
       return Double.NaN;
     }
-    @Override public Double poll(){
+    @Override public Double pollFirst(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);

@@ -698,9 +698,10 @@ public default RETTYPE peekFirstMETHODSUFFIX()
   return peekMETHODSUFFIX();
 }
 public abstract RETTYPE peekLastMETHODSUFFIX();
-public default RETTYPE pollFirstMETHODSUFFIX()
+public abstract RETTYPE pollFirstMETHODSUFFIX();
+public default RETTYPE pollMETHODSUFFIX()
 {
-  return pollMETHODSUFFIX();
+  return pollFirstMETHODSUFFIX();
 }
 public abstract RETTYPE pollLastMETHODSUFFIX();
 #ENDDEF

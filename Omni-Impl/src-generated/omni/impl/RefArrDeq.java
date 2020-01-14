@@ -2,11 +2,7 @@ package omni.impl;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.util.ArrCopy;
-import omni.util.OmniArray;
 import omni.util.TypeUtil;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
 public class RefArrDeq<E> extends RefUntetheredArrSeq<E> implements OmniDeque.OfRef<E>
 {
   RefArrDeq(int head,Object[] arr,int tail){
@@ -16,22 +12,22 @@ public class RefArrDeq<E> extends RefUntetheredArrSeq<E> implements OmniDeque.Of
     super();
   }
   @Override public boolean add(E val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public void addFirst(E val){
-    push(val);
+    super.push(val);
   }
   @Override public boolean offer(E val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offerFirst(E val){
-    push(val);
+    super.push(val);
     return true;
   }
   @Override public boolean offerLast(E val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @SuppressWarnings("unchecked")
@@ -69,30 +65,6 @@ public class RefArrDeq<E> extends RefUntetheredArrSeq<E> implements OmniDeque.Of
     return null;
   }
   @SuppressWarnings("unchecked")
-  @Override public E poll(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (E)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E pollFirst(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (E)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E pollLast(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (E)super.uncheckedRemoveLast(tail);
-    }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
   @Override public E pop(){
     return (E)super.uncheckedRemoveFirst(this.tail);
   }
@@ -107,23 +79,6 @@ public class RefArrDeq<E> extends RefUntetheredArrSeq<E> implements OmniDeque.Of
   @SuppressWarnings("unchecked")
   @Override public E removeFirst(){
     return (E)super.uncheckedRemoveFirst(this.tail);
-  }
-  @Override public Object[] toArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      Object[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Object[size],0,size);
-      }else{
-        final Object[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Object[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfRef.DEFAULT_ARR;
   }
   @Override public boolean contains(boolean val){
     final int tail;
@@ -435,17 +390,6 @@ public class RefArrDeq<E> extends RefUntetheredArrSeq<E> implements OmniDeque.Of
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveLastMatch(tail,TypeUtil.refEquals(val));
   }
-  @Override public OmniIterator.OfRef<E> iterator(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      int size;
-      if((size=(tail+1)-(tail=this.head))<=0){
-        size+=arr.length;
-      }
-      return new AscendingUntetheredArrSeqItr<E>(this,tail,size);
-    }
-    return new AscendingUntetheredArrSeqItr<E>(this,-1,0);
-  }
   @Override public OmniIterator.OfRef<E> descendingIterator(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -475,49 +419,5 @@ public class RefArrDeq<E> extends RefUntetheredArrSeq<E> implements OmniDeque.Of
       return new RefArrDeq<E>(head,copy,tail);
     }
     return new RefArrDeq<E>();
-  }
-  @Override public boolean removeIf(Predicate<? super E> filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter);
-  }
-  @Override public void forEach(Consumer<? super E> action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action);
-    }
-  }
-  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final T[] dst;
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
-      }else{
-        final Object[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return arrConstructor.apply(0);
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
-      }else{
-        final Object[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-    }else if(dst.length!=0){
-      dst[0]=null;
-    }
-    return dst;
   }
 }

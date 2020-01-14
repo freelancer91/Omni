@@ -474,9 +474,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekBoolean();
     }
     public abstract boolean peekLastBoolean();
-    public default boolean pollFirstBoolean()
+    public abstract boolean pollFirstBoolean();
+    public default boolean pollBoolean()
     {
-      return pollBoolean();
+      return pollFirstBoolean();
     }
     public abstract boolean pollLastBoolean();
     public default double peekFirstDouble()
@@ -484,9 +485,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     public default float peekFirstFloat()
@@ -494,9 +496,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekFloat();
     }
     public abstract float peekLastFloat();
-    public default float pollFirstFloat()
+    public abstract float pollFirstFloat();
+    public default float pollFloat()
     {
-      return pollFloat();
+      return pollFirstFloat();
     }
     public abstract float pollLastFloat();
     public default long peekFirstLong()
@@ -504,9 +507,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekLong();
     }
     public abstract long peekLastLong();
-    public default long pollFirstLong()
+    public abstract long pollFirstLong();
+    public default long pollLong()
     {
-      return pollLong();
+      return pollFirstLong();
     }
     public abstract long pollLastLong();
     public default int peekFirstInt()
@@ -514,9 +518,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekInt();
     }
     public abstract int peekLastInt();
-    public default int pollFirstInt()
+    public abstract int pollFirstInt();
+    public default int pollInt()
     {
-      return pollInt();
+      return pollFirstInt();
     }
     public abstract int pollLastInt();
     public default short peekFirstShort()
@@ -524,9 +529,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekShort();
     }
     public abstract short peekLastShort();
-    public default short pollFirstShort()
+    public abstract short pollFirstShort();
+    public default short pollShort()
     {
-      return pollShort();
+      return pollFirstShort();
     }
     public abstract short pollLastShort();
     public default byte peekFirstByte()
@@ -534,9 +540,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekByte();
     }
     public abstract byte peekLastByte();
-    public default byte pollFirstByte()
+    public abstract byte pollFirstByte();
+    public default byte pollByte()
     {
-      return pollByte();
+      return pollFirstByte();
     }
     public abstract byte pollLastByte();
     public default char peekFirstChar()
@@ -544,9 +551,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekChar();
     }
     public abstract char peekLastChar();
-    public default char pollFirstChar()
+    public abstract char pollFirstChar();
+    public default char pollChar()
     {
-      return pollChar();
+      return pollFirstChar();
     }
     public abstract char pollLastChar();
     @Override
@@ -755,9 +763,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekByte();
     }
     public abstract byte peekLastByte();
-    public default byte pollFirstByte()
+    public abstract byte pollFirstByte();
+    public default byte pollByte()
     {
-      return pollByte();
+      return pollFirstByte();
     }
     public abstract byte pollLastByte();
     public default double peekFirstDouble()
@@ -765,9 +774,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     public default float peekFirstFloat()
@@ -775,9 +785,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekFloat();
     }
     public abstract float peekLastFloat();
-    public default float pollFirstFloat()
+    public abstract float pollFirstFloat();
+    public default float pollFloat()
     {
-      return pollFloat();
+      return pollFirstFloat();
     }
     public abstract float pollLastFloat();
     public default long peekFirstLong()
@@ -785,9 +796,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekLong();
     }
     public abstract long peekLastLong();
-    public default long pollFirstLong()
+    public abstract long pollFirstLong();
+    public default long pollLong()
     {
-      return pollLong();
+      return pollFirstLong();
     }
     public abstract long pollLastLong();
     public default int peekFirstInt()
@@ -795,9 +807,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekInt();
     }
     public abstract int peekLastInt();
-    public default int pollFirstInt()
+    public abstract int pollFirstInt();
+    public default int pollInt()
     {
-      return pollInt();
+      return pollFirstInt();
     }
     public abstract int pollLastInt();
     public default short peekFirstShort()
@@ -805,9 +818,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekShort();
     }
     public abstract short peekLastShort();
-    public default short pollFirstShort()
+    public abstract short pollFirstShort();
+    public default short pollShort()
     {
-      return pollShort();
+      return pollFirstShort();
     }
     public abstract short pollLastShort();
     @Override
@@ -990,9 +1004,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekChar();
     }
     public abstract char peekLastChar();
-    public default char pollFirstChar()
+    public abstract char pollFirstChar();
+    public default char pollChar()
     {
-      return pollChar();
+      return pollFirstChar();
     }
     public abstract char pollLastChar();
     public default double peekFirstDouble()
@@ -1000,9 +1015,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     public default float peekFirstFloat()
@@ -1010,9 +1026,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekFloat();
     }
     public abstract float peekLastFloat();
-    public default float pollFirstFloat()
+    public abstract float pollFirstFloat();
+    public default float pollFloat()
     {
-      return pollFloat();
+      return pollFirstFloat();
     }
     public abstract float pollLastFloat();
     public default long peekFirstLong()
@@ -1020,9 +1037,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekLong();
     }
     public abstract long peekLastLong();
-    public default long pollFirstLong()
+    public abstract long pollFirstLong();
+    public default long pollLong()
     {
-      return pollLong();
+      return pollFirstLong();
     }
     public abstract long pollLastLong();
     public default int peekFirstInt()
@@ -1030,9 +1048,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekInt();
     }
     public abstract int peekLastInt();
-    public default int pollFirstInt()
+    public abstract int pollFirstInt();
+    public default int pollInt()
     {
-      return pollInt();
+      return pollFirstInt();
     }
     public abstract int pollLastInt();
     @Override
@@ -1243,9 +1262,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekShort();
     }
     public abstract short peekLastShort();
-    public default short pollFirstShort()
+    public abstract short pollFirstShort();
+    public default short pollShort()
     {
-      return pollShort();
+      return pollFirstShort();
     }
     public abstract short pollLastShort();
     public default double peekFirstDouble()
@@ -1253,9 +1273,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     public default float peekFirstFloat()
@@ -1263,9 +1284,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekFloat();
     }
     public abstract float peekLastFloat();
-    public default float pollFirstFloat()
+    public abstract float pollFirstFloat();
+    public default float pollFloat()
     {
-      return pollFloat();
+      return pollFirstFloat();
     }
     public abstract float pollLastFloat();
     public default long peekFirstLong()
@@ -1273,9 +1295,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekLong();
     }
     public abstract long peekLastLong();
-    public default long pollFirstLong()
+    public abstract long pollFirstLong();
+    public default long pollLong()
     {
-      return pollLong();
+      return pollFirstLong();
     }
     public abstract long pollLastLong();
     public default int peekFirstInt()
@@ -1283,9 +1306,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekInt();
     }
     public abstract int peekLastInt();
-    public default int pollFirstInt()
+    public abstract int pollFirstInt();
+    public default int pollInt()
     {
-      return pollInt();
+      return pollFirstInt();
     }
     public abstract int pollLastInt();
     @Override
@@ -1544,9 +1568,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekInt();
     }
     public abstract int peekLastInt();
-    public default int pollFirstInt()
+    public abstract int pollFirstInt();
+    public default int pollInt()
     {
-      return pollInt();
+      return pollFirstInt();
     }
     public abstract int pollLastInt();
     public default double peekFirstDouble()
@@ -1554,9 +1579,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     public default float peekFirstFloat()
@@ -1564,9 +1590,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekFloat();
     }
     public abstract float peekLastFloat();
-    public default float pollFirstFloat()
+    public abstract float pollFirstFloat();
+    public default float pollFloat()
     {
-      return pollFloat();
+      return pollFirstFloat();
     }
     public abstract float pollLastFloat();
     public default long peekFirstLong()
@@ -1574,9 +1601,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekLong();
     }
     public abstract long peekLastLong();
-    public default long pollFirstLong()
+    public abstract long pollFirstLong();
+    public default long pollLong()
     {
-      return pollLong();
+      return pollFirstLong();
     }
     public abstract long pollLastLong();
     @Override
@@ -1865,9 +1893,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekLong();
     }
     public abstract long peekLastLong();
-    public default long pollFirstLong()
+    public abstract long pollFirstLong();
+    public default long pollLong()
     {
-      return pollLong();
+      return pollFirstLong();
     }
     public abstract long pollLastLong();
     public default double peekFirstDouble()
@@ -1875,9 +1904,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     public default float peekFirstFloat()
@@ -1885,9 +1915,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekFloat();
     }
     public abstract float peekLastFloat();
-    public default float pollFirstFloat()
+    public abstract float pollFirstFloat();
+    public default float pollFloat()
     {
-      return pollFloat();
+      return pollFirstFloat();
     }
     public abstract float pollLastFloat();
     @Override
@@ -2192,9 +2223,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekFloat();
     }
     public abstract float peekLastFloat();
-    public default float pollFirstFloat()
+    public abstract float pollFirstFloat();
+    public default float pollFloat()
     {
-      return pollFloat();
+      return pollFirstFloat();
     }
     public abstract float pollLastFloat();
     public default double peekFirstDouble()
@@ -2202,9 +2234,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     @Override
@@ -2511,9 +2544,10 @@ public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E
       return peekDouble();
     }
     public abstract double peekLastDouble();
-    public default double pollFirstDouble()
+    public abstract double pollFirstDouble();
+    public default double pollDouble()
     {
-      return pollDouble();
+      return pollFirstDouble();
     }
     public abstract double pollLastDouble();
     @Override

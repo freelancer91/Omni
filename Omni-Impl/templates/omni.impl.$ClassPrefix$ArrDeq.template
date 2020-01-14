@@ -11,20 +11,15 @@ package omni.impl;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.util.ArrCopy;
-import omni.util.OmniArray;
 import omni.util.TypeUtil;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
-#IF OfBoolean,OfByte,OfChar,OfShort,OfFloat
-import omni.function.$TypeNameModifier$Consumer;
-import omni.function.$TypeNameModifier$Predicate;
-#ENDIF
-#IF OfDouble,OfLong,OfInt
-import java.util.function.$TypeNameModifier$Consumer;
+
+#IF OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 #ENDIF
-public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$BoxedType$> implements OmniDeque.Of$ClassPrefix$$<E>$
+#IF OfFloat
+import omni.function.$TypeNameModifier$Predicate;
+#ENDIF
+public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$
 {
   $ClassPrefix$ArrDeq(int head,$ArrayType$[] arr,int tail){
     super(head,arr,tail);
@@ -33,105 +28,105 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
     super();
   }
   @Override public boolean add($exposedType$ val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
 #IF OfRef
   @Override public void addFirst($exposedType$ val){
-    push(val);
+    super.push(val);
   }
 #ENDIF
   @Override public boolean offer($exposedType$ val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offerFirst($exposedType$ val){
-    push(val);
+    super.push(val);
     return true;
   }
   @Override public boolean offerLast($exposedType$ val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
 #IF OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public boolean add(boolean val){
-    addLast(($exposedType$)$queryCastBoolean$(val));
+    super.addLast(($exposedType$)$queryCastBoolean$(val));
     return true;
   }
 #ENDIF
 #IF OfShort,OfInt,OfLong
   @Override public boolean add(byte val){
-    addLast(($exposedType$)(val));
+    super.addLast(($exposedType$)(val));
     return true;
   }
 #ENDIF
 #IF OfFloat
   @Override public boolean add(short val){
-    addLast(($exposedType$)(val));
+    super.addLast(($exposedType$)(val));
     return true;
   }
 #ENDIF
 #IF OfInt,OfLong,OfFloat
   @Override public boolean add(char val){
-    addLast(($exposedType$)(val));
+    super.addLast(($exposedType$)(val));
     return true;
   }
 #ENDIF
 #IF OfLong,OfFloat,OfDouble
   @Override public boolean add(int val){
-    addLast(($exposedType$)(val));
+    super.addLast(($exposedType$)(val));
     return true;
   }
 #ENDIF
 #IF OfFloat,OfDouble
   @Override public boolean add(long val){
-    addLast(($exposedType$)(val));
+    super.addLast(($exposedType$)(val));
     return true;
   }
 #ENDIF
 #IF OfDouble
   @Override public boolean add(float val){
-    addLast(($exposedType$)(val));
+    super.addLast(($exposedType$)(val));
     return true;
   }
 #ENDIF
 #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public boolean add($BoxedType$ val){
-    addLast(($exposedType$)val);
+    super.addLast(($exposedType$)val);
     return true;
   }
 #ENDIF
 #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public void addFirst($BoxedType$ val){
-    push(($exposedType$)val);
+    super.push(($exposedType$)val);
   }
 #ENDIF
 #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public void addLast($BoxedType$ val){
-    addLast(($exposedType$)val);
+    super.addLast(($exposedType$)val);
   }
 #ENDIF
 #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public boolean offer($BoxedType$ val){
-    addLast(($exposedType$)val);
+    super.addLast(($exposedType$)val);
     return true;
   }
 #ENDIF
 #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public boolean offerFirst($BoxedType$ val){
-    push(($exposedType$)val);
+    super.push(($exposedType$)val);
     return true;
   }
 #ENDIF
 #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public boolean offerLast($BoxedType$ val){
-    addLast(($exposedType$)val);
+    super.addLast(($exposedType$)val);
     return true;
   }
 #ENDIF
 #IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
   @Override public void push($BoxedType$ val){
-    push(($exposedType$)val);
+    super.push(($exposedType$)val);
   }
 #ENDIF
 #IF OfRef
@@ -339,190 +334,8 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
     return Byte.MIN_VALUE;
   }
 #ENDIF
-#IF OfRef
-  @SuppressWarnings("unchecked")
-#ENDIF
-  @Override public $exposedType$ poll$TypeNameModifier$(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return ($exposedType$)super.uncheckedRemoveFirst(tail);
-    }
-    return $defaultVal$;
-  }
-#IF OfRef
-  @SuppressWarnings("unchecked")
-  @Override public $exposedType$ pollFirst$TypeNameModifier$(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return ($exposedType$)super.uncheckedRemoveFirst(tail);
-    }
-    return $defaultVal$;
-  }
-#ENDIF
-#IF OfRef
-  @SuppressWarnings("unchecked")
-#ENDIF
-  @Override public $exposedType$ pollLast$TypeNameModifier$(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return ($exposedType$)super.uncheckedRemoveLast(tail);
-    }
-    return $defaultVal$;
-  }
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
-  @Override public $BoxedType$ poll(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return ($BoxedType$)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
-  @Override public $BoxedType$ pollFirst(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return ($BoxedType$)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
-  @Override public $BoxedType$ pollLast(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return ($BoxedType$)super.uncheckedRemoveLast(tail);
-    }
-    return null;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat
-  @Override public double pollDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToDouble$(super.uncheckedRemoveFirst(tail));
-    }
-    return Double.NaN;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat
-  @Override public double pollLastDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToDouble$(super.uncheckedRemoveLast(tail));
-    }
-    return Double.NaN;
-  }
-#ENDIF
 
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
-  @Override public float pollFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToFloat$(super.uncheckedRemoveFirst(tail));
-    }
-    return Float.NaN;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
-  @Override public float pollLastFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToFloat$(super.uncheckedRemoveLast(tail));
-    }
-    return Float.NaN;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt
-  @Override public long pollLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToLong$(super.uncheckedRemoveFirst(tail));
-    }
-    return Long.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt
-  @Override public long pollLastLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToLong$(super.uncheckedRemoveLast(tail));
-    }
-    return Long.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort
-  @Override public int pollInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToInt$(super.uncheckedRemoveFirst(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort
-  @Override public int pollLastInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToInt$(super.uncheckedRemoveLast(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean,OfByte
-  @Override public short pollShort(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToShort$(super.uncheckedRemoveFirst(tail));
-    }
-    return Short.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean,OfByte
-  @Override public short pollLastShort(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToShort$(super.uncheckedRemoveLast(tail));
-    }
-    return Short.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean
-  @Override public char pollChar(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToChar$(super.uncheckedRemoveFirst(tail));
-    }
-    return Character.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean
-  @Override public char pollLastChar(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToChar$(super.uncheckedRemoveLast(tail));
-    }
-    return Character.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean
-  @Override public byte pollByte(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToByte$(super.uncheckedRemoveFirst(tail));
-    }
-    return Byte.MIN_VALUE;
-  }
-#ENDIF
-#IF OfBoolean
-  @Override public byte pollLastByte(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return $castToByte$(super.uncheckedRemoveLast(tail));
-    }
-    return Byte.MIN_VALUE;
-  }
-#ENDIF
+
 #IF OfRef
   @SuppressWarnings("unchecked")
 #ENDIF
@@ -565,31 +378,7 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
     return super.uncheckedRemoveLast(this.tail);
   }
 #ENDIF
-  #MACRO ToArray<$ArrayType$>($TypeNameModifier$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
-  #MACRO ToArray<$BoxedType$>(,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat
-  #MACRO ToArray<double>(Double,OmniArray.OfDouble.DEFAULT_ARR)
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
-  #MACRO ToArray<float>(Float,OmniArray.OfFloat.DEFAULT_ARR)
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort,OfInt
-  #MACRO ToArray<long>(Long,OmniArray.OfLong.DEFAULT_ARR)
-#ENDIF
-#IF OfBoolean,OfByte,OfChar,OfShort
-  #MACRO ToArray<int>(Int,OmniArray.OfInt.DEFAULT_ARR)
-#ENDIF
-#IF OfBoolean,OfByte
-  #MACRO ToArray<short>(Short,OmniArray.OfShort.DEFAULT_ARR)
-#ENDIF
-#IF OfBoolean
-  #MACRO ToArray<char>(Char,OmniArray.OfChar.DEFAULT_ARR)
-#ENDIF
-#IF OfBoolean
-  #MACRO ToArray<byte>(Byte,OmniArray.OfByte.DEFAULT_ARR)
-#ENDIF
+
   #MACRO QueryImpl<boolean,contains,boolean,uncheckedContainsMatch>(false)
 #IF OfByte,OfChar,OfShort,OfInt,OfLong,OfRef
   #MACRO QueryImpl<byte,contains,boolean,uncheckedContainsMatch>(false)
@@ -691,17 +480,6 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
   #MACRO QueryImpl<Float,removeLastOccurrence,boolean,uncheckedRemoveLastMatch>(false)
   #MACRO QueryImpl<Double,removeLastOccurrence,boolean,uncheckedRemoveLastMatch>(false)
 #ENDIF
-  @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      int size;
-      if((size=(tail+1)-(tail=this.head))<=0){
-        size+=arr.length;
-      }
-      return new AscendingUntetheredArrSeqItr<$BoxedType$>(this,tail,size);
-    }
-    return new AscendingUntetheredArrSeqItr<$BoxedType$>(this,-1,0);
-  }
   @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -709,9 +487,9 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
       if((size=(tail+1)-this.head)<=0){
         size+=arr.length;
       }
-      return new DescendingUntetheredArrSeqItr<$BoxedType$>(this,tail,size);
+      return new DescendingUntetheredArrSeqItr$<E>$(this,tail,size);
     }
-    return new DescendingUntetheredArrSeqItr<$BoxedType$>(this,-1,0);
+    return new DescendingUntetheredArrSeqItr$<E>$(this,-1,0);
   }
   @Override public Object clone(){
     int tail;
@@ -732,64 +510,9 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq<$Box
     }
     return new $ClassPrefix$ArrDeq$<E>$();
   }
-  @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter);
-  }
-#IFNOT OfRef
-  @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter::test);
-  }
-#ENDIF
-  @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action);
-    }
-  }
-#IFNOT OfRef
-  @Override public void forEach(Consumer<? super $BoxedType$> action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action::accept);
-    }
-  }
-#ENDIF
-  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final T[] dst;
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
-      }else{
-        final $ArrayType$[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return arrConstructor.apply(0);
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
-      }else{
-        final $ArrayType$[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-    }else if(dst.length!=0){
-      dst[0]=null;
-    }
-    return dst;
-  }
+
+
+
   
 }
 #MACRODEF QueryImpl<PARAMTYPE,METHODNAME,RETTYPE,UNCHECKEDMETHOD>(NEGRET)
@@ -1495,23 +1218,4 @@ if(val instanceof Boolean){
 }
   #ENDIF
 #ENDIF
-#ENDDEF
-#MACRODEF ToArray<DSTARR>(TYPENAMEMODIFIER,DEFAULTARR)
-@Override public DSTARR[] toTYPENAMEMODIFIERArray(){
-  int tail;
-  if((tail=this.tail)!=-1){
-    DSTARR[] dst;
-    final int head;
-      int size;
-    if((size=(++tail)-(head=this.head))>0){
-      ArrCopy.uncheckedCopy(this.arr,head,dst=new DSTARR[size],0,size);
-    }else{
-      final $ArrayType$[] arr;
-      ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new DSTARR[size+=arr.length],0,size-=tail);
-      ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-    }
-    return dst;
-  }
-  return DEFAULTARR;
-}
 #ENDDEF

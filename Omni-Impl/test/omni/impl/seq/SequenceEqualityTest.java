@@ -372,24 +372,8 @@ public class SequenceEqualityTest{
                 builder.accept(new FloatSnglLnkSeq.CheckedQueue());
                 builder.accept(new DoubleSnglLnkSeq.CheckedQueue());
                 builder.accept(new RefArrDeq<>());
-                builder.accept(new BooleanArrDeq());
-                builder.accept(new ByteArrDeq());
-                builder.accept(new CharArrDeq());
-                builder.accept(new ShortArrDeq());
-                builder.accept(new IntArrDeq());
-                builder.accept(new LongArrDeq());
-                builder.accept(new FloatArrDeq());
-                builder.accept(new DoubleArrDeq());
                 builder.accept(new PackedBooleanArrDeq());
                 builder.accept(new RefArrDeq.Checked<>());
-                builder.accept(new BooleanArrDeq.Checked());
-                builder.accept(new ByteArrDeq.Checked());
-                builder.accept(new CharArrDeq.Checked());
-                builder.accept(new ShortArrDeq.Checked());
-                builder.accept(new IntArrDeq.Checked());
-                builder.accept(new LongArrDeq.Checked());
-                builder.accept(new FloatArrDeq.Checked());
-                builder.accept(new DoubleArrDeq.Checked());
                 builder.accept(new PackedBooleanArrDeq.Checked());
                 //TODO
                 //builder.accept(new BooleanSetImplOld());

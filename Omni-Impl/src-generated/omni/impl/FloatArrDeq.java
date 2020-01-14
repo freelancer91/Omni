@@ -2,14 +2,9 @@ package omni.impl;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.util.ArrCopy;
-import omni.util.OmniArray;
 import omni.util.TypeUtil;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
-import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
-public class FloatArrDeq extends FloatUntetheredArrSeq<Float> implements OmniDeque.OfFloat
+public class FloatArrDeq extends FloatUntetheredArrSeq implements OmniDeque.OfFloat
 {
   FloatArrDeq(int head,float[] arr,int tail){
     super(head,arr,tail);
@@ -18,65 +13,65 @@ public class FloatArrDeq extends FloatUntetheredArrSeq<Float> implements OmniDeq
     super();
   }
   @Override public boolean add(float val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offer(float val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offerFirst(float val){
-    push(val);
+    super.push(val);
     return true;
   }
   @Override public boolean offerLast(float val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean add(boolean val){
-    addLast((float)TypeUtil.castToFloat(val));
+    super.addLast((float)TypeUtil.castToFloat(val));
     return true;
   }
   @Override public boolean add(short val){
-    addLast((float)(val));
+    super.addLast((float)(val));
     return true;
   }
   @Override public boolean add(char val){
-    addLast((float)(val));
+    super.addLast((float)(val));
     return true;
   }
   @Override public boolean add(int val){
-    addLast((float)(val));
+    super.addLast((float)(val));
     return true;
   }
   @Override public boolean add(long val){
-    addLast((float)(val));
+    super.addLast((float)(val));
     return true;
   }
   @Override public boolean add(Float val){
-    addLast((float)val);
+    super.addLast((float)val);
     return true;
   }
   @Override public void addFirst(Float val){
-    push((float)val);
+    super.push((float)val);
   }
   @Override public void addLast(Float val){
-    addLast((float)val);
+    super.addLast((float)val);
   }
   @Override public boolean offer(Float val){
-    addLast((float)val);
+    super.addLast((float)val);
     return true;
   }
   @Override public boolean offerFirst(Float val){
-    push((float)val);
+    super.push((float)val);
     return true;
   }
   @Override public boolean offerLast(Float val){
-    addLast((float)val);
+    super.addLast((float)val);
     return true;
   }
   @Override public void push(Float val){
-    push((float)val);
+    super.push((float)val);
   }
   @Override public float floatElement(){
     return (float)arr[head];
@@ -138,55 +133,6 @@ public class FloatArrDeq extends FloatUntetheredArrSeq<Float> implements OmniDeq
     }
     return Double.NaN;
   }
-  @Override public float pollFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (float)super.uncheckedRemoveFirst(tail);
-    }
-    return Float.NaN;
-  }
-  @Override public float pollLastFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (float)super.uncheckedRemoveLast(tail);
-    }
-    return Float.NaN;
-  }
-  @Override public Float poll(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Float)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Float pollFirst(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Float)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Float pollLast(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Float)super.uncheckedRemoveLast(tail);
-    }
-    return null;
-  }
-  @Override public double pollDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (double)(super.uncheckedRemoveFirst(tail));
-    }
-    return Double.NaN;
-  }
-  @Override public double pollLastDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (double)(super.uncheckedRemoveLast(tail));
-    }
-    return Double.NaN;
-  }
   @Override public float popFloat(){
     return (float)super.uncheckedRemoveFirst(this.tail);
   }
@@ -204,57 +150,6 @@ public class FloatArrDeq extends FloatUntetheredArrSeq<Float> implements OmniDeq
   }
   @Override public Float removeLast(){
     return super.uncheckedRemoveLast(this.tail);
-  }
-  @Override public float[] toFloatArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      float[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
-      }else{
-        final float[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfFloat.DEFAULT_ARR;
-  }
-  @Override public Float[] toArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      Float[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Float[size],0,size);
-      }else{
-        final float[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Float[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
-  }
-  @Override public double[] toDoubleArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      double[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
-      }else{
-        final float[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfDouble.DEFAULT_ARR;
   }
   @Override public boolean contains(boolean val){
     final int tail;
@@ -646,17 +541,6 @@ public class FloatArrDeq extends FloatUntetheredArrSeq<Float> implements OmniDeq
     }
     return false;     
   }
-  @Override public OmniIterator.OfFloat iterator(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      int size;
-      if((size=(tail+1)-(tail=this.head))<=0){
-        size+=arr.length;
-      }
-      return new AscendingUntetheredArrSeqItr<Float>(this,tail,size);
-    }
-    return new AscendingUntetheredArrSeqItr<Float>(this,-1,0);
-  }
   @Override public OmniIterator.OfFloat descendingIterator(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -664,9 +548,9 @@ public class FloatArrDeq extends FloatUntetheredArrSeq<Float> implements OmniDeq
       if((size=(tail+1)-this.head)<=0){
         size+=arr.length;
       }
-      return new DescendingUntetheredArrSeqItr<Float>(this,tail,size);
+      return new DescendingUntetheredArrSeqItr(this,tail,size);
     }
-    return new DescendingUntetheredArrSeqItr<Float>(this,-1,0);
+    return new DescendingUntetheredArrSeqItr(this,-1,0);
   }
   @Override public Object clone(){
     int tail;
@@ -686,59 +570,5 @@ public class FloatArrDeq extends FloatUntetheredArrSeq<Float> implements OmniDeq
       return new FloatArrDeq(head,copy,tail);
     }
     return new FloatArrDeq();
-  }
-  @Override public boolean removeIf(FloatPredicate filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter);
-  }
-  @Override public boolean removeIf(Predicate<? super Float> filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter::test);
-  }
-  @Override public void forEach(FloatConsumer action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action);
-    }
-  }
-  @Override public void forEach(Consumer<? super Float> action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action::accept);
-    }
-  }
-  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final T[] dst;
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
-      }else{
-        final float[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return arrConstructor.apply(0);
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
-      }else{
-        final float[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-    }else if(dst.length!=0){
-      dst[0]=null;
-    }
-    return dst;
   }
 }

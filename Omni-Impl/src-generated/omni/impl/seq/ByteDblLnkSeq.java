@@ -5055,7 +5055,7 @@ AbstractOmniCollection<Byte>
       }
       return false;
     }
-    @Override public byte pollByte(){
+    @Override public byte pollFirstByte(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5087,7 +5087,7 @@ AbstractOmniCollection<Byte>
       }
       return Byte.MIN_VALUE;
     }
-    @Override public Byte poll(){
+    @Override public Byte pollFirst(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5119,7 +5119,7 @@ AbstractOmniCollection<Byte>
       }
       return null;
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5151,7 +5151,7 @@ AbstractOmniCollection<Byte>
       }
       return Double.NaN;
     }
-    @Override public float pollFloat(){
+    @Override public float pollFirstFloat(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5183,7 +5183,7 @@ AbstractOmniCollection<Byte>
       }
       return Float.NaN;
     }
-    @Override public long pollLong(){
+    @Override public long pollFirstLong(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5215,7 +5215,7 @@ AbstractOmniCollection<Byte>
       }
       return Long.MIN_VALUE;
     }
-    @Override public int pollInt(){
+    @Override public int pollFirstInt(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -5247,7 +5247,7 @@ AbstractOmniCollection<Byte>
       }
       return Integer.MIN_VALUE;
     }
-    @Override public short pollShort(){
+    @Override public short pollFirstShort(){
       Node head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -6362,8 +6362,8 @@ AbstractOmniCollection<Byte>
     @Override public Byte peekFirst(){
       return peek();
     }
-    @Override public Byte pollFirst(){
-      return poll();
+    @Override public Byte poll(){
+      return pollFirst();
     }
     @Override public Byte pop(){
       return popByte();
@@ -6407,7 +6407,7 @@ AbstractOmniCollection<Byte>
     @Override public Byte getLast(){
       return getLastByte();
     }
-    @Override public byte pollByte(){
+    @Override public byte pollFirstByte(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
@@ -6437,7 +6437,7 @@ AbstractOmniCollection<Byte>
       }
       return Byte.MIN_VALUE;
     }
-    @Override public Byte poll(){
+    @Override public Byte pollFirst(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(head.val);
@@ -6467,7 +6467,7 @@ AbstractOmniCollection<Byte>
       }
       return null;
     }
-    @Override public double pollDouble(){
+    @Override public double pollFirstDouble(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
@@ -6497,7 +6497,7 @@ AbstractOmniCollection<Byte>
       }
       return Double.NaN;
     }
-    @Override public float pollFloat(){
+    @Override public float pollFirstFloat(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
@@ -6527,7 +6527,7 @@ AbstractOmniCollection<Byte>
       }
       return Float.NaN;
     }
-    @Override public long pollLong(){
+    @Override public long pollFirstLong(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
@@ -6557,7 +6557,7 @@ AbstractOmniCollection<Byte>
       }
       return Long.MIN_VALUE;
     }
-    @Override public int pollInt(){
+    @Override public int pollFirstInt(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
@@ -6587,7 +6587,7 @@ AbstractOmniCollection<Byte>
       }
       return Integer.MIN_VALUE;
     }
-    @Override public short pollShort(){
+    @Override public short pollFirstShort(){
       Node head;
       if((head=this.head)!=null){
         final var ret=(short)(head.val);

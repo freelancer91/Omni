@@ -28,7 +28,7 @@ import omni.function.$TypeNameModifier$Predicate;
 import java.util.function.$TypeNameModifier$Consumer;
 import java.util.function.$TypeNameModifier$Predicate;
 #ENDIF
-#IF OfLong,OfDouble,OfRef
+#IF OfLong,OfDouble
 import java.util.function.$TypeNameModifier$ToIntFunction;
 #ENDIF
 #IF OfFloat
@@ -37,17 +37,18 @@ import omni.function.$TypeNameModifier$ToIntFunction;
 #IF OfInt,OfShort,OfChar
 import java.util.function.IntUnaryOperator;
 #ENDIF
-#IF OfRef
-import java.util.function.Predicate;
 import omni.api.OmniIterator;
+#IF OfRef
 import java.util.function.ToIntFunction;
 #ENDIF
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.function.Consumer;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Externalizable
+abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable
 {
   $ArrayType$[] arr;
   int head;
@@ -72,6 +73,101 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
   @Override public boolean isEmpty(){
     return this.tail==-1;
   }
+  @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      int size;
+      if((size=(tail+1)-(tail=this.head))<=0){
+        size+=arr.length;
+      }
+      return new AscendingUntetheredArrSeqItr$<E>$(this,tail,size);
+    }
+    return new AscendingUntetheredArrSeqItr$<E>$(this,-1,0);
+  }
+ 
+  @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter);
+  }
+#IFNOT OfRef
+  @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter::test);
+  }
+#ENDIF
+  public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      ascendingForEach(tail,action);
+    }
+  }
+#IFNOT OfRef
+  public void forEach(Consumer<? super $BoxedType$> action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      ascendingForEach(tail,action::accept);
+    }
+  }
+#ENDIF
+  #MACRO ToArray<$ArrayType$>($TypeNameModifier$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
+  #MACRO ToArray<$BoxedType$>(,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
+#ENDIF
+#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong,OfFloat
+  #MACRO ToArray<double>(Double,OmniArray.OfDouble.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean,OfByte,OfChar,OfShort,OfInt,OfLong
+  #MACRO ToArray<float>(Float,OmniArray.OfFloat.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean,OfByte,OfChar,OfShort,OfInt
+  #MACRO ToArray<long>(Long,OmniArray.OfLong.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #MACRO ToArray<int>(Int,OmniArray.OfInt.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean,OfByte
+  #MACRO ToArray<short>(Short,OmniArray.OfShort.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<char>(Char,OmniArray.OfChar.DEFAULT_ARR)
+#ENDIF
+#IF OfBoolean
+  #MACRO ToArray<byte>(Byte,OmniArray.OfByte.DEFAULT_ARR)
+#ENDIF
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final T[] dst;
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
+      }else{
+        final $ArrayType$[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return arrConstructor.apply(0);
+  }
+  @Override public <T> T[] toArray(T[] dst){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }else{
+        final $ArrayType$[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
+  }
   @Override public void clear(){
 #IF OfRef
     final int tail;
@@ -89,26 +185,66 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
 #ENDIF
   }
 
+  void insertAtTail($ArrayType$[] arr,$ArrayType$ key,int head,int tail){
+    switch(Integer.signum((++tail)-head)){
+      case 0:
+        //fragmented must grow
+        final $ArrayType$[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.head=head;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(tail==arr.length){
+          if(head==0){
+            //must grow
+            ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(tail)],0,tail);
+            this.arr=arr;
+          }else{
+            tail=0;
+          }
+        }
+      case -1:
+        //fragmented
+    }
+    arr[tail]=key;
+    this.tail=tail;
+  }
+  void insertAtHead($ArrayType$[] arr,$ArrayType$ key,int head,int tail){
+    int newHead;
+    switch(Integer.signum(tail-(newHead=head-1))){
+      case 0:
+        //fragmented must grow
+        final $ArrayType$[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+        ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+        --newHead;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(newHead==-1 && tail==(newHead=arr.length-1)){
+          //must grow
+          this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+          ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[newHead],newHead-=(tail),tail);
+          --newHead;
+          this.arr=arr;
+        }
+      case -1:
+        //fragmented
+    }
+    arr[newHead]=key;
+    this.head=newHead;
+  }
   public void addLast($exposedType$ val){
     var arr=this.arr;
     int tail;
     if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(++tail==arr.length && head==0){
-          ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(tail)],0,tail);
-          this.arr=arr;
-        }
-      }else if(++tail==head){
-        this.head=0;
-        final var tmp=new $ArrayType$[OmniArray.growBy50Pct(tail=arr.length)];
-        final int copyLength;
-        ArrCopy.uncheckedCopy(arr,head,tmp,0,copyLength=tail-head);
-        ArrCopy.uncheckedCopy(arr,0,tmp,copyLength,head);
-        this.arr=arr=tmp;
-      }
-      arr[tail]=val;
-      this.tail=tail;
+      this.insertAtTail(arr,val,this.head,tail);
     }else{
       if(arr==null){
         this.arr=new $ArrayType$[]{val};
@@ -126,26 +262,7 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     var arr=this.arr;
     int tail;
     if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(head==0 && tail==arr.length-1){
-          final var tmp=new $ArrayType$[head=OmniArray.growBy50Pct(++tail)];
-          this.tail=head-1;
-          ArrCopy.uncheckedCopy(arr,0,tmp,head-=tail,tail);
-          this.arr=arr=tmp;
-        }
-        --head;
-      }else if(--head==tail){
-        int arrLength;
-        final var tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)];
-        this.tail=head-1;
-        ArrCopy.uncheckedCopy(arr,0,tmp,head-=(++tail),tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.arr=arr=tmp;
-        --head;
-      }
-      arr[head]=val;
-      this.head=head;
+      this.insertAtHead(arr,val,this.head,tail);
     }else{
       if(arr==null){
         this.arr=new $ArrayType$[]{val};
@@ -292,7 +409,7 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
     }
     return fragmentedRemoveFirstMatch(head,tail,queryParam);
   }
-
+  
 
 #IF OfBoolean
   boolean nonfragmentedRemoveLastMatch(int head,int tail,final boolean searchVal)
@@ -736,6 +853,58 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
       ++head;
     }
   }
+  public $BoxedType$ poll(){
+    return pollFirst();
+  }
+
+  #MACRO PollImpl($exposedType$,$TypeNameModifier$,$defaultVal$,($exposedType$))
+#IFNOT OfRef
+  #MACRO PollImpl($BoxedType$,,null,($BoxedType$))
+  #IFNOT OfDouble
+  #MACRO PollImpl(double,Double,Double.NaN,$castToDouble$)
+    #IFNOT OfFloat
+  #MACRO PollImpl(float,Float,Float.NaN,$castToFloat$)
+      #IFNOT OfLong
+  #MACRO PollImpl(long,Long,Long.MIN_VALUE,$castToLong$)
+        #IFNOT OfInt
+  #MACRO PollImpl(int,Int,Integer.MIN_VALUE,$castToInt$)
+          #IFNOT OfShort,OfChar
+  #MACRO PollImpl(short,Short,Short.MIN_VALUE,$castToShort$)
+            #IFNOT OfByte
+  #MACRO PollImpl(char,Char,Character.MIN_VALUE,$castToChar$)
+  #MACRO PollImpl(byte,Byte,Byte.MIN_VALUE,$castToByte$)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+
+
+
+#MACRODEF PollImpl(RETTYPE,METHODSUFFIX,DEFAULTVAL,CAST)
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+public RETTYPE pollFirstMETHODSUFFIX(){
+  final int tail;
+  if((tail=this.tail)!=-1){
+    return CAST(uncheckedRemoveFirst(tail));
+  }
+  return DEFAULTVAL;
+}
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+public RETTYPE pollLastMETHODSUFFIX(){
+  final int tail;
+  if((tail=this.tail)!=-1){
+    return CAST(uncheckedRemoveLast(tail));
+  }
+  return DEFAULTVAL;
+}
+#ENDDEF
   
   
 #IFNOT OfBoolean,OfByte
@@ -761,7 +930,6 @@ abstract class $ClassPrefix$UntetheredArrSeq<E> implements OmniCollection<E>,Ext
 #IF OfChar,OfInt,OfShort
   #MACRO AddSetFunctions(IntUnaryOperator,applyAsInt()
 #ELSE
-  
   #MACRO AddSetFunctions($TypeNameModifier$ToIntFunction$<E>$,applyAsInt()
 #ENDIF
 #MACRODEF AddSetFunctions(COMPARATORTYPE,COMPARATORCALL)
@@ -1037,7 +1205,25 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
   return true;
 }
 #ENDDEF
-
+  #IF OfChar,OfShort,OfInt
+  boolean uncheckedRemoveMatch(int tail,final IntUnaryOperator comparator)
+  #ELSEIF OfLong
+  boolean uncheckedRemoveMatch(int tail,final LongToIntFunction comparator)
+  #ELSEIF OfFloat
+  boolean uncheckedRemoveMatch(int tail,final FloatToIntFunction comparator)
+  #ELSEIF OfDouble
+  boolean uncheckedRemoveMatch(int tail,final DoubleToIntFunction comparator)
+  #ELSEIF OfRef
+  @SuppressWarnings("unchecked")
+  boolean uncheckedRemoveMatch(int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
+  #ENDIF
+  {
+    final int head;
+    if((head=this.head)<=tail){
+      return nonfragmentedRemoveMatch(head,tail,comparator);
+    }
+    return fragmentedRemoveMatch(head,tail,comparator);
+  }
   
   #IF OfChar,OfShort,OfInt
   boolean nonfragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
@@ -1627,14 +1813,14 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
   }
   
 #IF OfRef
-  static abstract class AbstractUntetheredArrSeqItr<E> implements OmniIterator.Of$ClassPrefix$$<E>${
+  static abstract class AbstractUntetheredArrSeqItr$<E>$ implements OmniIterator.Of$ClassPrefix$$<E>${
 #ELSE
-  static abstract class AbstractUntetheredArrSeqItr<E> extends Abstract$TypeNameModifier$Itr$<E>${
+  static abstract class AbstractUntetheredArrSeqItr$<E>$ extends Abstract$TypeNameModifier$Itr$<E>${
 #ENDIF
-    transient final $ClassPrefix$UntetheredArrSeq<E> root;
+    transient final $ClassPrefix$UntetheredArrSeq$<E>$ root;
     transient int index;
     transient int numLeft;
-    AbstractUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq<E> root,int index,int numLeft){
+    AbstractUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq$<E>$ root,int index,int numLeft){
       this.root=root;
       this.index=index;
       this.numLeft=numLeft;
@@ -1656,7 +1842,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
       return ($exposedType$)arr[index];
     }
     public void remove(){
-      final $ClassPrefix$UntetheredArrSeq<E> root;
+      final $ClassPrefix$UntetheredArrSeq$<E>$ root;
       final int head;
       int tail;
       switch(Integer.signum((tail=(root=this.root).tail)-(head=root.head))){
@@ -1686,16 +1872,16 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     }
 #ENDIF
     abstract void iterateIndex(int index,final $ArrayType$[] arr);
-    abstract void fragmentedRemove(final $ClassPrefix$UntetheredArrSeq<E> root,int head,int tail);
-    abstract void nonfragmentedRemove(final $ClassPrefix$UntetheredArrSeq<E> root,int head,int tail);
+    abstract void fragmentedRemove(final $ClassPrefix$UntetheredArrSeq$<E>$ root,int head,int tail);
+    abstract void nonfragmentedRemove(final $ClassPrefix$UntetheredArrSeq$<E>$ root,int head,int tail);
     abstract void uncheckedForEachRemaining(final $TypeNameModifier$Consumer$<? super E>$ action);
   }
-  static class AscendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
-    AscendingUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq<E> root,int index,int numLeft){
+  static class AscendingUntetheredArrSeqItr$<E>$ extends AbstractUntetheredArrSeqItr$<E>${
+    AscendingUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq$<E>$ root,int index,int numLeft){
       super(root,index,numLeft);
     }
     @Override public Object clone(){
-      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
+      return new AscendingUntetheredArrSeqItr$<E>$(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final $ArrayType$[] arr){
       if(++index==arr.length){
@@ -1703,7 +1889,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
       }
       this.index=index;
     }
-    @Override void nonfragmentedRemove(final $ClassPrefix$UntetheredArrSeq<E> root,final int head,int tail){
+    @Override void nonfragmentedRemove(final $ClassPrefix$UntetheredArrSeq$<E>$ root,final int head,int tail){
       final var arr=root.arr;
       final int index,headLength,tailLength;
       if((headLength=(index=this.index-1)-head)<=(tailLength=tail-index)){
@@ -1721,7 +1907,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
         this.index=index;
       }
     }
-    @Override void fragmentedRemove(final $ClassPrefix$UntetheredArrSeq<E> root,final int head,int tail){
+    @Override void fragmentedRemove(final $ClassPrefix$UntetheredArrSeq$<E>$ root,final int head,int tail){
       final var arr=root.arr;
       final int headLength;
       int index;
@@ -1808,7 +1994,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     @SuppressWarnings("unchecked")
 #ENDIF
     @Override void uncheckedForEachRemaining(final $TypeNameModifier$Consumer$<? super E>$ action){
-      final $ClassPrefix$UntetheredArrSeq<E> root;
+      final $ClassPrefix$UntetheredArrSeq$<E>$ root;
       final int tail;
       int index;
       final var arr=(root=this.root).arr;
@@ -1827,12 +2013,12 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
       this.index=index;
     }
   }
-  static class DescendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
-    DescendingUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq<E> root,int index,int numLeft){
+  static class DescendingUntetheredArrSeqItr$<E>$ extends AbstractUntetheredArrSeqItr$<E>${
+    DescendingUntetheredArrSeqItr($ClassPrefix$UntetheredArrSeq$<E>$ root,int index,int numLeft){
       super(root,index,numLeft);
     }
     @Override public Object clone(){
-      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
+      return new AscendingUntetheredArrSeqItr$<E>$(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final $ArrayType$[] arr){
       if(--index==-1){
@@ -1840,7 +2026,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
       }
       this.index=index;
     }
-    @Override void nonfragmentedRemove(final $ClassPrefix$UntetheredArrSeq<E> root,final int head,int tail){
+    @Override void nonfragmentedRemove(final $ClassPrefix$UntetheredArrSeq$<E>$ root,final int head,int tail){
       final var arr=root.arr;
       final int index,headLength,tailLength;
       if((headLength=(index=this.index+1)-head)<=(tailLength=tail-index)){
@@ -1858,7 +2044,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
         root.tail=tail-1;
       }
     }
-    @Override void fragmentedRemove(final $ClassPrefix$UntetheredArrSeq<E> root,final int head,int tail){
+    @Override void fragmentedRemove(final $ClassPrefix$UntetheredArrSeq$<E>$ root,final int head,int tail){
       final $ArrayType$[] arr;
       final int headLength;
       int index;
@@ -1945,7 +2131,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     @SuppressWarnings("unchecked")
 #ENDIF
     @Override void uncheckedForEachRemaining(final $TypeNameModifier$Consumer$<? super E>$ action){
-      final $ClassPrefix$UntetheredArrSeq<E> root;
+      final $ClassPrefix$UntetheredArrSeq$<E>$ root;
       final int head;
       int index;
       final var arr=(root=this.root).arr;
@@ -1965,3 +2151,23 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     }
   }
 }
+
+#MACRODEF ToArray<DSTARR>(TYPENAMEMODIFIER,DEFAULTARR)
+@Override public DSTARR[] toTYPENAMEMODIFIERArray(){
+  int tail;
+  if((tail=this.tail)!=-1){
+    DSTARR[] dst;
+    final int head;
+      int size;
+    if((size=(++tail)-(head=this.head))>0){
+      ArrCopy.uncheckedCopy(this.arr,head,dst=new DSTARR[size],0,size);
+    }else{
+      final $ArrayType$[] arr;
+      ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new DSTARR[size+=arr.length],0,size-=tail);
+      ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+    }
+    return dst;
+  }
+  return DEFAULTARR;
+}
+#ENDDEF

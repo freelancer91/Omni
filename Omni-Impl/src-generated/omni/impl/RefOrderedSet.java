@@ -30,8 +30,9 @@ public abstract class RefOrderedSet<E>
     Ascending(){
       super();
     }
+     @SuppressWarnings("unchecked")
     @Override int insertionCompare(E key1,E key2){
-      return Integer.signum(((Comparable)key1).compareTo((Comparable)key2));
+      return Integer.signum(((Comparable<E>)key1).compareTo(key2));
     }
   }
   public static class Descending<E> extends RefOrderedSet<E>{
@@ -41,8 +42,9 @@ public abstract class RefOrderedSet<E>
     Descending(){
       super();
     }
+     @SuppressWarnings("unchecked")
     @Override int insertionCompare(E key1,E key2){
-      return Integer.signum(((Comparable)key2).compareTo((Comparable)key1));
+      return Integer.signum(((Comparable<E>)key2).compareTo(key1));
     }
   }
 }

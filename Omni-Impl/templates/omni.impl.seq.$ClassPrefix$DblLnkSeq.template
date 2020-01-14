@@ -3304,8 +3304,8 @@ boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfCLASSPREFIX list){
     @Override public $exposedType$ remove$TypeNameModifier$(){
       return pop$TypeNameModifier$();
     }
-    @Override public $exposedType$ pollFirst$TypeNameModifier$(){
-      return poll$TypeNameModifier$();
+    @Override public $exposedType$ poll$TypeNameModifier$(){
+      return pollFirst$TypeNameModifier$();
     }
     @Override public $exposedType$ peekFirst$TypeNameModifier$(){
       return peek$TypeNameModifier$();
@@ -3317,8 +3317,8 @@ boolean isEqualTo(Node$<E>$ thisHead,int size,OmniList.OfCLASSPREFIX list){
     @Override public $BoxedType$ peekFirst(){
       return peek();
     }
-    @Override public $BoxedType$ pollFirst(){
-      return poll();
+    @Override public $BoxedType$ poll(){
+      return pollFirst();
     }
     @Override public $BoxedType$ pop(){
       return pop$TypeNameModifier$();
@@ -4894,7 +4894,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(Node$<E>$ tail
 #ENDIF
 #ENDDEF
 #MACRODEF PollImpl(CLASSPREFIX,RETTYPE,DEFAULTVAL,CAST)
-@Override public RETTYPE pollCLASSPREFIX(){
+@Override public RETTYPE pollFirstCLASSPREFIX(){
   Node$<E>$ head;
   if((head=this.head)!=null){
 #IFSWITCH CHECKED==true

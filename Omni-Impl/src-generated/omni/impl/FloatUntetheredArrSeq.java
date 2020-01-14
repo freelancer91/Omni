@@ -6,12 +6,15 @@ import omni.function.FloatComparator;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
 import omni.function.FloatToIntFunction;
+import omni.api.OmniIterator;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.function.Consumer;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externalizable
+abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externalizable
 {
   float[] arr;
   int head;
@@ -36,29 +39,185 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
   @Override public boolean isEmpty(){
     return this.tail==-1;
   }
+  @Override public OmniIterator.OfFloat iterator(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      int size;
+      if((size=(tail+1)-(tail=this.head))<=0){
+        size+=arr.length;
+      }
+      return new AscendingUntetheredArrSeqItr(this,tail,size);
+    }
+    return new AscendingUntetheredArrSeqItr(this,-1,0);
+  }
+  @Override public boolean removeIf(FloatPredicate filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter);
+  }
+  @Override public boolean removeIf(Predicate<? super Float> filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter::test);
+  }
+  public void forEach(FloatConsumer action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      ascendingForEach(tail,action);
+    }
+  }
+  public void forEach(Consumer<? super Float> action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      ascendingForEach(tail,action::accept);
+    }
+  }
+  @Override public float[] toFloatArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      float[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
+      }else{
+        final float[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfFloat.DEFAULT_ARR;
+  }
+  @Override public Float[] toArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      Float[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new Float[size],0,size);
+      }else{
+        final float[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Float[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
+  }
+  @Override public double[] toDoubleArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      double[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
+      }else{
+        final float[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfDouble.DEFAULT_ARR;
+  }
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final T[] dst;
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
+      }else{
+        final float[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return arrConstructor.apply(0);
+  }
+  @Override public <T> T[] toArray(T[] dst){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }else{
+        final float[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
+  }
   @Override public void clear(){
     this.tail=-1;
+  }
+  void insertAtTail(float[] arr,float key,int head,int tail){
+    switch(Integer.signum((++tail)-head)){
+      case 0:
+        //fragmented must grow
+        final float[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new float[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.head=head;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(tail==arr.length){
+          if(head==0){
+            //must grow
+            ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(tail)],0,tail);
+            this.arr=arr;
+          }else{
+            tail=0;
+          }
+        }
+      case -1:
+        //fragmented
+    }
+    arr[tail]=key;
+    this.tail=tail;
+  }
+  void insertAtHead(float[] arr,float key,int head,int tail){
+    int newHead;
+    switch(Integer.signum(tail-(newHead=head-1))){
+      case 0:
+        //fragmented must grow
+        final float[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new float[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+        ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+        --newHead;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(newHead==-1 && tail==(newHead=arr.length-1)){
+          //must grow
+          this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+          ArrCopy.uncheckedCopy(arr,0,arr=new float[newHead],newHead-=(tail),tail);
+          --newHead;
+          this.arr=arr;
+        }
+      case -1:
+        //fragmented
+    }
+    arr[newHead]=key;
+    this.head=newHead;
   }
   public void addLast(float val){
     var arr=this.arr;
     int tail;
     if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(++tail==arr.length && head==0){
-          ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(tail)],0,tail);
-          this.arr=arr;
-        }
-      }else if(++tail==head){
-        this.head=0;
-        final var tmp=new float[OmniArray.growBy50Pct(tail=arr.length)];
-        final int copyLength;
-        ArrCopy.uncheckedCopy(arr,head,tmp,0,copyLength=tail-head);
-        ArrCopy.uncheckedCopy(arr,0,tmp,copyLength,head);
-        this.arr=arr=tmp;
-      }
-      arr[tail]=val;
-      this.tail=tail;
+      this.insertAtTail(arr,val,this.head,tail);
     }else{
       if(arr==null){
         this.arr=new float[]{val};
@@ -76,26 +235,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
     var arr=this.arr;
     int tail;
     if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(head==0 && tail==arr.length-1){
-          final var tmp=new float[head=OmniArray.growBy50Pct(++tail)];
-          this.tail=head-1;
-          ArrCopy.uncheckedCopy(arr,0,tmp,head-=tail,tail);
-          this.arr=arr=tmp;
-        }
-        --head;
-      }else if(--head==tail){
-        int arrLength;
-        final var tmp=new float[head=OmniArray.growBy50Pct(arrLength=arr.length)];
-        this.tail=head-1;
-        ArrCopy.uncheckedCopy(arr,0,tmp,head-=(++tail),tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.arr=arr=tmp;
-        --head;
-      }
-      arr[head]=val;
-      this.head=head;
+      this.insertAtHead(arr,val,this.head,tail);
     }else{
       if(arr==null){
         this.arr=new float[]{val};
@@ -436,6 +576,51 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
       ++head;
     }
+  }
+  public Float poll(){
+    return pollFirst();
+  }
+  public float pollFirstFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (float)(uncheckedRemoveFirst(tail));
+    }
+    return Float.NaN;
+  }
+  public float pollLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (float)(uncheckedRemoveLast(tail));
+    }
+    return Float.NaN;
+  }
+  public Float pollFirst(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Float)(uncheckedRemoveFirst(tail));
+    }
+    return null;
+  }
+  public Float pollLast(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Float)(uncheckedRemoveLast(tail));
+    }
+    return null;
+  }
+  public double pollFirstDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (double)(uncheckedRemoveFirst(tail));
+    }
+    return Double.NaN;
+  }
+  public double pollLastDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (double)(uncheckedRemoveLast(tail));
+    }
+    return Double.NaN;
   }
   void insertMiddle(float key){
     float[] arr;
@@ -967,6 +1152,14 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
     }
     return true;
   }
+  boolean uncheckedRemoveMatch(int tail,final FloatToIntFunction comparator)
+  {
+    final int head;
+    if((head=this.head)<=tail){
+      return nonfragmentedRemoveMatch(head,tail,comparator);
+    }
+    return fragmentedRemoveMatch(head,tail,comparator);
+  }
   boolean nonfragmentedRemoveMatch(int head,int tail,final FloatToIntFunction comparator)
   {
     final float[] arr;
@@ -1306,11 +1499,11 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
   }
-  static abstract class AbstractUntetheredArrSeqItr<E> extends AbstractFloatItr{
-    transient final FloatUntetheredArrSeq<E> root;
+  static abstract class AbstractUntetheredArrSeqItr extends AbstractFloatItr{
+    transient final FloatUntetheredArrSeq root;
     transient int index;
     transient int numLeft;
-    AbstractUntetheredArrSeqItr(FloatUntetheredArrSeq<E> root,int index,int numLeft){
+    AbstractUntetheredArrSeqItr(FloatUntetheredArrSeq root,int index,int numLeft){
       this.root=root;
       this.index=index;
       this.numLeft=numLeft;
@@ -1326,7 +1519,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       return (float)arr[index];
     }
     public void remove(){
-      final FloatUntetheredArrSeq<E> root;
+      final FloatUntetheredArrSeq root;
       final int head;
       int tail;
       switch(Integer.signum((tail=(root=this.root).tail)-(head=root.head))){
@@ -1351,16 +1544,16 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
     abstract void iterateIndex(int index,final float[] arr);
-    abstract void fragmentedRemove(final FloatUntetheredArrSeq<E> root,int head,int tail);
-    abstract void nonfragmentedRemove(final FloatUntetheredArrSeq<E> root,int head,int tail);
+    abstract void fragmentedRemove(final FloatUntetheredArrSeq root,int head,int tail);
+    abstract void nonfragmentedRemove(final FloatUntetheredArrSeq root,int head,int tail);
     abstract void uncheckedForEachRemaining(final FloatConsumer action);
   }
-  static class AscendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
-    AscendingUntetheredArrSeqItr(FloatUntetheredArrSeq<E> root,int index,int numLeft){
+  static class AscendingUntetheredArrSeqItr extends AbstractUntetheredArrSeqItr{
+    AscendingUntetheredArrSeqItr(FloatUntetheredArrSeq root,int index,int numLeft){
       super(root,index,numLeft);
     }
     @Override public Object clone(){
-      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
+      return new AscendingUntetheredArrSeqItr(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final float[] arr){
       if(++index==arr.length){
@@ -1368,7 +1561,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
       this.index=index;
     }
-    @Override void nonfragmentedRemove(final FloatUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void nonfragmentedRemove(final FloatUntetheredArrSeq root,final int head,int tail){
       final var arr=root.arr;
       final int index,headLength,tailLength;
       if((headLength=(index=this.index-1)-head)<=(tailLength=tail-index)){
@@ -1380,7 +1573,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
         this.index=index;
       }
     }
-    @Override void fragmentedRemove(final FloatUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void fragmentedRemove(final FloatUntetheredArrSeq root,final int head,int tail){
       final var arr=root.arr;
       final int headLength;
       int index;
@@ -1446,7 +1639,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
     @Override void uncheckedForEachRemaining(final FloatConsumer action){
-      final FloatUntetheredArrSeq<E> root;
+      final FloatUntetheredArrSeq root;
       final int tail;
       int index;
       final var arr=(root=this.root).arr;
@@ -1465,12 +1658,12 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       this.index=index;
     }
   }
-  static class DescendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
-    DescendingUntetheredArrSeqItr(FloatUntetheredArrSeq<E> root,int index,int numLeft){
+  static class DescendingUntetheredArrSeqItr extends AbstractUntetheredArrSeqItr{
+    DescendingUntetheredArrSeqItr(FloatUntetheredArrSeq root,int index,int numLeft){
       super(root,index,numLeft);
     }
     @Override public Object clone(){
-      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
+      return new AscendingUntetheredArrSeqItr(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final float[] arr){
       if(--index==-1){
@@ -1478,7 +1671,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
       this.index=index;
     }
-    @Override void nonfragmentedRemove(final FloatUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void nonfragmentedRemove(final FloatUntetheredArrSeq root,final int head,int tail){
       final var arr=root.arr;
       final int index,headLength,tailLength;
       if((headLength=(index=this.index+1)-head)<=(tailLength=tail-index)){
@@ -1490,7 +1683,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
         root.tail=tail-1;
       }
     }
-    @Override void fragmentedRemove(final FloatUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void fragmentedRemove(final FloatUntetheredArrSeq root,final int head,int tail){
       final float[] arr;
       final int headLength;
       int index;
@@ -1556,7 +1749,7 @@ abstract class FloatUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
     @Override void uncheckedForEachRemaining(final FloatConsumer action){
-      final FloatUntetheredArrSeq<E> root;
+      final FloatUntetheredArrSeq root;
       final int head;
       int index;
       final var arr=(root=this.root).arr;

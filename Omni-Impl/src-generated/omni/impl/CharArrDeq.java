@@ -2,14 +2,8 @@ package omni.impl;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.util.ArrCopy;
-import omni.util.OmniArray;
 import omni.util.TypeUtil;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
-import omni.function.CharConsumer;
-import omni.function.CharPredicate;
-public class CharArrDeq extends CharUntetheredArrSeq<Character> implements OmniDeque.OfChar
+public class CharArrDeq extends CharUntetheredArrSeq implements OmniDeque.OfChar
 {
   CharArrDeq(int head,char[] arr,int tail){
     super(head,arr,tail);
@@ -18,49 +12,49 @@ public class CharArrDeq extends CharUntetheredArrSeq<Character> implements OmniD
     super();
   }
   @Override public boolean add(char val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offer(char val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offerFirst(char val){
-    push(val);
+    super.push(val);
     return true;
   }
   @Override public boolean offerLast(char val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean add(boolean val){
-    addLast((char)TypeUtil.castToChar(val));
+    super.addLast((char)TypeUtil.castToChar(val));
     return true;
   }
   @Override public boolean add(Character val){
-    addLast((char)val);
+    super.addLast((char)val);
     return true;
   }
   @Override public void addFirst(Character val){
-    push((char)val);
+    super.push((char)val);
   }
   @Override public void addLast(Character val){
-    addLast((char)val);
+    super.addLast((char)val);
   }
   @Override public boolean offer(Character val){
-    addLast((char)val);
+    super.addLast((char)val);
     return true;
   }
   @Override public boolean offerFirst(Character val){
-    push((char)val);
+    super.push((char)val);
     return true;
   }
   @Override public boolean offerLast(Character val){
-    addLast((char)val);
+    super.addLast((char)val);
     return true;
   }
   @Override public void push(Character val){
-    push((char)val);
+    super.push((char)val);
   }
   @Override public char charElement(){
     return (char)arr[head];
@@ -161,97 +155,6 @@ public class CharArrDeq extends CharUntetheredArrSeq<Character> implements OmniD
     }
     return Integer.MIN_VALUE;
   }
-  @Override public char pollChar(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (char)super.uncheckedRemoveFirst(tail);
-    }
-    return Character.MIN_VALUE;
-  }
-  @Override public char pollLastChar(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (char)super.uncheckedRemoveLast(tail);
-    }
-    return Character.MIN_VALUE;
-  }
-  @Override public Character poll(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Character)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Character pollFirst(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Character)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Character pollLast(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Character)super.uncheckedRemoveLast(tail);
-    }
-    return null;
-  }
-  @Override public double pollDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (double)(super.uncheckedRemoveFirst(tail));
-    }
-    return Double.NaN;
-  }
-  @Override public double pollLastDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (double)(super.uncheckedRemoveLast(tail));
-    }
-    return Double.NaN;
-  }
-  @Override public float pollFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (float)(super.uncheckedRemoveFirst(tail));
-    }
-    return Float.NaN;
-  }
-  @Override public float pollLastFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (float)(super.uncheckedRemoveLast(tail));
-    }
-    return Float.NaN;
-  }
-  @Override public long pollLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (long)(super.uncheckedRemoveFirst(tail));
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public long pollLastLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (long)(super.uncheckedRemoveLast(tail));
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public int pollInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (int)(super.uncheckedRemoveFirst(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
-  @Override public int pollLastInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (int)(super.uncheckedRemoveLast(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
   @Override public char popChar(){
     return (char)super.uncheckedRemoveFirst(this.tail);
   }
@@ -269,108 +172,6 @@ public class CharArrDeq extends CharUntetheredArrSeq<Character> implements OmniD
   }
   @Override public Character removeLast(){
     return super.uncheckedRemoveLast(this.tail);
-  }
-  @Override public char[] toCharArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      char[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new char[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new char[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfChar.DEFAULT_ARR;
-  }
-  @Override public Character[] toArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      Character[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Character[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Character[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfChar.DEFAULT_BOXED_ARR;
-  }
-  @Override public double[] toDoubleArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      double[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfDouble.DEFAULT_ARR;
-  }
-  @Override public float[] toFloatArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      float[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfFloat.DEFAULT_ARR;
-  }
-  @Override public long[] toLongArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      long[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new long[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new long[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfLong.DEFAULT_ARR;
-  }
-  @Override public int[] toIntArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      int[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new int[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new int[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfInt.DEFAULT_ARR;
   }
   @Override public boolean contains(boolean val){
     final int tail;
@@ -688,17 +489,6 @@ public class CharArrDeq extends CharUntetheredArrSeq<Character> implements OmniD
     }
     return false;  
   }
-  @Override public OmniIterator.OfChar iterator(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      int size;
-      if((size=(tail+1)-(tail=this.head))<=0){
-        size+=arr.length;
-      }
-      return new AscendingUntetheredArrSeqItr<Character>(this,tail,size);
-    }
-    return new AscendingUntetheredArrSeqItr<Character>(this,-1,0);
-  }
   @Override public OmniIterator.OfChar descendingIterator(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -706,9 +496,9 @@ public class CharArrDeq extends CharUntetheredArrSeq<Character> implements OmniD
       if((size=(tail+1)-this.head)<=0){
         size+=arr.length;
       }
-      return new DescendingUntetheredArrSeqItr<Character>(this,tail,size);
+      return new DescendingUntetheredArrSeqItr(this,tail,size);
     }
-    return new DescendingUntetheredArrSeqItr<Character>(this,-1,0);
+    return new DescendingUntetheredArrSeqItr(this,-1,0);
   }
   @Override public Object clone(){
     int tail;
@@ -728,59 +518,5 @@ public class CharArrDeq extends CharUntetheredArrSeq<Character> implements OmniD
       return new CharArrDeq(head,copy,tail);
     }
     return new CharArrDeq();
-  }
-  @Override public boolean removeIf(CharPredicate filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter);
-  }
-  @Override public boolean removeIf(Predicate<? super Character> filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter::test);
-  }
-  @Override public void forEach(CharConsumer action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action);
-    }
-  }
-  @Override public void forEach(Consumer<? super Character> action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action::accept);
-    }
-  }
-  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final T[] dst;
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return arrConstructor.apply(0);
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-    }else if(dst.length!=0){
-      dst[0]=null;
-    }
-    return dst;
   }
 }

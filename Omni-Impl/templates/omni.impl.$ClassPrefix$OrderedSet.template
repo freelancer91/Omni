@@ -15,13 +15,19 @@ import omni.util.TypeUtil;
 #IF OfFloat
 import omni.function.$TypeNameModifier$ToIntFunction;
 #ENDIF
+#IF OfDouble,OfLong
+import java.util.function.$TypeNameModifier$ToIntFunction;
+#ENDIF
 #IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
 import omni.function.$TypeNameModifier$Comparator;
 #ELSE
 import java.util.Comparator;
 #ENDIF
+#IF OfChar,OfShort,OfInt
+import java.util.function.IntUnaryOperator;
+#ENDIF
 public abstract class $ClassPrefix$OrderedSet$<E>$
-  extends $ClassPrefix$UntetheredArrSeq<$BoxedType$>
+  extends $ClassPrefix$UntetheredArrSeq$<E>$
   implements OmniNavigableSet.Of$ClassPrefix$$<E>$
 {
   $ClassPrefix$OrderedSet(int head,$ArrayType$[] arr,int tail){
@@ -30,7 +36,239 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   $ClassPrefix$OrderedSet(){
     super();
   }
-  
+#MACRODEF InitializeQueryParam<PARAMTYPE>(NEGRET)
+#IF OfChar
+  #IFSWITCH PARAMTYPE==Object
+final int k;
+if(key instanceof Character){
+  k=(char)key;
+}else if(key instanceof Integer || key instanceof Byte || key instanceof Short){
+  if((k=((Number)key).intValue())!=($exposedType$)k){
+    return NEGRET;
+  }
+}else if(key instanceof Long){
+  final long l;
+  if((l=(long)key)!=(k=($exposedType$)l)){
+    return NEGRET;
+  }
+}else if(key instanceof Float){
+  final float f;
+  if((f=(float)key)!=(k=($exposedType$)f)){
+    return NEGRET;
+  }
+}else if(key instanceof Double){
+  final double d;
+  if((d=(double)key)!=(k=($exposedType$)d)){
+    return NEGRET;
+  }
+}else if(key instanceof Boolean){
+  k=$queryCastBoolean$((boolean)key);
+}else{
+  return NEGRET;
+}
+  #ENDIF
+#ENDIF
+#IF OfShort
+  #IFSWITCH PARAMTYPE==Object
+final int k;
+if(key instanceof Short || key instanceof Byte){
+  k=((Number)key).shortValue();
+}else if(key instanceof Integer){
+  if((k=(int)key)!=($exposedType$)k){
+    return NEGRET;
+  }
+}else if(key instanceof Long){
+  final long l;
+  if((l=(long)key)!=(k=($exposedType$)l)){
+    return NEGRET;
+  }
+}else if(key instanceof Float){
+  final float f;
+  if((f=(float)key)!=(k=($exposedType$)f)){
+    return NEGRET;
+  }
+}else if(key instanceof Double){
+  final double d;
+  if((d=(double)key)!=(k=($exposedType$)d)){
+    return NEGRET;
+  }
+}else if(key instanceof Character){
+  if((k=(char)key)>$BoxedType$.MAX_VALUE){
+    return NEGRET;
+  }
+}else if(key instanceof Boolean){
+  k=$queryCastBoolean$((boolean)key);
+}else{
+  return NEGRET;
+}
+  #ENDIF
+#ENDIF
+#IF OfInt
+  #IFSWITCH PARAMTYPE==Object
+final int k;
+if(key instanceof Integer || key instanceof Short || key instanceof Byte){
+  k=((Number)key).intValue();
+}else if(key instanceof Long){
+  final long l;
+  if((l=(long)key)!=(k=($exposedType$)l)){
+    return NEGRET;
+  }
+}else if(key instanceof Float){
+  final float f;
+  if((double)(f=(float)key)!=(double)(k=($exposedType$)f)){
+    return NEGRET;
+  }
+}else if(key instanceof Double){
+  final double d;
+  if((d=(double)key)!=(k=($exposedType$)d)){
+    return NEGRET;
+  }
+}else if(key instanceof Character){
+  k=(char)key;
+}else if(key instanceof Boolean){
+  k=$queryCastBoolean$((boolean)key);
+}else{
+  return NEGRET;
+}
+  #ENDIF
+#ENDIF
+#IF OfLong
+  #IFSWITCH PARAMTYPE==Object
+final long k;
+if(key instanceof Long || key instanceof Integer || key instanceof Byte || key instanceof Short){
+  k=((Number)key).$exposedType$Value();
+}else if(key instanceof Float){
+  final float f;
+  if(!TypeUtil.floatEquals(f=(float)key,k=($exposedType$)f)){
+    return NEGRET;
+  }
+}else if(key instanceof Double){
+  final double d;
+  if(!TypeUtil.doubleEquals(d=(double)key,k=($exposedType$)d)){
+    return NEGRET;
+  }
+}else if(key instanceof Character){
+  k=(char)key;
+}else if(key instanceof Boolean){
+  k=$queryCastBoolean$((boolean)key);
+}else{
+  return NEGRET;
+}
+  #ENDIF
+#ENDIF
+#ENDDEF
+#IF OfChar,OfShort,OfInt,OfLong
+  #IF OfLong,OfFloat,OfDouble
+  abstract $TypeNameModifier$ToIntFunction getQueryComparator($exposedType$ key);
+  #ELSEIF OfRef
+  abstract $TypeNameModifier$ToIntFunction getQueryComparator(Comparable<E> key);
+  #ELSE
+  abstract IntUnaryOperator getQueryComparator(int key);
+  #ENDIF
+  #MACRO QueryImpl<contains>(uncheckedContainsMatch)
+  #MACRO QueryImpl<removeVal>(uncheckedRemoveMatch)
+#ENDIF
+
+#MACRODEF QueryImpl<METHODNAME>(UNCHECKEDMETHOD)
+#IF OfChar,OfShort,OfInt,OfLong
+@Override public boolean METHODNAME(boolean key){
+  final int tail;
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator($queryCastBoolean$(key)));
+}
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+@Override public boolean METHODNAME(byte key){
+  final int tail;
+  #IF OfChar
+  return key>=0 && (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSE
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ENDIF
+}
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+@Override public boolean METHODNAME(char key){
+  final int tail;
+  #IF OfChar,OfInt,OfLong
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSE
+  return key<=$BoxedType$.MAX_VALUE && (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ENDIF
+}
+#ENDIF
+#IF OfChar,OfShort
+@Override public boolean METHODNAME(short key){
+  final int tail;
+  #IF OfChar
+  return key>=0 && (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSE
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ENDIF
+}
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+@Override public boolean METHODNAME(int key){
+  final int tail;
+  #IF OfInt,OfLong
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSE
+  return key==($exposedType$)key && (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ENDIF
+}
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+@Override public boolean METHODNAME(long key){
+  #IF OfLong
+  final int tail;
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSE
+  final int tail,k;
+  return (tail=this.tail)!=-1 && (k=($exposedType$)key)==key && super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
+  #ENDIF
+}
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+@Override public boolean METHODNAME(float key){
+  #IF OfLong
+  final int tail;
+  final long k;
+  return (tail=this.tail)!=-1 && TypeUtil.floatEquals(key,k=($exposedType$)key) && super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
+  #ELSEIF OfInt
+  final int tail,k;
+  return (tail=this.tail)!=-1 && (double)(k=($exposedType$)key)==(double)key && super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
+  #ELSE
+  final int tail,k;
+  return (tail=this.tail)!=-1 && (k=($exposedType$)key)==key && super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
+  #ENDIF
+}
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+@Override public boolean METHODNAME(double key){
+  #IF OfLong
+  final int tail;
+  final long k;
+  return (tail=this.tail)!=-1 && TypeUtil.doubleEquals(key,k=($exposedType$)key) && super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
+  #ELSE
+  final int tail,k;
+  return (tail=this.tail)!=-1 && (k=($exposedType$)key)==key && super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
+  #ENDIF
+}
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+#IFSWITCH METHODNAME==removeVal
+@Override public boolean remove(Object key){
+#ELSE
+@Override public boolean METHODNAME(Object key){
+#ENDIF
+  final int tail;
+  if((tail=this.tail)!=-1){
+    #MACRO InitializeQueryParam<Object>(false)
+    return super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
+  }
+  return false;
+}
+#ENDIF
+#ENDDEF
   
 #IFNOT OfRef
   @Override public boolean add($BoxedType$ key){
@@ -45,61 +283,7 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   abstract boolean uncheckedAddPosInf(int tail);
   abstract boolean uncheckedAddNegInf(int tail);
   
-  private void insertAtTail($ArrayType$[] arr,$ArrayType$ key,int head,int tail){
-    switch(Integer.signum((++tail)-head)){
-      case 0:
-        //fragmented must grow
-        final $ArrayType$[] tmp;
-        int arrLength;
-        ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.head=head;
-        this.arr=arr=tmp;
-        break;
-      default:
-        //nonfragmented
-        if(tail==arr.length){
-          if(head==0){
-            //must grow
-            ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(tail)],0,tail);
-            this.arr=arr;
-          }else{
-            tail=0;
-          }
-        }
-      case -1:
-        //fragmented
-    }
-    arr[tail]=key;
-    this.tail=tail;
-  }
-  private void insertAtHead($ArrayType$[] arr,$ArrayType$ key,int head,int tail){
-      int newHead;
-      switch(Integer.signum(tail-(newHead=head-1))){
-        case 0:
-          //fragmented must grow
-          final $ArrayType$[] tmp;
-          int arrLength;
-          ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
-          ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
-          --newHead;
-          this.arr=arr=tmp;
-          break;
-        default:
-          //nonfragmented
-          if(newHead==-1 && tail==(newHead=arr.length-1)){
-            //must grow
-            this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
-            ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[newHead],newHead-=(tail),tail);
-            --newHead;
-            this.arr=arr;
-          }
-        case -1:
-          //fragmented
-      }
-      arr[newHead]=key;
-      this.head=newHead;
-    }
+  
   @Override public boolean add($exposedType$ key){
     int tail;
     if((tail=this.tail)!=-1){
@@ -123,7 +307,7 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
         }
   #ELSE
         final $KeyType$ bits;
-        if((bits=Double.doubleToRawLongBits(key)==0L){
+        if((bits=Double.doubleToRawLongBits(key))==0L){
           sorter=this::comparePos0;
         }else if(bits==Long.MIN_VALUE){
           sorter=this::compareNeg0;
@@ -176,8 +360,6 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
     }
   }
 #ENDIF
-  
-
   public static class Ascending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
     Ascending(int head,$ArrayType$[] arr,int tail){
       super(head,arr,tail);
@@ -185,6 +367,36 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
     Ascending(){
       super();
     }
+#IF OfLong
+    @Override $TypeNameModifier$ToIntFunction getQueryComparator($exposedType$ key){
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(key<k){
+          return 1;
+        }
+        return -1;
+      };
+    }
+#ENDIF
+#IF OfChar,OfShort,OfInt
+    @Override IntUnaryOperator getQueryComparator(int key){
+  #IF OfChar,OfShort
+      return k->Integer.signum(k-key);
+  #ELSEIF OfInt,OfLong
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(key<k){
+          return 1;
+        }
+        return -1;
+      };
+  #ENDIF
+    }
+#ENDIF
 #IF OfFloat,OfDouble
     @Override int comparePos0($exposedType$ key){
       if(0<key){
@@ -289,6 +501,9 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
       return false;
     }
 #ENDIF
+#IF OfRef
+     @SuppressWarnings("unchecked")
+#ENDIF
     @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
   #IF OfChar,OfShort
       return Integer.signum(key1-key2);
@@ -303,7 +518,7 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
       //ok if key2 is NaN
       return -1;
   #ELSE
-      return Integer.signum(((Comparable)key1).compareTo((Comparable)key2));
+      return Integer.signum(((Comparable$<E>$)key1).compareTo(key2));
   #ENDIF
     }
   }
@@ -315,6 +530,36 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
     Descending(){
       super();
     }
+#IF OfLong
+    @Override $TypeNameModifier$ToIntFunction getQueryComparator($exposedType$ key){
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(k<key){
+          return 1;
+        }
+        return -1;
+      };
+    }
+#ENDIF
+#IF OfChar,OfShort,OfInt
+    @Override IntUnaryOperator getQueryComparator(int key){
+  #IF OfChar,OfShort
+      return k->Integer.signum(key-k);
+  #ELSEIF OfInt,OfLong
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(k<key){
+          return 1;
+        }
+        return -1;
+      };
+  #ENDIF
+    }
+#ENDIF
 #IF OfFloat,OfDouble
     @Override boolean uncheckedAddPosInf(int tail){
       $ArrayType$[] arr;
@@ -324,8 +569,35 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
         if(bottomVal==bottomVal){
           super.insertAtHead(arr,$BoxedType$.POSITIVE_INFINITY,head,tail);
         }else{
-          //TODO add just to the right of head
-          throw new omni.util.NotYetImplementedException();
+          int newHead;
+          switch(Integer.signum(tail-(newHead=head-1))){
+            case 0:
+              //fragmented must grow
+              final $ArrayType$[] tmp;
+              int arrLength;
+              //copy [0->tail]
+              ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+              //copy [head+1->arrLenth-1]
+              ArrCopy.semicheckedCopy(arr,++head,tmp,head=tail-(arrLength-=head),arrLength);
+              --head;
+              this.arr=arr=tmp;
+              break;
+            default:
+              //nonfragmented
+              if(head==0 && tail==(newHead=arr.length-1)){
+                //must grow
+                this.tail=(newHead=OmniArray.growBy50Pct(tail+1))-1;
+                ArrCopy.uncheckedCopy(arr,1,arr=new $ArrayType$[newHead],newHead-=tail,tail);
+                head=--newHead;
+                --newHead;
+                this.arr=arr;
+              }
+            case -1:
+              //fragmented
+          }
+          arr[head]=$BoxedType$.POSITIVE_INFINITY;
+          arr[newHead]=$BoxedType$.NaN;
+          this.head=newHead;
         }
         return true;
       }
@@ -394,6 +666,9 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
       return false;
     }
 #ENDIF
+#IF OfRef
+     @SuppressWarnings("unchecked")
+#ENDIF
     @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
   #IF OfChar,OfShort
       return Integer.signum(key2-key1);
@@ -408,7 +683,7 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
       //ok if key2 is NaN
       return 1;
   #ELSE
-      return Integer.signum(((Comparable)key2).compareTo((Comparable)key1));
+      return Integer.signum(((Comparable$<E>$)key2).compareTo(key1));
   #ENDIF
     }
   }

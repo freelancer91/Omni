@@ -6,12 +6,15 @@ import omni.function.ShortComparator;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import java.util.function.IntUnaryOperator;
+import omni.api.OmniIterator;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.function.Consumer;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externalizable
+abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externalizable
 {
   short[] arr;
   int head;
@@ -36,29 +39,236 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
   @Override public boolean isEmpty(){
     return this.tail==-1;
   }
+  @Override public OmniIterator.OfShort iterator(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      int size;
+      if((size=(tail+1)-(tail=this.head))<=0){
+        size+=arr.length;
+      }
+      return new AscendingUntetheredArrSeqItr(this,tail,size);
+    }
+    return new AscendingUntetheredArrSeqItr(this,-1,0);
+  }
+  @Override public boolean removeIf(ShortPredicate filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter);
+  }
+  @Override public boolean removeIf(Predicate<? super Short> filter){
+    final int tail;
+    return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filter::test);
+  }
+  public void forEach(ShortConsumer action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      ascendingForEach(tail,action);
+    }
+  }
+  public void forEach(Consumer<? super Short> action){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      ascendingForEach(tail,action::accept);
+    }
+  }
+  @Override public short[] toShortArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      short[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new short[size],0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new short[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfShort.DEFAULT_ARR;
+  }
+  @Override public Short[] toArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      Short[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new Short[size],0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Short[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfShort.DEFAULT_BOXED_ARR;
+  }
+  @Override public double[] toDoubleArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      double[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfDouble.DEFAULT_ARR;
+  }
+  @Override public float[] toFloatArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      float[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfFloat.DEFAULT_ARR;
+  }
+  @Override public long[] toLongArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      long[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new long[size],0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new long[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfLong.DEFAULT_ARR;
+  }
+  @Override public int[] toIntArray(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      int[] dst;
+      final int head;
+        int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=new int[size],0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new int[size+=arr.length],0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return OmniArray.OfInt.DEFAULT_ARR;
+  }
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final T[] dst;
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      return dst;
+    }
+    return arrConstructor.apply(0);
+  }
+  @Override public <T> T[] toArray(T[] dst){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final int head;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }else{
+        final short[] arr;
+        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
+  }
   @Override public void clear(){
     this.tail=-1;
+  }
+  void insertAtTail(short[] arr,short key,int head,int tail){
+    switch(Integer.signum((++tail)-head)){
+      case 0:
+        //fragmented must grow
+        final short[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new short[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.head=head;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(tail==arr.length){
+          if(head==0){
+            //must grow
+            ArrCopy.uncheckedCopy(arr,0,arr=new short[OmniArray.growBy50Pct(tail)],0,tail);
+            this.arr=arr;
+          }else{
+            tail=0;
+          }
+        }
+      case -1:
+        //fragmented
+    }
+    arr[tail]=key;
+    this.tail=tail;
+  }
+  void insertAtHead(short[] arr,short key,int head,int tail){
+    int newHead;
+    switch(Integer.signum(tail-(newHead=head-1))){
+      case 0:
+        //fragmented must grow
+        final short[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new short[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+        ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+        --newHead;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(newHead==-1 && tail==(newHead=arr.length-1)){
+          //must grow
+          this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+          ArrCopy.uncheckedCopy(arr,0,arr=new short[newHead],newHead-=(tail),tail);
+          --newHead;
+          this.arr=arr;
+        }
+      case -1:
+        //fragmented
+    }
+    arr[newHead]=key;
+    this.head=newHead;
   }
   public void addLast(short val){
     var arr=this.arr;
     int tail;
     if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(++tail==arr.length && head==0){
-          ArrCopy.uncheckedCopy(arr,0,arr=new short[OmniArray.growBy50Pct(tail)],0,tail);
-          this.arr=arr;
-        }
-      }else if(++tail==head){
-        this.head=0;
-        final var tmp=new short[OmniArray.growBy50Pct(tail=arr.length)];
-        final int copyLength;
-        ArrCopy.uncheckedCopy(arr,head,tmp,0,copyLength=tail-head);
-        ArrCopy.uncheckedCopy(arr,0,tmp,copyLength,head);
-        this.arr=arr=tmp;
-      }
-      arr[tail]=val;
-      this.tail=tail;
+      this.insertAtTail(arr,val,this.head,tail);
     }else{
       if(arr==null){
         this.arr=new short[]{val};
@@ -76,26 +286,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
     var arr=this.arr;
     int tail;
     if((tail=this.tail)!=-1){
-      int head;
-      if((head=this.head)<=tail){
-        if(head==0 && tail==arr.length-1){
-          final var tmp=new short[head=OmniArray.growBy50Pct(++tail)];
-          this.tail=head-1;
-          ArrCopy.uncheckedCopy(arr,0,tmp,head-=tail,tail);
-          this.arr=arr=tmp;
-        }
-        --head;
-      }else if(--head==tail){
-        int arrLength;
-        final var tmp=new short[head=OmniArray.growBy50Pct(arrLength=arr.length)];
-        this.tail=head-1;
-        ArrCopy.uncheckedCopy(arr,0,tmp,head-=(++tail),tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.arr=arr=tmp;
-        --head;
-      }
-      arr[head]=val;
-      this.head=head;
+      this.insertAtHead(arr,val,this.head,tail);
     }else{
       if(arr==null){
         this.arr=new short[]{val};
@@ -436,6 +627,93 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
       ++head;
     }
+  }
+  public Short poll(){
+    return pollFirst();
+  }
+  public short pollFirstShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (short)(uncheckedRemoveFirst(tail));
+    }
+    return Short.MIN_VALUE;
+  }
+  public short pollLastShort(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (short)(uncheckedRemoveLast(tail));
+    }
+    return Short.MIN_VALUE;
+  }
+  public Short pollFirst(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Short)(uncheckedRemoveFirst(tail));
+    }
+    return null;
+  }
+  public Short pollLast(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (Short)(uncheckedRemoveLast(tail));
+    }
+    return null;
+  }
+  public double pollFirstDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (double)(uncheckedRemoveFirst(tail));
+    }
+    return Double.NaN;
+  }
+  public double pollLastDouble(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (double)(uncheckedRemoveLast(tail));
+    }
+    return Double.NaN;
+  }
+  public float pollFirstFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (float)(uncheckedRemoveFirst(tail));
+    }
+    return Float.NaN;
+  }
+  public float pollLastFloat(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (float)(uncheckedRemoveLast(tail));
+    }
+    return Float.NaN;
+  }
+  public long pollFirstLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (long)(uncheckedRemoveFirst(tail));
+    }
+    return Long.MIN_VALUE;
+  }
+  public long pollLastLong(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (long)(uncheckedRemoveLast(tail));
+    }
+    return Long.MIN_VALUE;
+  }
+  public int pollFirstInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (int)(uncheckedRemoveFirst(tail));
+    }
+    return Integer.MIN_VALUE;
+  }
+  public int pollLastInt(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return (int)(uncheckedRemoveLast(tail));
+    }
+    return Integer.MIN_VALUE;
   }
   void insertMiddle(short key){
     short[] arr;
@@ -967,6 +1245,14 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
     }
     return true;
   }
+  boolean uncheckedRemoveMatch(int tail,final IntUnaryOperator comparator)
+  {
+    final int head;
+    if((head=this.head)<=tail){
+      return nonfragmentedRemoveMatch(head,tail,comparator);
+    }
+    return fragmentedRemoveMatch(head,tail,comparator);
+  }
   boolean nonfragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
   {
     final short[] arr;
@@ -1306,11 +1592,11 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
   }
-  static abstract class AbstractUntetheredArrSeqItr<E> extends AbstractShortItr{
-    transient final ShortUntetheredArrSeq<E> root;
+  static abstract class AbstractUntetheredArrSeqItr extends AbstractShortItr{
+    transient final ShortUntetheredArrSeq root;
     transient int index;
     transient int numLeft;
-    AbstractUntetheredArrSeqItr(ShortUntetheredArrSeq<E> root,int index,int numLeft){
+    AbstractUntetheredArrSeqItr(ShortUntetheredArrSeq root,int index,int numLeft){
       this.root=root;
       this.index=index;
       this.numLeft=numLeft;
@@ -1326,7 +1612,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       return (short)arr[index];
     }
     public void remove(){
-      final ShortUntetheredArrSeq<E> root;
+      final ShortUntetheredArrSeq root;
       final int head;
       int tail;
       switch(Integer.signum((tail=(root=this.root).tail)-(head=root.head))){
@@ -1351,16 +1637,16 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
     abstract void iterateIndex(int index,final short[] arr);
-    abstract void fragmentedRemove(final ShortUntetheredArrSeq<E> root,int head,int tail);
-    abstract void nonfragmentedRemove(final ShortUntetheredArrSeq<E> root,int head,int tail);
+    abstract void fragmentedRemove(final ShortUntetheredArrSeq root,int head,int tail);
+    abstract void nonfragmentedRemove(final ShortUntetheredArrSeq root,int head,int tail);
     abstract void uncheckedForEachRemaining(final ShortConsumer action);
   }
-  static class AscendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
-    AscendingUntetheredArrSeqItr(ShortUntetheredArrSeq<E> root,int index,int numLeft){
+  static class AscendingUntetheredArrSeqItr extends AbstractUntetheredArrSeqItr{
+    AscendingUntetheredArrSeqItr(ShortUntetheredArrSeq root,int index,int numLeft){
       super(root,index,numLeft);
     }
     @Override public Object clone(){
-      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
+      return new AscendingUntetheredArrSeqItr(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final short[] arr){
       if(++index==arr.length){
@@ -1368,7 +1654,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
       this.index=index;
     }
-    @Override void nonfragmentedRemove(final ShortUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void nonfragmentedRemove(final ShortUntetheredArrSeq root,final int head,int tail){
       final var arr=root.arr;
       final int index,headLength,tailLength;
       if((headLength=(index=this.index-1)-head)<=(tailLength=tail-index)){
@@ -1380,7 +1666,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
         this.index=index;
       }
     }
-    @Override void fragmentedRemove(final ShortUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void fragmentedRemove(final ShortUntetheredArrSeq root,final int head,int tail){
       final var arr=root.arr;
       final int headLength;
       int index;
@@ -1446,7 +1732,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
     @Override void uncheckedForEachRemaining(final ShortConsumer action){
-      final ShortUntetheredArrSeq<E> root;
+      final ShortUntetheredArrSeq root;
       final int tail;
       int index;
       final var arr=(root=this.root).arr;
@@ -1465,12 +1751,12 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       this.index=index;
     }
   }
-  static class DescendingUntetheredArrSeqItr<E> extends AbstractUntetheredArrSeqItr<E>{
-    DescendingUntetheredArrSeqItr(ShortUntetheredArrSeq<E> root,int index,int numLeft){
+  static class DescendingUntetheredArrSeqItr extends AbstractUntetheredArrSeqItr{
+    DescendingUntetheredArrSeqItr(ShortUntetheredArrSeq root,int index,int numLeft){
       super(root,index,numLeft);
     }
     @Override public Object clone(){
-      return new AscendingUntetheredArrSeqItr<E>(root,index,numLeft);
+      return new AscendingUntetheredArrSeqItr(root,index,numLeft);
     }
     @Override void iterateIndex(int index,final short[] arr){
       if(--index==-1){
@@ -1478,7 +1764,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
       this.index=index;
     }
-    @Override void nonfragmentedRemove(final ShortUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void nonfragmentedRemove(final ShortUntetheredArrSeq root,final int head,int tail){
       final var arr=root.arr;
       final int index,headLength,tailLength;
       if((headLength=(index=this.index+1)-head)<=(tailLength=tail-index)){
@@ -1490,7 +1776,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
         root.tail=tail-1;
       }
     }
-    @Override void fragmentedRemove(final ShortUntetheredArrSeq<E> root,final int head,int tail){
+    @Override void fragmentedRemove(final ShortUntetheredArrSeq root,final int head,int tail){
       final short[] arr;
       final int headLength;
       int index;
@@ -1556,7 +1842,7 @@ abstract class ShortUntetheredArrSeq<E> implements OmniCollection<E>,Externaliza
       }
     }
     @Override void uncheckedForEachRemaining(final ShortConsumer action){
-      final ShortUntetheredArrSeq<E> root;
+      final ShortUntetheredArrSeq root;
       final int head;
       int index;
       final var arr=(root=this.root).arr;

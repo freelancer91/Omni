@@ -6164,7 +6164,7 @@ AbstractOmniCollection<E>
       }
       return false;
     }
-    @Override public E poll(){
+    @Override public E pollFirst(){
       Node<E> head;
       if((head=this.head)!=null){
         ++this.modCount;
@@ -7894,8 +7894,8 @@ AbstractOmniCollection<E>
     @Override public E remove(){
       return pop();
     }
-    @Override public E pollFirst(){
-      return poll();
+    @Override public E poll(){
+      return pollFirst();
     }
     @Override public E peekFirst(){
       return peek();
@@ -7903,7 +7903,7 @@ AbstractOmniCollection<E>
     @Override public E getFirst(){
       return element();
     }
-    @Override public E poll(){
+    @Override public E pollFirst(){
       Node<E> head;
       if((head=this.head)!=null){
         final var ret=(head.val);

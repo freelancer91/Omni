@@ -2,14 +2,8 @@ package omni.impl;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.util.ArrCopy;
-import omni.util.OmniArray;
 import omni.util.TypeUtil;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
-import omni.function.ShortConsumer;
-import omni.function.ShortPredicate;
-public class ShortArrDeq extends ShortUntetheredArrSeq<Short> implements OmniDeque.OfShort
+public class ShortArrDeq extends ShortUntetheredArrSeq implements OmniDeque.OfShort
 {
   ShortArrDeq(int head,short[] arr,int tail){
     super(head,arr,tail);
@@ -18,53 +12,53 @@ public class ShortArrDeq extends ShortUntetheredArrSeq<Short> implements OmniDeq
     super();
   }
   @Override public boolean add(short val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offer(short val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean offerFirst(short val){
-    push(val);
+    super.push(val);
     return true;
   }
   @Override public boolean offerLast(short val){
-    addLast(val);
+    super.addLast(val);
     return true;
   }
   @Override public boolean add(boolean val){
-    addLast((short)(short)TypeUtil.castToByte(val));
+    super.addLast((short)(short)TypeUtil.castToByte(val));
     return true;
   }
   @Override public boolean add(byte val){
-    addLast((short)(val));
+    super.addLast((short)(val));
     return true;
   }
   @Override public boolean add(Short val){
-    addLast((short)val);
+    super.addLast((short)val);
     return true;
   }
   @Override public void addFirst(Short val){
-    push((short)val);
+    super.push((short)val);
   }
   @Override public void addLast(Short val){
-    addLast((short)val);
+    super.addLast((short)val);
   }
   @Override public boolean offer(Short val){
-    addLast((short)val);
+    super.addLast((short)val);
     return true;
   }
   @Override public boolean offerFirst(Short val){
-    push((short)val);
+    super.push((short)val);
     return true;
   }
   @Override public boolean offerLast(Short val){
-    addLast((short)val);
+    super.addLast((short)val);
     return true;
   }
   @Override public void push(Short val){
-    push((short)val);
+    super.push((short)val);
   }
   @Override public short shortElement(){
     return (short)arr[head];
@@ -165,97 +159,6 @@ public class ShortArrDeq extends ShortUntetheredArrSeq<Short> implements OmniDeq
     }
     return Integer.MIN_VALUE;
   }
-  @Override public short pollShort(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (short)super.uncheckedRemoveFirst(tail);
-    }
-    return Short.MIN_VALUE;
-  }
-  @Override public short pollLastShort(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (short)super.uncheckedRemoveLast(tail);
-    }
-    return Short.MIN_VALUE;
-  }
-  @Override public Short poll(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Short)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Short pollFirst(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Short)super.uncheckedRemoveFirst(tail);
-    }
-    return null;
-  }
-  @Override public Short pollLast(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (Short)super.uncheckedRemoveLast(tail);
-    }
-    return null;
-  }
-  @Override public double pollDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (double)(super.uncheckedRemoveFirst(tail));
-    }
-    return Double.NaN;
-  }
-  @Override public double pollLastDouble(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (double)(super.uncheckedRemoveLast(tail));
-    }
-    return Double.NaN;
-  }
-  @Override public float pollFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (float)(super.uncheckedRemoveFirst(tail));
-    }
-    return Float.NaN;
-  }
-  @Override public float pollLastFloat(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (float)(super.uncheckedRemoveLast(tail));
-    }
-    return Float.NaN;
-  }
-  @Override public long pollLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (long)(super.uncheckedRemoveFirst(tail));
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public long pollLastLong(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (long)(super.uncheckedRemoveLast(tail));
-    }
-    return Long.MIN_VALUE;
-  }
-  @Override public int pollInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (int)(super.uncheckedRemoveFirst(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
-  @Override public int pollLastInt(){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      return (int)(super.uncheckedRemoveLast(tail));
-    }
-    return Integer.MIN_VALUE;
-  }
   @Override public short popShort(){
     return (short)super.uncheckedRemoveFirst(this.tail);
   }
@@ -273,108 +176,6 @@ public class ShortArrDeq extends ShortUntetheredArrSeq<Short> implements OmniDeq
   }
   @Override public Short removeLast(){
     return super.uncheckedRemoveLast(this.tail);
-  }
-  @Override public short[] toShortArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      short[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new short[size],0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new short[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfShort.DEFAULT_ARR;
-  }
-  @Override public Short[] toArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      Short[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Short[size],0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Short[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfShort.DEFAULT_BOXED_ARR;
-  }
-  @Override public double[] toDoubleArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      double[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfDouble.DEFAULT_ARR;
-  }
-  @Override public float[] toFloatArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      float[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfFloat.DEFAULT_ARR;
-  }
-  @Override public long[] toLongArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      long[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new long[size],0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new long[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfLong.DEFAULT_ARR;
-  }
-  @Override public int[] toIntArray(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      int[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new int[size],0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new int[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return OmniArray.OfInt.DEFAULT_ARR;
   }
   @Override public boolean contains(boolean val){
     final int tail;
@@ -712,17 +513,6 @@ public class ShortArrDeq extends ShortUntetheredArrSeq<Short> implements OmniDeq
     }
     return false;   
   }
-  @Override public OmniIterator.OfShort iterator(){
-    int tail;
-    if((tail=this.tail)!=-1){
-      int size;
-      if((size=(tail+1)-(tail=this.head))<=0){
-        size+=arr.length;
-      }
-      return new AscendingUntetheredArrSeqItr<Short>(this,tail,size);
-    }
-    return new AscendingUntetheredArrSeqItr<Short>(this,-1,0);
-  }
   @Override public OmniIterator.OfShort descendingIterator(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -730,9 +520,9 @@ public class ShortArrDeq extends ShortUntetheredArrSeq<Short> implements OmniDeq
       if((size=(tail+1)-this.head)<=0){
         size+=arr.length;
       }
-      return new DescendingUntetheredArrSeqItr<Short>(this,tail,size);
+      return new DescendingUntetheredArrSeqItr(this,tail,size);
     }
-    return new DescendingUntetheredArrSeqItr<Short>(this,-1,0);
+    return new DescendingUntetheredArrSeqItr(this,-1,0);
   }
   @Override public Object clone(){
     int tail;
@@ -752,59 +542,5 @@ public class ShortArrDeq extends ShortUntetheredArrSeq<Short> implements OmniDeq
       return new ShortArrDeq(head,copy,tail);
     }
     return new ShortArrDeq();
-  }
-  @Override public boolean removeIf(ShortPredicate filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter);
-  }
-  @Override public boolean removeIf(Predicate<? super Short> filter){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveIf(tail,filter::test);
-  }
-  @Override public void forEach(ShortConsumer action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action);
-    }
-  }
-  @Override public void forEach(Consumer<? super Short> action){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      super.ascendingForEach(tail,action::accept);
-    }
-  }
-  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final T[] dst;
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=arrConstructor.apply(size),0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=arrConstructor.apply(size+=arr.length),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
-    }
-    return arrConstructor.apply(0);
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    int tail;
-    if((tail=this.tail)!=-1){
-      final int head;
-      int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
-      }else{
-        final short[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=OmniArray.uncheckedArrResize(size+=arr.length,dst),0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-    }else if(dst.length!=0){
-      dst[0]=null;
-    }
-    return dst;
   }
 }
