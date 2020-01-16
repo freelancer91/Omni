@@ -2,8 +2,8 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.util.TypeUtil;
 import omni.function.ShortComparator;
+import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class ShortOrderedSet
   extends ShortUntetheredArrSeq
@@ -15,6 +15,7 @@ public abstract class ShortOrderedSet
   ShortOrderedSet(){
     super();
   }
+  abstract int insertionCompare(short key1,short key2);
   abstract IntUnaryOperator getQueryComparator(int key);
   @Override public boolean contains(boolean key){
     final int tail;
@@ -37,7 +38,8 @@ public abstract class ShortOrderedSet
     return key==(short)key && (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,getQueryComparator(key));
   }
   @Override public boolean contains(long key){
-    final int tail,k;
+    final int tail;
+    final int k;
     return (tail=this.tail)!=-1 && (k=(short)key)==key && super.uncheckedContainsMatch(tail,getQueryComparator(k));
   }
   @Override public boolean contains(float key){
@@ -107,7 +109,8 @@ public abstract class ShortOrderedSet
     return key==(short)key && (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getQueryComparator(key));
   }
   @Override public boolean removeVal(long key){
-    final int tail,k;
+    final int tail;
+    final int k;
     return (tail=this.tail)!=-1 && (k=(short)key)==key && super.uncheckedRemoveMatch(tail,getQueryComparator(k));
   }
   @Override public boolean removeVal(float key){
@@ -159,7 +162,6 @@ public abstract class ShortOrderedSet
   @Override public boolean add(Short key){
     return add((short)key);
   }
-  abstract int insertionCompare(short key1,short key2);
   @Override public boolean add(boolean key){
     return add((short)TypeUtil.castToByte(key));
   }
@@ -182,6 +184,9 @@ public abstract class ShortOrderedSet
     Ascending(){
       super();
     }
+    @Override public ShortComparator comparator(){
+      return Short::compare;
+    }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->Integer.signum(k-key);
     }
@@ -195,6 +200,9 @@ public abstract class ShortOrderedSet
     }
     Descending(){
       super();
+    }
+    @Override public ShortComparator comparator(){
+      return ShortComparator::descendingCompare;
     }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->Integer.signum(key-k);

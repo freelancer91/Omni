@@ -2,9 +2,9 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.function.DoubleComparator;
 import omni.util.TypeUtil;
 import java.util.function.DoubleToIntFunction;
-import omni.function.DoubleComparator;
 public abstract class DoubleOrderedSet
   extends DoubleUntetheredArrSeq
   implements OmniNavigableSet.OfDouble
@@ -15,17 +15,184 @@ public abstract class DoubleOrderedSet
   DoubleOrderedSet(){
     super();
   }
+  abstract int insertionCompare(double key1,double key2);
+  abstract DoubleToIntFunction getQueryComparator(double key);
+  @Override public boolean contains(boolean key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,key?this::comparePos1:this::comparePos0);
+  }
+  @Override public boolean contains(int key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,key==0?this::comparePos0:getQueryComparator(key));
+  }
+  @Override public boolean contains(long key){
+    final int tail;
+    return (tail=this.tail)!=-1 && TypeUtil.checkCastToDouble(key) && super.uncheckedContainsMatch(tail,key==0?this::comparePos0:getQueryComparator(key));
+  }
+  @Override public boolean removeVal(boolean key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,key?this::comparePos1:this::comparePos0);
+  }
+  @Override public boolean removeVal(int key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,key==0?this::comparePos0:getQueryComparator(key));
+  }
+  @Override public boolean removeVal(long key){
+    final int tail;
+    return (tail=this.tail)!=-1 && TypeUtil.checkCastToDouble(key) && super.uncheckedRemoveMatch(tail,key==0?this::comparePos0:getQueryComparator(key));
+  }
   @Override public boolean add(Double key){
     return add((double)key);
   }
-  abstract int insertionCompare(double key1,double key2);
+  abstract boolean uncheckedContainsMatch(int tail,double key);
+  abstract boolean uncheckedRemoveMatch(int tail,double key);
+  abstract boolean uncheckedContainsMatch(int tail,float key);
+  abstract boolean uncheckedRemoveMatch(int tail,float key);
+  @Override public boolean contains(float key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedContainsMatch(tail,key);
+  }
+  @Override public boolean contains(double key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedContainsMatch(tail,key);
+  }
+  @Override public boolean removeVal(float key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedRemoveMatch(tail,key);
+  }
+  @Override public boolean removeVal(double key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedRemoveMatch(tail,key);
+  }
+    @Override public boolean contains(Object key){
+      final int tail;
+      if((tail=this.tail)!=-1){
+        final DoubleToIntFunction comparator;
+        if(key instanceof Double){
+          return this.uncheckedContainsMatch(tail,(double)key);
+        }else if(key instanceof Integer || key instanceof Byte || key instanceof Short){
+          final int i;
+          comparator=(i=((Number)key).intValue())==0 ? this::comparePos0 : this.getQueryComparator(i);
+        }else if(key instanceof Long){
+          final long l;
+          if(!TypeUtil.checkCastToDouble(l=(long)key)){
+            return false;
+          }
+          comparator = l==0?this::comparePos0:this.getQueryComparator(l);
+        }else if(key instanceof Float){
+          return this.uncheckedContainsMatch(tail,(float)key);
+        }else if(key instanceof Character){
+          final int i;
+          comparator = (i=(char)key)==0?this::comparePos0:this.getQueryComparator(i);
+        }else if(key instanceof Boolean){
+          comparator = (boolean)key ? this::comparePos1: this::comparePos0;
+        }else{
+          return false;
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
+      }
+      return false;
+    }
+    @Override public boolean remove(Object key){
+      final int tail;
+      if((tail=this.tail)!=-1){
+        final DoubleToIntFunction comparator;
+        if(key instanceof Double){
+          return this.uncheckedRemoveMatch(tail,(double)key);
+        }else if(key instanceof Integer || key instanceof Byte || key instanceof Short){
+          final int i;
+          comparator=(i=((Number)key).intValue())==0 ? this::comparePos0 : this.getQueryComparator(i);
+        }else if(key instanceof Long){
+          final long l;
+          if(!TypeUtil.checkCastToDouble(l=(long)key)){
+            return false;
+          }
+          comparator = l==0?this::comparePos0:this.getQueryComparator(l);
+        }else if(key instanceof Float){
+          return this.uncheckedRemoveMatch(tail,(float)key);
+        }else if(key instanceof Character){
+          final int i;
+          comparator = (i=(char)key)==0?this::comparePos0:this.getQueryComparator(i);
+        }else if(key instanceof Boolean){
+          comparator = (boolean)key ? this::comparePos1: this::comparePos0;
+        }else{
+          return false;
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+      return false;
+    }
   abstract boolean uncheckedAddNaN(int tail);
   abstract int comparePos0(double key);
   abstract int compareNeg0(double key);
+  abstract int comparePos1(double key);
   abstract boolean uncheckedAddPosInf(int tail);
   abstract boolean uncheckedAddNegInf(int tail);
+  @Override public boolean add(boolean key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key){
+        return super.uncheckedAdd(tail,1.0d,this::comparePos1);
+      }else{
+        return super.uncheckedAdd(tail,0.0d,this::comparePos0);
+      }
+    }else{
+      super.insertMiddle(TypeUtil.castToDouble(key));
+      return true;
+    }
+  }
+  @Override public boolean add(int key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,0,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle((double)key);
+      return true;
+    }
+  }
+  @Override public boolean add(long key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,0,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle((double)key);
+      return true;
+    }
+  }
+  @Override public boolean add(float key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        final DoubleToIntFunction sorter;
+        switch(Float.floatToRawIntBits(key)){
+          case 0x7f800000:
+            return this.uncheckedAddPosInf(tail);
+          case 0xff800000:
+            return this.uncheckedAddNegInf(tail);
+          default:
+            return super.uncheckedAdd(tail,(double)key,this::insertionCompare);
+          case 0:
+            sorter=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            sorter=this::compareNeg0;
+        }
+        return super.uncheckedAdd(tail,(double)key,sorter);
+      }
+      return this.uncheckedAddNaN(tail);
+    }else{
+      super.insertMiddle((double)key);
+      return true;
+    }
+  }
   @Override public boolean add(double key){
-    int tail;
+    final int tail;
     if((tail=this.tail)!=-1){
       if(key==key){
         final DoubleToIntFunction sorter;
@@ -34,10 +201,6 @@ public abstract class DoubleOrderedSet
           sorter=this::comparePos0;
         }else if(bits==Long.MIN_VALUE){
           sorter=this::compareNeg0;
-        }else if(bits==0x7ff0000000000000L){
-          return this.uncheckedAddPosInf(tail);
-        }else if(bits==0xfff0000000000000L){
-          return this.uncheckedAddNegInf(tail);
         }else{
           return super.uncheckedAdd(tail,key,this::insertionCompare);
         }
@@ -56,10 +219,137 @@ public abstract class DoubleOrderedSet
     Ascending(){
       super();
     }
-    @Override int comparePos0(double key){
-      if(0<key){
-        return -1;
+    @Override boolean uncheckedContainsMatch(int tail,double key){
+      if(key==key){
+        final DoubleToIntFunction comparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          comparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          comparator=this::compareNeg0;
+        }else{
+          comparator=this.getQueryComparator(key);
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
       }
+      return Double.isNaN(this.arr[tail]);
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,double key){
+      if(key==key){
+        final DoubleToIntFunction comparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          comparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          comparator=this::compareNeg0;
+        }else{
+          comparator=this.getQueryComparator(key);
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+      {
+        final double[] arr;
+        if(Double.isNaN((arr=this.arr)[tail])){
+          if(tail==this.head){
+            tail=-1;
+          }else{
+            if(--tail==-1){
+              tail=arr.length-1;
+            }
+          }
+          this.tail=tail;
+          return true;
+        }
+      }
+      return false;
+    }
+    @Override boolean uncheckedContainsMatch(int tail,float key){
+      if(key==key){
+        DoubleToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            return this.arr[head]==Double.NEGATIVE_INFINITY;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
+      }
+      return Double.isNaN(this.arr[tail]);
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,float key){
+      if(key==key){
+        DoubleToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            int head;
+            final double[] arr;
+            if((arr=this.arr)[head=this.head]==Double.NEGATIVE_INFINITY){
+              if(tail==head){
+                this.tail=-1;
+              }else{
+                if(++head==arr.length){
+                  head=0;
+                }
+                this.head=head;
+              }
+              return true;
+            }
+            return false;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+      final double[] arr;
+      if(Double.isNaN((arr=this.arr)[tail])){
+        if(tail==this.head){
+          tail=-1;
+        }else{
+          if(--tail==-1){
+            tail=arr.length-1;
+          }
+        }
+        this.tail=tail;
+        return true;
+      }
+      return false;
+    }
+    @Override public DoubleComparator comparator(){
+      return Double::compare;
+    }
+    @Override DoubleToIntFunction getQueryComparator(double key){
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(key<k){
+          return 1;
+        }
+        return -1;
+      };
+    }
+    @Override int comparePos1(double key){
+      if(1>key){
+        return 1;
+      }
+      if(Double.doubleToRawLongBits(key)==TypeUtil.DBL_TRUE_BITS){
+        return 0;
+      }
+      return -1;
+    }
+    @Override int comparePos0(double key){
       if(0>key){
         return 1;
       }
@@ -70,20 +360,15 @@ public abstract class DoubleOrderedSet
       if(bits==Long.MIN_VALUE){
         return 1;
       }
-      //must be NaN
       return -1;
     }
     @Override int compareNeg0(double key){
-      if(0<key){
-        return -1;
-      }
       if(0>key){
         return 1;
       }
       if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
         return 0;
       }
-      //is positive 0 or NaN
       return -1;
     }
     @Override boolean uncheckedAddPosInf(int tail){
@@ -162,6 +447,128 @@ public abstract class DoubleOrderedSet
     Descending(){
       super();
     }
+    @Override boolean uncheckedContainsMatch(int tail,double key){
+        if(key==key){
+          final DoubleToIntFunction comparator;
+          final long bits;
+          if((bits=Double.doubleToRawLongBits(key))==0){
+            comparator=this::comparePos0;
+          }else if(bits==Long.MIN_VALUE){
+            comparator=this::compareNeg0;
+          }else{
+            comparator=this.getQueryComparator(key);
+          }
+          return super.uncheckedContainsMatch(tail,comparator);
+        }
+        return Double.isNaN(this.arr[head]);
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,double key){
+      if(key==key){
+        final DoubleToIntFunction comparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          comparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          comparator=this::compareNeg0;
+        }else{
+          comparator=this.getQueryComparator(key);
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+      {
+        int head;
+        final double[] arr;
+        if(Double.isNaN((arr=this.arr)[head=this.head])){
+          if(tail==head){
+            this.tail=-1;
+          }else{
+            if(++head==arr.length){
+              head=0;
+            }
+            this.head=head;
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+    @Override boolean uncheckedContainsMatch(int tail,float key){
+      if(key==key){
+        DoubleToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            return this.arr[tail]==Double.NEGATIVE_INFINITY;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
+      }
+      return Double.isNaN(this.arr[head]);
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,float key){
+      if(key==key){
+        DoubleToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            final double[] arr;
+            if((arr=this.arr)[tail]==Double.NEGATIVE_INFINITY){
+              if(tail==this.head){
+                tail=-1;
+              }else{
+                if(--tail==-1){
+                  tail=arr.length-1;
+                }
+              }
+              this.tail=tail;
+              return true;
+            }
+            return false;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+      int head;
+      final double[] arr;
+      if(Double.isNaN((arr=this.arr)[head=this.head])){
+        if(tail==head){
+          this.tail=-1;
+        }else{
+          if(++head==arr.length){
+            head=0;
+          }
+          this.head=head;
+        }
+        return true;
+      }
+      return false;
+    }
+    @Override public DoubleComparator comparator(){
+      return DoubleComparator::descendingCompare;
+    }
+    @Override DoubleToIntFunction getQueryComparator(double key){
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(k<key){
+          return 1;
+        }
+        return -1;
+      };
+    }
     @Override boolean uncheckedAddPosInf(int tail){
       double[] arr;
       final double bottomVal;
@@ -212,10 +619,17 @@ public abstract class DoubleOrderedSet
       }
       return false;
     }
-    @Override int comparePos0(double key){
-      if(0<key){
+    @Override int comparePos1(double key){
+      if(1>key){
         return 1;
       }
+      if(Double.doubleToRawLongBits(key)==TypeUtil.DBL_TRUE_BITS){
+        return 0;
+      }
+      //either NaN or greater than 1
+      return -1;
+    }
+    @Override int comparePos0(double key){
       if(0>key){
         return -1;
       }
@@ -224,22 +638,17 @@ public abstract class DoubleOrderedSet
         return 0;
       }
       if(bits==Long.MIN_VALUE){
-        return 1;
+        return -1;
       }
-      //must be NaN
       return 1;
     }
     @Override int compareNeg0(double key){
-      if(0<key){
-        return 1;
-      }
       if(0>key){
         return -1;
       }
       if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
         return 0;
       }
-      //is positive 0 or NaN
       return 1;
     }
     @Override boolean uncheckedAddNaN(int tail){

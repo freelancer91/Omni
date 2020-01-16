@@ -2,8 +2,8 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.util.TypeUtil;
 import omni.function.IntComparator;
+import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class IntOrderedSet
   extends IntUntetheredArrSeq
@@ -15,6 +15,7 @@ public abstract class IntOrderedSet
   IntOrderedSet(){
     super();
   }
+  abstract int insertionCompare(int key1,int key2);
   abstract IntUnaryOperator getQueryComparator(int key);
   @Override public boolean contains(boolean key){
     final int tail;
@@ -33,7 +34,8 @@ public abstract class IntOrderedSet
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,getQueryComparator(key));
   }
   @Override public boolean contains(long key){
-    final int tail,k;
+    final int tail;
+    final int k;
     return (tail=this.tail)!=-1 && (k=(int)key)==key && super.uncheckedContainsMatch(tail,getQueryComparator(k));
   }
   @Override public boolean contains(float key){
@@ -93,7 +95,8 @@ public abstract class IntOrderedSet
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getQueryComparator(key));
   }
   @Override public boolean removeVal(long key){
-    final int tail,k;
+    final int tail;
+    final int k;
     return (tail=this.tail)!=-1 && (k=(int)key)==key && super.uncheckedRemoveMatch(tail,getQueryComparator(k));
   }
   @Override public boolean removeVal(float key){
@@ -139,7 +142,6 @@ public abstract class IntOrderedSet
   @Override public boolean add(Integer key){
     return add((int)key);
   }
-  abstract int insertionCompare(int key1,int key2);
   @Override public boolean add(boolean key){
     return add((int)TypeUtil.castToByte(key));
   }
@@ -164,6 +166,9 @@ public abstract class IntOrderedSet
     }
     Ascending(){
       super();
+    }
+    @Override public IntComparator comparator(){
+      return Integer::compare;
     }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->{
@@ -194,6 +199,9 @@ public abstract class IntOrderedSet
     }
     Descending(){
       super();
+    }
+    @Override public IntComparator comparator(){
+      return IntComparator::descendingCompare;
     }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->{

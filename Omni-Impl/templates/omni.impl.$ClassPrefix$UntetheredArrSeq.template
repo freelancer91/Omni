@@ -38,9 +38,6 @@ import omni.function.$TypeNameModifier$ToIntFunction;
 import java.util.function.IntUnaryOperator;
 #ENDIF
 import omni.api.OmniIterator;
-#IF OfRef
-import java.util.function.ToIntFunction;
-#ENDIF
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.Consumer;
@@ -929,294 +926,21 @@ public RETTYPE pollLastMETHODSUFFIX(){
   #MACRO AddSetFunctions($TypeNameModifier$Comparator$<E>$,compare(key\,)
 #IF OfChar,OfInt,OfShort
   #MACRO AddSetFunctions(IntUnaryOperator,applyAsInt()
-#ELSE
+#ELSEIFNOT OfRef
   #MACRO AddSetFunctions($TypeNameModifier$ToIntFunction$<E>$,applyAsInt()
 #ENDIF
-#MACRODEF AddSetFunctions(COMPARATORTYPE,COMPARATORCALL)
-#IF OfRef
-@SuppressWarnings("unchecked")
-#ENDIF
-boolean uncheckedAdd(int tail,$exposedType$ key,COMPARATORTYPE sorter)
-{
-  final var arr=this.arr;
-  final int head;
-  if(tail<(head=this.head))
-  {
-    switch(sorter.COMPARATORCALL($exposedType$)arr[0]))
-    {
-      case 0:
-        return false;
-      case -1:
-        return fragmentedInsertLo(arr,head,tail,key,sorter);
-      default:
-        return fragmentedInsertHi(arr,head,tail,key,sorter);
-    }
-  }
-  else
-  {
-    final int mid;
-    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(head+tail)>>>1]))
-    {
-      case 0:
-        return false;
-      case -1:
-        return nonfragmentedInsertLo(arr,head,mid-1,key,sorter);
-      default:
-        return nonfragmentedInsertHi(arr,mid+1,tail,key,sorter);
-    }
-  }
-}
-#IF OfRef
-@SuppressWarnings("unchecked")
-#ENDIF
-boolean fragmentedInsertHi($ArrayType$[] arr,int head,int tail,$exposedType$ key,COMPARATORTYPE sorter){
-  int lo=1;
-  int hi=tail;
-  while(lo<=hi)
-  {
-    final int mid;
-    switch(sorter.COMPARATORCALL($exposedType$)arr[ mid=(hi+lo)>>>1]))
-    {
-      case 0:
-        return false;
-      case -1:
-        hi=mid-1;
-        break;
-      default:
-        lo=mid+1;
-    }
-  }
-  final int arrLength;
-  final int headDist=(arrLength=arr.length)-head;
-  if(++tail==head)
-  {
-    //must grow
-    final $ArrayType$[] tmp;
-    //allocate a new array and assign the key
-    (tmp=new $ArrayType$[hi=OmniArray.growBy50Pct(arrLength)])[lo]=key;
-    if(lo==0)
-    {
-      //inserting at index 0, copy the span from [0->tail] to the right one
-      ArrCopy.uncheckedCopy(arr,0,tmp,1,tail);
-    }
-    else
-    {
-      //inserting at 0<index<=tail
-      //copy [0->index]
-      ArrCopy.uncheckedCopy(arr,0,tmp,0,lo);
-      //copy [index->tail] but move it right one
-      ArrCopy.semicheckedCopy(arr,lo,tmp,lo+1,tail-lo);
-    }
-    //copy the head span [head->arrBound]
-    ArrCopy.uncheckedCopy(arr,head,tmp,(hi-=headDist),headDist);
-    this.head=hi;
-    this.tail=tail;
-    this.arr=tmp;
-  }
-  else
-  {
-    int tailDist;
-    if((tailDist=tail-lo)<=headDist+lo)
-    {
-      //shift the elements AFTER the insertion point right
-      ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist);
-      this.tail=tail;
-    }
-    else
-    {
-      //shift the elements BEFORE the insertion point left (wrap around the break)
-      ArrCopy.uncheckedSelfCopy(arr,tail=head-1,head,headDist);
-      arr[arrLength-1]=arr[0];
-      ArrCopy.semicheckedSelfCopy(arr,0,1,lo-1);
-      this.head=tail;
-    }
-    arr[lo]=key;
-  }
-  return true;
-}
-#IF OfRef
-@SuppressWarnings("unchecked")
-#ENDIF
-boolean fragmentedInsertLo($ArrayType$[] arr,int head,int tail,$exposedType$ key,COMPARATORTYPE sorter){
-  int arrBound;
-  int hi=(arrBound=arr.length)-1;
-  int lo=head;
-  do
-  {
-    final int mid;
-    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(hi+lo)>>>1]))
-    {
-      case 0:
-        return false;
-      case -1:
-        hi=mid-1;
-        break;
-      default:
-        lo=mid+1;
-    }
-  }while(lo<=hi);
-  final int headDist=lo-head;
-  if(++tail==head)
-  {
-    //must grow
-    final $ArrayType$[] tmp;
-    //Copy the span from [0->tail]
-    ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[hi=OmniArray.growBy50Pct(arrBound)],0,tail);
-    //copy the span from [index->arrBound]
-    ArrCopy.semicheckedCopy(arr,lo,tmp,hi-=(arrBound-=lo),arrBound);
-    //insert the new key
-    tmp[--hi]=key;
-    //copy the span from [head->index]
-    ArrCopy.semicheckedCopy(arr,head,tmp,hi-=headDist,headDist);
-    this.head=hi;
-    this.arr=tmp;
-  }
-  else
-  {
-    if(headDist<=((hi=(--arrBound)-lo)+(tail)))
-    {
-      //move the elements BEFORE the insertion point left
-      ArrCopy.semicheckedSelfCopy(arr,tail=head-1,head,headDist);
-      this.head=tail; 
-    }
-    else
-    {
-      //move the points AFTER the insertion point right (wrap around the break)
-      ArrCopy.uncheckedCopy(arr,0,arr,1,tail);
-      arr[0]=arr[arrBound];
-      ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,hi);
-      this.tail=tail;
-    }
-    arr[lo]=key;
-  }
-  return true;
-}
-#IF OfRef
-@SuppressWarnings("unchecked")
-#ENDIF
-boolean nonfragmentedInsertLo($ArrayType$[] arr,int head,int hi,$exposedType$ key,COMPARATORTYPE sorter){
-  int lo=head;
-  while(lo<=hi)
-  {
-    final int mid;
-    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(lo+hi)>>>1]))
-    {
-      case 0:
-        return false;
-      case -1:
-        hi=mid-1;
-        break;
-      default:
-        lo=mid+1;
-    }
-  }
-  int headDist;
-  if((headDist=lo-head)==0){
-    //inserting at index==head
-    if(--head==-1 && this.tail==(head=arr.length-1)){
-      //must grow
-      ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[headDist=OmniArray.growBy50Pct(++head)],lo=headDist-head,head);
-      this.tail=headDist-1;
-      this.head=--lo;
-      arr[lo]=key;
-      this.arr=arr;
-    }else{
-      arr[head]=key;
-      this.head=head;
-    }
-  }else{
-    if(head==0){
-      if(this.tail==(head=arr.length-1)){
-        //must grow
-        final var tmp=new $ArrayType$[headDist=OmniArray.growBy50Pct(++head)];
-        this.tail=headDist-1;
-        ArrCopy.uncheckedCopy(arr,lo,tmp,head=headDist-(headDist=head-lo),headDist);
-        tmp[--head]=key;
-        ArrCopy.uncheckedCopy(arr,0,tmp,head-=lo,lo);
-        this.arr=tmp;
-      }else{
-        arr[head]=arr[0];
-        ArrCopy.semicheckedSelfCopy(arr,0,1,headDist-1);
-        arr[lo]=key;
-      }
-      this.head=head;
-    }else{
-      ArrCopy.uncheckedSelfCopy(arr,hi=head-1,head,headDist);
-      arr[lo]=key;
-      this.head=hi;
-    }
-  }
-  return true;
-}
-#IF OfRef
-@SuppressWarnings("unchecked")
-#ENDIF
-boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ key,COMPARATORTYPE sorter){
-  int hi=tail;
-  while(lo<=hi)
-  {
-    final int mid;
-    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(lo+hi)>>>1]))
-    {
-      case 0:
-        return false;
-      case -1:
-        hi=mid-1;
-        break;
-      default:
-        lo=mid+1;
-    }
-  }
-  int tailDist;
-  if((tailDist=(++tail-lo))==0){
-    //inserting at index==tail+1
-    if(tail==arr.length && head==0){
-      //must grow
-      ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[head=OmniArray.growBy50Pct(tail)],0,tail);
-      this.tail=tail;
-      arr[lo]=key;
-      this.arr=arr;
-    }else{
-      arr[0]=key;
-      this.tail=0;
-    }
-  }else{
-    if(tail==arr.length){
-      if(this.head==0){
-        //must grow
-        final $ArrayType$[] tmp;
-        ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[hi=OmniArray.growBy50Pct(tail)],0,lo);
-        tmp[lo]=key;
-        ArrCopy.uncheckedCopy(arr,lo,tmp,lo+1,tailDist);
-        this.tail=tail;
-        this.arr=tmp;
-      }else{
-        arr[0]=arr[tail-1];
-        ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist-1);
-        arr[lo]=key;
-        this.tail=0;
-      }
-    }else{
-      ArrCopy.uncheckedCopy(arr,lo,arr,lo+1,tailDist);
-      arr[lo]=key;
-      this.tail=tail;
-    }
-  }
-  return true;
-}
-#ENDDEF
-  #IF OfChar,OfShort,OfInt
+  #IFNOT OfRef
+    #IF OfChar,OfShort,OfInt
   boolean uncheckedRemoveMatch(int tail,final IntUnaryOperator comparator)
-  #ELSEIF OfLong
+    #ELSEIF OfLong
   boolean uncheckedRemoveMatch(int tail,final LongToIntFunction comparator)
-  #ELSEIF OfFloat
+    #ELSEIF OfFloat
   boolean uncheckedRemoveMatch(int tail,final FloatToIntFunction comparator)
-  #ELSEIF OfDouble
+    #ELSEIF OfDouble
   boolean uncheckedRemoveMatch(int tail,final DoubleToIntFunction comparator)
-  #ELSEIF OfRef
-  @SuppressWarnings("unchecked")
+    #ELSEIF OfRef
   boolean uncheckedRemoveMatch(int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
-  #ENDIF
+    #ENDIF
   {
     final int head;
     if((head=this.head)<=tail){
@@ -1225,18 +949,18 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     return fragmentedRemoveMatch(head,tail,comparator);
   }
   
-  #IF OfChar,OfShort,OfInt
+    #IF OfChar,OfShort,OfInt
   boolean nonfragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
-  #ELSEIF OfLong
+    #ELSEIF OfLong
   boolean nonfragmentedRemoveMatch(int head,int tail,final LongToIntFunction comparator)
-  #ELSEIF OfFloat
+    #ELSEIF OfFloat
   boolean nonfragmentedRemoveMatch(int head,int tail,final FloatToIntFunction comparator)
-  #ELSEIF OfDouble
+    #ELSEIF OfDouble
   boolean nonfragmentedRemoveMatch(int head,int tail,final DoubleToIntFunction comparator)
-  #ELSEIF OfRef
+    #ELSEIF OfRef
   @SuppressWarnings("unchecked")
   boolean nonfragmentedRemoveMatch(int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
-  #ENDIF
+    #ENDIF
   {
     final $ArrayType$[] arr;
     int mid;
@@ -1250,9 +974,9 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
         }
         //found the element, pull the tail down
         ArrCopy.semicheckedSelfCopy(arr,mid,mid+1,tail-mid);
-  #IF OfRef
+    #IF OfRef
         arr[tail]=null;
-  #ENDIF
+    #ENDIF
         this.tail=tail-1;
         return true;
       case 0:
@@ -1261,9 +985,9 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
         {
           //the element is the last element
           this.tail=-1;
-  #IF OfRef
+    #IF OfRef
           arr[head]=null;
-  #ENDIF
+    #ENDIF
           return true;
         }
         break;
@@ -1277,25 +1001,25 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     //found the element, pull the head up
     ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,mid-head);
     this.head=tail;
-  #IF OfRef
+    #IF OfRef
     arr[head]=null;
-  #ENDIF
+    #ENDIF
     return true;
   }
   
   
-  #IF OfChar,OfShort,OfInt
+    #IF OfChar,OfShort,OfInt
   boolean fragmentedRemoveMatch(int head,int tail,final IntUnaryOperator comparator)
-  #ELSEIF OfLong
+    #ELSEIF OfLong
   boolean fragmentedRemoveMatch(int head,int tail,final LongToIntFunction comparator)
-  #ELSEIF OfFloat
+    #ELSEIF OfFloat
   boolean fragmentedRemoveMatch(int head,int tail,final FloatToIntFunction comparator)
-  #ELSEIF OfDouble
+    #ELSEIF OfDouble
   boolean fragmentedRemoveMatch(int head,int tail,final DoubleToIntFunction comparator)
-  #ELSEIF OfRef
+    #ELSEIF OfRef
   @SuppressWarnings("unchecked")
   boolean fragmentedRemoveMatch(int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
-  #ENDIF
+    #ENDIF
   {
     final $ArrayType$[] arr;
     switch(comparator.applyAsInt((arr=this.arr)[0]))
@@ -1330,9 +1054,9 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
           ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,index-head);
           this.head=tail;
         }
-  #IF OfRef
+    #IF OfRef
         arr[head]=null;
-  #ENDIF
+    #ENDIF
         return true;
       default:
         //search the upper half of the structure (between 0 and tail)
@@ -1344,24 +1068,24 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
         ArrCopy.semicheckedSelfCopy(arr,index,index+1,tail-index);
         this.tail=tail-1;
     }
-  #IF OfRef
+    #IF OfRef
     arr[tail]=null;
-  #ENDIF
+    #ENDIF
     return true;
   }
 
-  #IF OfChar,OfShort,OfInt
+    #IF OfChar,OfShort,OfInt
   static int findIndex(final $ArrayType$[] arr,int head,int tail,final IntUnaryOperator comparator)
-  #ELSEIF OfLong
+    #ELSEIF OfLong
   static int findIndex(final $ArrayType$[] arr,int head,int tail,final LongToIntFunction comparator)
-  #ELSEIF OfFloat
+    #ELSEIF OfFloat
   static int findIndex(final $ArrayType$[] arr,int head,int tail,final FloatToIntFunction comparator)
-  #ELSEIF OfDouble
+    #ELSEIF OfDouble
   static int findIndex(final $ArrayType$[] arr,int head,int tail,final DoubleToIntFunction comparator)
-  #ELSEIF OfRef
+    #ELSEIF OfRef
   @SuppressWarnings("unchecked")
   static int findIndex(final $ArrayType$[] arr,int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
-  #ENDIF
+    #ENDIF
   {
     do
     {
@@ -1382,18 +1106,18 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
   }
   
 
-  #IF OfChar,OfShort,OfInt
+    #IF OfChar,OfShort,OfInt
   boolean uncheckedContainsMatch(int tail,final IntUnaryOperator comparator)
-  #ELSEIF OfLong
+    #ELSEIF OfLong
   boolean uncheckedContainsMatch(int tail,final LongToIntFunction comparator)
-  #ELSEIF OfFloat
+    #ELSEIF OfFloat
   boolean uncheckedContainsMatch(int tail,final FloatToIntFunction comparator)
-  #ELSEIF OfDouble
+    #ELSEIF OfDouble
   boolean uncheckedContainsMatch(int tail,final DoubleToIntFunction comparator)
-  #ELSEIF OfRef
+    #ELSEIF OfRef
   @SuppressWarnings("unchecked")
   boolean uncheckedContainsMatch(int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
-  #ENDIF
+    #ENDIF
   {
     final var arr=this.arr;
     int head;
@@ -1419,6 +1143,7 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     }
     return findIndex(arr,head,tail,comparator)!=-1;
   }
+  #ENDIF
 #ENDIF
   $ArrayType$ uncheckedRemoveLast(int tail){
     final $ArrayType$[] arr;
@@ -2151,7 +1876,279 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
     }
   }
 }
-
+#MACRODEF AddSetFunctions(COMPARATORTYPE,COMPARATORCALL)
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+boolean uncheckedAdd(int tail,$exposedType$ key,COMPARATORTYPE sorter)
+{
+  final var arr=this.arr;
+  final int head;
+  if(tail<(head=this.head))
+  {
+    switch(sorter.COMPARATORCALL($exposedType$)arr[0]))
+    {
+      case 0:
+        return false;
+      case -1:
+        return fragmentedInsertLo(arr,head,tail,key,sorter);
+      default:
+        return fragmentedInsertHi(arr,head,tail,key,sorter);
+    }
+  }
+  else
+  {
+    final int mid;
+    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(head+tail)>>>1]))
+    {
+      case 0:
+        return false;
+      case -1:
+        return nonfragmentedInsertLo(arr,head,mid-1,key,sorter);
+      default:
+        return nonfragmentedInsertHi(arr,mid+1,tail,key,sorter);
+    }
+  }
+}
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+boolean fragmentedInsertHi($ArrayType$[] arr,int head,int tail,$exposedType$ key,COMPARATORTYPE sorter){
+  int lo=1;
+  int hi=tail;
+  while(lo<=hi)
+  {
+    final int mid;
+    switch(sorter.COMPARATORCALL($exposedType$)arr[ mid=(hi+lo)>>>1]))
+    {
+      case 0:
+        return false;
+      case -1:
+        hi=mid-1;
+        break;
+      default:
+        lo=mid+1;
+    }
+  }
+  final int arrLength;
+  final int headDist=(arrLength=arr.length)-head;
+  if(++tail==head)
+  {
+    //must grow
+    final $ArrayType$[] tmp;
+    //allocate a new array and assign the key
+    (tmp=new $ArrayType$[hi=OmniArray.growBy50Pct(arrLength)])[lo]=key;
+    if(lo==0)
+    {
+      //inserting at index 0, copy the span from [0->tail] to the right one
+      ArrCopy.uncheckedCopy(arr,0,tmp,1,tail);
+    }
+    else
+    {
+      //inserting at 0<index<=tail
+      //copy [0->index]
+      ArrCopy.uncheckedCopy(arr,0,tmp,0,lo);
+      //copy [index->tail] but move it right one
+      ArrCopy.semicheckedCopy(arr,lo,tmp,lo+1,tail-lo);
+    }
+    //copy the head span [head->arrBound]
+    ArrCopy.uncheckedCopy(arr,head,tmp,(hi-=headDist),headDist);
+    this.head=hi;
+    this.tail=tail;
+    this.arr=tmp;
+  }
+  else
+  {
+    int tailDist;
+    if((tailDist=tail-lo)<=headDist+lo)
+    {
+      //shift the elements AFTER the insertion point right
+      ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist);
+      this.tail=tail;
+    }
+    else
+    {
+      //shift the elements BEFORE the insertion point left (wrap around the break)
+      ArrCopy.uncheckedSelfCopy(arr,tail=head-1,head,headDist);
+      arr[arrLength-1]=arr[0];
+      ArrCopy.semicheckedSelfCopy(arr,0,1,lo-1);
+      this.head=tail;
+    }
+    arr[lo]=key;
+  }
+  return true;
+}
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+boolean fragmentedInsertLo($ArrayType$[] arr,int head,int tail,$exposedType$ key,COMPARATORTYPE sorter){
+  int arrBound;
+  int hi=(arrBound=arr.length)-1;
+  int lo=head;
+  do
+  {
+    final int mid;
+    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(hi+lo)>>>1]))
+    {
+      case 0:
+        return false;
+      case -1:
+        hi=mid-1;
+        break;
+      default:
+        lo=mid+1;
+    }
+  }while(lo<=hi);
+  final int headDist=lo-head;
+  if(++tail==head)
+  {
+    //must grow
+    final $ArrayType$[] tmp;
+    //Copy the span from [0->tail]
+    ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[hi=OmniArray.growBy50Pct(arrBound)],0,tail);
+    //copy the span from [index->arrBound]
+    ArrCopy.semicheckedCopy(arr,lo,tmp,hi-=(arrBound-=lo),arrBound);
+    //insert the new key
+    tmp[--hi]=key;
+    //copy the span from [head->index]
+    ArrCopy.semicheckedCopy(arr,head,tmp,hi-=headDist,headDist);
+    this.head=hi;
+    this.arr=tmp;
+  }
+  else
+  {
+    if(headDist<=((hi=(--arrBound)-lo)+(tail)))
+    {
+      //move the elements BEFORE the insertion point left
+      ArrCopy.semicheckedSelfCopy(arr,tail=head-1,head,headDist);
+      this.head=tail; 
+    }
+    else
+    {
+      //move the points AFTER the insertion point right (wrap around the break)
+      ArrCopy.uncheckedCopy(arr,0,arr,1,tail);
+      arr[0]=arr[arrBound];
+      ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,hi);
+      this.tail=tail;
+    }
+    arr[lo]=key;
+  }
+  return true;
+}
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+boolean nonfragmentedInsertLo($ArrayType$[] arr,int head,int hi,$exposedType$ key,COMPARATORTYPE sorter){
+  int lo=head;
+  while(lo<=hi)
+  {
+    final int mid;
+    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(lo+hi)>>>1]))
+    {
+      case 0:
+        return false;
+      case -1:
+        hi=mid-1;
+        break;
+      default:
+        lo=mid+1;
+    }
+  }
+  int headDist;
+  if((headDist=lo-head)==0){
+    //inserting at index==head
+    if(--head==-1 && this.tail==(head=arr.length-1)){
+      //must grow
+      ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[headDist=OmniArray.growBy50Pct(++head)],lo=headDist-head,head);
+      this.tail=headDist-1;
+      this.head=--lo;
+      arr[lo]=key;
+      this.arr=arr;
+    }else{
+      arr[head]=key;
+      this.head=head;
+    }
+  }else{
+    if(head==0){
+      if(this.tail==(head=arr.length-1)){
+        //must grow
+        final var tmp=new $ArrayType$[headDist=OmniArray.growBy50Pct(++head)];
+        this.tail=headDist-1;
+        ArrCopy.uncheckedCopy(arr,lo,tmp,head=headDist-(headDist=head-lo),headDist);
+        tmp[--head]=key;
+        ArrCopy.uncheckedCopy(arr,0,tmp,head-=lo,lo);
+        this.arr=tmp;
+      }else{
+        arr[head]=arr[0];
+        ArrCopy.semicheckedSelfCopy(arr,0,1,headDist-1);
+        arr[lo]=key;
+      }
+      this.head=head;
+    }else{
+      ArrCopy.uncheckedSelfCopy(arr,hi=head-1,head,headDist);
+      arr[lo]=key;
+      this.head=hi;
+    }
+  }
+  return true;
+}
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ key,COMPARATORTYPE sorter){
+  int hi=tail;
+  while(lo<=hi)
+  {
+    final int mid;
+    switch(sorter.COMPARATORCALL($exposedType$)arr[mid=(lo+hi)>>>1]))
+    {
+      case 0:
+        return false;
+      case -1:
+        hi=mid-1;
+        break;
+      default:
+        lo=mid+1;
+    }
+  }
+  int tailDist;
+  if((tailDist=(++tail-lo))==0){
+    //inserting at index==tail+1
+    if(tail==arr.length && head==0){
+      //must grow
+      ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[head=OmniArray.growBy50Pct(tail)],0,tail);
+      this.tail=tail;
+      arr[lo]=key;
+      this.arr=arr;
+    }else{
+      arr[0]=key;
+      this.tail=0;
+    }
+  }else{
+    if(tail==arr.length){
+      if(this.head==0){
+        //must grow
+        final $ArrayType$[] tmp;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[hi=OmniArray.growBy50Pct(tail)],0,lo);
+        tmp[lo]=key;
+        ArrCopy.uncheckedCopy(arr,lo,tmp,lo+1,tailDist);
+        this.tail=tail;
+        this.arr=tmp;
+      }else{
+        arr[0]=arr[tail-1];
+        ArrCopy.semicheckedCopy(arr,lo,arr,lo+1,tailDist-1);
+        arr[lo]=key;
+        this.tail=0;
+      }
+    }else{
+      ArrCopy.uncheckedCopy(arr,lo,arr,lo+1,tailDist);
+      arr[lo]=key;
+      this.tail=tail;
+    }
+  }
+  return true;
+}
+#ENDDEF
 #MACRODEF ToArray<DSTARR>(TYPENAMEMODIFIER,DEFAULTARR)
 @Override public DSTARR[] toTYPENAMEMODIFIERArray(){
   int tail;

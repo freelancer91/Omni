@@ -4,28 +4,19 @@
 #TYPEDEF OfLong
 #TYPEDEF OfFloat
 #TYPEDEF OfDouble
-#TYPEDEF OfRef
 package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-#IFNOT OfRef
-import omni.util.TypeUtil;
-#ENDIF
-#IF OfFloat
-import omni.function.$TypeNameModifier$ToIntFunction;
-#ENDIF
-#IF OfDouble,OfLong
-import java.util.function.$TypeNameModifier$ToIntFunction;
-#ENDIF
-#IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
 import omni.function.$TypeNameModifier$Comparator;
-#ELSE
-import java.util.Comparator;
-#ENDIF
-#IF OfChar,OfShort,OfInt
+import omni.util.TypeUtil;
+  #IF OfDouble,OfLong
+import java.util.function.$TypeNameModifier$ToIntFunction;
+  #ELSEIF OfFloat
+import omni.function.$TypeNameModifier$ToIntFunction;
+  #ELSE
 import java.util.function.IntUnaryOperator;
-#ENDIF
+  #ENDIF
 public abstract class $ClassPrefix$OrderedSet$<E>$
   extends $ClassPrefix$UntetheredArrSeq$<E>$
   implements OmniNavigableSet.Of$ClassPrefix$$<E>$
@@ -36,6 +27,938 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   $ClassPrefix$OrderedSet(){
     super();
   }
+  abstract int insertionCompare($exposedType$ key1,$exposedType$ key2);
+
+#IF OfLong,OfFloat,OfDouble
+  abstract $TypeNameModifier$ToIntFunction$<E>$ getQueryComparator($exposedType$ key);
+#ELSE
+  abstract IntUnaryOperator getQueryComparator(int key);
+#ENDIF
+  #MACRO QueryImpl<contains>(uncheckedContainsMatch)
+  #MACRO QueryImpl<removeVal>(uncheckedRemoveMatch)
+  @Override public boolean add($BoxedType$ key){
+    return add(($exposedType$)key);
+  }
+#IF OfFloat,OfDouble
+  abstract boolean uncheckedContainsMatch(int tail,double key);
+  abstract boolean uncheckedRemoveMatch(int tail,double key);
+  abstract boolean uncheckedContainsMatch(int tail,float key);
+  abstract boolean uncheckedRemoveMatch(int tail,float key);
+  @Override public boolean contains(float key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedContainsMatch(tail,key);
+  }
+  @Override public boolean contains(double key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedContainsMatch(tail,key);
+  }
+  @Override public boolean removeVal(float key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedRemoveMatch(tail,key);
+  }
+  @Override public boolean removeVal(double key){
+    final int tail;
+    return (tail=this.tail)!=-1 && this.uncheckedRemoveMatch(tail,key);
+  }
+  #MACRO QueryObject<contains>(uncheckedContainsMatch)
+  #MACRO QueryObject<remove>(uncheckedRemoveMatch)
+#MACRODEF QueryObject<METHODNAME>(UNCHECKEDMETHODNAME)
+#IF OfFloat,OfDouble
+  @Override public boolean METHODNAME(Object key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final $TypeNameModifier$ToIntFunction comparator;
+#IF OfFloat
+      if(key instanceof Float){
+        return this.UNCHECKEDMETHODNAME(tail,(float)key);
+      }else if(key instanceof Integer){
+        final int i;
+        if(!TypeUtil.checkCastToFloat(i=(int)key)){
+          return false;
+        }
+        comparator = i==0?this::comparePos0:this.getQueryComparator(i);
+      }else if(key instanceof Long){
+        final long l;
+        if(!TypeUtil.checkCastToFloat(l=(long)key)){
+          return false;
+        }
+        comparator = l==0?this::comparePos0:this.getQueryComparator(l);
+      }else if(key instanceof Double){
+        return this.UNCHECKEDMETHODNAME(tail,(double)key);
+      }else if(key instanceof Byte || key instanceof Short){
+        final int i;
+        comparator = (i=((Number)key).intValue())==0?this::comparePos0:this.getQueryComparator(i);
+      
+#ELSE
+      if(key instanceof Double){
+        return this.UNCHECKEDMETHODNAME(tail,(double)key);
+      }else if(key instanceof Integer || key instanceof Byte || key instanceof Short){
+        final int i;
+        comparator=(i=((Number)key).intValue())==0 ? this::comparePos0 : this.getQueryComparator(i);
+      }else if(key instanceof Long){
+        final long l;
+        if(!TypeUtil.checkCastToDouble(l=(long)key)){
+          return false;
+        }
+        comparator = l==0?this::comparePos0:this.getQueryComparator(l);
+      }else if(key instanceof Float){
+        return this.UNCHECKEDMETHODNAME(tail,(float)key);
+#ENDIF
+      }else if(key instanceof Character){
+        final int i;
+        comparator = (i=(char)key)==0?this::comparePos0:this.getQueryComparator(i);
+      }else if(key instanceof Boolean){
+        comparator = (boolean)key ? this::comparePos1: this::comparePos0;
+      }else{
+        return false;
+      }
+      return super.UNCHECKEDMETHODNAME(tail,comparator);
+    }
+    return false;
+  }
+  
+#ENDIF
+#ENDDEF
+  
+  abstract boolean uncheckedAddNaN(int tail);
+  abstract int comparePos0($exposedType$ key);
+  abstract int compareNeg0($exposedType$ key);
+  abstract int comparePos1($exposedType$ key);
+  abstract boolean uncheckedAddPosInf(int tail);
+  abstract boolean uncheckedAddNegInf(int tail);
+  @Override public boolean add(boolean key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key){
+  #IF OfFloat
+        return super.uncheckedAdd(tail,1.0f,this::comparePos1);
+      }else{
+        return super.uncheckedAdd(tail,0.0f,this::comparePos0);
+  #ELSE
+        return super.uncheckedAdd(tail,1.0d,this::comparePos1);
+      }else{
+        return super.uncheckedAdd(tail,0.0d,this::comparePos0);
+  #ENDIF
+      }
+    }else{
+      super.insertMiddle($queryCastBoolean$(key));
+      return true;
+    }
+  }
+  #IF OfFloat
+  @Override public boolean add(char key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,0,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle(($exposedType$)key);
+      return true;
+    }
+  }
+  @Override public boolean add(short key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,0,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle(($exposedType$)key);
+      return true;
+    }
+  }
+  #ENDIF
+  @Override public boolean add(int key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,0,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle(($exposedType$)key);
+      return true;
+    }
+  }
+  @Override public boolean add(long key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,0,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle(($exposedType$)key);
+      return true;
+    }
+  }
+  #IF OfDouble
+  @Override public boolean add(float key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction sorter;
+        switch(Float.floatToRawIntBits(key)){
+          case 0x7f800000:
+            return this.uncheckedAddPosInf(tail);
+          case 0xff800000:
+            return this.uncheckedAddNegInf(tail);
+          default:
+            return super.uncheckedAdd(tail,($exposedType$)key,this::insertionCompare);
+          case 0:
+            sorter=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            sorter=this::compareNeg0;
+        }
+        return super.uncheckedAdd(tail,($exposedType$)key,sorter);
+      }
+      return this.uncheckedAddNaN(tail);
+    }else{
+      super.insertMiddle(($exposedType$)key);
+      return true;
+    }
+  }
+  #ENDIF
+  
+  @Override public boolean add($exposedType$ key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction sorter;
+        
+  #IF OfFloat
+        switch(Float.floatToRawIntBits(key)){
+          case 0x7f800000:
+            return this.uncheckedAddPosInf(tail);
+          case 0xff800000:
+            return this.uncheckedAddNegInf(tail);
+          default:
+            return super.uncheckedAdd(tail,key,this::insertionCompare);
+          case 0:
+            sorter=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            sorter=this::compareNeg0;
+        }
+  #ELSE
+        final $KeyType$ bits;
+        if((bits=Double.doubleToRawLongBits(key))==0L){
+          sorter=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          sorter=this::compareNeg0;
+        }else{
+          return super.uncheckedAdd(tail,key,this::insertionCompare);
+        }
+  #ENDIF
+        return super.uncheckedAdd(tail,key,sorter);
+      }
+      return this.uncheckedAddNaN(tail);
+    }else{
+      super.insertMiddle(key);
+      return true;
+    }
+  }
+#ELSE
+  
+  @Override public boolean add(boolean key){
+    return add($queryCastBoolean$(key));
+  }
+    #IFNOT OfChar
+  @Override public boolean add(byte key){
+    return add(($exposedType$)key);
+  }
+    #ENDIF
+    #IFNOT OfChar,OfShort
+  @Override public boolean add(char key){
+    return add(($exposedType$)key);
+  }
+    #ENDIF
+    #IFNOT OfChar,OfShort,OfInt
+  @Override public boolean add(int key){
+    return add(($exposedType$)key);
+  }
+    #ENDIF
+  @Override public boolean add($exposedType$ key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertMiddle(key);
+      return true;
+    }
+  }
+#ENDIF
+  public static class Ascending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
+    Ascending(int head,$ArrayType$[] arr,int tail){
+      super(head,arr,tail);
+    }
+    Ascending(){
+      super();
+    }
+#IF OfFloat,OfDouble
+    @Override boolean uncheckedContainsMatch(int tail,double key){
+  #IF OfFloat
+      final float f;
+      if((f=(float)key)==key){
+        final $TypeNameModifier$ToIntFunction comparator;
+        switch(Float.floatToRawIntBits(f)){
+          case 0xff800000: //neg inf
+            return this.arr[this.head]==$BoxedType$.NEGATIVE_INFINITY;
+          default:
+            comparator=this.getQueryComparator(f);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
+      }
+      return f!=f && $BoxedType$.isNaN(this.arr[tail]);
+  #ELSE
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction comparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          comparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          comparator=this::compareNeg0;
+        }else{
+          comparator=this.getQueryComparator(key);
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
+      }
+      return $BoxedType$.isNaN(this.arr[tail]);
+  #ENDIF
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,double key){
+  #IF OfFloat
+      final float f;
+      if((f=(float)key)==key){
+        $TypeNameModifier$ToIntFunction comparator;
+        switch(Float.floatToRawIntBits(f)){
+          case 0xff800000: //neg inf
+            int head;
+            final $ArrayType$[] arr;
+            if(((arr=this.arr)[head=this.head])==$BoxedType$.NEGATIVE_INFINITY){
+              if(tail==head){
+                this.tail=-1;
+              }else{
+                if(++head==arr.length){
+                  head=0;
+                }
+                this.head=head;
+              }
+              return true;
+            }
+            return false;
+          default:
+            comparator=this.getQueryComparator(f);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }else if(f!=f)
+  #ELSE
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction comparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          comparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          comparator=this::compareNeg0;
+        }else{
+          comparator=this.getQueryComparator(key);
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+  #ENDIF
+      {
+        final $ArrayType$[] arr;
+        if($BoxedType$.isNaN((arr=this.arr)[tail])){
+          if(tail==this.head){
+            tail=-1;
+          }else{
+            if(--tail==-1){
+              tail=arr.length-1;
+            }
+            
+          }
+          this.tail=tail;
+          return true;
+        }
+      }
+      return false;
+    }
+    @Override boolean uncheckedContainsMatch(int tail,float key){
+      if(key==key){
+        $TypeNameModifier$ToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            return this.arr[head]==$BoxedType$.NEGATIVE_INFINITY;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
+      }
+      return $BoxedType$.isNaN(this.arr[tail]);
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,float key){
+      if(key==key){
+        $TypeNameModifier$ToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            int head;
+            final $ArrayType$[] arr;
+            if((arr=this.arr)[head=this.head]==$BoxedType$.NEGATIVE_INFINITY){
+              if(tail==head){
+                this.tail=-1;
+              }else{
+                if(++head==arr.length){
+                  head=0;
+                }
+                this.head=head;
+              }
+              return true;
+            }
+            return false;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+      final $ArrayType$[] arr;
+      if($BoxedType$.isNaN((arr=this.arr)[tail])){
+        if(tail==this.head){
+          tail=-1;
+        }else{
+          if(--tail==-1){
+            tail=arr.length-1;
+          }
+          
+        }
+        this.tail=tail;
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override public $TypeNameModifier$Comparator$<E>$ comparator(){
+      return $BoxedType$::compare;
+    }
+#IF OfLong,OfFloat,OfDouble
+    @Override $TypeNameModifier$ToIntFunction$<E>$ getQueryComparator($exposedType$ key){
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(key<k){
+          return 1;
+        }
+        return -1;
+      };
+    }
+#ENDIF
+#IF OfChar,OfShort,OfInt
+    @Override IntUnaryOperator getQueryComparator(int key){
+  #IF OfChar,OfShort
+      return k->Integer.signum(k-key);
+  #ELSEIF OfInt,OfLong
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(key<k){
+          return 1;
+        }
+        return -1;
+      };
+  #ENDIF
+    }
+#ENDIF
+#IF OfFloat,OfDouble
+    @Override int comparePos1($exposedType$ key){
+      if(1>key){
+        return 1;
+      }
+  #IF OfFloat
+      if(Float.floatToRawIntBits(key)==TypeUtil.FLT_TRUE_BITS){
+  #ELSE
+      if(Double.doubleToRawLongBits(key)==TypeUtil.DBL_TRUE_BITS){
+  #ENDIF
+        return 0;
+      }
+      return -1;
+    }
+    @Override int comparePos0($exposedType$ key){
+      if(0>key){
+        return 1;
+      }
+  #IF OfFloat
+      switch(Float.floatToRawIntBits(key)){
+        case 0:
+          return 0;
+        case Integer.MIN_VALUE:
+          return 1;
+        default:
+      }
+  #ELSE
+      final long bits;
+      if((bits=Double.doubleToRawLongBits(key))==0L){
+        return 0;
+      }
+      if(bits==Long.MIN_VALUE){
+        return 1;
+      }
+  #ENDIF
+      return -1;
+    }
+    @Override int compareNeg0($exposedType$ key){
+      if(0>key){
+        return 1;
+      }
+   #IF OfFloat
+      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
+   #ELSE
+      if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
+   #ENDIF
+        return 0;
+      }
+      return -1;
+    }
+    @Override boolean uncheckedAddPosInf(int tail){
+      $ArrayType$[] arr;
+      final $ArrayType$ topVal;
+      if((topVal=(arr=this.arr)[tail])!=$BoxedType$.POSITIVE_INFINITY){
+        if(topVal==topVal){
+          super.insertAtTail(arr,$BoxedType$.POSITIVE_INFINITY,this.head,tail);
+        }else{
+          int newTail,head;
+          switch(Integer.signum((newTail=tail+1)-(head=this.head))){
+            case 0:
+              //fragmented must grow
+              final $ArrayType$[] tmp;
+              int arrLength;
+              ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+              ArrCopy.uncheckedCopy(arr,newTail,tmp,head-=(arrLength-=newTail),arrLength);
+              this.head=head;
+              this.arr=arr=tmp;
+              break;
+            default:
+              //nonfragmented
+              if(newTail==arr.length){
+                if(head==0){
+                  //must grow
+                  ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(newTail)],0,tail);
+                  this.arr=arr;
+                }else{
+                  newTail=0;
+                }
+              }
+            case -1:
+              //fragmented
+          }
+          arr[tail]=$BoxedType$.POSITIVE_INFINITY;
+          arr[newTail]=$BoxedType$.NaN;
+          this.tail=newTail;
+        }
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddNegInf(int tail){
+      $ArrayType$[] arr;
+      final int head;
+      if((arr=this.arr)[head=this.head]!=$BoxedType$.NEGATIVE_INFINITY){
+        super.insertAtHead(arr,$BoxedType$.NEGATIVE_INFINITY,head,tail);
+        return true;
+      }
+      return false;
+    }
+    
+    @Override boolean uncheckedAddNaN(int tail){
+      $ArrayType$[] arr;
+      if(!$BoxedType$.isNaN((arr=this.arr)[tail])){
+        super.insertAtTail(arr,$BoxedType$.NaN,this.head,tail);
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
+#IF OfChar,OfShort
+      return Integer.signum(key1-key2);
+#ELSE
+      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
+      if(key1==key2){
+        return 0;
+      }
+      if(key1>key2){
+        return 1;
+      }
+      //ok if key2 is NaN
+      return -1;
+#ENDIF
+    }
+  }
+  
+  public static class Descending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
+    Descending(int head,$ArrayType$[] arr,int tail){
+      super(head,arr,tail);
+    }
+    Descending(){
+      super();
+    }
+#IF OfFloat,OfDouble
+    @Override boolean uncheckedContainsMatch(int tail,double key){
+  #IF OfFloat
+        final float f;
+        if((f=(float)key)==key){
+          final $TypeNameModifier$ToIntFunction comparator;
+          switch(Float.floatToRawIntBits(f)){
+            case 0xff800000: //neg inf
+              return this.arr[tail]==$BoxedType$.NEGATIVE_INFINITY;
+            default:
+              comparator=this.getQueryComparator(f);
+              break;
+            case 0:
+              comparator=this::comparePos0;
+              break;
+            case Integer.MIN_VALUE:
+              comparator=this::compareNeg0;
+          }
+          return super.uncheckedContainsMatch(tail,comparator);
+        }
+        return f!=f && $BoxedType$.isNaN(this.arr[head]);
+  #ELSE
+        if(key==key){
+          final $TypeNameModifier$ToIntFunction comparator;
+          final long bits;
+          if((bits=Double.doubleToRawLongBits(key))==0){
+            comparator=this::comparePos0;
+          }else if(bits==Long.MIN_VALUE){
+            comparator=this::compareNeg0;
+          }else{
+            comparator=this.getQueryComparator(key);
+          }
+          return super.uncheckedContainsMatch(tail,comparator);
+        }
+        return $BoxedType$.isNaN(this.arr[head]);
+  #ENDIF
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,double key){
+  #IF OfFloat
+      final float f;
+      if((f=(float)key)==key){
+        $TypeNameModifier$ToIntFunction comparator;
+        switch(Float.floatToRawIntBits(f)){
+          case 0xff800000: //neg inf
+            final $ArrayType$[] arr;
+            if((arr=this.arr)[tail]==$BoxedType$.NEGATIVE_INFINITY){
+              if(tail==this.head){
+                tail=-1;
+              }else{
+                if(--tail==-1){
+                  tail=arr.length-1;
+                }
+                
+              }
+              this.tail=tail;
+              return true;
+            }
+            return false;
+          default:
+            comparator=this.getQueryComparator(f);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }else if(f!=f)
+  #ELSE
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction comparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          comparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          comparator=this::compareNeg0;
+        }else{
+          comparator=this.getQueryComparator(key);
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+  #ENDIF
+      {
+        int head;
+        final $ArrayType$[] arr;
+        if($BoxedType$.isNaN((arr=this.arr)[head=this.head])){
+          if(tail==head){
+            this.tail=-1;
+          }else{
+            if(++head==arr.length){
+              head=0;
+            }
+            this.head=head;
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+    @Override boolean uncheckedContainsMatch(int tail,float key){
+      if(key==key){
+        $TypeNameModifier$ToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            return this.arr[tail]==$BoxedType$.NEGATIVE_INFINITY;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedContainsMatch(tail,comparator);
+      }
+      return $BoxedType$.isNaN(this.arr[head]);
+    }
+    @Override boolean uncheckedRemoveMatch(int tail,float key){
+      if(key==key){
+        $TypeNameModifier$ToIntFunction comparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0xff800000: //neg inf
+            final $ArrayType$[] arr;
+            if((arr=this.arr)[tail]==$BoxedType$.NEGATIVE_INFINITY){
+              if(tail==this.head){
+                tail=-1;
+              }else{
+                if(--tail==-1){
+                  tail=arr.length-1;
+                }
+                
+              }
+              this.tail=tail;
+              return true;
+            }
+            return false;
+          default:
+            comparator=this.getQueryComparator(key);
+            break;
+          case 0:
+            comparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            comparator=this::compareNeg0;
+        }
+        return super.uncheckedRemoveMatch(tail,comparator);
+      }
+      int head;
+      final $ArrayType$[] arr;
+      if($BoxedType$.isNaN((arr=this.arr)[head=this.head])){
+        if(tail==head){
+          this.tail=-1;
+        }else{
+          if(++head==arr.length){
+            head=0;
+          }
+          this.head=head;
+        }
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override public $TypeNameModifier$Comparator$<E>$ comparator(){
+      return $TypeNameModifier$Comparator::descendingCompare;
+    }
+#IF OfLong,OfFloat,OfDouble
+    @Override $TypeNameModifier$ToIntFunction$<E>$ getQueryComparator($ArrayType$ key){
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(k<key){
+          return 1;
+        }
+        return -1;
+      };
+    }
+#ENDIF
+#IF OfChar,OfShort,OfInt
+    @Override IntUnaryOperator getQueryComparator(int key){
+  #IF OfChar,OfShort
+      return k->Integer.signum(key-k);
+  #ELSEIF OfInt,OfLong
+      return k->{
+        if(k==key){
+          return 0;
+        }
+        if(k<key){
+          return 1;
+        }
+        return -1;
+      };
+  #ENDIF
+    }
+#ENDIF
+#IF OfFloat,OfDouble
+    @Override boolean uncheckedAddPosInf(int tail){
+      $ArrayType$[] arr;
+      final $ArrayType$ bottomVal;
+      int head;
+      if((bottomVal=(arr=this.arr)[head=this.head])!=$BoxedType$.POSITIVE_INFINITY){
+        if(bottomVal==bottomVal){
+          super.insertAtHead(arr,$BoxedType$.POSITIVE_INFINITY,head,tail);
+        }else{
+          int newHead;
+          switch(Integer.signum(tail-(newHead=head-1))){
+            case 0:
+              //fragmented must grow
+              final $ArrayType$[] tmp;
+              int arrLength;
+              //copy [0->tail]
+              ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+              //copy [head+1->arrLenth-1]
+              ArrCopy.semicheckedCopy(arr,++head,tmp,head=tail-(arrLength-=head),arrLength);
+              --head;
+              this.arr=arr=tmp;
+              break;
+            default:
+              //nonfragmented
+              if(head==0 && tail==(newHead=arr.length-1)){
+                //must grow
+                this.tail=(newHead=OmniArray.growBy50Pct(tail+1))-1;
+                ArrCopy.uncheckedCopy(arr,1,arr=new $ArrayType$[newHead],newHead-=tail,tail);
+                head=--newHead;
+                --newHead;
+                this.arr=arr;
+              }
+            case -1:
+              //fragmented
+          }
+          arr[head]=$BoxedType$.POSITIVE_INFINITY;
+          arr[newHead]=$BoxedType$.NaN;
+          this.head=newHead;
+        }
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddNegInf(int tail){
+      $ArrayType$[] arr;
+      if((arr=this.arr)[tail]!=$BoxedType$.NEGATIVE_INFINITY){
+        super.insertAtTail(arr,$BoxedType$.NEGATIVE_INFINITY,this.head,tail);
+        return true;
+      }
+      return false;
+    }
+    @Override int comparePos1($exposedType$ key){
+      if(1>key){
+        return 1;
+      }
+  #IF OfFloat
+      if(Float.floatToRawIntBits(key)==TypeUtil.FLT_TRUE_BITS){
+  #ELSE
+      if(Double.doubleToRawLongBits(key)==TypeUtil.DBL_TRUE_BITS){
+  #ENDIF
+        return 0;
+      }
+      //either NaN or greater than 1
+      return -1;
+    }
+    @Override int comparePos0($exposedType$ key){
+      if(0>key){
+        return -1;
+      }
+  #IF OfFloat
+      switch(Float.floatToRawIntBits(key)){
+        case 0:
+          return 0;
+        case Integer.MIN_VALUE:
+          return -1;
+        default:
+      }
+  #ELSE
+      final long bits;
+      if((bits=Double.doubleToRawLongBits(key))==0L){
+        return 0;
+      }
+      if(bits==Long.MIN_VALUE){
+        return -1;
+      }
+  #ENDIF
+      return 1;
+    }
+    @Override int compareNeg0($exposedType$ key){
+      if(0>key){
+        return -1;
+      }
+   #IF OfFloat
+      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
+   #ELSE
+      if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
+   #ENDIF
+        return 0;
+      }
+      return 1;
+    }
+    
+    @Override boolean uncheckedAddNaN(int tail){
+      $ArrayType$[] arr;
+      final int head;
+      if(!$BoxedType$.isNaN((arr=this.arr)[head=this.head])){
+        super.insertAtHead(arr,$BoxedType$.NaN,head,tail);
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
+  #IF OfChar,OfShort
+      return Integer.signum(key2-key1);
+  #ELSE
+      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
+      if(key1==key2){
+        return 0;
+      }
+      if(key1>key2){
+        return -1;
+      }
+      //ok if key2 is NaN
+      return 1;
+  #ENDIF
+    }
+  }
+  
+  
+}
 #MACRODEF InitializeQueryParam<PARAMTYPE>(NEGRET)
 #IF OfChar
   #IFSWITCH PARAMTYPE==Object
@@ -157,23 +1080,15 @@ if(key instanceof Long || key instanceof Integer || key instanceof Byte || key i
   #ENDIF
 #ENDIF
 #ENDDEF
-#IF OfChar,OfShort,OfInt,OfLong
-  #IF OfLong,OfFloat,OfDouble
-  abstract $TypeNameModifier$ToIntFunction getQueryComparator($exposedType$ key);
-  #ELSEIF OfRef
-  abstract $TypeNameModifier$ToIntFunction getQueryComparator(Comparable<E> key);
-  #ELSE
-  abstract IntUnaryOperator getQueryComparator(int key);
-  #ENDIF
-  #MACRO QueryImpl<contains>(uncheckedContainsMatch)
-  #MACRO QueryImpl<removeVal>(uncheckedRemoveMatch)
-#ENDIF
-
 #MACRODEF QueryImpl<METHODNAME>(UNCHECKEDMETHOD)
-#IF OfChar,OfShort,OfInt,OfLong
+#IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
 @Override public boolean METHODNAME(boolean key){
   final int tail;
+  #IF OfFloat,OfDouble
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,key?this::comparePos1:this::comparePos0);
+  #ELSE
   return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator($queryCastBoolean$(key)));
+  #ENDIF
 }
 #ENDIF
 #IF OfChar,OfShort,OfInt,OfLong
@@ -186,43 +1101,53 @@ if(key instanceof Long || key instanceof Integer || key instanceof Byte || key i
   #ENDIF
 }
 #ENDIF
-#IF OfChar,OfShort,OfInt,OfLong
+#IF OfChar,OfShort,OfInt,OfLong,OfFloat
 @Override public boolean METHODNAME(char key){
   final int tail;
   #IF OfChar,OfInt,OfLong
   return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSEIF OfFloat
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,key==0?this::comparePos0:getQueryComparator(key));
   #ELSE
   return key<=$BoxedType$.MAX_VALUE && (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
   #ENDIF
 }
 #ENDIF
-#IF OfChar,OfShort
+#IF OfChar,OfShort,OfFloat
 @Override public boolean METHODNAME(short key){
   final int tail;
   #IF OfChar
   return key>=0 && (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSEIF OfFloat
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,key==0?this::comparePos0:getQueryComparator(key));
   #ELSE
   return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
   #ENDIF
 }
 #ENDIF
-#IF OfChar,OfShort,OfInt,OfLong
+#IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
 @Override public boolean METHODNAME(int key){
   final int tail;
   #IF OfInt,OfLong
   return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSEIF OfFloat
+  return (tail=this.tail)!=-1 && TypeUtil.checkCastToFloat(key) && super.UNCHECKEDMETHOD(tail,key==0?this::comparePos0:getQueryComparator(key));
+  #ELSEIF OfDouble
+  return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,key==0?this::comparePos0:getQueryComparator(key));
   #ELSE
   return key==($exposedType$)key && (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
   #ENDIF
 }
 #ENDIF
-#IF OfChar,OfShort,OfInt,OfLong
+#IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
 @Override public boolean METHODNAME(long key){
-  #IF OfLong
   final int tail;
+  #IF OfLong
   return (tail=this.tail)!=-1 && super.UNCHECKEDMETHOD(tail,getQueryComparator(key));
+  #ELSEIF OfFloat,OfDouble
+  return (tail=this.tail)!=-1 && TypeUtil.checkCastTo$BoxedType$(key) && super.UNCHECKEDMETHOD(tail,key==0?this::comparePos0:getQueryComparator(key));
   #ELSE
-  final int tail,k;
+  final int k;
   return (tail=this.tail)!=-1 && (k=($exposedType$)key)==key && super.UNCHECKEDMETHOD(tail,getQueryComparator(k));
   #ENDIF
 }
@@ -269,424 +1194,3 @@ if(key instanceof Long || key instanceof Integer || key instanceof Byte || key i
 }
 #ENDIF
 #ENDDEF
-  
-#IFNOT OfRef
-  @Override public boolean add($BoxedType$ key){
-    return add(($exposedType$)key);
-  }
-#ENDIF
-  abstract int insertionCompare($exposedType$ key1,$exposedType$ key2);
-#IF OfFloat,OfDouble
-  abstract boolean uncheckedAddNaN(int tail);
-  abstract int comparePos0($exposedType$ key);
-  abstract int compareNeg0($exposedType$ key);
-  abstract boolean uncheckedAddPosInf(int tail);
-  abstract boolean uncheckedAddNegInf(int tail);
-  
-  
-  @Override public boolean add($exposedType$ key){
-    int tail;
-    if((tail=this.tail)!=-1){
-      if(key==key){
-        final $TypeNameModifier$ToIntFunction sorter;
-        
-  #IF OfFloat
-        switch(Float.floatToRawIntBits(key)){
-          case 0x7f800000:
-            return this.uncheckedAddPosInf(tail);
-          case 0xff800000:
-            return this.uncheckedAddNegInf(tail);
-          default:
-            return super.uncheckedAdd(tail,key,this::insertionCompare);
-          case 0:
-            sorter=this::comparePos0;
-            break;
-          case Integer.MIN_VALUE:
-            sorter=this::compareNeg0;
-            break;
-        }
-  #ELSE
-        final $KeyType$ bits;
-        if((bits=Double.doubleToRawLongBits(key))==0L){
-          sorter=this::comparePos0;
-        }else if(bits==Long.MIN_VALUE){
-          sorter=this::compareNeg0;
-        }else if(bits==0x7ff0000000000000L){
-          return this.uncheckedAddPosInf(tail);
-        }else if(bits==0xfff0000000000000L){
-          return this.uncheckedAddNegInf(tail);
-        }else{
-          return super.uncheckedAdd(tail,key,this::insertionCompare);
-        }
-  #ENDIF
-        return super.uncheckedAdd(tail,key,sorter);
-      }
-      return this.uncheckedAddNaN(tail);
-    }else{
-      super.insertMiddle(key);
-      return true;
-    }
-  }
-#ELSE
-  
-  
-  #IFNOT OfRef
-  @Override public boolean add(boolean key){
-    return add($queryCastBoolean$(key));
-  }
-    #IFNOT OfChar
-  @Override public boolean add(byte key){
-    return add(($exposedType$)key);
-  }
-    #ENDIF
-    #IFNOT OfChar,OfShort
-  @Override public boolean add(char key){
-    return add(($exposedType$)key);
-  }
-    #ENDIF
-    #IFNOT OfChar,OfShort,OfInt
-  @Override public boolean add(int key){
-    return add(($exposedType$)key);
-  }
-    #ENDIF
-  #ENDIF
-  @Override public boolean add($exposedType$ key){
-    int tail;
-    if((tail=this.tail)!=-1){
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle(key);
-      return true;
-    }
-  }
-#ENDIF
-  public static class Ascending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
-    Ascending(int head,$ArrayType$[] arr,int tail){
-      super(head,arr,tail);
-    }
-    Ascending(){
-      super();
-    }
-#IF OfLong
-    @Override $TypeNameModifier$ToIntFunction getQueryComparator($exposedType$ key){
-      return k->{
-        if(k==key){
-          return 0;
-        }
-        if(key<k){
-          return 1;
-        }
-        return -1;
-      };
-    }
-#ENDIF
-#IF OfChar,OfShort,OfInt
-    @Override IntUnaryOperator getQueryComparator(int key){
-  #IF OfChar,OfShort
-      return k->Integer.signum(k-key);
-  #ELSEIF OfInt,OfLong
-      return k->{
-        if(k==key){
-          return 0;
-        }
-        if(key<k){
-          return 1;
-        }
-        return -1;
-      };
-  #ENDIF
-    }
-#ENDIF
-#IF OfFloat,OfDouble
-    @Override int comparePos0($exposedType$ key){
-      if(0<key){
-        return -1;
-      }
-      if(0>key){
-        return 1;
-      }
-  #IF OfFloat
-      switch(Float.floatToRawIntBits(key)){
-        case 0:
-          return 0;
-        case Integer.MIN_VALUE:
-          return 1;
-        default:
-      }
-  #ELSE
-      final long bits;
-      if((bits=Double.doubleToRawLongBits(key))==0L){
-        return 0;
-      }
-      if(bits==Long.MIN_VALUE){
-        return 1;
-      }
-  #ENDIF
-      //must be NaN
-      return -1;
-    }
-    @Override int compareNeg0($exposedType$ key){
-      if(0<key){
-        return -1;
-      }
-      if(0>key){
-        return 1;
-      }
-   #IF OfFloat
-      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
-   #ELSE
-      if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
-   #ENDIF
-        return 0;
-      }
-      //is positive 0 or NaN
-      return -1;
-    }
-    @Override boolean uncheckedAddPosInf(int tail){
-      $ArrayType$[] arr;
-      final $ArrayType$ topVal;
-      if((topVal=(arr=this.arr)[tail])!=$BoxedType$.POSITIVE_INFINITY){
-        if(topVal==topVal){
-          super.insertAtTail(arr,$BoxedType$.POSITIVE_INFINITY,this.head,tail);
-        }else{
-          int newTail,head;
-          switch(Integer.signum((newTail=tail+1)-(head=this.head))){
-            case 0:
-              //fragmented must grow
-              final $ArrayType$[] tmp;
-              int arrLength;
-              ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-              ArrCopy.uncheckedCopy(arr,newTail,tmp,head-=(arrLength-=newTail),arrLength);
-              this.head=head;
-              this.arr=arr=tmp;
-              break;
-            default:
-              //nonfragmented
-              if(newTail==arr.length){
-                if(head==0){
-                  //must grow
-                  ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(newTail)],0,tail);
-                  this.arr=arr;
-                }else{
-                  newTail=0;
-                }
-              }
-            case -1:
-              //fragmented
-          }
-          arr[tail]=$BoxedType$.POSITIVE_INFINITY;
-          arr[newTail]=$BoxedType$.NaN;
-          this.tail=newTail;
-        }
-        return true;
-      }
-      return false;
-    }
-    @Override boolean uncheckedAddNegInf(int tail){
-      $ArrayType$[] arr;
-      final int head;
-      if((arr=this.arr)[head=this.head]!=$BoxedType$.NEGATIVE_INFINITY){
-        super.insertAtHead(arr,$BoxedType$.NEGATIVE_INFINITY,head,tail);
-        return true;
-      }
-      return false;
-    }
-    
-    @Override boolean uncheckedAddNaN(int tail){
-      $ArrayType$[] arr;
-      if(!$BoxedType$.isNaN((arr=this.arr)[tail])){
-        super.insertAtTail(arr,$BoxedType$.NaN,this.head,tail);
-        return true;
-      }
-      return false;
-    }
-#ENDIF
-#IF OfRef
-     @SuppressWarnings("unchecked")
-#ENDIF
-    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
-  #IF OfChar,OfShort
-      return Integer.signum(key1-key2);
-  #ELSEIF OfInt,OfLong,OfFloat,OfDouble
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return 1;
-      }
-      //ok if key2 is NaN
-      return -1;
-  #ELSE
-      return Integer.signum(((Comparable$<E>$)key1).compareTo(key2));
-  #ENDIF
-    }
-  }
-  
-  public static class Descending$<E>$ extends $ClassPrefix$OrderedSet$<E>${
-    Descending(int head,$ArrayType$[] arr,int tail){
-      super(head,arr,tail);
-    }
-    Descending(){
-      super();
-    }
-#IF OfLong
-    @Override $TypeNameModifier$ToIntFunction getQueryComparator($exposedType$ key){
-      return k->{
-        if(k==key){
-          return 0;
-        }
-        if(k<key){
-          return 1;
-        }
-        return -1;
-      };
-    }
-#ENDIF
-#IF OfChar,OfShort,OfInt
-    @Override IntUnaryOperator getQueryComparator(int key){
-  #IF OfChar,OfShort
-      return k->Integer.signum(key-k);
-  #ELSEIF OfInt,OfLong
-      return k->{
-        if(k==key){
-          return 0;
-        }
-        if(k<key){
-          return 1;
-        }
-        return -1;
-      };
-  #ENDIF
-    }
-#ENDIF
-#IF OfFloat,OfDouble
-    @Override boolean uncheckedAddPosInf(int tail){
-      $ArrayType$[] arr;
-      final $ArrayType$ bottomVal;
-      int head;
-      if((bottomVal=(arr=this.arr)[head=this.head])!=$BoxedType$.POSITIVE_INFINITY){
-        if(bottomVal==bottomVal){
-          super.insertAtHead(arr,$BoxedType$.POSITIVE_INFINITY,head,tail);
-        }else{
-          int newHead;
-          switch(Integer.signum(tail-(newHead=head-1))){
-            case 0:
-              //fragmented must grow
-              final $ArrayType$[] tmp;
-              int arrLength;
-              //copy [0->tail]
-              ArrCopy.uncheckedCopy(arr,0,tmp=new $ArrayType$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
-              //copy [head+1->arrLenth-1]
-              ArrCopy.semicheckedCopy(arr,++head,tmp,head=tail-(arrLength-=head),arrLength);
-              --head;
-              this.arr=arr=tmp;
-              break;
-            default:
-              //nonfragmented
-              if(head==0 && tail==(newHead=arr.length-1)){
-                //must grow
-                this.tail=(newHead=OmniArray.growBy50Pct(tail+1))-1;
-                ArrCopy.uncheckedCopy(arr,1,arr=new $ArrayType$[newHead],newHead-=tail,tail);
-                head=--newHead;
-                --newHead;
-                this.arr=arr;
-              }
-            case -1:
-              //fragmented
-          }
-          arr[head]=$BoxedType$.POSITIVE_INFINITY;
-          arr[newHead]=$BoxedType$.NaN;
-          this.head=newHead;
-        }
-        return true;
-      }
-      return false;
-    }
-    @Override boolean uncheckedAddNegInf(int tail){
-      $ArrayType$[] arr;
-      if((arr=this.arr)[tail]!=$BoxedType$.NEGATIVE_INFINITY){
-        super.insertAtTail(arr,$BoxedType$.NEGATIVE_INFINITY,this.head,tail);
-        return true;
-      }
-      return false;
-    }
-    @Override int comparePos0($exposedType$ key){
-      if(0<key){
-        return 1;
-      }
-      if(0>key){
-        return -1;
-      }
-  #IF OfFloat
-      switch(Float.floatToRawIntBits(key)){
-        case 0:
-          return 0;
-        case Integer.MIN_VALUE:
-          return -1;
-        default:
-      }
-  #ELSE
-      final long bits;
-      if((bits=Double.doubleToRawLongBits(key))==0L){
-        return 0;
-      }
-      if(bits==Long.MIN_VALUE){
-        return 1;
-      }
-  #ENDIF
-      //must be NaN
-      return 1;
-    }
-    @Override int compareNeg0($exposedType$ key){
-      if(0<key){
-        return 1;
-      }
-      if(0>key){
-        return -1;
-      }
-   #IF OfFloat
-      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
-   #ELSE
-      if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
-   #ENDIF
-        return 0;
-      }
-      //is positive 0 or NaN
-      return 1;
-    }
-    
-    @Override boolean uncheckedAddNaN(int tail){
-      $ArrayType$[] arr;
-      final int head;
-      if(!$BoxedType$.isNaN((arr=this.arr)[head=this.head])){
-        super.insertAtHead(arr,$BoxedType$.NaN,head,tail);
-        return true;
-      }
-      return false;
-    }
-#ENDIF
-#IF OfRef
-     @SuppressWarnings("unchecked")
-#ENDIF
-    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
-  #IF OfChar,OfShort
-      return Integer.signum(key2-key1);
-  #ELSEIF OfInt,OfLong,OfFloat,OfDouble
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return -1;
-      }
-      //ok if key2 is NaN
-      return 1;
-  #ELSE
-      return Integer.signum(((Comparable$<E>$)key2).compareTo(key1));
-  #ENDIF
-    }
-  }
-  
-  
-}

@@ -418,7 +418,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return null;
     }
     @Override
-    public boolean pollBoolean(){
+    public boolean pollFirstBoolean(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;
@@ -436,7 +436,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return false;
     }
     @Override
-    public byte pollByte(){
+    public byte pollFirstByte(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;
@@ -454,7 +454,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return Byte.MIN_VALUE;
     }
     @Override
-    public char pollChar(){
+    public char pollFirstChar(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;
@@ -472,7 +472,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return Character.MIN_VALUE;
     }
     @Override
-    public double pollDouble(){
+    public double pollFirstDouble(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;
@@ -490,7 +490,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return Double.NaN;
     }
     @Override
-    public float pollFloat(){
+    public float pollFirstFloat(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;
@@ -508,7 +508,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return Float.NaN;
     }
     @Override
-    public int pollInt(){
+    public int pollFirstInt(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;
@@ -679,7 +679,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return Short.MIN_VALUE;
     }
     @Override
-    public long pollLong(){
+    public long pollFirstLong(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;
@@ -697,7 +697,7 @@ public class PackedBooleanArrDeq extends AbstractBooleanArrDeq{
         return Long.MIN_VALUE;
     }
     @Override
-    public short pollShort(){
+    public short pollFirstShort(){
         final int tail;
         if((tail=this.tail) != -1){
             final long[] words;

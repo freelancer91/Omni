@@ -2,8 +2,8 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.util.TypeUtil;
 import omni.function.CharComparator;
+import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class CharOrderedSet
   extends CharUntetheredArrSeq
@@ -15,6 +15,7 @@ public abstract class CharOrderedSet
   CharOrderedSet(){
     super();
   }
+  abstract int insertionCompare(char key1,char key2);
   abstract IntUnaryOperator getQueryComparator(int key);
   @Override public boolean contains(boolean key){
     final int tail;
@@ -37,7 +38,8 @@ public abstract class CharOrderedSet
     return key==(char)key && (tail=this.tail)!=-1 && super.uncheckedContainsMatch(tail,getQueryComparator(key));
   }
   @Override public boolean contains(long key){
-    final int tail,k;
+    final int tail;
+    final int k;
     return (tail=this.tail)!=-1 && (k=(char)key)==key && super.uncheckedContainsMatch(tail,getQueryComparator(k));
   }
   @Override public boolean contains(float key){
@@ -103,7 +105,8 @@ public abstract class CharOrderedSet
     return key==(char)key && (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getQueryComparator(key));
   }
   @Override public boolean removeVal(long key){
-    final int tail,k;
+    final int tail;
+    final int k;
     return (tail=this.tail)!=-1 && (k=(char)key)==key && super.uncheckedRemoveMatch(tail,getQueryComparator(k));
   }
   @Override public boolean removeVal(float key){
@@ -151,7 +154,6 @@ public abstract class CharOrderedSet
   @Override public boolean add(Character key){
     return add((char)key);
   }
-  abstract int insertionCompare(char key1,char key2);
   @Override public boolean add(boolean key){
     return add(TypeUtil.castToChar(key));
   }
@@ -171,6 +173,9 @@ public abstract class CharOrderedSet
     Ascending(){
       super();
     }
+    @Override public CharComparator comparator(){
+      return Character::compare;
+    }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->Integer.signum(k-key);
     }
@@ -184,6 +189,9 @@ public abstract class CharOrderedSet
     }
     Descending(){
       super();
+    }
+    @Override public CharComparator comparator(){
+      return CharComparator::descendingCompare;
     }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->Integer.signum(key-k);

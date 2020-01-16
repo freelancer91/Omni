@@ -2,7 +2,6 @@
 
 package omni.impl.seq;
 import java.io.ObjectOutputStream;
-import java.io.ObjectOutput;
 import java.io.Externalizable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

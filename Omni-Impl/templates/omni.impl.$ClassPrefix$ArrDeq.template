@@ -510,10 +510,6 @@ public class $ClassPrefix$ArrDeq$<E>$ extends $ClassPrefix$UntetheredArrSeq$<E>$
     }
     return new $ClassPrefix$ArrDeq$<E>$();
   }
-
-
-
-  
 }
 #MACRODEF QueryImpl<PARAMTYPE,METHODNAME,RETTYPE,UNCHECKEDMETHOD>(NEGRET)
 #IFSWITCH METHODNAME==removeVal

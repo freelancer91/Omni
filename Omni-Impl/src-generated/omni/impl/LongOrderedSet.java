@@ -2,9 +2,9 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
+import omni.function.LongComparator;
 import omni.util.TypeUtil;
 import java.util.function.LongToIntFunction;
-import omni.function.LongComparator;
 public abstract class LongOrderedSet
   extends LongUntetheredArrSeq
   implements OmniNavigableSet.OfLong
@@ -15,6 +15,7 @@ public abstract class LongOrderedSet
   LongOrderedSet(){
     super();
   }
+  abstract int insertionCompare(long key1,long key2);
   abstract LongToIntFunction getQueryComparator(long key);
   @Override public boolean contains(boolean key){
     final int tail;
@@ -133,7 +134,6 @@ public abstract class LongOrderedSet
   @Override public boolean add(Long key){
     return add((long)key);
   }
-  abstract int insertionCompare(long key1,long key2);
   @Override public boolean add(boolean key){
     return add(TypeUtil.castToLong(key));
   }
@@ -161,6 +161,9 @@ public abstract class LongOrderedSet
     }
     Ascending(){
       super();
+    }
+    @Override public LongComparator comparator(){
+      return Long::compare;
     }
     @Override LongToIntFunction getQueryComparator(long key){
       return k->{
@@ -191,6 +194,9 @@ public abstract class LongOrderedSet
     }
     Descending(){
       super();
+    }
+    @Override public LongComparator comparator(){
+      return LongComparator::descendingCompare;
     }
     @Override LongToIntFunction getQueryComparator(long key){
       return k->{
