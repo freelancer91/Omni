@@ -4,22 +4,29 @@
 #TYPEDEF OfLong
 #TYPEDEF OfFloat
 #TYPEDEF OfDouble
+#TYPEDEF OfComparable
 package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.function.$TypeNameModifier$Comparator;
 import omni.util.TypeUtil;
-  #IF OfDouble,OfLong
+#IF OfComparable,OfDouble,OfLong
 import java.util.function.$TypeNameModifier$ToIntFunction;
-  #ELSEIF OfFloat
+#ENDIF
+#IF OfFloat
 import omni.function.$TypeNameModifier$ToIntFunction;
-  #ELSE
+#ENDIF
+#IF OfInt,OfShort,OfChar
 import java.util.function.IntUnaryOperator;
-  #ENDIF
-public abstract class $ClassPrefix$OrderedSet$<E>$
-  extends $ClassPrefix$UntetheredArrSeq$<E>$
-  implements OmniNavigableSet.Of$ClassPrefix$$<E>$
+#ENDIF
+#IF OfComparable
+public abstract class $ClassPrefix$OrderedSet<E extends Comparable<E>>
+  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniNavigableSet.OfRef$<E>$
+#ELSE
+public abstract class $ClassPrefix$OrderedSet
+  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniNavigableSet.Of$ClassPrefix$$<E>$
+#ENDIF
+  
 {
   $ClassPrefix$OrderedSet(int head,$ArrayType$[] arr,int tail){
     super(head,arr,tail);
@@ -27,6 +34,188 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   $ClassPrefix$OrderedSet(){
     super();
   }
+  @Override public boolean add($exposedType$ key){
+  #IF OfComparable
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedAdd(tail,key,this::insertionCompare);
+      }
+      return this.uncheckedAddNull(tail);
+    }else{
+      super.insertMiddle(key);
+      return true;
+    }
+  #ELSEIF OfDouble
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        $TypeNameModifier$ToIntFunction insertionComparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0L){
+          insertionComparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          insertionComparator=this::compareNeg0;
+        }else{
+          return super.uncheckedAdd(tail,key,this::insertionCompare);
+        }
+        return super.uncheckedAdd(tail,key,insertionComparator);
+      }
+      return this.uncheckedAddNaN(tail);
+    }else{
+      super.insertMiddle(key);
+      return true;
+    }
+  #ELSEIF OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  #ELSEIF OfLong
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  #ELSEIF OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  #ELSEIF OfShort
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  #ELSEIF OfChar
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  #ENDIF
+  }
+#IFNOT OfComparable
+  @Override public boolean add($BoxedType$ key){
+    return this.add(($exposedType$)key);
+  }
+  @Override public boolean add(boolean key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#ENDIF
+#IF OfShort,OfInt,OfLong
+  @Override public boolean add(byte key){
+    return this.add(($exposedType$)key);
+  }
+#ENDIF
+#IF OfInt,OfLong,OfFloat
+  @Override public boolean add(char key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#ENDIF
+#IF OfFloat
+  @Override public boolean add(short key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#ENDIF
+#IF OfLong,OfFloat,OfDouble
+  @Override public boolean add(int key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#ENDIF
+#IF OfFloat,OfDouble
+  @Override public boolean add(long key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#ENDIF
+#IF OfDouble
+  @Override public boolean add(float key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#ENDIF
+  abstract int insertionCompare($exposedType$ key1,$exposedType$ key2);
+#IF OfComparable
+  abstract boolean uncheckedAddNull(int tail);
+#ENDIF
+#IF OfDouble
+  abstract int comparePos0($exposedType$ key);
+  abstract int compareNeg0($exposedType$ key);
+  abstract boolean uncheckedAddNaN(int tail);
+#ENDIF
+#IF OfComparable
+  public static class Ascending<E extends Comparable<E>>
+#ELSE
+  public static class Ascending$<E>$
+#ENDIF
+    extends $ClassPrefix$OrderedSet$<E>$ implements Cloneable
+  {
+    public Ascending(){
+      super();
+    }
+    public Ascending(int head,$ArrayType$[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+#IF OfComparable
+    @Override boolean uncheckedAddNull(int tail){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+#ENDIF
+#IF OfDouble
+    @Override int comparePos0($exposedType$ key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override int compareNeg0($exposedType$ key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override boolean uncheckedAddNaN(int tail){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+#ENDIF
+  }
+
+#IF OfComparable
+  public static class Descending<E extends Comparable<E>>
+#ELSE
+  public static class Descending$<E>$
+#ENDIF
+    extends $ClassPrefix$OrderedSet$<E>$ implements Cloneable
+  {
+    public Descending(){
+      super();
+    }
+    public Descending(int head,$ArrayType$[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+#IF OfComparable
+    @Override boolean uncheckedAddNull(int tail){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+#ENDIF
+#IF OfDouble
+    @Override int comparePos0($exposedType$ key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override int compareNeg0($exposedType$ key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override boolean uncheckedAddNaN(int tail){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+#ENDIF
+  }
+  
+/*
+  
   abstract int insertionCompare($exposedType$ key1,$exposedType$ key2);
 
 #IF OfLong,OfFloat,OfDouble
@@ -62,63 +251,7 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   }
   #MACRO QueryObject<contains>(uncheckedContainsMatch)
   #MACRO QueryObject<remove>(uncheckedRemoveMatch)
-#MACRODEF QueryObject<METHODNAME>(UNCHECKEDMETHODNAME)
-#IF OfFloat,OfDouble
-  @Override public boolean METHODNAME(Object key){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      final $TypeNameModifier$ToIntFunction comparator;
-#IF OfFloat
-      if(key instanceof Float){
-        return this.UNCHECKEDMETHODNAME(tail,(float)key);
-      }else if(key instanceof Integer){
-        final int i;
-        if(!TypeUtil.checkCastToFloat(i=(int)key)){
-          return false;
-        }
-        comparator = i==0?this::comparePos0:this.getQueryComparator(i);
-      }else if(key instanceof Long){
-        final long l;
-        if(!TypeUtil.checkCastToFloat(l=(long)key)){
-          return false;
-        }
-        comparator = l==0?this::comparePos0:this.getQueryComparator(l);
-      }else if(key instanceof Double){
-        return this.UNCHECKEDMETHODNAME(tail,(double)key);
-      }else if(key instanceof Byte || key instanceof Short){
-        final int i;
-        comparator = (i=((Number)key).intValue())==0?this::comparePos0:this.getQueryComparator(i);
-      
-#ELSE
-      if(key instanceof Double){
-        return this.UNCHECKEDMETHODNAME(tail,(double)key);
-      }else if(key instanceof Integer || key instanceof Byte || key instanceof Short){
-        final int i;
-        comparator=(i=((Number)key).intValue())==0 ? this::comparePos0 : this.getQueryComparator(i);
-      }else if(key instanceof Long){
-        final long l;
-        if(!TypeUtil.checkCastToDouble(l=(long)key)){
-          return false;
-        }
-        comparator = l==0?this::comparePos0:this.getQueryComparator(l);
-      }else if(key instanceof Float){
-        return this.UNCHECKEDMETHODNAME(tail,(float)key);
-#ENDIF
-      }else if(key instanceof Character){
-        final int i;
-        comparator = (i=(char)key)==0?this::comparePos0:this.getQueryComparator(i);
-      }else if(key instanceof Boolean){
-        comparator = (boolean)key ? this::comparePos1: this::comparePos0;
-      }else{
-        return false;
-      }
-      return super.UNCHECKEDMETHODNAME(tail,comparator);
-    }
-    return false;
-  }
-  
-#ENDIF
-#ENDDEF
+
   
   abstract boolean uncheckedAddNaN(int tail);
   abstract int comparePos0($exposedType$ key);
@@ -956,7 +1089,7 @@ public abstract class $ClassPrefix$OrderedSet$<E>$
   #ENDIF
     }
   }
-  
+  */
   
 }
 #MACRODEF InitializeQueryParam<PARAMTYPE>(NEGRET)
@@ -1192,5 +1325,62 @@ if(key instanceof Long || key instanceof Integer || key instanceof Byte || key i
   }
   return false;
 }
+#ENDIF
+#ENDDEF
+#MACRODEF QueryObject<METHODNAME>(UNCHECKEDMETHODNAME)
+#IF OfFloat,OfDouble
+  @Override public boolean METHODNAME(Object key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final $TypeNameModifier$ToIntFunction comparator;
+#IF OfFloat
+      if(key instanceof Float){
+        return this.UNCHECKEDMETHODNAME(tail,(float)key);
+      }else if(key instanceof Integer){
+        final int i;
+        if(!TypeUtil.checkCastToFloat(i=(int)key)){
+          return false;
+        }
+        comparator = i==0?this::comparePos0:this.getQueryComparator(i);
+      }else if(key instanceof Long){
+        final long l;
+        if(!TypeUtil.checkCastToFloat(l=(long)key)){
+          return false;
+        }
+        comparator = l==0?this::comparePos0:this.getQueryComparator(l);
+      }else if(key instanceof Double){
+        return this.UNCHECKEDMETHODNAME(tail,(double)key);
+      }else if(key instanceof Byte || key instanceof Short){
+        final int i;
+        comparator = (i=((Number)key).intValue())==0?this::comparePos0:this.getQueryComparator(i);
+      
+#ELSE
+      if(key instanceof Double){
+        return this.UNCHECKEDMETHODNAME(tail,(double)key);
+      }else if(key instanceof Integer || key instanceof Byte || key instanceof Short){
+        final int i;
+        comparator=(i=((Number)key).intValue())==0 ? this::comparePos0 : this.getQueryComparator(i);
+      }else if(key instanceof Long){
+        final long l;
+        if(!TypeUtil.checkCastToDouble(l=(long)key)){
+          return false;
+        }
+        comparator = l==0?this::comparePos0:this.getQueryComparator(l);
+      }else if(key instanceof Float){
+        return this.UNCHECKEDMETHODNAME(tail,(float)key);
+#ENDIF
+      }else if(key instanceof Character){
+        final int i;
+        comparator = (i=(char)key)==0?this::comparePos0:this.getQueryComparator(i);
+      }else if(key instanceof Boolean){
+        comparator = (boolean)key ? this::comparePos1: this::comparePos0;
+      }else{
+        return false;
+      }
+      return super.UNCHECKEDMETHODNAME(tail,comparator);
+    }
+    return false;
+  }
+  
 #ENDIF
 #ENDDEF

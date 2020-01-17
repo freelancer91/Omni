@@ -2750,6 +2750,8 @@ public final class OmniArray
   public interface OfRef
   {
     public static final Object[] DEFAULT_ARR=new Object[]{};
+    @SuppressWarnings("rawtypes")
+    public static final Comparable[] DEFAULT_COMPARABLE_ARR=new Comparable[]{};
     public static void fill(Object[] arr,int begin,int end,Object val){
       for(;;){
         arr[begin]=val;

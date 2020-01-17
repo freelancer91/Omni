@@ -2,7 +2,7 @@ package omni.codegen;
 import java.util.ArrayList;
 import java.util.List;
 enum TypeDefinition{
-    OfGeneric(getOfGeneric()),OfRef(getOfRef()),OfString(getOfString()),OfInteger(getOfInteger()),
+    OfGeneric(getOfGeneric()),OfRef(getOfRef()),OfComparable(getOfComparable()),OfString(getOfString()),OfInteger(getOfInteger()),
     OfDouble(getOfDouble()),OfFloat(getOfFloat()),OfLong(getOfLong()),
     OfInt(getOfInt()),
     OfShort(getOfShort()),OfChar(getOfChar()),OfByte(getOfByte()),OfBoolean(getOfBoolean());
@@ -14,6 +14,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfBoolean(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Boolean"));
+        defVars.add(new DefVar("NewArray","new boolean"));
+
         defVars.add(new DefVar("KeyType","boolean"));
         //defVars.add(new DefVar("DNode","BooleanDblLnkNode"));
         //defVars.add(new DefVar("SNode","BooleanSnglLnkNode"));
@@ -46,6 +48,7 @@ enum TypeDefinition{
     }
     private static List<DefVar> getOfByte(){
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("NewArray","new byte"));
         defVars.add(new DefVar("BoxedExposed","Byte"));
         defVars.add(new DefVar("KeyType","byte"));
         //defVars.add(new DefVar("DNode","ByteDblLnkNode"));
@@ -77,7 +80,9 @@ enum TypeDefinition{
         return defVars;
     }
     private static List<DefVar> getOfChar(){
+
         final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("NewArray","new char"));
         defVars.add(new DefVar("BoxedExposed","Character"));
         //defVars.add(new DefVar("DNode","CharDblLnkNode"));
         //defVars.add(new DefVar("SNode","CharSnglLnkNode"));
@@ -110,8 +115,10 @@ enum TypeDefinition{
         return defVars;
     }
     private static List<DefVar> getOfDouble(){
+
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Double"));
+        defVars.add(new DefVar("NewArray","new double"));
         //defVars.add(new DefVar("DNode","DoubleDblLnkNode"));
         //defVars.add(new DefVar("SNode","DoubleSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -145,6 +152,8 @@ enum TypeDefinition{
     private static List<DefVar> getOfFloat(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Float"));
+        defVars.add(new DefVar("NewArray","new float"));
+
         //defVars.add(new DefVar("DNode","FloatDblLnkNode"));
         //defVars.add(new DefVar("SNode","FloatSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -179,6 +188,7 @@ enum TypeDefinition{
     private static List<DefVar> getOfInt(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Integer"));
+        defVars.add(new DefVar("NewArray","new int"));
         //defVars.add(new DefVar("DNode","IntDblLnkNode"));
         //defVars.add(new DefVar("SNode","IntSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -211,6 +221,7 @@ enum TypeDefinition{
     private static List<DefVar> getOfLong(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("BoxedExposed","Long"));
+        defVars.add(new DefVar("NewArray","new long"));
         //defVars.add(new DefVar("DNode","LongDblLnkNode"));
         //defVars.add(new DefVar("SNode","LongSnglLnkNode"));
         defVars.add(new DefVar("<E>",""));
@@ -247,6 +258,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("BoxedType","String"));
         defVars.add(new DefVar("TypeNameModifier",""));
         defVars.add(new DefVar("defaultVal","null"));
+        defVars.add(new DefVar("NewArray","new String"));
         return defVars;
     }
     private static List<DefVar> getOfInteger(){
@@ -254,9 +266,39 @@ enum TypeDefinition{
         defVars.add(new DefVar("<E>","<Integer>"));
         defVars.add(new DefVar("BoxedExposed","Integer"));
         defVars.add(new DefVar("ArrayType","Integer"));
+        defVars.add(new DefVar("NewArray","new Integer"));
         defVars.add(new DefVar("BoxedType","Integer"));
         defVars.add(new DefVar("TypeNameModifier",""));
         defVars.add(new DefVar("defaultVal","null"));
+        return defVars;
+    }
+    private static List<DefVar> getOfComparable(){
+    	final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("BoxedExposed","E"));
+        //defVars.add(new DefVar("DNode","RefDblLnkNode"));
+        //defVars.add(new DefVar("SNode","RefSnglLnkNode"));
+        defVars.add(new DefVar("<E>","<E>"));
+        defVars.add(new DefVar("BoxedType","E"));
+        defVars.add(new DefVar("TypeNameModifier",""));
+        defVars.add(new DefVar("ClassPrefix","Comparable"));
+        defVars.add(new DefVar("exposedType","E"));
+        defVars.add(new DefVar("removeAtIndexMethod","remove"));
+        defVars.add(new DefVar("NewArray","new Comparable"));
+        defVars.add(new DefVar("ArrayType","Comparable<E>"));
+        defVars.add(new DefVar("<\\? super E>","<? super E>"));
+        defVars.add(new DefVar("queryCastBoolean","OmniPred.OfRef.getEqualsPred"));
+        defVars.add(new DefVar("queryCastPrimitive","OmniPred.OfRef.getEqualsPred"));
+        defVars.add(new DefVar("queryCastRef","OmniPred.OfRef.getEqualsPred"));
+        defVars.add(new DefVar("defaultVal","null"));
+        defVars.add(new DefVar("hashCodeMethod","Objects.hashCode"));
+        defVars.add(new DefVar("elementMethod","element"));
+        defVars.add(new DefVar("UnaryOperator","UnaryOperator"));
+        defVars.add(new DefVar("applyMethod","apply"));
+        defVars.add(new DefVar("comparableType","Comparable<E>"));
+        defVars.add(new DefVar("queryParameterType","Object"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","null"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","DELETED"));
+        defVars.add(new DefVar("KeyType","Object"));
         return defVars;
     }
     private static List<DefVar> getOfRef(){
@@ -270,6 +312,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("ClassPrefix","Ref"));
         defVars.add(new DefVar("exposedType","E"));
         defVars.add(new DefVar("removeAtIndexMethod","remove"));
+        defVars.add(new DefVar("NewArray","new Object"));
         defVars.add(new DefVar("ArrayType","Object"));
         defVars.add(new DefVar("<\\? super E>","<? super E>"));
         defVars.add(new DefVar("queryCastBoolean","OmniPred.OfRef.getEqualsPred"));
@@ -300,6 +343,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("removeAtIndexMethod","removeShortAt"));
         defVars.add(new DefVar("AbstractListextends",".Of16BitPrimitive"));
         defVars.add(new DefVar("ArrayType","short"));
+        defVars.add(new DefVar("NewArray","new short"));
         defVars.add(new DefVar("<\\? super E>",""));
         defVars.add(new DefVar("queryParameterType","int"));
         defVars.add(new DefVar("castToInt","(int)"));

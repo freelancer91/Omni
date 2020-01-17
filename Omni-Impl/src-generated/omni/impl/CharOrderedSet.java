@@ -2,12 +2,10 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.function.CharComparator;
 import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class CharOrderedSet
-  extends CharUntetheredArrSeq
-  implements OmniNavigableSet.OfChar
+  extends CharUntetheredArrSeq implements OmniNavigableSet.OfChar
 {
   CharOrderedSet(int head,char[] arr,int tail){
     super(head,arr,tail);
@@ -15,6 +13,47 @@ public abstract class CharOrderedSet
   CharOrderedSet(){
     super();
   }
+  @Override public boolean add(char key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(Character key){
+    return this.add((char)key);
+  }
+  @Override public boolean add(boolean key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  abstract int insertionCompare(char key1,char key2);
+  public static class Ascending
+    extends CharOrderedSet implements Cloneable
+  {
+    public Ascending(){
+      super();
+    }
+    public Ascending(int head,char[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(char key1,char key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+  public static class Descending
+    extends CharOrderedSet implements Cloneable
+  {
+    public Descending(){
+      super();
+    }
+    public Descending(int head,char[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(char key1,char key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+/*
   abstract int insertionCompare(char key1,char key2);
   abstract IntUnaryOperator getQueryComparator(int key);
   @Override public boolean contains(boolean key){
@@ -200,4 +239,5 @@ public abstract class CharOrderedSet
       return Integer.signum(key2-key1);
     }
   }
+  */
 }

@@ -2,12 +2,10 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.function.ShortComparator;
 import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class ShortOrderedSet
-  extends ShortUntetheredArrSeq
-  implements OmniNavigableSet.OfShort
+  extends ShortUntetheredArrSeq implements OmniNavigableSet.OfShort
 {
   ShortOrderedSet(int head,short[] arr,int tail){
     super(head,arr,tail);
@@ -15,6 +13,50 @@ public abstract class ShortOrderedSet
   ShortOrderedSet(){
     super();
   }
+  @Override public boolean add(short key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(Short key){
+    return this.add((short)key);
+  }
+  @Override public boolean add(boolean key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(byte key){
+    return this.add((short)key);
+  }
+  abstract int insertionCompare(short key1,short key2);
+  public static class Ascending
+    extends ShortOrderedSet implements Cloneable
+  {
+    public Ascending(){
+      super();
+    }
+    public Ascending(int head,short[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(short key1,short key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+  public static class Descending
+    extends ShortOrderedSet implements Cloneable
+  {
+    public Descending(){
+      super();
+    }
+    public Descending(int head,short[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(short key1,short key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+/*
   abstract int insertionCompare(short key1,short key2);
   abstract IntUnaryOperator getQueryComparator(int key);
   @Override public boolean contains(boolean key){
@@ -211,4 +253,5 @@ public abstract class ShortOrderedSet
       return Integer.signum(key2-key1);
     }
   }
+  */
 }

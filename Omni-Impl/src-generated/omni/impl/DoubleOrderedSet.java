@@ -2,12 +2,10 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.function.DoubleComparator;
 import omni.util.TypeUtil;
 import java.util.function.DoubleToIntFunction;
 public abstract class DoubleOrderedSet
-  extends DoubleUntetheredArrSeq
-  implements OmniNavigableSet.OfDouble
+  extends DoubleUntetheredArrSeq implements OmniNavigableSet.OfDouble
 {
   DoubleOrderedSet(int head,double[] arr,int tail){
     super(head,arr,tail);
@@ -15,6 +13,103 @@ public abstract class DoubleOrderedSet
   DoubleOrderedSet(){
     super();
   }
+  @Override public boolean add(double key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        DoubleToIntFunction insertionComparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0L){
+          insertionComparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          insertionComparator=this::compareNeg0;
+        }else{
+          return super.uncheckedAdd(tail,key,this::insertionCompare);
+        }
+        return super.uncheckedAdd(tail,key,insertionComparator);
+      }
+      return this.uncheckedAddNaN(tail);
+    }else{
+      super.insertMiddle(key);
+      return true;
+    }
+  }
+  @Override public boolean add(Double key){
+    return this.add((double)key);
+  }
+  @Override public boolean add(boolean key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(int key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(long key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(float key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  abstract int insertionCompare(double key1,double key2);
+  abstract int comparePos0(double key);
+  abstract int compareNeg0(double key);
+  abstract boolean uncheckedAddNaN(int tail);
+  public static class Ascending
+    extends DoubleOrderedSet implements Cloneable
+  {
+    public Ascending(){
+      super();
+    }
+    public Ascending(int head,double[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(double key1,double key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override int comparePos0(double key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override int compareNeg0(double key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override boolean uncheckedAddNaN(int tail){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+  public static class Descending
+    extends DoubleOrderedSet implements Cloneable
+  {
+    public Descending(){
+      super();
+    }
+    public Descending(int head,double[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(double key1,double key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override int comparePos0(double key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override int compareNeg0(double key){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override boolean uncheckedAddNaN(int tail){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+/*
   abstract int insertionCompare(double key1,double key2);
   abstract DoubleToIntFunction getQueryComparator(double key);
   @Override public boolean contains(boolean key){
@@ -672,4 +767,5 @@ public abstract class DoubleOrderedSet
       return 1;
     }
   }
+  */
 }

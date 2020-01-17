@@ -2,12 +2,10 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.function.IntComparator;
 import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class IntOrderedSet
-  extends IntUntetheredArrSeq
-  implements OmniNavigableSet.OfInt
+  extends IntUntetheredArrSeq implements OmniNavigableSet.OfInt
 {
   IntOrderedSet(int head,int[] arr,int tail){
     super(head,arr,tail);
@@ -15,6 +13,54 @@ public abstract class IntOrderedSet
   IntOrderedSet(){
     super();
   }
+  @Override public boolean add(int key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(Integer key){
+    return this.add((int)key);
+  }
+  @Override public boolean add(boolean key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(byte key){
+    return this.add((int)key);
+  }
+  @Override public boolean add(char key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  abstract int insertionCompare(int key1,int key2);
+  public static class Ascending
+    extends IntOrderedSet implements Cloneable
+  {
+    public Ascending(){
+      super();
+    }
+    public Ascending(int head,int[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(int key1,int key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+  public static class Descending
+    extends IntOrderedSet implements Cloneable
+  {
+    public Descending(){
+      super();
+    }
+    public Descending(int head,int[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(int key1,int key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+/*
   abstract int insertionCompare(int key1,int key2);
   abstract IntUnaryOperator getQueryComparator(int key);
   @Override public boolean contains(boolean key){
@@ -226,4 +272,5 @@ public abstract class IntOrderedSet
       return 1;
     }
   }
+  */
 }

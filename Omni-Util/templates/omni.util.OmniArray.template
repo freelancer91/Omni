@@ -294,6 +294,10 @@ Objects.hashCode(VAL)
 public interface OfCLASSPREFIX
 {
   public static final PRIMITIVETYPE[] DEFAULT_ARR=new PRIMITIVETYPE[]{};
+#IFSWITCH CLASSPREFIX==Ref
+  @SuppressWarnings("rawtypes")
+  public static final Comparable[] DEFAULT_COMPARABLE_ARR=new Comparable[]{};
+#ENDIF
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
 #ENDIF

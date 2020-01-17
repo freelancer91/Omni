@@ -2,12 +2,10 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.function.LongComparator;
 import omni.util.TypeUtil;
 import java.util.function.LongToIntFunction;
 public abstract class LongOrderedSet
-  extends LongUntetheredArrSeq
-  implements OmniNavigableSet.OfLong
+  extends LongUntetheredArrSeq implements OmniNavigableSet.OfLong
 {
   LongOrderedSet(int head,long[] arr,int tail){
     super(head,arr,tail);
@@ -15,6 +13,58 @@ public abstract class LongOrderedSet
   LongOrderedSet(){
     super();
   }
+  @Override public boolean add(long key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(Long key){
+    return this.add((long)key);
+  }
+  @Override public boolean add(boolean key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(byte key){
+    return this.add((long)key);
+  }
+  @Override public boolean add(char key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(int key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  abstract int insertionCompare(long key1,long key2);
+  public static class Ascending
+    extends LongOrderedSet implements Cloneable
+  {
+    public Ascending(){
+      super();
+    }
+    public Ascending(int head,long[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(long key1,long key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+  public static class Descending
+    extends LongOrderedSet implements Cloneable
+  {
+    public Descending(){
+      super();
+    }
+    public Descending(int head,long[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(long key1,long key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+/*
   abstract int insertionCompare(long key1,long key2);
   abstract LongToIntFunction getQueryComparator(long key);
   @Override public boolean contains(boolean key){
@@ -221,4 +271,5 @@ public abstract class LongOrderedSet
       return 1;
     }
   }
+  */
 }

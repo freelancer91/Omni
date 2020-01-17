@@ -2,12 +2,10 @@ package omni.impl;
 import omni.api.OmniNavigableSet;
 import omni.util.OmniArray;
 import omni.util.ArrCopy;
-import omni.function.FloatComparator;
 import omni.util.TypeUtil;
 import omni.function.FloatToIntFunction;
 public abstract class FloatOrderedSet
-  extends FloatUntetheredArrSeq
-  implements OmniNavigableSet.OfFloat
+  extends FloatUntetheredArrSeq implements OmniNavigableSet.OfFloat
 {
   FloatOrderedSet(int head,float[] arr,int tail){
     super(head,arr,tail);
@@ -15,6 +13,63 @@ public abstract class FloatOrderedSet
   FloatOrderedSet(){
     super();
   }
+  @Override public boolean add(float key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(Float key){
+    return this.add((float)key);
+  }
+  @Override public boolean add(boolean key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(char key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(short key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(int key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public boolean add(long key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  abstract int insertionCompare(float key1,float key2);
+  public static class Ascending
+    extends FloatOrderedSet implements Cloneable
+  {
+    public Ascending(){
+      super();
+    }
+    public Ascending(int head,float[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(float key1,float key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+  public static class Descending
+    extends FloatOrderedSet implements Cloneable
+  {
+    public Descending(){
+      super();
+    }
+    public Descending(int head,float[] arr,int tail){
+      super(head,arr,tail);
+    }
+    @Override int insertionCompare(float key1,float key2){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+  }
+/*
   abstract int insertionCompare(float key1,float key2);
   abstract FloatToIntFunction getQueryComparator(float key);
   @Override public boolean contains(boolean key){
@@ -748,4 +803,5 @@ public abstract class FloatOrderedSet
       return 1;
     }
   }
+  */
 }
