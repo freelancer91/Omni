@@ -209,61 +209,6 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
   @Override public void clear(){
     this.tail=-1;
   }
-  void insertAtTail(char[] arr,char key,int head,int tail){
-    switch(Integer.signum((++tail)-head)){
-      case 0:
-        //fragmented must grow
-        final char[] tmp;
-        int arrLength;
-        ArrCopy.uncheckedCopy(arr,0,tmp=new char[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.head=head;
-        this.arr=arr=tmp;
-        break;
-      default:
-        //nonfragmented
-        if(tail==arr.length){
-          if(head==0){
-            //must grow
-            ArrCopy.uncheckedCopy(arr,0,arr=new char[OmniArray.growBy50Pct(tail)],0,tail);
-            this.arr=arr;
-          }else{
-            tail=0;
-          }
-        }
-      case -1:
-        //fragmented
-    }
-    arr[tail]=key;
-    this.tail=tail;
-  }
-  void insertAtHead(char[] arr,char key,int head,int tail){
-    int newHead;
-    switch(Integer.signum(tail-(newHead=head-1))){
-      case 0:
-        //fragmented must grow
-        final char[] tmp;
-        int arrLength;
-        ArrCopy.uncheckedCopy(arr,0,tmp=new char[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
-        ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
-        --newHead;
-        this.arr=arr=tmp;
-        break;
-      default:
-        //nonfragmented
-        if(newHead==-1 && tail==(newHead=arr.length-1)){
-          //must grow
-          this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
-          ArrCopy.uncheckedCopy(arr,0,arr=new char[newHead],newHead-=(tail),tail);
-          --newHead;
-          this.arr=arr;
-        }
-      case -1:
-        //fragmented
-    }
-    arr[newHead]=key;
-    this.head=newHead;
-  }
   public void addLast(char val){
     var arr=this.arr;
     int tail;
@@ -715,7 +660,62 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
     }
     return Integer.MIN_VALUE;
   }
-  void insertMiddle(char key){
+  void insertAtTail(char[] arr,char key,int head,int tail){
+    switch(Integer.signum((++tail)-head)){
+      case 0:
+        //fragmented must grow
+        final char[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new char[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.head=head;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(tail==arr.length){
+          if(head==0){
+            //must grow
+            ArrCopy.uncheckedCopy(arr,0,arr=new char[OmniArray.growBy50Pct(tail)],0,tail);
+            this.arr=arr;
+          }else{
+            tail=0;
+          }
+        }
+      case -1:
+        //fragmented
+    }
+    arr[tail]=key;
+    this.tail=tail;
+  }
+  void insertAtHead(char[] arr,char key,int head,int tail){
+    int newHead;
+    switch(Integer.signum(tail-(newHead=head-1))){
+      case 0:
+        //fragmented must grow
+        final char[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new char[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+        ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+        --newHead;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(newHead==-1 && tail==(newHead=arr.length-1)){
+          //must grow
+          this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+          ArrCopy.uncheckedCopy(arr,0,arr=new char[newHead],newHead-=(tail),tail);
+          --newHead;
+          this.arr=arr;
+        }
+      case -1:
+        //fragmented
+    }
+    arr[newHead]=key;
+    this.head=newHead;
+  }
+  void insertAtMiddle(char key){
     char[] arr;
     if((arr=this.arr)==null){
       this.arr=new char[]{key};

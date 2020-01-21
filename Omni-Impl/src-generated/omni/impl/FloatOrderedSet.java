@@ -14,33 +14,101 @@ public abstract class FloatOrderedSet
     super();
   }
   @Override public boolean add(float key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        final FloatToIntFunction insertionComparator;
+        switch(Float.floatToRawIntBits(key)){
+          default:
+            return super.uncheckedAdd(tail,key,this::insertionCompare);
+          case 0x7f800000:
+            return this.uncheckedAddPosInf(tail);
+          case 0xff800000:
+            return this.uncheckedAddNegInf(tail);
+          case 0:
+            insertionComparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            insertionComparator=this::compareNeg0;
+        }
+        return super.uncheckedAdd(tail,key,insertionComparator);
+      }
+      return this.uncheckedAddNaN(tail);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(Float key){
     return this.add((float)key);
   }
   @Override public boolean add(boolean key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key){
+        return super.uncheckedAdd(tail,1,this::insertionCompare);
+      }else{
+        return super.uncheckedAdd(tail,0,this::comparePos0);
+      }
+    }else{
+      super.insertAtMiddle(TypeUtil.castToFloat(key));
+      return true;
+    }
   }
   @Override public boolean add(char key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,key,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(short key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,key,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(int key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,key,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(long key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==0){
+        return super.uncheckedAdd(tail,key,this::comparePos0);
+      }
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   abstract int insertionCompare(float key1,float key2);
+  abstract int comparePos0(float key);
+  abstract int compareNeg0(float key);
+  abstract boolean uncheckedAddNaN(int tail);
+  abstract boolean uncheckedAddPosInf(int tail);
+  abstract boolean uncheckedAddNegInf(int tail);
   public static class Ascending
     extends FloatOrderedSet implements Cloneable
   {
@@ -51,8 +119,96 @@ public abstract class FloatOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(float key1,float key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(key1>key2){
+        return 1;
+      }
+      if(key1==key2){
+        return 0;
+      }
+      return -1;
+    }
+    @Override int comparePos0(float key){
+      if(0>key){
+        //insert hi
+        return 1;
+      }
+      switch(Float.floatToRawIntBits(key)){
+        case 0: //pos0
+          return 0;
+        case Integer.MIN_VALUE: //neg0
+          return 1;
+        default:
+      }
+      return -1; //0<key || key!=key so insert lo
+    }
+    @Override int compareNeg0(float key){
+      if(0>key){
+        //insert hi
+        return 1;
+      }
+      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
+        return 0;
+      }
+      return -1; //0<key || key!=key so insert lo
+    }
+    @Override boolean uncheckedAddNaN(int tail){
+      final float[] arr;
+      if(!Float.isNaN((arr=this.arr)[tail])){
+        super.insertAtTail(arr,Float.NaN,this.head,tail);
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddPosInf(int tail){
+      float[] arr;
+      final float topVal;
+      if((topVal=(arr=this.arr)[tail])!=Float.POSITIVE_INFINITY){
+        int head=this.head;
+        if(Float.isNaN(topVal)){
+          //add it before the tail
+          int newTail;
+          switch(Integer.signum((newTail=tail+1)-head)){
+            case 0:
+              //fragmented must grow
+              final float[] tmp;
+              int arrLength;
+              ArrCopy.semicheckedCopy(arr,0,tmp=new float[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+              ArrCopy.uncheckedCopy(arr,newTail,tmp,head-=(arrLength-=newTail),arrLength);
+              this.head=head;
+              this.arr=arr=tmp;
+              break;
+            default:
+              //nonfragmented
+              if(newTail==arr.length){
+                if(head==0){
+                  //must grow
+                  ArrCopy.semicheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(newTail)],0,tail);
+                  this.arr=arr;
+                }else{
+                  newTail=0;
+                }
+              }
+            case -1:
+              //fragmented
+          }
+          arr[tail]=Float.POSITIVE_INFINITY;
+          arr[newTail]=Float.NaN;
+          this.tail=newTail;
+        }else{
+          super.insertAtTail(arr,Float.POSITIVE_INFINITY,head,tail);
+        }
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddNegInf(int tail){
+      final float[] arr;
+      final int head;
+      if(((arr=this.arr)[head=this.head])!=Float.NEGATIVE_INFINITY){
+        super.insertAtHead(arr,Float.NEGATIVE_INFINITY,head,tail);
+        return true;
+      }
+      return false;
     }
   }
   public static class Descending
@@ -65,8 +221,96 @@ public abstract class FloatOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(float key1,float key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(key1>key2){
+        return -1;
+      }
+      if(key1==key2){
+        return 0;
+      }
+      return 1;
+    }
+    @Override int comparePos0(float key){
+      if(0>key){
+        return -1;
+      }
+      switch(Float.floatToRawIntBits(key)){
+        case 0: //pos0
+          return 0;
+        case Integer.MIN_VALUE: //neg0
+          return -1;
+        default:
+      }
+      return 1; //key>pos0 || key!=key
+    }
+    @Override int compareNeg0(float key){
+      if(0>key){
+        return -1;
+      }
+      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
+        return 0;
+      }
+      return 1; //key>neg0 || key!=key
+    }
+    @Override boolean uncheckedAddNaN(int tail){
+      final float[] arr;
+      final int head;
+      if(!Float.isNaN((arr=this.arr)[head=this.head])){
+        super.insertAtHead(arr,Float.NaN,head,tail);
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddPosInf(int tail){
+      int head;
+      float[] arr;
+      final float bottomVal;
+      if((bottomVal=(arr=this.arr)[head=this.head])!=Float.POSITIVE_INFINITY){
+        if(Float.isNaN(bottomVal)){
+          //add just after head
+          int newHead;
+          switch(Integer.signum(tail-(newHead=head-1))){
+            case 0:
+              //fragmented must grow
+              final float[] tmp;
+              int arrLength;
+              ArrCopy.uncheckedCopy(arr,0,tmp=new float[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+              ArrCopy.semicheckedCopy(arr,head,tmp,head=tail-(arrLength-=(head+1)),arrLength);
+              --head;
+              newHead=head-1;
+              this.arr=arr=tmp;
+              break;
+            default:
+              //nonfragmented
+              if(newHead==-1){
+                if(tail==(newHead=(tail=arr.length)-1)){
+                  //must grow
+                  this.tail=(head=OmniArray.growBy50Pct(tail))-1;
+                  ArrCopy.semicheckedCopy(arr,0,arr=new float[head],head-=newHead,newHead);
+                  --head;
+                  this.arr=arr;
+                }
+                newHead=head-1;
+              }
+            case -1:
+              //fragmented
+          }
+          arr[head]=Float.POSITIVE_INFINITY;
+          arr[newHead]=Float.NaN;
+          this.head=newHead;
+        }else{
+          super.insertAtHead(arr,Float.POSITIVE_INFINITY,head,tail);
+        }
+        return true;
+      }
+      return false;
+    }
+    @Override boolean uncheckedAddNegInf(int tail){
+      final float[] arr;
+      if(((arr=this.arr)[tail])!=Float.NEGATIVE_INFINITY){
+        super.insertAtTail(arr,Float.NEGATIVE_INFINITY,this.head,tail);
+        return true;
+      }
+      return false;
     }
   }
 /*
@@ -111,9 +355,6 @@ public abstract class FloatOrderedSet
   @Override public boolean removeVal(long key){
     final int tail;
     return (tail=this.tail)!=-1 && TypeUtil.checkCastToFloat(key) && super.uncheckedRemoveMatch(tail,key==0?this::comparePos0:getQueryComparator(key));
-  }
-  @Override public boolean add(Float key){
-    return add((float)key);
   }
   abstract boolean uncheckedContainsMatch(int tail,double key);
   abstract boolean uncheckedRemoveMatch(int tail,double key);
@@ -205,99 +446,6 @@ public abstract class FloatOrderedSet
       }
       return false;
     }
-  abstract boolean uncheckedAddNaN(int tail);
-  abstract int comparePos0(float key);
-  abstract int compareNeg0(float key);
-  abstract int comparePos1(float key);
-  abstract boolean uncheckedAddPosInf(int tail);
-  abstract boolean uncheckedAddNegInf(int tail);
-  @Override public boolean add(boolean key){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(key){
-        return super.uncheckedAdd(tail,1.0f,this::comparePos1);
-      }else{
-        return super.uncheckedAdd(tail,0.0f,this::comparePos0);
-      }
-    }else{
-      super.insertMiddle(TypeUtil.castToFloat(key));
-      return true;
-    }
-  }
-  @Override public boolean add(char key){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(key==0){
-        return super.uncheckedAdd(tail,0,this::comparePos0);
-      }
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle((float)key);
-      return true;
-    }
-  }
-  @Override public boolean add(short key){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(key==0){
-        return super.uncheckedAdd(tail,0,this::comparePos0);
-      }
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle((float)key);
-      return true;
-    }
-  }
-  @Override public boolean add(int key){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(key==0){
-        return super.uncheckedAdd(tail,0,this::comparePos0);
-      }
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle((float)key);
-      return true;
-    }
-  }
-  @Override public boolean add(long key){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(key==0){
-        return super.uncheckedAdd(tail,0,this::comparePos0);
-      }
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle((float)key);
-      return true;
-    }
-  }
-  @Override public boolean add(float key){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(key==key){
-        final FloatToIntFunction sorter;
-        switch(Float.floatToRawIntBits(key)){
-          case 0x7f800000:
-            return this.uncheckedAddPosInf(tail);
-          case 0xff800000:
-            return this.uncheckedAddNegInf(tail);
-          default:
-            return super.uncheckedAdd(tail,key,this::insertionCompare);
-          case 0:
-            sorter=this::comparePos0;
-            break;
-          case Integer.MIN_VALUE:
-            sorter=this::compareNeg0;
-        }
-        return super.uncheckedAdd(tail,key,sorter);
-      }
-      return this.uncheckedAddNaN(tail);
-    }else{
-      super.insertMiddle(key);
-      return true;
-    }
-  }
   public static class Ascending extends FloatOrderedSet{
     Ascending(int head,float[] arr,int tail){
       super(head,arr,tail);
@@ -448,105 +596,6 @@ public abstract class FloatOrderedSet
         }
         return -1;
       };
-    }
-    @Override int comparePos1(float key){
-      if(1>key){
-        return 1;
-      }
-      if(Float.floatToRawIntBits(key)==TypeUtil.FLT_TRUE_BITS){
-        return 0;
-      }
-      return -1;
-    }
-    @Override int comparePos0(float key){
-      if(0>key){
-        return 1;
-      }
-      switch(Float.floatToRawIntBits(key)){
-        case 0:
-          return 0;
-        case Integer.MIN_VALUE:
-          return 1;
-        default:
-      }
-      return -1;
-    }
-    @Override int compareNeg0(float key){
-      if(0>key){
-        return 1;
-      }
-      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
-        return 0;
-      }
-      return -1;
-    }
-    @Override boolean uncheckedAddPosInf(int tail){
-      float[] arr;
-      final float topVal;
-      if((topVal=(arr=this.arr)[tail])!=Float.POSITIVE_INFINITY){
-        if(topVal==topVal){
-          super.insertAtTail(arr,Float.POSITIVE_INFINITY,this.head,tail);
-        }else{
-          int newTail,head;
-          switch(Integer.signum((newTail=tail+1)-(head=this.head))){
-            case 0:
-              //fragmented must grow
-              final float[] tmp;
-              int arrLength;
-              ArrCopy.uncheckedCopy(arr,0,tmp=new float[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-              ArrCopy.uncheckedCopy(arr,newTail,tmp,head-=(arrLength-=newTail),arrLength);
-              this.head=head;
-              this.arr=arr=tmp;
-              break;
-            default:
-              //nonfragmented
-              if(newTail==arr.length){
-                if(head==0){
-                  //must grow
-                  ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(newTail)],0,tail);
-                  this.arr=arr;
-                }else{
-                  newTail=0;
-                }
-              }
-            case -1:
-              //fragmented
-          }
-          arr[tail]=Float.POSITIVE_INFINITY;
-          arr[newTail]=Float.NaN;
-          this.tail=newTail;
-        }
-        return true;
-      }
-      return false;
-    }
-    @Override boolean uncheckedAddNegInf(int tail){
-      float[] arr;
-      final int head;
-      if((arr=this.arr)[head=this.head]!=Float.NEGATIVE_INFINITY){
-        super.insertAtHead(arr,Float.NEGATIVE_INFINITY,head,tail);
-        return true;
-      }
-      return false;
-    }
-    @Override boolean uncheckedAddNaN(int tail){
-      float[] arr;
-      if(!Float.isNaN((arr=this.arr)[tail])){
-        super.insertAtTail(arr,Float.NaN,this.head,tail);
-        return true;
-      }
-      return false;
-    }
-    @Override int insertionCompare(float key1,float key2){
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return 1;
-      }
-      //ok if key2 is NaN
-      return -1;
     }
   }
   public static class Descending extends FloatOrderedSet{
@@ -699,108 +748,6 @@ public abstract class FloatOrderedSet
         }
         return -1;
       };
-    }
-    @Override boolean uncheckedAddPosInf(int tail){
-      float[] arr;
-      final float bottomVal;
-      int head;
-      if((bottomVal=(arr=this.arr)[head=this.head])!=Float.POSITIVE_INFINITY){
-        if(bottomVal==bottomVal){
-          super.insertAtHead(arr,Float.POSITIVE_INFINITY,head,tail);
-        }else{
-          int newHead;
-          switch(Integer.signum(tail-(newHead=head-1))){
-            case 0:
-              //fragmented must grow
-              final float[] tmp;
-              int arrLength;
-              //copy [0->tail]
-              ArrCopy.uncheckedCopy(arr,0,tmp=new float[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
-              //copy [head+1->arrLenth-1]
-              ArrCopy.semicheckedCopy(arr,++head,tmp,head=tail-(arrLength-=head),arrLength);
-              --head;
-              this.arr=arr=tmp;
-              break;
-            default:
-              //nonfragmented
-              if(head==0 && tail==(newHead=arr.length-1)){
-                //must grow
-                this.tail=(newHead=OmniArray.growBy50Pct(tail+1))-1;
-                ArrCopy.uncheckedCopy(arr,1,arr=new float[newHead],newHead-=tail,tail);
-                head=--newHead;
-                --newHead;
-                this.arr=arr;
-              }
-            case -1:
-              //fragmented
-          }
-          arr[head]=Float.POSITIVE_INFINITY;
-          arr[newHead]=Float.NaN;
-          this.head=newHead;
-        }
-        return true;
-      }
-      return false;
-    }
-    @Override boolean uncheckedAddNegInf(int tail){
-      float[] arr;
-      if((arr=this.arr)[tail]!=Float.NEGATIVE_INFINITY){
-        super.insertAtTail(arr,Float.NEGATIVE_INFINITY,this.head,tail);
-        return true;
-      }
-      return false;
-    }
-    @Override int comparePos1(float key){
-      if(1>key){
-        return 1;
-      }
-      if(Float.floatToRawIntBits(key)==TypeUtil.FLT_TRUE_BITS){
-        return 0;
-      }
-      //either NaN or greater than 1
-      return -1;
-    }
-    @Override int comparePos0(float key){
-      if(0>key){
-        return -1;
-      }
-      switch(Float.floatToRawIntBits(key)){
-        case 0:
-          return 0;
-        case Integer.MIN_VALUE:
-          return -1;
-        default:
-      }
-      return 1;
-    }
-    @Override int compareNeg0(float key){
-      if(0>key){
-        return -1;
-      }
-      if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
-        return 0;
-      }
-      return 1;
-    }
-    @Override boolean uncheckedAddNaN(int tail){
-      float[] arr;
-      final int head;
-      if(!Float.isNaN((arr=this.arr)[head=this.head])){
-        super.insertAtHead(arr,Float.NaN,head,tail);
-        return true;
-      }
-      return false;
-    }
-    @Override int insertionCompare(float key1,float key2){
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return -1;
-      }
-      //ok if key2 is NaN
-      return 1;
     }
   }
   */

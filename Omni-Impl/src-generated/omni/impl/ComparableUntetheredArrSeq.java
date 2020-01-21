@@ -174,7 +174,7 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     return null;
   }
   @SuppressWarnings("unchecked")
-  void insertMiddle(E key){
+  void insertAtMiddle(E key){
     Comparable<E>[] arr;
     if((arr=this.arr)==null){
       this.arr=new Comparable[]{key};

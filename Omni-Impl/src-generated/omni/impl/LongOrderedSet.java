@@ -14,26 +14,46 @@ public abstract class LongOrderedSet
     super();
   }
   @Override public boolean add(long key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(Long key){
     return this.add((long)key);
   }
   @Override public boolean add(boolean key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,TypeUtil.castToLong(key),this::insertionCompare);
+    }else{
+      super.insertAtMiddle(TypeUtil.castToLong(key));
+      return true;
+    }
   }
   @Override public boolean add(byte key){
     return this.add((long)key);
   }
   @Override public boolean add(char key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(int key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   abstract int insertionCompare(long key1,long key2);
   public static class Ascending
@@ -46,8 +66,13 @@ public abstract class LongOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(long key1,long key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(key1>key2){
+        return 1;
+      }
+      if(key1==key2){
+        return 0;
+      }
+      return -1;
     }
   }
   public static class Descending
@@ -60,8 +85,13 @@ public abstract class LongOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(long key1,long key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(key1>key2){
+        return -1;
+      }
+      if(key1==key2){
+        return 0;
+      }
+      return 1;
     }
   }
 /*
@@ -181,30 +211,6 @@ public abstract class LongOrderedSet
     }
     return false;
   }
-  @Override public boolean add(Long key){
-    return add((long)key);
-  }
-  @Override public boolean add(boolean key){
-    return add(TypeUtil.castToLong(key));
-  }
-  @Override public boolean add(byte key){
-    return add((long)key);
-  }
-  @Override public boolean add(char key){
-    return add((long)key);
-  }
-  @Override public boolean add(int key){
-    return add((long)key);
-  }
-  @Override public boolean add(long key){
-    int tail;
-    if((tail=this.tail)!=-1){
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle(key);
-      return true;
-    }
-  }
   public static class Ascending extends LongOrderedSet{
     Ascending(int head,long[] arr,int tail){
       super(head,arr,tail);
@@ -225,17 +231,6 @@ public abstract class LongOrderedSet
         }
         return -1;
       };
-    }
-    @Override int insertionCompare(long key1,long key2){
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return 1;
-      }
-      //ok if key2 is NaN
-      return -1;
     }
   }
   public static class Descending extends LongOrderedSet{
@@ -258,17 +253,6 @@ public abstract class LongOrderedSet
         }
         return -1;
       };
-    }
-    @Override int insertionCompare(long key1,long key2){
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return -1;
-      }
-      //ok if key2 is NaN
-      return 1;
     }
   }
   */

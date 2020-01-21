@@ -14,15 +14,25 @@ public abstract class ShortOrderedSet
     super();
   }
   @Override public boolean add(short key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(Short key){
     return this.add((short)key);
   }
   @Override public boolean add(boolean key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,(short)TypeUtil.castToByte(key),this::insertionCompare);
+    }else{
+      super.insertAtMiddle((short)TypeUtil.castToByte(key));
+      return true;
+    }
   }
   @Override public boolean add(byte key){
     return this.add((short)key);
@@ -38,8 +48,7 @@ public abstract class ShortOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(short key1,short key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return Integer.signum(key1-key2);
     }
   }
   public static class Descending
@@ -52,8 +61,7 @@ public abstract class ShortOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(short key1,short key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      return Integer.signum(key2-key1);
     }
   }
 /*
@@ -201,24 +209,6 @@ public abstract class ShortOrderedSet
     }
     return false;
   }
-  @Override public boolean add(Short key){
-    return add((short)key);
-  }
-  @Override public boolean add(boolean key){
-    return add((short)TypeUtil.castToByte(key));
-  }
-  @Override public boolean add(byte key){
-    return add((short)key);
-  }
-  @Override public boolean add(short key){
-    int tail;
-    if((tail=this.tail)!=-1){
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle(key);
-      return true;
-    }
-  }
   public static class Ascending extends ShortOrderedSet{
     Ascending(int head,short[] arr,int tail){
       super(head,arr,tail);
@@ -231,9 +221,6 @@ public abstract class ShortOrderedSet
     }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->Integer.signum(k-key);
-    }
-    @Override int insertionCompare(short key1,short key2){
-      return Integer.signum(key1-key2);
     }
   }
   public static class Descending extends ShortOrderedSet{
@@ -248,9 +235,6 @@ public abstract class ShortOrderedSet
     }
     @Override IntUnaryOperator getQueryComparator(int key){
       return k->Integer.signum(key-k);
-    }
-    @Override int insertionCompare(short key1,short key2){
-      return Integer.signum(key2-key1);
     }
   }
   */

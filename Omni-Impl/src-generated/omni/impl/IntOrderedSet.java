@@ -14,22 +14,37 @@ public abstract class IntOrderedSet
     super();
   }
   @Override public boolean add(int key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   @Override public boolean add(Integer key){
     return this.add((int)key);
   }
   @Override public boolean add(boolean key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,(int)TypeUtil.castToByte(key),this::insertionCompare);
+    }else{
+      super.insertAtMiddle((int)TypeUtil.castToByte(key));
+      return true;
+    }
   }
   @Override public boolean add(byte key){
     return this.add((int)key);
   }
   @Override public boolean add(char key){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,this::insertionCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
   abstract int insertionCompare(int key1,int key2);
   public static class Ascending
@@ -42,8 +57,13 @@ public abstract class IntOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(int key1,int key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(key1>key2){
+        return 1;
+      }
+      if(key1==key2){
+        return 0;
+      }
+      return -1;
     }
   }
   public static class Descending
@@ -56,8 +76,13 @@ public abstract class IntOrderedSet
       super(head,arr,tail);
     }
     @Override int insertionCompare(int key1,int key2){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+      if(key1>key2){
+        return -1;
+      }
+      if(key1==key2){
+        return 0;
+      }
+      return 1;
     }
   }
 /*
@@ -185,27 +210,6 @@ public abstract class IntOrderedSet
     }
     return false;
   }
-  @Override public boolean add(Integer key){
-    return add((int)key);
-  }
-  @Override public boolean add(boolean key){
-    return add((int)TypeUtil.castToByte(key));
-  }
-  @Override public boolean add(byte key){
-    return add((int)key);
-  }
-  @Override public boolean add(char key){
-    return add((int)key);
-  }
-  @Override public boolean add(int key){
-    int tail;
-    if((tail=this.tail)!=-1){
-      return super.uncheckedAdd(tail,key,this::insertionCompare);
-    }else{
-      super.insertMiddle(key);
-      return true;
-    }
-  }
   public static class Ascending extends IntOrderedSet{
     Ascending(int head,int[] arr,int tail){
       super(head,arr,tail);
@@ -226,17 +230,6 @@ public abstract class IntOrderedSet
         }
         return -1;
       };
-    }
-    @Override int insertionCompare(int key1,int key2){
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return 1;
-      }
-      //ok if key2 is NaN
-      return -1;
     }
   }
   public static class Descending extends IntOrderedSet{
@@ -259,17 +252,6 @@ public abstract class IntOrderedSet
         }
         return -1;
       };
-    }
-    @Override int insertionCompare(int key1,int key2){
-      //key1 is guaranteed to be non-zero, non-infinity, and non-nan
-      if(key1==key2){
-        return 0;
-      }
-      if(key1>key2){
-        return -1;
-      }
-      //ok if key2 is NaN
-      return 1;
     }
   }
   */

@@ -120,61 +120,6 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
       OmniArray.OfRef.nullifyRange(arr,tail,head);
     }
   }
-  void insertAtTail(Object[] arr,Object key,int head,int tail){
-    switch(Integer.signum((++tail)-head)){
-      case 0:
-        //fragmented must grow
-        final Object[] tmp;
-        int arrLength;
-        ArrCopy.uncheckedCopy(arr,0,tmp=new Object[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-        this.head=head;
-        this.arr=arr=tmp;
-        break;
-      default:
-        //nonfragmented
-        if(tail==arr.length){
-          if(head==0){
-            //must grow
-            ArrCopy.uncheckedCopy(arr,0,arr=new Object[OmniArray.growBy50Pct(tail)],0,tail);
-            this.arr=arr;
-          }else{
-            tail=0;
-          }
-        }
-      case -1:
-        //fragmented
-    }
-    arr[tail]=key;
-    this.tail=tail;
-  }
-  void insertAtHead(Object[] arr,Object key,int head,int tail){
-    int newHead;
-    switch(Integer.signum(tail-(newHead=head-1))){
-      case 0:
-        //fragmented must grow
-        final Object[] tmp;
-        int arrLength;
-        ArrCopy.uncheckedCopy(arr,0,tmp=new Object[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
-        ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
-        --newHead;
-        this.arr=arr=tmp;
-        break;
-      default:
-        //nonfragmented
-        if(newHead==-1 && tail==(newHead=arr.length-1)){
-          //must grow
-          this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
-          ArrCopy.uncheckedCopy(arr,0,arr=new Object[newHead],newHead-=(tail),tail);
-          --newHead;
-          this.arr=arr;
-        }
-      case -1:
-        //fragmented
-    }
-    arr[newHead]=key;
-    this.head=newHead;
-  }
   public void addLast(E val){
     var arr=this.arr;
     int tail;
@@ -577,7 +522,62 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
     }
     return null;
   }
-  void insertMiddle(E key){
+  void insertAtTail(Object[] arr,E key,int head,int tail){
+    switch(Integer.signum((++tail)-head)){
+      case 0:
+        //fragmented must grow
+        final Object[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new Object[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+        ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+        this.head=head;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(tail==arr.length){
+          if(head==0){
+            //must grow
+            ArrCopy.uncheckedCopy(arr,0,arr=new Object[OmniArray.growBy50Pct(tail)],0,tail);
+            this.arr=arr;
+          }else{
+            tail=0;
+          }
+        }
+      case -1:
+        //fragmented
+    }
+    arr[tail]=key;
+    this.tail=tail;
+  }
+  void insertAtHead(Object[] arr,E key,int head,int tail){
+    int newHead;
+    switch(Integer.signum(tail-(newHead=head-1))){
+      case 0:
+        //fragmented must grow
+        final Object[] tmp;
+        int arrLength;
+        ArrCopy.uncheckedCopy(arr,0,tmp=new Object[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+        ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+        --newHead;
+        this.arr=arr=tmp;
+        break;
+      default:
+        //nonfragmented
+        if(newHead==-1 && tail==(newHead=arr.length-1)){
+          //must grow
+          this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+          ArrCopy.uncheckedCopy(arr,0,arr=new Object[newHead],newHead-=(tail),tail);
+          --newHead;
+          this.arr=arr;
+        }
+      case -1:
+        //fragmented
+    }
+    arr[newHead]=key;
+    this.head=newHead;
+  }
+  void insertAtMiddle(E key){
     Object[] arr;
     if((arr=this.arr)==null){
       this.arr=new Object[]{key};
