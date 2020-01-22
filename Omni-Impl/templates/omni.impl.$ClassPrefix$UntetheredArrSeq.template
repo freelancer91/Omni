@@ -15,8 +15,11 @@ import omni.util.OmniArray;
 #IF OfBoolean
 import omni.util.TypeUtil;
 #ENDIF
-#IF OfChar,OfDouble,OfFloat,OfInt,OfLong,OfShort
+#IF OfChar,OfDouble,OfFloat,OfInt,OfLong
 import omni.function.$TypeNameModifier$Comparator;
+#ENDIF
+#IF OfShort
+import omni.function.IntComparator;
 #ENDIF
 #IF OfRef,OfComparable
 import java.util.Comparator;
@@ -105,14 +108,14 @@ abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$C
   public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
 #IFNOT OfRef,OfComparable
   public void forEach(Consumer<? super $BoxedType$> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
 #ENDIF
@@ -968,7 +971,11 @@ public RETTYPE pollLastMETHODSUFFIX(){
       this.head=index;
     }
   }
+#IF OfShort
+  #MACRO AddSetFunctions(IntComparator$<E>$,compare(key\,)
+#ELSE
   #MACRO AddSetFunctions($TypeNameModifier$Comparator$<E>$,compare(key\,)
+#ENDIF
 #IF OfChar,OfInt,OfShort
   #MACRO AddSetFunctions(IntUnaryOperator,applyAsInt()
 #ELSEIFNOT OfRef
@@ -1152,21 +1159,20 @@ public RETTYPE pollLastMETHODSUFFIX(){
   
 
     #IF OfChar,OfShort,OfInt
-  boolean uncheckedContainsMatch(int tail,final IntUnaryOperator comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final IntUnaryOperator comparator)
     #ELSEIF OfLong
-  boolean uncheckedContainsMatch(int tail,final LongToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final LongToIntFunction comparator)
     #ELSEIF OfFloat
-  boolean uncheckedContainsMatch(int tail,final FloatToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final FloatToIntFunction comparator)
     #ELSEIF OfDouble
-  boolean uncheckedContainsMatch(int tail,final DoubleToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final DoubleToIntFunction comparator)
     #ELSEIF OfRef,OfComparable
   @SuppressWarnings("unchecked")
-  boolean uncheckedContainsMatch(int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
     #ENDIF
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -1240,10 +1246,9 @@ public RETTYPE pollLastMETHODSUFFIX(){
 #IF OfRef,OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
-  void ascendingForEach(int tail,$TypeNameModifier$Consumer$<? super E>$ action){
+  void ascendingForEach(int head,int tail,$TypeNameModifier$Consumer$<? super E>$ action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept(($exposedType$)arr[head]);
         if(++head==bound){
@@ -1263,10 +1268,9 @@ public RETTYPE pollLastMETHODSUFFIX(){
 #IF OfRef,OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
-  void descendingForEach(int tail,$TypeNameModifier$Consumer$<? super E>$ action){
+  void descendingForEach(int head,int tail,$TypeNameModifier$Consumer$<? super E>$ action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept(($exposedType$)arr[tail]);
         if(tail==0){
@@ -1320,7 +1324,7 @@ public RETTYPE pollLastMETHODSUFFIX(){
   #IF OfRef,OfComparable
   @SuppressWarnings("unchecked")
   #ENDIF
-  private static $<E>$ int nonfragmentedPullDown(final $ArrayType$[] arr,int dst,int src,int bound,final $TypeNameModifier$Predicate$<? super E>$ filter){
+  static $<E>$ int nonfragmentedPullDown(final $ArrayType$[] arr,int dst,int src,int bound,final $TypeNameModifier$Predicate$<? super E>$ filter){
     for(;src<=bound;++src){
       final $ArrayType$ tmp;
       if(!filter.test(($exposedType$)(tmp=arr[src]))){
@@ -1379,7 +1383,7 @@ public RETTYPE pollLastMETHODSUFFIX(){
   #IF OfRef,OfComparable
   @SuppressWarnings("unchecked")
   #ENDIF
-  private static $<E>$ int fragmentedPullDown(final $ArrayType$[] arr,int src,int arrBound,int tail,final $TypeNameModifier$Predicate$<? super E>$ filter){
+  static $<E>$ int fragmentedPullDown(final $ArrayType$[] arr,int src,int arrBound,int tail,final $TypeNameModifier$Predicate$<? super E>$ filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final $ArrayType$ tmp;

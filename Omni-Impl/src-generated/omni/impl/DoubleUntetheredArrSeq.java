@@ -61,13 +61,13 @@ abstract class DoubleUntetheredArrSeq implements OmniCollection.OfDouble,Externa
   public void forEach(DoubleConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Double> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public double[] toDoubleArray(){
@@ -1233,11 +1233,10 @@ abstract class DoubleUntetheredArrSeq implements OmniCollection.OfDouble,Externa
     while(head<=tail);
     return -1;
   }
-  boolean uncheckedContainsMatch(int tail,final DoubleToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final DoubleToIntFunction comparator)
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -1300,10 +1299,9 @@ abstract class DoubleUntetheredArrSeq implements OmniCollection.OfDouble,Externa
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,DoubleConsumer action){
+  void ascendingForEach(int head,int tail,DoubleConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((double)arr[head]);
         if(++head==bound){
@@ -1320,10 +1318,9 @@ abstract class DoubleUntetheredArrSeq implements OmniCollection.OfDouble,Externa
       ++head;
     }
   }
-  void descendingForEach(int tail,DoubleConsumer action){
+  void descendingForEach(int head,int tail,DoubleConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((double)arr[tail]);
         if(tail==0){
@@ -1341,7 +1338,7 @@ abstract class DoubleUntetheredArrSeq implements OmniCollection.OfDouble,Externa
       --tail;
     }
   }
-  private static  int nonfragmentedPullDown(final double[] arr,int dst,int src,int bound,final DoublePredicate filter){
+  static  int nonfragmentedPullDown(final double[] arr,int dst,int src,int bound,final DoublePredicate filter){
     for(;src<=bound;++src){
       final double tmp;
       if(!filter.test((double)(tmp=arr[src]))){
@@ -1377,7 +1374,7 @@ abstract class DoubleUntetheredArrSeq implements OmniCollection.OfDouble,Externa
       return false;
     }
   }
-  private static  int fragmentedPullDown(final double[] arr,int src,int arrBound,int tail,final DoublePredicate filter){
+  static  int fragmentedPullDown(final double[] arr,int src,int arrBound,int tail,final DoublePredicate filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final double tmp;

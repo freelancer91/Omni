@@ -59,13 +59,13 @@ abstract class ByteUntetheredArrSeq implements OmniCollection.OfByte,Externaliza
   public void forEach(ByteConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Byte> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public byte[] toByteArray(){
@@ -785,10 +785,9 @@ abstract class ByteUntetheredArrSeq implements OmniCollection.OfByte,Externaliza
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,ByteConsumer action){
+  void ascendingForEach(int head,int tail,ByteConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((byte)arr[head]);
         if(++head==bound){
@@ -805,10 +804,9 @@ abstract class ByteUntetheredArrSeq implements OmniCollection.OfByte,Externaliza
       ++head;
     }
   }
-  void descendingForEach(int tail,ByteConsumer action){
+  void descendingForEach(int head,int tail,ByteConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((byte)arr[tail]);
         if(tail==0){
@@ -826,7 +824,7 @@ abstract class ByteUntetheredArrSeq implements OmniCollection.OfByte,Externaliza
       --tail;
     }
   }
-  private static  int nonfragmentedPullDown(final byte[] arr,int dst,int src,int bound,final BytePredicate filter){
+  static  int nonfragmentedPullDown(final byte[] arr,int dst,int src,int bound,final BytePredicate filter){
     for(;src<=bound;++src){
       final byte tmp;
       if(!filter.test((byte)(tmp=arr[src]))){
@@ -862,7 +860,7 @@ abstract class ByteUntetheredArrSeq implements OmniCollection.OfByte,Externaliza
       return false;
     }
   }
-  private static  int fragmentedPullDown(final byte[] arr,int src,int arrBound,int tail,final BytePredicate filter){
+  static  int fragmentedPullDown(final byte[] arr,int src,int arrBound,int tail,final BytePredicate filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final byte tmp;

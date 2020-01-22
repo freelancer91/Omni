@@ -61,13 +61,13 @@ abstract class IntUntetheredArrSeq implements OmniCollection.OfInt,Externalizabl
   public void forEach(IntConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Integer> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public int[] toIntArray(){
@@ -1326,11 +1326,10 @@ abstract class IntUntetheredArrSeq implements OmniCollection.OfInt,Externalizabl
     while(head<=tail);
     return -1;
   }
-  boolean uncheckedContainsMatch(int tail,final IntUnaryOperator comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final IntUnaryOperator comparator)
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -1393,10 +1392,9 @@ abstract class IntUntetheredArrSeq implements OmniCollection.OfInt,Externalizabl
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,IntConsumer action){
+  void ascendingForEach(int head,int tail,IntConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((int)arr[head]);
         if(++head==bound){
@@ -1413,10 +1411,9 @@ abstract class IntUntetheredArrSeq implements OmniCollection.OfInt,Externalizabl
       ++head;
     }
   }
-  void descendingForEach(int tail,IntConsumer action){
+  void descendingForEach(int head,int tail,IntConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((int)arr[tail]);
         if(tail==0){
@@ -1434,7 +1431,7 @@ abstract class IntUntetheredArrSeq implements OmniCollection.OfInt,Externalizabl
       --tail;
     }
   }
-  private static  int nonfragmentedPullDown(final int[] arr,int dst,int src,int bound,final IntPredicate filter){
+  static  int nonfragmentedPullDown(final int[] arr,int dst,int src,int bound,final IntPredicate filter){
     for(;src<=bound;++src){
       final int tmp;
       if(!filter.test((int)(tmp=arr[src]))){
@@ -1470,7 +1467,7 @@ abstract class IntUntetheredArrSeq implements OmniCollection.OfInt,Externalizabl
       return false;
     }
   }
-  private static  int fragmentedPullDown(final int[] arr,int src,int arrBound,int tail,final IntPredicate filter){
+  static  int fragmentedPullDown(final int[] arr,int src,int arrBound,int tail,final IntPredicate filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final int tmp;

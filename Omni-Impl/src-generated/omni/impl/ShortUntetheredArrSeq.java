@@ -2,7 +2,7 @@ package omni.impl;
 import omni.api.OmniCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.function.ShortComparator;
+import omni.function.IntComparator;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import java.util.function.IntUnaryOperator;
@@ -61,13 +61,13 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
   public void forEach(ShortConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Short> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public short[] toShortArray(){
@@ -733,7 +733,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
       this.head=index;
     }
   }
-  boolean uncheckedAdd(int tail,short key,ShortComparator sorter)
+  boolean uncheckedAdd(int tail,short key,IntComparator sorter)
   {
     final var arr=this.arr;
     final int head;
@@ -763,7 +763,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
       }
     }
   }
-  boolean fragmentedInsertHi(short[] arr,int head,int tail,short key,ShortComparator sorter){
+  boolean fragmentedInsertHi(short[] arr,int head,int tail,short key,IntComparator sorter){
     int lo=1;
     int hi=tail;
     while(lo<=hi)
@@ -828,7 +828,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     }
     return true;
   }
-  boolean fragmentedInsertLo(short[] arr,int head,int tail,short key,ShortComparator sorter){
+  boolean fragmentedInsertLo(short[] arr,int head,int tail,short key,IntComparator sorter){
     int arrBound;
     int hi=(arrBound=arr.length)-1;
     int lo=head;
@@ -882,7 +882,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     }
     return true;
   }
-  boolean nonfragmentedInsertLo(short[] arr,int head,int hi,short key,ShortComparator sorter){
+  boolean nonfragmentedInsertLo(short[] arr,int head,int hi,short key,IntComparator sorter){
     int lo=head;
     while(lo<=hi)
     {
@@ -936,7 +936,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     }
     return true;
   }
-  boolean nonfragmentedInsertHi(short[] arr,int lo,int tail,short key,ShortComparator sorter){
+  boolean nonfragmentedInsertHi(short[] arr,int lo,int tail,short key,IntComparator sorter){
     int hi=tail;
     while(lo<=hi)
     {
@@ -1357,11 +1357,10 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     while(head<=tail);
     return -1;
   }
-  boolean uncheckedContainsMatch(int tail,final IntUnaryOperator comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final IntUnaryOperator comparator)
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -1424,10 +1423,9 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,ShortConsumer action){
+  void ascendingForEach(int head,int tail,ShortConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((short)arr[head]);
         if(++head==bound){
@@ -1444,10 +1442,9 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
       ++head;
     }
   }
-  void descendingForEach(int tail,ShortConsumer action){
+  void descendingForEach(int head,int tail,ShortConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((short)arr[tail]);
         if(tail==0){
@@ -1465,7 +1462,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
       --tail;
     }
   }
-  private static  int nonfragmentedPullDown(final short[] arr,int dst,int src,int bound,final ShortPredicate filter){
+  static  int nonfragmentedPullDown(final short[] arr,int dst,int src,int bound,final ShortPredicate filter){
     for(;src<=bound;++src){
       final short tmp;
       if(!filter.test((short)(tmp=arr[src]))){
@@ -1501,7 +1498,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
       return false;
     }
   }
-  private static  int fragmentedPullDown(final short[] arr,int src,int arrBound,int tail,final ShortPredicate filter){
+  static  int fragmentedPullDown(final short[] arr,int src,int arrBound,int tail,final ShortPredicate filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final short tmp;

@@ -60,13 +60,13 @@ abstract class BooleanUntetheredArrSeq implements OmniCollection.OfBoolean,Exter
   public void forEach(BooleanConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Boolean> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public boolean[] toBooleanArray(){
@@ -875,10 +875,9 @@ abstract class BooleanUntetheredArrSeq implements OmniCollection.OfBoolean,Exter
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,BooleanConsumer action){
+  void ascendingForEach(int head,int tail,BooleanConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((boolean)arr[head]);
         if(++head==bound){
@@ -895,10 +894,9 @@ abstract class BooleanUntetheredArrSeq implements OmniCollection.OfBoolean,Exter
       ++head;
     }
   }
-  void descendingForEach(int tail,BooleanConsumer action){
+  void descendingForEach(int head,int tail,BooleanConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((boolean)arr[tail]);
         if(tail==0){

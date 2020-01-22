@@ -61,13 +61,13 @@ abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externali
   public void forEach(FloatConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Float> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public float[] toFloatArray(){
@@ -1264,11 +1264,10 @@ abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externali
     while(head<=tail);
     return -1;
   }
-  boolean uncheckedContainsMatch(int tail,final FloatToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final FloatToIntFunction comparator)
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -1331,10 +1330,9 @@ abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externali
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,FloatConsumer action){
+  void ascendingForEach(int head,int tail,FloatConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((float)arr[head]);
         if(++head==bound){
@@ -1351,10 +1349,9 @@ abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externali
       ++head;
     }
   }
-  void descendingForEach(int tail,FloatConsumer action){
+  void descendingForEach(int head,int tail,FloatConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((float)arr[tail]);
         if(tail==0){
@@ -1372,7 +1369,7 @@ abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externali
       --tail;
     }
   }
-  private static  int nonfragmentedPullDown(final float[] arr,int dst,int src,int bound,final FloatPredicate filter){
+  static  int nonfragmentedPullDown(final float[] arr,int dst,int src,int bound,final FloatPredicate filter){
     for(;src<=bound;++src){
       final float tmp;
       if(!filter.test((float)(tmp=arr[src]))){
@@ -1408,7 +1405,7 @@ abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externali
       return false;
     }
   }
-  private static  int fragmentedPullDown(final float[] arr,int src,int arrBound,int tail,final FloatPredicate filter){
+  static  int fragmentedPullDown(final float[] arr,int src,int arrBound,int tail,final FloatPredicate filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final float tmp;

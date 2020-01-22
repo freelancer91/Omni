@@ -61,13 +61,13 @@ abstract class LongUntetheredArrSeq implements OmniCollection.OfLong,Externaliza
   public void forEach(LongConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Long> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public long[] toLongArray(){
@@ -1295,11 +1295,10 @@ abstract class LongUntetheredArrSeq implements OmniCollection.OfLong,Externaliza
     while(head<=tail);
     return -1;
   }
-  boolean uncheckedContainsMatch(int tail,final LongToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final LongToIntFunction comparator)
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -1362,10 +1361,9 @@ abstract class LongUntetheredArrSeq implements OmniCollection.OfLong,Externaliza
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,LongConsumer action){
+  void ascendingForEach(int head,int tail,LongConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((long)arr[head]);
         if(++head==bound){
@@ -1382,10 +1380,9 @@ abstract class LongUntetheredArrSeq implements OmniCollection.OfLong,Externaliza
       ++head;
     }
   }
-  void descendingForEach(int tail,LongConsumer action){
+  void descendingForEach(int head,int tail,LongConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((long)arr[tail]);
         if(tail==0){
@@ -1403,7 +1400,7 @@ abstract class LongUntetheredArrSeq implements OmniCollection.OfLong,Externaliza
       --tail;
     }
   }
-  private static  int nonfragmentedPullDown(final long[] arr,int dst,int src,int bound,final LongPredicate filter){
+  static  int nonfragmentedPullDown(final long[] arr,int dst,int src,int bound,final LongPredicate filter){
     for(;src<=bound;++src){
       final long tmp;
       if(!filter.test((long)(tmp=arr[src]))){
@@ -1439,7 +1436,7 @@ abstract class LongUntetheredArrSeq implements OmniCollection.OfLong,Externaliza
       return false;
     }
   }
-  private static  int fragmentedPullDown(final long[] arr,int src,int arrBound,int tail,final LongPredicate filter){
+  static  int fragmentedPullDown(final long[] arr,int src,int arrBound,int tail,final LongPredicate filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final long tmp;

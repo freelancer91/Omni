@@ -1,0 +1,811 @@
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfComparable
+package omni.impl;
+import omni.util.ArrCopy;
+import omni.api.OmniSortedSet;
+#IF OfDouble,OfFloat
+import omni.util.TypeUtil;
+#ENDIF
+#IF OfComparable
+import java.util.Comparator;
+#ELSE
+import omni.function.$TypeNameModifier$Comparator;
+#ENDIF
+#IF OfDouble,OfComparable
+import java.util.function.$TypeNameModifier$ToIntFunction;
+#ENDIF
+#IF OfFloat
+import omni.function.$TypeNameModifier$ToIntFunction;
+#ENDIF
+#IF OfChar
+import java.util.function.IntUnaryOperator;
+#ENDIF
+#IF OfChar,OfComparable,OfDouble,OfFloat
+import omni.util.OmniArray;
+#ENDIF
+#IF OfComparable
+public class $ClassPrefix$AscendingSortedSet<E extends Comparable<E>> extends $ClassPrefix$UntetheredArrSeqSet$<E>$ implements Cloneable
+#ELSE
+public class $ClassPrefix$AscendingSortedSet$<E>$ extends $ClassPrefix$UntetheredArrSeqSet$<E>$ implements Cloneable
+#ENDIF
+{
+  public $ClassPrefix$AscendingSortedSet(){
+    super();
+  }
+  public $ClassPrefix$AscendingSortedSet(int head,$ArrayType$[] arr,int tail){
+    super(head,arr,tail);
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+#ENDIF
+  @Override public Object clone(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final $ArrayType$[] dst;
+      final int head,cloneTail;
+      int size;
+      if((size=(++tail)-(head=this.head))>0){
+        ArrCopy.uncheckedCopy(arr,head,dst=$NewArray$[size],0,size);
+        cloneTail=size-1;
+      }else{
+        final $ArrayType$[] arr;
+        dst=$NewArray$[size+=(arr=this.arr).length];
+        cloneTail=size-1;
+        ArrCopy.uncheckedCopy(arr,0,dst,size-=tail,tail);
+        ArrCopy.uncheckedCopy(arr,head,dst,0,size);
+      }
+      return new $ClassPrefix$AscendingSortedSet$<E>$(0,dst,cloneTail);
+    }
+    return new $ClassPrefix$AscendingSortedSet$<E>$();
+  }
+  @Override public $TypeNameModifier$Comparator$<E>$ comparator(){
+#IF OfComparable
+    return Comparator.nullsLast(Comparable::compareTo);
+#ELSE
+    return $BoxedType$::compare;
+#ENDIF
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  @Override boolean uncheckedAddNull(int tail){
+    //add at tail
+    final $ArrayType$[] arr;
+    if((arr=this.arr)[tail]!=null){
+      int head;
+      switch(Integer.signum(++tail-(head=this.head))){
+        case 0:
+          //fragmented must grow
+          int arrLength;
+          final $ArrayType$[] tmp;
+          ArrCopy.uncheckedCopy(arr,0,tmp=$NewArray$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+          ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+          this.head=head;
+          this.arr=tmp;
+          break;
+        case 1:
+          //nonfragmented
+          if(tail==arr.length){
+            if(0==head){
+              //must grow
+              ArrCopy.uncheckedCopy(arr,0,tmp=$NewArray$[head=OmniArray.growBy50Pct(tail)],0,tail);
+              this.arr=tmp;
+            }else{
+              tail=0;
+            }
+          }
+        default:
+          //fragmented
+      }
+      this.tail=tail;
+      return true;
+    }
+    return false;
+  }
+  @Override $TypeNameModifier$ToIntFunction$<E>$ getQueryComparator($exposedType$ key){
+    return (k)->Integer.signum(-k.compareTo(key));
+  }
+  @Override boolean uncheckedremoveNull(int tail){
+    final $ArrayType$[] arr;
+    if((arr=this.arr)[tail]==null){
+      if(tail==this.head){
+        tail=-1;
+      }else if(--tail==-1){
+        tail=arr.length-1;
+      }
+      this.tail=tail;
+      return true;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Object key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Boolean key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Byte key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Character key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Short key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Integer key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Long key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Float key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Double key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator(($exposedType$)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
+  }
+#ENDIF
+#IF OfDouble
+  @Override public boolean contains(double key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction$<E>$ queryComparator;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          queryComparator=this::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          queryComparator=this::compareNeg0;
+        }else{
+          queryComparator=super.getQueryComparator(key);
+        }
+        return super.uncheckedContainsMatch(this.head,tail,queryComparator);
+      }
+      return $BoxedType$.isNaN(arr[tail]);
+    }
+    return false;
+  }
+  @Override public boolean contains(float key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        final $TypeNameModifier$ToIntFunction$<E>$ queryComparator;
+        switch(Float.floatToRawIntBits(key)){
+          case 0x7f800000: //pos inf
+            final $ArrayType$[] arr;
+            return ((arr=this.arr)[tail]==$BoxedType$.POSITIVE_INFINITY) || (tail!=head && arr[tail==0?arr.length-1:tail-1]==$BoxedType$.POSITIVE_INFINITY);
+          case 0xff800000:
+            return this.arr[head]==$BoxedType$.NEGATIVE_INFINITY;
+          case 0:
+            queryComparator=this::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            queryComparator=this::compareNeg0;
+            break;
+          default:
+            queryComparator=super.getQueryComparator(key);
+        }
+        return super.uncheckedContainsMatch(this.head,tail,queryComparator);
+      }
+      return $BoxedType$.isNaN(arr[tail]);
+    }
+    return false;
+  }
+  @Override public boolean contains(Object key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      final $TypeNameModifier$ToIntFunction$<E>$ queryComparator;
+      if(key instanceof Double){
+        final double d;
+        if((d=(double)key)==d){
+          final long bits;
+          if((bits=Double.doubleToRawLongBits(d))==0){
+            queryComparator=this::comparePos0;
+          }else if(bits==Long.MIN_VALUE){
+            queryComparator=this::compareNeg0;
+          }else{
+            queryComparator=super.getQueryComparator(d);
+          }
+        }else{
+          return $BoxedType$.isNaN(arr[tail]);
+        }
+      }else if(key instanceof Integer || key instanceof Byte || key instanceof Short){
+        final int i;
+        queryComparator=((i=((Number)key).intValue())==0)?this::comparePos0:super.getQueryComparator(i);
+      }else if(key instanceof Long){
+        final long l;
+        if(!TypeUtil.checkCastToDouble(l=(long)key)){
+          return false;
+        }
+        queryComparator=l==0?this::comparePos0:super.getQueryComparator(l);
+      }else if(key instanceof Float){
+        final float f;
+        if((f=(float)key)==f){
+          switch(Float.floatToRawIntBits(f)){
+            case 0xff800000:
+              return arr[this.head]==$BoxedType$.NEGATIVE_INFINITY;
+            case 0x7f800000:
+              final $ArrayType$[] arr;
+              return ((arr=this.arr)[tail]==$BoxedType$.POSITIVE_INFINITY)
+                   ||(tail!=this.head && (arr[tail==0?arr.length-1:tail-1]==$BoxedType$.POSITIVE_INFINITY));
+            case 0:
+              queryComparator=this::comparePos0;
+              break;
+            case Integer.MIN_VALUE:
+              queryComparator=this::compareNeg0;
+              break;
+            default:
+              queryComparator=super.getQueryComparator(f);
+          }
+          
+        }else{
+          return $BoxedType$.isNaN(arr[tail]);
+        }
+        
+      }else if(key instanceof Character){
+        final int i;
+        queryComparator=((i=(char)key)==0)?this::comparePos0:super.getQueryComparator(i);
+      }else if(key instanceof Boolean){
+        queryComparator=((boolean)key)?this::comparePos1:this::comparePos0;
+      }else{
+        return false;
+      }
+      return super.uncheckedContainsMatch(this.head,tail,queryComparator);
+    }
+    return false;
+  }
+#ENDIF
+#IF OfDouble,OfFloat
+  @Override boolean uncheckedremoveNaN(int tail){
+     final $ArrayType$[] arr;
+     if($BoxedType$.isNaN((arr=this.arr)[tail])){
+       if(tail==this.head){
+         tail=-1;
+       }else if(--tail==-1){
+         tail=arr.length-1;
+       }
+       this.tail=tail;
+       return true;
+     } 
+     return false;
+  }
+  @Override boolean uncheckedremovePosInf(int tail){
+    final $ArrayType$[] arr;
+    if((arr=this.arr)[tail]==$BoxedType$.POSITIVE_INFINITY){
+      if(tail==this.head){
+        tail=-1;
+      }else if(--tail==-1){
+        tail=arr.length-1;
+      }
+      this.tail=tail;
+      return true;
+    }
+    if(tail!=this.head){
+      if(--tail==-1){
+        tail=arr.length-1;
+      }
+      if(arr[tail]==$BoxedType$.POSITIVE_INFINITY){
+        arr[tail]=$BoxedType$.NaN;
+        this.tail=tail;
+        return true;
+      }
+    }
+    return false;
+  }
+  @Override boolean uncheckedremoveNegInf(int tail){
+    final $ArrayType$[] arr;
+    int head;
+    if((arr=this.arr)[head=this.head]==$BoxedType$.NEGATIVE_INFINITY){
+      if(tail==head){
+        this.tail=-1;
+        
+      }else{
+        if(++head==arr.length){
+          head=0;
+        }
+        this.head=head;
+      }
+      return true;
+    }
+    return false;
+  }
+  @Override int comparePos1($exposedType$ key){
+    if(1>key){
+      //insert hi;
+      return 1;
+    }
+    if(1==key){
+      return 0;
+    }
+    return -1;
+  }
+  @Override int comparePos0($exposedType$ key){
+    if(0>key){
+      //insert hi
+      return 1;
+    }
+#IF OfFloat
+    switch(Float.floatToRawIntBits(key)){
+      case 0: //pos0
+        return 0;
+      case Integer.MIN_VALUE: //neg0
+        return 1;
+      default:
+    }
+#ELSE
+    final long bits;
+    if((bits=Double.doubleToRawLongBits(key))==0){ //pos0
+      return 0;
+    }
+    if(bits==Long.MIN_VALUE){ //neg0
+      return 1;
+    }
+#ENDIF
+    return -1; //0<key || key!=key so insert lo
+  }
+  @Override int compareNeg0($exposedType$ key){
+    if(0>key){
+      //insert hi
+      return 1;
+    }
+#IF OfFloat
+    if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
+#ELSE
+    if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
+#ENDIF
+      return 0;
+    }
+    return -1; //0<key || key!=key so insert lo
+  }
+  @Override boolean uncheckedAddNaN(int tail){
+    final $ArrayType$[] arr;
+    if(!$BoxedType$.isNaN((arr=this.arr)[tail])){
+      super.insertAtTail(arr,$BoxedType$.NaN,this.head,tail);
+      return true;
+    }
+    return false;
+  }
+  @Override boolean uncheckedAddPosInf(int tail){
+    $ArrayType$[] arr;
+    final $ArrayType$ topVal;
+    if((topVal=(arr=this.arr)[tail])!=$BoxedType$.POSITIVE_INFINITY){
+      int head=this.head;
+      if($BoxedType$.isNaN(topVal)){
+        #MACRO AddJustBeforeTail($BoxedType$.NaN,$BoxedType$.POSITIVE_INFINITY)
+        
+      }else{
+        super.insertAtTail(arr,$BoxedType$.POSITIVE_INFINITY,head,tail);
+      }
+      return true;
+    }
+    return false;
+  }
+  @Override boolean uncheckedAddNegInf(int tail){
+    final $ArrayType$[] arr;
+    final int head;
+    if(((arr=this.arr)[head=this.head])!=$BoxedType$.NEGATIVE_INFINITY){
+      super.insertAtHead(arr,$BoxedType$.NEGATIVE_INFINITY,head,tail);
+      return true;
+    }
+    return false;
+  }
+#ENDIF
+#IF OfFloat
+    @Override public boolean contains(double key){
+      final int tail;
+      if((tail=this.tail)!=-1){
+        final float f;
+        if((f=(float)key)==f){
+          final $TypeNameModifier$ToIntFunction$<E>$ queryComparator;
+          switch(Float.floatToRawIntBits(f)){
+            case 0x7f800000: //pos inf
+              final $ArrayType$[] arr;
+              return ((arr=this.arr)[tail]==$BoxedType$.POSITIVE_INFINITY) || (tail!=head && arr[tail==0?arr.length-1:tail-1]==$BoxedType$.POSITIVE_INFINITY);
+            case 0xff800000:
+              return this.arr[head]==$BoxedType$.NEGATIVE_INFINITY;
+            case 0:
+              queryComparator=this::comparePos0;
+              break;
+            case Integer.MIN_VALUE:
+              queryComparator=this::compareNeg0;
+              break;
+            default:
+              queryComparator=super.getQueryComparator(f);
+          }
+          return super.uncheckedContainsMatch(this.head,tail,queryComparator);
+        }else if(f!=f){
+          return $BoxedType$.isNaN(arr[tail]);
+        }
+      }
+      return false;
+    }
+    @Override public boolean contains(float key){
+      final int tail;
+      if((tail=this.tail)!=-1){
+        if(key==key){
+          final $TypeNameModifier$ToIntFunction$<E>$ queryComparator;
+          switch(Float.floatToRawIntBits(key)){
+            case 0x7f800000: //pos inf
+              final $ArrayType$[] arr;
+              return ((arr=this.arr)[tail]==$BoxedType$.POSITIVE_INFINITY) || (tail!=head && arr[tail==0?arr.length-1:tail-1]==$BoxedType$.POSITIVE_INFINITY);
+            case 0xff800000:
+              return this.arr[head]==$BoxedType$.NEGATIVE_INFINITY;
+            case 0:
+              queryComparator=this::comparePos0;
+              break;
+            case Integer.MIN_VALUE:
+              queryComparator=this::compareNeg0;
+              break;
+            default:
+              queryComparator=super.getQueryComparator(key);
+          }
+          return super.uncheckedContainsMatch(this.head,tail,queryComparator);
+        }
+        return $BoxedType$.isNaN(arr[tail]);
+      }
+      return false;
+    }
+    @Override public boolean contains(Object key){
+      final int tail;
+      if((tail=this.tail)!=-1){
+        final $TypeNameModifier$ToIntFunction$<E>$ queryComparator;
+        if(key instanceof Float){
+          final float f;
+          if((f=(float)key)==f){
+            switch(Float.floatToRawIntBits(f)){
+              case 0xff800000:
+                return arr[this.head]==$BoxedType$.NEGATIVE_INFINITY;
+              case 0x7f800000:
+                final $ArrayType$[] arr;
+                return ((arr=this.arr)[tail]==$BoxedType$.POSITIVE_INFINITY)
+                     ||(tail!=this.head && (arr[tail==0?arr.length-1:tail-1]==$BoxedType$.POSITIVE_INFINITY));
+              case 0:
+                queryComparator=this::comparePos0;
+                break;
+              case Integer.MIN_VALUE:
+                queryComparator=this::compareNeg0;
+                break;
+              default:
+                queryComparator=super.getQueryComparator(f);
+            }
+            
+          }else{
+            return $BoxedType$.isNaN(arr[tail]);
+          }
+        }else if(key instanceof Integer){
+          final int i;
+          if(!TypeUtil.checkCastToFloat(i=(int)key)){
+            return false;
+          }
+          queryComparator=(i==0)?this::comparePos0:super.getQueryComparator(i);
+        }else if(key instanceof Long){
+          final long l;
+          if(!TypeUtil.checkCastToFloat(l=(long)key)){
+            return false;
+          }
+          queryComparator=l==0?this::comparePos0:super.getQueryComparator(l);
+        }else if(key instanceof Double){
+          final double d;
+          final float f;
+          if((d=(double)key)==(f=(float)d)){
+            switch(Float.floatToRawIntBits(f)){
+              case 0xff800000:
+                return arr[this.head]==$BoxedType$.NEGATIVE_INFINITY;
+              case 0x7f800000:
+                final $ArrayType$[] arr;
+                return ((arr=this.arr)[tail]==$BoxedType$.POSITIVE_INFINITY)
+                     ||(tail!=this.head && (arr[tail==0?arr.length-1:tail-1]==$BoxedType$.POSITIVE_INFINITY));
+              case 0:
+                queryComparator=this::comparePos0;
+                break;
+              case Integer.MIN_VALUE:
+                queryComparator=this::compareNeg0;
+                break;
+              default:
+                queryComparator=super.getQueryComparator(f);
+            }
+          }else{
+            return $BoxedType$.isNaN(arr[tail]);
+          }
+        }else if(key instanceof Byte || key instanceof Short){
+          final int i;
+          queryComparator=((i=((Number)key).shortValue())==0)?this::comparePos0:super.getQueryComparator(i);
+        }else if(key instanceof Character){
+          final int i;
+          queryComparator=((i=(char)key)==0)?this::comparePos0:super.getQueryComparator(i);
+        }else if(key instanceof Boolean){
+          queryComparator=((boolean)key)?this::comparePos1:this::comparePos0;
+        }else{
+          return false;
+        }
+        return super.uncheckedContainsMatch(this.head,tail,queryComparator);
+      }
+      return false;
+    }
+#ENDIF
+#IF OfChar
+  @Override boolean uncheckedAdd0(int tail){
+    final $ArrayType$[] arr;
+    final int head;
+    if(((arr=this.arr)[head=this.head])!=0){
+      super.insertAtHead(arr,($exposedType$)0,head,tail);
+      return true;
+    }
+    return false;
+  }
+  @Override boolean uncheckedAdd1(int tail){
+    int head;
+    $ArrayType$[] arr;
+    final $ArrayType$ bottomVal;
+    if((bottomVal=(arr=this.arr)[head=this.head])!=1){
+      if(bottomVal==0){
+        #MACRO AddJustAfterHead(0,1)
+      }else{
+        super.insertAtHead(arr,($exposedType$)1,head,tail);
+      }
+      return true;
+    }
+    return false;
+  }
+  @Override boolean uncheckedcontains(int tail,boolean key){
+    final var arr=this.arr;
+    int head=this.head;
+    if(key){
+      switch(arr[head]){
+        case 0:
+          return head!=tail && arr[(++head==arr.length)?0:head]==1;
+        case 1:
+          return true;
+        default:
+      }
+    }
+    return arr[head]==0;
+  }
+  @Override boolean uncheckedremoveVal(int tail,boolean key){
+    final var arr=this.arr;
+    int head=this.head;
+    if(key){
+      switch(arr[head]){
+        case 0:
+          if(head!=tail && arr[(++head==arr.length)?(head=0):head]==1){
+            arr[head]=0;
+            this.head=head;
+            return true;
+          }
+        default:
+          return false;
+        case 1:
+      }
+    }else if(arr[head]!=0){
+      return false;
+    }
+    if(head==tail){
+      this.tail=-1;
+    }else{
+      if(++head==arr.length){
+        head=0;
+      }
+      this.head=head;
+    }
+    return true;
+  }
+  private static IntUnaryOperator getQueryComparator(int key){
+    return (k)->Integer.signum(key-k);
+  }
+  @Override boolean uncheckedcontains(int tail,int key){
+    switch(key){
+      default:
+        return super.uncheckedContainsMatch(this.head,tail,getQueryComparator(key));
+      case 1:
+        {
+          final $ArrayType$[] arr;
+          int head;
+          switch((arr=this.arr)[head=this.head]){
+            case 0:
+              return head!=tail && arr[(++head==arr.length)?0:head]==1;
+            case 1:
+              return true;
+            default:
+          }
+          return false;
+        }
+      case 0:
+        return arr[head]==0;
+    }
+  }
+  @Override boolean uncheckedremoveVal(int tail,int key){
+    final $ArrayType$[] arr;
+    int head;
+    switch(key){
+      default:
+        return super.uncheckedRemoveMatch(tail,getQueryComparator(key));
+      case 1:
+        switch((arr=this.arr)[head=this.head]){
+          case 0:
+            if(head!=tail && arr[(++head==arr.length)?(head=0):head]==1){
+              arr[head]=0;
+              this.head=head;
+              return true;
+            }
+          default:
+            return false;
+          case 1:
+        }
+        break;
+      case 0:
+        if((arr=this.arr)[head=this.head]!=0){
+          return false;
+        }
+    }
+    if(head==tail){
+      this.tail=-1;
+    }else{
+      if(++head==arr.length){
+        head=0;
+      }
+      this.head=head;
+    }
+    return true;
+  }
+#ENDIF
+#IF OfShort
+  @Override int insertionCompare(int key1,int key2){
+#ELSE
+  @Override int insertionCompare($exposedType$ key1,$exposedType$ key2){
+#ENDIF
+#IF OfComparable
+    return Integer.signum(-key2.compareTo(key1));
+#ELSEIF OfDouble,OfFloat,OfLong,OfInt
+    if(key1>key2){
+      return 1;
+    }
+    if(key1==key2){
+      return 0;
+    }
+    return -1;
+#ELSEIF OfShort,OfChar
+    return Integer.signum(key1-key2);
+#ENDIF
+  }
+}
+#MACRODEF AddJustAfterHead(BOTTOMVAL,NEXTVAL)
+//add just after head
+int newHead;
+switch(Integer.signum(tail-(newHead=head-1))){
+  case 0:
+    //fragmented must grow
+    final $ArrayType$[] tmp;
+    int arrLength;
+    ArrCopy.uncheckedCopy(arr,0,tmp=$NewArray$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+    ArrCopy.semicheckedCopy(arr,head,tmp,head=tail-(arrLength-=(head+1)),arrLength);
+    --head;
+    newHead=head-1;
+    this.arr=arr=tmp;
+    break;
+  default:
+    //nonfragmented
+    if(newHead==-1){
+      if(tail==(newHead=(tail=arr.length)-1)){
+        //must grow
+        this.tail=(head=OmniArray.growBy50Pct(tail))-1;
+        ArrCopy.semicheckedCopy(arr,0,arr=$NewArray$[head],head-=newHead,newHead);
+        --head;
+        this.arr=arr;
+      }
+      newHead=head-1;
+    }
+  case -1:
+    //fragmented
+}
+arr[head]=NEXTVAL;
+arr[newHead]=BOTTOMVAL;
+this.head=newHead;
+#ENDDEF
+#MACRODEF AddJustBeforeTail(TOPVAL,NEXTVAL)
+//add it before the tail
+int newTail;
+switch(Integer.signum((newTail=tail+1)-head)){
+  case 0:
+    //fragmented must grow
+    final $ArrayType$[] tmp;
+    int arrLength;
+    ArrCopy.semicheckedCopy(arr,0,tmp=$NewArray$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+    ArrCopy.uncheckedCopy(arr,newTail,tmp,head-=(arrLength-=newTail),arrLength);
+    this.head=head;
+    this.arr=arr=tmp;
+    break;
+  default:
+    //nonfragmented
+    if(newTail==arr.length){
+      if(head==0){
+        //must grow
+        ArrCopy.semicheckedCopy(arr,0,arr=$NewArray$[OmniArray.growBy50Pct(newTail)],0,tail);
+        this.arr=arr;
+      }else{
+        newTail=0;
+      }
+    }
+  case -1:
+    //fragmented
+}
+arr[tail]=NEXTVAL;
+arr[newTail]=TOPVAL;
+this.tail=newTail;
+#ENDDEF

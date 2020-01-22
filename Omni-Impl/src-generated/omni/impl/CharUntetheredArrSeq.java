@@ -61,13 +61,13 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
   public void forEach(CharConsumer action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   public void forEach(Consumer<? super Character> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action::accept);
+      ascendingForEach(this.head,tail,action::accept);
     }
   }
   @Override public char[] toCharArray(){
@@ -1357,11 +1357,10 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
     while(head<=tail);
     return -1;
   }
-  boolean uncheckedContainsMatch(int tail,final IntUnaryOperator comparator)
+  boolean uncheckedContainsMatch(int head,int tail,final IntUnaryOperator comparator)
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -1424,10 +1423,9 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
     this.head=head;
     return ret;
   }
-  void ascendingForEach(int tail,CharConsumer action){
+  void ascendingForEach(int head,int tail,CharConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((char)arr[head]);
         if(++head==bound){
@@ -1444,10 +1442,9 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
       ++head;
     }
   }
-  void descendingForEach(int tail,CharConsumer action){
+  void descendingForEach(int head,int tail,CharConsumer action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((char)arr[tail]);
         if(tail==0){
@@ -1465,7 +1462,7 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
       --tail;
     }
   }
-  private static  int nonfragmentedPullDown(final char[] arr,int dst,int src,int bound,final CharPredicate filter){
+  static  int nonfragmentedPullDown(final char[] arr,int dst,int src,int bound,final CharPredicate filter){
     for(;src<=bound;++src){
       final char tmp;
       if(!filter.test((char)(tmp=arr[src]))){
@@ -1501,7 +1498,7 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
       return false;
     }
   }
-  private static  int fragmentedPullDown(final char[] arr,int src,int arrBound,int tail,final CharPredicate filter){
+  static  int fragmentedPullDown(final char[] arr,int src,int arrBound,int tail,final CharPredicate filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final char tmp;

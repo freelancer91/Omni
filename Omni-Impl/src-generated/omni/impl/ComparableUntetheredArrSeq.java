@@ -55,7 +55,7 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
   public void forEach(Consumer<? super E> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
     @SuppressWarnings("unchecked")
@@ -835,11 +835,10 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     return -1;
   }
   @SuppressWarnings("unchecked")
-  boolean uncheckedContainsMatch(int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
+  boolean uncheckedContainsMatch(int head,int tail,@SuppressWarnings("rawtypes") final ToIntFunction comparator)
   {
     final var arr=this.arr;
-    int head;
-    if((head=this.head)>tail)
+    if(head>tail)
     {
       //fragmented
       switch(comparator.applyAsInt(arr[0]))
@@ -905,10 +904,9 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     return ret;
   }
   @SuppressWarnings("unchecked")
-  void ascendingForEach(int tail,Consumer<? super E> action){
+  void ascendingForEach(int head,int tail,Consumer<? super E> action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((E)arr[head]);
         if(++head==bound){
@@ -926,10 +924,9 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     }
   }
   @SuppressWarnings("unchecked")
-  void descendingForEach(int tail,Consumer<? super E> action){
+  void descendingForEach(int head,int tail,Consumer<? super E> action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((E)arr[tail]);
         if(tail==0){
@@ -948,7 +945,7 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> int nonfragmentedPullDown(final Comparable<E>[] arr,int dst,int src,int bound,final Predicate<? super E> filter){
+  static <E> int nonfragmentedPullDown(final Comparable<E>[] arr,int dst,int src,int bound,final Predicate<? super E> filter){
     for(;src<=bound;++src){
       final Comparable<E> tmp;
       if(!filter.test((E)(tmp=arr[src]))){
@@ -990,7 +987,7 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> int fragmentedPullDown(final Comparable<E>[] arr,int src,int arrBound,int tail,final Predicate<? super E> filter){
+  static <E> int fragmentedPullDown(final Comparable<E>[] arr,int src,int arrBound,int tail,final Predicate<? super E> filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final Comparable<E> tmp;

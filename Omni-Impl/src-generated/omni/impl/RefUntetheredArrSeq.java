@@ -54,7 +54,7 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
   public void forEach(Consumer<? super E> action){
     final int tail;
     if((tail=this.tail)!=-1){
-      ascendingForEach(tail,action);
+      ascendingForEach(this.head,tail,action);
     }
   }
   @Override public Object[] toArray(){
@@ -900,10 +900,9 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
     return ret;
   }
   @SuppressWarnings("unchecked")
-  void ascendingForEach(int tail,Consumer<? super E> action){
+  void ascendingForEach(int head,int tail,Consumer<? super E> action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(int bound=arr.length;;){
         action.accept((E)arr[head]);
         if(++head==bound){
@@ -921,10 +920,9 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
     }
   }
   @SuppressWarnings("unchecked")
-  void descendingForEach(int tail,Consumer<? super E> action){
+  void descendingForEach(int head,int tail,Consumer<? super E> action){
     final var arr=this.arr;
-    int head;
-    if(tail<(head=this.head)){
+    if(tail<head){
       for(;;){
         action.accept((E)arr[tail]);
         if(tail==0){
@@ -943,7 +941,7 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> int nonfragmentedPullDown(final Object[] arr,int dst,int src,int bound,final Predicate<? super E> filter){
+  static <E> int nonfragmentedPullDown(final Object[] arr,int dst,int src,int bound,final Predicate<? super E> filter){
     for(;src<=bound;++src){
       final Object tmp;
       if(!filter.test((E)(tmp=arr[src]))){
@@ -985,7 +983,7 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> int fragmentedPullDown(final Object[] arr,int src,int arrBound,int tail,final Predicate<? super E> filter){
+  static <E> int fragmentedPullDown(final Object[] arr,int src,int arrBound,int tail,final Predicate<? super E> filter){
     int dst=nonfragmentedPullDown(arr,src,src+1,arrBound,filter);
     for(src=0;;++src){
       final Object tmp;
