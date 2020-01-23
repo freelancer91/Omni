@@ -16,4 +16,43 @@ abstract class Abstract$ClassPrefix$SubNavigableSet
 #ENDIF
 {
   //TODO
+  
+  
+  final $ClassPrefix$UntetheredArrSeqSet$<E>$ root;
+  final Abstract$ClassPrefix$SubNavigableSet$<E>$ parent;
+  $exposedType$ inclLo;
+  $exposedType$ inclHi;
+  int head;
+  int tail;
+  Abstract$ClassPrefix$SubNavigableSet($ClassPrefix$UntetheredArrSeqSet$<E>$ root,$exposedType$ inclLo,$exposedType$ inclHi,int head,int tail){
+    this.root=root;
+    this.parent=null;
+    this.inclLo=inclLo;
+    this.inclHi=inclHi;
+    this.head=head;
+    this.tail=tail;
+  }
+  Abstract$ClassPrefix$SubNavigableSet(Abstract$ClassPrefix$SubNavigableSet$<E>$ parent,$exposedType$ inclLo,$exposedType$ inclHi,int head,int tail){
+    this.root=parent.root;
+    this.parent=parent;
+    this.inclLo=inclLo;
+    this.inclHi=inclHi;
+    this.head=head;
+    this.tail=tail;
+  }
+  @Override public int size(){
+    int size;
+    if((size=this.tail+1)!=0 && size-=head)<=0){
+      size+=root.arr.length;
+    }
+    return size;
+  }
+  @Override public boolean isEmpty(){
+    return this.tail==-1;
+  }
+  @Override public void clear(){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  
 }
