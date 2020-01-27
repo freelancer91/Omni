@@ -2632,8 +2632,8 @@ this.tail=newTail;
     int head;
     if((head=this.head)<=tail){
       //non-fragmented
-  #IFSWITCH DIRECTION==Ascending
       for(var mid=(head+tail)>>>1;;){
+  #IFSWITCH DIRECTION==Ascending
         final $ArrayType$ tmp;
         if((tmp=arr[mid])==null){
           break;
@@ -2650,11 +2650,12 @@ this.tail=newTail;
         if((mid=(head+tail)>>>1)<head){
           return ($exposedType$)arr[head];
         }
-      }
   #ELSE
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+        
+        //TODO
+        throw new omni.util.NotYetImplementedException();
   #ENDIF
+      }
     }else{
       //TODO
       throw new omni.util.NotYetImplementedException();
