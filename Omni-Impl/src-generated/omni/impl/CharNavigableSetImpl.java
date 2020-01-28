@@ -1,13 +1,13 @@
 package omni.impl;
 import omni.api.OmniIterator;
-import omni.api.OmniNavigableSet;
+import omni.api.OmniSet;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.function.CharComparator;
 import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class CharNavigableSetImpl
-  extends CharUntetheredArrSeq implements OmniNavigableSet.OfChar
+  extends CharUntetheredArrSeq implements OmniSet.OfChar
 {
   CharNavigableSetImpl(int head,char[] arr,int tail){
     super(head,arr,tail);
@@ -15,12 +15,59 @@ public abstract class CharNavigableSetImpl
   CharNavigableSetImpl(){
     super();
   }
-  @Override public char firstChar(){
-    return (char)arr[head];
+  private static  int privateCompare(char key1,char key2){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
-  @Override public char lastChar(){
-    return (char)arr[tail];
+  @Override public boolean add(char key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=0){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      char[] arr;
+      if((arr=this.arr)[tail]!=0)
+      {
+        int head;
+        switch(Integer.signum((++tail)-(head=this.head))){
+          case 0:
+            //fragmented must grow
+            final char[] tmp;
+            int arrLength;
+            ArrCopy.uncheckedCopy(arr,0,tmp=new char[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+            this.head=head;
+            this.arr=tmp;
+            this.tail=tail;
+            return true;
+          default:
+            //nonfragmented
+            if(tail==arr.length){
+              if(head==0){
+                //must grow
+                ArrCopy.uncheckedCopy(arr,0,arr=new char[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+                this.tail=tail;
+                return true;
+              }else{
+                tail=0;
+              }
+            }
+          case -1:
+            //fragmented
+        }
+        arr[tail]=0;
+        this.tail=tail;
+        return true;
+      }
+      return false;
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
+  /*
   @Override public boolean add(char key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -53,13 +100,27 @@ public abstract class CharNavigableSetImpl
       return true;
     }
   }
-  abstract int insertionCompare(char key1,char key2);
-  abstract boolean uncheckedAdd0(int tail);
-  abstract boolean uncheckedAdd1(int tail);
-  abstract boolean uncheckedcontains(int tail,int key);
-  abstract boolean uncheckedremoveVal(int tail,int key);
-  abstract boolean uncheckedcontains(int tail,boolean key);
-  abstract boolean uncheckedremoveVal(int tail,boolean key);
+  private int insertionCompare(char key1,char key2)
+  {
+  }
+  private boolean uncheckedAdd0(int tail)
+  {
+  }
+  private boolean uncheckedAdd1(int tail)
+  {
+  }
+  private boolean uncheckedcontains(int tail,int key)
+  {
+  }
+  private boolean uncheckedremoveVal(int tail,int key)
+  {
+  }
+  private boolean uncheckedcontains(int tail,boolean key)
+  {
+  }
+  private boolean uncheckedremoveVal(int tail,boolean key)
+  {
+  }
   @Override public boolean contains(boolean key){
     final int tail;
     return (tail=this.tail)!=-1 && uncheckedcontains(tail,key);
@@ -200,6 +261,13 @@ public abstract class CharNavigableSetImpl
     }
     return false;
   }
+  @Override public char firstChar(){
+    return (char)arr[head];
+  }
+  @Override public char lastChar(){
+    return (char)arr[tail];
+  }
+  */
   public static class Ascending extends CharNavigableSetImpl implements Cloneable
   {
     public Ascending(){
@@ -208,6 +276,7 @@ public abstract class CharNavigableSetImpl
     public Ascending(int head,char[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public char charCeiling(char val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -354,6 +423,10 @@ public abstract class CharNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public CharComparator comparator(){
+      return Character::compare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -374,9 +447,9 @@ public abstract class CharNavigableSetImpl
       }
       return new Ascending();
     }
-    @Override public CharComparator comparator(){
-      return Character::compare;
-    }
+    /*
+    */
+    /*
     @Override boolean uncheckedAdd0(int tail){
       final char[] arr;
       final int head;
@@ -533,6 +606,7 @@ public abstract class CharNavigableSetImpl
     @Override int insertionCompare(char key1,char key2){
       return Integer.signum(key1-key2);
     }
+    */
   }
   public static class Descending extends CharNavigableSetImpl implements Cloneable
   {
@@ -542,6 +616,7 @@ public abstract class CharNavigableSetImpl
     public Descending(int head,char[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public char charCeiling(char val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -688,6 +763,10 @@ public abstract class CharNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public CharComparator comparator(){
+      return CharComparator::descendingCompare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -708,9 +787,9 @@ public abstract class CharNavigableSetImpl
       }
       return new Descending();
     }
-    @Override public CharComparator comparator(){
-      return CharComparator::descendingCompare;
-    }
+    /*
+    */
+    /*
     @Override boolean uncheckedAdd0(int tail){
       final char[] arr;
       if(((arr=this.arr)[tail])!=0){
@@ -861,5 +940,6 @@ public abstract class CharNavigableSetImpl
     @Override int insertionCompare(char key1,char key2){
       return Integer.signum(key2-key1);
     }
+    */
   }
 }

@@ -1,13 +1,13 @@
 package omni.impl;
 import omni.api.OmniIterator;
-import omni.api.OmniNavigableSet;
+import omni.api.OmniSet;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.function.ToIntFunction;
 public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
-  extends ComparableUntetheredArrSeq<E> implements OmniNavigableSet.OfRef<E>
+  extends ComparableUntetheredArrSeq<E> implements OmniSet.OfRef<E>
 {
   ComparableNavigableSetImpl(int head,Comparable<E>[] arr,int tail){
     super(head,arr,tail);
@@ -15,14 +15,54 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
   ComparableNavigableSetImpl(){
     super();
   }
-  @SuppressWarnings("unchecked")
-  @Override public E first(){
-    return (E)arr[head];
+  private static <E> int privateCompare(E key1,E key2){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
-  @SuppressWarnings("unchecked")
-  @Override public E last(){
-    return (E)arr[tail];
+  @Override public boolean add(E key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedAdd(tail,key,ComparableNavigableSetImpl::privateCompare);
+      }
+      Comparable<E>[] arr;
+      if((arr=this.arr)[tail]!=null)
+      {
+        int head;
+        switch(Integer.signum((++tail)-(head=this.head))){
+          case 0:
+            //fragmented must grow
+            final Comparable<E>[] tmp;
+            int arrLength;
+            ArrCopy.uncheckedCopy(arr,0,tmp=new Comparable[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+            this.head=head;
+            this.arr=tmp;
+            break;
+          default:
+            //nonfragmented
+            if(tail==arr.length){
+              if(head==0){
+                //must grow
+                ArrCopy.uncheckedCopy(arr,0,arr=new Comparable[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+              }else{
+                tail=0;
+              }
+            }
+          case -1:
+            //fragmented
+        }
+        this.tail=tail;
+        return true;
+      }
+      return false;
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
+  /*
   @Override public boolean add(E key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -35,10 +75,18 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       return true;
     }
   }
-  abstract int insertionCompare(E key1,E key2);
-  abstract boolean uncheckedAddNull(int tail);
-  abstract boolean uncheckedremoveNull(int tail);
-  abstract ToIntFunction<E> getQueryComparator(E key);
+  private int insertionCompare(E key1,E key2)
+  {
+  }
+  private boolean uncheckedAddNull(int tail)
+  {
+  }
+  private boolean uncheckedremoveNull(int tail)
+  {
+  }
+  private ToIntFunction<E> getQueryComparator(E key)
+  {
+  }
   @SuppressWarnings("unchecked")
   @Override public boolean contains(boolean key){
     final int tail;
@@ -218,6 +266,15 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     }
     return false;
   }
+  @SuppressWarnings("unchecked")
+  @Override public E first(){
+    return (E)arr[head];
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E last(){
+    return (E)arr[tail];
+  }
+  */
   public static class Ascending<E extends Comparable<E>> extends ComparableNavigableSetImpl<E> implements Cloneable
   {
     public Ascending(){
@@ -226,6 +283,7 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     public Ascending(int head,Comparable<E>[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @SuppressWarnings("unchecked")
     @Override public E ceiling(E val){
       int tail;
@@ -237,18 +295,23 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
           for(var mid=(head+tail)>>>1;;){
             final Comparable<E> tmp;
             if((tmp=arr[mid])==null){
+              //We have encountered the greatest possible value (also the default value)
+              //We could have only gotten here by starting at a set of size 1 OR by searching for null, so return null
               break;
             }
             switch(Integer.signum(tmp.compareTo(val))){
               case 0:
                 return (E)tmp;
               case -1:
+                //the encountered value is less then the search value, so search to the right (higher values)
                 head=mid+1;
                 break;
               default:
+                //the encountered value is greater than the search value, so search to the left (lower values)
                 tail=mid-1;
             }
             if((mid=(head+tail)>>>1)<head){
+              //the midpoint is less then the lower point, so return the head, which is at guaranteed greater then the search value
               return (E)arr[head];
             }
           }
@@ -303,6 +366,10 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public Comparator<E> comparator(){
+      return Comparator.nullsLast(Comparable::compareTo);
+    }
+    */
     @SuppressWarnings("unchecked")
     @Override public Object clone(){
       int tail;
@@ -324,9 +391,7 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       }
       return new Ascending<E>();
     }
-    @Override public Comparator<E> comparator(){
-      return Comparator.nullsLast(Comparable::compareTo);
-    }
+    /*
     @SuppressWarnings("unchecked")
     @Override boolean uncheckedAddNull(int tail){
       //add at tail
@@ -477,9 +542,12 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     @Override ToIntFunction<E> getQueryComparator(E key){
       return (k)->Integer.signum(-k.compareTo(key));
     }
+    */
+    /*
     @Override int insertionCompare(E key1,E key2){
       return Integer.signum(-key2.compareTo(key1));
     }
+    */
   }
   public static class Descending<E extends Comparable<E>> extends ComparableNavigableSetImpl<E> implements Cloneable
   {
@@ -489,6 +557,7 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     public Descending(int head,Comparable<E>[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @SuppressWarnings("unchecked")
     @Override public E ceiling(E val){
       int tail;
@@ -497,8 +566,27 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
         int head;
         if((head=this.head)<=tail){
           //non-fragmented
-          //TODO
-          throw new omni.util.NotYetImplementedException();
+          for(var mid=(head+tail)>>>1;;){
+            final Comparable<E> tmp;
+            if((tmp=arr[mid])==null){
+              //we have encountered the least(greatest) possible value (also the default value)
+              //The search value might be to the right, so search there
+              head=mid+1;
+            }else{
+              switch(Integer.signum(tmp.compareTo(val))){
+                case 0:
+                  return (E) tmp;
+                case -1:
+                  tail=mid-1;
+                  break;
+                default:
+                  head=mid+1;
+              }
+            }
+            if((mid=(head+tail)>>>1)<head){
+              break;
+            }
+          }
         }else{
           //TODO
           throw new omni.util.NotYetImplementedException();
@@ -550,6 +638,10 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public Comparator<E> comparator(){
+      return Comparator.nullsFirst(Collections.reverseOrder());
+    }
+    */
     @SuppressWarnings("unchecked")
     @Override public Object clone(){
       int tail;
@@ -571,9 +663,7 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       }
       return new Descending<E>();
     }
-    @Override public Comparator<E> comparator(){
-      return Comparator.nullsFirst(Collections.reverseOrder());
-    }
+    /*
     @SuppressWarnings("unchecked")
     @Override boolean uncheckedAddNull(int tail){
       //add at tail
@@ -725,8 +815,11 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     @Override ToIntFunction<E> getQueryComparator(E key){
       return (k)->Integer.signum(k.compareTo(key));
     }
+    */
+    /*
     @Override int insertionCompare(E key1,E key2){
       return Integer.signum(key2.compareTo(key1));
     }
+    */
   }
 }

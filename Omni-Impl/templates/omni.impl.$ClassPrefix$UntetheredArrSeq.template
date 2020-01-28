@@ -15,11 +15,8 @@ import omni.util.OmniArray;
 #IF OfBoolean
 import omni.util.TypeUtil;
 #ENDIF
-#IF OfChar,OfDouble,OfFloat,OfInt,OfLong
+#IF OfShort,OfChar,OfDouble,OfFloat,OfInt,OfLong
 import omni.function.$TypeNameModifier$Comparator;
-#ENDIF
-#IF OfShort
-import omni.function.IntComparator;
 #ENDIF
 #IF OfRef,OfComparable
 import java.util.Comparator;
@@ -971,11 +968,8 @@ public RETTYPE pollLastMETHODSUFFIX(){
       this.head=index;
     }
   }
-#IF OfShort
-  #MACRO AddSetFunctions(IntComparator$<E>$,compare(key\,)
-#ELSE
+
   #MACRO AddSetFunctions($TypeNameModifier$Comparator$<E>$,compare(key\,)
-#ENDIF
 #IF OfChar,OfInt,OfShort
   #MACRO AddSetFunctions(IntUnaryOperator,applyAsInt()
 #ELSEIFNOT OfRef

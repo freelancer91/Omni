@@ -1,13 +1,13 @@
 package omni.impl;
 import omni.api.OmniIterator;
-import omni.api.OmniNavigableSet;
+import omni.api.OmniSet;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.function.FloatComparator;
 import omni.util.TypeUtil;
 import omni.function.FloatToIntFunction;
 public abstract class FloatNavigableSetImpl
-  extends FloatUntetheredArrSeq implements OmniNavigableSet.OfFloat
+  extends FloatUntetheredArrSeq implements OmniSet.OfFloat
 {
   FloatNavigableSetImpl(int head,float[] arr,int tail){
     super(head,arr,tail);
@@ -15,12 +15,56 @@ public abstract class FloatNavigableSetImpl
   FloatNavigableSetImpl(){
     super();
   }
-  @Override public float firstFloat(){
-    return (float)arr[head];
+  private static  int privateCompare(float key1,float key2){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
-  @Override public float lastFloat(){
-    return (float)arr[tail];
+  @Override public boolean add(float key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      float[] arr;
+      if(!Float.isNaN((arr=this.arr)[tail]))
+      {
+        int head;
+        switch(Integer.signum((++tail)-(head=this.head))){
+          case 0:
+            //fragmented must grow
+            final float[] tmp;
+            int arrLength;
+            ArrCopy.uncheckedCopy(arr,0,tmp=new float[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+            this.head=head;
+            this.arr=arr=tmp;
+            break;
+          default:
+            //nonfragmented
+            if(tail==arr.length){
+              if(head==0){
+                //must grow
+                ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+              }else{
+                tail=0;
+              }
+            }
+          case -1:
+            //fragmented
+        }
+        arr[tail]=Float.NaN;
+        this.tail=tail;
+        return true;
+      }
+      return false;
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
+  /*
   @Override public boolean add(float key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -111,13 +155,27 @@ public abstract class FloatNavigableSetImpl
       return true;
     }
   }
-  abstract int insertionCompare(float key1,float key2);
-  abstract int comparePos0(float key);
-  abstract int compareNeg0(float key);
-  abstract int comparePos1(float key);
-  abstract boolean uncheckedAddNaN(int tail);
-  abstract boolean uncheckedAddPosInf(int tail);
-  abstract boolean uncheckedAddNegInf(int tail);
+  private int insertionCompare(float key1,float key2)
+  {
+  }
+  private int comparePos0(float key)
+  {
+  }
+  private int compareNeg0(float key)
+  {
+  }
+  private int comparePos1(float key)
+  {
+  }
+  private boolean uncheckedAddNaN(int tail)
+  {
+  }
+  private boolean uncheckedAddPosInf(int tail)
+  {
+  }
+  private boolean uncheckedAddNegInf(int tail)
+  {
+  }
   @Override public boolean contains(boolean key){
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,key?this::comparePos1:this::comparePos0);
@@ -290,6 +348,13 @@ public abstract class FloatNavigableSetImpl
     }
     return false;
   }
+  @Override public float firstFloat(){
+    return (float)arr[head];
+  }
+  @Override public float lastFloat(){
+    return (float)arr[tail];
+  }
+  */
   public static class Ascending extends FloatNavigableSetImpl implements Cloneable
   {
     public Ascending(){
@@ -298,6 +363,7 @@ public abstract class FloatNavigableSetImpl
     public Ascending(int head,float[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public float floatCeiling(float val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -393,6 +459,10 @@ public abstract class FloatNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public FloatComparator comparator(){
+      return Float::compare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -413,9 +483,9 @@ public abstract class FloatNavigableSetImpl
       }
       return new Ascending();
     }
-    @Override public FloatComparator comparator(){
-      return Float::compare;
-    }
+    /*
+    */
+    /*
     @Override boolean uncheckedremoveNaN(int tail){
        final float[] arr;
        if(Float.isNaN((arr=this.arr)[tail])){
@@ -700,6 +770,7 @@ public abstract class FloatNavigableSetImpl
       }
       return -1;
     }
+    */
   }
   public static class Descending extends FloatNavigableSetImpl implements Cloneable
   {
@@ -709,6 +780,7 @@ public abstract class FloatNavigableSetImpl
     public Descending(int head,float[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public float floatCeiling(float val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -804,6 +876,10 @@ public abstract class FloatNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public FloatComparator comparator(){
+      return FloatComparator::descendingCompare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -824,9 +900,9 @@ public abstract class FloatNavigableSetImpl
       }
       return new Descending();
     }
-    @Override public FloatComparator comparator(){
-      return FloatComparator::descendingCompare;
-    }
+    /*
+    */
+    /*
     @Override int comparePos1(float key){
       if(1>key){
         return -1;
@@ -1117,5 +1193,6 @@ public abstract class FloatNavigableSetImpl
       }
       return 1;
     }
+    */
   }
 }

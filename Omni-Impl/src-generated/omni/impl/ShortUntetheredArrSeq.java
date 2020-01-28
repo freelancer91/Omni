@@ -2,7 +2,7 @@ package omni.impl;
 import omni.api.OmniCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.function.IntComparator;
+import omni.function.ShortComparator;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import java.util.function.IntUnaryOperator;
@@ -733,7 +733,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
       this.head=index;
     }
   }
-  boolean uncheckedAdd(int tail,short key,IntComparator sorter)
+  boolean uncheckedAdd(int tail,short key,ShortComparator sorter)
   {
     final var arr=this.arr;
     final int head;
@@ -763,7 +763,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
       }
     }
   }
-  boolean fragmentedInsertHi(short[] arr,int head,int tail,short key,IntComparator sorter){
+  boolean fragmentedInsertHi(short[] arr,int head,int tail,short key,ShortComparator sorter){
     int lo=1;
     int hi=tail;
     while(lo<=hi)
@@ -828,7 +828,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     }
     return true;
   }
-  boolean fragmentedInsertLo(short[] arr,int head,int tail,short key,IntComparator sorter){
+  boolean fragmentedInsertLo(short[] arr,int head,int tail,short key,ShortComparator sorter){
     int arrBound;
     int hi=(arrBound=arr.length)-1;
     int lo=head;
@@ -882,7 +882,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     }
     return true;
   }
-  boolean nonfragmentedInsertLo(short[] arr,int head,int hi,short key,IntComparator sorter){
+  boolean nonfragmentedInsertLo(short[] arr,int head,int hi,short key,ShortComparator sorter){
     int lo=head;
     while(lo<=hi)
     {
@@ -936,7 +936,7 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     }
     return true;
   }
-  boolean nonfragmentedInsertHi(short[] arr,int lo,int tail,short key,IntComparator sorter){
+  boolean nonfragmentedInsertHi(short[] arr,int lo,int tail,short key,ShortComparator sorter){
     int hi=tail;
     while(lo<=hi)
     {

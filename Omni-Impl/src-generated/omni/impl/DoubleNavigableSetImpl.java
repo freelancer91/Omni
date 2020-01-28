@@ -1,13 +1,13 @@
 package omni.impl;
 import omni.api.OmniIterator;
-import omni.api.OmniNavigableSet;
+import omni.api.OmniSet;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.function.DoubleComparator;
 import omni.util.TypeUtil;
 import java.util.function.DoubleToIntFunction;
 public abstract class DoubleNavigableSetImpl
-  extends DoubleUntetheredArrSeq implements OmniNavigableSet.OfDouble
+  extends DoubleUntetheredArrSeq implements OmniSet.OfDouble
 {
   DoubleNavigableSetImpl(int head,double[] arr,int tail){
     super(head,arr,tail);
@@ -15,12 +15,56 @@ public abstract class DoubleNavigableSetImpl
   DoubleNavigableSetImpl(){
     super();
   }
-  @Override public double firstDouble(){
-    return (double)arr[head];
+  private static  int privateCompare(double key1,double key2){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
-  @Override public double lastDouble(){
-    return (double)arr[tail];
+  @Override public boolean add(double key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      if(key==key){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+      }
+      double[] arr;
+      if(!Double.isNaN((arr=this.arr)[tail]))
+      {
+        int head;
+        switch(Integer.signum((++tail)-(head=this.head))){
+          case 0:
+            //fragmented must grow
+            final double[] tmp;
+            int arrLength;
+            ArrCopy.uncheckedCopy(arr,0,tmp=new double[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+            this.head=head;
+            this.arr=arr=tmp;
+            break;
+          default:
+            //nonfragmented
+            if(tail==arr.length){
+              if(head==0){
+                //must grow
+                ArrCopy.uncheckedCopy(arr,0,arr=new double[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+              }else{
+                tail=0;
+              }
+            }
+          case -1:
+            //fragmented
+        }
+        arr[tail]=Double.NaN;
+        this.tail=tail;
+        return true;
+      }
+      return false;
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
+  /*
   @Override public boolean add(double key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -108,13 +152,27 @@ public abstract class DoubleNavigableSetImpl
       return true;
     }
   }
-  abstract int insertionCompare(double key1,double key2);
-  abstract int comparePos0(double key);
-  abstract int compareNeg0(double key);
-  abstract int comparePos1(double key);
-  abstract boolean uncheckedAddNaN(int tail);
-  abstract boolean uncheckedAddPosInf(int tail);
-  abstract boolean uncheckedAddNegInf(int tail);
+  private int insertionCompare(double key1,double key2)
+  {
+  }
+  private int comparePos0(double key)
+  {
+  }
+  private int compareNeg0(double key)
+  {
+  }
+  private int comparePos1(double key)
+  {
+  }
+  private boolean uncheckedAddNaN(int tail)
+  {
+  }
+  private boolean uncheckedAddPosInf(int tail)
+  {
+  }
+  private boolean uncheckedAddNegInf(int tail)
+  {
+  }
   @Override public boolean contains(boolean key){
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,key?this::comparePos1:this::comparePos0);
@@ -248,6 +306,13 @@ public abstract class DoubleNavigableSetImpl
     }
     return false;
   }
+  @Override public double firstDouble(){
+    return (double)arr[head];
+  }
+  @Override public double lastDouble(){
+    return (double)arr[tail];
+  }
+  */
   public static class Ascending extends DoubleNavigableSetImpl implements Cloneable
   {
     public Ascending(){
@@ -256,6 +321,7 @@ public abstract class DoubleNavigableSetImpl
     public Ascending(int head,double[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public double doubleCeiling(double val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -334,6 +400,10 @@ public abstract class DoubleNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public DoubleComparator comparator(){
+      return Double::compare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -354,9 +424,9 @@ public abstract class DoubleNavigableSetImpl
       }
       return new Ascending();
     }
-    @Override public DoubleComparator comparator(){
-      return Double::compare;
-    }
+    /*
+    */
+    /*
     @Override public boolean contains(double key){
       final int tail;
       if((tail=this.tail)!=-1){
@@ -617,6 +687,7 @@ public abstract class DoubleNavigableSetImpl
       }
       return -1;
     }
+    */
   }
   public static class Descending extends DoubleNavigableSetImpl implements Cloneable
   {
@@ -626,6 +697,7 @@ public abstract class DoubleNavigableSetImpl
     public Descending(int head,double[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public double doubleCeiling(double val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -704,6 +776,10 @@ public abstract class DoubleNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public DoubleComparator comparator(){
+      return DoubleComparator::descendingCompare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -724,9 +800,9 @@ public abstract class DoubleNavigableSetImpl
       }
       return new Descending();
     }
-    @Override public DoubleComparator comparator(){
-      return DoubleComparator::descendingCompare;
-    }
+    /*
+    */
+    /*
     @Override int comparePos1(double key){
       if(1>key){
         return -1;
@@ -989,5 +1065,6 @@ public abstract class DoubleNavigableSetImpl
       }
       return 1;
     }
+    */
   }
 }

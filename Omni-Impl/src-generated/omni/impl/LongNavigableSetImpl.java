@@ -1,12 +1,12 @@
 package omni.impl;
 import omni.api.OmniIterator;
-import omni.api.OmniNavigableSet;
+import omni.api.OmniSet;
 import omni.util.ArrCopy;
 import omni.function.LongComparator;
 import omni.util.TypeUtil;
 import java.util.function.LongToIntFunction;
 public abstract class LongNavigableSetImpl
-  extends LongUntetheredArrSeq implements OmniNavigableSet.OfLong
+  extends LongUntetheredArrSeq implements OmniSet.OfLong
 {
   LongNavigableSetImpl(int head,long[] arr,int tail){
     super(head,arr,tail);
@@ -14,12 +14,20 @@ public abstract class LongNavigableSetImpl
   LongNavigableSetImpl(){
     super();
   }
-  @Override public long firstLong(){
-    return (long)arr[head];
+  private static  int privateCompare(long key1,long key2){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
-  @Override public long lastLong(){
-    return (long)arr[tail];
+  @Override public boolean add(long key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,LongNavigableSetImpl::privateCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
+  /*
   @Override public boolean add(long key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -62,7 +70,9 @@ public abstract class LongNavigableSetImpl
       return true;
     }
   }
-  abstract int insertionCompare(long key1,long key2);
+  private int insertionCompare(long key1,long key2)
+  {
+  }
   LongToIntFunction getQueryComparator(long key){
     return (k)->this.insertionCompare(key,k);
   }
@@ -180,6 +190,13 @@ public abstract class LongNavigableSetImpl
     }
     return false;
   }
+  @Override public long firstLong(){
+    return (long)arr[head];
+  }
+  @Override public long lastLong(){
+    return (long)arr[tail];
+  }
+  */
   public static class Ascending extends LongNavigableSetImpl implements Cloneable
   {
     public Ascending(){
@@ -188,6 +205,7 @@ public abstract class LongNavigableSetImpl
     public Ascending(int head,long[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public long longCeiling(long val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -300,6 +318,10 @@ public abstract class LongNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public LongComparator comparator(){
+      return Long::compare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -320,9 +342,9 @@ public abstract class LongNavigableSetImpl
       }
       return new Ascending();
     }
-    @Override public LongComparator comparator(){
-      return Long::compare;
-    }
+    /*
+    */
+    /*
     @Override int insertionCompare(long key1,long key2){
       if(key1>key2){
         return 1;
@@ -332,6 +354,7 @@ public abstract class LongNavigableSetImpl
       }
       return -1;
     }
+    */
   }
   public static class Descending extends LongNavigableSetImpl implements Cloneable
   {
@@ -341,6 +364,7 @@ public abstract class LongNavigableSetImpl
     public Descending(int head,long[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public long longCeiling(long val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -453,6 +477,10 @@ public abstract class LongNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public LongComparator comparator(){
+      return LongComparator::descendingCompare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -473,9 +501,9 @@ public abstract class LongNavigableSetImpl
       }
       return new Descending();
     }
-    @Override public LongComparator comparator(){
-      return LongComparator::descendingCompare;
-    }
+    /*
+    */
+    /*
     @Override int insertionCompare(long key1,long key2){
       if(key1>key2){
         return -1;
@@ -485,5 +513,6 @@ public abstract class LongNavigableSetImpl
       }
       return 1;
     }
+    */
   }
 }

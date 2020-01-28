@@ -1,12 +1,12 @@
 package omni.impl;
 import omni.api.OmniIterator;
-import omni.api.OmniNavigableSet;
+import omni.api.OmniSet;
 import omni.util.ArrCopy;
 import omni.function.IntComparator;
 import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class IntNavigableSetImpl
-  extends IntUntetheredArrSeq implements OmniNavigableSet.OfInt
+  extends IntUntetheredArrSeq implements OmniSet.OfInt
 {
   IntNavigableSetImpl(int head,int[] arr,int tail){
     super(head,arr,tail);
@@ -14,12 +14,20 @@ public abstract class IntNavigableSetImpl
   IntNavigableSetImpl(){
     super();
   }
-  @Override public int firstInt(){
-    return (int)arr[head];
+  private static  int privateCompare(int key1,int key2){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
-  @Override public int lastInt(){
-    return (int)arr[tail];
+  @Override public boolean add(int key){
+    int tail;
+    if((tail=this.tail)!=-1){
+      return super.uncheckedAdd(tail,key,IntNavigableSetImpl::privateCompare);
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
+  /*
   @Override public boolean add(int key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -53,7 +61,9 @@ public abstract class IntNavigableSetImpl
       return true;
     }
   }
-  abstract int insertionCompare(int key1,int key2);
+  private int insertionCompare(int key1,int key2)
+  {
+  }
   IntUnaryOperator getQueryComparator(int key){
     return (k)->this.insertionCompare(key,k);
   }
@@ -177,6 +187,13 @@ public abstract class IntNavigableSetImpl
     }
     return false;
   }
+  @Override public int firstInt(){
+    return (int)arr[head];
+  }
+  @Override public int lastInt(){
+    return (int)arr[tail];
+  }
+  */
   public static class Ascending extends IntNavigableSetImpl implements Cloneable
   {
     public Ascending(){
@@ -185,6 +202,7 @@ public abstract class IntNavigableSetImpl
     public Ascending(int head,int[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public int intCeiling(int val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -314,6 +332,10 @@ public abstract class IntNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public IntComparator comparator(){
+      return Integer::compare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -334,9 +356,9 @@ public abstract class IntNavigableSetImpl
       }
       return new Ascending();
     }
-    @Override public IntComparator comparator(){
-      return Integer::compare;
-    }
+    /*
+    */
+    /*
     @Override int insertionCompare(int key1,int key2){
       if(key1>key2){
         return 1;
@@ -346,6 +368,7 @@ public abstract class IntNavigableSetImpl
       }
       return -1;
     }
+    */
   }
   public static class Descending extends IntNavigableSetImpl implements Cloneable
   {
@@ -355,6 +378,7 @@ public abstract class IntNavigableSetImpl
     public Descending(int head,int[] arr,int tail){
       super(head,arr,tail);
     }
+    /*
     @Override public int intCeiling(int val){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -484,6 +508,10 @@ public abstract class IntNavigableSetImpl
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
+    @Override public IntComparator comparator(){
+      return IntComparator::descendingCompare;
+    }
+    */
     @Override public Object clone(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -504,9 +532,9 @@ public abstract class IntNavigableSetImpl
       }
       return new Descending();
     }
-    @Override public IntComparator comparator(){
-      return IntComparator::descendingCompare;
-    }
+    /*
+    */
+    /*
     @Override int insertionCompare(int key1,int key2){
       if(key1>key2){
         return -1;
@@ -516,5 +544,6 @@ public abstract class IntNavigableSetImpl
       }
       return 1;
     }
+    */
   }
 }

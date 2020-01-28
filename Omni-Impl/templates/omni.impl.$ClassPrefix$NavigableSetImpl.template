@@ -7,7 +7,7 @@
 #TYPEDEF OfComparable
 package omni.impl;
 import omni.api.OmniIterator;
-import omni.api.OmniNavigableSet;
+import omni.api.OmniSet;
 import omni.util.ArrCopy;
 #IF OfChar,OfFloat,OfDouble,OfComparable
 import omni.util.OmniArray;
@@ -32,10 +32,10 @@ import java.util.function.IntUnaryOperator;
 #ENDIF
 #IF OfComparable
 public abstract class $ClassPrefix$NavigableSetImpl<E extends Comparable<E>>
-  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniNavigableSet.OfRef$<E>$
+  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniSet.OfRef$<E>$
 #ELSE
 public abstract class $ClassPrefix$NavigableSetImpl
-  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniNavigableSet.Of$ClassPrefix$$<E>$
+  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniSet.Of$ClassPrefix$$<E>$
 #ENDIF
   
 {
@@ -45,18 +45,87 @@ public abstract class $ClassPrefix$NavigableSetImpl
   $ClassPrefix$NavigableSetImpl(){
     super();
   }
-#IF OfComparable
-  @SuppressWarnings("unchecked")
-#ENDIF
-  @Override public $exposedType$ first$TypeNameModifier$(){
-    return ($exposedType$)arr[head];
+  private static $<E>$ int privateCompare($exposedType$ key1,$exposedType$ key2){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
   }
-#IF OfComparable
-  @SuppressWarnings("unchecked")
+  @Override public boolean add($exposedType$ key){
+    int tail;
+    if((tail=this.tail)!=-1){
+#IF OfComparable,OfDouble,OfFloat,OfChar
+  #IF OfComparable
+      if(key!=null){
+  #ELSEIF OfFloat,OfDouble
+      if(key==key){
+  #ELSE
+      if(key!=0){
+  #ENDIF
+  #IF OfFloat,OfDouble
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+  #ELSE
+        return super.uncheckedAdd(tail,key,$ClassPrefix$NavigableSetImpl::privateCompare);
+  #ENDIF
+      }
+      $ArrayType$[] arr;
+  #IF OfChar
+      int head;
+      if((arr=this.arr)[head=this.head]!=0){
+        //TODO
+        throw new omni.util.NotYetImplementedException();
+  #ELSE
+    #IF OfComparable
+      if((arr=this.arr)[tail]!=null){
+    #ELSE
+      if(!$BoxedType$.isNaN((arr=this.arr)[tail])){
+    #ENDIF
+        int head;
+        switch(Integer.signum((++tail)-(head=this.head))){
+          case 0:
+            //fragmented must grow
+            final $ArrayType$[] tmp;
+            int arrLength;
+            ArrCopy.uncheckedCopy(arr,0,tmp=$NewArray$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+            this.head=head;
+    #IF OfComparable
+            this.arr=tmp;
+    #ELSE
+            this.arr=arr=tmp;
+    #ENDIF
+            break;
+          default:
+            //nonfragmented
+            if(tail==arr.length){
+              if(head==0){
+                //must grow
+                ArrCopy.uncheckedCopy(arr,0,arr=$NewArray$[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+              }else{
+                tail=0;
+              }
+            }
+          case -1:
+            //fragmented
+        }
+    #IF OfDouble,OfFloat
+        arr[tail]=$BoxedType$.NaN;
+    #ENDIF
+        this.tail=tail;
+  #ENDIF
+        return true;
+      }
+      return false;
+#ELSE
+      return super.uncheckedAdd(tail,key,$ClassPrefix$NavigableSetImpl::privateCompare);
 #ENDIF
-  @Override public $exposedType$ last$TypeNameModifier$(){
-    return ($exposedType$)arr[tail];
+    }else{
+      super.insertAtMiddle(key);
+      return true;
+    }
   }
+
+  /*
   @Override public boolean add($exposedType$ key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -205,30 +274,75 @@ public abstract class $ClassPrefix$NavigableSetImpl
   }
 #ENDIF
 #IF OfShort
-  abstract int insertionCompare(int key1,int key2);
+  private int insertionCompare(int key1,int key2)
+  {
+  
+  }
 #ELSE
-  abstract int insertionCompare($exposedType$ key1,$exposedType$ key2);
+  private int insertionCompare($exposedType$ key1,$exposedType$ key2)
+  {
+  
+  }
 #ENDIF
 #IF OfComparable
-  abstract boolean uncheckedAddNull(int tail);
+  private boolean uncheckedAddNull(int tail)
+  {
+  
+  }
 #ENDIF
 #IF OfDouble,OfFloat
-  abstract int comparePos0($exposedType$ key);
-  abstract int compareNeg0($exposedType$ key);
-  abstract int comparePos1($exposedType$ key);
-  abstract boolean uncheckedAddNaN(int tail);
-  abstract boolean uncheckedAddPosInf(int tail);
-  abstract boolean uncheckedAddNegInf(int tail);
+  private int comparePos0($exposedType$ key)
+  {
+  
+  }
+  private int compareNeg0($exposedType$ key)
+  {
+  
+  }
+  private int comparePos1($exposedType$ key)
+  {
+  
+  }
+  private boolean uncheckedAddNaN(int tail)
+  {
+  
+  }
+  private boolean uncheckedAddPosInf(int tail)
+  {
+  
+  }
+  private boolean uncheckedAddNegInf(int tail)
+  {
+  
+  }
 #ENDIF
 #IF OfChar
-  abstract boolean uncheckedAdd0(int tail);
-  abstract boolean uncheckedAdd1(int tail);
+  private boolean uncheckedAdd0(int tail)
+  {
+  
+  }
+  private boolean uncheckedAdd1(int tail)
+  {
+  
+  }
 #ENDIF
 #IF OfChar
-  abstract boolean uncheckedcontains(int tail,int key);
-  abstract boolean uncheckedremoveVal(int tail,int key);
-  abstract boolean uncheckedcontains(int tail,boolean key);
-  abstract boolean uncheckedremoveVal(int tail,boolean key);
+  private boolean uncheckedcontains(int tail,int key)
+  {
+  
+  }
+  private boolean uncheckedremoveVal(int tail,int key)
+  {
+  
+  }
+  private boolean uncheckedcontains(int tail,boolean key)
+  {
+  
+  }
+  private boolean uncheckedremoveVal(int tail,boolean key)
+  {
+  
+  }
 #ENDIF
 #IF OfChar
   @Override public boolean contains(boolean key){
@@ -373,8 +487,14 @@ public abstract class $ClassPrefix$NavigableSetImpl
   }
 #ENDIF
 #IF OfComparable
-  abstract boolean uncheckedremoveNull(int tail);
-  abstract $TypeNameModifier$ToIntFunction$<E>$ getQueryComparator($exposedType$ key);
+  private boolean uncheckedremoveNull(int tail)
+  {
+  
+  }
+  private $TypeNameModifier$ToIntFunction$<E>$ getQueryComparator($exposedType$ key)
+  {
+  
+  }
   @SuppressWarnings("unchecked")
   @Override public boolean contains(boolean key){
     final int tail;
@@ -1238,7 +1358,19 @@ public abstract class $ClassPrefix$NavigableSetImpl
     return false;
   }
 #ENDIF
-
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+#ENDIF
+  @Override public $exposedType$ first$TypeNameModifier$(){
+    return ($exposedType$)arr[head];
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+#ENDIF
+  @Override public $exposedType$ last$TypeNameModifier$(){
+    return ($exposedType$)arr[tail];
+  }
+  */
 #IF OfComparable
   public static class Ascending<E extends Comparable<E>> extends $ClassPrefix$NavigableSetImpl$<E>$ implements Cloneable
 #ELSE
@@ -1246,6 +1378,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
 #ENDIF
   {
     #MACRO AscendingDescendingBody<Ascending>()
+    /*
 #IF OfDouble
     @Override public boolean contains(double key){
       final int tail;
@@ -1768,6 +1901,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
       return Integer.signum(key1-key2);
 #ENDIF
     }
+    */
   }
 #IF OfComparable
   public static class Descending<E extends Comparable<E>> extends $ClassPrefix$NavigableSetImpl$<E>$ implements Cloneable
@@ -1776,6 +1910,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
 #ENDIF
   {
     #MACRO AscendingDescendingBody<Descending>()
+    /*
 #IF OfDouble,OfFloat
     @Override int comparePos1($exposedType$ key){
       if(1>key){
@@ -2301,6 +2436,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
       return Integer.signum(key2-key1);
 #ENDIF
     }
+    */
   }
 }
 #MACRODEF AscendingDescendingBody<DIRECTION>()
@@ -2310,6 +2446,7 @@ public DIRECTION(){
 public DIRECTION(int head,$ArrayType$[] arr,int tail){
   super(head,arr,tail);
 }
+/*
 #MACRO HigherLowerCeilingFloorImpl<NATIVETYPE>($exposedType$,$defaultVal$,$exposedType$)
 #IFNOT OfComparable
 #MACRO HigherLowerCeilingFloorImpl<BOXEDTYPE>($BoxedType$,null,$exposedType$)
@@ -2404,6 +2541,25 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
   throw new omni.util.NotYetImplementedException();
 }
 #ENDIF
+#IFSWITCH DIRECTION==Ascending
+@Override public $TypeNameModifier$Comparator$<E>$ comparator(){
+#IF OfComparable
+  return Comparator.nullsLast(Comparable::compareTo);
+#ELSE
+  return $BoxedType$::compare;
+#ENDIF
+}
+
+#ELSE
+@Override public $TypeNameModifier$Comparator$<E>$ comparator(){
+#IF OfComparable
+  return Comparator.nullsFirst(Collections.reverseOrder());
+#ELSE
+  return $TypeNameModifier$Comparator::descendingCompare;
+#ENDIF
+}
+#ENDIF
+*/
 #IF OfComparable
 @SuppressWarnings("unchecked")
 #ENDIF
@@ -2427,24 +2583,7 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
   }
   return new DIRECTION$<E>$();
 }
-#IFSWITCH DIRECTION==Ascending
-@Override public $TypeNameModifier$Comparator$<E>$ comparator(){
-#IF OfComparable
-  return Comparator.nullsLast(Comparable::compareTo);
-#ELSE
-  return $BoxedType$::compare;
-#ENDIF
-}
-
-#ELSE
-@Override public $TypeNameModifier$Comparator$<E>$ comparator(){
-#IF OfComparable
-  return Comparator.nullsFirst(Collections.reverseOrder());
-#ELSE
-  return $TypeNameModifier$Comparator::descendingCompare;
-#ENDIF
-}
-#ENDIF
+/*
 #IF OfComparable
 @SuppressWarnings("unchecked")
 @Override boolean uncheckedAddNull(int tail){
@@ -2547,6 +2686,7 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
   #ENDIF
 }
 #ENDIF
+*/
 #ENDDEF
 #MACRODEF AddJustAfterHead(BOTTOMVAL,NEXTVAL)
 //add just after head
@@ -2636,24 +2776,45 @@ this.tail=newTail;
   #IFSWITCH DIRECTION==Ascending
         final $ArrayType$ tmp;
         if((tmp=arr[mid])==null){
+          //We have encountered the greatest possible value (also the default value)
+          //We could have only gotten here by starting at a set of size 1 OR by searching for null, so return null
           break;
         }
         switch(Integer.signum(tmp.compareTo(val))){
           case 0:
             return ($exposedType$)tmp;
           case -1:
+            //the encountered value is less then the search value, so search to the right (higher values)
             head=mid+1;
             break;
           default:
+            //the encountered value is greater than the search value, so search to the left (lower values)
             tail=mid-1;
         }
         if((mid=(head+tail)>>>1)<head){
+          //the midpoint is less then the lower point, so return the head, which is at guaranteed greater then the search value
           return ($exposedType$)arr[head];
         }
   #ELSE
-        
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        final $ArrayType$ tmp;
+        if((tmp=arr[mid])==null){
+          //we have encountered the least(greatest) possible value (also the default value)
+          //The search value might be to the right, so search there
+          head=mid+1;
+        }else{
+          switch(Integer.signum(tmp.compareTo(val))){
+            case 0:
+              return ($exposedType$) tmp;
+            case -1:
+              tail=mid-1;
+              break;
+            default:
+              head=mid+1;
+          }
+        }
+        if((mid=(head+tail)>>>1)<head){
+          break;
+        }
   #ENDIF
       }
     }else{
