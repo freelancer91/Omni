@@ -19,49 +19,47 @@ public abstract class CharNavigableSetImpl
     //TODO
     throw new omni.util.NotYetImplementedException();
   }
+  private boolean uncheckedAdd0(int tail){
+    char[] arr;
+    int head;
+    if((arr=this.arr)[head=this.head]!=0){
+      int newHead;
+      switch(Integer.signum(tail-(newHead=head-1))){
+        case 0:
+          //fragmented must grow
+          final char[] tmp;
+          int arrLength;
+          ArrCopy.uncheckedCopy(arr,0,tmp=new char[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+          ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+          this.arr=tmp;
+          this.head=newHead-1;
+          return true;
+        default:
+          //nonfragmented
+          if(newHead==-1 && tail==(newHead=arr.length-1)){
+            //must grow
+            this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+            ArrCopy.uncheckedCopy(arr,0,arr=new char[newHead],newHead-=(tail),tail);
+            this.arr=arr;
+            this.head=newHead-1;
+            return true;
+          }
+        case -1:
+          //fragmented
+      }
+      arr[newHead]=0;
+      this.head=newHead;
+      return true;
+    }
+    return false;
+  }
   @Override public boolean add(char key){
     int tail;
     if((tail=this.tail)!=-1){
       if(key!=0){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+        return super.uncheckedAdd(tail,key,CharNavigableSetImpl::privateCompare);
       }
-      char[] arr;
-      if((arr=this.arr)[tail]!=0)
-      {
-        int head;
-        switch(Integer.signum((++tail)-(head=this.head))){
-          case 0:
-            //fragmented must grow
-            final char[] tmp;
-            int arrLength;
-            ArrCopy.uncheckedCopy(arr,0,tmp=new char[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-            this.head=head;
-            this.arr=tmp;
-            this.tail=tail;
-            return true;
-          default:
-            //nonfragmented
-            if(tail==arr.length){
-              if(head==0){
-                //must grow
-                ArrCopy.uncheckedCopy(arr,0,arr=new char[OmniArray.growBy50Pct(tail)],0,tail);
-                this.arr=arr;
-                this.tail=tail;
-                return true;
-              }else{
-                tail=0;
-              }
-            }
-          case -1:
-            //fragmented
-        }
-        arr[tail]=0;
-        this.tail=tail;
-        return true;
-      }
-      return false;
+      return uncheckedAdd0(tail);
     }else{
       super.insertAtMiddle(key);
       return true;

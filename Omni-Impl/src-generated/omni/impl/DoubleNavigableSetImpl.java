@@ -19,46 +19,72 @@ public abstract class DoubleNavigableSetImpl
     //TODO
     throw new omni.util.NotYetImplementedException();
   }
+  private static int comparePos0(double key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static int compareNeg0(double key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private boolean uncheckedAddNegInf(int tail){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private boolean uncheckedAddPosInf(int tail){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private boolean uncheckedAddUndefined(int tail){
+    double[] arr;
+    if(!Double.isNaN((arr=this.arr)[tail])){
+      int head;
+      switch(Integer.signum((++tail)-(head=this.head))){
+        case 0:
+          //fragmented must grow
+          final double[] tmp;
+          int arrLength;
+          ArrCopy.uncheckedCopy(arr,0,tmp=new double[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+          ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+          this.head=head;
+          this.arr=arr=tmp;
+          break;
+        default:
+          //nonfragmented
+          if(tail==arr.length){
+            if(head==0){
+              //must grow
+              ArrCopy.uncheckedCopy(arr,0,arr=new double[OmniArray.growBy50Pct(tail)],0,tail);
+              this.arr=arr;
+            }else{
+              tail=0;
+            }
+          }
+        case -1:
+          //fragmented
+      }
+      arr[tail]=Double.NaN;
+      this.tail=tail;
+      return true;
+    }
+    return false;
+  }
   @Override public boolean add(double key){
     int tail;
     if((tail=this.tail)!=-1){
       if(key==key){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
-      }
-      double[] arr;
-      if(!Double.isNaN((arr=this.arr)[tail]))
-      {
-        int head;
-        switch(Integer.signum((++tail)-(head=this.head))){
-          case 0:
-            //fragmented must grow
-            final double[] tmp;
-            int arrLength;
-            ArrCopy.uncheckedCopy(arr,0,tmp=new double[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-            this.head=head;
-            this.arr=arr=tmp;
-            break;
-          default:
-            //nonfragmented
-            if(tail==arr.length){
-              if(head==0){
-                //must grow
-                ArrCopy.uncheckedCopy(arr,0,arr=new double[OmniArray.growBy50Pct(tail)],0,tail);
-                this.arr=arr;
-              }else{
-                tail=0;
-              }
-            }
-          case -1:
-            //fragmented
+        final DoubleToIntFunction compareFunc;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          compareFunc=DoubleNavigableSetImpl::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          compareFunc=DoubleNavigableSetImpl::compareNeg0;
+        }else{
+          return super.uncheckedAdd(tail,key,DoubleNavigableSetImpl::privateCompare);
         }
-        arr[tail]=Double.NaN;
-        this.tail=tail;
-        return true;
+        return super.uncheckedAdd(tail,key,compareFunc);
       }
-      return false;
+      return uncheckedAddUndefined(tail);
     }else{
       super.insertAtMiddle(key);
       return true;

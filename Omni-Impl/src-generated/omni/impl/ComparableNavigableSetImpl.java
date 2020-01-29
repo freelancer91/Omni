@@ -19,44 +19,46 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     //TODO
     throw new omni.util.NotYetImplementedException();
   }
+  private boolean uncheckedAddUndefined(int tail){
+    Comparable<E>[] arr;
+    if((arr=this.arr)[tail]!=null){
+      int head;
+      switch(Integer.signum((++tail)-(head=this.head))){
+        case 0:
+          //fragmented must grow
+          final Comparable<E>[] tmp;
+          int arrLength;
+          ArrCopy.uncheckedCopy(arr,0,tmp=new Comparable[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+          ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+          this.head=head;
+          this.arr=tmp;
+          break;
+        default:
+          //nonfragmented
+          if(tail==arr.length){
+            if(head==0){
+              //must grow
+              ArrCopy.uncheckedCopy(arr,0,arr=new Comparable[OmniArray.growBy50Pct(tail)],0,tail);
+              this.arr=arr;
+            }else{
+              tail=0;
+            }
+          }
+        case -1:
+          //fragmented
+      }
+      this.tail=tail;
+      return true;
+    }
+    return false;
+  }
   @Override public boolean add(E key){
     int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
         return super.uncheckedAdd(tail,key,ComparableNavigableSetImpl::privateCompare);
       }
-      Comparable<E>[] arr;
-      if((arr=this.arr)[tail]!=null)
-      {
-        int head;
-        switch(Integer.signum((++tail)-(head=this.head))){
-          case 0:
-            //fragmented must grow
-            final Comparable<E>[] tmp;
-            int arrLength;
-            ArrCopy.uncheckedCopy(arr,0,tmp=new Comparable[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-            this.head=head;
-            this.arr=tmp;
-            break;
-          default:
-            //nonfragmented
-            if(tail==arr.length){
-              if(head==0){
-                //must grow
-                ArrCopy.uncheckedCopy(arr,0,arr=new Comparable[OmniArray.growBy50Pct(tail)],0,tail);
-                this.arr=arr;
-              }else{
-                tail=0;
-              }
-            }
-          case -1:
-            //fragmented
-        }
-        this.tail=tail;
-        return true;
-      }
-      return false;
+      return uncheckedAddUndefined(tail);
     }else{
       super.insertAtMiddle(key);
       return true;

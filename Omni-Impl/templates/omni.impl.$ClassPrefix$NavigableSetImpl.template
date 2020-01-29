@@ -49,6 +49,106 @@ public abstract class $ClassPrefix$NavigableSetImpl
     //TODO
     throw new omni.util.NotYetImplementedException();
   }
+#IF OfChar
+  private boolean uncheckedAdd0(int tail){
+    $ArrayType$[] arr;
+    int head;
+    if((arr=this.arr)[head=this.head]!=0){
+      int newHead;
+      switch(Integer.signum(tail-(newHead=head-1))){
+        case 0:
+          //fragmented must grow
+          final $ArrayType$[] tmp;
+          int arrLength;
+          ArrCopy.uncheckedCopy(arr,0,tmp=$NewArray$[tail=OmniArray.growBy50Pct(arrLength=arr.length)],0,head);
+          ArrCopy.uncheckedCopy(arr,head,tmp,newHead=tail-(arrLength-=head),arrLength);
+          this.arr=tmp;
+          this.head=newHead-1;
+          return true;
+        default:
+          //nonfragmented
+          if(newHead==-1 && tail==(newHead=arr.length-1)){
+            //must grow
+            this.tail=(newHead=OmniArray.growBy50Pct(++tail))-1;
+            ArrCopy.uncheckedCopy(arr,0,arr=$NewArray$[newHead],newHead-=(tail),tail);
+            this.arr=arr;
+            this.head=newHead-1;
+            return true;
+          }
+        case -1:
+          //fragmented
+      }
+      arr[newHead]=0;
+      this.head=newHead;
+      return true;
+    }
+    return false;
+  }
+#ENDIF
+#IF OfFloat,OfDouble
+  private static int comparePos0($exposedType$ key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static int compareNeg0($exposedType$ key){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private boolean uncheckedAddNegInf(int tail){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private boolean uncheckedAddPosInf(int tail){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#ENDIF
+#IF OfDouble,OfFloat,OfComparable
+  private boolean uncheckedAddUndefined(int tail){
+    $ArrayType$[] arr;
+  #IF OfComparable
+    if((arr=this.arr)[tail]!=null){
+  #ELSE
+    if(!$BoxedType$.isNaN((arr=this.arr)[tail])){
+  #ENDIF
+      int head;
+      switch(Integer.signum((++tail)-(head=this.head))){
+        case 0:
+          //fragmented must grow
+          final $ArrayType$[] tmp;
+          int arrLength;
+          ArrCopy.uncheckedCopy(arr,0,tmp=$NewArray$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
+          ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
+          this.head=head;
+  #IF OfComparable
+          this.arr=tmp;
+  #ELSE
+          this.arr=arr=tmp;
+  #ENDIF
+          break;
+        default:
+          //nonfragmented
+          if(tail==arr.length){
+            if(head==0){
+              //must grow
+              ArrCopy.uncheckedCopy(arr,0,arr=$NewArray$[OmniArray.growBy50Pct(tail)],0,tail);
+              this.arr=arr;
+            }else{
+              tail=0;
+            }
+          }
+        case -1:
+          //fragmented
+      }
+  #IF OfDouble,OfFloat
+      arr[tail]=$BoxedType$.NaN;
+  #ENDIF
+      this.tail=tail;
+      return true;
+    }
+    return false;
+  }
+#ENDIF
   @Override public boolean add($exposedType$ key){
     int tail;
     if((tail=this.tail)!=-1){
@@ -60,62 +160,42 @@ public abstract class $ClassPrefix$NavigableSetImpl
   #ELSE
       if(key!=0){
   #ENDIF
-  #IF OfFloat,OfDouble
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+  #IF OfFloat
+        final FloatToIntFunction compareFunc;
+        switch(Float.floatToRawIntBits(key)){
+          default:
+            return super.uncheckedAdd(tail,key,$ClassPrefix$NavigableSetImpl::privateCompare);
+          case 0x7f800000:
+            return this.uncheckedAddPosInf(tail);
+          case 0xff800000:
+            return this.uncheckedAddNegInf(tail);
+          case 0:
+            compareFunc=$ClassPrefix$NavigableSetImpl::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            compareFunc=$ClassPrefix$NavigableSetImpl::compareNeg0;
+        }
+        return super.uncheckedAdd(tail,key,compareFunc);
+  #ELSEIF OfDouble
+        final DoubleToIntFunction compareFunc;
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(key))==0){
+          compareFunc=$ClassPrefix$NavigableSetImpl::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          compareFunc=$ClassPrefix$NavigableSetImpl::compareNeg0;
+        }else{
+          return super.uncheckedAdd(tail,key,$ClassPrefix$NavigableSetImpl::privateCompare);
+        }
+        return super.uncheckedAdd(tail,key,compareFunc);
   #ELSE
         return super.uncheckedAdd(tail,key,$ClassPrefix$NavigableSetImpl::privateCompare);
   #ENDIF
       }
-      $ArrayType$[] arr;
   #IF OfChar
-      int head;
-      if((arr=this.arr)[head=this.head]!=0){
-        //TODO
-        throw new omni.util.NotYetImplementedException();
+      return uncheckedAdd0(tail);
   #ELSE
-    #IF OfComparable
-      if((arr=this.arr)[tail]!=null){
-    #ELSE
-      if(!$BoxedType$.isNaN((arr=this.arr)[tail])){
-    #ENDIF
-        int head;
-        switch(Integer.signum((++tail)-(head=this.head))){
-          case 0:
-            //fragmented must grow
-            final $ArrayType$[] tmp;
-            int arrLength;
-            ArrCopy.uncheckedCopy(arr,0,tmp=$NewArray$[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-            this.head=head;
-    #IF OfComparable
-            this.arr=tmp;
-    #ELSE
-            this.arr=arr=tmp;
-    #ENDIF
-            break;
-          default:
-            //nonfragmented
-            if(tail==arr.length){
-              if(head==0){
-                //must grow
-                ArrCopy.uncheckedCopy(arr,0,arr=$NewArray$[OmniArray.growBy50Pct(tail)],0,tail);
-                this.arr=arr;
-              }else{
-                tail=0;
-              }
-            }
-          case -1:
-            //fragmented
-        }
-    #IF OfDouble,OfFloat
-        arr[tail]=$BoxedType$.NaN;
-    #ENDIF
-        this.tail=tail;
+      return uncheckedAddUndefined(tail);
   #ENDIF
-        return true;
-      }
-      return false;
 #ELSE
       return super.uncheckedAdd(tail,key,$ClassPrefix$NavigableSetImpl::privateCompare);
 #ENDIF
