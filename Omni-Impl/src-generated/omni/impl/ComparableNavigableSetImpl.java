@@ -1,13 +1,13 @@
 package omni.impl;
-import omni.api.OmniIterator;
-import omni.api.OmniSet;
+import omni.api.OmniNavigableSet;
 import omni.util.ArrCopy;
+import omni.api.OmniIterator;
 import omni.util.OmniArray;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.function.ToIntFunction;
 public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
-  extends ComparableUntetheredArrSeq<E> implements OmniSet.OfRef<E>
+  extends ComparableUntetheredArrSeq<E> implements OmniNavigableSet.OfRef<E>
 {
   ComparableNavigableSetImpl(int head,Comparable<E>[] arr,int tail){
     super(head,arr,tail);
@@ -15,10 +15,13 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
   ComparableNavigableSetImpl(){
     super();
   }
-  private static <E> int privateCompare(E key1,E key2){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static <E extends Comparable<E>> int privateCompare(E key1,E key2){
+    if(key2!=null){
+      return Integer.signum(-key2.compareTo(key1));
+    }
+    return -1;
   }
+  @SuppressWarnings("unchecked")
   private boolean uncheckedAddUndefined(int tail){
     Comparable<E>[] arr;
     if((arr=this.arr)[tail]!=null){
@@ -64,119 +67,49 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       return true;
     }
   }
-  /*
-  @Override public boolean add(E key){
+  private static <E extends Comparable<E>> ToIntFunction<E> getSearchFunction(E key){
+    return (k)->privateCompare(k,key);
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Object key){
     final int tail;
     if((tail=this.tail)!=-1){
-      if(key!=null){
-        return super.uncheckedAdd(tail,key,this::insertionCompare);
+      if(key instanceof Comparable){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }else if(key==null){
+        return arr[tail]==null;
       }
-      return this.uncheckedAddNull(tail);
-    }else{
-      super.insertAtMiddle(key);
-      return true;
     }
-  }
-  private int insertionCompare(E key1,E key2)
-  {
-  }
-  private boolean uncheckedAddNull(int tail)
-  {
-  }
-  private boolean uncheckedremoveNull(int tail)
-  {
-  }
-  private ToIntFunction<E> getQueryComparator(E key)
-  {
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(boolean key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Boolean)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(byte key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Byte)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(char key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Character)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(short key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Short)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(int key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Integer)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(long key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Long)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(float key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Float)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean contains(double key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)(Double)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(boolean key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Boolean)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(byte key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Byte)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(char key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Character)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(short key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Short)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(int key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Integer)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(long key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Long)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(float key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Float)key));
-  }
-  @SuppressWarnings("unchecked")
-  @Override public boolean removeVal(double key){
-    final int tail;
-    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)(Double)key));
+    return false;
   }
   @SuppressWarnings("unchecked")
   @Override public boolean remove(Object key){
     final int tail;
     if((tail=this.tail)!=-1){
-      if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+      if(key instanceof Comparable){
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
+      }else if(key==null){
+        return uncheckedRemoveNull(tail);
       }
-      return this.uncheckedremoveNull(tail);
+    }
+    return false;
+  }
+  private boolean uncheckedRemoveNull(int tail){
+    final Comparable<E>[] arr;
+    if(((arr=this.arr)[tail])==null){
+      switch(Integer.signum(tail-head)){
+        case 0:
+          this.tail=-1;
+          break;
+        case -1:
+          if(tail==0){
+            this.tail=arr.length-1;
+            break;
+          }
+        default:
+          this.tail=tail-1;
+      }
+      return true;
     }
     return false;
   }
@@ -185,9 +118,20 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Boolean key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
     }
     return false;
   }
@@ -196,9 +140,20 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Byte key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
     }
     return false;
   }
@@ -207,9 +162,20 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Character key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
     }
     return false;
   }
@@ -218,9 +184,20 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Short key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
     }
     return false;
   }
@@ -229,9 +206,20 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Integer key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
     }
     return false;
   }
@@ -240,9 +228,20 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Long key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
     }
     return false;
   }
@@ -251,9 +250,20 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(Float key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
     }
     return false;
   }
@@ -262,21 +272,103 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(key!=null){
-        return super.uncheckedRemoveMatch(tail,this.getQueryComparator((E)key));
+        return super.uncheckedRemoveMatch(tail,getSearchFunction((E)key));
       }
-      return this.uncheckedremoveNull(tail);
+      return uncheckedRemoveNull(tail);
     }
     return false;
   }
   @SuppressWarnings("unchecked")
-  @Override public E first(){
-    return (E)arr[head];
+  @Override public boolean contains(Double key){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(key!=null){
+        return super.uncheckedContainsMatch(head,tail,getSearchFunction((E)key));
+      }
+      return arr[tail]==null;
+    }
+    return false;
   }
   @SuppressWarnings("unchecked")
-  @Override public E last(){
-    return (E)arr[tail];
+  @Override public boolean contains(boolean key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Boolean)key));
   }
-  */
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(boolean key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Boolean)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(byte key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Byte)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(byte key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Byte)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(char key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Character)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(char key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Character)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(short key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Short)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(short key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Short)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(int key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Integer)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(int key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Integer)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(long key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Long)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(long key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Long)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(float key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Float)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(float key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Float)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean contains(double key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction((E)(Double)key));
+  }
+  @SuppressWarnings("unchecked")
+  @Override public boolean removeVal(double key){
+    final int tail;
+    return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Double)key));
+  }
   public static class Ascending<E extends Comparable<E>> extends ComparableNavigableSetImpl<E> implements Cloneable
   {
     public Ascending(){
@@ -285,78 +377,18 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     public Ascending(int head,Comparable<E>[] arr,int tail){
       super(head,arr,tail);
     }
-    /*
+    @Override public Comparator<E> comparator(){
+      return Comparator.nullsLast(Comparable::compareTo);
+    }
     @SuppressWarnings("unchecked")
-    @Override public E ceiling(E val){
-      int tail;
-      if(val!=null && (tail=this.tail)!=-1){
-        final var arr=this.arr;
-        int head;
-        if((head=this.head)<=tail){
-          //non-fragmented
-          for(var mid=(head+tail)>>>1;;){
-            final Comparable<E> tmp;
-            if((tmp=arr[mid])==null){
-              //We have encountered the greatest possible value (also the default value)
-              //We could have only gotten here by starting at a set of size 1 OR by searching for null, so return null
-              break;
-            }
-            switch(Integer.signum(tmp.compareTo(val))){
-              case 0:
-                return (E)tmp;
-              case -1:
-                //the encountered value is less then the search value, so search to the right (higher values)
-                head=mid+1;
-                break;
-              default:
-                //the encountered value is greater than the search value, so search to the left (lower values)
-                tail=mid-1;
-            }
-            if((mid=(head+tail)>>>1)<head){
-              //the midpoint is less then the lower point, so return the head, which is at guaranteed greater then the search value
-              return (E)arr[head];
-            }
-          }
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-      }
-      return null;
+    @Override public E first(){
+      return (E)arr[head];
     }
-    @Override public E floor(E val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @SuppressWarnings("unchecked")
+    @Override public E last(){
+      return (E)arr[tail];
     }
-    @Override public E higher(E val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public E lower(E val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement, boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement, boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive){
+    @Override public OmniNavigableSet.OfRef<E> descendingSet(){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -364,14 +396,30 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfRef<E> descendingSet(){
+    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public Comparator<E> comparator(){
-      return Comparator.nullsLast(Comparable::compareTo);
+    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
     }
-    */
+    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,E toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,boolean inclusiveFrom,E toElement,boolean inclusiveTo){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     @SuppressWarnings("unchecked")
     @Override public Object clone(){
       int tail;
@@ -393,163 +441,6 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       }
       return new Ascending<E>();
     }
-    /*
-    @SuppressWarnings("unchecked")
-    @Override boolean uncheckedAddNull(int tail){
-      //add at tail
-      final Comparable<E>[] arr;
-      if((arr=this.arr)[tail]!=null){
-        int head;
-        switch(Integer.signum(++tail-(head=this.head))){
-          case 0:
-            //fragmented must grow
-            int arrLength;
-            final Comparable<E>[] tmp;
-            ArrCopy.uncheckedCopy(arr,0,tmp=new Comparable[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,tail);
-            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-            this.head=head;
-            this.arr=tmp;
-            break;
-          case 1:
-            //nonfragmented
-            if(tail==arr.length){
-              if(0==head){
-                //must grow
-                ArrCopy.uncheckedCopy(arr,0,tmp=new Comparable[head=OmniArray.growBy50Pct(tail)],0,tail);
-                this.arr=tmp;
-              }else{
-                tail=0;
-              }
-            }
-          default:
-            //fragmented
-        }
-        this.tail=tail;
-        return true;
-      }
-      return false;
-    }
-    @Override boolean uncheckedremoveNull(int tail){
-      final Comparable<E>[] arr;
-      if((arr=this.arr)[tail]==null){
-        if(tail==this.head){
-          tail=-1;
-        }else if(--tail==-1){
-          tail=arr.length-1;
-        }
-        this.tail=tail;
-        return true;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Object key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Boolean key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Byte key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Character key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Short key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Integer key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Long key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Float key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Double key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[tail]==null;
-      }
-      return false;
-    }
-    @Override ToIntFunction<E> getQueryComparator(E key){
-      return (k)->Integer.signum(-k.compareTo(key));
-    }
-    */
-    /*
-    @Override int insertionCompare(E key1,E key2){
-      return Integer.signum(-key2.compareTo(key1));
-    }
-    */
   }
   public static class Descending<E extends Comparable<E>> extends ComparableNavigableSetImpl<E> implements Cloneable
   {
@@ -559,76 +450,18 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     public Descending(int head,Comparable<E>[] arr,int tail){
       super(head,arr,tail);
     }
-    /*
+    @Override public Comparator<E> comparator(){
+      return Comparator.nullsFirst(Collections.reverseOrder());
+    }
     @SuppressWarnings("unchecked")
-    @Override public E ceiling(E val){
-      int tail;
-      if(val!=null && (tail=this.tail)!=-1){
-        final var arr=this.arr;
-        int head;
-        if((head=this.head)<=tail){
-          //non-fragmented
-          for(var mid=(head+tail)>>>1;;){
-            final Comparable<E> tmp;
-            if((tmp=arr[mid])==null){
-              //we have encountered the least(greatest) possible value (also the default value)
-              //The search value might be to the right, so search there
-              head=mid+1;
-            }else{
-              switch(Integer.signum(tmp.compareTo(val))){
-                case 0:
-                  return (E) tmp;
-                case -1:
-                  tail=mid-1;
-                  break;
-                default:
-                  head=mid+1;
-              }
-            }
-            if((mid=(head+tail)>>>1)<head){
-              break;
-            }
-          }
-        }else{
-          //TODO
-          throw new omni.util.NotYetImplementedException();
-        }
-      }
-      return null;
+    @Override public E first(){
+      return (E)arr[tail];
     }
-    @Override public E floor(E val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
+    @SuppressWarnings("unchecked")
+    @Override public E last(){
+      return (E)arr[head];
     }
-    @Override public E higher(E val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public E lower(E val){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement, boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement, boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive){
+    @Override public OmniNavigableSet.OfRef<E> descendingSet(){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -636,14 +469,30 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfRef<E> descendingSet(){
+    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public Comparator<E> comparator(){
-      return Comparator.nullsFirst(Collections.reverseOrder());
+    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
     }
-    */
+    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement,boolean inclusive){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,E toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,boolean inclusiveFrom,E toElement,boolean inclusiveTo){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
     @SuppressWarnings("unchecked")
     @Override public Object clone(){
       int tail;
@@ -665,163 +514,5 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       }
       return new Descending<E>();
     }
-    /*
-    @SuppressWarnings("unchecked")
-    @Override boolean uncheckedAddNull(int tail){
-      //add at tail
-      final Comparable<E>[] arr;
-      int head;
-      if((arr=this.arr)[head=this.head]!=null){
-        switch(Integer.signum(tail-(--head))){
-          case 0:
-            //fragmented must grow
-            final Comparable<E>[] tmp;
-            int arrLength;
-            ArrCopy.uncheckedCopy(arr,0,tmp=new Comparable[head=OmniArray.growBy50Pct(arrLength=arr.length)],0,++tail);
-            ArrCopy.uncheckedCopy(arr,tail,tmp,head-=(arrLength-=tail),arrLength);
-            --head;
-            this.arr=tmp;
-            break;
-          default:
-            //nonfragmented
-            if(head==-1){
-              if(tail==(head=arr.length-1)){
-                //must grow
-                this.tail=(head=OmniArray.growBy50Pct(++tail))-1;
-                ArrCopy.uncheckedCopy(arr,0,tmp=new Comparable[head],head-=tail,tail);
-                --head;
-                this.arr=tmp;
-              }
-            }
-          case -1:
-            //fragmented
-        }
-        this.head=head;
-        return true;
-      }
-      return false;
-    }
-    @Override boolean uncheckedremoveNull(int tail){
-      final Comparable<E>[] arr;
-      int head;
-      if((arr=this.arr)[head=this.head]==null){
-        if(tail==head){
-          tail=-1;
-        }else if(--tail==-1){
-          tail=arr.length-1;
-        }
-        this.tail=tail;
-        return true;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Object key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Boolean key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Byte key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Character key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Short key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Integer key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Long key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Float key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @SuppressWarnings("unchecked")
-    @Override public boolean contains(Double key){
-      final int tail;
-      if((tail=this.tail)!=-1){
-        if(key!=null){
-          return super.uncheckedContainsMatch(this.head,tail,this.getQueryComparator((E)key));
-        }
-        return arr[head]==null;
-      }
-      return false;
-    }
-    @Override ToIntFunction<E> getQueryComparator(E key){
-      return (k)->Integer.signum(k.compareTo(key));
-    }
-    */
-    /*
-    @Override int insertionCompare(E key1,E key2){
-      return Integer.signum(key2.compareTo(key1));
-    }
-    */
   }
 }
