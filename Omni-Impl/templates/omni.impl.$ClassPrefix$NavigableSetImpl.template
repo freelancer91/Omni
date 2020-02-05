@@ -1659,32 +1659,45 @@ public abstract class $ClassPrefix$NavigableSetImpl
   @Override public E lower(E val){
     int tail;
     if((tail=this.tail)!=-1){
-      //TODO
+      //TODO trickier than I thought
       throw new omni.util.NotYetImplementedException();
-      /*
-      final $ArrayType$[] arr;
-      $ArrayType$ tmp;
-      
-      if((tmp=(arr=this.arr)[tail])!=null && tmp.compareTo(val)<0){
-        return ($exposedType$)tmp;
-      }
-      final int head;
-      if(tail==(head=this.head) || (tmp=arr[head]).compareTo(val)>=0){
-        return null;
-      }
-      if(head<tail){
-        return nonfragmentedLowerImpl(arr,head,tail,val);
-      }else{
-        return fragmentedLowerImpl(arr,head,tail,val);
-      }
-      */
     }
     return null;
   }
 #ELSE
   @Override public $exposedType$ $exposedType$Ceiling($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  #IF OfDouble,OfFloat
+    int tail;
+    if(val==val && (tail=this.tail)!=-1){
+      //TODO trickier than I thought
+      throw new omni.util.NotYetImplementedException();
+    }
+    return $defaultVal$;
+  #ELSE
+    int tail;
+    if((tail=this.tail)!=-1){
+      final $ArrayType$[] arr;
+      $ArrayType$ tmp;
+      switch(privateCompare(val,tmp=(arr=this.arr)[tail])){
+        default:
+          final int head;
+          if(tail==(head=this.head)){
+            break;
+          }
+          if(privateCompare(val,tmp=arr[head])>0){
+            if(head<tail){
+              return nonfragmentedCeilingImpl(arr,head,tail,val);
+            }else{
+              return fragmentedCeilingImpl(arr,head,tail,val);
+            }
+          }
+        case 0:
+          return tmp;
+        case 1:
+      }
+    }
+    return $defaultVal$;
+  #ENDIF
   }
   @Override public $exposedType$ $exposedType$Floor($exposedType$ val){
     //TODO
