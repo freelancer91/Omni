@@ -538,6 +538,54 @@ public abstract class FloatNavigableSetImpl
     }
     return false;
   }
+  @Override public float floatCeiling(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float floatFloor(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float higherFloat(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float lowerFloat(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Float ceiling(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Float floor(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Float higher(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Float lower(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double doubleCeiling(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double doubleFloor(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double higherDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double lowerDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
   public static class Ascending extends FloatNavigableSetImpl implements Cloneable
   {
     public Ascending(){
@@ -701,5 +749,41 @@ public abstract class FloatNavigableSetImpl
       }
       return new Descending();
     }
+      @Override public Float ceiling(float val){
+        return super.floor(val);
+      }
+      @Override public Float floor(float val){
+        return super.ceiling(val);
+      }
+      @Override public Float higher(float val){
+        return super.lower(val);
+      }
+      @Override public Float lower(float val){
+        return super.higher(val);
+      }
+      @Override public float floatCeiling(float val){
+        return super.floatFloor(val);
+      }
+      @Override public float floatFloor(float val){
+        return super.floatCeiling(val);
+      }
+      @Override public float higherFloat(float val){
+        return super.lowerFloat(val);
+      }
+      @Override public float lowerFloat(float val){
+        return super.higherFloat(val);
+      }
+      @Override public double doubleCeiling(double val){
+        return super.doubleFloor(val);
+      }
+      @Override public double doubleFloor(double val){
+        return super.doubleCeiling(val);
+      }
+      @Override public double higherDouble(double val){
+        return super.lowerDouble(val);
+      }
+      @Override public double lowerDouble(double val){
+        return super.higherDouble(val);
+      }
   }
 }

@@ -476,6 +476,38 @@ public abstract class DoubleNavigableSetImpl
     }
     return false;
   }
+  @Override public double doubleCeiling(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double doubleFloor(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double higherDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double lowerDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Double ceiling(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Double floor(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Double higher(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public Double lower(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
   public static class Ascending extends DoubleNavigableSetImpl implements Cloneable
   {
     public Ascending(){
@@ -639,5 +671,29 @@ public abstract class DoubleNavigableSetImpl
       }
       return new Descending();
     }
+      @Override public Double ceiling(double val){
+        return super.floor(val);
+      }
+      @Override public Double floor(double val){
+        return super.ceiling(val);
+      }
+      @Override public Double higher(double val){
+        return super.lower(val);
+      }
+      @Override public Double lower(double val){
+        return super.higher(val);
+      }
+      @Override public double doubleCeiling(double val){
+        return super.doubleFloor(val);
+      }
+      @Override public double doubleFloor(double val){
+        return super.doubleCeiling(val);
+      }
+      @Override public double higherDouble(double val){
+        return super.lowerDouble(val);
+      }
+      @Override public double lowerDouble(double val){
+        return super.higherDouble(val);
+      }
   }
 }

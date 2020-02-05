@@ -45,6 +45,8 @@ public abstract class $ClassPrefix$NavigableSetImpl
   $ClassPrefix$NavigableSetImpl(){
     super();
   }
+  
+
 #IF OfComparable
   private static <E extends Comparable<E>> int privateCompare($exposedType$ key1,$exposedType$ key2){
 #ELSEIF OfChar,OfShort
@@ -1503,8 +1505,289 @@ public abstract class $ClassPrefix$NavigableSetImpl
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(($exposedType$)(Double)key));
   #ENDIF
   }
-  
-  
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$ nonfragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ nonfragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$ fragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ fragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$ fragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$ nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$ fragmentedHigherImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$$ nonfragmentedLowerImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  private static <E extends Comparable<E>> $ArrayType$ fragmentedLowerImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ELSE
+  private static $ArrayType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$exposedType$ val){
+#ENDIF
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  @Override public E ceiling(E val){
+    final int tail;
+    if(val!=null && (tail=this.tail)!=-1){
+      final $ArrayType$[] arr;
+      $ArrayType$ tmp;
+      if((tmp=(arr=this.arr)[tail]!=null){
+        switch(Integer.signum(tmp.compareTo(val))){
+          case 0:
+            return ($exposedType$)tmp;
+          case -1:
+            return null;
+          default:
+        }
+      }
+      final int head
+      if((head=this.head)==tail || (tmp=arr[head]).compareTo(val)>=0){
+        return ($exposedType$)tmp;
+      }
+      if(head<tail){
+        return nonfragmentedCeilingImpl(arr,head,tail,val);
+      }else{
+        return fragmentedCeilingImpl(arr,head,tail,val);
+      }
+    }
+    return null;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E floor(E val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(val==null){
+        return ($exposedType$)arr[tail];
+      }
+      final $ArrayType$[] arr;
+      $ArrayType$ tmp;
+      if((tmp=(arr=this.arr)[tail])!=null && tmp.compareTo(val)<=0){
+        return ($exposedType$)tmp;
+      }
+      final int head;
+      if((head=this.head)!=tail){
+        switch(Integer.signum((tmp=arr[head]).compareTo(val))){
+          case 0:
+            return ($exposedType$)tmp;
+          case -1:
+            if(head<tail){
+              return nonfragmentedFloorImpl(arr,head,tail,val);
+            }else{
+              return fragmentedFloorImpl(arr,head,tail,val);
+            }
+          default:
+        }
+      }
+    }
+    return null;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E higher(E val){
+    final int tail;
+    if(val!=null && (tail=this.tail)!=-1){
+      final $ArrayType$[] arr;
+      $ArrayType$ tmp;
+      if((tmp=(arr=this.arr)[tail]!=null && tmp.compareTo(val)>0){
+        int head
+        if((head=this.head)!=tail){
+          switch(Integer.signum((tmp=arr[head).compareTo(val))){
+            case 0:
+              if(++head==arr.length){
+                head=0;
+              }
+              return ($exposedType$)arr[head];
+            case -1:
+              if(head<tail){
+                return nonfragmentedHigherImpl(arr,head,tail,val);
+              }else{
+                return fragmentedHigherImpl(arr,head,tail,val);
+              }
+            default:
+          }
+        }
+        return ($exposedType$)tmp;
+      }
+    }
+    return null;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E lower(E val){
+    int tail;
+    if((tail=this.tail)!=-1){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+      /*
+      final $ArrayType$[] arr;
+      $ArrayType$ tmp;
+      
+      if((tmp=(arr=this.arr)[tail])!=null && tmp.compareTo(val)<0){
+        return ($exposedType$)tmp;
+      }
+      final int head;
+      if(tail==(head=this.head) || (tmp=arr[head]).compareTo(val)>=0){
+        return null;
+      }
+      if(head<tail){
+        return nonfragmentedLowerImpl(arr,head,tail,val);
+      }else{
+        return fragmentedLowerImpl(arr,head,tail,val);
+      }
+      */
+    }
+    return null;
+  }
+#ELSE
+  @Override public $exposedType$ $exposedType$Ceiling($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public $exposedType$ $exposedType$Floor($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public $exposedType$ higher$TypeNameModifier$($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public $exposedType$ lower$TypeNameModifier$($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public $BoxedType$ ceiling($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public $BoxedType$ floor($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public $BoxedType$ higher($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public $BoxedType$ lower($exposedType$ val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  #IFNOT OfDouble
+  @Override public double doubleCeiling(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double doubleFloor(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double higherDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public double lowerDouble(double val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+    #IFNOT OfFloat
+  @Override public float floatCeiling(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float floatFloor(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float higherFloat(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public float lowerFloat(float val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+      #IFNOT OfLong
+  @Override public long longCeiling(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long longFloor(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long higherLong(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public long lowerLong(long val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+        #IFNOT OfInt
+  @Override public int intCeiling(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int intFloor(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int higherInt(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @Override public int lowerInt(int val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+
 
 #IF OfComparable
   public static class Ascending<E extends Comparable<E>> extends $ClassPrefix$NavigableSetImpl$<E>$ implements Cloneable
@@ -1677,8 +1960,44 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
   }
   return new DIRECTION$<E>$();
 }
+#IFSWITCH DIRECTION==Descending
+  #IF OfComparable
+  #MACRO DescendingAccessMethods($exposedType$,$exposedType$,ceiling,floor,)
+  #ELSE
+  #MACRO DescendingAccessMethods($BoxedType$,$exposedType$,ceiling,floor,)
+  #MACRO DescendingAccessMethods($exposedType$,$exposedType$,$exposedType$Ceiling,$exposedType$Floor,$TypeNameModifier$)
+    #IFNOT OfDouble
+  #MACRO DescendingAccessMethods(double,double,doubleCeiling,doubleFloor,Double) 
+      #IFNOT OfFloat
+  #MACRO DescendingAccessMethods(float,float,floatCeiling,floatFloor,Float) 
+        #IFNOT OfLong
+  #MACRO DescendingAccessMethods(long,long,longCeiling,longFloor,Long) 
+          #IFNOT OfInt
+  #MACRO DescendingAccessMethods(int,int,intCeiling,intFloor,Int) 
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
 
 #ENDDEF
+
+#MACRODEF DescendingAccessMethods(RETTYPE,PARAMTYPE,CEILINGNAME,FLOORNAME,TYPENAMEMODIFIER)
+@Override public RETTYPE CEILINGNAME(PARAMTYPE val){
+  return super.FLOORNAME(val);
+}
+@Override public RETTYPE FLOORNAME(PARAMTYPE val){
+  return super.CEILINGNAME(val);
+}
+@Override public RETTYPE higherTYPENAMEMODIFIER(PARAMTYPE val){
+  return super.lowerTYPENAMEMODIFIER(val);
+}
+@Override public RETTYPE lowerTYPENAMEMODIFIER(PARAMTYPE val){
+  return super.higherTYPENAMEMODIFIER(val);
+}
+#ENDDEF
+
 
 
 

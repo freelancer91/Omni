@@ -671,6 +671,84 @@ abstract class LongUntetheredArrSeq implements OmniCollection.OfLong,Externaliza
       this.head=index;
     }
   }
+  /*
+  private static long ceilingImplHelper(long[] tmp,int head,int tail,LongToIntFunction searchFunc){
+    while(head<=tail){
+      final int mid;
+      final long tmp;
+      switch(Integer.signum(tmp=arr[mid=(head+tail)>>>1])){
+        case 0:
+          return tmp;
+        case 1:
+          tail=mid-1;
+          break;
+        default:
+          head=mid+1;
+      }
+    }
+    return arr[head];
+  }  
+  private static long nonfragmentedCeilingImpl(long[] arr,int head,int tail,LongToIntFunction searchFunc){
+    long tmp;
+    int mid;
+    switch(searchFunc.applyAsInt(tmp=arr[mid=(head+tail)>>>1])){
+      case 0:
+        return tmp;
+      case 1:
+      {
+        while((head=mid+1)<=tail){
+          switch(searchFunc.applyAsInt(tmp=arr[mid=(head+tail)>>>1])){
+            case 1:
+              continue;
+            case 0:
+              return tmp;
+            default:
+              return ceilingImplHelper(arr,head,mid-1,searchFunc);
+          }
+        }
+        return Long.MIN_VALUE;
+      }
+      default:
+      {
+        while((tail=mid-1)>=head){
+          switch(searchFunc.applyAsInt(tmp=arr[mid=(head+tail)>>>1])){
+            case -1:
+              continue;
+            case 0:
+              return tmp;
+            default:
+              return ceilingImplHelper(arr,mid+1,tail,searchFunc);
+          }
+        }
+        return arr[head];
+      }
+    }
+  }
+  private static long fragmentedCeilingImpl(long[] arr,int head,int tail,LongToIntFunction searchFunc){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  long ceilingImpl(int tail,LongToIntFunction searchFunc){
+    int head;
+    switch(Integer.signum(tail-(head=this.head)){
+      case 0:
+      {
+        final long tmpVal;
+        if(searchFunc.applyAsInt(tmpVal=arr[tail])<=0){
+          return tmpVal;
+        }
+        break;
+      }
+      case 1:
+      {
+        return nonfragmentedCeilingImpl(arr,head,tail,searchFunc);
+      }
+      default:
+        return fragmentedCeilingImpl(arr,head,tail,searchFunc);
+    }
+    return Long.MIN_VALUE;
+  }
+  */
   boolean uncheckedAdd(int tail,long key,LongComparator sorter)
   {
     final var arr=this.arr;

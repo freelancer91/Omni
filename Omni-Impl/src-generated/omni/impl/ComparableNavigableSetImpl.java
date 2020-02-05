@@ -369,6 +369,120 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Double)key));
   }
+  private static <E extends Comparable<E>> E nonfragmentedCeilingImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static <E extends Comparable<E>> E fragmentedCeilingImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static <E extends Comparable<E>> E nonfragmentedFloorImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static <E extends Comparable<E>> E fragmentedFloorImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static <E extends Comparable<E>> E nonfragmentedHigherImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static <E extends Comparable<E>> E fragmentedHigherImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static <E extends Comparable<E>> E nonfragmentedLowerImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  private static <E extends Comparable<E>> E fragmentedLowerImpl(Comparable<E>[] arr,int head,int tail,E val){
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E ceiling(E val){
+    final int tail;
+    if(val!=null && (tail=this.tail)!=-1){
+      final int head;
+      switch(Integer.signum(tail-(head=this.head))){
+        case 1:
+          return nonfragmentedCeilingImpl(arr,head,tail,val);
+        default:
+          return fragmentedCeilingImpl(arr,head,tail,val);
+        case 0:
+          final Comparable<E> tmp;
+          if((tmp=arr[head])!=null && tmp.compareTo(val)>=0){
+            return (E)tmp;
+          }
+      }
+    }
+    return null;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E floor(E val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(val==null){
+        return (E)arr[head];
+      }
+      final int head;
+      switch(Integer.signum(tail-(head=this.head))){
+        case 1:
+          return nonfragmentedFloorImpl(arr,head,tail,val);
+        default:
+          return fragmentedFloorImpl(arr,head,tail,val);
+        case 0:
+          final Comparable<E> tmp;
+          if((tmp=arr[head])!=null && tmp.compareTo(val)<=0){
+            return (E)tmp;
+          }
+      }
+    }
+    return null;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E higher(E val){
+    final int tail;
+    if(val!=null && (tail=this.tail)!=-1){
+      final int head;
+      switch(Integer.signum(tail-(head=this.head))){
+        case 1:
+          return nonfragmentedHigherImpl(arr,head,tail,val);
+        default:
+          return fragmentedHigherImpl(arr,head,tail,val);
+        case 0:
+          final Comparable<E> tmp;
+          if((tmp=arr[head])!=null && tmp.compareTo(val)>0){
+            return (E)tmp;
+          }
+      }
+    }
+    return null;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E lower(E val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      if(val==null){
+        return (E)arr[tail];
+      }
+      final int head;
+      switch(Integer.signum(tail-(head=this.head))){
+        case 1:
+          return nonfragmentedLowerImpl(arr,head,tail,val);
+        default:
+          return fragmentedLowerImpl(arr,head,tail,val);
+        case 0:
+          final Comparable<E> tmp;
+          if((tmp=arr[head])!=null && tmp.compareTo(val)<0){
+            return (E)tmp;
+          }
+      }
+    }
+    return null;
+  }
   public static class Ascending<E extends Comparable<E>> extends ComparableNavigableSetImpl<E> implements Cloneable
   {
     public Ascending(){
@@ -514,5 +628,17 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       }
       return new Descending<E>();
     }
+      @Override public E ceiling(E val){
+        return super.floor(val);
+      }
+      @Override public E floor(E val){
+        return super.ceiling(val);
+      }
+      @Override public E higher(E val){
+        return super.lower(val);
+      }
+      @Override public E lower(E val){
+        return super.higher(val);
+      }
   }
 }
