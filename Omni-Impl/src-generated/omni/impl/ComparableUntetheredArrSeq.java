@@ -27,6 +27,28 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     super();
     this.tail=-1;
   }
+  static abstract class AbstractFullView<E extends Comparable<E>> implements OmniCollection.OfRef<E>
+  {
+    transient final ComparableUntetheredArrSeq<E> root;
+    AbstractFullView(ComparableUntetheredArrSeq<E> root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.size();
+    }
+    @Override public boolean isEmpty(){
+      return root.isEmpty();
+    }
+    @Override public void clear(){
+      root.clear();
+    }
+    @Override public boolean add(E key){
+      return root.add(key);
+    }
+    @Override public boolean removeIf(Predicate<? super E> filter){
+      return root.removeIf(filter);
+    }
+  }
   @Override public int size(){
     int tail;
     if((tail=this.tail+1)>0 && (tail-=this.head)<=0){

@@ -1,13 +1,19 @@
 package omni.impl;
-import omni.api.OmniNavigableSet;
+import java.io.Serializable;
+import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
 import omni.api.OmniIterator;
+import omni.util.OmniArray;
+import omni.function.CharPredicate;
+import omni.function.CharConsumer;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.util.OmniArray;
 import omni.function.CharComparator;
 import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class CharNavigableSetImpl
-  extends CharUntetheredArrSeq implements OmniNavigableSet.OfChar
+  extends CharUntetheredArrSeq implements OmniSortedSet.OfChar
 {
   CharNavigableSetImpl(int head,char[] arr,int tail){
     super(head,arr,tail);
@@ -52,6 +58,9 @@ public abstract class CharNavigableSetImpl
     }
     return false;
   }
+  private static IntUnaryOperator getSearchFunction(int key){
+    return (k)->privateCompare(k,key);
+  }
   @Override public boolean add(char key){
     int tail;
     if((tail=this.tail)!=-1){
@@ -78,9 +87,6 @@ public abstract class CharNavigableSetImpl
       super.insertAtMiddle(TypeUtil.castToChar(key));
       return true;
     }
-  }
-  private static IntUnaryOperator getSearchFunction(int key){
-    return (k)->privateCompare(k,key);
   }
   @Override public boolean contains(Object key){
     final int tail;
@@ -220,101 +226,249 @@ public abstract class CharNavigableSetImpl
     final int i;
     return (tail=this.tail)!=-1 && key==(i=(char)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(i));
   }
-  @Override public char charCeiling(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class AscendingFullView extends CharUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfChar,Cloneable,Serializable
+  {
+    AscendingFullView(CharUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Character> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfChar iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char[] toCharArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        char[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new char[size],0,size);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new char[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfChar.DEFAULT_ARR;
+    }
+    @Override public Character[] toArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Character[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new Character[size],0,size);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new Character[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfChar.DEFAULT_BOXED_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new double[size],0,size);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        float[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new float[size],0,size);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new float[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override public long[] toLongArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new long[size],0,size);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new long[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public int[] toIntArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        int[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new int[size],0,size);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new int[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
   }
-  @Override public char charFloor(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public char higherChar(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public char lowerChar(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Character ceiling(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Character floor(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Character higher(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Character lower(char val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double doubleCeiling(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double doubleFloor(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double higherDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double lowerDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float floatCeiling(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float floatFloor(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float higherFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float lowerFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long longCeiling(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long longFloor(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long higherLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long lowerLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int intCeiling(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int intFloor(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int higherInt(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int lowerInt(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class DescendingFullView extends CharUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfChar,Cloneable,Serializable
+  {
+    DescendingFullView(CharUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Character> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfChar iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public char[] toCharArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        char[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new char[size+=arr.length],tail,size-tail);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new char[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfChar.DEFAULT_ARR;
+    }
+    @Override public Character[] toArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Character[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Character[size+=arr.length],tail,size-tail);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Character[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfChar.DEFAULT_BOXED_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        float[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override public long[] toLongArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public int[] toIntArray(){
+      int tail;
+      final CharUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        int[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+        }else{
+          final char[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
   }
   public static class Ascending extends CharNavigableSetImpl implements Cloneable
   {
@@ -333,47 +487,27 @@ public abstract class CharNavigableSetImpl
     @Override public char lastChar(){
       return (char)arr[tail];
     }
-    @Override public OmniNavigableSet.OfChar descendingSet(){
+    @Override public OmniSortedSet.OfChar headSet(char toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfChar descendingIterator(){
+    @Override public OmniSortedSet.OfChar headSet(Character toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar headSet(char toElement){
+    @Override public OmniSortedSet.OfChar tailSet(char fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar headSet(char toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfChar tailSet(Character fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar headSet(Character toElement){
+    @Override public OmniSortedSet.OfChar subSet(char fromElement,char toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar tailSet(char fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar tailSet(char fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar tailSet(Character fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar subSet(char fromElement,char toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar subSet(char fromElement,boolean inclusiveFrom,char toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar subSet(Character fromElement,Character toElement){
+    @Override public OmniSortedSet.OfChar subSet(Character fromElement,Character toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -415,47 +549,27 @@ public abstract class CharNavigableSetImpl
     @Override public char lastChar(){
       return (char)arr[head];
     }
-    @Override public OmniNavigableSet.OfChar descendingSet(){
+    @Override public OmniSortedSet.OfChar headSet(char toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfChar descendingIterator(){
+    @Override public OmniSortedSet.OfChar headSet(Character toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar headSet(char toElement){
+    @Override public OmniSortedSet.OfChar tailSet(char fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar headSet(char toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfChar tailSet(Character fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar headSet(Character toElement){
+    @Override public OmniSortedSet.OfChar subSet(char fromElement,char toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfChar tailSet(char fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar tailSet(char fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar tailSet(Character fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar subSet(char fromElement,char toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar subSet(char fromElement,boolean inclusiveFrom,char toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfChar subSet(Character fromElement,Character toElement){
+    @Override public OmniSortedSet.OfChar subSet(Character fromElement,Character toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -479,6 +593,109 @@ public abstract class CharNavigableSetImpl
       }
       return new Descending();
     }
+      @Override public char[] toCharArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          char[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new char[size+=arr.length],tail,size-tail);
+          }else{
+            final char[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new char[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfChar.DEFAULT_ARR;
+      }
+      @Override public Character[] toArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          Character[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Character[size+=arr.length],tail,size-tail);
+          }else{
+            final char[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Character[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfChar.DEFAULT_BOXED_ARR;
+      }
+      @Override public double[] toDoubleArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          double[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          }else{
+            final char[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public float[] toFloatArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          float[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          }else{
+            final char[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfFloat.DEFAULT_ARR;
+      }
+      @Override public long[] toLongArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          long[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+          }else{
+            final char[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_ARR;
+      }
+      @Override public int[] toIntArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          int[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+          }else{
+            final char[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfInt.DEFAULT_ARR;
+      }
+      /*
       @Override public Character ceiling(char val){
         return super.floor(val);
       }
@@ -491,6 +708,8 @@ public abstract class CharNavigableSetImpl
       @Override public Character lower(char val){
         return super.higher(val);
       }
+      */
+      /*
       @Override public char charCeiling(char val){
         return super.charFloor(val);
       }
@@ -503,6 +722,8 @@ public abstract class CharNavigableSetImpl
       @Override public char lowerChar(char val){
         return super.higherChar(val);
       }
+      */
+      /*
       @Override public double doubleCeiling(double val){
         return super.doubleFloor(val);
       }
@@ -515,6 +736,8 @@ public abstract class CharNavigableSetImpl
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      */
+      /*
       @Override public float floatCeiling(float val){
         return super.floatFloor(val);
       }
@@ -527,6 +750,8 @@ public abstract class CharNavigableSetImpl
       @Override public float lowerFloat(float val){
         return super.higherFloat(val);
       }
+      */
+      /*
       @Override public long longCeiling(long val){
         return super.longFloor(val);
       }
@@ -539,6 +764,8 @@ public abstract class CharNavigableSetImpl
       @Override public long lowerLong(long val){
         return super.higherLong(val);
       }
+      */
+      /*
       @Override public int intCeiling(int val){
         return super.intFloor(val);
       }
@@ -551,5 +778,6 @@ public abstract class CharNavigableSetImpl
       @Override public int lowerInt(int val){
         return super.higherInt(val);
       }
+      */
   }
 }

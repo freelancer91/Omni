@@ -29,6 +29,37 @@ abstract class ShortUntetheredArrSeq implements OmniCollection.OfShort,Externali
     super();
     this.tail=-1;
   }
+  static abstract class AbstractFullView implements OmniCollection.OfShort
+  {
+    transient final ShortUntetheredArrSeq root;
+    AbstractFullView(ShortUntetheredArrSeq root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.size();
+    }
+    @Override public boolean isEmpty(){
+      return root.isEmpty();
+    }
+    @Override public void clear(){
+      root.clear();
+    }
+    @Override public boolean add(short key){
+      return root.add(key);
+    }
+    @Override public boolean add(Short key){
+      return root.add((short)key);
+    }
+    @Override public boolean add(boolean key){
+      return root.add(key);
+    }
+    @Override public boolean removeIf(ShortPredicate filter){
+      return root.removeIf(filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Short> filter){
+      return root.removeIf((ShortPredicate)filter::test);
+    }
+  }
   @Override public int size(){
     int tail;
     if((tail=this.tail+1)>0 && (tail-=this.head)<=0){

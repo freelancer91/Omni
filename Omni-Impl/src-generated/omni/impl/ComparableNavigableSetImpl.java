@@ -1,13 +1,17 @@
 package omni.impl;
-import omni.api.OmniNavigableSet;
+import java.io.Serializable;
+import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
 import omni.api.OmniIterator;
+import omni.util.OmniArray;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.util.OmniArray;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.ToIntFunction;
 public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
-  extends ComparableUntetheredArrSeq<E> implements OmniNavigableSet.OfRef<E>
+  extends ComparableUntetheredArrSeq<E> implements OmniSortedSet.OfRef<E>
 {
   ComparableNavigableSetImpl(int head,Comparable<E>[] arr,int tail){
     super(head,arr,tail);
@@ -20,6 +24,9 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       return Integer.signum(-key2.compareTo(key1));
     }
     return -1;
+  }
+  private static <E extends Comparable<E>> ToIntFunction<E> getSearchFunction(E key){
+    return (k)->privateCompare(k,key);
   }
   @SuppressWarnings("unchecked")
   private boolean uncheckedAddUndefined(int tail){
@@ -66,9 +73,6 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       super.insertAtMiddle(key);
       return true;
     }
-  }
-  private static <E extends Comparable<E>> ToIntFunction<E> getSearchFunction(E key){
-    return (k)->privateCompare(k,key);
   }
   @SuppressWarnings("unchecked")
   @Override public boolean contains(Object key){
@@ -369,311 +373,63 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Double)key));
   }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedCeilingImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>=0;
-    //assert tail<arr.length-1;
-    //assert arr[tail+1]==null || arr[tail+1].compareTo(val)>0;
-    for(;;){
-      final int mid;
-      final Comparable<E> tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case 1:
-          if((tail=mid-1)>=head){
-            continue;
-          }
-        case 0:
-          return (E)tmp;
-        default:
-          if((head=mid+1)>tail){
-            return (E)arr[head];
-          }
-      }
+  private static class AscendingFullView<E extends Comparable<E>> extends ComparableUntetheredArrSeq.AbstractFullView<E> implements OmniSortedSet.OfRef<E>,Cloneable,Serializable
+  {
+    AscendingFullView(ComparableUntetheredArrSeq<E> root){
+      super(root);
     }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedFloorImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>0;
-    //assert tail<arr.length;
-    //assert arr[head-1]!=null;
-    //assert arr[head-1].compareTo(val)<0;
-    for(;;){
-      final int mid;
-      final Comparable<E> tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case -1:
-          if((head=mid+1)<=tail){
-            continue;
-          }
-        case 0:
-          return (E)tmp;
-        default:
-          if((tail=mid-1)<head){
-            return (E)arr[tail];
-          }
-      }
+    @Override public OmniIterator.OfRef<E> iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
     }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedHigherImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>=0;
-    //assert tail<arr.length-1;
-    //assert arr[tail+1]==null || arr[tail+1].compareTo(val)>0;
-    for(;;){
-      final int mid;
-      final Comparable<E> tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case 1:
-          if((tail=mid-1)>=head){
-            continue;
-          }
-          return (E)tmp;
-        case 0:
-          return (E)arr[mid+1];
-        default:
-          if((head=mid+1)>tail){
-            return (E)arr[head];
-          }
-      }
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedLowerImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>0;
-    //assert tail<arr.length;
-    //assert arr[head-1]!=null;
-    //assert arr[head-1].compareTo(val)<0;
-    for(;;){
-      final int mid;
-      final Comparable<E> tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case -1:
-          if((head=mid+1)<=tail){
-            continue;
-          }
-          return (E)tmp;
-        case 0:
-          return (E)arr[mid-1];
-        default:
-          if((tail=mid-1)<head){
-            return (E)arr[tail];
-          }
-      }
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedCeilingImpl(Comparable<E>[] arr,int head,int tail,E val){
-    final Comparable<E> tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case 1:
-        if((tail=mid-1)>=head){
-          break;
-        }
-      case 0:
-        return (E)tmp;
-      default:
-        if((head=0)>tail){
-          return (E)arr[0];
-        }
-    }
-    return nonfragmentedCeilingImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedFloorImpl(Comparable<E>[] arr,int head,int tail,E val){
-    final Comparable<E> tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case -1:
-        if((head=0)<=tail){
-          break;
-        }
-      case 0:
-        return (E)tmp;
-      default:
-        if((tail=mid-1)<head){
-          return (E)arr[tail];
-        }
-    }
-    return nonfragmentedFloorImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedHigherImpl(Comparable<E>[] arr,int head,int tail,E val){
-    final Comparable<E> tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case 1:
-        if((tail=mid-1)>=head){
-          break;
-        }
-        return (E)tmp;
-      default:
-        if((head=0)<=tail){
-          break;
-        }
-      case 0:
-        return (E)arr[0];
-    }
-    return nonfragmentedHigherImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedLowerImpl(Comparable<E>[] arr,int head,int tail,E val){
-    final Comparable<E> tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case -1:
-        if((head=0)<=tail){
-          break;
-        }
-        return (E)tmp;
-      default:
-        if((tail=mid-1)>=head){
-          break;
-        }
-      case 0:
-        return (E)arr[mid-1];
-    }
-    return nonfragmentedLowerImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E ceiling(E val){
-    final int tail;
-    if(val!=null && (tail=this.tail)!=-1){
-      final Comparable<E>[] arr;
-      final Comparable<E> tmp;
-      if((tmp=(arr=this.arr)[tail])==null){
+      @SuppressWarnings("unchecked")
+    @Override public Comparable<E>[] toArray(){
+      int tail;
+      final ComparableUntetheredArrSeq<E> root;
+      if((tail=(root=this.root).tail)!=-1){
+        Comparable<E>[] dst;
         final int head;
-        switch(Integer.signum(tail-(head=this.head))){
-          case 1:
-            return nonfragmentedCeilingImpl(arr,head,tail-1,val);
-          default:
-            return fragmentedCeilingImpl(arr,head,tail-1,val);
-          case 0:
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new Comparable[size],0,size);
+        }else{
+          final Comparable<E>[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new Comparable[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
         }
-      }else{
-        switch(Integer.signum(tmp.compareTo(val))){
-          case 1:
-            final int head;
-            switch(Integer.signum(tail-(head=this.head))){
-              case 1:
-                return nonfragmentedCeilingImpl(arr,head,tail-1,val);
-              default:
-                return fragmentedCeilingImpl(arr,head,tail-1,val);
-              case 0:
-            }
-           case 0:
-            return (E)tmp;
-          default:
-        }
+        return dst;
       }
+      return (Comparable<E>[])OmniArray.OfRef.DEFAULT_COMPARABLE_ARR;
     }
-    return null;
   }
-  @SuppressWarnings("unchecked")
-  @Override public E higher(E val){
-    final int tail;
-    if(val!=null && (tail=this.tail)!=-1){
-      final Comparable<E>[] arr;
-      final Comparable<E> tmp;
-      if((tmp=(arr=this.arr)[tail])==null){
+  private static class DescendingFullView<E extends Comparable<E>> extends ComparableUntetheredArrSeq.AbstractFullView<E> implements OmniSortedSet.OfRef<E>,Cloneable,Serializable
+  {
+    DescendingFullView(ComparableUntetheredArrSeq<E> root){
+      super(root);
+    }
+    @Override public OmniIterator.OfRef<E> iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+      @SuppressWarnings("unchecked")
+    @Override public Comparable<E>[] toArray(){
+      int tail;
+      final ComparableUntetheredArrSeq<E> root;
+      if((tail=(root=this.root).tail)!=-1){
+        Comparable<E>[] dst;
         final int head;
-        switch(Integer.signum(tail-(head=this.head))){
-          case 1:
-            return nonfragmentedHigherImpl(arr,head,tail-1,val);
-          default:
-            return fragmentedHigherImpl(arr,head,tail-1,val);
-          case 0:
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+        }else{
+          final Comparable<E>[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
         }
-      }else{
-        if(tmp.compareTo(val)>0){
-          final int head;
-          switch(Integer.signum(tail-(head=this.head))){
-            case 0:
-              return (E)tmp;
-            case 1:
-              return nonfragmentedHigherImpl(arr,head,tail-1,val);
-            default:
-              return fragmentedHigherImpl(arr,head,tail-1,val);
-          }
-        }
+        return dst;
       }
+      return (Comparable<E>[])OmniArray.OfRef.DEFAULT_COMPARABLE_ARR;
     }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E floor(E val){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(val==null){
-        return (E)arr[tail];
-      }
-      final int head;
-      final Comparable<E>[] arr;
-      final Comparable<E> tmp;
-      if((tmp=(arr=this.arr)[head=this.head])!=null){
-        switch(Integer.signum(tmp.compareTo(val))){
-          case -1:
-            switch(Integer.signum(tail-head)){
-              case 1:
-                return nonfragmentedFloorImpl(arr,head+1,tail,val);
-              default:
-                return fragmentedFloorImpl(arr,head+1,tail,val);
-              case 0:
-            }
-          case 0:
-            return (E)tmp;
-          default:
-        }
-      }
-    }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E lower(E val){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      final var arr=this.arr;
-      final Comparable<E> tmp;
-      if(val==null){
-        if((tmp=arr[tail])==null){
-          switch(Integer.signum(tail-head)){
-            default:
-              if(tail==0){
-                return (E)arr[arr.length-1];
-              }
-            case 1:
-              return (E)arr[tail-1];
-            case 0:
-          }
-        }
-        return (E)tmp;
-      }else{
-        final int head;
-        if((tmp=arr[head=this.head])!=null && tmp.compareTo(val)<0){
-          switch(Integer.signum(tail-head)){
-            case 0:
-              return (E)tmp;
-            case 1:
-              return nonfragmentedLowerImpl(arr,head+1,tail,val);
-            default:
-              return fragmentedLowerImpl(arr,head+1,tail,val);
-          }
-        }
-      }
-    }
-    return null;
   }
   public static class Ascending<E extends Comparable<E>> extends ComparableNavigableSetImpl<E> implements Cloneable
   {
@@ -694,35 +450,15 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     @Override public E last(){
       return (E)arr[tail];
     }
-    @Override public OmniNavigableSet.OfRef<E> descendingSet(){
+    @Override public OmniSortedSet.OfRef<E> headSet(E toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfRef<E> descendingIterator(){
+    @Override public OmniSortedSet.OfRef<E> tailSet(E fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,boolean inclusiveFrom,E toElement,boolean inclusiveTo){
+    @Override public OmniSortedSet.OfRef<E> subSet(E fromElement,E toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -767,35 +503,15 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     @Override public E last(){
       return (E)arr[head];
     }
-    @Override public OmniNavigableSet.OfRef<E> descendingSet(){
+    @Override public OmniSortedSet.OfRef<E> headSet(E toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfRef<E> descendingIterator(){
+    @Override public OmniSortedSet.OfRef<E> tailSet(E fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> headSet(E toElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> tailSet(E fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,E toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfRef<E> subSet(E fromElement,boolean inclusiveFrom,E toElement,boolean inclusiveTo){
+    @Override public OmniSortedSet.OfRef<E> subSet(E fromElement,E toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -820,6 +536,25 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       }
       return new Descending<E>();
     }
+        @SuppressWarnings("unchecked")
+      @Override public Comparable<E>[] toArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          Comparable<E>[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+          }else{
+            final Comparable<E>[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return (Comparable<E>[])OmniArray.OfRef.DEFAULT_COMPARABLE_ARR;
+      }
+      /*
       @Override public E ceiling(E val){
         return super.floor(val);
       }
@@ -832,5 +567,6 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
       @Override public E lower(E val){
         return super.higher(val);
       }
+      */
   }
 }

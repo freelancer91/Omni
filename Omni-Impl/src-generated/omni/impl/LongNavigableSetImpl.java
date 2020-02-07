@@ -1,12 +1,18 @@
 package omni.impl;
-import omni.api.OmniNavigableSet;
+import java.io.Serializable;
+import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
 import omni.api.OmniIterator;
+import omni.util.OmniArray;
+import java.util.function.LongPredicate;
+import java.util.function.LongConsumer;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.function.LongComparator;
 import omni.util.TypeUtil;
 import java.util.function.LongToIntFunction;
 public abstract class LongNavigableSetImpl
-  extends LongUntetheredArrSeq implements OmniNavigableSet.OfLong
+  extends LongUntetheredArrSeq implements OmniSortedSet.OfLong
 {
   LongNavigableSetImpl(int head,long[] arr,int tail){
     super(head,arr,tail);
@@ -22,6 +28,9 @@ public abstract class LongNavigableSetImpl
       return 1;
     }
     return -1;
+  }
+  private static LongToIntFunction getSearchFunction(long key){
+    return (k)->privateCompare(k,key);
   }
   @Override public boolean add(long key){
     int tail;
@@ -70,9 +79,6 @@ public abstract class LongNavigableSetImpl
       super.insertAtMiddle(key);
       return true;
     }
-  }
-  private static LongToIntFunction getSearchFunction(long key){
-    return (k)->privateCompare(k,key);
   }
   @Override public boolean contains(Object key){
     final int tail;
@@ -196,69 +202,177 @@ public abstract class LongNavigableSetImpl
     final long l;
     return (tail=this.tail)!=-1 && TypeUtil.doubleEquals(key,l=(long)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(l));
   }
-  @Override public long longCeiling(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class AscendingFullView extends LongUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfLong,Cloneable,Serializable
+  {
+    AscendingFullView(LongUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Long> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfLong iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long[] toLongArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new long[size],0,size);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new long[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public Long[] toArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new Long[size],0,size);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new Long[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_BOXED_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new double[size],0,size);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        float[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new float[size],0,size);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new float[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
   }
-  @Override public long longFloor(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long higherLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long lowerLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Long ceiling(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Long floor(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Long higher(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Long lower(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double doubleCeiling(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double doubleFloor(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double higherDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double lowerDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float floatCeiling(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float floatFloor(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float higherFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float lowerFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class DescendingFullView extends LongUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfLong,Cloneable,Serializable
+  {
+    DescendingFullView(LongUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Long> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfLong iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public long[] toLongArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public Long[] toArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Long[size+=arr.length],tail,size-tail);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Long[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_BOXED_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      int tail;
+      final LongUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        float[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+        }else{
+          final long[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
   }
   public static class Ascending extends LongNavigableSetImpl implements Cloneable
   {
@@ -277,47 +391,27 @@ public abstract class LongNavigableSetImpl
     @Override public long lastLong(){
       return (long)arr[tail];
     }
-    @Override public OmniNavigableSet.OfLong descendingSet(){
+    @Override public OmniSortedSet.OfLong headSet(long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfLong descendingIterator(){
+    @Override public OmniSortedSet.OfLong headSet(Long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong headSet(long toElement){
+    @Override public OmniSortedSet.OfLong tailSet(long fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong headSet(long toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfLong tailSet(Long fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong headSet(Long toElement){
+    @Override public OmniSortedSet.OfLong subSet(long fromElement,long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong tailSet(long fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong tailSet(long fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong tailSet(Long fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong subSet(long fromElement,long toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong subSet(long fromElement,boolean inclusiveFrom,long toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong subSet(Long fromElement,Long toElement){
+    @Override public OmniSortedSet.OfLong subSet(Long fromElement,Long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -359,47 +453,27 @@ public abstract class LongNavigableSetImpl
     @Override public long lastLong(){
       return (long)arr[head];
     }
-    @Override public OmniNavigableSet.OfLong descendingSet(){
+    @Override public OmniSortedSet.OfLong headSet(long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfLong descendingIterator(){
+    @Override public OmniSortedSet.OfLong headSet(Long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong headSet(long toElement){
+    @Override public OmniSortedSet.OfLong tailSet(long fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong headSet(long toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfLong tailSet(Long fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong headSet(Long toElement){
+    @Override public OmniSortedSet.OfLong subSet(long fromElement,long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfLong tailSet(long fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong tailSet(long fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong tailSet(Long fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong subSet(long fromElement,long toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong subSet(long fromElement,boolean inclusiveFrom,long toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfLong subSet(Long fromElement,Long toElement){
+    @Override public OmniSortedSet.OfLong subSet(Long fromElement,Long toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -423,6 +497,75 @@ public abstract class LongNavigableSetImpl
       }
       return new Descending();
     }
+      @Override public long[] toLongArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          long[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+          }else{
+            final long[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_ARR;
+      }
+      @Override public Long[] toArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          Long[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Long[size+=arr.length],tail,size-tail);
+          }else{
+            final long[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Long[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_BOXED_ARR;
+      }
+      @Override public double[] toDoubleArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          double[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          }else{
+            final long[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public float[] toFloatArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          float[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          }else{
+            final long[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfFloat.DEFAULT_ARR;
+      }
+      /*
       @Override public Long ceiling(long val){
         return super.floor(val);
       }
@@ -435,6 +578,8 @@ public abstract class LongNavigableSetImpl
       @Override public Long lower(long val){
         return super.higher(val);
       }
+      */
+      /*
       @Override public long longCeiling(long val){
         return super.longFloor(val);
       }
@@ -447,6 +592,8 @@ public abstract class LongNavigableSetImpl
       @Override public long lowerLong(long val){
         return super.higherLong(val);
       }
+      */
+      /*
       @Override public double doubleCeiling(double val){
         return super.doubleFloor(val);
       }
@@ -459,6 +606,8 @@ public abstract class LongNavigableSetImpl
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      */
+      /*
       @Override public float floatCeiling(float val){
         return super.floatFloor(val);
       }
@@ -471,5 +620,6 @@ public abstract class LongNavigableSetImpl
       @Override public float lowerFloat(float val){
         return super.higherFloat(val);
       }
+      */
   }
 }

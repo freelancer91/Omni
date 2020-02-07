@@ -65,6 +65,48 @@ abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$C
     super();
     this.tail=-1;
   }
+#IFNOT OfBoolean,OfByte,OfRef
+#IF OfComparable
+  static abstract class AbstractFullView<E extends Comparable<E>> implements OmniCollection.OfRef$<E>$
+#ELSE
+  static abstract class AbstractFullView implements OmniCollection.Of$ClassPrefix$$<E>$
+#ENDIF
+  {
+    transient final $ClassPrefix$UntetheredArrSeq$<E>$ root;
+    AbstractFullView($ClassPrefix$UntetheredArrSeq$<E>$ root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.size();
+    }
+    @Override public boolean isEmpty(){
+      return root.isEmpty();
+    }
+    @Override public void clear(){
+      root.clear();
+    }
+    @Override public boolean add($exposedType$ key){
+      return root.add(key);
+    }
+#IFNOT OfComparable
+    @Override public boolean add($BoxedType$ key){
+      return root.add(($exposedType$)key);
+    }
+    @Override public boolean add(boolean key){
+      return root.add(key);
+    }
+#ENDIF
+    @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
+      return root.removeIf(filter);
+    }
+#IFNOT OfComparable
+    @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
+      return root.removeIf(($TypeNameModifier$Predicate)filter::test);
+    }
+#ENDIF
+  }
+#ENDIF
+  
   @Override public int size(){
     int tail;
     if((tail=this.tail+1)>0 && (tail-=this.head)<=0){

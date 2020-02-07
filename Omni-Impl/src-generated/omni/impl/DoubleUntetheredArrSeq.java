@@ -29,6 +29,37 @@ abstract class DoubleUntetheredArrSeq implements OmniCollection.OfDouble,Externa
     super();
     this.tail=-1;
   }
+  static abstract class AbstractFullView implements OmniCollection.OfDouble
+  {
+    transient final DoubleUntetheredArrSeq root;
+    AbstractFullView(DoubleUntetheredArrSeq root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.size();
+    }
+    @Override public boolean isEmpty(){
+      return root.isEmpty();
+    }
+    @Override public void clear(){
+      root.clear();
+    }
+    @Override public boolean add(double key){
+      return root.add(key);
+    }
+    @Override public boolean add(Double key){
+      return root.add((double)key);
+    }
+    @Override public boolean add(boolean key){
+      return root.add(key);
+    }
+    @Override public boolean removeIf(DoublePredicate filter){
+      return root.removeIf(filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Double> filter){
+      return root.removeIf((DoublePredicate)filter::test);
+    }
+  }
   @Override public int size(){
     int tail;
     if((tail=this.tail+1)>0 && (tail-=this.head)<=0){

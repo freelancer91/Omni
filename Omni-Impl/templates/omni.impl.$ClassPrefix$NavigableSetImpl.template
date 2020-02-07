@@ -6,9 +6,21 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfComparable
 package omni.impl;
-import omni.api.OmniNavigableSet;
+import java.io.Serializable;
+import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
 import omni.api.OmniIterator;
+import omni.util.OmniArray;
+#IF OfChar,OfShort,OfFloat
+import omni.function.$TypeNameModifier$Predicate;
+import omni.function.$TypeNameModifier$Consumer;
+#ENDIF
+#IF OfDouble,OfLong,OfInt
+import java.util.function.$TypeNameModifier$Predicate;
+import java.util.function.$TypeNameModifier$Consumer;
+#ENDIF
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 #IF OfChar,OfFloat,OfDouble,OfComparable
 import omni.util.OmniArray;
 #ENDIF
@@ -32,10 +44,10 @@ import java.util.function.IntUnaryOperator;
 #ENDIF
 #IF OfComparable
 public abstract class $ClassPrefix$NavigableSetImpl<E extends Comparable<E>>
-  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniNavigableSet.OfRef$<E>$
+  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniSortedSet.OfRef$<E>$
 #ELSE
 public abstract class $ClassPrefix$NavigableSetImpl
-  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniNavigableSet.Of$ClassPrefix$$<E>$
+  extends $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniSortedSet.Of$ClassPrefix$$<E>$
 #ENDIF
   
 {
@@ -113,7 +125,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
     if(key<0){
       return 1;
     }
-#IF OfFloat
+  #IF OfFloat
     switch(Float.floatToRawIntBits(key)){
       case 0:
         return 0;
@@ -121,25 +133,25 @@ public abstract class $ClassPrefix$NavigableSetImpl
         return 1;
       default:
     }
-#ELSE
+  #ELSE
     final long bits;
     if((bits=Double.doubleToRawLongBits(key))==0){
       return 0;
     }else if(bits==Long.MIN_VALUE){
       return 1;
     }
-#ENDIF
+  #ENDIF
     return -1;
   }
   private static int compareNeg0($exposedType$ key){
     if(key<0){
       return 1;
     }
-#IF OfFloat
+  #IF OfFloat
     if(Float.floatToRawIntBits(key)==Integer.MIN_VALUE){
-#ELSE
+  #ELSE
     if(Double.doubleToRawLongBits(key)==Long.MIN_VALUE){
-#ENDIF
+  #ENDIF
       return 0;
     }
     return -1;
@@ -154,6 +166,15 @@ public abstract class $ClassPrefix$NavigableSetImpl
     return false;
   }
 #ENDIF
+#IF OfInt,OfShort,OfChar
+  private static IntUnaryOperator getSearchFunction(int key){
+#ELSEIF OfComparable
+  private static <E extends Comparable<E>> ToIntFunction<E> getSearchFunction(E key){
+#ELSE
+  private static $BoxedType$ToIntFunction getSearchFunction($exposedType$ key){
+#ENDIF
+    return (k)->privateCompare(k,key);
+  }
 #IF OfDouble,OfFloat,OfComparable
   #IF OfComparable
   @SuppressWarnings("unchecked")
@@ -378,18 +399,10 @@ public abstract class $ClassPrefix$NavigableSetImpl
     }
   }
 #ENDIF
-  #IF OfInt,OfShort,OfChar
-  private static IntUnaryOperator getSearchFunction(int key){
-  #ELSEIF OfComparable
-  private static <E extends Comparable<E>> ToIntFunction<E> getSearchFunction(E key){
-  #ELSE
-  private static $BoxedType$ToIntFunction getSearchFunction($exposedType$ key){
-  #ENDIF
-    return (k)->privateCompare(k,key);
-  }
-  #IF OfComparable
+
+#IF OfComparable
   @SuppressWarnings("unchecked")
-  #ENDIF
+#ENDIF
   @Override public boolean contains(Object key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -665,9 +678,9 @@ public abstract class $ClassPrefix$NavigableSetImpl
     }
     return false;
   }
-  #IF OfComparable
+#IF OfComparable
   @SuppressWarnings("unchecked")
-  #ENDIF
+#ENDIF
   @Override public boolean remove(Object key){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -758,7 +771,6 @@ public abstract class $ClassPrefix$NavigableSetImpl
         return true;
       }
       return false;
-      
 #ELSEIF OfFloat
       jumpToRemoveTail:for(;;){
         final $BoxedType$ToIntFunction searchFunction;
@@ -863,7 +875,6 @@ public abstract class $ClassPrefix$NavigableSetImpl
         return true;
       }
       return false;
-      
 #ELSEIF OfLong
       final long l;
       if(key instanceof Long || key instanceof Integer || key instanceof Byte || key instanceof Short){
@@ -1088,9 +1099,9 @@ public abstract class $ClassPrefix$NavigableSetImpl
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(($exposedType$)(Byte)key));
   #ENDIF
   }
-#IF OfComparable
+  #IF OfComparable
   @SuppressWarnings("unchecked")
-#ENDIF
+  #ENDIF
   @Override public boolean removeVal(byte key){
   #IF OfChar
     final int tail;
@@ -1105,9 +1116,9 @@ public abstract class $ClassPrefix$NavigableSetImpl
   }
 #ENDIF
 #IFNOT OfDouble
-#IF OfComparable
+  #IF OfComparable
   @SuppressWarnings("unchecked")
-#ENDIF
+  #ENDIF
   @Override public boolean contains(char key){
   #IF OfChar,OfInt,OfLong
     final int tail;
@@ -1123,9 +1134,9 @@ public abstract class $ClassPrefix$NavigableSetImpl
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(($exposedType$)(Character)key));
   #ENDIF
   }
-#IF OfComparable
+  #IF OfComparable
   @SuppressWarnings("unchecked")
-#ENDIF
+  #ENDIF
   @Override public boolean removeVal(char key){
   #IF OfChar,OfInt,OfLong
     final int tail;
@@ -1143,9 +1154,9 @@ public abstract class $ClassPrefix$NavigableSetImpl
   }
 #ENDIF
 #IFNOT OfDouble,OfInt
-#IF OfComparable
+  #IF OfComparable
   @SuppressWarnings("unchecked")
-#ENDIF
+  #ENDIF
   @Override public boolean contains(short key){
   #IF OfChar
     final int tail;
@@ -1161,9 +1172,9 @@ public abstract class $ClassPrefix$NavigableSetImpl
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(($exposedType$)(Short)key));
   #ENDIF
   }
-#IF OfComparable
+  #IF OfComparable
   @SuppressWarnings("unchecked")
-#ENDIF
+  #ENDIF
   @Override public boolean removeVal(short key){
   #IF OfChar
     final int tail;
@@ -1184,99 +1195,99 @@ public abstract class $ClassPrefix$NavigableSetImpl
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean contains(int key){
-  #IF OfChar,OfShort
+#IF OfChar,OfShort
     final int tail;
     return key==($exposedType$)key && (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(key));
-  #ELSEIF OfInt,OfLong
+#ELSEIF OfInt,OfLong
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(key));
-  #ELSEIF OfFloat
+#ELSEIF OfFloat
     final int tail;
     return (tail=this.tail)!=-1 && TypeUtil.checkCastToFloat(key) && super.uncheckedContainsMatch(head,tail,key==0?$ClassPrefix$NavigableSetImpl::comparePos0:getSearchFunction(key));
-  #ELSEIF OfDouble
+#ELSEIF OfDouble
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,key==0?$ClassPrefix$NavigableSetImpl::comparePos0:getSearchFunction(key));
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(($exposedType$)(Integer)key));
-  #ENDIF
+#ENDIF
   }
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean removeVal(int key){
-  #IF OfChar,OfShort
+#IF OfChar,OfShort
     final int tail;
     return key==($exposedType$)key && (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(key));
-  #ELSEIF OfInt,OfLong
+#ELSEIF OfInt,OfLong
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(key));
-  #ELSEIF OfFloat
+#ELSEIF OfFloat
     final int tail;
     return (tail=this.tail)!=-1 && TypeUtil.checkCastToFloat(key) && super.uncheckedRemoveMatch(tail,key==0?$ClassPrefix$NavigableSetImpl::comparePos0:getSearchFunction(key));
-  #ELSEIF OfDouble
+#ELSEIF OfDouble
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,key==0?$ClassPrefix$NavigableSetImpl::comparePos0:getSearchFunction(key));
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(($exposedType$)(Integer)key));
-  #ENDIF
+#ENDIF
   }
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean contains(long key){
-  #IF OfChar,OfShort,OfInt
+#IF OfChar,OfShort,OfInt
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && key==(i=($exposedType$)key) && super.uncheckedContainsMatch(head,tail,getSearchFunction(i));
-  #ELSEIF OfLong
+#ELSEIF OfLong
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(key));
-  #ELSEIF OfFloat,OfDouble
+#ELSEIF OfFloat,OfDouble
     final int tail;
     return (tail=this.tail)!=-1 && TypeUtil.checkCastTo$BoxedType$(key) && super.uncheckedContainsMatch(head,tail,key==0?$ClassPrefix$NavigableSetImpl::comparePos0:getSearchFunction(key));
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(($exposedType$)(Long)key));
-  #ENDIF
+#ENDIF
   }
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean removeVal(long key){
-  #IF OfChar,OfShort,OfInt
+#IF OfChar,OfShort,OfInt
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && key==(i=($exposedType$)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(i));
-  #ELSEIF OfLong
+#ELSEIF OfLong
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(key));
-  #ELSEIF OfFloat,OfDouble
+#ELSEIF OfFloat,OfDouble
     final int tail;
     return (tail=this.tail)!=-1 && TypeUtil.checkCastTo$BoxedType$(key) && super.uncheckedRemoveMatch(tail,key==0?$ClassPrefix$NavigableSetImpl::comparePos0:getSearchFunction(key));
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(($exposedType$)(Long)key));
-  #ENDIF
+#ENDIF
   }
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean contains(float key){
-  #IF OfChar,OfShort
+#IF OfChar,OfShort
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && key==(i=($exposedType$)key) && super.uncheckedContainsMatch(head,tail,getSearchFunction(i));
-  #ELSEIF OfInt
+#ELSEIF OfInt
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && (double)key==(double)(i=(int)key) && super.uncheckedContainsMatch(head,tail,getSearchFunction(i));
-  #ELSEIF OfLong
+#ELSEIF OfLong
     final int tail;
     final long l;
     return (tail=this.tail)!=-1 && TypeUtil.floatEquals(key,l=(long)key) && super.uncheckedContainsMatch(head,tail,getSearchFunction(l));
-  #ELSEIF OfFloat,OfDouble
+#ELSEIF OfFloat,OfDouble
     final int tail;
     if((tail=this.tail)!=-1){
       if(key==key){
@@ -1298,28 +1309,28 @@ public abstract class $ClassPrefix$NavigableSetImpl
       return $BoxedType$.isNaN(arr[tail]);
     }
     return false;
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(($exposedType$)(Float)key));
-  #ENDIF
+#ENDIF
   }
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean removeVal(float key){
-  #IF OfChar,OfShort
+#IF OfChar,OfShort
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && key==(i=($exposedType$)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(i));
-  #ELSEIF OfInt
+#ELSEIF OfInt
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && (double)key==(double)(i=(int)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(i));
-  #ELSEIF OfLong
+#ELSEIF OfLong
     final int tail;
     final long l;
     return (tail=this.tail)!=-1 && TypeUtil.floatEquals(key,l=(long)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(l));
-  #ELSEIF OfFloat,OfDouble
+#ELSEIF OfFloat,OfDouble
     final int tail;
     if((tail=this.tail)!=-1){
       if(key==key){
@@ -1354,24 +1365,24 @@ public abstract class $ClassPrefix$NavigableSetImpl
       }
     }
     return false;
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(($exposedType$)(Float)key));
-  #ENDIF
+#ENDIF
   }
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean contains(double key){
-  #IF OfChar,OfShort,OfInt
+#IF OfChar,OfShort,OfInt
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && key==(i=($exposedType$)key) && super.uncheckedContainsMatch(head,tail,getSearchFunction(i));
-  #ELSEIF OfLong
+#ELSEIF OfLong
     final int tail;
     final long l;
     return (tail=this.tail)!=-1 && TypeUtil.doubleEquals(key,l=(long)key) && super.uncheckedContainsMatch(head,tail,getSearchFunction(l));
-  #ELSEIF OfFloat
+#ELSEIF OfFloat
     final int tail;
     if((tail=this.tail)!=-1){
       final float f;
@@ -1394,7 +1405,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
       return f!=f && $BoxedType$.isNaN(arr[tail]);
     }
     return false;
-  #ELSEIF OfDouble
+#ELSEIF OfDouble
     final int tail;
     if((tail=this.tail)!=-1){
       if(key==key){
@@ -1412,24 +1423,24 @@ public abstract class $ClassPrefix$NavigableSetImpl
       return $BoxedType$.isNaN(arr[tail]);
     }
     return false;
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedContainsMatch(head,tail,getSearchFunction(($exposedType$)(Double)key));
-  #ENDIF
+#ENDIF
   }
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
   @Override public boolean removeVal(double key){
-  #IF OfChar,OfShort,OfInt
+#IF OfChar,OfShort,OfInt
     final int tail;
     final int i;
     return (tail=this.tail)!=-1 && key==(i=($exposedType$)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(i));
-  #ELSEIF OfLong
+#ELSEIF OfLong
     final int tail;
     final long l;
     return (tail=this.tail)!=-1 && TypeUtil.doubleEquals(key,l=(long)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(l));
-  #ELSEIF OfFloat
+#ELSEIF OfFloat
     final int tail;
     if((tail=this.tail)!=-1){
       final float f;
@@ -1467,7 +1478,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
       }
     }
     return false;
-  #ELSEIF OfDouble
+#ELSEIF OfDouble
     final int tail;
     if((tail=this.tail)!=-1){
       if(key==key){
@@ -1500,426 +1511,28 @@ public abstract class $ClassPrefix$NavigableSetImpl
       }
     }
     return false;
-  #ELSE
+#ELSE
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction(($exposedType$)(Double)key));
-  #ENDIF
+#ENDIF
+  }
+
+#IF OfComparable
+  private static class AscendingFullView<E extends Comparable<E>> extends $ClassPrefix$UntetheredArrSeq.AbstractFullView$<E>$ implements OmniSortedSet.OfRef$<E>$,Cloneable,Serializable
+#ELSE
+  private static class AscendingFullView extends $ClassPrefix$UntetheredArrSeq.AbstractFullView$<E>$ implements OmniSortedSet.Of$ClassPrefix$$<E>$,Cloneable,Serializable
+#ENDIF
+  {
+    #MACRO AscendingDescendingFullViewBody<Ascending>()
   }
 #IF OfComparable
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>=0;
-    //assert tail<arr.length-1;
-    //assert arr[tail+1]==null || arr[tail+1].compareTo(val)>0;
-    for(;;){
-      final int mid;
-      final $ArrayType$ tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case 1:
-          if((tail=mid-1)>=head){
-            continue;
-          }
-        case 0:
-          return ($exposedType$)tmp;
-        default:
-          if((head=mid+1)>tail){
-            return ($exposedType$)arr[head];
-          }
-      }
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>0;
-    //assert tail<arr.length;
-    //assert arr[head-1]!=null;
-    //assert arr[head-1].compareTo(val)<0;
-    for(;;){
-      final int mid;
-      final $ArrayType$ tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case -1:
-          if((head=mid+1)<=tail){
-            continue;
-          }
-        case 0:
-          return ($exposedType$)tmp;
-        default:
-          if((tail=mid-1)<head){
-            return ($exposedType$)arr[tail];
-          }
-      }
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>=0;
-    //assert tail<arr.length-1;
-    //assert arr[tail+1]==null || arr[tail+1].compareTo(val)>0;
-    for(;;){
-      final int mid;
-      final $ArrayType$ tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case 1:
-          if((tail=mid-1)>=head){
-            continue;
-          }
-          return ($exposedType$)tmp;
-        case 0:
-          return ($exposedType$)arr[mid+1];
-        default:
-          if((head=mid+1)>tail){
-            return ($exposedType$)arr[head];
-          }
-      }
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E nonfragmentedLowerImpl($ArrayType$[] arr,int head,int tail,E val){
-    //assert arr!=null;
-    //assert val!=null;
-    //assert tail>=head;
-    //assert head>0;
-    //assert tail<arr.length;
-    //assert arr[head-1]!=null;
-    //assert arr[head-1].compareTo(val)<0;
-    for(;;){
-      final int mid;
-      final $ArrayType$ tmp;
-      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
-        case -1:
-          if((head=mid+1)<=tail){
-            continue;
-          }
-          return ($exposedType$)tmp;
-        case 0:
-          return ($exposedType$)arr[mid-1];
-        default:
-          if((tail=mid-1)<head){
-            return ($exposedType$)arr[tail];
-          }
-      }
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,E val){
-    final $ArrayType$ tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case 1:
-        if((tail=mid-1)>=head){
-          break;
-        }
-      case 0:
-        return ($exposedType$)tmp;
-      default:
-        if((head=0)>tail){
-          return ($exposedType$)arr[0];
-        }
-    }
-    return nonfragmentedCeilingImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedFloorImpl($ArrayType$[] arr,int head,int tail,E val){
-    final $ArrayType$ tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case -1:
-        if((head=0)<=tail){
-          break;
-        }
-      case 0:
-        return ($exposedType$)tmp;
-      default:
-        if((tail=mid-1)<head){
-          return ($exposedType$)arr[tail];
-        }
-    }
-    return nonfragmentedFloorImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedHigherImpl($ArrayType$[] arr,int head,int tail,E val){
-    final $ArrayType$ tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case 1:
-        if((tail=mid-1)>=head){
-          break;
-        }
-        return ($exposedType$)tmp;
-      default:
-        if((head=0)<=tail){
-          break;
-        }
-      case 0:
-        return ($exposedType$)arr[0];
-    }
-    return nonfragmentedHigherImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  private static <E extends Comparable<E>> E fragmentedLowerImpl($ArrayType$[] arr,int head,int tail,E val){
-    final $ArrayType$ tmp;
-    final int mid;
-    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
-      case -1:
-        if((head=0)<=tail){
-          break;
-        }
-        return ($exposedType$)tmp;
-      default:
-        if((tail=mid-1)>=head){
-          break;
-        }
-      case 0:
-        return ($exposedType$)arr[mid-1];
-    }
-    return nonfragmentedLowerImpl(arr,head,tail,val);
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E ceiling(E val){
-    final int tail;
-    if(val!=null && (tail=this.tail)!=-1){
-      final $ArrayType$[] arr;
-      final $ArrayType$ tmp;
-      if((tmp=(arr=this.arr)[tail])==null){
-        final int head;
-        switch(Integer.signum(tail-(head=this.head))){
-          case 1:
-            return nonfragmentedCeilingImpl(arr,head,tail-1,val);
-          default:
-            return fragmentedCeilingImpl(arr,head,tail-1,val);
-          case 0:
-        }
-      }else{
-        switch(Integer.signum(tmp.compareTo(val))){
-          case 1:
-            final int head;
-            switch(Integer.signum(tail-(head=this.head))){
-              case 1:
-                return nonfragmentedCeilingImpl(arr,head,tail-1,val);
-              default:
-                return fragmentedCeilingImpl(arr,head,tail-1,val);
-              case 0:
-            }
-           case 0:
-            return ($exposedType$)tmp;
-          default:
-        }
-      }
-    }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E higher(E val){
-    final int tail;
-    if(val!=null && (tail=this.tail)!=-1){
-      final $ArrayType$[] arr;
-      final $ArrayType$ tmp;
-      if((tmp=(arr=this.arr)[tail])==null){
-        final int head;
-        switch(Integer.signum(tail-(head=this.head))){
-          case 1:
-            return nonfragmentedHigherImpl(arr,head,tail-1,val);
-          default:
-            return fragmentedHigherImpl(arr,head,tail-1,val);
-          case 0:
-        }
-      }else{
-        if(tmp.compareTo(val)>0){
-          final int head;
-          switch(Integer.signum(tail-(head=this.head))){
-            case 0:
-              return ($exposedType$)tmp;
-            case 1:
-              return nonfragmentedHigherImpl(arr,head,tail-1,val);
-            default:
-              return fragmentedHigherImpl(arr,head,tail-1,val);
-          }
-        }
-      }
-    }
-    return null;
-  }
-  
-  @SuppressWarnings("unchecked")
-  @Override public E floor(E val){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      if(val==null){
-        return ($exposedType$)arr[tail];
-      }
-      final int head;
-      final $ArrayType$[] arr;
-      final $ArrayType$ tmp;
-      if((tmp=(arr=this.arr)[head=this.head])!=null){
-        switch(Integer.signum(tmp.compareTo(val))){
-          case -1:
-            switch(Integer.signum(tail-head)){
-              case 1:
-                return nonfragmentedFloorImpl(arr,head+1,tail,val);
-              default:
-                return fragmentedFloorImpl(arr,head+1,tail,val);
-              case 0:
-            }
-          case 0:
-            return ($exposedType$)tmp;
-          default:
-        }
-      }
-    }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E lower(E val){
-    final int tail;
-    if((tail=this.tail)!=-1){
-      final var arr=this.arr;
-      final $ArrayType$ tmp;
-      if(val==null){
-        if((tmp=arr[tail])==null){
-          switch(Integer.signum(tail-head)){
-            default:
-              if(tail==0){
-                return ($exposedType$)arr[arr.length-1];
-              }
-            case 1:
-              return ($exposedType$)arr[tail-1];
-            case 0:
-          }
-        }
-        return ($exposedType$)tmp;
-      }else{
-        final int head;
-        if((tmp=arr[head=this.head])!=null && tmp.compareTo(val)<0){
-          switch(Integer.signum(tail-head)){
-            case 0:
-              return ($exposedType$)tmp;
-            case 1:
-              return nonfragmentedLowerImpl(arr,head+1,tail,val);
-            default:
-              return fragmentedLowerImpl(arr,head+1,tail,val);
-          }
-        }
-      }
-    }
-    return null;
-  }
+  private static class DescendingFullView<E extends Comparable<E>> extends $ClassPrefix$UntetheredArrSeq.AbstractFullView$<E>$ implements OmniSortedSet.OfRef$<E>$,Cloneable,Serializable
 #ELSE
-  @Override public $exposedType$ $exposedType$Ceiling($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public $exposedType$ $exposedType$Floor($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public $exposedType$ higher$TypeNameModifier$($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public $exposedType$ lower$TypeNameModifier$($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public $BoxedType$ ceiling($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public $BoxedType$ floor($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public $BoxedType$ higher($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public $BoxedType$ lower($exposedType$ val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  #IFNOT OfDouble
-  @Override public double doubleCeiling(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double doubleFloor(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double higherDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double lowerDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-    #IFNOT OfFloat
-  @Override public float floatCeiling(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float floatFloor(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float higherFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float lowerFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-      #IFNOT OfLong
-  @Override public long longCeiling(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long longFloor(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long higherLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long lowerLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-        #IFNOT OfInt
-  @Override public int intCeiling(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int intFloor(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int higherInt(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int lowerInt(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-        #ENDIF
-      #ENDIF
-    #ENDIF
-  #ENDIF
+  private static class DescendingFullView extends $ClassPrefix$UntetheredArrSeq.AbstractFullView$<E>$ implements OmniSortedSet.Of$ClassPrefix$$<E>$,Cloneable,Serializable
 #ENDIF
-
+  {
+    #MACRO AscendingDescendingFullViewBody<Descending>()
+  }
 
 #IF OfComparable
   public static class Ascending<E extends Comparable<E>> extends $ClassPrefix$NavigableSetImpl$<E>$ implements Cloneable
@@ -1927,7 +1540,7 @@ public abstract class $ClassPrefix$NavigableSetImpl
   public static class Ascending$<E>$ extends $ClassPrefix$NavigableSetImpl$<E>$ implements Cloneable
 #ENDIF
   {
-    #MACRO AscendingDescendingBody<Ascending>()
+    #MACRO AscendingDescendingRootBody<Ascending>()
 
   }
 #IF OfComparable
@@ -1936,11 +1549,53 @@ public abstract class $ClassPrefix$NavigableSetImpl
   public static class Descending$<E>$ extends $ClassPrefix$NavigableSetImpl$<E>$ implements Cloneable
 #ENDIF
   {
-    #MACRO AscendingDescendingBody<Descending>()
+    #MACRO AscendingDescendingRootBody<Descending>()
 
   }
+  
+
+  
 }
-#MACRODEF AscendingDescendingBody<DIRECTION>()
+#MACRODEF AscendingDescendingFullViewBody<DIRECTION>()
+DIRECTIONFullView($ClassPrefix$UntetheredArrSeq$<E>$ root){
+  super(root);
+}
+#IFNOT OfComparable
+@Override public void forEach(Consumer<? super $BoxedType$> action){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#ENDIF
+#IF OfComparable
+@Override public OmniIterator.OfRef<E> iterator(){
+#ELSE
+@Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+#ENDIF
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#IF OfComparable
+#MACRO ToArray<root,$ArrayType$>($TypeNameModifier$,($ArrayType$[])OmniArray.OfRef.DEFAULT_COMPARABLE_ARR)
+#ELSE
+#MACRO ToArray<root,$ArrayType$>($TypeNameModifier$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
+#MACRO ToArray<root,$BoxedType$>(,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong,OfFloat
+#MACRO ToArray<root,double>(Double,OmniArray.OfDouble.DEFAULT_ARR)
+#ENDIF
+#IF OfChar,OfShort,OfInt,OfLong
+#MACRO ToArray<root,float>(Float,OmniArray.OfFloat.DEFAULT_ARR)
+#ENDIF
+#IF OfChar,OfShort,OfInt
+#MACRO ToArray<root,long>(Long,OmniArray.OfLong.DEFAULT_ARR)
+#ENDIF
+#IF OfChar,OfShort
+#MACRO ToArray<root,int>(Int,OmniArray.OfInt.DEFAULT_ARR)
+#ENDIF
+#ENDDEF
+#MACRODEF AscendingDescendingRootBody<DIRECTION>()
 public DIRECTION(){
   super();
 }
@@ -1982,88 +1637,50 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
   return ($exposedType$)arr[head];
 #ENDIF
 }
+
 #IF OfComparable
-@Override public OmniNavigableSet.OfRef<E> descendingSet(){
+@Override public OmniSortedSet.OfRef<E> headSet($exposedType$ toElement){
 #ELSE
-@Override public OmniNavigableSet.Of$ClassPrefix$ descendingSet(){
+@Override public OmniSortedSet.Of$ClassPrefix$ headSet($exposedType$ toElement){
 #ENDIF
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
 
-#IF OfComparable
-@Override public OmniIterator.OfRef<E> descendingIterator(){
-#ELSE
-@Override public OmniIterator.Of$ClassPrefix$ descendingIterator(){
-#ENDIF
-  //TODO
-  throw new omni.util.NotYetImplementedException();
-}
-
-#IF OfComparable
-@Override public OmniNavigableSet.OfRef<E> headSet($exposedType$ toElement){
-#ELSE
-@Override public OmniNavigableSet.Of$ClassPrefix$ headSet($exposedType$ toElement){
-#ENDIF
-  //TODO
-  throw new omni.util.NotYetImplementedException();
-}
-#IF OfComparable
-@Override public OmniNavigableSet.OfRef<E> headSet($exposedType$ toElement,boolean inclusive){
-#ELSE
-@Override public OmniNavigableSet.Of$ClassPrefix$ headSet($exposedType$ toElement,boolean inclusive){
-#ENDIF
-  //TODO
-  throw new omni.util.NotYetImplementedException();
-}
 #IFNOT OfComparable
-@Override public OmniNavigableSet.Of$ClassPrefix$ headSet($BoxedType$ toElement){
+@Override public OmniSortedSet.Of$ClassPrefix$ headSet($BoxedType$ toElement){
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
 #ENDIF
 
 #IF OfComparable
-@Override public OmniNavigableSet.OfRef<E> tailSet($exposedType$ fromElement){
+@Override public OmniSortedSet.OfRef<E> tailSet($exposedType$ fromElement){
 #ELSE
-@Override public OmniNavigableSet.Of$ClassPrefix$ tailSet($exposedType$ fromElement){
+@Override public OmniSortedSet.Of$ClassPrefix$ tailSet($exposedType$ fromElement){
 #ENDIF
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
-#IF OfComparable
-@Override public OmniNavigableSet.OfRef<E> tailSet($exposedType$ fromElement,boolean inclusive){
-#ELSE
-@Override public OmniNavigableSet.Of$ClassPrefix$ tailSet($exposedType$ fromElement,boolean inclusive){
-#ENDIF
-  //TODO
-  throw new omni.util.NotYetImplementedException();
-}
+
 #IFNOT OfComparable
-@Override public OmniNavigableSet.Of$ClassPrefix$ tailSet($BoxedType$ fromElement){
+@Override public OmniSortedSet.Of$ClassPrefix$ tailSet($BoxedType$ fromElement){
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
 #ENDIF
 
 #IF OfComparable
-@Override public OmniNavigableSet.OfRef<E> subSet($exposedType$ fromElement,$exposedType$ toElement){
+@Override public OmniSortedSet.OfRef<E> subSet($exposedType$ fromElement,$exposedType$ toElement){
 #ELSE
-@Override public OmniNavigableSet.Of$ClassPrefix$ subSet($exposedType$ fromElement,$exposedType$ toElement){
+@Override public OmniSortedSet.Of$ClassPrefix$ subSet($exposedType$ fromElement,$exposedType$ toElement){
 #ENDIF
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
-#IF OfComparable
-@Override public OmniNavigableSet.OfRef<E> subSet($exposedType$ fromElement,boolean inclusiveFrom,$exposedType$ toElement,boolean inclusiveTo){
-#ELSE
-@Override public OmniNavigableSet.Of$ClassPrefix$ subSet($exposedType$ fromElement,boolean inclusiveFrom,$exposedType$ toElement,boolean inclusiveTo){
-#ENDIF
-  //TODO
-  throw new omni.util.NotYetImplementedException();
-}
+
 #IFNOT OfComparable
-@Override public OmniNavigableSet.Of$ClassPrefix$ subSet($BoxedType$ fromElement,$BoxedType$ toElement){
+@Override public OmniSortedSet.Of$ClassPrefix$ subSet($BoxedType$ fromElement,$BoxedType$ toElement){
   //TODO
   throw new omni.util.NotYetImplementedException();
 }
@@ -2094,6 +1711,26 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
 }
 #IFSWITCH DIRECTION==Descending
   #IF OfComparable
+  #MACRO ToArray<this,$ArrayType$>($TypeNameModifier$,($ArrayType$[])OmniArray.OfRef.DEFAULT_COMPARABLE_ARR)
+  #ELSE
+  #MACRO ToArray<this,$ArrayType$>($TypeNameModifier$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+  #ENDIF
+  #IF OfChar,OfShort,OfInt,OfLong,OfFloat,OfDouble
+  #MACRO ToArray<this,$BoxedType$>(,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
+  #ENDIF
+  #IF OfChar,OfShort,OfInt,OfLong,OfFloat
+  #MACRO ToArray<this,double>(Double,OmniArray.OfDouble.DEFAULT_ARR)
+  #ENDIF
+  #IF OfChar,OfShort,OfInt,OfLong
+  #MACRO ToArray<this,float>(Float,OmniArray.OfFloat.DEFAULT_ARR)
+  #ENDIF
+  #IF OfChar,OfShort,OfInt
+  #MACRO ToArray<this,long>(Long,OmniArray.OfLong.DEFAULT_ARR)
+  #ENDIF
+  #IF OfChar,OfShort
+  #MACRO ToArray<this,int>(Int,OmniArray.OfInt.DEFAULT_ARR)
+  #ENDIF
+  #IF OfComparable
   #MACRO DescendingAccessMethods($exposedType$,$exposedType$,ceiling,floor,)
   #ELSE
   #MACRO DescendingAccessMethods($BoxedType$,$exposedType$,ceiling,floor,)
@@ -2112,10 +1749,914 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
     #ENDIF
   #ENDIF
 #ENDIF
+#ENDDEF
+#MACRODEF ToArray<SOURCE,DSTARR>(TYPENAMEMODIFIER,DEFAULTARR)
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+#ENDIF
+@Override public DSTARR[] toTYPENAMEMODIFIERArray(){
+  int tail;
+#IFSWITCH SOURCE==this
+  if((tail=this.tail)!=-1){
+#ELSE
+  final $ClassPrefix$UntetheredArrSeq$<E>$ root;
+  if((tail=(root=this.root).tail)!=-1){
+#ENDIF
+    DSTARR[] dst;
+    final int head;
+    int size;
+    if((size=(++tail)-(head=SOURCE.head))>0){
+#IFSWITCH DIRECTION==Ascending
+  #IF OfComparable
+      ArrCopy.uncheckedCopy(SOURCE.arr,head,dst=new Comparable[size],0,size);
+  #ELSE
+      ArrCopy.uncheckedCopy(SOURCE.arr,head,dst=new DSTARR[size],0,size);
+  #ENDIF
+#ELSE
+  #IF OfComparable
+      ArrCopy.uncheckedReverseCopy(arr=SOURCE.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+  #ELSE
+      ArrCopy.uncheckedReverseCopy(arr=SOURCE.arr,head,dst=new DSTARR[size+=arr.length],tail,size-tail);
+  #ENDIF
+#ENDIF
+    }else{
+      final $ArrayType$[] arr;
+#IFSWITCH DIRECTION==Ascending
+  #IF OfComparable
+      ArrCopy.uncheckedCopy(arr=SOURCE.arr,head,dst=new Comparable[size+=arr.length],0,size-=tail);
+  #ELSE
+      ArrCopy.uncheckedCopy(arr=SOURCE.arr,head,dst=new DSTARR[size+=arr.length],0,size-=tail);
+  #ENDIF
+      ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+#ELSE
+  #IF OfComparable
+      ArrCopy.uncheckedReverseCopy(arr=SOURCE.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+  #ELSE
+      ArrCopy.uncheckedReverseCopy(arr=SOURCE.arr,head,dst=new DSTARR[size+=arr.length],tail,size-tail);
+  #ENDIF
+      ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+#ENDIF
+
+    }
+    return dst;
+  }
+  return DEFAULTARR;
+}
+#ENDDEF
+#MACRODEF AscendingAccessMethods()
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E nonfragmentedCeilingImpl($ArrayType$[] arr,int head,int tail, E val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ nonfragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ nonfragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ nonfragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    for(;;){
+      final int mid;
+      final $ArrayType$ tmp;
+#IF OfComparable
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+#ELSEIF OfDouble,OfFloat
+      switch(searchFunc.applyAsInt(tmp=arr[mid=(head+tail)>>>1])){
+#ELSE
+      switch(privateCompare(val,tmp=arr[mid=(head+tail)>>>1])){
+#ENDIF
+        case 1:
+          if((tail=mid-1)>=head){
+            continue;
+          }
+        case 0:
+          return ($exposedType$)tmp;
+        default:
+          if((head=mid+1)>tail){
+            return ($exposedType$)arr[head];
+          }
+      }
+    }
+  }
+  
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail, E val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ nonfragmentedFloorImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    for(;;){
+      final int mid;
+      final $ArrayType$ tmp;
+#IF OfComparable
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+#ELSEIF OfDouble,OfFloat
+      switch(searchFunc.applyAsInt(tmp=arr[mid=(head+tail)>>>1])){
+#ELSE
+      switch(privateCompare(val,tmp=arr[mid=(head+tail)>>>1])){
+#ENDIF
+        case -1:
+          if((head=mid+1)<=tail){
+            continue;
+          }
+        case 0:
+          return ($exposedType$)tmp;
+        default:
+          if((tail=mid-1)<head){
+            return ($exposedType$)arr[tail];
+          }
+      }
+    }
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail, E val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    for(;;){
+      final int mid;
+      final $ArrayType$ tmp;
+#IF OfComparable
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+#ELSEIF OfDouble,OfFloat
+      switch(searchFunc.applyAsInt(tmp=arr[mid=(head+tail)>>>1])){
+#ELSE
+      switch(privateCompare(val,tmp=arr[mid=(head+tail)>>>1])){
+#ENDIF
+        case 1:
+          if((tail=mid-1)>=head){
+            continue;
+          }
+          return ($exposedType$)tmp;
+        case 0:
+          return ($exposedType$)arr[mid+1];
+        default:
+          if((head=mid+1)>tail){
+            return ($exposedType$)arr[head];
+          }
+      }
+    }
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail, E val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ nonfragmentedHigherImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    for(;;){
+      final int mid;
+      final $ArrayType$ tmp;
+#IF OfComparable
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+#ELSEIF OfDouble,OfFloat
+      switch(searchFunc.applyAsInt(tmp=arr[mid=(head+tail)>>>1])){
+#ELSE
+      switch(privateCompare(val,tmp=arr[mid=(head+tail)>>>1])){
+#ENDIF
+        case -1:
+          if((head=mid+1)<=tail){
+            continue;
+          }
+          return ($exposedType$)tmp;
+        case 0:
+          return ($exposedType$)arr[mid-1];
+        default:
+          if((tail=mid-1)<head){
+            return ($exposedType$)arr[tail];
+          }
+      }
+    }
+  }
+  
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E fragmentedCeilingImpl($ArrayType$[] arr,int head,int tail, E val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ fragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ fragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ fragmentedCeilingImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    final $ArrayType$ tmp;
+    final int mid;
+#IF OfComparable
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+#ELSEIF OfDouble,OfFloat
+    switch(searchFunc.applyAsInt(tmp=arr[mid=arr.length-1])){
+#ELSE
+    switch(privateCompare(val,tmp=arr[mid=arr.length-1])){
+#ENDIF
+      case 1:
+        if((tail=mid-1)>=head){
+          break;
+        }
+      case 0:
+        return ($exposedType$)tmp;
+      default:
+        if((head=0)>tail){
+          return ($exposedType$)arr[0];
+        }
+    }
+#IF OfDouble,OfFloat
+    return nonfragmentedCeilingImpl(arr,head,tail,searchFunc);
+#ELSE
+    return nonfragmentedCeilingImpl(arr,head,tail,val);
+#ENDIF
+  }
+
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E fragmentedFloorImpl($ArrayType$[] arr,int head,int tail, val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ fragmentedFloorImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ fragmentedFloorImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ fragmentedFloorImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    final $ArrayType$ tmp;
+    final int mid;
+#IF OfComparable
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+#ELSEIF OfDouble,OfFloat
+    switch(searchFunc.applyAsInt(tmp=arr[mid=arr.length-1])){
+#ELSE
+    switch(privateCompare(val,tmp=arr[mid=arr.length-1])){
+#ENDIF
+      case -1:
+        if((head=0)<=tail){
+          break;
+        }
+      case 0:
+        return ($exposedType$)tmp;
+      default:
+        if((tail=mid-1)<head){
+          return ($exposedType$)arr[tail];
+        }
+    }
+#IF OfDouble,OfFloat
+    return nonfragmentedFloorImpl(arr,head,tail,searchFunc);
+#ELSE
+    return nonfragmentedFloorImpl(arr,head,tail,val);
+#ENDIF
+  }
+
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E fragmentedHigherImpl($ArrayType$[] arr,int head,int tail, val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ fragmentedHigherImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ fragmentedHigherImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ fragmentedHigherImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    final $ArrayType$ tmp;
+    final int mid;
+#IF OfComparable
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+#ELSEIF OfDouble,OfFloat
+    switch(searchFunc.applyAsInt(tmp=arr[mid=arr.length-1])){
+#ELSE
+    switch(privateCompare(val,tmp=arr[mid=arr.length-1])){
+#ENDIF
+      case 1:
+        if((tail=mid-1)>=head){
+          break;
+        }
+        return ($exposedType$)tmp;
+      default:
+        if((head=0)<=tail){
+          break;
+        }
+      case 0:
+        return ($exposedType$)arr[0];
+    }
+#IF OfDouble,OfFloat
+    return nonfragmentedHigherImpl(arr,head,tail,searchFunc);
+#ELSE
+    return nonfragmentedHigherImpl(arr,head,tail,val);
+#ENDIF
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E fragmentedLowerImpl($ArrayType$[] arr,int head,int tail, val){
+#ELSEIF OfDouble,OfFloat
+  private static $exposedType$ fragmentedLowerImpl($ArrayType$[] arr,int head,int tail,$BoxedType$ToIntFunction searchFunc){
+#ELSEIF OfLong
+  private static $exposedType$ fragmentedLowerImpl($ArrayType$[] arr,int head,int tail,long val){
+#ELSE
+  private static $exposedType$ fragmentedLowerImpl($ArrayType$[] arr,int head,int tail,int val){
+#ENDIF
+    final $ArrayType$ tmp;
+    final int mid;
+#IF OfComparable
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+#ELSEIF OfDouble,OfFloat
+    switch(searchFunc.applyAsInt(tmp=arr[mid=arr.length-1])){
+#ELSE
+    switch(privateCompare(val,tmp=arr[mid=arr.length-1])){
+#ENDIF
+      case -1:
+        if((head=0)<=tail){
+          break;
+        }
+        return ($exposedType$)tmp;
+      default:
+        if((tail=mid-1)>=head){
+          break;
+        }
+      case 0:
+        return ($exposedType$)arr[mid-1];
+    }
+#IF OfDouble,OfFloat
+    return nonfragmentedLowerImpl(arr,head,tail,searchFunc);
+#ELSE
+    return nonfragmentedLowerImpl(arr,head,tail,val);
+#ENDIF
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  @Override public E ceiling(E val){
+#ELSE
+  @Override public $exposedType$ $exposedType$Ceiling($exposedType$ val){
+#ENDIF
+    final int tail;
+  #IF OfComparable
+    if(val!=null && (tail=this.tail)!=-1){
+  #ELSEIF OfDouble,OfFloat
+    if(val==val && (tail=this.tail)!=-1){
+  #ELSE
+    if((tail=this.tail)!=-1){
+  #ENDIF
+  #IF OfComparable
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      if((tmp=(arr=this.arr)[tail])==null){
+        final int head;
+        switch(Integer.signum(tail-(head=this.head))){
+          case 1:
+            return nonfragmentedCeilingImpl(arr,head,tail-1,val);
+          default:
+            return fragmentedCeilingImpl(arr,head,tail-1,val);
+          case 0:
+        }
+      }else{
+        switch(Integer.signum(tmp.compareTo(val))){
+          case 1:
+            final int head;
+            switch(Integer.signum(tail-(head=this.head))){
+              case 1:
+                return nonfragmentedCeilingImpl(arr,head,tail-1,val);
+              default:
+                return fragmentedCeilingImpl(arr,head,tail-1,val);
+              case 0:
+            }
+           case 0:
+            return ($exposedType$)tmp;
+          default:
+        }
+      }
+  #ELSEIF OfDouble,OfFloat
+    
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+  #ELSE
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+  #ENDIF
+    }
+    return $defaultVal$;
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+  @Override public E floor(E val){
+#ELSE
+  @Override public $exposedType$ $exposedType$Floor($exposedType$ val){
+#ENDIF
+    final int tail;
+    if((tail=this.tail)!=-1){
+#IF OfComparable
+      if(val==null){
+        return ($exposedType$)arr[tail];
+      }
+      final int head;
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      if((tmp=(arr=this.arr)[head=this.head])!=null){
+        switch(Integer.signum(tmp.compareTo(val))){
+          case -1:
+            switch(Integer.signum(tail-head)){
+              case 1:
+                return nonfragmentedFloorImpl(arr,head+1,tail,val);
+              default:
+                return fragmentedFloorImpl(arr,head+1,tail,val);
+              case 0:
+            }
+          case 0:
+            return ($exposedType$)tmp;
+          default:
+        }
+      }
+#ELSE
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+#ENDIF
+    }
+    return $defaultVal$;
+  }
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+#ENDIF
+  @Override public $exposedType$ higher$TypeNameModifier$($exposedType$ val){
+    final int tail;
+#IF OfComparable
+    if(val!=null && (tail=this.tail)!=-1){
+#ELSEIF OfDouble,OfFloat
+    if(val==val && (tail=this.tail)!=-1){
+#ELSE
+    if((tail=this.tail)!=-1){
+#ENDIF
+#IF OfComparable
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      if((tmp=(arr=this.arr)[tail])==null){
+        final int head;
+        switch(Integer.signum(tail-(head=this.head))){
+          case 1:
+            return nonfragmentedHigherImpl(arr,head,tail-1,val);
+          default:
+            return fragmentedHigherImpl(arr,head,tail-1,val);
+          case 0:
+        }
+      }else{
+        if(tmp.compareTo(val)>0){
+          final int head;
+          switch(Integer.signum(tail-(head=this.head))){
+            case 0:
+              return ($exposedType$)tmp;
+            case 1:
+              return nonfragmentedHigherImpl(arr,head,tail-1,val);
+            default:
+              return fragmentedHigherImpl(arr,head,tail-1,val);
+          }
+        }
+      }
+#ELSE
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+#ENDIF
+    }
+    return $defaultVal$;
+  }
+  
+#IF OfComparable
+  @SuppressWarnings("unchecked")
+#ENDIF
+  @Override public $exposedType$ lower$TypeNameModifier$($exposedType$ val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+#IF OfComparable
+      final var arr=this.arr;
+      final $ArrayType$ tmp;
+      if(val==null){
+        if((tmp=arr[tail])==null){
+          switch(Integer.signum(tail-head)){
+            default:
+              if(tail==0){
+                return ($exposedType$)arr[arr.length-1];
+              }
+            case 1:
+              return ($exposedType$)arr[tail-1];
+            case 0:
+          }
+        }
+        return ($exposedType$)tmp;
+      }else{
+        final int head;
+        if((tmp=arr[head=this.head])!=null && tmp.compareTo(val)<0){
+          switch(Integer.signum(tail-head)){
+            case 0:
+              return ($exposedType$)tmp;
+            case 1:
+              return nonfragmentedLowerImpl(arr,head+1,tail,val);
+            default:
+              return fragmentedLowerImpl(arr,head+1,tail,val);
+          }
+        }
+      }
+#ELSE
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+#ENDIF
+    }
+    return $defaultVal$;
+  }
+#IFNOT OfComparable
+  @Override public $BoxedType$ ceiling($exposedType$ val){
+    final int tail;
+    if((tail=this.tail)!=-1){
+  #IF OfDouble,OfFloat
+      if(val!=val){
+        final $ArrayType$ tmp;
+        if($BoxedType$.isNan(tmp=arr[tail])){
+          return tmp;
+        }
+      }else
+  #ENDIF
+      {
+  #IF OfDouble,OfFloat
+        final $BoxedType$ToIntFunction searchFunc;
+    #IF OfDouble
+        final long bits;
+        if((bits=Double.doubleToRawLongBits(val))==0){
+          searchFunc=$ClassPrefix$NavigableSetImpl::comparePos0;
+        }else if(bits==Long.MIN_VALUE){
+          searchFunc=$ClassPrefix$NavigableSetImpl::compareNeg0;
+        }else{
+          searchFunc=getSearchFunction(val);
+        }
+    #ELSE
+        switch(Float.floatToRawIntBits(val)){
+          case 0xff800000
+            return arr[head];
+          case 0:
+            searchFunc=$ClassPrefix$NavigableSetImpl::comparePos0;
+            break;
+          case Integer.MIN_VALUE:
+            searchFunc=$ClassPrefix$NavigableSetImpl::compareNeg0;
+            break;
+          default:
+            searchFunc=getSearchFunction(val);
+        }
+    #ENDIF
+  #ENDIF
+        final $ArrayType$ tmp;
+  #IF OfDouble,OfFloat
+        switch(searchFunc.applyAsInt(tmp=(arr=this.arr)[tail])){
+  #ELSE
+        switch(privateCompare(val,tmp=(arr=this.arr)[tail])){
+  #ENDIF
+          default:
+            switch(Integer.signum(tail-(head=this.head))){
+              case 1:
+  #IF OfDouble,OfFloat
+                return nonfragmentedCeilingImpl(arr,head,tail,searchFunc);
+              default:
+                return fragmentedCeilingImpl(arr,head,tail,searchFunc);
+  #ELSE
+                return nonfragmentedCeilingImpl(arr,head,tail,val);
+              default:
+                return fragmentedCeilingImpl(arr,head,tail,val);
+  #ENDIF
+              case 0:
+            }
+          case 0:
+            return tmp;
+          case 1:
+        }
+      }
+    }
+    return null;
+  }
+  @Override public $BoxedType$ floor($exposedType$ val){
+    #IF OfDouble,OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSEIF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public $BoxedType$ higher($exposedType$ val){
+    #IF OfDouble,OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSEIF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public $BoxedType$ lower($exposedType$ val){
+    #IF OfDouble,OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSEIF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  #IFNOT OfDouble
+  @Override public double doubleCeiling(double val){
+    #IF OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSEIF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public double doubleFloor(double val){
+    #IF OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSEIF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public double higherDouble(double val){
+    #IF OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSEIF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public double lowerDouble(double val){
+    #IF OfFloat
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSEIF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+    #IFNOT OfFloat
+  @Override public float floatCeiling(float val){
+    #IF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public float floatFloor(float val){
+    #IF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public float higherFloat(float val){
+    #IF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+  @Override public float lowerFloat(float val){
+    #IF OfLong,OfInt
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ELSE
+    //TODO
+    throw new omni.util.NotYetImplementedException();
+    #ENDIF
+  }
+      #IFNOT OfLong
+  @Override public long longCeiling(long val){
+    final int tail;
+    if(val<=$BoxedType$.MAX_VALUE && (tail=this.tail)!=-1){
+      if(val<=$BoxedType$.MIN_VALUE){
+        return arr[head];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      final int iVal;
+      switch(privateCompare(iVal=(int)val,(tmp=(arr=this.arr)[tail]))){
+        default:
+          final int head;
+          switch(Integer.signum(tail-(head=this.head))){
+            case 1:
+              return nonfragmentedCeilingImpl(arr,head,tail-1,iVal);
+            default:
+              return fragmentedCeilingImpl(arr,head,tail-1,iVal);
+            case 0:
+          }
+        case 0:
+          return tmp;
+        case 1:
+      }
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public long longFloor(long val){
+    final int tail;
+    if(val>=$BoxedType$.MIN_VALUE && (tail=this.tail)!=-1){
+      if(val>=$BoxedType$.MAX_VALUE){
+        return arr[tail];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      final int head;
+      final int iVal;
+      switch(privateCompare(iVal=(int)val,(tmp=(arr=this.arr)[head=this.head]))){
+        default:
+          switch(Integer.signum(tail-head)){
+            case 1:
+              return nonfragmentedFloorImpl(arr,head+1,tail,iVal);
+            default:
+              return fragmentedFloorImpl(arr,head+1,tail,iVal);
+            case 0:
+          }
+        case 0:
+          return tmp;
+        case -1:
+      }
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public long higherLong(long val){
+    final int tail;
+    if(val<$BoxedType$.MAX_VALUE && (tail=this.tail)!=-1){
+      if(val<$BoxedType$.MIN_VALUE){
+        return arr[head];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      final int iVal;
+      if((iVal=(int)val)<(arr=this.arr)[tail]){
+        final int head;
+        switch(Integer.signum(tail-(head=this.head))){
+          case 1:
+            return nonfragmentedHigherImpl(arr,head,tail-1,iVal);
+          default:
+            return fragmentedHigherImpl(arr,head,tail-1,iVal);
+          case 0:
+            return tmp;
+        }
+      }
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public long lowerLong(long val){
+    final int tail;
+    if(val>$BoxedType$.MIN_VALUE && (tail=this.tail)!=-1){
+      if(val>$BoxedType$.MAX_VALUE){
+        return arr[tail];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      final int head;
+      final int iVal;
+      if((iVal=(int)val)>(tmp=(arr=this.arr)[head=this.head])){
+        switch(Integer.signum(tail-(head)){
+          case 1:
+            return nonfragmentedLowerImpl(arr,head+1,tail,iVal);
+          default:
+            return fragmentedLowerImpl(arr,head+1,tail,iVal);
+          case 0:
+            return tmp;
+        }
+      }
+    }
+    return Long.MIN_VALUE;
+  }
+        #IFNOT OfInt
+  @Override public int intCeiling(int val){
+    final int tail;
+    if(val<=$BoxedType$.MAX_VALUE && (tail=this.tail)!=-1){
+      if(val<=$BoxedType$.MIN_VALUE){
+        return arr[head];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      switch(Integer.signum(val-(tmp=(arr=this.arr)[tail]))){
+        default:
+          final int head;
+          switch(Integer.signum(tail-(head=this.head))){
+            case 1:
+              return nonfragmentedCeilingImpl(arr,head,tail-1,val);
+            default:
+              return fragmentedCeilingImpl(arr,head,tail-1,val);
+            case 0:
+          }
+        case 0:
+          return tmp;
+        case 1:
+      }
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public int intFloor(int val){
+    final int tail;
+    if(val>=$BoxedType$.MIN_VALUE && (tail=this.tail)!=-1){
+      if(val>=$BoxedType$.MAX_VALUE){
+        return arr[tail];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      final int head;
+      switch(Integer.signum(val-(tmp=(arr=this.arr)[head=this.head]))){
+        default:
+          switch(Integer.signum(tail-head)){
+            case 1:
+              return nonfragmentedFloorImpl(arr,head+1,tail,val);
+            default:
+              return fragmentedFloorImpl(arr,head+1,tail,val);
+            case 0:
+          }
+        case 0:
+          return tmp;
+        case -1:
+      }
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public int higherInt(int val){
+    final int tail;
+    if(val<$BoxedType$.MAX_VALUE && (tail=this.tail)!=-1){
+      if(val<$BoxedType$.MIN_VALUE){
+        return arr[head];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      if(val<(arr=this.arr)[tail]){
+        final int head;
+        switch(Integer.signum(tail-(head=this.head))){
+          case 1:
+            return nonfragmentedHigherImpl(arr,head,tail-1,val);
+          default:
+            return fragmentedHigherImpl(arr,head,tail-1,val);
+          case 0:
+            return tmp;
+        }
+      }
+    }
+    return Integer.MIN_VALUE;
+  }
+  @Override public int lowerInt(int val){
+    final int tail;
+    if(val>$BoxedType$.MIN_VALUE && (tail=this.tail)!=-1){
+      if(val>$BoxedType$.MAX_VALUE){
+        return arr[tail];
+      }
+      final $ArrayType$[] arr;
+      final $ArrayType$ tmp;
+      final int head;
+      if(val>(tmp=(arr=this.arr)[head=this.head])){
+        switch(Integer.signum(tail-(head)){
+          case 1:
+            return nonfragmentedLowerImpl(arr,head+1,tail,val);
+          default:
+            return fragmentedLowerImpl(arr,head+1,tail,val);
+          case 0:
+            return tmp;
+        }
+      }
+    }
+    return Integer.MIN_VALUE;
+  }
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
 
 #ENDDEF
-
 #MACRODEF DescendingAccessMethods(RETTYPE,PARAMTYPE,CEILINGNAME,FLOORNAME,TYPENAMEMODIFIER)
+/*
 @Override public RETTYPE CEILINGNAME(PARAMTYPE val){
   return super.FLOORNAME(val);
 }
@@ -2128,6 +2669,7 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
 @Override public RETTYPE lowerTYPENAMEMODIFIER(PARAMTYPE val){
   return super.higherTYPENAMEMODIFIER(val);
 }
+*/
 #ENDDEF
 
 

@@ -29,6 +29,37 @@ abstract class FloatUntetheredArrSeq implements OmniCollection.OfFloat,Externali
     super();
     this.tail=-1;
   }
+  static abstract class AbstractFullView implements OmniCollection.OfFloat
+  {
+    transient final FloatUntetheredArrSeq root;
+    AbstractFullView(FloatUntetheredArrSeq root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.size();
+    }
+    @Override public boolean isEmpty(){
+      return root.isEmpty();
+    }
+    @Override public void clear(){
+      root.clear();
+    }
+    @Override public boolean add(float key){
+      return root.add(key);
+    }
+    @Override public boolean add(Float key){
+      return root.add((float)key);
+    }
+    @Override public boolean add(boolean key){
+      return root.add(key);
+    }
+    @Override public boolean removeIf(FloatPredicate filter){
+      return root.removeIf(filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Float> filter){
+      return root.removeIf((FloatPredicate)filter::test);
+    }
+  }
   @Override public int size(){
     int tail;
     if((tail=this.tail+1)>0 && (tail-=this.head)<=0){

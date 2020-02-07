@@ -1,13 +1,19 @@
 package omni.impl;
-import omni.api.OmniNavigableSet;
+import java.io.Serializable;
+import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
 import omni.api.OmniIterator;
+import omni.util.OmniArray;
+import java.util.function.DoublePredicate;
+import java.util.function.DoubleConsumer;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.util.OmniArray;
 import omni.function.DoubleComparator;
 import omni.util.TypeUtil;
 import java.util.function.DoubleToIntFunction;
 public abstract class DoubleNavigableSetImpl
-  extends DoubleUntetheredArrSeq implements OmniNavigableSet.OfDouble
+  extends DoubleUntetheredArrSeq implements OmniSortedSet.OfDouble
 {
   DoubleNavigableSetImpl(int head,double[] arr,int tail){
     super(head,arr,tail);
@@ -53,6 +59,9 @@ public abstract class DoubleNavigableSetImpl
       return true;
     }
     return false;
+  }
+  private static DoubleToIntFunction getSearchFunction(double key){
+    return (k)->privateCompare(k,key);
   }
   private boolean uncheckedAddUndefined(int tail){
     double[] arr;
@@ -171,9 +180,6 @@ public abstract class DoubleNavigableSetImpl
       super.insertAtMiddle(key);
       return true;
     }
-  }
-  private static DoubleToIntFunction getSearchFunction(double key){
-    return (k)->privateCompare(k,key);
   }
   @Override public boolean contains(Object key){
     final int tail;
@@ -476,37 +482,105 @@ public abstract class DoubleNavigableSetImpl
     }
     return false;
   }
-  @Override public double doubleCeiling(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class AscendingFullView extends DoubleUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfDouble,Cloneable,Serializable
+  {
+    AscendingFullView(DoubleUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Double> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfDouble iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final DoubleUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new double[size],0,size);
+        }else{
+          final double[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public Double[] toArray(){
+      int tail;
+      final DoubleUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new Double[size],0,size);
+        }else{
+          final double[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new Double[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_BOXED_ARR;
+    }
   }
-  @Override public double doubleFloor(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double higherDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double lowerDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Double ceiling(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Double floor(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Double higher(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Double lower(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class DescendingFullView extends DoubleUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfDouble,Cloneable,Serializable
+  {
+    DescendingFullView(DoubleUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Double> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfDouble iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final DoubleUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+        }else{
+          final double[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public Double[] toArray(){
+      int tail;
+      final DoubleUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Double[size+=arr.length],tail,size-tail);
+        }else{
+          final double[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_BOXED_ARR;
+    }
   }
   public static class Ascending extends DoubleNavigableSetImpl implements Cloneable
   {
@@ -525,47 +599,27 @@ public abstract class DoubleNavigableSetImpl
     @Override public double lastDouble(){
       return (double)arr[tail];
     }
-    @Override public OmniNavigableSet.OfDouble descendingSet(){
+    @Override public OmniSortedSet.OfDouble headSet(double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfDouble descendingIterator(){
+    @Override public OmniSortedSet.OfDouble headSet(Double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble headSet(double toElement){
+    @Override public OmniSortedSet.OfDouble tailSet(double fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble headSet(double toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfDouble tailSet(Double fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble headSet(Double toElement){
+    @Override public OmniSortedSet.OfDouble subSet(double fromElement,double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble tailSet(double fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble tailSet(double fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble tailSet(Double fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble subSet(double fromElement,double toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble subSet(double fromElement,boolean inclusiveFrom,double toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble subSet(Double fromElement,Double toElement){
+    @Override public OmniSortedSet.OfDouble subSet(Double fromElement,Double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -607,47 +661,27 @@ public abstract class DoubleNavigableSetImpl
     @Override public double lastDouble(){
       return (double)arr[head];
     }
-    @Override public OmniNavigableSet.OfDouble descendingSet(){
+    @Override public OmniSortedSet.OfDouble headSet(double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfDouble descendingIterator(){
+    @Override public OmniSortedSet.OfDouble headSet(Double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble headSet(double toElement){
+    @Override public OmniSortedSet.OfDouble tailSet(double fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble headSet(double toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfDouble tailSet(Double fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble headSet(Double toElement){
+    @Override public OmniSortedSet.OfDouble subSet(double fromElement,double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfDouble tailSet(double fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble tailSet(double fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble tailSet(Double fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble subSet(double fromElement,double toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble subSet(double fromElement,boolean inclusiveFrom,double toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfDouble subSet(Double fromElement,Double toElement){
+    @Override public OmniSortedSet.OfDouble subSet(Double fromElement,Double toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -671,6 +705,41 @@ public abstract class DoubleNavigableSetImpl
       }
       return new Descending();
     }
+      @Override public double[] toDoubleArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          double[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          }else{
+            final double[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public Double[] toArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          Double[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Double[size+=arr.length],tail,size-tail);
+          }else{
+            final double[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_BOXED_ARR;
+      }
+      /*
       @Override public Double ceiling(double val){
         return super.floor(val);
       }
@@ -683,6 +752,8 @@ public abstract class DoubleNavigableSetImpl
       @Override public Double lower(double val){
         return super.higher(val);
       }
+      */
+      /*
       @Override public double doubleCeiling(double val){
         return super.doubleFloor(val);
       }
@@ -695,5 +766,6 @@ public abstract class DoubleNavigableSetImpl
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      */
   }
 }

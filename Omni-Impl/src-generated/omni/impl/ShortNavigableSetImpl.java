@@ -1,12 +1,18 @@
 package omni.impl;
-import omni.api.OmniNavigableSet;
+import java.io.Serializable;
+import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
 import omni.api.OmniIterator;
+import omni.util.OmniArray;
+import omni.function.ShortPredicate;
+import omni.function.ShortConsumer;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.function.ShortComparator;
 import omni.util.TypeUtil;
 import java.util.function.IntUnaryOperator;
 public abstract class ShortNavigableSetImpl
-  extends ShortUntetheredArrSeq implements OmniNavigableSet.OfShort
+  extends ShortUntetheredArrSeq implements OmniSortedSet.OfShort
 {
   ShortNavigableSetImpl(int head,short[] arr,int tail){
     super(head,arr,tail);
@@ -16,6 +22,9 @@ public abstract class ShortNavigableSetImpl
   }
   private static int privateCompare(int key1,int key2){
     return Integer.signum(key1-key2);
+  }
+  private static IntUnaryOperator getSearchFunction(int key){
+    return (k)->privateCompare(k,key);
   }
   @Override public boolean add(short key){
     int tail;
@@ -46,9 +55,6 @@ public abstract class ShortNavigableSetImpl
       super.insertAtMiddle(key);
       return true;
     }
-  }
-  private static IntUnaryOperator getSearchFunction(int key){
-    return (k)->privateCompare(k,key);
   }
   @Override public boolean contains(Object key){
     final int tail;
@@ -196,101 +202,249 @@ public abstract class ShortNavigableSetImpl
     final int i;
     return (tail=this.tail)!=-1 && key==(i=(short)key) && super.uncheckedRemoveMatch(tail,getSearchFunction(i));
   }
-  @Override public short shortCeiling(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class AscendingFullView extends ShortUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfShort,Cloneable,Serializable
+  {
+    AscendingFullView(ShortUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Short> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfShort iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short[] toShortArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        short[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new short[size],0,size);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new short[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    @Override public Short[] toArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Short[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new Short[size],0,size);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new Short[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_BOXED_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new double[size],0,size);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        float[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new float[size],0,size);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new float[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override public long[] toLongArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new long[size],0,size);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new long[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public int[] toIntArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        int[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedCopy(root.arr,head,dst=new int[size],0,size);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedCopy(arr=root.arr,head,dst=new int[size+=arr.length],0,size-=tail);
+          ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
   }
-  @Override public short shortFloor(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public short higherShort(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public short lowerShort(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Short ceiling(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Short floor(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Short higher(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public Short lower(short val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double doubleCeiling(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double doubleFloor(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double higherDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public double lowerDouble(double val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float floatCeiling(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float floatFloor(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float higherFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public float lowerFloat(float val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long longCeiling(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long longFloor(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long higherLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public long lowerLong(long val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int intCeiling(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int intFloor(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int higherInt(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
-  @Override public int lowerInt(int val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+  private static class DescendingFullView extends ShortUntetheredArrSeq.AbstractFullView implements OmniSortedSet.OfShort,Cloneable,Serializable
+  {
+    DescendingFullView(ShortUntetheredArrSeq root){
+      super(root);
+    }
+    @Override public void forEach(Consumer<? super Short> action){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniIterator.OfShort iterator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public short[] toShortArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        short[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new short[size+=arr.length],tail,size-tail);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new short[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    @Override public Short[] toArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        Short[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Short[size+=arr.length],tail,size-tail);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Short[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfShort.DEFAULT_BOXED_ARR;
+    }
+    @Override public double[] toDoubleArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        double[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override public float[] toFloatArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        float[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override public long[] toLongArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        long[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override public int[] toIntArray(){
+      int tail;
+      final ShortUntetheredArrSeq root;
+      if((tail=(root=this.root).tail)!=-1){
+        int[] dst;
+        final int head;
+        int size;
+        if((size=(++tail)-(head=root.head))>0){
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+        }else{
+          final short[] arr;
+          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+        }
+        return dst;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
   }
   public static class Ascending extends ShortNavigableSetImpl implements Cloneable
   {
@@ -309,47 +463,27 @@ public abstract class ShortNavigableSetImpl
     @Override public short lastShort(){
       return (short)arr[tail];
     }
-    @Override public OmniNavigableSet.OfShort descendingSet(){
+    @Override public OmniSortedSet.OfShort headSet(short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfShort descendingIterator(){
+    @Override public OmniSortedSet.OfShort headSet(Short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort headSet(short toElement){
+    @Override public OmniSortedSet.OfShort tailSet(short fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort headSet(short toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfShort tailSet(Short fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort headSet(Short toElement){
+    @Override public OmniSortedSet.OfShort subSet(short fromElement,short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort tailSet(short fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort tailSet(short fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort tailSet(Short fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort subSet(short fromElement,short toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort subSet(short fromElement,boolean inclusiveFrom,short toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort subSet(Short fromElement,Short toElement){
+    @Override public OmniSortedSet.OfShort subSet(Short fromElement,Short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -391,47 +525,27 @@ public abstract class ShortNavigableSetImpl
     @Override public short lastShort(){
       return (short)arr[head];
     }
-    @Override public OmniNavigableSet.OfShort descendingSet(){
+    @Override public OmniSortedSet.OfShort headSet(short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniIterator.OfShort descendingIterator(){
+    @Override public OmniSortedSet.OfShort headSet(Short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort headSet(short toElement){
+    @Override public OmniSortedSet.OfShort tailSet(short fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort headSet(short toElement,boolean inclusive){
+    @Override public OmniSortedSet.OfShort tailSet(Short fromElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort headSet(Short toElement){
+    @Override public OmniSortedSet.OfShort subSet(short fromElement,short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
-    @Override public OmniNavigableSet.OfShort tailSet(short fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort tailSet(short fromElement,boolean inclusive){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort tailSet(Short fromElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort subSet(short fromElement,short toElement){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort subSet(short fromElement,boolean inclusiveFrom,short toElement,boolean inclusiveTo){
-      //TODO
-      throw new omni.util.NotYetImplementedException();
-    }
-    @Override public OmniNavigableSet.OfShort subSet(Short fromElement,Short toElement){
+    @Override public OmniSortedSet.OfShort subSet(Short fromElement,Short toElement){
       //TODO
       throw new omni.util.NotYetImplementedException();
     }
@@ -455,6 +569,109 @@ public abstract class ShortNavigableSetImpl
       }
       return new Descending();
     }
+      @Override public short[] toShortArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          short[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new short[size+=arr.length],tail,size-tail);
+          }else{
+            final short[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new short[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfShort.DEFAULT_ARR;
+      }
+      @Override public Short[] toArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          Short[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Short[size+=arr.length],tail,size-tail);
+          }else{
+            final short[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Short[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfShort.DEFAULT_BOXED_ARR;
+      }
+      @Override public double[] toDoubleArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          double[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          }else{
+            final short[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      @Override public float[] toFloatArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          float[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          }else{
+            final short[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfFloat.DEFAULT_ARR;
+      }
+      @Override public long[] toLongArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          long[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+          }else{
+            final short[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfLong.DEFAULT_ARR;
+      }
+      @Override public int[] toIntArray(){
+        int tail;
+        if((tail=this.tail)!=-1){
+          int[] dst;
+          final int head;
+          int size;
+          if((size=(++tail)-(head=this.head))>0){
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+          }else{
+            final short[] arr;
+            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+          }
+          return dst;
+        }
+        return OmniArray.OfInt.DEFAULT_ARR;
+      }
+      /*
       @Override public Short ceiling(short val){
         return super.floor(val);
       }
@@ -467,6 +684,8 @@ public abstract class ShortNavigableSetImpl
       @Override public Short lower(short val){
         return super.higher(val);
       }
+      */
+      /*
       @Override public short shortCeiling(short val){
         return super.shortFloor(val);
       }
@@ -479,6 +698,8 @@ public abstract class ShortNavigableSetImpl
       @Override public short lowerShort(short val){
         return super.higherShort(val);
       }
+      */
+      /*
       @Override public double doubleCeiling(double val){
         return super.doubleFloor(val);
       }
@@ -491,6 +712,8 @@ public abstract class ShortNavigableSetImpl
       @Override public double lowerDouble(double val){
         return super.higherDouble(val);
       }
+      */
+      /*
       @Override public float floatCeiling(float val){
         return super.floatFloor(val);
       }
@@ -503,6 +726,8 @@ public abstract class ShortNavigableSetImpl
       @Override public float lowerFloat(float val){
         return super.higherFloat(val);
       }
+      */
+      /*
       @Override public long longCeiling(long val){
         return super.longFloor(val);
       }
@@ -515,6 +740,8 @@ public abstract class ShortNavigableSetImpl
       @Override public long lowerLong(long val){
         return super.higherLong(val);
       }
+      */
+      /*
       @Override public int intCeiling(int val){
         return super.intFloor(val);
       }
@@ -527,5 +754,6 @@ public abstract class ShortNavigableSetImpl
       @Override public int lowerInt(int val){
         return super.higherInt(val);
       }
+      */
   }
 }

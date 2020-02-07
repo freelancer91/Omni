@@ -29,6 +29,37 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
     super();
     this.tail=-1;
   }
+  static abstract class AbstractFullView implements OmniCollection.OfChar
+  {
+    transient final CharUntetheredArrSeq root;
+    AbstractFullView(CharUntetheredArrSeq root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.size();
+    }
+    @Override public boolean isEmpty(){
+      return root.isEmpty();
+    }
+    @Override public void clear(){
+      root.clear();
+    }
+    @Override public boolean add(char key){
+      return root.add(key);
+    }
+    @Override public boolean add(Character key){
+      return root.add((char)key);
+    }
+    @Override public boolean add(boolean key){
+      return root.add(key);
+    }
+    @Override public boolean removeIf(CharPredicate filter){
+      return root.removeIf(filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Character> filter){
+      return root.removeIf((CharPredicate)filter::test);
+    }
+  }
   @Override public int size(){
     int tail;
     if((tail=this.tail+1)>0 && (tail-=this.head)<=0){

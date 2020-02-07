@@ -29,6 +29,37 @@ abstract class IntUntetheredArrSeq implements OmniCollection.OfInt,Externalizabl
     super();
     this.tail=-1;
   }
+  static abstract class AbstractFullView implements OmniCollection.OfInt
+  {
+    transient final IntUntetheredArrSeq root;
+    AbstractFullView(IntUntetheredArrSeq root){
+      this.root=root;
+    }
+    @Override public int size(){
+      return root.size();
+    }
+    @Override public boolean isEmpty(){
+      return root.isEmpty();
+    }
+    @Override public void clear(){
+      root.clear();
+    }
+    @Override public boolean add(int key){
+      return root.add(key);
+    }
+    @Override public boolean add(Integer key){
+      return root.add((int)key);
+    }
+    @Override public boolean add(boolean key){
+      return root.add(key);
+    }
+    @Override public boolean removeIf(IntPredicate filter){
+      return root.removeIf(filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Integer> filter){
+      return root.removeIf((IntPredicate)filter::test);
+    }
+  }
   @Override public int size(){
     int tail;
     if((tail=this.tail+1)>0 && (tail-=this.head)<=0){
