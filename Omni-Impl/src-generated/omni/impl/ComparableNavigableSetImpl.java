@@ -369,53 +369,245 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     return (tail=this.tail)!=-1 && super.uncheckedRemoveMatch(tail,getSearchFunction((E)(Double)key));
   }
+  @SuppressWarnings("unchecked")
   private static <E extends Comparable<E>> E nonfragmentedCeilingImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    //assert arr!=null;
+    //assert val!=null;
+    //assert tail>=head;
+    //assert head>=0;
+    //assert tail<arr.length-1;
+    //assert arr[tail+1]==null || arr[tail+1].compareTo(val)>0;
+    for(;;){
+      final int mid;
+      final Comparable<E> tmp;
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+        case 1:
+          if((tail=mid-1)>=head){
+            continue;
+          }
+        case 0:
+          return (E)tmp;
+        default:
+          if((head=mid+1)>tail){
+            return (E)arr[head];
+          }
+      }
+    }
   }
-  private static <E extends Comparable<E>> E fragmentedCeilingImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
+  @SuppressWarnings("unchecked")
   private static <E extends Comparable<E>> E nonfragmentedFloorImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    //assert arr!=null;
+    //assert val!=null;
+    //assert tail>=head;
+    //assert head>0;
+    //assert tail<arr.length;
+    //assert arr[head-1]!=null;
+    //assert arr[head-1].compareTo(val)<0;
+    for(;;){
+      final int mid;
+      final Comparable<E> tmp;
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+        case -1:
+          if((head=mid+1)<=tail){
+            continue;
+          }
+        case 0:
+          return (E)tmp;
+        default:
+          if((tail=mid-1)<head){
+            return (E)arr[tail];
+          }
+      }
+    }
   }
-  private static <E extends Comparable<E>> E fragmentedFloorImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
+  @SuppressWarnings("unchecked")
   private static <E extends Comparable<E>> E nonfragmentedHigherImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    //assert arr!=null;
+    //assert val!=null;
+    //assert tail>=head;
+    //assert head>=0;
+    //assert tail<arr.length-1;
+    //assert arr[tail+1]==null || arr[tail+1].compareTo(val)>0;
+    for(;;){
+      final int mid;
+      final Comparable<E> tmp;
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+        case 1:
+          if((tail=mid-1)>=head){
+            continue;
+          }
+          return (E)tmp;
+        case 0:
+          return (E)arr[mid+1];
+        default:
+          if((head=mid+1)>tail){
+            return (E)arr[head];
+          }
+      }
+    }
   }
-  private static <E extends Comparable<E>> E fragmentedHigherImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
-  }
+  @SuppressWarnings("unchecked")
   private static <E extends Comparable<E>> E nonfragmentedLowerImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    //assert arr!=null;
+    //assert val!=null;
+    //assert tail>=head;
+    //assert head>0;
+    //assert tail<arr.length;
+    //assert arr[head-1]!=null;
+    //assert arr[head-1].compareTo(val)<0;
+    for(;;){
+      final int mid;
+      final Comparable<E> tmp;
+      switch(Integer.signum((tmp=arr[mid=(head+tail)>>>1]).compareTo(val))){
+        case -1:
+          if((head=mid+1)<=tail){
+            continue;
+          }
+          return (E)tmp;
+        case 0:
+          return (E)arr[mid-1];
+        default:
+          if((tail=mid-1)<head){
+            return (E)arr[tail];
+          }
+      }
+    }
   }
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E fragmentedCeilingImpl(Comparable<E>[] arr,int head,int tail,E val){
+    final Comparable<E> tmp;
+    final int mid;
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+      case 1:
+        if((tail=mid-1)>=head){
+          break;
+        }
+      case 0:
+        return (E)tmp;
+      default:
+        if((head=0)>tail){
+          return (E)arr[0];
+        }
+    }
+    return nonfragmentedCeilingImpl(arr,head,tail,val);
+  }
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E fragmentedFloorImpl(Comparable<E>[] arr,int head,int tail,E val){
+    final Comparable<E> tmp;
+    final int mid;
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+      case -1:
+        if((head=0)<=tail){
+          break;
+        }
+      case 0:
+        return (E)tmp;
+      default:
+        if((tail=mid-1)<head){
+          return (E)arr[tail];
+        }
+    }
+    return nonfragmentedFloorImpl(arr,head,tail,val);
+  }
+  @SuppressWarnings("unchecked")
+  private static <E extends Comparable<E>> E fragmentedHigherImpl(Comparable<E>[] arr,int head,int tail,E val){
+    final Comparable<E> tmp;
+    final int mid;
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+      case 1:
+        if((tail=mid-1)>=head){
+          break;
+        }
+        return (E)tmp;
+      default:
+        if((head=0)<=tail){
+          break;
+        }
+      case 0:
+        return (E)arr[0];
+    }
+    return nonfragmentedHigherImpl(arr,head,tail,val);
+  }
+  @SuppressWarnings("unchecked")
   private static <E extends Comparable<E>> E fragmentedLowerImpl(Comparable<E>[] arr,int head,int tail,E val){
-    //TODO
-    throw new omni.util.NotYetImplementedException();
+    final Comparable<E> tmp;
+    final int mid;
+    switch((tmp=arr[mid=arr.length-1]).compareTo(val)){
+      case -1:
+        if((head=0)<=tail){
+          break;
+        }
+        return (E)tmp;
+      default:
+        if((tail=mid-1)>=head){
+          break;
+        }
+      case 0:
+        return (E)arr[mid-1];
+    }
+    return nonfragmentedLowerImpl(arr,head,tail,val);
   }
   @SuppressWarnings("unchecked")
   @Override public E ceiling(E val){
     final int tail;
     if(val!=null && (tail=this.tail)!=-1){
-      final int head;
-      switch(Integer.signum(tail-(head=this.head))){
-        case 1:
-          return nonfragmentedCeilingImpl(arr,head,tail,val);
-        default:
-          return fragmentedCeilingImpl(arr,head,tail,val);
-        case 0:
-          final Comparable<E> tmp;
-          if((tmp=arr[head])!=null && tmp.compareTo(val)>=0){
+      final Comparable<E>[] arr;
+      final Comparable<E> tmp;
+      if((tmp=(arr=this.arr)[tail])==null){
+        final int head;
+        switch(Integer.signum(tail-(head=this.head))){
+          case 1:
+            return nonfragmentedCeilingImpl(arr,head,tail-1,val);
+          default:
+            return fragmentedCeilingImpl(arr,head,tail-1,val);
+          case 0:
+        }
+      }else{
+        switch(Integer.signum(tmp.compareTo(val))){
+          case 1:
+            final int head;
+            switch(Integer.signum(tail-(head=this.head))){
+              case 1:
+                return nonfragmentedCeilingImpl(arr,head,tail-1,val);
+              default:
+                return fragmentedCeilingImpl(arr,head,tail-1,val);
+              case 0:
+            }
+           case 0:
             return (E)tmp;
+          default:
+        }
+      }
+    }
+    return null;
+  }
+  @SuppressWarnings("unchecked")
+  @Override public E higher(E val){
+    final int tail;
+    if(val!=null && (tail=this.tail)!=-1){
+      final Comparable<E>[] arr;
+      final Comparable<E> tmp;
+      if((tmp=(arr=this.arr)[tail])==null){
+        final int head;
+        switch(Integer.signum(tail-(head=this.head))){
+          case 1:
+            return nonfragmentedHigherImpl(arr,head,tail-1,val);
+          default:
+            return fragmentedHigherImpl(arr,head,tail-1,val);
+          case 0:
+        }
+      }else{
+        if(tmp.compareTo(val)>0){
+          final int head;
+          switch(Integer.signum(tail-(head=this.head))){
+            case 0:
+              return (E)tmp;
+            case 1:
+              return nonfragmentedHigherImpl(arr,head,tail-1,val);
+            default:
+              return fragmentedHigherImpl(arr,head,tail-1,val);
           }
+        }
       }
     }
     return null;
@@ -425,38 +617,25 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     final int tail;
     if((tail=this.tail)!=-1){
       if(val==null){
-        return (E)arr[head];
+        return (E)arr[tail];
       }
       final int head;
-      switch(Integer.signum(tail-(head=this.head))){
-        case 1:
-          return nonfragmentedFloorImpl(arr,head,tail,val);
-        default:
-          return fragmentedFloorImpl(arr,head,tail,val);
-        case 0:
-          final Comparable<E> tmp;
-          if((tmp=arr[head])!=null && tmp.compareTo(val)<=0){
+      final Comparable<E>[] arr;
+      final Comparable<E> tmp;
+      if((tmp=(arr=this.arr)[head=this.head])!=null){
+        switch(Integer.signum(tmp.compareTo(val))){
+          case -1:
+            switch(Integer.signum(tail-head)){
+              case 1:
+                return nonfragmentedFloorImpl(arr,head+1,tail,val);
+              default:
+                return fragmentedFloorImpl(arr,head+1,tail,val);
+              case 0:
+            }
+          case 0:
             return (E)tmp;
-          }
-      }
-    }
-    return null;
-  }
-  @SuppressWarnings("unchecked")
-  @Override public E higher(E val){
-    final int tail;
-    if(val!=null && (tail=this.tail)!=-1){
-      final int head;
-      switch(Integer.signum(tail-(head=this.head))){
-        case 1:
-          return nonfragmentedHigherImpl(arr,head,tail,val);
-        default:
-          return fragmentedHigherImpl(arr,head,tail,val);
-        case 0:
-          final Comparable<E> tmp;
-          if((tmp=arr[head])!=null && tmp.compareTo(val)>0){
-            return (E)tmp;
-          }
+          default:
+        }
       }
     }
     return null;
@@ -465,20 +644,33 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
   @Override public E lower(E val){
     final int tail;
     if((tail=this.tail)!=-1){
+      final var arr=this.arr;
+      final Comparable<E> tmp;
       if(val==null){
-        return (E)arr[tail];
-      }
-      final int head;
-      switch(Integer.signum(tail-(head=this.head))){
-        case 1:
-          return nonfragmentedLowerImpl(arr,head,tail,val);
-        default:
-          return fragmentedLowerImpl(arr,head,tail,val);
-        case 0:
-          final Comparable<E> tmp;
-          if((tmp=arr[head])!=null && tmp.compareTo(val)<0){
-            return (E)tmp;
+        if((tmp=arr[tail])==null){
+          switch(Integer.signum(tail-head)){
+            default:
+              if(tail==0){
+                return (E)arr[arr.length-1];
+              }
+            case 1:
+              return (E)arr[tail-1];
+            case 0:
           }
+        }
+        return (E)tmp;
+      }else{
+        final int head;
+        if((tmp=arr[head=this.head])!=null && tmp.compareTo(val)<0){
+          switch(Integer.signum(tail-head)){
+            case 0:
+              return (E)tmp;
+            case 1:
+              return nonfragmentedLowerImpl(arr,head+1,tail,val);
+            default:
+              return fragmentedLowerImpl(arr,head+1,tail,val);
+          }
+        }
       }
     }
     return null;
