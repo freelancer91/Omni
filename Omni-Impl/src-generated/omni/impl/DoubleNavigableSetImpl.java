@@ -1,4 +1,5 @@
 package omni.impl;
+import java.util.function.IntFunction;
 import java.io.Serializable;
 import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
@@ -487,9 +488,63 @@ public abstract class DoubleNavigableSetImpl
     AscendingFullView(DoubleUntetheredArrSeq root){
       super(root);
     }
-    @Override public void forEach(Consumer<? super Double> action){
+    @Override public <T> T[] toArray(T[] arr){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public DoubleComparator comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble headSet(double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble tailSet(double fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble subSet(double fromElement, double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble headSet(Double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble tailSet(Double fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble subSet(Double fromElement,Double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double firstDouble(){
+      final DoubleUntetheredArrSeq root;
+      return(double)(root=this.root).arr[root.head];
+    }
+    @Override public double lastDouble(){
+      final DoubleUntetheredArrSeq root;
+      return(double)(root=this.root).arr[root.tail];
+    }
+    @Override public void forEach(DoubleConsumer action){
+      final DoubleUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.ascendingForEach(root.head,tail,action);
+      }
+    }
+    @Override public void forEach(Consumer<? super Double> action){
+      final DoubleUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.ascendingForEach(root.head,tail,action::accept);
+      }
     }
     @Override public OmniIterator.OfDouble iterator(){
       //TODO
@@ -537,9 +592,63 @@ public abstract class DoubleNavigableSetImpl
     DescendingFullView(DoubleUntetheredArrSeq root){
       super(root);
     }
-    @Override public void forEach(Consumer<? super Double> action){
+    @Override public <T> T[] toArray(T[] arr){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public DoubleComparator comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble headSet(double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble tailSet(double fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble subSet(double fromElement, double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble headSet(Double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble tailSet(Double fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfDouble subSet(Double fromElement,Double toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public double firstDouble(){
+      final DoubleUntetheredArrSeq root;
+      return(double)(root=this.root).arr[root.tail];
+    }
+    @Override public double lastDouble(){
+      final DoubleUntetheredArrSeq root;
+      return(double)(root=this.root).arr[root.head];
+    }
+    @Override public void forEach(DoubleConsumer action){
+      final DoubleUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.descendingForEach(root.head,tail,action);
+      }
+    }
+    @Override public void forEach(Consumer<? super Double> action){
+      final DoubleUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.descendingForEach(root.head,tail,action::accept);
+      }
     }
     @Override public OmniIterator.OfDouble iterator(){
       //TODO
@@ -553,7 +662,7 @@ public abstract class DoubleNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new double[size],0,size);
         }else{
           final double[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
@@ -571,7 +680,7 @@ public abstract class DoubleNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new Double[size],0,size);
         }else{
           final double[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Double[size+=arr.length],tail,size-tail);
@@ -712,7 +821,7 @@ public abstract class DoubleNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new double[size],0,size);
           }else{
             final double[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
@@ -729,7 +838,7 @@ public abstract class DoubleNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Double[size],0,size);
           }else{
             final double[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Double[size+=arr.length],tail,size-tail);

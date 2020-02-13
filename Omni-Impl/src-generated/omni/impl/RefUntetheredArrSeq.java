@@ -57,20 +57,34 @@ abstract class RefUntetheredArrSeq<E> implements OmniCollection.OfRef<E>,Externa
       ascendingForEach(this.head,tail,action);
     }
   }
+Object[] uncheckedAscendingToRefArray(int head,int tail){
+  final Object[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new Object[size],0,size);
+  }else{
+    final Object[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Object[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+Object[] uncheckedDescendingToRefArray(int head,int tail){
+  final Object[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Object[size],0,size);
+  }else{
+    final Object[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Object[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
   @Override public Object[] toArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      Object[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Object[size],0,size);
-      }else{
-        final Object[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Object[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToRefArray(head,tail);
     }
     return OmniArray.OfRef.DEFAULT_ARR;
   }

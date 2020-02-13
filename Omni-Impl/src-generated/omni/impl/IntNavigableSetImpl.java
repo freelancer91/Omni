@@ -1,4 +1,5 @@
 package omni.impl;
+import java.util.function.IntFunction;
 import java.io.Serializable;
 import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
@@ -202,9 +203,63 @@ public abstract class IntNavigableSetImpl
     AscendingFullView(IntUntetheredArrSeq root){
       super(root);
     }
-    @Override public void forEach(Consumer<? super Integer> action){
+    @Override public <T> T[] toArray(T[] arr){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public IntComparator comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt headSet(int toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt tailSet(int fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt subSet(int fromElement, int toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt headSet(Integer toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt tailSet(Integer fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt subSet(Integer fromElement,Integer toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int firstInt(){
+      final IntUntetheredArrSeq root;
+      return(int)(root=this.root).arr[root.head];
+    }
+    @Override public int lastInt(){
+      final IntUntetheredArrSeq root;
+      return(int)(root=this.root).arr[root.tail];
+    }
+    @Override public void forEach(IntConsumer action){
+      final IntUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.ascendingForEach(root.head,tail,action);
+      }
+    }
+    @Override public void forEach(Consumer<? super Integer> action){
+      final IntUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.ascendingForEach(root.head,tail,action::accept);
+      }
     }
     @Override public OmniIterator.OfInt iterator(){
       //TODO
@@ -306,9 +361,63 @@ public abstract class IntNavigableSetImpl
     DescendingFullView(IntUntetheredArrSeq root){
       super(root);
     }
-    @Override public void forEach(Consumer<? super Integer> action){
+    @Override public <T> T[] toArray(T[] arr){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public IntComparator comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt headSet(int toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt tailSet(int fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt subSet(int fromElement, int toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt headSet(Integer toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt tailSet(Integer fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfInt subSet(Integer fromElement,Integer toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public int firstInt(){
+      final IntUntetheredArrSeq root;
+      return(int)(root=this.root).arr[root.tail];
+    }
+    @Override public int lastInt(){
+      final IntUntetheredArrSeq root;
+      return(int)(root=this.root).arr[root.head];
+    }
+    @Override public void forEach(IntConsumer action){
+      final IntUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.descendingForEach(root.head,tail,action);
+      }
+    }
+    @Override public void forEach(Consumer<? super Integer> action){
+      final IntUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.descendingForEach(root.head,tail,action::accept);
+      }
     }
     @Override public OmniIterator.OfInt iterator(){
       //TODO
@@ -322,7 +431,7 @@ public abstract class IntNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new int[size],0,size);
         }else{
           final int[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new int[size+=arr.length],tail,size-tail);
@@ -340,7 +449,7 @@ public abstract class IntNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Integer[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new Integer[size],0,size);
         }else{
           final int[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Integer[size+=arr.length],tail,size-tail);
@@ -358,7 +467,7 @@ public abstract class IntNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new double[size],0,size);
         }else{
           final int[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
@@ -376,7 +485,7 @@ public abstract class IntNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new float[size],0,size);
         }else{
           final int[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
@@ -394,7 +503,7 @@ public abstract class IntNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new long[size],0,size);
         }else{
           final int[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new long[size+=arr.length],tail,size-tail);
@@ -535,7 +644,7 @@ public abstract class IntNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new int[size],0,size);
           }else{
             final int[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new int[size+=arr.length],tail,size-tail);
@@ -552,7 +661,7 @@ public abstract class IntNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Integer[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Integer[size],0,size);
           }else{
             final int[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Integer[size+=arr.length],tail,size-tail);
@@ -569,7 +678,7 @@ public abstract class IntNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new double[size],0,size);
           }else{
             final int[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
@@ -586,7 +695,7 @@ public abstract class IntNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new float[size],0,size);
           }else{
             final int[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
@@ -603,7 +712,7 @@ public abstract class IntNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new long[size],0,size);
           }else{
             final int[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);

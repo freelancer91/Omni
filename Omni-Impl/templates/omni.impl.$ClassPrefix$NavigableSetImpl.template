@@ -6,6 +6,7 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfComparable
 package omni.impl;
+import java.util.function.IntFunction;
 import java.io.Serializable;
 import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
@@ -1560,10 +1561,101 @@ public abstract class $ClassPrefix$NavigableSetImpl
 DIRECTIONFullView($ClassPrefix$UntetheredArrSeq$<E>$ root){
   super(root);
 }
-#IFNOT OfComparable
-@Override public void forEach(Consumer<? super $BoxedType$> action){
+
+@Override public <T> T[] toArray(T[] arr){
   //TODO
   throw new omni.util.NotYetImplementedException();
+}
+@Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public $TypeNameModifier$Comparator$<E>$ comparator(){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#IF OfComparable
+@Override public OmniSortedSet.OfRef$<E>$ headSet($exposedType$ toElement){
+#ELSE
+@Override public OmniSortedSet.Of$ClassPrefix$$<E>$ headSet($exposedType$ toElement){
+#ENDIF
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#IF OfComparable
+@Override public OmniSortedSet.OfRef$<E>$ tailSet($exposedType$ fromElement){
+#ELSE
+@Override public OmniSortedSet.Of$ClassPrefix$$<E>$ tailSet($exposedType$ fromElement){
+#ENDIF
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#IF OfComparable
+@Override public OmniSortedSet.OfRef$<E>$ subSet($exposedType$ fromElement, $exposedType$ toElement){
+#ELSE
+@Override public OmniSortedSet.Of$ClassPrefix$$<E>$ subSet($exposedType$ fromElement, $exposedType$ toElement){
+#ENDIF
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#IFNOT OfComparable
+@Override public OmniSortedSet.Of$ClassPrefix$$<E>$ headSet($BoxedType$ toElement){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public OmniSortedSet.Of$ClassPrefix$$<E>$ tailSet($BoxedType$ fromElement){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+@Override public OmniSortedSet.Of$ClassPrefix$$<E>$ subSet($BoxedType$ fromElement,$BoxedType$ toElement){
+  //TODO
+  throw new omni.util.NotYetImplementedException();
+}
+#ENDIF
+#IF OfComparable
+@SuppressWarnings("unchecked")
+#ENDIF
+@Override public $exposedType$ first$TypeNameModifier$(){
+  final $ClassPrefix$UntetheredArrSeq$<E>$ root;
+#IFSWITCH DIRECTION==Ascending
+  return($exposedType$)(root=this.root).arr[root.head];
+#ELSE
+  return($exposedType$)(root=this.root).arr[root.tail];
+#ENDIF
+}
+#IF OfComparable
+@SuppressWarnings("unchecked")
+#ENDIF
+@Override public $exposedType$ last$TypeNameModifier$(){
+  final $ClassPrefix$UntetheredArrSeq$<E>$ root;
+#IFSWITCH DIRECTION==Ascending
+  return($exposedType$)(root=this.root).arr[root.tail];
+#ELSE
+  return($exposedType$)(root=this.root).arr[root.head];
+#ENDIF
+}
+@Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
+  final $ClassPrefix$UntetheredArrSeq$<E>$ root;
+  int tail;
+  if((tail=(root=this.root).tail)!=-1){
+#IFSWITCH DIRECTION==Ascending
+    root.ascendingForEach(root.head,tail,action);
+#ELSE
+    root.descendingForEach(root.head,tail,action);
+#ENDIF
+  }
+}
+#IFNOT OfComparable
+@Override public void forEach(Consumer<? super $BoxedType$> action){
+  final $ClassPrefix$UntetheredArrSeq$<E>$ root;
+  int tail;
+  if((tail=(root=this.root).tail)!=-1){
+#IFSWITCH DIRECTION==Ascending
+    root.ascendingForEach(root.head,tail,action::accept);
+#ELSE
+    root.descendingForEach(root.head,tail,action::accept);
+#ENDIF
+  }
 }
 #ENDIF
 #IF OfComparable
@@ -1751,6 +1843,19 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
 #ENDIF
 #ENDDEF
 #MACRODEF ToArray<SOURCE,DSTARR>(TYPENAMEMODIFIER,DEFAULTARR)
+#IFSWITCH SOURCE==this
+  #IFSWITCH DIRECTION==Descending
+    #IF OfComparable
+@SuppressWarnings("unchecked")
+    #ENDIF
+@Override public DSTARR[] toTYPENAMEMODIFIERArray(){
+  
+}
+  #ENDIF
+#ELSE
+
+#ENDIF
+
 #IF OfComparable
   @SuppressWarnings("unchecked")
 #ENDIF
@@ -1774,9 +1879,9 @@ public DIRECTION(int head,$ArrayType$[] arr,int tail){
   #ENDIF
 #ELSE
   #IF OfComparable
-      ArrCopy.uncheckedReverseCopy(arr=SOURCE.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+      ArrCopy.uncheckedReverseCopy(SOURCE.arr,head,dst=new Comparable[size],0,size);
   #ELSE
-      ArrCopy.uncheckedReverseCopy(arr=SOURCE.arr,head,dst=new DSTARR[size+=arr.length],tail,size-tail);
+      ArrCopy.uncheckedReverseCopy(SOURCE.arr,head,dst=new DSTARR[size],0,size);
   #ENDIF
 #ENDIF
     }else{

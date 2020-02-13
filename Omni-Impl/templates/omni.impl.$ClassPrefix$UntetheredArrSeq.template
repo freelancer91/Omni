@@ -65,6 +65,7 @@ abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$C
     super();
     this.tail=-1;
   }
+  
 #IFNOT OfBoolean,OfByte,OfRef
 #IF OfComparable
   static abstract class AbstractFullView<E extends Comparable<E>> implements OmniCollection.OfRef$<E>$
@@ -88,12 +89,152 @@ abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$C
     @Override public boolean add($exposedType$ key){
       return root.add(key);
     }
+#IF OfInt,OfLong,OfShort
+    @Override public boolean add(byte key){
+      return root.add(key);
+    }
+#ENDIF
+#IF OfFloat,OfLong,OfInt
+    @Override public boolean add(char key){
+      return root.add(key);
+    }
+#ENDIF
+#IF OfFloat
+    @Override public boolean add(short key){
+      return root.add(key);
+    }
+#ENDIF
+#IF OfDouble
+    @Override public boolean add(float key){
+      return root.add(key);
+    }
+#ENDIF
+#IF OfDouble,OfFloat,OfLong
+    @Override public boolean add(int key){
+      return root.add(key);
+    }
+#ENDIF
+#IF OfDouble,OfFloat
+    @Override public boolean add(long key){
+      return root.add(key);
+    }
+#ENDIF
 #IFNOT OfComparable
     @Override public boolean add($BoxedType$ key){
       return root.add(($exposedType$)key);
     }
     @Override public boolean add(boolean key){
       return root.add(key);
+    }
+#ENDIF
+    @Override public boolean contains(Object val){
+      return root.contains(val);
+    }
+    @Override public boolean remove(Object val){
+      return root.remove(val);
+    }
+    @Override public boolean contains(boolean val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(boolean val){
+      return root.removeVal(val);
+    }
+#IF OfChar,OfComparable,OfInt,OfLong,OfShort
+    @Override public boolean contains(byte val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(byte val){
+      return root.removeVal(val);
+    }
+#ENDIF
+#IF OfChar,OfComparable,OfFloat,OfInt,OfLong,OfShort
+    @Override public boolean contains(char val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(char val){
+      return root.removeVal(val);
+    }
+#ENDIF
+#IF OfChar,OfComparable,OfFloat,OfShort
+    @Override public boolean contains(short val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(short val){
+      return root.removeVal(val);
+    }
+#ENDIF
+    @Override public boolean contains(int val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(int val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(long val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(long val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(float val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(float val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(double val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(double val){
+      return root.removeVal(val);
+    }
+#IF OfComparable
+    @Override public boolean contains(Boolean val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Boolean val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Byte val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Byte val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Character val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Character val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Short val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Short val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Integer val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Integer val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Long val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Long val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Float val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Float val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Double val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Double val){
+      return root.removeVal(val);
     }
 #ENDIF
     @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
@@ -157,6 +298,34 @@ abstract class $ClassPrefix$UntetheredArrSeq$<E>$ implements OmniCollection.Of$C
       ascendingForEach(this.head,tail,action::accept);
     }
   }
+#ENDIF
+#IF OfComparable
+#MACRO UncheckedToArrayImpl(Ref,$ArrayType$)
+#ELSE
+#MACRO UncheckedToArrayImpl(Ref,Object)
+#ENDIF
+#IFNOT OfComparable,OfRef
+#MACRO UncheckedToArrayImpl(,$BoxedType$)
+#MACRO UncheckedToArrayImpl($TypeNameModifier$,$ArrayType$)
+  #IFNOT OfDouble
+#MACRO UncheckedToArrayImpl(Double,double)
+    #IFNOT OfFloat
+#MACRO UncheckedToArrayImpl(Float,float)
+      #IFNOT OfLong
+#MACRO UncheckedToArrayImpl(Long,long)
+        #IFNOT OfInt
+#MACRO UncheckedToArrayImpl(Int,int)
+          #IFNOT OfShort,OfChar
+#MACRO UncheckedToArrayImpl(Short,short)
+          #ENDIF
+          #IFNOT OfShort,OfChar,OfByte
+#MACRO UncheckedToArrayImpl(Char,char)
+#MACRO UncheckedToArrayImpl(Byte,byte)
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
 #ENDIF
 #IF OfComparable
   #MACRO ToArray<$ArrayType$>($TypeNameModifier$,($ArrayType$[])OmniArray.OfRef.DEFAULT_COMPARABLE_ARR)
@@ -1430,8 +1599,6 @@ public RETTYPE pollLastMETHODSUFFIX(){
       --tail;
     }
   }
-
-
 #IF OfBoolean
   void fragmentedRemoveIfHelper($ArrayType$[] arr,int head,int tail,$ArrayType$ retainThis){
     int count=1;
@@ -2349,6 +2516,48 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
   return true;
 }
 #ENDDEF
+#MACRODEF UncheckedToArrayImpl(TYPENAMEMODIFIER,DSTARR)
+DSTARR[] uncheckedAscendingToTYPENAMEMODIFIERArray(int head,int tail){
+  final DSTARR[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+#IF OfComparable
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new Comparable[size],0,size);
+#ELSE
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new DSTARR[size],0,size);
+#ENDIF
+  }else{
+    final $ArrayType$[] arr;
+#IF OfComparable
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],0,size-=tail);
+#ELSE
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new DSTARR[size+=arr.length],0,size-=tail);
+#ENDIF
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+DSTARR[] uncheckedDescendingToTYPENAMEMODIFIERArray(int head,int tail){
+  final DSTARR[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+#IF OfComparable
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Comparable[size],0,size);
+#ELSE
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new DSTARR[size],0,size);
+#ENDIF
+  }else{
+    final $ArrayType$[] arr;
+#IF OfComparable
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+#ELSE
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new DSTARR[size+=arr.length],tail,size-tail);
+#ENDIF
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
+#ENDDEF
 #MACRODEF ToArray<DSTARR>(TYPENAMEMODIFIER,DEFAULTARR)
 #IF OfComparable
   @SuppressWarnings("unchecked")
@@ -2356,24 +2565,11 @@ boolean nonfragmentedInsertHi($ArrayType$[] arr,int lo,int tail,$exposedType$ ke
 @Override public DSTARR[] toTYPENAMEMODIFIERArray(){
   int tail;
   if((tail=this.tail)!=-1){
-    DSTARR[] dst;
-    final int head;
-      int size;
-    if((size=(++tail)-(head=this.head))>0){
-  #IF OfComparable
-      ArrCopy.uncheckedCopy(this.arr,head,dst=new Comparable[size],0,size);
-    }else{
-      final $ArrayType$[] arr;
-      ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],0,size-=tail);
+  #IF OfComparable,OfRef
+    return uncheckedAscendingToRefArray(head,tail);
   #ELSE
-      ArrCopy.uncheckedCopy(this.arr,head,dst=new DSTARR[size],0,size);
-    }else{
-      final $ArrayType$[] arr;
-      ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new DSTARR[size+=arr.length],0,size-=tail);
+    return uncheckedAscendingToTYPENAMEMODIFIERArray(head,tail);
   #ENDIF
-      ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-    }
-    return dst;
   }
   return DEFAULTARR;
 }

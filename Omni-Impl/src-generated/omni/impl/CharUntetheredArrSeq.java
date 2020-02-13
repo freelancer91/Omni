@@ -53,6 +53,60 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
     @Override public boolean add(boolean key){
       return root.add(key);
     }
+    @Override public boolean contains(Object val){
+      return root.contains(val);
+    }
+    @Override public boolean remove(Object val){
+      return root.remove(val);
+    }
+    @Override public boolean contains(boolean val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(boolean val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(byte val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(byte val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(char val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(char val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(short val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(short val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(int val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(int val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(long val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(long val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(float val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(float val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(double val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(double val){
+      return root.removeVal(val);
+    }
     @Override public boolean removeIf(CharPredicate filter){
       return root.removeIf(filter);
     }
@@ -101,105 +155,213 @@ abstract class CharUntetheredArrSeq implements OmniCollection.OfChar,Externaliza
       ascendingForEach(this.head,tail,action::accept);
     }
   }
+Object[] uncheckedAscendingToRefArray(int head,int tail){
+  final Object[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new Object[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Object[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+Object[] uncheckedDescendingToRefArray(int head,int tail){
+  final Object[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Object[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Object[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
+Character[] uncheckedAscendingToArray(int head,int tail){
+  final Character[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new Character[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Character[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+Character[] uncheckedDescendingToArray(int head,int tail){
+  final Character[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Character[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Character[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
+char[] uncheckedAscendingToCharArray(int head,int tail){
+  final char[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new char[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new char[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+char[] uncheckedDescendingToCharArray(int head,int tail){
+  final char[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new char[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new char[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
+double[] uncheckedAscendingToDoubleArray(int head,int tail){
+  final double[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+double[] uncheckedDescendingToDoubleArray(int head,int tail){
+  final double[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new double[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
+float[] uncheckedAscendingToFloatArray(int head,int tail){
+  final float[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+float[] uncheckedDescendingToFloatArray(int head,int tail){
+  final float[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new float[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
+long[] uncheckedAscendingToLongArray(int head,int tail){
+  final long[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new long[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new long[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+long[] uncheckedDescendingToLongArray(int head,int tail){
+  final long[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new long[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new long[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
+int[] uncheckedAscendingToIntArray(int head,int tail){
+  final int[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new int[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new int[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+int[] uncheckedDescendingToIntArray(int head,int tail){
+  final int[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new int[size],0,size);
+  }else{
+    final char[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new int[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
   @Override public char[] toCharArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      char[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new char[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new char[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToCharArray(head,tail);
     }
     return OmniArray.OfChar.DEFAULT_ARR;
   }
   @Override public Character[] toArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      Character[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Character[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Character[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToArray(head,tail);
     }
     return OmniArray.OfChar.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      double[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new double[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new double[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToDoubleArray(head,tail);
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
   @Override public float[] toFloatArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      float[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new float[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new float[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToFloatArray(head,tail);
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
   @Override public long[] toLongArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      long[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new long[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new long[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToLongArray(head,tail);
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
   @Override public int[] toIntArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      int[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new int[size],0,size);
-      }else{
-        final char[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new int[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToIntArray(head,tail);
     }
     return OmniArray.OfInt.DEFAULT_ARR;
   }

@@ -45,6 +45,108 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
     @Override public boolean add(E key){
       return root.add(key);
     }
+    @Override public boolean contains(Object val){
+      return root.contains(val);
+    }
+    @Override public boolean remove(Object val){
+      return root.remove(val);
+    }
+    @Override public boolean contains(boolean val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(boolean val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(byte val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(byte val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(char val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(char val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(short val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(short val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(int val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(int val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(long val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(long val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(float val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(float val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(double val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(double val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Boolean val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Boolean val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Byte val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Byte val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Character val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Character val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Short val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Short val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Integer val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Integer val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Long val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Long val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Float val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Float val){
+      return root.removeVal(val);
+    }
+    @Override public boolean contains(Double val){
+      return root.contains(val);
+    }
+    @Override public boolean removeVal(Double val){
+      return root.removeVal(val);
+    }
     @Override public boolean removeIf(Predicate<? super E> filter){
       return root.removeIf(filter);
     }
@@ -80,21 +182,35 @@ abstract class ComparableUntetheredArrSeq<E extends Comparable<E>> implements Om
       ascendingForEach(this.head,tail,action);
     }
   }
+Comparable<E>[] uncheckedAscendingToRefArray(int head,int tail){
+  final Comparable<E>[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedCopy(this.arr,head,dst=new Comparable[size],0,size);
+  }else{
+    final Comparable<E>[] arr;
+    ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],0,size-=tail);
+    ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+  }
+  return dst;
+}
+Comparable<E>[] uncheckedDescendingToRefArray(int head,int tail){
+  final Comparable<E>[] dst;
+  int size;
+  if((size=(++tail)-head)>0){
+    ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Comparable[size],0,size);
+  }else{
+    final Comparable<E>[] arr;
+    ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,tail);
+  }
+  return dst;
+}
     @SuppressWarnings("unchecked")
   @Override public Comparable<E>[] toArray(){
     int tail;
     if((tail=this.tail)!=-1){
-      Comparable<E>[] dst;
-      final int head;
-        int size;
-      if((size=(++tail)-(head=this.head))>0){
-        ArrCopy.uncheckedCopy(this.arr,head,dst=new Comparable[size],0,size);
-      }else{
-        final Comparable<E>[] arr;
-        ArrCopy.uncheckedCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],0,size-=tail);
-        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
-      }
-      return dst;
+      return uncheckedAscendingToRefArray(head,tail);
     }
     return (Comparable<E>[])OmniArray.OfRef.DEFAULT_COMPARABLE_ARR;
   }

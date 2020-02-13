@@ -1,4 +1,5 @@
 package omni.impl;
+import java.util.function.IntFunction;
 import java.io.Serializable;
 import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
@@ -378,6 +379,47 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     AscendingFullView(ComparableUntetheredArrSeq<E> root){
       super(root);
     }
+    @Override public <T> T[] toArray(T[] arr){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Comparator<E> comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfRef<E> headSet(E toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfRef<E> tailSet(E fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfRef<E> subSet(E fromElement, E toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @SuppressWarnings("unchecked")
+    @Override public E first(){
+      final ComparableUntetheredArrSeq<E> root;
+      return(E)(root=this.root).arr[root.head];
+    }
+    @SuppressWarnings("unchecked")
+    @Override public E last(){
+      final ComparableUntetheredArrSeq<E> root;
+      return(E)(root=this.root).arr[root.tail];
+    }
+    @Override public void forEach(Consumer<? super E> action){
+      final ComparableUntetheredArrSeq<E> root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.ascendingForEach(root.head,tail,action);
+      }
+    }
     @Override public OmniIterator.OfRef<E> iterator(){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -407,6 +449,47 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
     DescendingFullView(ComparableUntetheredArrSeq<E> root){
       super(root);
     }
+    @Override public <T> T[] toArray(T[] arr){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public Comparator<E> comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfRef<E> headSet(E toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfRef<E> tailSet(E fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfRef<E> subSet(E fromElement, E toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @SuppressWarnings("unchecked")
+    @Override public E first(){
+      final ComparableUntetheredArrSeq<E> root;
+      return(E)(root=this.root).arr[root.tail];
+    }
+    @SuppressWarnings("unchecked")
+    @Override public E last(){
+      final ComparableUntetheredArrSeq<E> root;
+      return(E)(root=this.root).arr[root.head];
+    }
+    @Override public void forEach(Consumer<? super E> action){
+      final ComparableUntetheredArrSeq<E> root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.descendingForEach(root.head,tail,action);
+      }
+    }
     @Override public OmniIterator.OfRef<E> iterator(){
       //TODO
       throw new omni.util.NotYetImplementedException();
@@ -420,7 +503,7 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new Comparable[size],0,size);
         }else{
           final Comparable<E>[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
@@ -544,7 +627,7 @@ public abstract class ComparableNavigableSetImpl<E extends Comparable<E>>
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Comparable[size],0,size);
           }else{
             final Comparable<E>[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Comparable[size+=arr.length],tail,size-tail);

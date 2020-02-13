@@ -1,4 +1,5 @@
 package omni.impl;
+import java.util.function.IntFunction;
 import java.io.Serializable;
 import omni.api.OmniSortedSet;
 import omni.util.ArrCopy;
@@ -549,9 +550,63 @@ public abstract class FloatNavigableSetImpl
     AscendingFullView(FloatUntetheredArrSeq root){
       super(root);
     }
-    @Override public void forEach(Consumer<? super Float> action){
+    @Override public <T> T[] toArray(T[] arr){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public FloatComparator comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat headSet(float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat tailSet(float fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat subSet(float fromElement, float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat headSet(Float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat tailSet(Float fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat subSet(Float fromElement,Float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float firstFloat(){
+      final FloatUntetheredArrSeq root;
+      return(float)(root=this.root).arr[root.head];
+    }
+    @Override public float lastFloat(){
+      final FloatUntetheredArrSeq root;
+      return(float)(root=this.root).arr[root.tail];
+    }
+    @Override public void forEach(FloatConsumer action){
+      final FloatUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.ascendingForEach(root.head,tail,action);
+      }
+    }
+    @Override public void forEach(Consumer<? super Float> action){
+      final FloatUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.ascendingForEach(root.head,tail,action::accept);
+      }
     }
     @Override public OmniIterator.OfFloat iterator(){
       //TODO
@@ -617,9 +672,63 @@ public abstract class FloatNavigableSetImpl
     DescendingFullView(FloatUntetheredArrSeq root){
       super(root);
     }
-    @Override public void forEach(Consumer<? super Float> action){
+    @Override public <T> T[] toArray(T[] arr){
       //TODO
       throw new omni.util.NotYetImplementedException();
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public FloatComparator comparator(){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat headSet(float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat tailSet(float fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat subSet(float fromElement, float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat headSet(Float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat tailSet(Float fromElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public OmniSortedSet.OfFloat subSet(Float fromElement,Float toElement){
+      //TODO
+      throw new omni.util.NotYetImplementedException();
+    }
+    @Override public float firstFloat(){
+      final FloatUntetheredArrSeq root;
+      return(float)(root=this.root).arr[root.tail];
+    }
+    @Override public float lastFloat(){
+      final FloatUntetheredArrSeq root;
+      return(float)(root=this.root).arr[root.head];
+    }
+    @Override public void forEach(FloatConsumer action){
+      final FloatUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.descendingForEach(root.head,tail,action);
+      }
+    }
+    @Override public void forEach(Consumer<? super Float> action){
+      final FloatUntetheredArrSeq root;
+      int tail;
+      if((tail=(root=this.root).tail)!=-1){
+        root.descendingForEach(root.head,tail,action::accept);
+      }
     }
     @Override public OmniIterator.OfFloat iterator(){
       //TODO
@@ -633,7 +742,7 @@ public abstract class FloatNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new float[size],0,size);
         }else{
           final float[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new float[size+=arr.length],tail,size-tail);
@@ -651,7 +760,7 @@ public abstract class FloatNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Float[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new Float[size],0,size);
         }else{
           final float[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new Float[size+=arr.length],tail,size-tail);
@@ -669,7 +778,7 @@ public abstract class FloatNavigableSetImpl
         final int head;
         int size;
         if((size=(++tail)-(head=root.head))>0){
-          ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+          ArrCopy.uncheckedReverseCopy(root.arr,head,dst=new double[size],0,size);
         }else{
           final float[] arr;
           ArrCopy.uncheckedReverseCopy(arr=root.arr,head,dst=new double[size+=arr.length],tail,size-tail);
@@ -810,7 +919,7 @@ public abstract class FloatNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new float[size],0,size);
           }else{
             final float[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new float[size+=arr.length],tail,size-tail);
@@ -827,7 +936,7 @@ public abstract class FloatNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Float[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new Float[size],0,size);
           }else{
             final float[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new Float[size+=arr.length],tail,size-tail);
@@ -844,7 +953,7 @@ public abstract class FloatNavigableSetImpl
           final int head;
           int size;
           if((size=(++tail)-(head=this.head))>0){
-            ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
+            ArrCopy.uncheckedReverseCopy(this.arr,head,dst=new double[size],0,size);
           }else{
             final float[] arr;
             ArrCopy.uncheckedReverseCopy(arr=this.arr,head,dst=new double[size+=arr.length],tail,size-tail);
